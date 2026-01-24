@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 import { WebSocketServer, type WebSocket } from "ws";
 import type { ExtensionAPI, ExtensionContext, SessionEntry } from "@mariozechner/pi-coding-agent";
 
+import { scanSessions, groupByProject, findForkRelationships } from "./lib/analyzer.js";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // WebSocket message types
@@ -278,12 +280,25 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
       }
 
       case "list_sessions": {
-        // This would need access to session directory scanning
-        // For now, return empty list
-        ws.send(JSON.stringify({
-          type: "response",
-          data: { sessions: [] },
-        }));
+        try {
+          const sessions = await scanSessions();
+          const projects = groupByProject(sessions);
+          const forks = findForkRelationships(sessions);
+          
+          ws.send(JSON.stringify({
+            type: "response",
+            data: { 
+              projects,
+              forks,
+              totalSessions: sessions.length
+            },
+          }));
+        } catch (err) {
+          ws.send(JSON.stringify({
+            type: "error",
+            data: { message: `Failed to list sessions: ${err}` },
+          }));
+        }
         break;
       }
     }

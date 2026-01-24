@@ -37,10 +37,13 @@ class Dashboard {
       forkBtn: document.getElementById('fork-btn'),
       closeDetailsBtn: document.getElementById('close-details'),
       searchInput: document.getElementById('search'),
+      refreshBtn: document.getElementById('refresh-btn'),
+      sessionList: document.getElementById('session-list'),
     };
   }
 
   bindEvents() {
+    this.elements.refreshBtn.addEventListener('click', () => this.fetchSessions());
     this.elements.expandAllBtn.addEventListener('click', () => this.expandAll());
     this.elements.collapseAllBtn.addEventListener('click', () => this.collapseAll());
     this.elements.zoomToLeafBtn.addEventListener('click', () => this.zoomToLeaf());
@@ -68,6 +71,7 @@ class Dashboard {
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
       this.updateConnectionStatus('connected');
+      this.fetchSessions();
     };
     
     this.ws.onclose = () => {
@@ -116,6 +120,16 @@ class Dashboard {
     el.querySelector('.status-text').textContent = texts[status] || status;
   }
 
+  fetchSessions() {
+    this.sendCommand({ type: 'list_sessions' });
+    this.elements.sessionList.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Scanning sessions...</p>
+      </div>
+    `;
+  }
+
   // Message handlers
   handleMessage(message) {
     switch (message.type) {
@@ -132,11 +146,110 @@ class Dashboard {
         this.onAgentStatus(message.data);
         break;
       case 'response':
-        // Handle command responses
+        if (message.data && message.data.projects) {
+          this.renderSessionList(message.data.projects, message.data.forks);
+        }
         break;
       case 'error':
         console.error('Server error:', message.data?.message);
         break;
+    }
+  }
+
+  renderSessionList(projects, forks) {
+    const el = this.elements.sessionList;
+    if (!projects || projects.length === 0) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <p>No sessions found</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    
+    // Group forks by parent for quick lookup
+    const forksByParent = new Map();
+    if (forks) {
+      for (const fork of forks) {
+        if (!forksByParent.has(fork.parentPath)) {
+          forksByParent.set(fork.parentPath, []);
+        }
+        forksByParent.get(fork.parentPath).push(fork);
+      }
+    }
+
+    for (const project of projects) {
+      const projectName = project.cwd.split('/').pop() || project.cwd;
+      
+      html += `
+        <div class="project-group">
+          <div class="project-header" title="${this.escapeHtml(project.cwd)}">
+            <span class="project-icon">📁</span>
+            <span class="project-name">${this.escapeHtml(projectName)}</span>
+            <span class="project-count">${project.sessions.length}</span>
+          </div>
+          <div class="project-sessions">
+      `;
+      
+      for (const session of project.sessions) {
+        const isCurrent = this.sessionData && this.sessionData.sessionFile === session.path;
+        const date = new Date(session.header.timestamp);
+        const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const name = session.name || session.path.split('/').pop();
+        
+        // Check if this session is a parent of others (has forks)
+        const childForks = forksByParent.get(session.path);
+        const forkBadge = childForks ? `<span class="fork-badge" title="${childForks.length} forks">⑂ ${childForks.length}</span>` : '';
+        
+        // Check if this session is a fork itself
+        const parentBadge = session.header.parentSession ? `<span class="fork-source" title="Forked from another session">↳</span>` : '';
+        
+        // Topics
+        const topicsHtml = session.topics && session.topics.length > 0 
+          ? `<div class="session-topics">${session.topics.map(t => `<span class="topic-tag">${this.escapeHtml(t)}</span>`).join('')}</div>`
+          : '';
+
+        html += `
+          <div class="session-item ${isCurrent ? 'active' : ''}" data-path="${this.escapeHtml(session.path)}">
+            <div class="session-main">
+              ${parentBadge}
+              <span class="session-name">${this.escapeHtml(name)}</span>
+              ${forkBadge}
+            </div>
+            <div class="session-meta">
+              <span class="session-time">${timeStr}</span>
+              <span class="session-entries">${session.stats.entryCount} entries</span>
+            </div>
+            ${topicsHtml}
+            ${session.firstMessage ? `<div class="session-preview">${this.escapeHtml(session.firstMessage)}</div>` : ''}
+          </div>
+        `;
+      }
+      
+      html += `</div></div>`;
+    }
+    
+    el.innerHTML = html;
+    
+    // Bind click events
+    el.querySelectorAll('.session-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const path = item.dataset.path;
+        if (path && (!this.sessionData || this.sessionData.sessionFile !== path)) {
+          this.switchSession(path);
+        }
+      });
+    });
+  }
+
+  switchSession(path) {
+    if (confirm('Switch to this session?')) {
+      this.sendCommand({
+        type: 'switch_session',
+        sessionPath: path,
+      });
     }
   }
 
