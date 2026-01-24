@@ -1,0 +1,20 @@
+{
+  "name": "pi-tree-viz-dashboard",
+  "version": "0.1.0",
+  "description": "Pi extension for live session tree visualization dashboard",
+  "type": "module",
+  "dependencies": {
+    "open": "^11.0.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.2"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

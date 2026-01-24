@@ -1,0 +1,319 @@
+/**
+ * HTTP + WebSocket server for the dashboard
+ */
+
+import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { join, dirname } from "node:path";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { WebSocketServer, type WebSocket } from "ws";
+import type { ExtensionAPI, ExtensionContext, SessionEntry } from "@mariozechner/pi-coding-agent";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// WebSocket message types
+export interface WsMessage {
+  type: string;
+  data?: unknown;
+  id?: string;
+}
+
+export interface SessionStateMessage extends WsMessage {
+  type: "session_state";
+  data: {
+    sessionFile: string | null;
+    sessionId: string | null;
+    entries: SessionEntry[];
+    branch: SessionEntry[];
+    leafId: string | null;
+    isStreaming: boolean;
+  };
+}
+
+export interface EntryAddedMessage extends WsMessage {
+  type: "entry_added";
+  data: SessionEntry;
+}
+
+export interface LeafChangedMessage extends WsMessage {
+  type: "leaf_changed";
+  data: {
+    oldLeafId: string | null;
+    newLeafId: string | null;
+  };
+}
+
+export interface AgentStatusMessage extends WsMessage {
+  type: "agent_status";
+  data: {
+    isStreaming: boolean;
+    isCompacting: boolean;
+  };
+}
+
+// Incoming WebSocket commands
+export interface NavigateCommand {
+  type: "navigate";
+  entryId: string;
+  summarize?: boolean;
+}
+
+export interface ForkCommand {
+  type: "fork";
+  entryId: string;
+}
+
+export interface SwitchSessionCommand {
+  type: "switch_session";
+  sessionPath: string;
+}
+
+export interface ListSessionsCommand {
+  type: "list_sessions";
+}
+
+export interface GetStateCommand {
+  type: "get_state";
+  id?: string;
+}
+
+export type IncomingCommand = NavigateCommand | ForkCommand | SwitchSessionCommand | ListSessionsCommand | GetStateCommand;
+
+export interface DashboardServerOptions {
+  port: number;
+  ctx: ExtensionContext;
+  pi: ExtensionAPI;
+  getSessionData: () => {
+    sessionFile: string | null;
+    sessionId: string | null;
+    entries: SessionEntry[];
+    branch: SessionEntry[];
+    leafId: string | null;
+    isStreaming: boolean;
+  };
+  onNavigate: (entryId: string, summarize: boolean) => Promise<void>;
+  onFork: (entryId: string) => Promise<void>;
+  onSwitchSession: (sessionPath: string) => Promise<void>;
+}
+
+export interface DashboardServer {
+  port: number;
+  broadcast: (message: WsMessage) => void;
+  close: () => void;
+}
+
+/**
+ * Create HTTP + WebSocket server for the dashboard
+ */
+export async function createServer(options: DashboardServerOptions): Promise<DashboardServer> {
+  const { port, getSessionData, onNavigate, onFork, onSwitchSession } = options;
+  
+  const clients = new Set<WebSocket>();
+  
+  // MIME types for static files
+  const mimeTypes: Record<string, string> = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "application/javascript",
+    ".json": "application/json",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+  };
+
+  /**
+   * Serve static files from web directory
+   */
+  async function serveStatic(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
+    const url = req.url || "/";
+    const path = url === "/" ? "/index.html" : url;
+    
+    // Security: prevent directory traversal
+    if (path.includes("..")) {
+      res.writeHead(403);
+      res.end("Forbidden");
+      return true;
+    }
+
+    const filePath = join(__dirname, "web", path);
+    const ext = path.substring(path.lastIndexOf("."));
+    const contentType = mimeTypes[ext] || "application/octet-stream";
+
+    try {
+      const content = await readFile(filePath);
+      res.writeHead(200, { "Content-Type": contentType });
+      res.end(content);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Handle API requests
+   */
+  function handleApi(req: IncomingMessage, res: ServerResponse): boolean {
+    const url = req.url || "";
+    
+    if (url === "/api/state") {
+      const data = getSessionData();
+      res.writeHead(200, { 
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      });
+      res.end(JSON.stringify(data));
+      return true;
+    }
+
+    return false;
+  }
+
+  // Create HTTP server
+  const httpServer = createHttpServer(async (req, res) => {
+    // Try API first
+    if (handleApi(req, res)) return;
+    
+    // Try static files
+    if (await serveStatic(req, res)) return;
+    
+    // 404
+    res.writeHead(404);
+    res.end("Not Found");
+  });
+
+  // Create WebSocket server
+  const wss = new WebSocketServer({ server: httpServer });
+
+  wss.on("connection", (ws) => {
+    clients.add(ws);
+
+    // Send initial state
+    const state = getSessionData();
+    ws.send(JSON.stringify({
+      type: "session_state",
+      data: state,
+    }));
+
+    ws.on("message", async (data) => {
+      try {
+        const message = JSON.parse(data.toString()) as IncomingCommand;
+        await handleCommand(ws, message);
+      } catch (err) {
+        ws.send(JSON.stringify({
+          type: "error",
+          data: { message: String(err) },
+        }));
+      }
+    });
+
+    ws.on("close", () => {
+      clients.delete(ws);
+    });
+
+    ws.on("error", () => {
+      clients.delete(ws);
+    });
+  });
+
+  /**
+   * Handle incoming WebSocket commands
+   */
+  async function handleCommand(ws: WebSocket, command: IncomingCommand) {
+    switch (command.type) {
+      case "get_state": {
+        const state = getSessionData();
+        ws.send(JSON.stringify({
+          type: "response",
+          id: command.id,
+          data: state,
+        }));
+        break;
+      }
+
+      case "navigate": {
+        try {
+          await onNavigate(command.entryId, command.summarize ?? false);
+          ws.send(JSON.stringify({
+            type: "response",
+            data: { success: true },
+          }));
+        } catch (err) {
+          ws.send(JSON.stringify({
+            type: "error",
+            data: { message: String(err) },
+          }));
+        }
+        break;
+      }
+
+      case "fork": {
+        try {
+          await onFork(command.entryId);
+          ws.send(JSON.stringify({
+            type: "response",
+            data: { success: true },
+          }));
+        } catch (err) {
+          ws.send(JSON.stringify({
+            type: "error",
+            data: { message: String(err) },
+          }));
+        }
+        break;
+      }
+
+      case "switch_session": {
+        try {
+          await onSwitchSession(command.sessionPath);
+          ws.send(JSON.stringify({
+            type: "response",
+            data: { success: true },
+          }));
+        } catch (err) {
+          ws.send(JSON.stringify({
+            type: "error",
+            data: { message: String(err) },
+          }));
+        }
+        break;
+      }
+
+      case "list_sessions": {
+        // This would need access to session directory scanning
+        // For now, return empty list
+        ws.send(JSON.stringify({
+          type: "response",
+          data: { sessions: [] },
+        }));
+        break;
+      }
+    }
+  }
+
+  /**
+   * Broadcast message to all connected clients
+   */
+  function broadcast(message: WsMessage) {
+    const json = JSON.stringify(message);
+    for (const client of clients) {
+      if (client.readyState === 1) { // OPEN
+        client.send(json);
+      }
+    }
+  }
+
+  // Start server
+  return new Promise((resolve, reject) => {
+    httpServer.on("error", reject);
+    
+    httpServer.listen(port, () => {
+      resolve({
+        port,
+        broadcast,
+        close: () => {
+          wss.close();
+          httpServer.close();
+        },
+      });
+    });
+  });
+}

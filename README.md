@@ -12,47 +12,77 @@ Pi sessions are stored as JSONL files with a tree structure. This tool parses se
 - **Understand compaction** and how context is summarized
 - **Search across sessions** for specific content
 
-## Status
+## Features
 
-🚧 **Work in Progress**
+### Phase 1: Static Visualizer ✅
 
-See [docs/RESEARCH.md](docs/RESEARCH.md) for detailed research on pi's session format.
-See [docs/PLAN.md](docs/PLAN.md) for the implementation roadmap.
-
-## Planned Features
-
-### Phase 1: Static Visualizer
-- CLI tool that generates interactive HTML
-- Tree visualization with D3.js
-- Session browser with filtering
-- Entry details and search
-
-### Phase 2: Live Dashboard  
-- Pi extension with `/dashboard` command
-- Real-time session updates via WebSocket
-- Navigate, fork, and switch sessions from browser
-
-## Installation
+CLI tool that generates a self-contained HTML file with an interactive visualization:
 
 ```bash
-# Coming soon
+# Install globally
 npm install -g pi-tree-viz
-```
 
-## Usage
-
-```bash
-# Generate visualization for default session directory
+# Generate visualization
 pi-tree-viz
 
 # Specify output file
 pi-tree-viz --output ./my-sessions.html
 
-# Watch for changes
-pi-tree-viz --watch
+# Filter to specific project
+pi-tree-viz --project ~/my-project
 
-# Custom session directory
-pi-tree-viz --session-dir ~/.pi/agent/sessions
+# Open in browser after generation
+pi-tree-viz --open
+```
+
+### Phase 2: Live Dashboard ✅
+
+Pi extension with real-time session visualization:
+
+```bash
+# Install the extension
+ln -s /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/dashboard
+
+# Or copy it
+cp -r /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/
+
+# Then in pi, use:
+/dashboard
+```
+
+See [extensions/dashboard/README.md](extensions/dashboard/README.md) for full documentation.
+
+## Installation
+
+```bash
+# CLI tool
+npm install -g pi-tree-viz
+
+# Extension (symlink to your pi extensions)
+cd ~/.pi/agent/extensions
+ln -s /path/to/pi-tree-viz/extensions/dashboard
+```
+
+## Documentation
+
+- [docs/RESEARCH.md](docs/RESEARCH.md) - Detailed research on pi's session format
+- [docs/PLAN.md](docs/PLAN.md) - Implementation roadmap
+- [extensions/dashboard/README.md](extensions/dashboard/README.md) - Live dashboard extension
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build CLI
+npm run build
+
+# Watch mode
+npm run dev
+
+# Install extension dependencies
+cd extensions/dashboard && npm install
 ```
 
 ## License
