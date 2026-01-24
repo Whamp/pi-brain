@@ -1,0 +1,53 @@
+{
+  "name": "pi-tree-viz",
+  "version": "0.1.0",
+  "description": "Interactive browser visualization for pi coding agent session trees, branches, and forks",
+  "type": "module",
+  "bin": {
+    "pi-tree-viz": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts src/cli.ts --format esm --dts --watch",
+    "test": "vitest",
+    "lint": "biome check src/",
+    "format": "biome format --write src/",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "keywords": [
+    "pi",
+    "coding-agent",
+    "session",
+    "visualization",
+    "tree",
+    "branches"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.5",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "open": "^10.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
