@@ -59,6 +59,11 @@ export function isForkSession(
 /**
  * Find all fork relationships from a list of parsed sessions
  *
+ * Note: Similar to analyzer.ts:findForkRelationships() but without sorting.
+ * The analyzer version sorts by timestamp; this version preserves input order.
+ * Both are exported to avoid circular imports that would exceed the barrel
+ * file module limit.
+ *
  * @param {SessionInfo[]} sessions Array of parsed session info objects
  * @returns {ForkRelationship[]} Array of fork relationships
  */
