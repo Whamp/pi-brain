@@ -3,18 +3,19 @@
  * Creates a self-contained HTML file with embedded CSS and JS
  */
 
-import { groupByProject } from "./analyzer.js";
-import type {
-  SessionInfo,
-  ForkRelationship,
-  TreeNode,
-  SessionMessageEntry,
-  AssistantMessage,
-  CompactionEntry,
-  BranchSummaryEntry,
-  ModelChangeEntry,
-  ThinkingLevelChangeEntry,
+import  {
+  type SessionInfo,
+  type ForkRelationship,
+  type TreeNode,
+  type SessionMessageEntry,
+  type AssistantMessage,
+  type CompactionEntry,
+  type BranchSummaryEntry,
+  type ModelChangeEntry,
+  type ThinkingLevelChangeEntry,
 } from "./types.js";
+
+import { groupByProject } from "./analyzer.js";
 
 /**
  * Compact session info for embedding (removes full content)

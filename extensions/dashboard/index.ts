@@ -12,11 +12,12 @@
  * - Switch between sessions
  */
 
-import type {
-  ExtensionAPI,
-  ExtensionContext,
-  ExtensionCommandContext,
+import  {
+  type ExtensionAPI,
+  type ExtensionContext,
+  type ExtensionCommandContext,
 } from "@mariozechner/pi-coding-agent";
+
 import open from "open";
 
 import {
