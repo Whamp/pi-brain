@@ -24,6 +24,8 @@
     "eslint-plugin-vitest/prefer-called-times": "off",
     "eslint-plugin-jest/prefer-called-with": "off",
     "eslint-plugin-jest/require-hook": "off",
+    "eslint-plugin-jest/no-hooks": "off",
+    "eslint-plugin-jest/max-expects": "off",
     "eslint-plugin-import/consistent-type-specifier-style": "off",
     "eslint-plugin-promise/avoid-new": "off",
     "typescript-eslint/no-explicit-any": "off",

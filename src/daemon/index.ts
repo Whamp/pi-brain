@@ -4,7 +4,7 @@
  * This module contains:
  * - watcher.ts - File system watching (inotify/chokidar)
  * - watcher-events.ts - Event types for the watcher
- * - queue.ts - Analysis job queue (TODO: Phase 3.2)
+ * - queue.ts - Analysis job queue (SQLite-backed)
  * - processor.ts - Job processing and pi agent invocation (TODO: Phase 3.4)
  * - cli.ts - Daemon CLI (start, stop, status) (TODO: Phase 3.9)
  */
@@ -35,6 +35,20 @@ export {
   type ErrorEventDetail,
   type SessionEventName,
 } from "./watcher-events.js";
+
+// Export queue functionality
+export {
+  QueueManager,
+  createQueueManager,
+  generateJobId,
+  PRIORITY,
+  type JobType,
+  type JobStatus,
+  type JobContext,
+  type JobInput,
+  type AnalysisJob,
+  type QueueStats,
+} from "./queue.js";
 
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";

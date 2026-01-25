@@ -129,6 +129,11 @@ export class SessionWatcher extends EventTarget {
       }
     }
 
+    // Check if stop() was called during path validation
+    if (!this.isRunning) {
+      return;
+    }
+
     this.watcher = watch(this.watchPaths, {
       persistent: true,
       ignoreInitial: false,
@@ -176,9 +181,12 @@ export class SessionWatcher extends EventTarget {
    * Stop watching
    */
   async stop(): Promise<void> {
-    if (!this.isRunning || !this.watcher) {
+    if (!this.isRunning) {
       return;
     }
+
+    // Mark as not running first to prevent race conditions with start()
+    this.isRunning = false;
 
     // Clear all idle timers
     for (const state of this.sessionStates.values()) {
@@ -188,9 +196,11 @@ export class SessionWatcher extends EventTarget {
       }
     }
 
-    await this.watcher.close();
-    this.watcher = null;
-    this.isRunning = false;
+    if (this.watcher) {
+      await this.watcher.close();
+      this.watcher = null;
+    }
+
     this.sessionStates.clear();
   }
 
@@ -254,6 +264,11 @@ export class SessionWatcher extends EventTarget {
    * Handle new file detected
    */
   private handleNewFile(filePath: string): void {
+    // Ignore events after watcher is stopped
+    if (!this.isRunning) {
+      return;
+    }
+
     // Double-check it's a .jsonl file (chokidar's ignore can be unreliable)
     if (!filePath.endsWith(".jsonl")) {
       return;
@@ -283,6 +298,11 @@ export class SessionWatcher extends EventTarget {
    * Handle file change detected
    */
   private handleFileChange(filePath: string): void {
+    // Ignore events after watcher is stopped
+    if (!this.isRunning) {
+      return;
+    }
+
     if (!filePath.endsWith(".jsonl")) {
       return;
     }
@@ -308,6 +328,11 @@ export class SessionWatcher extends EventTarget {
    * Handle file removal
    */
   private handleFileRemove(filePath: string): void {
+    // Ignore events after watcher is stopped
+    if (!this.isRunning) {
+      return;
+    }
+
     const state = this.sessionStates.get(filePath);
     if (!state) {
       return;
@@ -351,6 +376,11 @@ export class SessionWatcher extends EventTarget {
    * Check if a session is idle and trigger analysis if so
    */
   private checkIdle(filePath: string): void {
+    // Ignore if watcher is stopped
+    if (!this.isRunning) {
+      return;
+    }
+
     const state = this.sessionStates.get(filePath);
     if (!state) {
       return;

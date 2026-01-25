@@ -42,7 +42,7 @@ Track implementation progress. Agents update status as they complete work.
 | ID  | Task                                                   | Status  | Deps     | Notes            |
 | --- | ------------------------------------------------------ | ------- | -------- | ---------------- |
 | 3.1 | Implement file watcher (inotify or polling)            | done    | 1.1      | 2026-01-25       |
-| 3.2 | Implement analysis queue (SQLite-backed)               | pending | 1.2      |                  |
+| 3.2 | Implement analysis queue (SQLite-backed)               | active  | 1.2      | 2026-01-25       |
 | 3.3 | Implement idle detection (10-minute timeout)           | done    | 3.1      | Completed in 3.1 |
 | 3.4 | Implement job processor (spawns pi agent)              | pending | 3.2      |                  |
 | 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |                  |
