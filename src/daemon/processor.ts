@@ -115,6 +115,7 @@ interface LessonOutput {
   details: string;
   confidence: "high" | "medium" | "low";
   tags: string[];
+  actionable?: string;
 }
 
 /** Skill availability information */
