@@ -19,7 +19,7 @@ Track implementation progress. Agents update status as they complete work.
 | --- | -------------------------------------------------------------------------------- | ------- | ---- | ----------------------------- |
 | 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | done    | -    | 2026-01-25                    |
 | 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | done    | -    | 2026-01-25                    |
-| 1.3 | Implement JSON file storage for nodes                                            | active  | 1.2  | 2026-01-25                    |
+| 1.3 | Implement JSON file storage for nodes                                            | done    | 1.2  | 2026-01-25                    |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | pending | -    |                               |
 | 1.5 | Set up prompt file structure with versioning                                     | pending | -    |                               |
 | 1.6 | Write initial session-analyzer prompt                                            | pending | 1.5  | see specs/session-analyzer.md |
@@ -143,6 +143,15 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 08:57 - Task 1.3
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (122 tests total, 34 new node storage tests)
+**Commit**: b01edc1
+**Notes**: Implemented JSON file storage for nodes per specs/storage.md and specs/node-model.md. Created node-types.ts with full TypeScript interfaces matching the spec (Node, Edge, Lesson, ModelObservations, etc.). Created node-storage.ts with functions for writing/reading nodes to ~/.pi-brain/data/nodes/YYYY/MM/<id>-v<version>.json, including versioning support.
+
+---
 
 ## 2026-01-25 08:35 - Task 1.2
 
