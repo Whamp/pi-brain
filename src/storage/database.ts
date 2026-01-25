@@ -123,16 +123,9 @@ export function migrate(db: Database.Database): number {
       db.exec(migration.sql);
 
       // Record migration (schema_version table is created in migration 001)
-      if (migration.version > 1) {
-        db.prepare(
-          "INSERT INTO schema_version (version, description) VALUES (?, ?)"
-        ).run(migration.version, migration.description);
-      } else {
-        // First migration creates the table, so insert after exec
-        db.prepare(
-          "INSERT INTO schema_version (version, description) VALUES (?, ?)"
-        ).run(migration.version, migration.description);
-      }
+      db.prepare(
+        "INSERT INTO schema_version (version, description) VALUES (?, ?)"
+      ).run(migration.version, migration.description);
     })();
 
     appliedCount++;
