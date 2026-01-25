@@ -81,6 +81,7 @@ export function findForkRelationships(
     if (session.header.parentSession) {
       relationships.push({
         childPath: session.path,
+        childSessionId: session.header.id,
         parentPath: session.header.parentSession,
         timestamp: session.header.timestamp,
       });
