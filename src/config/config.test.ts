@@ -312,6 +312,7 @@ describe("transformConfig", () => {
     const config = transformConfig(raw);
     expect(config.daemon.maxConcurrentAnalysis).toBe(2);
     expect(config.daemon.analysisTimeoutMinutes).toBe(60);
+    expect(config.daemon.maxQueueSize).toBe(500);
   });
 
   it("transforms query config", () => {
