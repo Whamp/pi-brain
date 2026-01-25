@@ -196,7 +196,11 @@ export function getLatestNodeVersion(
   options: NodeStorageOptions = {}
 ): { version: number; path: string } | null {
   const versions = listNodeVersions(nodeId, options);
-  return versions.length > 0 ? versions.at(-1) : null;
+  if (versions.length === 0) {
+    return null;
+  }
+  const last = versions.at(-1);
+  return last ?? null;
 }
 
 /**
