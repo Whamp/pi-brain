@@ -20,7 +20,7 @@ Track implementation progress. Agents update status as they complete work.
 | 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | done    | -    | 2026-01-25                    |
 | 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | done    | -    | 2026-01-25                    |
 | 1.3 | Implement JSON file storage for nodes                                            | done    | 1.2  | 2026-01-25                    |
-| 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | active  | -    | 2026-01-25                    |
+| 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | done    | -    | 2026-01-25                    |
 | 1.5 | Set up prompt file structure with versioning                                     | pending | -    |                               |
 | 1.6 | Write initial session-analyzer prompt                                            | pending | 1.5  | see specs/session-analyzer.md |
 
@@ -143,6 +143,15 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 09:11 - Task 1.4
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (194 tests total, 72 new config tests)
+**Commit**: ba52abc
+**Notes**: Implemented YAML-based configuration system per specs/overview.md and specs/daemon.md. Created config types (hub, daemon, query, spoke), config loading with path expansion and validation, and helper functions for directory setup. Supports ~/.pi-brain/config.yaml with sensible defaults for single-computer use.
+
+---
 
 ## 2026-01-25 08:57 - Task 1.3
 
