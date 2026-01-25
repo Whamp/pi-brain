@@ -275,6 +275,8 @@ export function createNodeVersion(
   const newNode: Node = {
     ...existingNode,
     ...updates,
+    // Preserve identity fields that should never change
+    id: existingNode.id,
     version: newVersion,
     previousVersions: [...existingNode.previousVersions, previousRef],
     metadata: {
