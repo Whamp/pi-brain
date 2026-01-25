@@ -23,6 +23,7 @@
     "eslint-plugin-jest/require-hook": "off",
     "eslint-plugin-jest/valid-title": "off",
     "eslint-plugin-vitest/prefer-describe-function-title": "off",
+    "eslint-plugin-vitest/prefer-called-times": "off",
     "eslint-plugin-import/consistent-type-specifier-style": "off",
     "eslint-plugin-promise/avoid-new": "off",
     "typescript-eslint/no-explicit-any": "off",

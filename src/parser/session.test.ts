@@ -2,7 +2,7 @@
  * Tests for parser module
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type {
   AssistantMessage,
@@ -279,10 +279,16 @@ describe("parseSessionContent", () => {
       const validEntry = JSON.stringify(createMessageEntry("1", null, "user"));
       const content = `${header}\nnot valid json\n${validEntry}`;
 
+      // Suppress expected warning during test
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
       const result = parseSessionContent(content, "/test/session.jsonl");
 
       expect(result.entries).toHaveLength(1);
       expect(result.entries[0].id).toBe("1");
+      expect(warnSpy).toHaveBeenCalledOnce();
+
+      warnSpy.mockRestore();
     });
   });
 });
