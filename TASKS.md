@@ -35,7 +35,7 @@ Track implementation progress. Agents update status as they complete work.
 | 2.5 | Implement fork detection (new sessions with parentSession)          | done   | 2.1  | 2026-01-25       |
 | 2.6 | Implement 10-minute timestamp gap detection (resume)                | done   | 2.1  | Completed in 2.1 |
 | 2.7 | Implement segment extraction (start_entry_id, end_entry_id)         | done   | 2.1  | Completed in 2.1 |
-| 2.8 | Write tests with real session files                                 | active | 2.7  | 2026-01-25       |
+| 2.8 | Write tests with real session files                                 | done   | 2.7  | 2026-01-25       |
 
 ## Phase 3: Daemon Core
 
@@ -168,6 +168,31 @@ Key design decisions:
 - Skip tree_jump detection immediately after branch_summary (already captured)
 - Metadata entries (label, session_info) excluded from boundary detection
 - Resume threshold: 10 minutes (configurable via constant)
+
+---
+
+## 2026-01-25 14:18 - Task 2.8
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (360 tests total, 58 new integration tests)
+**Commit**: 079c393
+**Notes**: Created comprehensive integration tests with real session file fixtures per specs/pi-integration.md and specs/node-model.md. Added:
+
+- 6 realistic JSONL fixtures in src/parser/**fixtures**/:
+  - simple-session.jsonl: Basic linear conversation
+  - session-with-compaction.jsonl: Context compaction boundary
+  - session-with-branch-summary.jsonl: Tree navigation with summary
+  - session-with-resume.jsonl: 10+ minute timestamp gap
+  - session-forked.jsonl: Forked session with parentSession
+  - session-with-mixed-boundaries.jsonl: All boundary types combined
+- real-session.test.ts with 58 tests covering:
+  - Session header/entry parsing
+  - Boundary detection for all types
+  - Segment extraction
+  - Fork detection and tree operations
+  - Cross-session fork discovery
+
+Fixtures are based on actual pi session format observed in ~/.pi/agent/sessions/.
 
 ---
 
