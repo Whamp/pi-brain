@@ -39,17 +39,17 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 3: Daemon Core
 
-| ID  | Task                                                   | Status  | Deps     | Notes      |
-| --- | ------------------------------------------------------ | ------- | -------- | ---------- |
-| 3.1 | Implement file watcher (inotify or polling)            | active  | 1.1      | 2026-01-25 |
-| 3.2 | Implement analysis queue (SQLite-backed)               | pending | 1.2      |            |
-| 3.3 | Implement idle detection (10-minute timeout)           | pending | 3.1      |            |
-| 3.4 | Implement job processor (spawns pi agent)              | pending | 3.2      |            |
-| 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |            |
-| 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |            |
-| 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |            |
-| 3.8 | Implement error handling and retry logic               | pending | 3.4      |            |
-| 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |            |
+| ID  | Task                                                   | Status  | Deps     | Notes            |
+| --- | ------------------------------------------------------ | ------- | -------- | ---------------- |
+| 3.1 | Implement file watcher (inotify or polling)            | done    | 1.1      | 2026-01-25       |
+| 3.2 | Implement analysis queue (SQLite-backed)               | pending | 1.2      |                  |
+| 3.3 | Implement idle detection (10-minute timeout)           | done    | 3.1      | Completed in 3.1 |
+| 3.4 | Implement job processor (spawns pi agent)              | pending | 3.2      |                  |
+| 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |                  |
+| 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |                  |
+| 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                  |
+| 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
+| 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                  |
 
 ## Phase 4: Node Storage & Queries
 
@@ -303,6 +303,30 @@ Prompt created at:
 **Validation**: npm run check passes, npm test passes (69 tests), imports resolve correctly
 **Commit**: 5842048
 **Notes**: Reorganized flat structure into modular directories. Fixed pre-existing test bug (missing label argument in createLabelEntry call).
+
+---
+
+## 2026-01-25 14:42 - Task 3.1 (and 3.3)
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (390 tests total, 30 new watcher tests)
+**Commit**: c97f8bf
+**Notes**: Implemented session file watcher per specs/daemon.md. Created:
+
+- `src/daemon/watcher.ts`: SessionWatcher class using chokidar for cross-platform file watching (inotify on Linux)
+- `src/daemon/watcher-events.ts`: Event types and factory functions for type-safe events
+- `src/daemon/watcher.test.ts`: 30 comprehensive tests
+
+Key features implemented:
+
+- Detects new/changed/removed .jsonl session files
+- Idle detection with configurable timeout (emits `sessionIdle` event)
+- Session state tracking (lastModified, lastAnalyzed, analyzing)
+- Uses EventTarget for cross-platform event emission
+- Configurable stabilityThreshold for awaitWriteFinish
+- Directory auto-creation if watch paths don't exist
+
+Also completed Task 3.3 (idle detection) as part of this work - the watcher's `scheduleIdleCheck()` and `checkIdle()` methods implement the 10-minute timeout.
 
 ---
 
