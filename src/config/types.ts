@@ -1,0 +1,151 @@
+/**
+ * Configuration types for pi-brain
+ *
+ * Configuration is loaded from ~/.pi-brain/config.yaml
+ * All paths support ~ expansion for home directory
+ */
+
+/**
+ * Spoke sync method options
+ */
+export type SyncMethod = "syncthing" | "rsync" | "api";
+
+/**
+ * Spoke machine configuration
+ * Spokes are secondary machines that sync sessions to the hub
+ */
+export interface SpokeConfig {
+  /** Unique name for this spoke */
+  name: string;
+
+  /** How sessions are synced from this spoke */
+  syncMethod: SyncMethod;
+
+  /** Local path where synced sessions appear */
+  path: string;
+
+  /** For rsync: source path (e.g., user@server:~/.pi/agent/sessions) */
+  source?: string;
+}
+
+/**
+ * Hub configuration
+ * The hub is the primary computer where daemon runs
+ */
+export interface HubConfig {
+  /** Path to local pi sessions directory */
+  sessionsDir: string;
+
+  /** Path to pi-brain data directory (contains brain.db and nodes/) */
+  databaseDir: string;
+
+  /** Port for the web UI server */
+  webUiPort: number;
+}
+
+/**
+ * Daemon configuration
+ * Controls the background analysis process
+ */
+export interface DaemonConfig {
+  /** Minutes of inactivity before session is considered idle */
+  idleTimeoutMinutes: number;
+
+  /** Number of parallel analysis workers */
+  parallelWorkers: number;
+
+  /** Maximum retries for failed analysis jobs */
+  maxRetries: number;
+
+  /** Base delay between retries in seconds */
+  retryDelaySeconds: number;
+
+  /** Cron schedule for nightly reanalysis (e.g., "0 2 * * *") */
+  reanalysisSchedule: string;
+
+  /** Cron schedule for connection discovery */
+  connectionDiscoverySchedule: string;
+
+  /** Model provider for analysis (e.g., "zai", "anthropic") */
+  provider: string;
+
+  /** Model name for analysis (e.g., "glm-4.7") */
+  model: string;
+
+  /** Path to session analyzer prompt file */
+  promptFile: string;
+
+  /** Maximum concurrent analysis jobs */
+  maxConcurrentAnalysis: number;
+
+  /** Timeout for each analysis in minutes */
+  analysisTimeoutMinutes: number;
+
+  /** Maximum queue size before rejecting new jobs */
+  maxQueueSize: number;
+}
+
+/**
+ * Query configuration
+ * Controls the /brain query interface
+ */
+export interface QueryConfig {
+  /** Model provider for queries */
+  provider: string;
+
+  /** Model name for queries */
+  model: string;
+}
+
+/**
+ * Complete pi-brain configuration
+ */
+export interface PiBrainConfig {
+  /** Hub settings */
+  hub: HubConfig;
+
+  /** Spoke machines */
+  spokes: SpokeConfig[];
+
+  /** Daemon behavior */
+  daemon: DaemonConfig;
+
+  /** Query settings */
+  query: QueryConfig;
+}
+
+/**
+ * Raw YAML configuration (snake_case, before transformation)
+ * This matches the YAML file structure
+ */
+export interface RawConfig {
+  hub?: {
+    sessions_dir?: string;
+    database_dir?: string;
+    web_ui_port?: number;
+  };
+  spokes?: {
+    name?: string;
+    sync_method?: string;
+    path?: string;
+    source?: string;
+  }[];
+  daemon?: {
+    idle_timeout_minutes?: number;
+    parallel_workers?: number;
+    max_retries?: number;
+    retry_delay_seconds?: number;
+    reanalysis_schedule?: string;
+    connection_discovery_schedule?: string;
+    provider?: string;
+    model?: string;
+    prompt_file?: string;
+    max_concurrent_analysis?: number;
+    analysis_timeout_minutes?: number;
+    max_queue_size?: number;
+  };
+  query?: {
+    provider?: string;
+    model?: string;
+  };
+}

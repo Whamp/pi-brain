@@ -40,7 +40,8 @@
   "dependencies": {
     "better-sqlite3": "^12.6.2",
     "commander": "^13.0.0",
-    "open": "^10.1.0"
+    "open": "^10.1.0",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
