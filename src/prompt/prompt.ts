@@ -171,7 +171,13 @@ export function archivePrompt(
   historyDir: string,
   version: string
 ): string {
+  // Ensure prompt's parent directory structure exists
   ensurePromptsDir(dirname(promptPath));
+
+  // Also ensure the target history directory exists
+  if (!existsSync(historyDir)) {
+    mkdirSync(historyDir, { recursive: true });
+  }
 
   const filename = getArchiveFilename(version);
   const archivePath = join(historyDir, filename);
