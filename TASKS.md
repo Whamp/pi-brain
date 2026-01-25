@@ -46,7 +46,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.3 | Implement idle detection (10-minute timeout)           | done    | 3.1      | Completed in 3.1 |
 | 3.4 | Implement job processor (spawns pi agent)              | done    | 3.2      | 2026-01-25       |
 | 3.5 | Implement pi agent invocation with correct flags       | done    | 3.4      | 2026-01-25       |
-| 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |                  |
+| 3.6 | Parse agent output (JSON mode)                         | done    | 3.5      | 2026-01-25       |
 | 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                  |
 | 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
 | 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                  |
@@ -381,6 +381,22 @@ Key design decisions:
 - Skills directory: ~/skills/ (standard pi skill location)
 - Prompt passed via -p flag, system prompt via --system-prompt
 - JSON extraction tries code fence first, then raw JSON fallback
+
+---
+
+## 2026-01-25 14:02 - Task 3.6
+
+**Status**: pending → done
+**Validation**: Already validated as part of task 3.4 (480 tests pass, npm run check passes)
+**Commit**: 1814edc (same as 3.4)
+**Notes**: Task 3.6 was already completed as part of task 3.4. The `parseAgentOutput()` function in `src/daemon/processor.ts` handles pi's JSON mode output:
+
+- Parses newline-delimited JSON events from stdout
+- Finds `agent_end` event with final messages
+- Extracts last assistant message
+- Uses `extractNodeFromText()` to extract JSON from code fences or raw text
+- Validates output with `isValidNodeOutput()` against the expected schema
+- Returns structured `AgentResult` with success/failure state
 
 ---
 
