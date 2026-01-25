@@ -572,7 +572,7 @@ describe("getProjectFromSessionPath", () => {
   });
 });
 
-describe("dEFAULT_WATCHER_CONFIG", () => {
+describe("default watcher config", () => {
   it("should have expected default values", () => {
     expect(DEFAULT_WATCHER_CONFIG.idleTimeoutMinutes).toBe(10);
     expect(DEFAULT_WATCHER_CONFIG.stabilityThreshold).toBe(2000);
