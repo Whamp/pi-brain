@@ -1,0 +1,395 @@
+/**
+ * Tests for database module
+ */
+
+import type Database from "better-sqlite3";
+
+import { existsSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+
+import {
+  closeDatabase,
+  getSchemaVersion,
+  isDatabaseHealthy,
+  loadMigrations,
+  migrate,
+  openDatabase,
+} from "./database.js";
+
+/** Create a unique test database path */
+function createTestDbPath(): string {
+  return join(
+    tmpdir(),
+    `pi-brain-test-${Date.now()}-${Math.random().toString(36).slice(2)}.db`
+  );
+}
+
+/** Clean up test database files */
+function cleanupTestDb(dbPath: string, db?: Database.Database): void {
+  if (db) {
+    try {
+      db.close();
+    } catch {
+      // Ignore close errors
+    }
+  }
+
+  for (const suffix of ["", "-wal", "-shm"]) {
+    const file = dbPath + suffix;
+    if (existsSync(file)) {
+      rmSync(file);
+    }
+  }
+}
+
+describe("database", () => {
+  describe("loadMigrations", () => {
+    it("loads migration files in order", () => {
+      const migrations = loadMigrations();
+
+      expect(migrations.length).toBeGreaterThan(0);
+      expect(migrations[0].version).toBe(1);
+      expect(migrations[0].description).toContain("initial");
+    });
+
+    it("parses migration metadata correctly", () => {
+      const migrations = loadMigrations();
+      const [initial] = migrations;
+
+      expect(initial.filename).toBe("001_initial.sql");
+      expect(initial.sql).toContain("CREATE TABLE");
+    });
+  });
+
+  describe("openDatabase", () => {
+    it("creates database file if it does not exist", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        expect(existsSync(testDbPath)).toBeFalsy();
+
+        const db = openDatabase({ path: testDbPath });
+
+        expect(existsSync(testDbPath)).toBeTruthy();
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("runs migrations by default", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const version = getSchemaVersion(db);
+        expect(version).toBeGreaterThan(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("skips migrations when migrate: false", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath, migrate: false });
+
+        // Schema version table won't exist, should return 0
+        expect(getSchemaVersion(db)).toBe(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("configures WAL mode", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const result = db.pragma("journal_mode") as {
+          journal_mode: string;
+        }[];
+        expect(result[0].journal_mode).toBe("wal");
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("enables foreign keys", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const result = db.pragma("foreign_keys") as {
+          foreign_keys: number;
+        }[];
+        expect(result[0].foreign_keys).toBe(1);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
+
+  describe("migrate", () => {
+    it("applies all migrations to fresh database", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath, migrate: false });
+        const migrations = loadMigrations();
+
+        const applied = migrate(db);
+
+        expect(applied).toBe(migrations.length);
+        expect(getSchemaVersion(db)).toBe(migrations.length);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("skips already applied migrations", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+        const firstVersion = getSchemaVersion(db);
+
+        // Run migrations again
+        const applied = migrate(db);
+
+        expect(applied).toBe(0);
+        expect(getSchemaVersion(db)).toBe(firstVersion);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates core tables", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const tables = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+          )
+          .all() as { name: string }[];
+        const tableNames = tables.map((t) => t.name);
+
+        // Check core tables exist
+        expect(tableNames).toContain("nodes");
+        expect(tableNames).toContain("edges");
+        expect(tableNames).toContain("tags");
+        expect(tableNames).toContain("lessons");
+        expect(tableNames).toContain("schema_version");
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates daemon and analytics tables", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const tables = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+          )
+          .all() as { name: string }[];
+        const tableNames = tables.map((t) => t.name);
+
+        expect(tableNames).toContain("analysis_queue");
+        expect(tableNames).toContain("daemon_decisions");
+        expect(tableNames).toContain("failure_patterns");
+        expect(tableNames).toContain("model_stats");
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates FTS virtual table", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const tables = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='nodes_fts'"
+          )
+          .all();
+
+        expect(tables).toHaveLength(1);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates query performance indexes", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const indexes = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'idx_%'"
+          )
+          .all() as { name: string }[];
+        const indexNames = indexes.map((i) => i.name);
+
+        expect(indexNames).toContain("idx_nodes_project");
+        expect(indexNames).toContain("idx_nodes_type");
+        expect(indexNames).toContain("idx_edges_source");
+        expect(indexNames).toContain("idx_lessons_node");
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
+
+  describe("isDatabaseHealthy", () => {
+    it("returns true for healthy database", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        expect(isDatabaseHealthy(db)).toBeTruthy();
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("returns false for closed database", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+        db.close();
+
+        expect(isDatabaseHealthy(db)).toBeFalsy();
+        cleanupTestDb(testDbPath);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
+
+  describe("closeDatabase", () => {
+    it("closes the database connection", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        closeDatabase(db);
+
+        expect(isDatabaseHealthy(db)).toBeFalsy();
+        cleanupTestDb(testDbPath);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
+
+  describe("schema integrity", () => {
+    it("enforces foreign key constraints", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Try to insert a tag referencing non-existent node
+        expect(() => {
+          db.prepare("INSERT INTO tags (node_id, tag) VALUES (?, ?)").run(
+            "nonexistent",
+            "test"
+          );
+        }).toThrow(/FOREIGN KEY constraint failed/);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("cascades deletes from nodes to tags", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert a node
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "test-node",
+          "/test/session.jsonl",
+          "2026-01-25T00:00:00Z",
+          "2026-01-25T00:00:00Z",
+          "/test/node.json"
+        );
+
+        // Insert related tag
+        db.prepare("INSERT INTO tags (node_id, tag) VALUES (?, ?)").run(
+          "test-node",
+          "test-tag"
+        );
+
+        // Delete the node
+        db.prepare("DELETE FROM nodes WHERE id = ?").run("test-node");
+
+        // Verify cascaded delete
+        const tags = db
+          .prepare("SELECT * FROM tags WHERE node_id = ?")
+          .all("test-node");
+        expect(tags).toHaveLength(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("cascades deletes from nodes to lessons", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert a node
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "test-node",
+          "/test/session.jsonl",
+          "2026-01-25T00:00:00Z",
+          "2026-01-25T00:00:00Z",
+          "/test/node.json"
+        );
+
+        // Insert related lesson
+        db.prepare(`
+          INSERT INTO lessons (id, node_id, level, summary)
+          VALUES (?, ?, ?, ?)
+        `).run("lesson-1", "test-node", "project", "Test lesson");
+
+        // Delete the node
+        db.prepare("DELETE FROM nodes WHERE id = ?").run("test-node");
+
+        // Verify cascaded delete
+        const lessons = db
+          .prepare("SELECT * FROM lessons WHERE node_id = ?")
+          .all("test-node");
+        expect(lessons).toHaveLength(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
+});

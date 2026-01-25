@@ -17,8 +17,8 @@ Track implementation progress. Agents update status as they complete work.
 
 | ID  | Task                                                                             | Status  | Deps | Notes                         |
 | --- | -------------------------------------------------------------------------------- | ------- | ---- | ----------------------------- |
-| 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | active  | -    | 2026-01-25                    |
-| 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | pending | -    |                               |
+| 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | done    | -    | 2026-01-25                    |
+| 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | active  | -    | 2026-01-25                    |
 | 1.3 | Implement JSON file storage for nodes                                            | pending | 1.2  |                               |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | pending | -    |                               |
 | 1.5 | Set up prompt file structure with versioning                                     | pending | -    |                               |
@@ -143,6 +143,15 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 08:32 - Task 1.1
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (69 tests), imports resolve correctly
+**Commit**: 5842048
+**Notes**: Reorganized flat structure into modular directories. Fixed pre-existing test bug (missing label argument in createLabelEntry call).
+
+---
 
 ### Template Entry
 
