@@ -5,15 +5,22 @@
  * - Prompt version calculation (hash-based)
  * - Archiving prompts to history
  * - Tracking versions in database
- * - Default prompt creation
+ * - Default prompt creation and installation
  */
 
 import type Database from "better-sqlite3";
 
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, copyFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  copyFileSync,
+  writeFileSync,
+} from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { PromptVersion, PromptVersionRecord } from "./types.js";
 
@@ -318,4 +325,63 @@ export function getOutdatedNodeCount(
     `)
     .get(currentVersion) as { count: number };
   return result.count;
+}
+
+/**
+ * Get the path to the bundled default prompt
+ *
+ * This is the prompt file shipped with the pi-brain package
+ */
+export function getBundledPromptPath(): string {
+  // Get the directory of this module file
+  const moduleDir = dirname(fileURLToPath(import.meta.url));
+  // Go up to src/, then to prompts/
+  return join(moduleDir, "..", "..", "prompts", "session-analyzer.md");
+}
+
+/**
+ * Ensure the default prompt exists at the target location
+ *
+ * If no prompt file exists at the target path, copies the bundled default.
+ * Returns true if a new prompt was installed, false if one already existed.
+ */
+export function ensureDefaultPrompt(targetPath?: string): boolean {
+  const promptPath = targetPath ?? DEFAULT_PROMPT_PATH;
+
+  // If prompt already exists, don't overwrite
+  if (existsSync(promptPath)) {
+    return false;
+  }
+
+  // Ensure parent directories exist
+  ensurePromptsDir(dirname(promptPath));
+
+  // Try to copy bundled prompt
+  const bundledPath = getBundledPromptPath();
+  if (existsSync(bundledPath)) {
+    copyFileSync(bundledPath, promptPath);
+    return true;
+  }
+
+  // If bundled prompt doesn't exist (e.g., development), create a minimal one
+  const minimalPrompt = `# Session Analyzer
+
+You are a librarian for a pi coding agent knowledge base. Your task is to analyze session segments and extract structured insights.
+
+## Output Format
+
+Return a JSON object with the following fields:
+
+- classification: { type, project, isNewProject, hadClearGoal }
+- content: { summary, outcome, keyDecisions, filesTouched, toolsUsed, errorsSeen }
+- lessons: { project, task, user, model, tool, skill, subagent }
+- observations: { modelsUsed, promptingWins, promptingFailures, modelQuirks, toolUseErrors }
+- semantic: { tags, topics }
+- daemonMeta: { decisions, rlmUsed }
+
+See the full documentation for detailed schema information.
+`;
+
+  writeFileSync(promptPath, minimalPrompt, "utf8");
+  return true;
 }

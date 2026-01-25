@@ -34,6 +34,8 @@ import {
   listPromptVersions,
   hasOutdatedNodes,
   getOutdatedNodeCount,
+  getBundledPromptPath,
+  ensureDefaultPrompt,
 } from "./prompt.js";
 
 /** Create unique test directory */
@@ -643,6 +645,71 @@ describe("prompt versioning", () => {
         expect(getOutdatedNodeCount(db, "v2-new22222")).toBe(0);
       } finally {
         db.close();
+      }
+    });
+  });
+
+  describe("default prompt installation", () => {
+    it("getBundledPromptPath returns path to prompts directory", () => {
+      const bundledPath = getBundledPromptPath();
+      expect(bundledPath).toContain("prompts");
+      expect(bundledPath).toContain("session-analyzer.md");
+    });
+
+    it("ensureDefaultPrompt returns false if prompt already exists", () => {
+      const testDir = createTestDir();
+      try {
+        mkdirSync(testDir, { recursive: true });
+        const promptPath = join(testDir, "session-analyzer.md");
+        writeFileSync(promptPath, "existing prompt", "utf8");
+
+        const result = ensureDefaultPrompt(promptPath);
+
+        expect(result).toBeFalsy();
+        expect(readFileSync(promptPath, "utf8")).toBe("existing prompt");
+      } finally {
+        cleanupTestDir(testDir);
+      }
+    });
+
+    it("ensureDefaultPrompt creates prompt if none exists", () => {
+      const testDir = createTestDir();
+      try {
+        const promptsDir = join(testDir, "prompts");
+        const promptPath = join(promptsDir, "session-analyzer.md");
+
+        expect(existsSync(promptPath)).toBeFalsy();
+
+        const result = ensureDefaultPrompt(promptPath);
+
+        expect(result).toBeTruthy();
+        expect(existsSync(promptPath)).toBeTruthy();
+        // Should have some content
+        const content = readFileSync(promptPath, "utf8");
+        expect(content.length).toBeGreaterThan(0);
+        expect(content).toContain("Session Analyzer");
+      } finally {
+        cleanupTestDir(testDir);
+      }
+    });
+
+    it("ensureDefaultPrompt creates parent directories if needed", () => {
+      const testDir = createTestDir();
+      try {
+        const promptPath = join(
+          testDir,
+          "deep",
+          "nested",
+          "session-analyzer.md"
+        );
+
+        expect(existsSync(join(testDir, "deep"))).toBeFalsy();
+
+        ensureDefaultPrompt(promptPath);
+
+        expect(existsSync(promptPath)).toBeTruthy();
+      } finally {
+        cleanupTestDir(testDir);
       }
     });
   });
