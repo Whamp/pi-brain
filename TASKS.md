@@ -28,7 +28,7 @@ Track implementation progress. Agents update status as they complete work.
 
 | ID  | Task                                                                | Status  | Deps    | Notes      |
 | --- | ------------------------------------------------------------------- | ------- | ------- | ---------- |
-| 2.1 | Enhance existing parser to detect all boundary types                | active  | 1.1     | 2026-01-25 |
+| 2.1 | Enhance existing parser to detect all boundary types                | done    | 1.1     | 2026-01-25 |
 | 2.2 | Implement branch_summary entry detection (tree/branch with summary) | pending | 2.1     |            |
 | 2.3 | Implement parentId mismatch detection (tree without summary)        | pending | 2.1     |            |
 | 2.4 | Implement compaction entry detection                                | pending | 2.1     |            |
@@ -143,6 +143,33 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 12:17 - Task 2.1
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (278 tests total, 39 new boundary tests)
+**Commit**: b10294b
+**Notes**: Implemented boundary detection for session segmentation per specs/node-model.md and specs/pi-integration.md. Created src/parser/boundary.ts with:
+
+- `BoundaryType` type for 4 boundary types: branch, tree_jump, compaction, resume
+- `Boundary` interface with metadata for each type
+- `Segment` interface for contiguous entry spans between boundaries
+- `LeafTracker` class to track current leaf for tree jump detection
+- `detectBoundaries()` function that detects all boundary types:
+  - `branch`: branch_summary entries (tree navigation WITH summary)
+  - `tree_jump`: parentId mismatch (tree navigation WITHOUT summary)
+  - `compaction`: compaction entries
+  - `resume`: 10+ minute timestamp gaps
+- `extractSegments()` to split entries at boundary points
+- `getBoundaryStats()` for boundary statistics
+
+Key design decisions:
+
+- Skip tree_jump detection immediately after branch_summary (already captured)
+- Metadata entries (label, session_info) excluded from boundary detection
+- Resume threshold: 10 minutes (configurable via constant)
+
+---
 
 ## 2026-01-25 11:52 - Task 1.6
 
