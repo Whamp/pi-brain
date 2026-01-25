@@ -5,7 +5,7 @@
  * - watcher.ts - File system watching (inotify/chokidar)
  * - watcher-events.ts - Event types for the watcher
  * - queue.ts - Analysis job queue (SQLite-backed)
- * - processor.ts - Job processing and pi agent invocation (TODO: Phase 3.4)
+ * - processor.ts - Job processing and pi agent invocation
  * - cli.ts - Daemon CLI (start, stop, status) (TODO: Phase 3.9)
  */
 
@@ -49,6 +49,30 @@ export {
   type AnalysisJob,
   type QueueStats,
 } from "./queue.js";
+
+// Export processor functionality
+export {
+  JobProcessor,
+  createProcessor,
+  invokeAgent,
+  parseAgentOutput,
+  extractNodeFromText,
+  isValidNodeOutput,
+  buildAnalysisPrompt,
+  buildSkillsArg,
+  getSkillAvailability,
+  checkSkillAvailable,
+  validateRequiredSkills,
+  consoleLogger,
+  REQUIRED_SKILLS,
+  OPTIONAL_SKILLS,
+  SKILLS_DIR,
+  type AgentResult,
+  type AgentNodeOutput,
+  type SkillInfo,
+  type ProcessorLogger,
+  type ProcessorConfig,
+} from "./processor.js";
 
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";
