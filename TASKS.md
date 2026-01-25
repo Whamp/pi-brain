@@ -22,7 +22,7 @@ Track implementation progress. Agents update status as they complete work.
 | 1.3 | Implement JSON file storage for nodes                                            | done   | 1.2  | 2026-01-25 |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | done   | -    | 2026-01-25 |
 | 1.5 | Set up prompt file structure with versioning                                     | done   | -    | 2026-01-25 |
-| 1.6 | Write initial session-analyzer prompt                                            | active | 1.5  | 2026-01-25 |
+| 1.6 | Write initial session-analyzer prompt                                            | done   | 1.5  | 2026-01-25 |
 
 ## Phase 2: Session Parsing
 
@@ -143,6 +143,29 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 09:40 - Task 1.6
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (243 tests total, 4 new prompt installation tests)
+**Commit**: accc137
+**Notes**: Created initial session-analyzer prompt per specs/session-analyzer.md. The prompt includes:
+
+- Role and task definition
+- Complete output schema with all required fields
+- Lesson taxonomy (7 levels: project, task, user, model, tool, skill, subagent)
+- Extraction guidelines for quality analysis
+- Quality criteria (high vs low quality)
+- 3 detailed examples (successful coding, debugging with model quirk, failed refactor)
+- Output validation checklist
+
+Also added:
+
+- prompts/session-analyzer.md - bundled default prompt (~18KB)
+- getBundledPromptPath() - locates prompt in package
+- ensureDefaultPrompt() - copies bundled prompt to ~/.pi-brain/prompts/ if not exists
+
+---
 
 ## 2026-01-25 09:27 - Task 1.5
 
