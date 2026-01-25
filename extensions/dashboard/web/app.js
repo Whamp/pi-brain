@@ -9,9 +9,7 @@ class Dashboard {
   reconnectAttempts = 0;
   maxReconnectAttempts = 10;
   reconnectDelay = 1e3;
-constructor() {
-    
-
+  constructor() {
     this.init();
   }
 
