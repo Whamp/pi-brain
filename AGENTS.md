@@ -154,6 +154,8 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 
 ## Testing
 
+**Warning**: `npm test` runs Vitest in watch mode and will block. Always use `npm test -- --run` for single-run execution, or use tmux if watch mode is needed.
+
 - Write assertions inside `it()` or `test()` blocks
 - Avoid done callbacks in async tests - use async/await instead
 - Don't use `.only` or `.skip` in committed code

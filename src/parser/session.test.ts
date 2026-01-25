@@ -11,7 +11,7 @@ import type {
   SessionInfoEntry,
   SessionMessageEntry,
   UserMessage,
-} from "./types.js";
+} from "../types.js";
 
 import {
   buildTree,
@@ -22,7 +22,7 @@ import {
   getEntry,
   getPathToEntry,
   parseSessionContent,
-} from "./parser.js";
+} from "./session.js";
 
 // =============================================================================
 // Test Helpers

@@ -15,8 +15,8 @@ import {
   findForkRelationships,
   getDefaultSessionDir,
   getOverallStats,
-} from "./analyzer.js";
-import { generateHTML } from "./generator.js";
+} from "./parser/analyzer.js";
+import { generateHTML } from "./web/generator.js";
 
 const program = new Command();
 

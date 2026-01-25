@@ -17,7 +17,7 @@ Track implementation progress. Agents update status as they complete work.
 
 | ID  | Task                                                                             | Status  | Deps | Notes                         |
 | --- | -------------------------------------------------------------------------------- | ------- | ---- | ----------------------------- |
-| 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | pending | -    |                               |
+| 1.1 | Create project structure (src/daemon, src/parser, src/storage, src/api, src/web) | active  | -    | 2026-01-25                    |
 | 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | pending | -    |                               |
 | 1.3 | Implement JSON file storage for nodes                                            | pending | 1.2  |                               |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | pending | -    |                               |
