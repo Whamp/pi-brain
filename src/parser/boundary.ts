@@ -315,6 +315,21 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
     boundaryByEntryId.set(boundary.entryId, boundary);
   }
 
+  // Helper to create a segment from a slice of entries
+  // Precondition: segmentEntries.length > 0 (ensured by caller)
+  function createSegment(segmentEntries: SessionEntry[]): Segment {
+    const [first, ...rest] = segmentEntries;
+    const last = rest.length > 0 ? (rest.at(-1) ?? first) : first;
+    return {
+      startEntryId: first.id,
+      endEntryId: last.id,
+      boundaries: [],
+      entryCount: segmentEntries.length,
+      startTimestamp: first.timestamp,
+      endTimestamp: last.timestamp,
+    };
+  }
+
   let segmentStartIndex = 0;
 
   for (let i = 0; i < contentEntries.length; i++) {
@@ -329,14 +344,7 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
       if (i > segmentStartIndex) {
         // Create segment for entries before this boundary
         const segmentEntries = contentEntries.slice(segmentStartIndex, i);
-        segments.push({
-          startEntryId: segmentEntries[0].id,
-          endEntryId: segmentEntries.at(-1).id,
-          boundaries: [], // No boundary at end of this segment
-          entryCount: segmentEntries.length,
-          startTimestamp: segmentEntries[0].timestamp,
-          endTimestamp: segmentEntries.at(-1).timestamp,
-        });
+        segments.push(createSegment(segmentEntries));
       }
 
       // Update segment start for next iteration
@@ -347,14 +355,7 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
   // Handle the final segment
   if (segmentStartIndex < contentEntries.length) {
     const segmentEntries = contentEntries.slice(segmentStartIndex);
-    segments.push({
-      startEntryId: segmentEntries[0].id,
-      endEntryId: segmentEntries.at(-1).id,
-      boundaries: [], // Final segment has no boundaries leading out
-      entryCount: segmentEntries.length,
-      startTimestamp: segmentEntries[0].timestamp,
-      endTimestamp: segmentEntries.at(-1).timestamp,
-    });
+    segments.push(createSegment(segmentEntries));
   }
 
   return segments;
