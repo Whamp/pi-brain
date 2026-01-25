@@ -7,7 +7,7 @@
 {"type":"session_info","id":"00000006","parentId":"00000005","timestamp":"2026-01-25T10:03:00.000Z","name":"Complex Session - Phase 1"}
 {"type":"message","id":"00000007","parentId":"00000005","timestamp":"2026-01-25T10:04:00.000Z","message":{"role":"user","content":"Keep going"}}
 {"type":"message","id":"00000008","parentId":"00000007","timestamp":"2026-01-25T10:04:10.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Continuing the implementation..."}],"provider":"zai","model":"glm-4.7","usage":{"input":300,"output":150},"stopReason":"end"}}
-{"type":"compaction","id":"00000009","parentId":"00000008","timestamp":"2026-01-25T10:05:00.000Z","summary":"# Context Checkpoint\n\n## Progress\n- Started complex work\n- Completed phase 1","firstKeptEntryIndex":6,"tokensBefore":50000}
+{"type":"compaction","id":"00000009","parentId":"00000008","timestamp":"2026-01-25T10:05:00.000Z","summary":"# Context Checkpoint\n\n## Progress\n- Started complex work\n- Completed phase 1","firstKeptEntryId":"00000007","tokensBefore":50000}
 {"type":"message","id":"00000010","parentId":"00000009","timestamp":"2026-01-25T10:05:05.000Z","message":{"role":"user","content":"Start phase 2"}}
 {"type":"message","id":"00000011","parentId":"00000010","timestamp":"2026-01-25T10:05:15.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Starting phase 2..."}],"provider":"zai","model":"glm-4.7","usage":{"input":400,"output":200},"stopReason":"end"}}
 {"type":"message","id":"00000012","parentId":"00000011","timestamp":"2026-01-25T10:25:00.000Z","message":{"role":"user","content":"I am back after a 20 minute break"}}
