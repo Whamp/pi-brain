@@ -226,6 +226,8 @@ export interface DaemonMeta {
   analysisLog?: string;
   /** Whether RLM skill was needed */
   rlmUsed: boolean;
+  /** Whether codemap skill was available during analysis */
+  codemapAvailable?: boolean;
   /** Approximate tokens in raw segment */
   segmentTokenCount?: number;
 }
