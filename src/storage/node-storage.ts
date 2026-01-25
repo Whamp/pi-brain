@@ -10,6 +10,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { homedir } from "node:os";
@@ -144,10 +145,22 @@ export function listNodeFiles(options: NodeStorageOptions = {}): string[] {
 
   for (const year of years) {
     const yearPath = join(nodesDir, year);
+
+    // Skip if not a directory
+    if (!statSync(yearPath).isDirectory()) {
+      continue;
+    }
+
     const months = readdirSync(yearPath).filter((f) => /^\d{2}$/.test(f));
 
     for (const month of months) {
       const monthPath = join(yearPath, month);
+
+      // Skip if not a directory
+      if (!statSync(monthPath).isDirectory()) {
+        continue;
+      }
+
       const nodeFiles = readdirSync(monthPath).filter((f) =>
         f.endsWith(".json")
       );
