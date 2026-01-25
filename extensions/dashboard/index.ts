@@ -13,7 +13,7 @@
  */
 
 import type { ExtensionAPI, ExtensionContext, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
-import { createServer, type DashboardServer } from "./server.js";
+import { createServer, type DashboardServer, type DashboardAction } from "./server.js";
 import open from "open";
 
 const DEFAULT_PORT = 8765;
@@ -22,7 +22,18 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   let server: DashboardServer | null = null;
   let currentCtx: ExtensionContext | null = null;
   
-  // Navigation/fork from browser are handled via dashboard-nav/dashboard-fork commands
+  // Action queue for command proxying pattern
+  // WebSocket handlers queue actions, then trigger /dashboard-exec which has proper ExtensionCommandContext
+  const pendingActions: DashboardAction[] = [];
+  
+  /**
+   * Queue an action and trigger execution via /dashboard-exec command
+   */
+  function queueAction(action: DashboardAction) {
+    pendingActions.push(action);
+    // Auto-trigger execution - the command handler will have proper context
+    pi.sendUserMessage("/dashboard-exec", { deliverAs: "steer" });
+  }
 
   /**
    * Start the dashboard server
@@ -31,23 +42,23 @@ export default function dashboardExtension(pi: ExtensionAPI) {
     if (server) {
       return server;
     }
+    
+    // Set initial context
+    currentCtx = ctx;
 
     server = await createServer({
       port,
       ctx,
       pi,
-      getSessionData: () => buildSessionData(ctx),
-      onNavigate: async (entryId, summarize) => {
-        // Notify user - they can use /dashboard-nav command
-        ctx.ui.notify(`Navigate: /dashboard-nav ${entryId} ${summarize}`, "info");
+      // Use currentCtx (kept fresh via event handlers) rather than stale ctx from server start
+      getSessionData: () => {
+        if (!currentCtx) {
+          // Fallback to original ctx if currentCtx not set (shouldn't happen)
+          return buildSessionData(ctx);
+        }
+        return buildSessionData(currentCtx);
       },
-      onFork: async (entryId) => {
-        // Notify user - they can use /dashboard-fork command
-        ctx.ui.notify(`Fork: /dashboard-fork ${entryId}`, "info");
-      },
-      onSwitchSession: async (sessionPath) => {
-        ctx.ui.notify(`Session switch requested: ${sessionPath}`, "info");
-      },
+      queueAction,
     });
 
     return server;
@@ -157,6 +168,75 @@ export default function dashboardExtension(pi: ExtensionAPI) {
         ctx.ui.notify(`Forked from ${args.slice(0, 8)}...`, "success");
       } catch (err) {
         ctx.ui.notify(`Fork failed: ${err}`, "error");
+      }
+    },
+  });
+
+  // Register /dashboard-exec command to execute queued actions from WebSocket
+  // This uses the command proxying pattern: WebSocket handlers queue actions,
+  // then trigger this command which has proper ExtensionCommandContext
+  pi.registerCommand("dashboard-exec", {
+    description: "Execute queued dashboard action (internal)",
+    handler: async (_args, ctx: ExtensionCommandContext) => {
+      const action = pendingActions.shift();
+      if (!action) return;
+      
+      switch (action.type) {
+        case "navigate":
+          if (!action.entryId) {
+            ctx.ui.notify("Navigate action missing entryId", "error");
+            return;
+          }
+          try {
+            await ctx.navigateTree(action.entryId, { 
+              summarize: action.summarize ?? false 
+            });
+            ctx.ui.notify(`Navigated to ${action.entryId.slice(0, 8)}...`, "success");
+          } catch (err) {
+            ctx.ui.notify(`Navigation failed: ${err}`, "error");
+          }
+          break;
+          
+        case "fork":
+          if (!action.entryId) {
+            ctx.ui.notify("Fork action missing entryId", "error");
+            return;
+          }
+          try {
+            await ctx.fork(action.entryId);
+            ctx.ui.notify(`Forked from ${action.entryId.slice(0, 8)}...`, "success");
+          } catch (err) {
+            ctx.ui.notify(`Fork failed: ${err}`, "error");
+          }
+          break;
+          
+        case "switch":
+          // Session switching via /resume command
+          if (!action.sessionPath) {
+            ctx.ui.notify("Switch action missing sessionPath", "error");
+            return;
+          }
+          // Use pi.sendUserMessage to trigger /resume command
+          // This switches to the specified session
+          pi.sendUserMessage(`/resume ${action.sessionPath}`, { deliverAs: "steer" });
+          ctx.ui.notify(`Switching to session...`, "info");
+          break;
+          
+        case "summarize":
+          // Standalone summarization of a branch
+          if (!action.entryId) {
+            ctx.ui.notify("Summarize action missing entryId", "error");
+            return;
+          }
+          // Navigate to the entry with summarize flag
+          // This uses Pi's built-in summarization during navigation
+          try {
+            await ctx.navigateTree(action.entryId, { summarize: true });
+            ctx.ui.notify(`Summarized and navigated to ${action.entryId.slice(0, 8)}...`, "success");
+          } catch (err) {
+            ctx.ui.notify(`Summarization failed: ${err}`, "error");
+          }
+          break;
       }
     },
   });

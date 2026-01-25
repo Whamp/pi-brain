@@ -79,7 +79,23 @@ export interface GetStateCommand {
   id?: string;
 }
 
-export type IncomingCommand = NavigateCommand | ForkCommand | SwitchSessionCommand | ListSessionsCommand | GetStateCommand;
+export interface SummarizeCommand {
+  type: "summarize";
+  entryId: string;
+}
+
+export type IncomingCommand = NavigateCommand | ForkCommand | SwitchSessionCommand | ListSessionsCommand | GetStateCommand | SummarizeCommand;
+
+/**
+ * Action queued for execution via /dashboard-exec command
+ * This pattern allows WebSocket handlers to request actions that require ExtensionCommandContext
+ */
+export interface DashboardAction {
+  type: "navigate" | "fork" | "switch" | "summarize";
+  entryId?: string;
+  sessionPath?: string;
+  summarize?: boolean;
+}
 
 export interface DashboardServerOptions {
   port: number;
@@ -93,9 +109,8 @@ export interface DashboardServerOptions {
     leafId: string | null;
     isStreaming: boolean;
   };
-  onNavigate: (entryId: string, summarize: boolean) => Promise<void>;
-  onFork: (entryId: string) => Promise<void>;
-  onSwitchSession: (sessionPath: string) => Promise<void>;
+  /** Queue an action for execution via /dashboard-exec command */
+  queueAction: (action: DashboardAction) => void;
 }
 
 export interface DashboardServer {
@@ -108,7 +123,7 @@ export interface DashboardServer {
  * Create HTTP + WebSocket server for the dashboard
  */
 export async function createServer(options: DashboardServerOptions): Promise<DashboardServer> {
-  const { port, getSessionData, onNavigate, onFork, onSwitchSession } = options;
+  const { port, getSessionData, queueAction } = options;
   
   const clients = new Set<WebSocket>();
   
@@ -232,50 +247,51 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
       }
 
       case "navigate": {
-        try {
-          await onNavigate(command.entryId, command.summarize ?? false);
-          ws.send(JSON.stringify({
-            type: "response",
-            data: { success: true },
-          }));
-        } catch (err) {
-          ws.send(JSON.stringify({
-            type: "error",
-            data: { message: String(err) },
-          }));
-        }
+        queueAction({
+          type: "navigate",
+          entryId: command.entryId,
+          summarize: command.summarize ?? false,
+        });
+        ws.send(JSON.stringify({
+          type: "response",
+          data: { queued: true },
+        }));
         break;
       }
 
       case "fork": {
-        try {
-          await onFork(command.entryId);
-          ws.send(JSON.stringify({
-            type: "response",
-            data: { success: true },
-          }));
-        } catch (err) {
-          ws.send(JSON.stringify({
-            type: "error",
-            data: { message: String(err) },
-          }));
-        }
+        queueAction({
+          type: "fork",
+          entryId: command.entryId,
+        });
+        ws.send(JSON.stringify({
+          type: "response",
+          data: { queued: true },
+        }));
         break;
       }
 
       case "switch_session": {
-        try {
-          await onSwitchSession(command.sessionPath);
-          ws.send(JSON.stringify({
-            type: "response",
-            data: { success: true },
-          }));
-        } catch (err) {
-          ws.send(JSON.stringify({
-            type: "error",
-            data: { message: String(err) },
-          }));
-        }
+        queueAction({
+          type: "switch",
+          sessionPath: command.sessionPath,
+        });
+        ws.send(JSON.stringify({
+          type: "response",
+          data: { queued: true },
+        }));
+        break;
+      }
+
+      case "summarize": {
+        queueAction({
+          type: "summarize",
+          entryId: command.entryId,
+        });
+        ws.send(JSON.stringify({
+          type: "response",
+          data: { queued: true },
+        }));
         break;
       }
 
