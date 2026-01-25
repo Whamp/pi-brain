@@ -1,0 +1,9 @@
+{"type":"session","version":3,"id":"resume-sess-1234-5678-90ab-cdef12345678","timestamp":"2026-01-25T10:00:00.000Z","cwd":"/home/will/projects/test-project"}
+{"type":"message","id":"00000001","parentId":null,"timestamp":"2026-01-25T10:00:01.000Z","message":{"role":"user","content":"Start a task"}}
+{"type":"message","id":"00000002","parentId":"00000001","timestamp":"2026-01-25T10:00:05.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Starting the task..."}],"provider":"google","model":"gemini-2.5-flash","usage":{"input":100,"output":50},"stopReason":"end"}}
+{"type":"message","id":"00000003","parentId":"00000002","timestamp":"2026-01-25T10:05:00.000Z","message":{"role":"user","content":"Continue"}}
+{"type":"message","id":"00000004","parentId":"00000003","timestamp":"2026-01-25T10:05:10.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Continuing..."}],"provider":"google","model":"gemini-2.5-flash","usage":{"input":200,"output":100},"stopReason":"end"}}
+{"type":"message","id":"00000005","parentId":"00000004","timestamp":"2026-01-25T10:25:00.000Z","message":{"role":"user","content":"I am back after a break"}}
+{"type":"message","id":"00000006","parentId":"00000005","timestamp":"2026-01-25T10:25:10.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Welcome back! Let me continue where we left off."}],"provider":"google","model":"gemini-2.5-flash","usage":{"input":300,"output":150},"stopReason":"end"}}
+{"type":"message","id":"00000007","parentId":"00000006","timestamp":"2026-01-25T10:30:00.000Z","message":{"role":"user","content":"Keep going"}}
+{"type":"message","id":"00000008","parentId":"00000007","timestamp":"2026-01-25T10:30:10.000Z","message":{"role":"assistant","content":[{"type":"text","text":"Working on the next part..."}],"provider":"google","model":"gemini-2.5-flash","usage":{"input":400,"output":200},"stopReason":"end"}}
