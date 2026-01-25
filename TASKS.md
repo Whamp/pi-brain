@@ -44,7 +44,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.1 | Implement file watcher (inotify or polling)            | done    | 1.1      | 2026-01-25       |
 | 3.2 | Implement analysis queue (SQLite-backed)               | done    | 1.2      | 2026-01-25       |
 | 3.3 | Implement idle detection (10-minute timeout)           | done    | 3.1      | Completed in 3.1 |
-| 3.4 | Implement job processor (spawns pi agent)              | active  | 3.2      | 2026-01-25       |
+| 3.4 | Implement job processor (spawns pi agent)              | done    | 3.2      | 2026-01-25       |
 | 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |                  |
 | 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |                  |
 | 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                  |
@@ -351,6 +351,36 @@ Also completed Task 3.3 (idle detection) as part of this work - the watcher's `s
 - `src/storage/migrations/003_queue_locking.sql`: Adds worker_id and locked_until columns
 
 Also disabled `no-hooks` and `max-expects` lint rules in .oxlintrc.json (consistent with existing test patterns).
+
+---
+
+## 2026-01-25 15:18 - Task 3.4
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (480 tests total, 49 new processor tests)
+**Commit**: 1814edc
+**Notes**: Implemented job processor for pi agent invocation per specs/daemon.md and specs/session-analyzer.md. Created:
+
+- `src/daemon/processor.ts`: JobProcessor class with:
+  - `invokeAgent()`: Spawns pi with correct flags (--provider, --model, --system-prompt, --skills, --no-session, --mode json)
+  - `parseAgentOutput()`: Parses pi's JSON mode streaming output (newline-delimited JSON events)
+  - `extractNodeFromText()`: Extracts JSON from code-fenced or raw text responses
+  - `isValidNodeOutput()`: Basic schema validation for AgentNodeOutput
+  - `buildAnalysisPrompt()`: Constructs analysis prompts from AnalysisJob
+  - Skill management: checkSkillAvailable, getSkillAvailability, buildSkillsArg, validateRequiredSkills
+  - ProcessorLogger interface for customizable logging
+  - Timeout support with configurable analysisTimeoutMinutes
+  - Required skill: rlm (for handling long sessions)
+  - Optional skill: codemap (for code structure analysis)
+- `src/daemon/processor.test.ts`: 49 comprehensive tests
+- Updated `src/daemon/index.ts` to export processor functionality
+
+Key design decisions:
+
+- Uses spawnPiProcess helper to avoid multiple Promise resolve calls (lint-compliant)
+- Skills directory: ~/skills/ (standard pi skill location)
+- Prompt passed via -p flag, system prompt via --system-prompt
+- JSON extraction tries code fence first, then raw JSON fallback
 
 ---
 
