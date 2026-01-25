@@ -103,7 +103,7 @@ function createLabelEntry(
   id: string,
   parentId: string | null,
   targetId: string,
-  label: string | undefined,
+  label?: string,
   timestamp?: string
 ): LabelEntry {
   return {
