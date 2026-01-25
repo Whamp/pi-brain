@@ -672,8 +672,12 @@ GET /api/v1/stats/tool-errors
   "status": "success",
   "data": {
     "byTool": [
-      { "tool": "edit", "count": 47, "models": ["gemini-3-flash"] },
-      { "tool": "bash", "count": 12, "models": ["glm-4.7"] }
+      {
+        "tool": "edit",
+        "count": 47,
+        "models": ["google-antigravity/gemini-3-flash"]
+      },
+      { "tool": "bash", "count": 12, "models": ["zai/glm-4.7"] }
     ],
     "byModel": [
       { "model": "google-antigravity/gemini-3-flash", "count": 52 },
