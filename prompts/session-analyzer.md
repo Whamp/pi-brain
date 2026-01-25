@@ -649,7 +649,7 @@ Before returning, validate your output:
 
 1. **Required fields**: All top-level fields must be present
 2. **Summary length**: At least 10 characters
-3. **Model format**: All model references use "provider/model" format
+3. **Model format**: `modelQuirks[].model` and `toolUseErrors[].model` use "provider/model" format (e.g., "anthropic/claude-sonnet-4-20250514")
 4. **Tags quality**: No generic tags like "code" or "programming"
 5. **Outcome accuracy**: Matches what actually happened
 
