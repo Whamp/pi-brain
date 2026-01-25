@@ -6,7 +6,7 @@ import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, basename } from "node:path";
 
-import  { type SessionInfo, type ForkRelationship, type ProjectGroup } from "./types.js";
+import type { SessionInfo, ForkRelationship, ProjectGroup } from "./types.js";
 
 import { parseSession } from "./parser.js";
 

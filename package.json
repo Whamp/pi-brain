@@ -32,8 +32,8 @@
     "build": "tsup src/index.ts src/cli.ts --format esm --dts --clean",
     "dev": "tsup src/index.ts src/cli.ts --format esm --dts --watch",
     "test": "vitest",
-    "lint": "biome check src/",
-    "format": "biome format --write src/",
+    "check": "ultracite check",
+    "fix": "ultracite fix",
     "prepublishOnly": "npm run build",
     "prepare": "husky"
   },
@@ -42,7 +42,6 @@
     "open": "^10.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.10.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",

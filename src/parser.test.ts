@@ -4,13 +4,13 @@
 
 import { describe, expect, it } from "vitest";
 
-import  {
-  type AssistantMessage,
-  type LabelEntry,
-  type SessionEntry,
-  type SessionInfoEntry,
-  type SessionMessageEntry,
-  type UserMessage,
+import type {
+  AssistantMessage,
+  LabelEntry,
+  SessionEntry,
+  SessionInfoEntry,
+  SessionMessageEntry,
+  UserMessage,
 } from "./types.js";
 
 import {
@@ -148,7 +148,7 @@ function createValidSessionContent(entries: SessionEntry[] = []): string {
 // parseSessionContent Tests
 // =============================================================================
 
-describe(parseSessionContent, () => {
+describe("parseSessionContent", () => {
   describe("happy path", () => {
     it("parses a valid session with header only", () => {
       const content = createValidSessionContent();
@@ -291,7 +291,7 @@ describe(parseSessionContent, () => {
 // buildTree Tests
 // =============================================================================
 
-describe(buildTree, () => {
+describe("buildTree", () => {
   describe("happy path", () => {
     it("returns null for empty entries", () => {
       const tree = buildTree([]);
@@ -487,7 +487,7 @@ describe(buildTree, () => {
 // findLeaf Tests
 // =============================================================================
 
-describe(findLeaf, () => {
+describe("findLeaf", () => {
   it("returns null for empty entries", () => {
     expect(findLeaf([])).toBeNull();
   });
@@ -553,7 +553,7 @@ describe(findLeaf, () => {
 // findBranchPoints Tests
 // =============================================================================
 
-describe(findBranchPoints, () => {
+describe("findBranchPoints", () => {
   it("returns empty array for empty entries", () => {
     expect(findBranchPoints([])).toStrictEqual([]);
   });
@@ -604,7 +604,7 @@ describe(findBranchPoints, () => {
 // calculateStats Tests
 // =============================================================================
 
-describe(calculateStats, () => {
+describe("calculateStats", () => {
   it("returns zeroed message counts for empty entries", () => {
     const stats = calculateStats([], null);
 
@@ -800,7 +800,7 @@ describe(calculateStats, () => {
 // extractTextPreview Tests
 // =============================================================================
 
-describe(extractTextPreview, () => {
+describe("extractTextPreview", () => {
   it("extracts text from string content", () => {
     const message: UserMessage = {
       role: "user",
@@ -890,7 +890,7 @@ describe(extractTextPreview, () => {
 // getPathToEntry Tests
 // =============================================================================
 
-describe(getPathToEntry, () => {
+describe("getPathToEntry", () => {
   it("returns empty array for non-existent entry", () => {
     const entries = [createMessageEntry("1", null, "user")];
 
@@ -941,7 +941,7 @@ describe(getPathToEntry, () => {
 // getEntry Tests
 // =============================================================================
 
-describe(getEntry, () => {
+describe("getEntry", () => {
   it("returns undefined for empty entries", () => {
     expect(getEntry([], "1")).toBeUndefined();
   });

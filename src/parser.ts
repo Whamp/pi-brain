@@ -5,18 +5,18 @@
 
 import { readFile } from "node:fs/promises";
 
-import  {
-  type SessionHeader,
-  type SessionEntry,
-  type SessionInfo,
-  type TreeNode,
-  type SessionStats,
-  type SessionMessageEntry,
-  type AssistantMessage,
-  type UserMessage,
-  type TextContent,
-  type LabelEntry,
-  type SessionInfoEntry,
+import type {
+  SessionHeader,
+  SessionEntry,
+  SessionInfo,
+  TreeNode,
+  SessionStats,
+  SessionMessageEntry,
+  AssistantMessage,
+  UserMessage,
+  TextContent,
+  LabelEntry,
+  SessionInfoEntry,
 } from "./types.js";
 
 /**
