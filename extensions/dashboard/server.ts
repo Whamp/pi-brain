@@ -2,12 +2,11 @@
  * HTTP + WebSocket server for the dashboard
  */
 
-import  {
-  type ExtensionAPI,
-  type ExtensionContext,
-  type SessionEntry,
+import type {
+  ExtensionAPI,
+  ExtensionContext,
+  SessionEntry,
 } from "@mariozechner/pi-coding-agent";
-
 import { readFile } from "node:fs/promises";
 import {
   createServer as createHttpServer,

@@ -6,11 +6,11 @@ class Dashboard {
   ws = null;
   sessionData = null;
   selectedNode = null;
+  reconnectAttempts = 0;
+  maxReconnectAttempts = 10;
+  reconnectDelay = 1e3;
 constructor() {
     
-    this.reconnectAttempts = 0;
-    this.maxReconnectAttempts = 10;
-    this.reconnectDelay = 1000;
 
     this.init();
   }

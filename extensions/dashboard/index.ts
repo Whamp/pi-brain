@@ -12,12 +12,11 @@
  * - Switch between sessions
  */
 
-import  {
-  type ExtensionAPI,
-  type ExtensionContext,
-  type ExtensionCommandContext,
+import type {
+  ExtensionAPI,
+  ExtensionContext,
+  ExtensionCommandContext,
 } from "@mariozechner/pi-coding-agent";
-
 import open from "open";
 
 import {
@@ -118,10 +117,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   /**
    * Broadcast agent status change
    */
-  function broadcastAgentStatus(
-    isStreaming: boolean,
-    isCompacting: boolean = false
-  ) {
+  function broadcastAgentStatus(isStreaming: boolean, isCompacting = false) {
     if (!server) {
       return;
     }

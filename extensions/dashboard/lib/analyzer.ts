@@ -6,9 +6,12 @@ import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, basename } from "node:path";
 
-import  { type SessionInfo, type ForkRelationship, type ProjectGroup } from "./types.js";
-
 import { parseSession } from "./parser.js";
+import type {
+  SessionInfo,
+  ForkRelationship,
+  ProjectGroup,
+} from "./types.js";
 
 /**
  * Default session directory
@@ -104,7 +107,10 @@ export function groupByProject(sessions: SessionInfo[]): ProjectGroup[] {
     if (!groups.has(cwd)) {
       groups.set(cwd, []);
     }
-    groups.get(cwd)!.push(session);
+    const group = groups.get(cwd);
+    if (group) {
+      group.push(session);
+    }
   }
 
   const result: ProjectGroup[] = [];

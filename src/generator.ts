@@ -3,16 +3,18 @@
  * Creates a self-contained HTML file with embedded CSS and JS
  */
 
-import  {
-  type SessionInfo,
-  type ForkRelationship,
-  type TreeNode,
-  type SessionEntry,
-  type SessionMessageEntry,
-  type AssistantMessage,
-} from "./types.js";
-
 import { groupByProject } from "./analyzer.js";
+import type {
+  SessionInfo,
+  ForkRelationship,
+  TreeNode,
+  SessionMessageEntry,
+  AssistantMessage,
+  CompactionEntry,
+  BranchSummaryEntry,
+  ModelChangeEntry,
+  ThinkingLevelChangeEntry,
+} from "./types.js";
 
 /**
  * Compact session info for embedding (removes full content)
@@ -111,15 +113,15 @@ function compressTree(node: TreeNode): CompactTreeNode {
     }
   } else if (entry.type === "compaction") {
     label = "[Compaction]";
-    content = (entry as any).summary?.slice(0, 300);
+    content = (entry as CompactionEntry).summary?.slice(0, 300);
   } else if (entry.type === "branch_summary") {
     label = "[Branch Summary]";
-    content = (entry as any).summary?.slice(0, 300);
+    content = (entry as BranchSummaryEntry).summary?.slice(0, 300);
   } else if (entry.type === "model_change") {
-    const mc = entry as any;
+    const mc = entry as ModelChangeEntry;
     label = `Model → ${mc.provider}/${mc.modelId}`;
   } else if (entry.type === "thinking_level_change") {
-    label = `Thinking → ${(entry as any).thinkingLevel}`;
+    label = `Thinking → ${(entry as ThinkingLevelChangeEntry).thinkingLevel}`;
   } else {
     label = entry.type;
   }

@@ -5,18 +5,18 @@
 
 import { readFile } from "node:fs/promises";
 
-import  {
-  type SessionHeader,
-  type SessionEntry,
-  type SessionInfo,
-  type TreeNode,
-  type SessionStats,
-  type SessionMessageEntry,
-  type AssistantMessage,
-  type UserMessage,
-  type TextContent,
-  type LabelEntry,
-  type SessionInfoEntry,
+import type {
+  SessionHeader,
+  SessionEntry,
+  SessionInfo,
+  TreeNode,
+  SessionStats,
+  SessionMessageEntry,
+  AssistantMessage,
+  UserMessage,
+  TextContent,
+  LabelEntry,
+  SessionInfoEntry,
 } from "./types.js";
 
 /**
@@ -102,7 +102,10 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
     if (!childrenMap.has(parentId)) {
       childrenMap.set(parentId, []);
     }
-    childrenMap.get(parentId)!.push(entry);
+    const children = childrenMap.get(parentId);
+    if (children) {
+      children.push(entry);
+    }
   }
 
   // Sort children by timestamp
@@ -119,7 +122,10 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
         if (!labelsMap.has(labelEntry.targetId)) {
           labelsMap.set(labelEntry.targetId, []);
         }
-        labelsMap.get(labelEntry.targetId)!.push(labelEntry.label);
+        const labels = labelsMap.get(labelEntry.targetId);
+        if (labels) {
+          labels.push(labelEntry.label);
+        }
       }
     }
   }
