@@ -177,7 +177,7 @@ interface ModelObservations {
 }
 
 interface ModelUsage {
-  provider: string; // "anthropic", "zai", etc.
+  provider: string; // "google-antigravity", "zai", etc.
   model: string; // "gemini-3-flash", "glm-4.7"
   tokensInput: number;
   tokensOutput: number;

@@ -249,7 +249,7 @@ function formatModelSection(
 
 ### Example Generated Content
 
-For Claude Sonnet:
+For Gemini 3 Flash:
 
 ```markdown
 ## Notes for gemini-3-flash
