@@ -178,7 +178,7 @@ Key design decisions:
 **Commit**: 079c393
 **Notes**: Created comprehensive integration tests with real session file fixtures per specs/pi-integration.md and specs/node-model.md. Added:
 
-- 6 realistic JSONL fixtures in src/parser/**fixtures**/:
+- 6 realistic JSONL fixtures in `src/parser/__fixtures__/`:
   - simple-session.jsonl: Basic linear conversation
   - session-with-compaction.jsonl: Context compaction boundary
   - session-with-branch-summary.jsonl: Tree navigation with summary
