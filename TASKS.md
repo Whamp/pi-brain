@@ -26,16 +26,16 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 2: Session Parsing
 
-| ID  | Task                                                                | Status  | Deps    | Notes |
-| --- | ------------------------------------------------------------------- | ------- | ------- | ----- |
-| 2.1 | Enhance existing parser to detect all boundary types                | pending | 1.1     |       |
-| 2.2 | Implement branch_summary entry detection (tree/branch with summary) | pending | 2.1     |       |
-| 2.3 | Implement parentId mismatch detection (tree without summary)        | pending | 2.1     |       |
-| 2.4 | Implement compaction entry detection                                | pending | 2.1     |       |
-| 2.5 | Implement fork detection (new sessions with parentSession)          | pending | 2.1     |       |
-| 2.6 | Implement 10-minute timestamp gap detection (resume)                | pending | 2.1     |       |
-| 2.7 | Implement segment extraction (start_entry_id, end_entry_id)         | pending | 2.1-2.6 |       |
-| 2.8 | Write tests with real session files                                 | pending | 2.7     |       |
+| ID  | Task                                                                | Status  | Deps    | Notes      |
+| --- | ------------------------------------------------------------------- | ------- | ------- | ---------- |
+| 2.1 | Enhance existing parser to detect all boundary types                | active  | 1.1     | 2026-01-25 |
+| 2.2 | Implement branch_summary entry detection (tree/branch with summary) | pending | 2.1     |            |
+| 2.3 | Implement parentId mismatch detection (tree without summary)        | pending | 2.1     |            |
+| 2.4 | Implement compaction entry detection                                | pending | 2.1     |            |
+| 2.5 | Implement fork detection (new sessions with parentSession)          | pending | 2.1     |            |
+| 2.6 | Implement 10-minute timestamp gap detection (resume)                | pending | 2.1     |            |
+| 2.7 | Implement segment extraction (start_entry_id, end_entry_id)         | pending | 2.1-2.6 |            |
+| 2.8 | Write tests with real session files                                 | pending | 2.7     |            |
 
 ## Phase 3: Daemon Core
 
