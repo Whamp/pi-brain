@@ -39,17 +39,17 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 3: Daemon Core
 
-| ID  | Task                                                   | Status  | Deps     | Notes               |
-| --- | ------------------------------------------------------ | ------- | -------- | ------------------- |
-| 3.1 | Implement file watcher (inotify or polling)            | pending | 1.1      | see specs/daemon.md |
-| 3.2 | Implement analysis queue (SQLite-backed)               | pending | 1.2      |                     |
-| 3.3 | Implement idle detection (10-minute timeout)           | pending | 3.1      |                     |
-| 3.4 | Implement job processor (spawns pi agent)              | pending | 3.2      |                     |
-| 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |                     |
-| 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |                     |
-| 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                     |
-| 3.8 | Implement error handling and retry logic               | pending | 3.4      |                     |
-| 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                     |
+| ID  | Task                                                   | Status  | Deps     | Notes      |
+| --- | ------------------------------------------------------ | ------- | -------- | ---------- |
+| 3.1 | Implement file watcher (inotify or polling)            | active  | 1.1      | 2026-01-25 |
+| 3.2 | Implement analysis queue (SQLite-backed)               | pending | 1.2      |            |
+| 3.3 | Implement idle detection (10-minute timeout)           | pending | 3.1      |            |
+| 3.4 | Implement job processor (spawns pi agent)              | pending | 3.2      |            |
+| 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |            |
+| 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |            |
+| 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |            |
+| 3.8 | Implement error handling and retry logic               | pending | 3.4      |            |
+| 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |            |
 
 ## Phase 4: Node Storage & Queries
 

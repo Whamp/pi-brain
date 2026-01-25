@@ -22,5 +22,32 @@ export * from "./config/index.js";
 // Prompt module
 export * from "./prompt/index.js";
 
+// Daemon module
+export {
+  createWatcher,
+  DEFAULT_WATCHER_CONFIG,
+  DAEMON_MODULE_VERSION,
+  getProjectFromSessionPath,
+  getSessionName,
+  isSessionFile,
+  SessionWatcher,
+  // Event helpers
+  SESSION_EVENTS,
+  createSessionEvent,
+  createErrorEvent,
+  createReadyEvent,
+  isSessionEvent,
+  isErrorEvent,
+  getSessionPath,
+  getEventError,
+} from "./daemon/index.js";
+export type {
+  SessionState,
+  WatcherConfig,
+  SessionEventDetail,
+  ErrorEventDetail,
+  SessionEventName,
+} from "./daemon/index.js";
+
 // Web visualization
 export * from "./web/generator.js";
