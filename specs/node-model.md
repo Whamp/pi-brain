@@ -178,7 +178,7 @@ interface ModelObservations {
 
 interface ModelUsage {
   provider: string; // "anthropic", "zai", etc.
-  model: string; // "claude-sonnet-4-20250514", "glm-4.7"
+  model: string; // "gemini-3-flash", "glm-4.7"
   tokensInput: number;
   tokensOutput: number;
   cacheRead?: number;

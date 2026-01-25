@@ -400,11 +400,11 @@ GET /api/v1/quirks
 
 **Query Parameters:**
 
-| Parameter   | Type   | Description                                                  |
-| ----------- | ------ | ------------------------------------------------------------ |
-| `model`     | string | Filter by model (e.g., "anthropic/claude-sonnet-4-20250514") |
-| `severity`  | string | Minimum severity                                             |
-| `frequency` | string | Minimum frequency                                            |
+| Parameter   | Type   | Description                                                 |
+| ----------- | ------ | ----------------------------------------------------------- |
+| `model`     | string | Filter by model (e.g., "google-antigravity/gemini-3-flash") |
+| `severity`  | string | Minimum severity                                            |
+| `frequency` | string | Minimum frequency                                           |
 
 **Response:**
 
@@ -415,7 +415,7 @@ GET /api/v1/quirks
     "quirks": [
       {
         "id": "quirk-123",
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "observation": "Uses sed to read files instead of read tool",
         "frequency": "often",
         "severity": "low",
@@ -453,7 +453,7 @@ GET /api/v1/tool-errors
         "tool": "edit",
         "errorType": "exact_match_failed",
         "count": 47,
-        "models": ["anthropic/claude-sonnet-4-20250514", "zai/glm-4.7"],
+        "models": ["google-antigravity/gemini-3-flash", "zai/glm-4.7"],
         "recentNodes": ["a1b2c3d4", "b2c3d4e5"]
       }
     ]
@@ -603,7 +603,7 @@ GET /api/v1/stats
       "totalTokens": 2500000,
       "totalCost": 12.45,
       "byModel": {
-        "anthropic/claude-sonnet-4-20250514": {
+        "google-antigravity/gemini-3-flash": {
           "tokens": 1500000,
           "cost": 8.5
         },
@@ -645,7 +645,7 @@ GET /api/v1/stats/models
   "data": {
     "models": [
       {
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "totalTokens": 1500000,
         "totalCost": 8.5,
         "sessionCount": 200,
@@ -672,11 +672,11 @@ GET /api/v1/stats/tool-errors
   "status": "success",
   "data": {
     "byTool": [
-      { "tool": "edit", "count": 47, "models": ["claude-sonnet-4-20250514"] },
+      { "tool": "edit", "count": 47, "models": ["gemini-3-flash"] },
       { "tool": "bash", "count": 12, "models": ["glm-4.7"] }
     ],
     "byModel": [
-      { "model": "anthropic/claude-sonnet-4-20250514", "count": 52 },
+      { "model": "google-antigravity/gemini-3-flash", "count": 52 },
       { "model": "zai/glm-4.7", "count": 8 }
     ],
     "trends": {

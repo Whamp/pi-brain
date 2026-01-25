@@ -252,7 +252,7 @@ function formatModelSection(
 For Claude Sonnet:
 
 ```markdown
-## Notes for claude-sonnet-4-20250514
+## Notes for gemini-3-flash
 
 ### Known quirks to avoid:
 
@@ -526,7 +526,7 @@ async function measureEffectiveness(
 │  │ Active Prompt Additions                                      [Refresh] │   │
 │  │                                                                        │   │
 │  │ ┌─────────────────────────────────────────────────────────────────┐   │   │
-│  │ │ claude-sonnet-4-20250514                               3 insights │   │   │
+│  │ │ gemini-3-flash                               3 insights │   │   │
 │  │ │ ▼ Uses sed instead of read tool                                  │   │   │
 │  │ │   Frequency: 15 times • Improvement: +45% ✓                      │   │   │
 │  │ │   [View] [Edit] [Disable]                                        │   │   │
@@ -662,7 +662,7 @@ pi-brain prompt-learning run
 pi-brain prompt-learning insights
 
 # Preview generated prompts
-pi-brain prompt-learning preview --model anthropic/claude-sonnet-4-20250514
+pi-brain prompt-learning preview --model google-antigravity/gemini-3-flash
 
 # Enable/disable insights
 pi-brain prompt-learning enable insight-123

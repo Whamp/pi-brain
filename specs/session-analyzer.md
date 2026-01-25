@@ -136,8 +136,8 @@ Return a JSON object with this structure:
   "observations": {
     "modelsUsed": [
       {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-20250514",
+        "provider": "google-antigravity",
+        "model": "gemini-3-flash",
         "tokensInput": 15000,
         "tokensOutput": 3000,
         "cost": 0.05
@@ -147,7 +147,7 @@ Return a JSON object with this structure:
     "promptingFailures": ["Approaches that failed"],
     "modelQuirks": [
       {
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "observation": "What happened",
         "frequency": "once | sometimes | often | always",
         "workaround": "How to avoid",
@@ -159,7 +159,7 @@ Return a JSON object with this structure:
         "tool": "edit",
         "errorType": "exact_match_failed",
         "context": "What led to the error",
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "wasRetried": true
       }
     ]
@@ -415,8 +415,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-20250514",
+        "provider": "google-antigravity",
+        "model": "gemini-3-flash",
         "tokensInput": 25000,
         "tokensOutput": 8000,
         "cost": 0.12
@@ -528,8 +528,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-20250514",
+        "provider": "google-antigravity",
+        "model": "gemini-3-flash",
         "tokensInput": 18000,
         "tokensOutput": 4000,
         "cost": 0.07
@@ -539,7 +539,7 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     "promptingFailures": [],
     "modelQuirks": [
       {
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "observation": "Uses bash/sed/cat to read files instead of read tool",
         "frequency": "often",
         "workaround": "Add reminder in system prompt to prefer read tool",
@@ -637,8 +637,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "anthropic",
-        "model": "claude-sonnet-4-20250514",
+        "provider": "google-antigravity",
+        "model": "gemini-3-flash",
         "tokensInput": 12000,
         "tokensOutput": 3000,
         "cost": 0.05
@@ -654,14 +654,14 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
         "tool": "edit",
         "errorType": "exact_match_failed",
         "context": "Attempted large multi-line change without verifying exact text",
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "wasRetried": true
       },
       {
         "tool": "edit",
         "errorType": "whitespace_mismatch",
         "context": "Retry used tabs instead of spaces",
-        "model": "anthropic/claude-sonnet-4-20250514",
+        "model": "google-antigravity/gemini-3-flash",
         "wasRetried": false
       }
     ]

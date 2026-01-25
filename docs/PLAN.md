@@ -947,7 +947,7 @@ Output:
 },
 "model_quirks": [
 {
-"model": "anthropic/claude-sonnet-4-20250514",
+"model": "google-antigravity/gemini-3-flash",
 "observation": "Uses sed/cat to read files instead of read tool",
 "frequency": "often",
 "workaround": "Remind in system prompt to use read tool"
