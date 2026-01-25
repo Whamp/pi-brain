@@ -8,15 +8,25 @@ if [ -z "$(git diff --cached --name-only)" ]; then
   exit 0
 fi
 
-# Run formatter
+# Run linter fixes
 npx ultracite fix
+LINT_EXIT_CODE=$?
+
+if [ $LINT_EXIT_CODE -ne 0 ]; then
+  echo "Linting failed"
+  exit $LINT_EXIT_CODE
+fi
+
+# Run formatter
+npx oxfmt --write .
 FORMAT_EXIT_CODE=$?
 
 if [ $FORMAT_EXIT_CODE -ne 0 ]; then
+  echo "Formatting failed"
   exit $FORMAT_EXIT_CODE
 fi
 
-# Re-add any files that were modified by formatter
+# Re-add any files that were modified by linter/formatter
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
 if [ -n "$STAGED_FILES" ]; then
   echo "$STAGED_FILES" | while IFS= read -r file; do
@@ -24,6 +34,15 @@ if [ -n "$STAGED_FILES" ]; then
       git add "$file"
     fi
   done
+fi
+
+# Run full check to ensure everything passes
+npx ultracite check
+CHECK_EXIT_CODE=$?
+
+if [ $CHECK_EXIT_CODE -ne 0 ]; then
+  echo "Check failed after fixes - there may be unfixable issues"
+  exit $CHECK_EXIT_CODE
 fi
 
 # Run tests (with --run to avoid watch mode)

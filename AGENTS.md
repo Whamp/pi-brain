@@ -2,13 +2,62 @@
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
 
-## Quick Reference
+## Toolchain
 
-- **Format code**: `npm exec -- ultracite fix`
-- **Check for issues**: `npm exec -- ultracite check`
-- **Diagnose setup**: `npm exec -- ultracite doctor`
+Ultracite wraps two tools:
 
-Oxlint + Oxfmt (the underlying engine) provides robust linting and formatting. Most issues are automatically fixable.
+- **oxlint** - Fast linter (rules configured in `.oxlintrc.json`)
+- **oxfmt** - Fast formatter (configured in `.oxfmtrc.jsonc`)
+
+## Commands
+
+| Command                | What it does                                         |
+| ---------------------- | ---------------------------------------------------- |
+| `npm run check`        | Run linter + formatter check (fails if issues found) |
+| `npm run fix`          | Run linter fixes only (does NOT format)              |
+| `npx oxfmt --write .`  | Run formatter to fix formatting                      |
+| `npx ultracite doctor` | Diagnose setup issues                                |
+
+### Full Fix Workflow
+
+```bash
+# Fix all issues (lint + format)
+npm run fix && npx oxfmt --write .
+
+# Verify clean
+npm run check
+```
+
+### Pre-commit Hook
+
+The pre-commit hook runs:
+
+1. `npm run fix` - Auto-fix lint issues
+2. `npx oxfmt --write .` - Auto-fix formatting
+3. `npm test -- --run` - Run tests
+
+If any step fails, the commit is blocked.
+
+---
+
+## Configuration
+
+### `.oxlintrc.json` - Linter Rules
+
+Extends ultracite's core config. Project-specific rule overrides:
+
+```json
+{
+  "extends": ["./node_modules/ultracite/config/oxlint/core/.oxlintrc.json"],
+  "rules": {
+    "rule-name": "off" // Disable a rule
+  }
+}
+```
+
+### `.oxfmtrc.jsonc` - Formatter Config
+
+Standard Prettier-compatible options (printWidth, semi, quotes, etc.)
 
 ---
 
@@ -120,7 +169,3 @@ Oxlint + Oxfmt's linter will catch most issues automatically. Focus your attenti
 4. **Edge cases** - Handle boundary conditions and error states
 5. **User experience** - Accessibility, performance, and usability considerations
 6. **Documentation** - Add comments for complex logic, but prefer self-documenting code
-
----
-
-Most formatting and common issues are automatically fixed by Oxlint + Oxfmt. Run `npm exec -- ultracite fix` before committing to ensure compliance.
