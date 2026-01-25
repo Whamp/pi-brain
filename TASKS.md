@@ -144,26 +144,26 @@ Track implementation progress. Agents update status as they complete work.
 
 <!-- Agents append entries here after completing tasks -->
 
-## 2026-01-25 09:40 - Task 1.6
+## 2026-01-25 11:52 - Task 1.6
 
 **Status**: pending → done
-**Validation**: npm run check passes, npm test passes (243 tests total, 4 new prompt installation tests)
-**Commit**: accc137
-**Notes**: Created initial session-analyzer prompt per specs/session-analyzer.md. The prompt includes:
+**Validation**: npm run check passes, npm test passes (239 tests), integration test validates prompt structure
+**Commit**: 328f2e1
+**Notes**: Wrote initial session-analyzer prompt per specs/session-analyzer.md. The prompt:
 
-- Role and task definition
-- Complete output schema with all required fields
-- Lesson taxonomy (7 levels: project, task, user, model, tool, skill, subagent)
-- Extraction guidelines for quality analysis
-- Quality criteria (high vs low quality)
-- 3 detailed examples (successful coding, debugging with model quirk, failed refactor)
-- Output validation checklist
+- Defines the analyzer's role as a "librarian" extracting structured insights
+- Specifies complete JSON output schema matching node-types.ts interfaces
+- Includes lesson taxonomy (project, task, user, model, tool, skill, subagent)
+- Provides 3 detailed examples (successful implementation, debugging with model quirk, failed session)
+- Documents extraction guidelines and quality criteria
+- Explains RLM and codemap skill integration
+- Covers vague goal detection (hadClearGoal)
+- Documents daemonMeta.decisions for judgment calls
 
-Also added:
+Prompt created at:
 
-- prompts/session-analyzer.md - bundled default prompt (~18KB)
-- getBundledPromptPath() - locates prompt in package
-- ensureDefaultPrompt() - copies bundled prompt to ~/.pi-brain/prompts/ if not exists
+- prompts/session-analyzer.md (project source, version controlled)
+- ~/.pi-brain/prompts/session-analyzer.md (runtime location)
 
 ---
 

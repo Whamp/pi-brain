@@ -32,9 +32,26 @@ Focus on:
 - Tool results — What worked/failed?
 - Compaction summaries — What happened before compaction?
 
-## Output Schema
+## Understanding Code Changes
 
-Return a JSON object with this structure:
+Use the codemap skill (if available) to understand code structure:
+
+- `codemap <file>` — See exports, imports, structure
+- `codemap deps <file>` — See what a file depends on
+- `codemap callers <symbol>` — See what calls a function
+- `codemap "src/**/*.ts" --budget 20000` — Project overview
+
+This helps you understand:
+
+- The role of modified files in the codebase
+- Dependencies affected by changes
+- Architectural decisions and their context
+
+If codemap is unavailable, proceed without it and note `"codemapAvailable": false` in daemonMeta.
+
+## Output Format
+
+Return a **single JSON object** matching this exact structure. Do not include any text before or after the JSON.
 
 ```json
 {
@@ -81,8 +98,8 @@ Return a JSON object with this structure:
   "observations": {
     "modelsUsed": [
       {
-        "provider": "google-antigravity",
-        "model": "gemini-3-flash",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-20250514",
         "tokensInput": 15000,
         "tokensOutput": 3000,
         "cost": 0.05
@@ -92,7 +109,7 @@ Return a JSON object with this structure:
     "promptingFailures": ["Approaches that failed"],
     "modelQuirks": [
       {
-        "model": "google-antigravity/gemini-3-flash",
+        "model": "anthropic/claude-sonnet-4-20250514",
         "observation": "What happened",
         "frequency": "once | sometimes | often | always",
         "workaround": "How to avoid",
@@ -104,7 +121,7 @@ Return a JSON object with this structure:
         "tool": "edit",
         "errorType": "exact_match_failed",
         "context": "What led to the error",
-        "model": "google-antigravity/gemini-3-flash",
+        "model": "anthropic/claude-sonnet-4-20250514",
         "wasRetried": true
       }
     ]
@@ -124,8 +141,23 @@ Return a JSON object with this structure:
         "needsReview": false
       }
     ],
-    "rlmUsed": false
+    "rlmUsed": false,
+    "codemapAvailable": true
   }
+}
+```
+
+## Lesson Format
+
+Each lesson object has this structure:
+
+```json
+{
+  "level": "project | task | user | model | tool | skill | subagent",
+  "summary": "One-line summary",
+  "details": "Full explanation with context",
+  "confidence": "high | medium | low",
+  "tags": ["relevant", "tags"]
 }
 ```
 
@@ -217,7 +249,7 @@ Subagent patterns:
 
 - Always note which model made an observation
 - Different models behave differently
-- Quirks should be tied to specific providers/models
+- Quirks should be tied to specific providers/models using "provider/model" format
 
 ### Note Tool Usage
 
@@ -230,27 +262,28 @@ Subagent patterns:
 Set `hadClearGoal: false` when:
 
 - User says "improve", "fix", "update" without specifics
-- User's first message is unclear
-- Significant clarification was needed
+- User's first message is unclear about what to do
+- Significant clarification was needed before work could begin
+- The request was ambiguous or open-ended
 
 ## Quality Criteria
 
 ### High-Quality Analysis
 
-✅ Specific, actionable lessons
-✅ Model-specific observations with provider/model
-✅ Clear decision rationale with alternatives
-✅ Accurate outcome assessment
-✅ Useful tags for future search
+✅ Specific, actionable lessons  
+✅ Model-specific observations with provider/model  
+✅ Clear decision rationale with alternatives  
+✅ Accurate outcome assessment  
+✅ Useful tags for future search  
 ✅ Non-obvious insights
 
 ### Low-Quality Analysis
 
-❌ Vague summaries ("worked on code")
-❌ Generic lessons ("be careful with errors")
-❌ Missing model specifics
-❌ Incorrect outcome (success when actually failed)
-❌ Obvious/useless tags ("coding", "computer")
+❌ Vague summaries ("worked on code")  
+❌ Generic lessons ("be careful with errors")  
+❌ Missing model specifics  
+❌ Incorrect outcome (success when actually failed)  
+❌ Obvious/useless tags ("coding", "computer")  
 ❌ Missing key decisions
 
 ## Handling Long Sessions
@@ -264,20 +297,7 @@ If the session segment is too long to fit in context, use the RLM skill:
 
 When you receive an RLM synthesis, validate and enhance it rather than re-analyzing.
 
-## Understanding Code Changes
-
-Use the codemap skill to understand code structure (if available):
-
-- `codemap <file>` — See exports, imports, structure
-- `codemap deps <file>` — See what a file depends on
-- `codemap callers <symbol>` — See what calls a function
-- `codemap "src/**/*.ts" --budget 20000` — Project overview
-
-This helps you understand:
-
-- The role of modified files in the codebase
-- Dependencies affected by changes
-- Architectural decisions and their context
+Set `rlmUsed: true` in daemonMeta when you use the RLM skill.
 
 ## Daemon Decisions
 
@@ -290,9 +310,7 @@ If you need to make a judgment call, document it in `daemonMeta.decisions`:
 
 Set `needsReview: true` for decisions that should be reviewed by the user.
 
-## Examples
-
-### Example 1: Successful Implementation
+## Example: Successful Implementation
 
 **Session segment** (summarized):
 
@@ -360,7 +378,7 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     "user": [
       {
         "level": "user",
-        "summary": "User specifies security requirements upfront saves iteration",
+        "summary": "Specifying security requirements upfront saves iteration",
         "details": "User mentioned 'production-ready' which guided security-focused decisions.",
         "confidence": "medium",
         "tags": ["prompting"]
@@ -374,8 +392,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "google-antigravity",
-        "model": "gemini-3-flash",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-20250514",
         "tokensInput": 25000,
         "tokensOutput": 8000,
         "cost": 0.12
@@ -401,12 +419,13 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   },
   "daemonMeta": {
     "decisions": [],
-    "rlmUsed": false
+    "rlmUsed": false,
+    "codemapAvailable": true
   }
 }
 ```
 
-### Example 2: Debugging with Model Quirk
+## Example: Debugging with Model Quirk
 
 **Session segment** (summarized):
 
@@ -487,8 +506,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "google-antigravity",
-        "model": "gemini-3-flash",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-20250514",
         "tokensInput": 18000,
         "tokensOutput": 4000,
         "cost": 0.07
@@ -498,7 +517,7 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     "promptingFailures": [],
     "modelQuirks": [
       {
-        "model": "google-antigravity/gemini-3-flash",
+        "model": "anthropic/claude-sonnet-4-20250514",
         "observation": "Uses bash/sed/cat to read files instead of read tool",
         "frequency": "often",
         "workaround": "Add reminder in system prompt to prefer read tool",
@@ -519,12 +538,13 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   },
   "daemonMeta": {
     "decisions": [],
-    "rlmUsed": false
+    "rlmUsed": false,
+    "codemapAvailable": true
   }
 }
 ```
 
-### Example 3: Failed Session with Tool Errors
+## Example: Failed Session with Tool Errors
 
 **Session segment** (summarized):
 
@@ -596,8 +616,8 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
   "observations": {
     "modelsUsed": [
       {
-        "provider": "google-antigravity",
-        "model": "gemini-3-flash",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-20250514",
         "tokensInput": 12000,
         "tokensOutput": 3000,
         "cost": 0.05
@@ -613,14 +633,14 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
         "tool": "edit",
         "errorType": "exact_match_failed",
         "context": "Attempted large multi-line change without verifying exact text",
-        "model": "google-antigravity/gemini-3-flash",
+        "model": "anthropic/claude-sonnet-4-20250514",
         "wasRetried": true
       },
       {
         "tool": "edit",
         "errorType": "whitespace_mismatch",
         "context": "Retry used tabs instead of spaces",
-        "model": "google-antigravity/gemini-3-flash",
+        "model": "anthropic/claude-sonnet-4-20250514",
         "wasRetried": false
       }
     ]
@@ -638,19 +658,17 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
         "needsReview": false
       }
     ],
-    "rlmUsed": false
+    "rlmUsed": false,
+    "codemapAvailable": true
   }
 }
 ```
 
-## Output Validation
+## Important Reminders
 
-Before returning, validate your output:
-
-1. **Required fields**: All top-level fields must be present
-2. **Summary length**: At least 10 characters
-3. **Model format**: `modelQuirks[].model` and `toolUseErrors[].model` use "provider/model" format (e.g., "google-antigravity/gemini-3-flash")
-4. **Tags quality**: No generic tags like "code" or "programming"
-5. **Outcome accuracy**: Matches what actually happened
-
-If you're uncertain about a field, include it with your best assessment and add a daemon decision explaining your reasoning.
+1. **Output only valid JSON** — No markdown, no explanations, just the JSON object
+2. **Use "provider/model" format** for model references (e.g., "anthropic/claude-sonnet-4-20250514")
+3. **Be specific** — Vague lessons and tags are not useful
+4. **Look for patterns** — The same model quirk across sessions is valuable
+5. **Document uncertainty** — Use daemonMeta.decisions for judgment calls
+6. **Detect vague goals** — This helps identify prompting improvement opportunities
