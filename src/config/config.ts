@@ -386,6 +386,12 @@ export function ensureDirectories(config: PiBrainConfig): void {
     fs.mkdirSync(promptsDir, { recursive: true });
   }
 
+  // Ensure prompts history subdirectory
+  const historyDir = path.join(promptsDir, "history");
+  if (!fs.existsSync(historyDir)) {
+    fs.mkdirSync(historyDir, { recursive: true });
+  }
+
   // Ensure logs directory
   const logsDir = path.join(DEFAULT_CONFIG_DIR, "logs");
   if (!fs.existsSync(logsDir)) {

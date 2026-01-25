@@ -21,7 +21,7 @@ Track implementation progress. Agents update status as they complete work.
 | 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | done    | -    | 2026-01-25                    |
 | 1.3 | Implement JSON file storage for nodes                                            | done    | 1.2  | 2026-01-25                    |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | done    | -    | 2026-01-25                    |
-| 1.5 | Set up prompt file structure with versioning                                     | pending | -    |                               |
+| 1.5 | Set up prompt file structure with versioning                                     | active  | -    | 2026-01-25                    |
 | 1.6 | Write initial session-analyzer prompt                                            | pending | 1.5  | see specs/session-analyzer.md |
 
 ## Phase 2: Session Parsing
