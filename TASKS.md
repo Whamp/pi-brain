@@ -32,7 +32,7 @@ Track implementation progress. Agents update status as they complete work.
 | 2.2 | Implement branch_summary entry detection (tree/branch with summary) | done    | 2.1  | Completed in 2.1 |
 | 2.3 | Implement parentId mismatch detection (tree without summary)        | done    | 2.1  | Completed in 2.1 |
 | 2.4 | Implement compaction entry detection                                | done    | 2.1  | Completed in 2.1 |
-| 2.5 | Implement fork detection (new sessions with parentSession)          | active  | 2.1  | 2026-01-25       |
+| 2.5 | Implement fork detection (new sessions with parentSession)          | done    | 2.1  | 2026-01-25       |
 | 2.6 | Implement 10-minute timestamp gap detection (resume)                | done    | 2.1  | Completed in 2.1 |
 | 2.7 | Implement segment extraction (start_entry_id, end_entry_id)         | done    | 2.1  | Completed in 2.1 |
 | 2.8 | Write tests with real session files                                 | pending | 2.7  |                  |
@@ -168,6 +168,40 @@ Key design decisions:
 - Skip tree_jump detection immediately after branch_summary (already captured)
 - Metadata entries (label, session_info) excluded from boundary detection
 - Resume threshold: 10 minutes (configurable via constant)
+
+---
+
+## 2026-01-25 14:05 - Tasks 2.2-2.4, 2.6, 2.7
+
+**Status**: pending → done
+**Validation**: Already implemented and tested as part of task 2.1
+**Commit**: (part of 2.1)
+**Notes**: These tasks were granular sub-tasks of 2.1. The comprehensive boundary detection implementation in 2.1 already includes:
+
+- 2.2: branch_summary detection (`type === "branch_summary"`)
+- 2.3: parentId mismatch detection (tree_jump boundary type)
+- 2.4: compaction entry detection (`type === "compaction"`)
+- 2.6: 10-minute gap detection (resume boundary type)
+- 2.7: segment extraction (`extractSegments()` function)
+
+---
+
+## 2026-01-25 14:05 - Task 2.5
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (302 tests total, 20 new fork tests)
+**Commit**: c17c3dd
+**Notes**: Implemented fork detection for session-level relationships per specs/node-model.md and specs/pi-integration.md. Created src/parser/fork.ts with:
+
+- `ForkInfo` interface for single session fork detection
+- `isForkSession()` to check if a session header has parentSession
+- `findForks()` to extract ForkRelationship[] from SessionInfo[]
+- `findForksFromHeaders()` for lightweight header-only detection
+- `buildForkTree()` to build parent→children map
+- `getForkChain()` to trace ancestry back to root
+- `getForkDescendants()` to find all forked descendants
+
+Added `childSessionId` field to existing `ForkRelationship` type in types.ts for complete tracking.
 
 ---
 
