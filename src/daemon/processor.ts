@@ -74,6 +74,8 @@ export interface AgentNodeOutput {
       model: string;
       tokensInput: number;
       tokensOutput: number;
+      cacheRead?: number;
+      cacheWrite?: number;
       cost: number;
     }[];
     promptingWins: string[];
@@ -96,6 +98,8 @@ export interface AgentNodeOutput {
   semantic: {
     tags: string[];
     topics: string[];
+    relatedProjects?: string[];
+    concepts?: string[];
   };
   daemonMeta: {
     decisions: {
