@@ -45,7 +45,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.2 | Implement analysis queue (SQLite-backed)               | done    | 1.2      | 2026-01-25       |
 | 3.3 | Implement idle detection (10-minute timeout)           | done    | 3.1      | Completed in 3.1 |
 | 3.4 | Implement job processor (spawns pi agent)              | done    | 3.2      | 2026-01-25       |
-| 3.5 | Implement pi agent invocation with correct flags       | pending | 3.4      |                  |
+| 3.5 | Implement pi agent invocation with correct flags       | done    | 3.4      | 2026-01-25       |
 | 3.6 | Parse agent output (JSON mode)                         | pending | 3.5      |                  |
 | 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                  |
 | 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
@@ -381,6 +381,24 @@ Key design decisions:
 - Skills directory: ~/skills/ (standard pi skill location)
 - Prompt passed via -p flag, system prompt via --system-prompt
 - JSON extraction tries code fence first, then raw JSON fallback
+
+---
+
+## 2026-01-25 14:02 - Task 3.5
+
+**Status**: pending → done
+**Validation**: Already validated as part of task 3.4 (480 tests pass, npm run check passes)
+**Commit**: 1814edc (same as 3.4)
+**Notes**: Task 3.5 was already completed as part of task 3.4. The `invokeAgent()` function in `src/daemon/processor.ts` implements pi agent invocation with all required flags:
+
+- `--provider` and `--model` from DaemonConfig
+- `--system-prompt` pointing to the analyzer prompt
+- `--skills rlm,codemap` (dynamically built based on availability)
+- `--no-session` for stateless invocation
+- `--mode json` for structured output
+- `-p` with the analysis prompt
+
+The implementation also includes skill availability validation and dynamic skill arg building.
 
 ---
 
