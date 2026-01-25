@@ -9,6 +9,7 @@ export * from "./types.js";
 export * from "./parser/session.js";
 export * from "./parser/analyzer.js";
 export * from "./parser/boundary.js";
+export * from "./parser/fork.js";
 
 // Storage module
 export * from "./storage/database.js";

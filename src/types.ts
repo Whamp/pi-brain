@@ -264,6 +264,8 @@ export interface ForkRelationship {
   parentPath: string;
   /** Path to child (forked) session */
   childPath: string;
+  /** Session ID of the child session */
+  childSessionId: string;
   /** Timestamp of fork */
   timestamp: string;
 }
