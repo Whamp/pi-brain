@@ -3,14 +3,15 @@
  */
 
 class Dashboard {
-  constructor() {
-    this.ws = null;
-    this.sessionData = null;
-    this.selectedNode = null;
+  ws = null;
+  sessionData = null;
+  selectedNode = null;
+constructor() {
+    
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 10;
     this.reconnectDelay = 1000;
-    
+
     this.init();
   }
 
@@ -22,106 +23,126 @@ class Dashboard {
 
   bindElements() {
     this.elements = {
-      connectionStatus: document.getElementById('connection-status'),
-      agentStatus: document.getElementById('agent-status'),
-      sessionInfo: document.getElementById('session-info'),
-      sessionTitle: document.getElementById('session-title'),
-      treeStats: document.getElementById('tree-stats'),
-      treeView: document.getElementById('tree-view'),
-      entryDetails: document.getElementById('entry-details'),
-      entryActions: document.getElementById('entry-actions'),
-      expandAllBtn: document.getElementById('expand-all-btn'),
-      collapseAllBtn: document.getElementById('collapse-all-btn'),
-      zoomToLeafBtn: document.getElementById('zoom-to-leaf-btn'),
-      navigateBtn: document.getElementById('navigate-btn'),
-      forkBtn: document.getElementById('fork-btn'),
-      closeDetailsBtn: document.getElementById('close-details'),
-      searchInput: document.getElementById('search'),
-      refreshBtn: document.getElementById('refresh-btn'),
-      sessionList: document.getElementById('session-list'),
+      agentStatus: document.getElementById("agent-status"),
+      closeDetailsBtn: document.getElementById("close-details"),
+      collapseAllBtn: document.getElementById("collapse-all-btn"),
+      connectionStatus: document.getElementById("connection-status"),
+      entryActions: document.getElementById("entry-actions"),
+      entryDetails: document.getElementById("entry-details"),
+      expandAllBtn: document.getElementById("expand-all-btn"),
+      forkBtn: document.getElementById("fork-btn"),
+      navigateBtn: document.getElementById("navigate-btn"),
+      refreshBtn: document.getElementById("refresh-btn"),
+      searchInput: document.getElementById("search"),
+      sessionInfo: document.getElementById("session-info"),
+      sessionList: document.getElementById("session-list"),
+      sessionTitle: document.getElementById("session-title"),
+      treeStats: document.getElementById("tree-stats"),
+      treeView: document.getElementById("tree-view"),
+      zoomToLeafBtn: document.getElementById("zoom-to-leaf-btn"),
     };
   }
 
   bindEvents() {
-    this.elements.refreshBtn.addEventListener('click', () => this.fetchSessions());
-    this.elements.expandAllBtn.addEventListener('click', () => this.expandAll());
-    this.elements.collapseAllBtn.addEventListener('click', () => this.collapseAll());
-    this.elements.zoomToLeafBtn.addEventListener('click', () => this.zoomToLeaf());
-    this.elements.navigateBtn.addEventListener('click', () => this.navigateToSelected());
-    this.elements.forkBtn.addEventListener('click', () => this.forkFromSelected());
-    this.elements.closeDetailsBtn.addEventListener('click', () => this.clearSelection());
-    this.elements.searchInput.addEventListener('input', (e) => this.onSearch(e.target.value));
-    
+    this.elements.refreshBtn.addEventListener("click", () =>
+      this.fetchSessions()
+    );
+    this.elements.expandAllBtn.addEventListener("click", () =>
+      this.expandAll()
+    );
+    this.elements.collapseAllBtn.addEventListener("click", () =>
+      this.collapseAll()
+    );
+    this.elements.zoomToLeafBtn.addEventListener("click", () =>
+      this.zoomToLeaf()
+    );
+    this.elements.navigateBtn.addEventListener("click", () =>
+      this.navigateToSelected()
+    );
+    this.elements.forkBtn.addEventListener("click", () =>
+      this.forkFromSelected()
+    );
+    this.elements.closeDetailsBtn.addEventListener("click", () =>
+      this.clearSelection()
+    );
+    this.elements.searchInput.addEventListener("input", (e) =>
+      this.onSearch(e.target.value)
+    );
+
     // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') this.clearSelection();
-      if (e.key === 'Home') this.zoomToLeaf();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        this.clearSelection();
+      }
+      if (e.key === "Home") {
+        this.zoomToLeaf();
+      }
     });
   }
 
   // WebSocket connection
   connect() {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}`;
-    
-    this.updateConnectionStatus('connecting');
-    
+
+    this.updateConnectionStatus("connecting");
+
     this.ws = new WebSocket(wsUrl);
-    
+
     this.ws.onopen = () => {
       this.reconnectAttempts = 0;
-      this.updateConnectionStatus('connected');
+      this.updateConnectionStatus("connected");
       this.fetchSessions();
     };
-    
+
     this.ws.onclose = () => {
-      this.updateConnectionStatus('disconnected');
+      this.updateConnectionStatus("disconnected");
       this.scheduleReconnect();
     };
-    
+
     this.ws.onerror = () => {
-      this.updateConnectionStatus('error');
+      this.updateConnectionStatus("error");
     };
-    
+
     this.ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         this.handleMessage(message);
-      } catch (err) {
-        console.error('Failed to parse message:', err);
+      } catch (error) {
+        console.error("Failed to parse message:", error);
       }
     };
   }
 
   scheduleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      this.updateConnectionStatus('failed');
+      this.updateConnectionStatus("failed");
       return;
     }
-    
-    this.reconnectAttempts++;
+
+    this.reconnectAttempts += 1;
     const delay = this.reconnectDelay * Math.min(this.reconnectAttempts, 5);
-    
+
     setTimeout(() => this.connect(), delay);
   }
 
   updateConnectionStatus(status) {
     const el = this.elements.connectionStatus;
     el.className = `status ${status}`;
-    
+
     const texts = {
-      connecting: 'Connecting...',
-      connected: 'Connected',
-      disconnected: 'Disconnected',
-      error: 'Connection Error',
-      failed: 'Connection Failed',
+      connected: "Connected",
+      connecting: "Connecting...",
+      disconnected: "Disconnected",
+      error: "Connection Error",
+      failed: "Connection Failed",
     };
-    
-    el.querySelector('.status-text').textContent = texts[status] || status;
+
+    el.querySelector(".status-text").textContent = texts[status] || status;
   }
 
   fetchSessions() {
-    this.sendCommand({ type: 'list_sessions' });
+    this.sendCommand({ type: "list_sessions" });
     this.elements.sessionList.innerHTML = `
       <div class="loading-state">
         <div class="spinner"></div>
@@ -133,26 +154,36 @@ class Dashboard {
   // Message handlers
   handleMessage(message) {
     switch (message.type) {
-      case 'session_state':
+      case "session_state": {
         this.onSessionState(message.data);
         break;
-      case 'entry_added':
+      }
+      case "entry_added": {
         this.onEntryAdded(message.data);
         break;
-      case 'leaf_changed':
+      }
+      case "leaf_changed": {
         this.onLeafChanged(message.data);
         break;
-      case 'agent_status':
+      }
+      case "agent_status": {
         this.onAgentStatus(message.data);
         break;
-      case 'response':
+      }
+      case "response": {
         if (message.data && message.data.projects) {
           this.renderSessionList(message.data.projects, message.data.forks);
         }
         break;
-      case 'error':
-        console.error('Server error:', message.data?.message);
+      }
+      case "error": {
+        console.error("Server error:", message.data?.message);
         break;
+      }
+      default: {
+        // Unknown message type - ignore
+        break;
+      }
     }
   }
 
@@ -167,8 +198,8 @@ class Dashboard {
       return;
     }
 
-    let html = '';
-    
+    let html = "";
+
     // Group forks by parent for quick lookup
     const forksByParent = new Map();
     if (forks) {
@@ -181,8 +212,8 @@ class Dashboard {
     }
 
     for (const project of projects) {
-      const projectName = project.cwd.split('/').pop() || project.cwd;
-      
+      const projectName = project.cwd.split("/").pop() || project.cwd;
+
       html += `
         <div class="project-group">
           <div class="project-header" title="${this.escapeHtml(project.cwd)}">
@@ -192,27 +223,33 @@ class Dashboard {
           </div>
           <div class="project-sessions">
       `;
-      
+
       for (const session of project.sessions) {
-        const isCurrent = this.sessionData && this.sessionData.sessionFile === session.path;
+        const isCurrent =
+          this.sessionData && this.sessionData.sessionFile === session.path;
         const date = new Date(session.header.timestamp);
-        const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const name = session.name || session.path.split('/').pop();
-        
+        const timeStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+        const name = session.name || session.path.split("/").pop();
+
         // Check if this session is a parent of others (has forks)
         const childForks = forksByParent.get(session.path);
-        const forkBadge = childForks ? `<span class="fork-badge" title="${childForks.length} forks">⑂ ${childForks.length}</span>` : '';
-        
+        const forkBadge = childForks
+          ? `<span class="fork-badge" title="${childForks.length} forks">⑂ ${childForks.length}</span>`
+          : "";
+
         // Check if this session is a fork itself
-        const parentBadge = session.header.parentSession ? `<span class="fork-source" title="Forked from another session">↳</span>` : '';
-        
+        const parentBadge = session.header.parentSession
+          ? `<span class="fork-source" title="Forked from another session">↳</span>`
+          : "";
+
         // Topics
-        const topicsHtml = session.topics && session.topics.length > 0 
-          ? `<div class="session-topics">${session.topics.map(t => `<span class="topic-tag">${this.escapeHtml(t)}</span>`).join('')}</div>`
-          : '';
+        const topicsHtml =
+          session.topics && session.topics.length > 0
+            ? `<div class="session-topics">${session.topics.map((t) => `<span class="topic-tag">${this.escapeHtml(t)}</span>`).join("")}</div>`
+            : "";
 
         html += `
-          <div class="session-item ${isCurrent ? 'active' : ''}" data-path="${this.escapeHtml(session.path)}">
+          <div class="session-item ${isCurrent ? "active" : ""}" data-path="${this.escapeHtml(session.path)}">
             <div class="session-main">
               ${parentBadge}
               <span class="session-name">${this.escapeHtml(name)}</span>
@@ -223,21 +260,24 @@ class Dashboard {
               <span class="session-entries">${session.stats.entryCount} entries</span>
             </div>
             ${topicsHtml}
-            ${session.firstMessage ? `<div class="session-preview">${this.escapeHtml(session.firstMessage)}</div>` : ''}
+            ${session.firstMessage ? `<div class="session-preview">${this.escapeHtml(session.firstMessage)}</div>` : ""}
           </div>
         `;
       }
-      
+
       html += `</div></div>`;
     }
-    
+
     el.innerHTML = html;
-    
+
     // Bind click events
-    el.querySelectorAll('.session-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const path = item.dataset.path;
-        if (path && (!this.sessionData || this.sessionData.sessionFile !== path)) {
+    el.querySelectorAll(".session-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        const { path } = item.dataset;
+        if (
+          path &&
+          (!this.sessionData || this.sessionData.sessionFile !== path)
+        ) {
           this.switchSession(path);
         }
       });
@@ -245,10 +285,10 @@ class Dashboard {
   }
 
   switchSession(path) {
-    if (confirm('Switch to this session?')) {
+    if (confirm("Switch to this session?")) {
       this.sendCommand({
-        type: 'switch_session',
         sessionPath: path,
+        type: "switch_session",
       });
     }
   }
@@ -261,18 +301,22 @@ class Dashboard {
   }
 
   onEntryAdded(entry) {
-    if (!this.sessionData) return;
-    
+    if (!this.sessionData) {
+      return;
+    }
+
     // Add to entries array
     this.sessionData.entries.push(entry);
-    
+
     // Re-render tree
     this.renderTree();
   }
 
   onLeafChanged(data) {
-    if (!this.sessionData) return;
-    
+    if (!this.sessionData) {
+      return;
+    }
+
     this.sessionData.leafId = data.newLeafId;
     this.renderTree();
     this.zoomToLeaf();
@@ -284,28 +328,28 @@ class Dashboard {
 
   updateAgentStatus(isStreaming, isCompacting = false) {
     const el = this.elements.agentStatus;
-    
+
     if (isCompacting) {
-      el.className = 'agent-status compacting';
-      el.querySelector('.agent-text').textContent = 'Compacting...';
+      el.className = "agent-status compacting";
+      el.querySelector(".agent-text").textContent = "Compacting...";
     } else if (isStreaming) {
-      el.className = 'agent-status streaming';
-      el.querySelector('.agent-text').textContent = 'Streaming...';
+      el.className = "agent-status streaming";
+      el.querySelector(".agent-text").textContent = "Streaming...";
     } else {
-      el.className = 'agent-status idle';
-      el.querySelector('.agent-text').textContent = 'Idle';
+      el.className = "agent-status idle";
+      el.querySelector(".agent-text").textContent = "Idle";
     }
   }
 
   updateSessionInfo() {
     const el = this.elements.sessionInfo;
     if (!this.sessionData) {
-      el.textContent = '';
+      el.textContent = "";
       return;
     }
-    
-    const file = this.sessionData.sessionFile || 'Ephemeral';
-    const name = file.split('/').pop() || file;
+
+    const file = this.sessionData.sessionFile || "Ephemeral";
+    const name = file.split("/").pop() || file;
     el.textContent = name;
   }
 
@@ -323,46 +367,50 @@ class Dashboard {
     const tree = this.buildTree(this.sessionData.entries);
     const html = this.renderNode(tree);
     this.elements.treeView.innerHTML = html;
-    
+
     // Bind node click events
-    this.elements.treeView.querySelectorAll('.node-content').forEach(el => {
-      el.addEventListener('click', (e) => {
+    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
-        const id = el.dataset.id;
+        const { id } = el.dataset;
         this.selectNode(id);
       });
-      
+
       // Double-click to toggle expand
-      el.addEventListener('dblclick', (e) => {
+      el.addEventListener("dblclick", (e) => {
         e.stopPropagation();
-        const children = el.parentElement.querySelector('.tree-children');
+        const children = el.parentElement.querySelector(".tree-children");
         if (children) {
-          children.classList.toggle('collapsed');
+          children.classList.toggle("collapsed");
         }
       });
     });
 
     // Bind toggle buttons
-    this.elements.treeView.querySelectorAll('.toggle-btn').forEach(el => {
-      el.addEventListener('click', (e) => {
+    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
-        const children = el.closest('.tree-node').querySelector('.tree-children');
+        const children = el
+          .closest(".tree-node")
+          .querySelector(".tree-children");
         if (children) {
-          children.classList.toggle('collapsed');
-          el.textContent = children.classList.contains('collapsed') ? '▶' : '▼';
+          children.classList.toggle("collapsed");
+          el.textContent = children.classList.contains("collapsed") ? "▶" : "▼";
         }
       });
     });
-    
+
     this.updateTreeStats();
   }
 
   buildTree(entries) {
-    if (entries.length === 0) return null;
-    
+    if (entries.length === 0) {
+      return null;
+    }
+
     const byId = new Map();
     const childrenMap = new Map();
-    
+
     // Index entries
     for (const entry of entries) {
       byId.set(entry.id, entry);
@@ -371,67 +419,71 @@ class Dashboard {
       }
       childrenMap.get(entry.parentId).push(entry);
     }
-    
+
     // Sort children by timestamp
     for (const children of childrenMap.values()) {
       children.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
     }
-    
+
     // Build tree
     const buildNode = (entry, depth = 0) => {
       const children = (childrenMap.get(entry.id) || [])
-        .filter(e => e.type !== 'label')
-        .map(e => buildNode(e, depth + 1));
-      
+        .filter((e) => e.type !== "label")
+        .map((e) => buildNode(e, depth + 1));
+
       return {
-        entry,
         children,
         depth,
-        isLeaf: entry.id === this.sessionData.leafId,
+        entry,
         isBranchPoint: children.length > 1,
+        isLeaf: entry.id === this.sessionData.leafId,
       };
     };
-    
+
     const roots = childrenMap.get(null) || [];
-    if (roots.length === 0) return null;
-    
+    if (roots.length === 0) {
+      return null;
+    }
+
     return buildNode(roots[0]);
   }
 
   renderNode(node, isRoot = true) {
-    if (!node) return '';
-    
-    const entry = node.entry;
+    if (!node) {
+      return "";
+    }
+
+    const { entry } = node;
     const nodeType = this.getNodeType(entry);
     const nodeClass = this.getNodeClass(entry);
     const label = this.getNodeLabel(entry);
     const hasChildren = node.children.length > 0;
-    
-    let html = `<div class="tree-node ${isRoot ? 'root-node' : ''}">`;
-    
+
+    let html = `<div class="tree-node ${isRoot ? "root-node" : ""}">`;
+
     // Node content
-    html += `<div class="node-content ${node.isLeaf ? 'leaf' : ''}" data-id="${entry.id}">`;
-    
+    html += `<div class="node-content ${node.isLeaf ? "leaf" : ""}" data-id="${entry.id}">`;
+
     if (hasChildren) {
       html += `<button class="toggle-btn">▼</button>`;
     } else {
       html += `<span class="toggle-spacer"></span>`;
     }
-    
+
     html += `<span class="node-dot ${nodeClass}"></span>`;
     html += `<span class="node-label">${this.escapeHtml(label)}</span>`;
     html += `<span class="node-type">${nodeType}</span>`;
-    
+
     if (node.isBranchPoint) {
       html += `<span class="branch-marker">⑂ ${node.children.length}</span>`;
     }
-    
+
     if (node.isLeaf) {
       html += `<span class="leaf-marker">← current</span>`;
     }
-    
+
     html += `</div>`;
-    
+
     // Children
     if (hasChildren) {
       html += `<div class="tree-children">`;
@@ -440,86 +492,92 @@ class Dashboard {
       }
       html += `</div>`;
     }
-    
+
     html += `</div>`;
-    
+
     return html;
   }
 
   getNodeType(entry) {
-    if (entry.type === 'message') {
-      return entry.message?.role || 'message';
+    if (entry.type === "message") {
+      return entry.message?.role || "message";
     }
     return entry.type;
   }
 
   getNodeClass(entry) {
-    if (entry.type === 'message') {
-      return entry.message?.role || '';
+    if (entry.type === "message") {
+      return entry.message?.role || "";
     }
     return entry.type;
   }
 
   getNodeLabel(entry) {
-    if (entry.type === 'message') {
+    if (entry.type === "message") {
       const msg = entry.message;
-      if (!msg) return 'message';
-      
-      if (msg.role === 'user') {
+      if (!msg) {
+        return "message";
+      }
+
+      if (msg.role === "user") {
         return this.extractText(msg.content);
-      } else if (msg.role === 'assistant') {
+      } else if (msg.role === "assistant") {
         return this.extractText(msg.content);
-      } else if (msg.role === 'toolResult') {
+      } else if (msg.role === "toolResult") {
         return `[${msg.toolName}]`;
       }
-    } else if (entry.type === 'compaction') {
-      return '[Compaction]';
-    } else if (entry.type === 'branch_summary') {
-      return '[Branch Summary]';
-    } else if (entry.type === 'model_change') {
+    } else if (entry.type === "compaction") {
+      return "[Compaction]";
+    } else if (entry.type === "branch_summary") {
+      return "[Branch Summary]";
+    } else if (entry.type === "model_change") {
       return `Model → ${entry.provider}/${entry.modelId}`;
-    } else if (entry.type === 'thinking_level_change') {
+    } else if (entry.type === "thinking_level_change") {
       return `Thinking → ${entry.thinkingLevel}`;
     }
-    
+
     return entry.type;
   }
 
   extractText(content, maxLength = 100) {
-    if (typeof content === 'string') {
+    if (typeof content === "string") {
       return this.truncate(content, maxLength);
     }
     if (Array.isArray(content)) {
       for (const block of content) {
-        if (block.type === 'text') {
+        if (block.type === "text") {
           return this.truncate(block.text, maxLength);
         }
-        if (block.type === 'toolCall') {
+        if (block.type === "toolCall") {
           return `[${block.name}]`;
         }
       }
     }
-    return '';
+    return "";
   }
 
   truncate(str, maxLength) {
-    if (!str) return '';
-    const cleaned = str.replace(/\s+/g, ' ').trim();
-    if (cleaned.length <= maxLength) return cleaned;
-    return cleaned.slice(0, maxLength - 3) + '...';
+    if (!str) {
+      return "";
+    }
+    const cleaned = str.replaceAll(/\s+/g, " ").trim();
+    if (cleaned.length <= maxLength) {
+      return cleaned;
+    }
+    return `${cleaned.slice(0, maxLength - 3)}...`;
   }
 
   updateTreeStats() {
     const el = this.elements.treeStats;
     if (!this.sessionData) {
-      el.textContent = '';
+      el.textContent = "";
       return;
     }
-    
-    const entries = this.sessionData.entries;
-    const messages = entries.filter(e => e.type === 'message').length;
+
+    const { entries } = this.sessionData;
+    const messages = entries.filter((e) => e.type === "message").length;
     const branchPoints = this.countBranchPoints(entries);
-    
+
     el.textContent = `${entries.length} entries · ${messages} messages · ${branchPoints} branches`;
   }
 
@@ -527,51 +585,59 @@ class Dashboard {
     const childCount = new Map();
     for (const entry of entries) {
       if (entry.parentId) {
-        childCount.set(entry.parentId, (childCount.get(entry.parentId) || 0) + 1);
+        childCount.set(
+          entry.parentId,
+          (childCount.get(entry.parentId) || 0) + 1
+        );
       }
     }
-    return Array.from(childCount.values()).filter(c => c > 1).length;
+    return [...childCount.values()].filter((c) => c > 1).length;
   }
 
   // Node selection
   selectNode(id) {
     // Update visual state
-    this.elements.treeView.querySelectorAll('.node-content').forEach(el => {
-      el.classList.toggle('selected', el.dataset.id === id);
+    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.id === id);
     });
-    
+
     // Find entry
-    const entry = this.sessionData?.entries.find(e => e.id === id);
-    if (!entry) return;
-    
+    const entry = this.sessionData?.entries.find((e) => e.id === id);
+    if (!entry) {
+      return;
+    }
+
     this.selectedNode = entry;
     this.renderEntryDetails(entry);
-    this.elements.entryActions.classList.remove('hidden');
-    
+    this.elements.entryActions.classList.remove("hidden");
+
     // Only show navigate for user messages
-    const isUserMessage = entry.type === 'message' && entry.message?.role === 'user';
+    const isUserMessage =
+      entry.type === "message" && entry.message?.role === "user";
     this.elements.navigateBtn.disabled = !isUserMessage;
     this.elements.forkBtn.disabled = !isUserMessage;
   }
 
   clearSelection() {
-    this.elements.treeView.querySelectorAll('.node-content.selected').forEach(el => {
-      el.classList.remove('selected');
-    });
-    
+    this.elements.treeView
+      .querySelectorAll(".node-content.selected")
+      .forEach((el) => {
+        el.classList.remove("selected");
+      });
+
     this.selectedNode = null;
     this.elements.entryDetails.innerHTML = `
       <div class="empty-state">
         <p>Select a node to view details</p>
       </div>
     `;
-    this.elements.entryActions.classList.add('hidden');
+    this.elements.entryActions.classList.add("hidden");
   }
 
   renderEntryDetails(entry) {
     const el = this.elements.entryDetails;
-    let html = '';
-    
+    let html = "";
+
     // Basic info
     html += `
       <div class="detail-section">
@@ -579,34 +645,34 @@ class Dashboard {
         <div class="detail-row"><span class="label">ID</span><span class="value">${entry.id}</span></div>
         <div class="detail-row"><span class="label">Type</span><span class="value">${entry.type}</span></div>
         <div class="detail-row"><span class="label">Time</span><span class="value">${new Date(entry.timestamp).toLocaleString()}</span></div>
-        <div class="detail-row"><span class="label">Parent</span><span class="value">${entry.parentId || 'none'}</span></div>
+        <div class="detail-row"><span class="label">Parent</span><span class="value">${entry.parentId || "none"}</span></div>
       </div>
     `;
-    
+
     // Message content
-    if (entry.type === 'message') {
+    if (entry.type === "message") {
       const msg = entry.message;
       if (msg) {
         html += `
           <div class="detail-section">
             <h4>${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}</h4>
         `;
-        
-        if (msg.role === 'user' || msg.role === 'assistant') {
+
+        if (msg.role === "user" || msg.role === "assistant") {
           const content = this.extractFullContent(msg.content);
           html += `<div class="detail-content">${this.escapeHtml(content)}</div>`;
-        } else if (msg.role === 'toolResult') {
+        } else if (msg.role === "toolResult") {
           html += `<div class="detail-row"><span class="label">Tool</span><span class="value">${msg.toolName}</span></div>`;
           const content = this.extractFullContent(msg.content);
           html += `<div class="detail-content">${this.escapeHtml(content)}</div>`;
         }
-        
+
         // Model and usage for assistant
-        if (msg.role === 'assistant') {
+        if (msg.role === "assistant") {
           html += `
             <div class="detail-row"><span class="label">Model</span><span class="value">${msg.provider}/${msg.model}</span></div>
           `;
-          
+
           if (msg.usage) {
             html += `
               <div class="detail-row"><span class="label">Tokens</span><span class="value">${msg.usage.input?.toLocaleString() || 0} in / ${msg.usage.output?.toLocaleString() || 0} out</span></div>
@@ -618,109 +684,120 @@ class Dashboard {
             }
           }
         }
-        
+
         html += `</div>`;
       }
-    } else if (entry.type === 'compaction') {
+    } else if (entry.type === "compaction") {
       html += `
         <div class="detail-section">
           <h4>Compaction Summary</h4>
-          <div class="detail-content">${this.escapeHtml(entry.summary || '')}</div>
+          <div class="detail-content">${this.escapeHtml(entry.summary || "")}</div>
           <div class="detail-row"><span class="label">Tokens Before</span><span class="value">${entry.tokensBefore?.toLocaleString() || 0}</span></div>
         </div>
       `;
-    } else if (entry.type === 'branch_summary') {
+    } else if (entry.type === "branch_summary") {
       html += `
         <div class="detail-section">
           <h4>Branch Summary</h4>
-          <div class="detail-content">${this.escapeHtml(entry.summary || '')}</div>
+          <div class="detail-content">${this.escapeHtml(entry.summary || "")}</div>
         </div>
       `;
     }
-    
+
     el.innerHTML = html;
   }
 
   extractFullContent(content, maxLength = 2000) {
-    if (typeof content === 'string') {
+    if (typeof content === "string") {
       return content.slice(0, maxLength);
     }
     if (Array.isArray(content)) {
       const parts = [];
       for (const block of content) {
-        if (block.type === 'text') {
+        if (block.type === "text") {
           parts.push(block.text);
-        } else if (block.type === 'toolCall') {
+        } else if (block.type === "toolCall") {
           parts.push(`[Tool: ${block.name}]`);
-        } else if (block.type === 'thinking') {
+        } else if (block.type === "thinking") {
           parts.push(`<thinking>${block.thinking}</thinking>`);
         }
       }
-      return parts.join('\n\n').slice(0, maxLength);
+      return parts.join("\n\n").slice(0, maxLength);
     }
-    return '';
+    return "";
   }
 
   // Actions
   expandAll() {
-    this.elements.treeView.querySelectorAll('.tree-children').forEach(el => {
-      el.classList.remove('collapsed');
+    this.elements.treeView.querySelectorAll(".tree-children").forEach((el) => {
+      el.classList.remove("collapsed");
     });
-    this.elements.treeView.querySelectorAll('.toggle-btn').forEach(el => {
-      el.textContent = '▼';
+    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+      el.textContent = "▼";
     });
   }
 
   collapseAll() {
-    this.elements.treeView.querySelectorAll('.tree-children').forEach(el => {
-      el.classList.add('collapsed');
+    this.elements.treeView.querySelectorAll(".tree-children").forEach((el) => {
+      el.classList.add("collapsed");
     });
-    this.elements.treeView.querySelectorAll('.toggle-btn').forEach(el => {
-      el.textContent = '▶';
+    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+      el.textContent = "▶";
     });
   }
 
   zoomToLeaf() {
-    if (!this.sessionData?.leafId) return;
-    
-    const leafEl = this.elements.treeView.querySelector(`[data-id="${this.sessionData.leafId}"]`);
+    if (!this.sessionData?.leafId) {
+      return;
+    }
+
+    const leafEl = this.elements.treeView.querySelector(
+      `[data-id="${this.sessionData.leafId}"]`
+    );
     if (leafEl) {
       // Expand all ancestors
-      let parent = leafEl.closest('.tree-children');
+      let parent = leafEl.closest(".tree-children");
       while (parent) {
-        parent.classList.remove('collapsed');
-        const toggle = parent.previousElementSibling?.querySelector('.toggle-btn');
-        if (toggle) toggle.textContent = '▼';
-        parent = parent.parentElement?.closest('.tree-children');
+        parent.classList.remove("collapsed");
+        const toggle =
+          parent.previousElementSibling?.querySelector(".toggle-btn");
+        if (toggle) {
+          toggle.textContent = "▼";
+        }
+        parent = parent.parentElement?.closest(".tree-children");
       }
-      
+
       // Scroll into view
-      leafEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
+      leafEl.scrollIntoView({ behavior: "smooth", block: "center" });
+
       // Highlight briefly
-      leafEl.classList.add('highlight');
-      setTimeout(() => leafEl.classList.remove('highlight'), 1000);
+      leafEl.classList.add("highlight");
+      setTimeout(() => leafEl.classList.remove("highlight"), 1000);
     }
   }
 
   navigateToSelected() {
-    if (!this.selectedNode) return;
-    
-    const shouldSummarize = confirm('Generate summary of abandoned branch?');
-    
+    if (!this.selectedNode) {
+      return;
+    }
+
+    const shouldSummarize = confirm("Generate summary of abandoned branch?");
+
     this.sendCommand({
-      type: 'navigate',
       entryId: this.selectedNode.id,
       summarize: shouldSummarize,
+      type: "navigate",
     });
   }
 
   forkFromSelected() {
-    if (!this.selectedNode) return;
-    
+    if (!this.selectedNode) {
+      return;
+    }
+
     this.sendCommand({
-      type: 'fork',
       entryId: this.selectedNode.id,
+      type: "fork",
     });
   }
 
@@ -732,35 +809,38 @@ class Dashboard {
 
   onSearch(query) {
     const lowerQuery = query.toLowerCase();
-    
-    this.elements.treeView.querySelectorAll('.node-content').forEach(el => {
-      const label = el.querySelector('.node-label')?.textContent?.toLowerCase() || '';
+
+    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+      const label =
+        el.querySelector(".node-label")?.textContent?.toLowerCase() || "";
       const matches = !query || label.includes(lowerQuery);
-      
-      el.classList.toggle('search-hidden', !matches);
-      
+
+      el.classList.toggle("search-hidden", !matches);
+
       // If matches, expand to show
       if (matches && query) {
-        let parent = el.closest('.tree-children');
+        let parent = el.closest(".tree-children");
         while (parent) {
-          parent.classList.remove('collapsed');
-          parent = parent.parentElement?.closest('.tree-children');
+          parent.classList.remove("collapsed");
+          parent = parent.parentElement?.closest(".tree-children");
         }
       }
     });
   }
 
   escapeHtml(str) {
-    if (!str) return '';
+    if (!str) {
+      return "";
+    }
     return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
   }
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   window.dashboard = new Dashboard();
 });

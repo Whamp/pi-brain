@@ -15,7 +15,7 @@ export interface SessionEntryBase {
 }
 
 export interface SessionHeader {
-  type: 'session';
+  type: "session";
   version: number;
   id: string;
   timestamp: string;
@@ -24,12 +24,12 @@ export interface SessionHeader {
 }
 
 export interface SessionMessageEntry extends SessionEntryBase {
-  type: 'message';
+  type: "message";
   message: AgentMessage;
 }
 
 export interface CompactionEntry extends SessionEntryBase {
-  type: 'compaction';
+  type: "compaction";
   summary: string;
   firstKeptEntryId: string;
   tokensBefore: number;
@@ -43,7 +43,7 @@ export interface CompactionDetails {
 }
 
 export interface BranchSummaryEntry extends SessionEntryBase {
-  type: 'branch_summary';
+  type: "branch_summary";
   fromId: string;
   summary: string;
   fromHook?: boolean;
@@ -56,24 +56,24 @@ export interface BranchSummaryDetails {
 }
 
 export interface ModelChangeEntry extends SessionEntryBase {
-  type: 'model_change';
+  type: "model_change";
   provider: string;
   modelId: string;
 }
 
 export interface ThinkingLevelChangeEntry extends SessionEntryBase {
-  type: 'thinking_level_change';
+  type: "thinking_level_change";
   thinkingLevel: string;
 }
 
 export interface CustomEntry extends SessionEntryBase {
-  type: 'custom';
+  type: "custom";
   customType: string;
   data?: unknown;
 }
 
 export interface CustomMessageEntry extends SessionEntryBase {
-  type: 'custom_message';
+  type: "custom_message";
   customType: string;
   content: string | ContentBlock[];
   display: boolean;
@@ -81,13 +81,13 @@ export interface CustomMessageEntry extends SessionEntryBase {
 }
 
 export interface LabelEntry extends SessionEntryBase {
-  type: 'label';
+  type: "label";
   targetId: string;
   label: string | undefined;
 }
 
 export interface SessionInfoEntry extends SessionEntryBase {
-  type: 'session_info';
+  type: "session_info";
   name: string;
 }
 
@@ -107,14 +107,14 @@ export type SessionEntry =
 // =============================================================================
 
 export interface UserMessage {
-  role: 'user';
+  role: "user";
   content: string | ContentBlock[];
   timestamp?: number;
   attachments?: Attachment[];
 }
 
 export interface AssistantMessage {
-  role: 'assistant';
+  role: "assistant";
   content: ContentBlock[];
   provider: string;
   model: string;
@@ -124,7 +124,7 @@ export interface AssistantMessage {
 }
 
 export interface ToolResultMessage {
-  role: 'toolResult';
+  role: "toolResult";
   toolCallId: string;
   toolName: string;
   content: ContentBlock[];
@@ -135,35 +135,39 @@ export interface ToolResultMessage {
 export type AgentMessage = UserMessage | AssistantMessage | ToolResultMessage;
 
 export interface TextContent {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
 export interface ThinkingContent {
-  type: 'thinking';
+  type: "thinking";
   thinking: string;
 }
 
 export interface ToolCallContent {
-  type: 'toolCall';
+  type: "toolCall";
   id: string;
   name: string;
   arguments: Record<string, unknown>;
 }
 
 export interface ImageContent {
-  type: 'image';
+  type: "image";
   source: ImageSource;
 }
 
 export interface ImageSource {
-  type: 'base64' | 'url';
+  type: "base64" | "url";
   mediaType?: string;
   data?: string;
   url?: string;
 }
 
-export type ContentBlock = TextContent | ThinkingContent | ToolCallContent | ImageContent;
+export type ContentBlock =
+  | TextContent
+  | ThinkingContent
+  | ToolCallContent
+  | ImageContent;
 
 export interface Usage {
   input: number;

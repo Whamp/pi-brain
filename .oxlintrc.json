@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/ultracite/config/oxlint/core/.oxlintrc.json"],
+  "rules": {
+    "eslint/max-statements": "off",
+    "eslint/complexity": "off",
+    "eslint/func-style": "off",
+    "eslint/class-methods-use-this": "off",
+    "eslint/no-alert": "off",
+    "eslint/no-plusplus": "off",
+    "eslint/no-empty-function": "off",
+    "eslint/no-inner-declarations": "off",
+    "eslint/no-inline-comments": "off",
+    "eslint/require-await": "off",
+    "eslint/default-case": "off",
+    "eslint/sort-keys": "off",
+    "eslint/prefer-template": "off",
+    "eslint-plugin-unicorn/prefer-query-selector": "off",
+    "eslint-plugin-unicorn/prefer-add-event-listener": "off",
+    "eslint-plugin-unicorn/no-array-for-each": "off",
+    "eslint-plugin-unicorn/no-lonely-if": "off",
+    "eslint-plugin-unicorn/consistent-function-scoping": "off",
+    "eslint-plugin-jest/require-hook": "off",
+    "eslint-plugin-promise/avoid-new": "off",
+    "typescript-eslint/no-explicit-any": "off",
+    "typescript-eslint/no-non-null-assertion": "off",
+    "typescript-eslint/no-inferrable-types": "off"
+  }
+}

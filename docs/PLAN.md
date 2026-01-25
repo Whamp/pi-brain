@@ -1,5 +1,18 @@
 # pi-brain: Implementation Plan
 
+> **Note:** This plan has evolved from the original `pi-tree-viz` project.
+> Phase 1 (Static Visualizer) is complete in the existing codebase.
+> The specs in `specs/` describe the full pi-brain system.
+>
+> ## Original pi-tree-viz Phases (Complete)
+>
+> - **Phase 1**: Static HTML generator ✅ (see `src/`)
+> - **Phase 2**: Live dashboard ✅ (see `extensions/dashboard/`)
+>
+> ## pi-brain Phases
+>
+> The remainder of this document describes the full pi-brain system.
+
 A "second brain" for pi coding agent sessions — analyzing, connecting, and learning from every interaction.
 
 ## Vision
@@ -74,13 +87,13 @@ When pi-brain is working, you can:
 
 ### Components
 
-| Component | Responsibility | Default Location |
-|-----------|---------------|------------------|
-| **Session Watcher** | Monitors directories for new/changed sessions | Hub |
-| **Daemon Queue** | Manages analysis work queue, spawns pi agents | Hub |
-| **Knowledge Graph** | SQLite + JSON storage for nodes and edges | Hub |
-| **Web UI** | Dashboard, visualization, search, queries | Hub |
-| **Sync Layer** | Moves sessions from spokes to hub | Between hub/spokes |
+| Component           | Responsibility                                | Default Location   |
+| ------------------- | --------------------------------------------- | ------------------ |
+| **Session Watcher** | Monitors directories for new/changed sessions | Hub                |
+| **Daemon Queue**    | Manages analysis work queue, spawns pi agents | Hub                |
+| **Knowledge Graph** | SQLite + JSON storage for nodes and edges     | Hub                |
+| **Web UI**          | Dashboard, visualization, search, queries     | Hub                |
+| **Sync Layer**      | Moves sessions from spokes to hub             | Between hub/spokes |
 
 ### Configuration
 
@@ -94,7 +107,7 @@ hub:
 
 spokes:
   - name: laptop
-    sync_method: syncthing  # or rsync, api
+    sync_method: syncthing # or rsync, api
     path: /synced/laptop-sessions
   - name: server
     sync_method: rsync
@@ -103,8 +116,8 @@ spokes:
 
 daemon:
   idle_timeout_minutes: 10
-  parallel_workers: 1  # Increase for more powerful hardware
-  reanalysis_schedule: "0 2 * * *"  # 2am nightly
+  parallel_workers: 1 # Increase for more powerful hardware
+  reanalysis_schedule: "0 2 * * *" # 2am nightly
   model: zai/glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md
 ```
@@ -120,83 +133,83 @@ A node represents a contiguous segment of work within a session.
 ```typescript
 interface Node {
   // Identity
-  id: string;                    // UUID
-  version: number;               // Analysis version (1, 2, 3...)
-  previous_versions: string[];   // IDs of previous version nodes
-  
+  id: string; // UUID
+  version: number; // Analysis version (1, 2, 3...)
+  previous_versions: string[]; // IDs of previous version nodes
+
   // Source
-  session_file: string;          // Path to session .jsonl
+  session_file: string; // Path to session .jsonl
   segment: {
     start_entry_id: string;
     end_entry_id: string;
   };
-  computer: string;              // Hostname of originating machine
-  
+  computer: string; // Hostname of originating machine
+
   // Classification
-  type: NodeType;                // See enum below
-  project: string;               // Project path
+  type: NodeType; // See enum below
+  project: string; // Project path
   is_new_project: boolean;
-  had_clear_goal: boolean;       // For vague-prompting detection
-  
+  had_clear_goal: boolean; // For vague-prompting detection
+
   // Content
-  summary: string;               // What happened
-  outcome: 'success' | 'partial' | 'failed' | 'abandoned';
+  summary: string; // What happened
+  outcome: "success" | "partial" | "failed" | "abandoned";
   key_decisions: Decision[];
   files_touched: string[];
-  
+
   // Lessons (multi-level taxonomy)
   lessons: {
-    project: Lesson[];           // "In pi-brain, we use SQLite because..."
-    task: Lesson[];              // "Debugging async needs explicit logging"
-    user: Lesson[];              // "I should be more specific on refactors"
-    model: Lesson[];             // "Claude-sonnet over-engineers solutions"
-    tool: Lesson[];              // "edit fails with trailing whitespace"
-    skill: Lesson[];             // "RLM skill needs chunking hints"
-    subagent: Lesson[];          // "worker agent needs clearer scope"
+    project: Lesson[]; // "In pi-brain, we use SQLite because..."
+    task: Lesson[]; // "Debugging async needs explicit logging"
+    user: Lesson[]; // "I should be more specific on refactors"
+    model: Lesson[]; // "Claude-sonnet over-engineers solutions"
+    tool: Lesson[]; // "edit fails with trailing whitespace"
+    skill: Lesson[]; // "RLM skill needs chunking hints"
+    subagent: Lesson[]; // "worker agent needs clearer scope"
   };
-  
+
   // Model/Agent Observations
   models_used: ModelUsage[];
   prompting_wins: string[];
   prompting_failures: string[];
   model_quirks: ModelQuirk[];
   tool_use_errors: ToolError[];
-  
+
   // Metadata
   tokens_used: number;
   cost: number;
   duration_minutes: number;
-  timestamp: string;             // ISO 8601
-  
+  timestamp: string; // ISO 8601
+
   // Semantic Linking
   tags: string[];
   topics: string[];
-  
+
   // Daemon Meta
   analyzed_at: string;
-  analyzer_version: string;      // Prompt version used
-  daemon_decisions: DaemonDecision[];  // Key decisions made by daemon
+  analyzer_version: string; // Prompt version used
+  daemon_decisions: DaemonDecision[]; // Key decisions made by daemon
 }
 
-type NodeType = 
-  | 'coding'
-  | 'sysadmin'
-  | 'research'
-  | 'planning'
-  | 'debugging'
-  | 'qa'
-  | 'brainstorm'
-  | 'handoff'
-  | 'refactor'
-  | 'documentation'
-  | 'configuration'
-  | 'other';
+type NodeType =
+  | "coding"
+  | "sysadmin"
+  | "research"
+  | "planning"
+  | "debugging"
+  | "qa"
+  | "brainstorm"
+  | "handoff"
+  | "refactor"
+  | "documentation"
+  | "configuration"
+  | "other";
 
 interface Lesson {
-  level: 'project' | 'task' | 'user' | 'model' | 'tool' | 'skill' | 'subagent';
+  level: "project" | "task" | "user" | "model" | "tool" | "skill" | "subagent";
   summary: string;
   details: string;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
   tags: string[];
 }
 
@@ -217,7 +230,7 @@ interface ModelUsage {
 interface ModelQuirk {
   model: string;
   observation: string;
-  frequency: 'once' | 'sometimes' | 'often' | 'always';
+  frequency: "once" | "sometimes" | "often" | "always";
   workaround?: string;
 }
 
@@ -247,41 +260,41 @@ interface Edge {
   type: EdgeType;
   metadata: Record<string, unknown>;
   created_at: string;
-  created_by: 'boundary' | 'daemon' | 'user';  // How edge was created
+  created_by: "boundary" | "daemon" | "user"; // How edge was created
 }
 
 type EdgeType =
   // Explicit boundaries (from session structure)
-  | 'fork'              // Created via /fork command
-  | 'branch'            // Created via /tree with summary
-  | 'tree_jump'         // Created via /tree without summary
-  | 'handoff'           // Explicit session handoff
-  | 'resume'            // Resumed after 10+ min gap
-  | 'compaction'        // Follows a compaction event
-  
+  | "fork" // Created via /fork command
+  | "branch" // Created via /tree with summary
+  | "tree_jump" // Created via /tree without summary
+  | "handoff" // Explicit session handoff
+  | "resume" // Resumed after 10+ min gap
+  | "compaction" // Follows a compaction event
+
   // Inferred connections (daemon discovers)
-  | 'semantic'          // Related by topic/technique
-  | 'temporal'          // Same work session, different context
-  | 'continuation'      // Continues work from earlier session
-  | 'reference'         // References content from another session
-  | 'lesson_application' // Applies lesson learned elsewhere
-  | 'failure_pattern';   // Same failure mode observed
+  | "semantic" // Related by topic/technique
+  | "temporal" // Same work session, different context
+  | "continuation" // Continues work from earlier session
+  | "reference" // References content from another session
+  | "lesson_application" // Applies lesson learned elsewhere
+  | "failure_pattern"; // Same failure mode observed
 ```
 
 ### Node Boundaries
 
 A node boundary is triggered when:
 
-| Event | Detection Method | Edge Type Created |
-|-------|------------------|-------------------|
-| `/tree` with summary | `branch_summary` entry | `branch` |
-| `/tree` without summary | New entry's `parentId` ≠ previous leaf | `tree_jump` |
-| `/branch` | `branch_summary` entry | `branch` |
-| `/fork` | New session with `parentSession` header | `fork` |
-| `/compact` | `compaction` entry | `compaction` |
-| `/resume` | 10+ minute gap in timestamps | `resume` |
-| Session end | 10+ minutes idle | (triggers analysis) |
-| Handoff | Explicit handoff marker | `handoff` |
+| Event                   | Detection Method                        | Edge Type Created   |
+| ----------------------- | --------------------------------------- | ------------------- |
+| `/tree` with summary    | `branch_summary` entry                  | `branch`            |
+| `/tree` without summary | New entry's `parentId` ≠ previous leaf  | `tree_jump`         |
+| `/branch`               | `branch_summary` entry                  | `branch`            |
+| `/fork`                 | New session with `parentSession` header | `fork`              |
+| `/compact`              | `compaction` entry                      | `compaction`        |
+| `/resume`               | 10+ minute gap in timestamps            | `resume`            |
+| Session end             | 10+ minutes idle                        | (triggers analysis) |
+| Handoff                 | Explicit handoff marker                 | `handoff`           |
 
 ### Versioning
 
@@ -312,8 +325,8 @@ The daemon is a persistent process that:
 ```typescript
 interface AnalysisJob {
   id: string;
-  type: 'initial' | 'reanalysis' | 'connection_discovery';
-  priority: number;  // Lower = higher priority
+  type: "initial" | "reanalysis" | "connection_discovery";
+  priority: number; // Lower = higher priority
   session_file: string;
   segment?: {
     start_entry_id: string;
@@ -322,7 +335,7 @@ interface AnalysisJob {
   queued_at: string;
   started_at?: string;
   completed_at?: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  status: "pending" | "running" | "completed" | "failed";
   error?: string;
   retry_count: number;
 }
@@ -377,10 +390,10 @@ def is_session_idle(session_file, timeout_minutes=10):
     last_entry = get_last_entry(session_file)
     if not last_entry:
         return False
-    
+
     last_activity = parse_timestamp(last_entry.timestamp)
     idle_duration = now() - last_activity
-    
+
     return idle_duration.minutes >= timeout_minutes
 ```
 
@@ -398,24 +411,24 @@ def nightly_job():
     # 1. Queue reanalysis for outdated nodes
     current_prompt_version = get_prompt_version()
     outdated = db.query("""
-        SELECT * FROM nodes 
-        WHERE analyzer_version < ? 
+        SELECT * FROM nodes
+        WHERE analyzer_version < ?
         ORDER BY timestamp DESC
         LIMIT 100
     """, current_prompt_version)
-    
+
     for node in outdated:
         queue_job('reanalysis', node)
-    
+
     # 2. Connection discovery for recent nodes
     recent = db.query("""
-        SELECT * FROM nodes 
+        SELECT * FROM nodes
         WHERE analyzed_at > datetime('now', '-7 days')
     """)
-    
+
     for node in recent:
         queue_job('connection_discovery', node)
-    
+
     # 3. Pattern aggregation
     aggregate_failure_patterns()
     aggregate_model_quirks()
@@ -426,7 +439,7 @@ def nightly_job():
 
 ```yaml
 daemon:
-  parallel_workers: 1  # Default: single worker
+  parallel_workers: 1 # Default: single worker
   # Increase for more powerful hardware
   # Each worker is a separate pi agent process
 ```
@@ -458,7 +471,7 @@ CREATE TABLE nodes (
     timestamp TEXT,
     analyzed_at TEXT,
     analyzer_version TEXT,
-    
+
     -- Full data stored as JSON
     data_file TEXT NOT NULL  -- Path to JSON file with full node data
 );
@@ -471,7 +484,7 @@ CREATE TABLE edges (
     metadata TEXT,  -- JSON
     created_at TEXT,
     created_by TEXT,
-    
+
     FOREIGN KEY (source_node_id) REFERENCES nodes(id),
     FOREIGN KEY (target_node_id) REFERENCES nodes(id)
 );
@@ -479,7 +492,7 @@ CREATE TABLE edges (
 CREATE TABLE tags (
     node_id TEXT NOT NULL,
     tag TEXT NOT NULL,
-    
+
     PRIMARY KEY (node_id, tag),
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
@@ -487,7 +500,7 @@ CREATE TABLE tags (
 CREATE TABLE topics (
     node_id TEXT NOT NULL,
     topic TEXT NOT NULL,
-    
+
     PRIMARY KEY (node_id, topic),
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
@@ -499,7 +512,7 @@ CREATE TABLE lessons (
     summary TEXT,
     details TEXT,
     confidence TEXT,
-    
+
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
 
@@ -510,7 +523,7 @@ CREATE TABLE model_quirks (
     observation TEXT,
     frequency TEXT,
     workaround TEXT,
-    
+
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
 
@@ -521,7 +534,7 @@ CREATE TABLE tool_errors (
     error_type TEXT,
     context TEXT,
     model TEXT,
-    
+
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
 
@@ -531,7 +544,7 @@ CREATE TABLE daemon_decisions (
     timestamp TEXT,
     decision TEXT,
     reasoning TEXT,
-    
+
     FOREIGN KEY (node_id) REFERENCES nodes(id)
 );
 
@@ -623,6 +636,7 @@ Browser-based interface for exploring the knowledge graph.
 Initial landing page with key metrics and recent activity.
 
 **Panels:**
+
 - **Tool Use Failures by Model** (table/chart)
   - Model | Tool | Error Type | Count | Last Seen
   - Click to see examples
@@ -650,6 +664,7 @@ Initial landing page with key metrics and recent activity.
 Interactive node-link-node DAG visualization.
 
 **Features:**
+
 - Nodes as circles/boxes with summary preview
 - Edges as labeled arrows (fork, branch, resume, semantic, etc.)
 - Color coding by node type or project
@@ -660,6 +675,7 @@ Interactive node-link-node DAG visualization.
 - Cluster by project
 
 **Controls:**
+
 - Filter by: project, type, model, date range, tags
 - Search: fuzzy search across summaries
 - Layout: tree, force-directed, timeline
@@ -670,6 +686,7 @@ Interactive node-link-node DAG visualization.
 Expanded view when clicking a node.
 
 **Sections:**
+
 - **Summary**: What happened
 - **Classification**: Type, project, outcome
 - **Key Decisions**: What was decided and why
@@ -687,11 +704,13 @@ Expanded view when clicking a node.
 Structured search interface.
 
 **Search modes:**
+
 - **Fuzzy text**: Search summaries, lessons, decisions
 - **SQL-like**: `project:pi-brain type:debugging model:claude*`
 - **Tag-based**: Click tags to filter
 
 **Saved searches:**
+
 - User can save common queries
 - Quick access from sidebar
 
@@ -700,6 +719,7 @@ Structured search interface.
 Traditional file explorer for manual browsing.
 
 **Structure:**
+
 - By project
   - By session
     - By node (segment)
@@ -749,17 +769,17 @@ pi.registerCommand("brain", {
   handler: async (query, ctx) => {
     // 1. Send query to brain API
     const response = await fetch(`http://localhost:8765/api/query`, {
-      method: 'POST',
-      body: JSON.stringify({ query, context: getCurrentContext(ctx) })
+      method: "POST",
+      body: JSON.stringify({ query, context: getCurrentContext(ctx) }),
     });
-    
+
     // 2. Brain uses pi agent + RLM to answer
     const result = await response.json();
-    
+
     // 3. Display result
     ctx.ui.notify(result.summary, "info");
     ctx.setNextUserMessage(result.detailed_answer);
-  }
+  },
 });
 ```
 
@@ -771,6 +791,7 @@ Allow agents to query the knowledge graph programmatically.
 # Brain Query Skill
 
 Use this skill to query the pi-brain knowledge graph for:
+
 - Past decisions and their rationale
 - Lessons learned about tools, models, techniques
 - Related work on the same project
@@ -794,11 +815,11 @@ brain-query "What did we decide about X in project Y"
 
 ### Integration Points
 
-| Integration | How |
-|-------------|-----|
-| Query from pi | `/brain` command |
-| Agent queries | `brain` skill + tool |
-| Live updates | Dashboard shows current session |
+| Integration      | How                                          |
+| ---------------- | -------------------------------------------- |
+| Query from pi    | `/brain` command                             |
+| Agent queries    | `brain` skill + tool                         |
+| Live updates     | Dashboard shows current session              |
 | Prompt injection | Model-specific quirks added to system prompt |
 
 ---
@@ -849,52 +870,52 @@ Input: [session with user asking to implement auth, agent successfully implement
 Output:
 \`\`\`json
 {
-  "type": "coding",
-  "project": "/home/will/projects/myapp",
-  "is_new_project": false,
-  "had_clear_goal": true,
-  "summary": "Implemented JWT authentication with refresh tokens. Added login/logout endpoints, middleware for protected routes, and token refresh logic.",
-  "outcome": "success",
-  "key_decisions": [
-    {
-      "what": "Used short-lived access tokens (15min) with longer refresh tokens (7 days)",
-      "why": "Balance between security and user experience",
-      "alternatives_considered": ["Session-based auth", "Longer access tokens"]
-    }
-  ],
-  "lessons": {
-    "project": [
-      {
-        "level": "project",
-        "summary": "Auth is JWT-based with refresh tokens",
-        "details": "Access tokens expire in 15 minutes, refresh tokens in 7 days. Stored in httpOnly cookies.",
-        "confidence": "high",
-        "tags": ["auth", "jwt", "security"]
-      }
-    ],
-    "task": [],
-    "user": [
-      {
-        "level": "user",
-        "summary": "Providing security requirements upfront saves iteration",
-        "details": "User specified 'secure' and 'production-ready' which guided decisions",
-        "confidence": "medium",
-        "tags": ["prompting"]
-      }
-    ],
-    "model": [],
-    "tool": [],
-    "skill": [],
-    "subagent": []
-  },
-  "prompting_wins": [
-    "User specified 'production-ready' which prompted more thorough implementation"
-  ],
-  "prompting_failures": [],
-  "model_quirks": [],
-  "tool_use_errors": [],
-  "tags": ["auth", "jwt", "api", "security"],
-  "topics": ["authentication", "web development"]
+"type": "coding",
+"project": "/home/will/projects/myapp",
+"is_new_project": false,
+"had_clear_goal": true,
+"summary": "Implemented JWT authentication with refresh tokens. Added login/logout endpoints, middleware for protected routes, and token refresh logic.",
+"outcome": "success",
+"key_decisions": [
+{
+"what": "Used short-lived access tokens (15min) with longer refresh tokens (7 days)",
+"why": "Balance between security and user experience",
+"alternatives_considered": ["Session-based auth", "Longer access tokens"]
+}
+],
+"lessons": {
+"project": [
+{
+"level": "project",
+"summary": "Auth is JWT-based with refresh tokens",
+"details": "Access tokens expire in 15 minutes, refresh tokens in 7 days. Stored in httpOnly cookies.",
+"confidence": "high",
+"tags": ["auth", "jwt", "security"]
+}
+],
+"task": [],
+"user": [
+{
+"level": "user",
+"summary": "Providing security requirements upfront saves iteration",
+"details": "User specified 'secure' and 'production-ready' which guided decisions",
+"confidence": "medium",
+"tags": ["prompting"]
+}
+],
+"model": [],
+"tool": [],
+"skill": [],
+"subagent": []
+},
+"prompting_wins": [
+"User specified 'production-ready' which prompted more thorough implementation"
+],
+"prompting_failures": [],
+"model_quirks": [],
+"tool_use_errors": [],
+"tags": ["auth", "jwt", "api", "security"],
+"topics": ["authentication", "web development"]
 }
 \`\`\`
 
@@ -905,34 +926,34 @@ Input: [session where Claude kept using sed instead of read tool]
 Output:
 \`\`\`json
 {
-  "type": "debugging",
-  "project": "/home/will/projects/pi-brain",
-  "is_new_project": false,
-  "had_clear_goal": true,
-  "summary": "Debugged issue with SQLite connection pooling. Found that connections weren't being released properly.",
-  "outcome": "success",
-  "key_decisions": [...],
-  "lessons": {
-    "tool": [
-      {
-        "level": "tool",
-        "summary": "Claude uses sed to read files instead of read tool",
-        "details": "Multiple times during this session, Claude used 'bash: cat file | sed' instead of the read tool. This is less efficient and loses line number context.",
-        "confidence": "high",
-        "tags": ["claude", "tool-use", "read"]
-      }
-    ],
-    ...
-  },
-  "model_quirks": [
-    {
-      "model": "anthropic/claude-sonnet-4-20250514",
-      "observation": "Uses sed/cat to read files instead of read tool",
-      "frequency": "often",
-      "workaround": "Remind in system prompt to use read tool"
-    }
-  ],
-  ...
+"type": "debugging",
+"project": "/home/will/projects/pi-brain",
+"is_new_project": false,
+"had_clear_goal": true,
+"summary": "Debugged issue with SQLite connection pooling. Found that connections weren't being released properly.",
+"outcome": "success",
+"key_decisions": [...],
+"lessons": {
+"tool": [
+{
+"level": "tool",
+"summary": "Claude uses sed to read files instead of read tool",
+"details": "Multiple times during this session, Claude used 'bash: cat file | sed' instead of the read tool. This is less efficient and loses line number context.",
+"confidence": "high",
+"tags": ["claude", "tool-use", "read"]
+}
+],
+...
+},
+"model_quirks": [
+{
+"model": "anthropic/claude-sonnet-4-20250514",
+"observation": "Uses sed/cat to read files instead of read tool",
+"frequency": "often",
+"workaround": "Remind in system prompt to use read tool"
+}
+],
+...
 }
 \`\`\`
 ```
@@ -951,6 +972,7 @@ prompts/
 ```
 
 When prompt changes:
+
 1. Hash new content
 2. If different from current, save to history
 3. Update prompt_version_history table
@@ -965,6 +987,7 @@ When prompt changes:
 **Goal**: Storage schema, configuration, project structure
 
 **Tasks:**
+
 - [ ] Create project structure (rename pi-tree-viz → pi-brain or create new)
 - [ ] Design and implement SQLite schema
 - [ ] Implement JSON file storage for nodes
@@ -973,6 +996,7 @@ When prompt changes:
 - [ ] Write initial session-analyzer prompt
 
 **Deliverables:**
+
 - `~/.pi-brain/` directory structure
 - `brain.db` SQLite database
 - Configuration loading
@@ -983,6 +1007,7 @@ When prompt changes:
 **Goal**: Parse sessions, detect boundaries, extract segments
 
 **Tasks:**
+
 - [ ] Enhance existing parser to detect all boundary types
 - [ ] Implement boundary detection:
   - [ ] `branch_summary` entries (tree/branch with summary)
@@ -994,6 +1019,7 @@ When prompt changes:
 - [ ] Tests with real session files
 
 **Deliverables:**
+
 - Boundary detection module
 - Segment extraction module
 - Test coverage
@@ -1003,6 +1029,7 @@ When prompt changes:
 **Goal**: File watcher, queue system, job processing
 
 **Tasks:**
+
 - [ ] Implement file watcher (inotify or polling)
 - [ ] Implement analysis queue (SQLite-backed)
 - [ ] Implement idle detection (10-minute timeout)
@@ -1014,6 +1041,7 @@ When prompt changes:
 - [ ] Daemon CLI (start, stop, status, queue info)
 
 **Deliverables:**
+
 - `pi-brain daemon start/stop/status`
 - Queue management
 - Agent spawning and result parsing
@@ -1024,6 +1052,7 @@ When prompt changes:
 **Goal**: Full node persistence, query layer
 
 **Tasks:**
+
 - [ ] Implement node creation (with JSON file)
 - [ ] Implement node versioning (reanalysis)
 - [ ] Implement edge creation
@@ -1038,6 +1067,7 @@ When prompt changes:
 - [ ] Tool error aggregation queries
 
 **Deliverables:**
+
 - Node CRUD operations
 - Query API
 - Aggregation functions
@@ -1047,6 +1077,7 @@ When prompt changes:
 **Goal**: Basic web interface with graph visualization
 
 **Tasks:**
+
 - [ ] Set up web framework (SvelteKit recommended)
 - [ ] Implement API routes for queries
 - [ ] Build graph visualization component (D3.js)
@@ -1059,6 +1090,7 @@ When prompt changes:
 - [ ] Build file browser view
 
 **Deliverables:**
+
 - Web server
 - Graph visualization
 - Node details
@@ -1069,6 +1101,7 @@ When prompt changes:
 **Goal**: Dashboard with key metrics
 
 **Tasks:**
+
 - [ ] Tool use failures by model panel
 - [ ] Vague goal tracker panel
 - [ ] Recent activity timeline
@@ -1077,6 +1110,7 @@ When prompt changes:
 - [ ] Real-time daemon status
 
 **Deliverables:**
+
 - Dashboard view
 - All panels implemented
 - Live updates
@@ -1086,6 +1120,7 @@ When prompt changes:
 **Goal**: `/brain` command and skill
 
 **Tasks:**
+
 - [ ] Implement brain-query extension
 - [ ] Implement `/brain` command
 - [ ] Create query processing (pi agent + RLM)
@@ -1094,6 +1129,7 @@ When prompt changes:
 - [ ] Test integration
 
 **Deliverables:**
+
 - Pi extension
 - `/brain` command
 - `brain` skill
@@ -1103,6 +1139,7 @@ When prompt changes:
 **Goal**: Reanalysis, connection discovery, pattern aggregation
 
 **Tasks:**
+
 - [ ] Implement scheduler (cron-like or systemd timer)
 - [ ] Implement reanalysis queue population
 - [ ] Implement connection discovery
@@ -1117,6 +1154,7 @@ When prompt changes:
 - [ ] Surface in dashboard
 
 **Deliverables:**
+
 - Nightly job runner
 - Connection discovery
 - Pattern aggregation
@@ -1127,6 +1165,7 @@ When prompt changes:
 **Goal**: Hub and spoke architecture
 
 **Tasks:**
+
 - [ ] Document Syncthing setup for spokes
 - [ ] Implement rsync-based sync option
 - [ ] Implement API-based sync option (future)
@@ -1135,6 +1174,7 @@ When prompt changes:
 - [ ] Computer field populated correctly
 
 **Deliverables:**
+
 - Sync documentation
 - Spoke configuration
 - Multi-source session processing
@@ -1144,6 +1184,7 @@ When prompt changes:
 **Goal**: Systematic prompt improvement from insights
 
 **Tasks:**
+
 - [ ] Aggregate model-specific learnings
 - [ ] Generate model-specific prompt additions
 - [ ] Implement prompt injection mechanism
@@ -1151,6 +1192,7 @@ When prompt changes:
 - [ ] Build "insights to prompts" UI
 
 **Deliverables:**
+
 - Aggregated insights API
 - Prompt generation
 - Injection mechanism
@@ -1170,6 +1212,7 @@ The structured output from session analysis creates potential training data:
 Over time, this could be used to fine-tune a specialized "librarian" model (GLM-4.7 or similar) that's optimized for this specific task.
 
 **Requirements:**
+
 - Store raw session segments alongside analyzed nodes
 - Track quality of analyses (user feedback)
 - Export in fine-tuning format when ready
@@ -1209,14 +1252,14 @@ Lessons learned in one project may apply to others:
 
 ## Success Metrics
 
-| Metric | Target |
-|--------|--------|
-| Session coverage | 90%+ of sessions analyzed within 24h |
-| Query response time | < 3 seconds for simple queries |
-| Graph render time | < 2 seconds for 100 nodes |
-| Daemon uptime | 99%+ |
-| Prompt improvement | Measurable reduction in known quirks |
-| User satisfaction | "I understand my work better" |
+| Metric              | Target                               |
+| ------------------- | ------------------------------------ |
+| Session coverage    | 90%+ of sessions analyzed within 24h |
+| Query response time | < 3 seconds for simple queries       |
+| Graph render time   | < 2 seconds for 100 nodes            |
+| Daemon uptime       | 99%+                                 |
+| Prompt improvement  | Measurable reduction in known quirks |
+| User satisfaction   | "I understand my work better"        |
 
 ---
 

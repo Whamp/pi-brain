@@ -7,6 +7,7 @@ Comprehensive analysis of how pi coding agent stores and manages session trees, 
 ### File Location
 
 Sessions are stored as JSONL files:
+
 ```
 ~/.pi/agent/sessions/--<encoded-path>--/<timestamp>_<uuid>.jsonl
 ```
@@ -14,6 +15,7 @@ Sessions are stored as JSONL files:
 Where `<encoded-path>` is the working directory with `/` replaced by `-`.
 
 Example:
+
 ```
 ~/.pi/agent/sessions/--home-will-projects-myapp--/2026-01-24T16-22-26-831Z_e99116ac-a6da-48fc-ad8b-2feca1c51550.jsonl
 ```
@@ -33,7 +35,7 @@ Each line is a JSON object with a `type` field. The first line is always the ses
   "id": "uuid",
   "timestamp": "2024-12-03T14:00:00.000Z",
   "cwd": "/path/to/project",
-  "parentSession": "/path/to/parent.jsonl"  // optional, for forks
+  "parentSession": "/path/to/parent.jsonl" // optional, for forks
 }
 ```
 
@@ -55,6 +57,7 @@ Messages in the conversation (user, assistant, toolResult):
 ```
 
 Assistant messages include:
+
 - `provider`, `model` - Which LLM responded
 - `usage` - Token counts and costs
 - `stopReason` - Why generation stopped
@@ -139,7 +142,7 @@ Extension state persistence (NOT in LLM context):
   "parentId": "g7h8i9j0",
   "timestamp": "...",
   "customType": "my-extension",
-  "data": {"count": 42}
+  "data": { "count": 42 }
 }
 ```
 
@@ -226,19 +229,24 @@ branch_points = {k: v for k, v in parent_to_children.items() if len(v) > 1}
 
 ## Forks vs Trees
 
-| Feature | `/fork` | `/tree` |
-|---------|---------|---------|
-| View | Flat list of user messages | Full tree structure |
-| Action | Creates **new session file** | Changes leaf in **same session** |
-| Summary | Never | Optional (user prompted) |
-| Tracking | `parentSession` in header | `branch_summary` entry |
+| Feature  | `/fork`                      | `/tree`                          |
+| -------- | ---------------------------- | -------------------------------- |
+| View     | Flat list of user messages   | Full tree structure              |
+| Action   | Creates **new session file** | Changes leaf in **same session** |
+| Summary  | Never                        | Optional (user prompted)         |
+| Tracking | `parentSession` in header    | `branch_summary` entry           |
 
 ### Fork Relationships
 
 Forked sessions have `parentSession` in their header pointing to the original session file:
 
 ```json
-{"type":"session","version":3,"id":"...","parentSession":"/path/to/original.jsonl"}
+{
+  "type": "session",
+  "version": 3,
+  "id": "...",
+  "parentSession": "/path/to/original.jsonl"
+}
 ```
 
 This creates a cross-file relationship that can be visualized as a "family tree" of sessions.
@@ -259,11 +267,13 @@ This creates a cross-file relationship that can be visualized as a "family tree"
 From analyzing actual session files:
 
 ### Session Sizes
+
 - Typical sessions: 50-500 entries
 - Large sessions: 1000+ entries
 - File sizes: 1KB to 4MB+
 
 ### Branch Complexity
+
 - Most sessions have 0-4 branch points
 - Branch points often occur at:
   - Model/thinking changes (adjacent branches)
@@ -271,11 +281,13 @@ From analyzing actual session files:
   - Tool result vs. user continuation
 
 ### Compaction Frequency
+
 - Triggers when context exceeds threshold
 - Typically 1-5 compactions per large session
 - Each compaction tracks `tokensBefore` for history
 
 ### Fork Usage
+
 - Less common than in-session branching
 - Used for major exploration divergences
 - Creates separate session files for cleaner history

@@ -1,9 +1,9 @@
 /**
  * Pi Dashboard Extension
- * 
+ *
  * Provides a /dashboard command that opens a browser-based visualization
  * of the current session tree with real-time updates via WebSocket.
- * 
+ *
  * Features:
  * - Real-time session tree visualization
  * - Live message streaming display
@@ -12,20 +12,30 @@
  * - Switch between sessions
  */
 
-import type { ExtensionAPI, ExtensionContext, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
-import { createServer, type DashboardServer, type DashboardAction } from "./server.js";
+import  {
+  type ExtensionAPI,
+  type ExtensionContext,
+  type ExtensionCommandContext,
+} from "@mariozechner/pi-coding-agent";
+
 import open from "open";
+
+import {
+  createServer,
+  type DashboardServer,
+  type DashboardAction,
+} from "./server.js";
 
 const DEFAULT_PORT = 8765;
 
 export default function dashboardExtension(pi: ExtensionAPI) {
   let server: DashboardServer | null = null;
   let currentCtx: ExtensionContext | null = null;
-  
+
   // Action queue for command proxying pattern
   // WebSocket handlers queue actions, then trigger /dashboard-exec which has proper ExtensionCommandContext
   const pendingActions: DashboardAction[] = [];
-  
+
   /**
    * Queue an action and trigger execution via /dashboard-exec command
    */
@@ -38,11 +48,14 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   /**
    * Start the dashboard server
    */
-  async function startServer(ctx: ExtensionContext, port: number): Promise<DashboardServer> {
+  async function startServer(
+    ctx: ExtensionContext,
+    port: number
+  ): Promise<DashboardServer> {
     if (server) {
       return server;
     }
-    
+
     // Set initial context
     currentCtx = ctx;
 
@@ -76,12 +89,12 @@ export default function dashboardExtension(pi: ExtensionAPI) {
     const sessionId = sm.getSessionId();
 
     return {
+      branch,
+      entries,
+      isStreaming: !ctx.isIdle(),
+      leafId,
       sessionFile,
       sessionId,
-      entries,
-      branch,
-      leafId,
-      isStreaming: !ctx.isIdle(),
     };
   }
 
@@ -89,11 +102,13 @@ export default function dashboardExtension(pi: ExtensionAPI) {
    * Broadcast session state to all connected clients
    */
   function broadcastSessionState() {
-    if (!server || !currentCtx) return;
-    
+    if (!server || !currentCtx) {
+      return;
+    }
+
     server.broadcast({
-      type: "session_state",
       data: buildSessionData(currentCtx),
+      type: "session_state",
     });
   }
 
@@ -103,12 +118,17 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   /**
    * Broadcast agent status change
    */
-  function broadcastAgentStatus(isStreaming: boolean, isCompacting: boolean = false) {
-    if (!server) return;
-    
+  function broadcastAgentStatus(
+    isStreaming: boolean,
+    isCompacting: boolean = false
+  ) {
+    if (!server) {
+      return;
+    }
+
     server.broadcast({
+      data: { isCompacting, isStreaming },
       type: "agent_status",
-      data: { isStreaming, isCompacting },
     });
   }
 
@@ -116,19 +136,21 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   pi.registerCommand("dashboard", {
     description: "Open session visualization dashboard in browser",
     handler: async (args, ctx) => {
-      const port = args ? parseInt(args, 10) || DEFAULT_PORT : DEFAULT_PORT;
+      const port = args
+        ? Number.parseInt(args, 10) || DEFAULT_PORT
+        : DEFAULT_PORT;
       currentCtx = ctx;
 
       try {
         const srv = await startServer(ctx, port);
         const url = `http://localhost:${srv.port}`;
-        
+
         ctx.ui.notify(`Dashboard running at ${url}`, "info");
-        
+
         // Open browser
         await open(url);
-      } catch (err) {
-        ctx.ui.notify(`Failed to start dashboard: ${err}`, "error");
+      } catch (error) {
+        ctx.ui.notify(`Failed to start dashboard: ${error}`, "error");
       }
     },
   });
@@ -141,15 +163,15 @@ export default function dashboardExtension(pi: ExtensionAPI) {
         ctx.ui.notify("Usage: /dashboard-nav <entryId> [summarize]", "error");
         return;
       }
-      
+
       const [entryId, summarizeArg] = args.split(" ");
       const summarize = summarizeArg === "true" || summarizeArg === "1";
-      
+
       try {
         await ctx.navigateTree(entryId, { summarize });
         ctx.ui.notify(`Navigated to ${entryId.slice(0, 8)}...`, "success");
-      } catch (err) {
-        ctx.ui.notify(`Navigation failed: ${err}`, "error");
+      } catch (error) {
+        ctx.ui.notify(`Navigation failed: ${error}`, "error");
       }
     },
   });
@@ -162,12 +184,12 @@ export default function dashboardExtension(pi: ExtensionAPI) {
         ctx.ui.notify("Usage: /dashboard-fork <entryId>", "error");
         return;
       }
-      
+
       try {
         await ctx.fork(args.trim());
         ctx.ui.notify(`Forked from ${args.slice(0, 8)}...`, "success");
-      } catch (err) {
-        ctx.ui.notify(`Fork failed: ${err}`, "error");
+      } catch (error) {
+        ctx.ui.notify(`Fork failed: ${error}`, "error");
       }
     },
   });
@@ -179,38 +201,48 @@ export default function dashboardExtension(pi: ExtensionAPI) {
     description: "Execute queued dashboard action (internal)",
     handler: async (_args, ctx: ExtensionCommandContext) => {
       const action = pendingActions.shift();
-      if (!action) return;
-      
+      if (!action) {
+        return;
+      }
+
       switch (action.type) {
-        case "navigate":
+        case "navigate": {
           if (!action.entryId) {
             ctx.ui.notify("Navigate action missing entryId", "error");
             return;
           }
           try {
-            await ctx.navigateTree(action.entryId, { 
-              summarize: action.summarize ?? false 
+            await ctx.navigateTree(action.entryId, {
+              summarize: action.summarize ?? false,
             });
-            ctx.ui.notify(`Navigated to ${action.entryId.slice(0, 8)}...`, "success");
-          } catch (err) {
-            ctx.ui.notify(`Navigation failed: ${err}`, "error");
+            ctx.ui.notify(
+              `Navigated to ${action.entryId.slice(0, 8)}...`,
+              "success"
+            );
+          } catch (error) {
+            ctx.ui.notify(`Navigation failed: ${error}`, "error");
           }
           break;
-          
-        case "fork":
+        }
+
+        case "fork": {
           if (!action.entryId) {
             ctx.ui.notify("Fork action missing entryId", "error");
             return;
           }
           try {
             await ctx.fork(action.entryId);
-            ctx.ui.notify(`Forked from ${action.entryId.slice(0, 8)}...`, "success");
-          } catch (err) {
-            ctx.ui.notify(`Fork failed: ${err}`, "error");
+            ctx.ui.notify(
+              `Forked from ${action.entryId.slice(0, 8)}...`,
+              "success"
+            );
+          } catch (error) {
+            ctx.ui.notify(`Fork failed: ${error}`, "error");
           }
           break;
-          
-        case "switch":
+        }
+
+        case "switch": {
           // Session switching via /resume command
           if (!action.sessionPath) {
             ctx.ui.notify("Switch action missing sessionPath", "error");
@@ -218,11 +250,14 @@ export default function dashboardExtension(pi: ExtensionAPI) {
           }
           // Use pi.sendUserMessage to trigger /resume command
           // This switches to the specified session
-          pi.sendUserMessage(`/resume ${action.sessionPath}`, { deliverAs: "steer" });
+          pi.sendUserMessage(`/resume ${action.sessionPath}`, {
+            deliverAs: "steer",
+          });
           ctx.ui.notify(`Switching to session...`, "info");
           break;
-          
-        case "summarize":
+        }
+
+        case "summarize": {
           // Standalone summarization of a branch
           if (!action.entryId) {
             ctx.ui.notify("Summarize action missing entryId", "error");
@@ -232,11 +267,15 @@ export default function dashboardExtension(pi: ExtensionAPI) {
           // This uses Pi's built-in summarization during navigation
           try {
             await ctx.navigateTree(action.entryId, { summarize: true });
-            ctx.ui.notify(`Summarized and navigated to ${action.entryId.slice(0, 8)}...`, "success");
-          } catch (err) {
-            ctx.ui.notify(`Summarization failed: ${err}`, "error");
+            ctx.ui.notify(
+              `Summarized and navigated to ${action.entryId.slice(0, 8)}...`,
+              "success"
+            );
+          } catch (error) {
+            ctx.ui.notify(`Summarization failed: ${error}`, "error");
           }
           break;
+        }
       }
     },
   });
@@ -269,11 +308,11 @@ export default function dashboardExtension(pi: ExtensionAPI) {
   pi.on("session_tree", async (event, ctx) => {
     currentCtx = ctx;
     server?.broadcast({
-      type: "leaf_changed",
       data: {
-        oldLeafId: event.oldLeafId,
         newLeafId: event.newLeafId,
+        oldLeafId: event.oldLeafId,
       },
+      type: "leaf_changed",
     });
     broadcastSessionState();
   });

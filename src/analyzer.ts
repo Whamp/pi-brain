@@ -2,23 +2,27 @@
  * Analyzer for scanning session directories and finding relationships
  */
 
-import { readdir, stat } from 'node:fs/promises';
-import { join, basename } from 'node:path';
-import { homedir } from 'node:os';
-import type { SessionInfo, ForkRelationship, ProjectGroup } from './types.js';
-import { parseSession } from './parser.js';
+import { readdir, stat } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join, basename } from "node:path";
+
+import  { type SessionInfo, type ForkRelationship, type ProjectGroup } from "./types.js";
+
+import { parseSession } from "./parser.js";
 
 /**
  * Default session directory
  */
 export function getDefaultSessionDir(): string {
-  return join(homedir(), '.pi', 'agent', 'sessions');
+  return join(homedir(), ".pi", "agent", "sessions");
 }
 
 /**
  * Scan session directory and parse all sessions
  */
-export async function scanSessions(sessionDir?: string): Promise<SessionInfo[]> {
+export async function scanSessions(
+  sessionDir?: string
+): Promise<SessionInfo[]> {
   const dir = sessionDir || getDefaultSessionDir();
   const sessions: SessionInfo[] = [];
 
@@ -29,28 +33,34 @@ export async function scanSessions(sessionDir?: string): Promise<SessionInfo[]> 
       const projectPath = join(dir, projectDir);
       const projectStat = await stat(projectPath);
 
-      if (!projectStat.isDirectory()) continue;
+      if (!projectStat.isDirectory()) {
+        continue;
+      }
 
       try {
         const sessionFiles = await readdir(projectPath);
 
         for (const sessionFile of sessionFiles) {
-          if (!sessionFile.endsWith('.jsonl')) continue;
+          if (!sessionFile.endsWith(".jsonl")) {
+            continue;
+          }
 
           const sessionPath = join(projectPath, sessionFile);
           try {
             const session = await parseSession(sessionPath);
             sessions.push(session);
-          } catch (e) {
-            console.warn(`Failed to parse session ${sessionPath}:`, e);
+          } catch (error) {
+            console.warn(`Failed to parse session ${sessionPath}:`, error);
           }
         }
-      } catch (e) {
-        console.warn(`Failed to read project directory ${projectPath}:`, e);
+      } catch (error) {
+        console.warn(`Failed to read project directory ${projectPath}:`, error);
       }
     }
-  } catch (e) {
-    throw new Error(`Failed to read session directory ${dir}: ${e}`);
+  } catch (error) {
+    throw new Error(`Failed to read session directory ${dir}: ${error}`, {
+      cause: error,
+    });
   }
 
   // Sort by timestamp (newest first)
@@ -62,14 +72,16 @@ export async function scanSessions(sessionDir?: string): Promise<SessionInfo[]> 
 /**
  * Find fork relationships between sessions
  */
-export function findForkRelationships(sessions: SessionInfo[]): ForkRelationship[] {
+export function findForkRelationships(
+  sessions: SessionInfo[]
+): ForkRelationship[] {
   const relationships: ForkRelationship[] = [];
 
   for (const session of sessions) {
     if (session.header.parentSession) {
       relationships.push({
-        parentPath: session.header.parentSession,
         childPath: session.path,
+        parentPath: session.header.parentSession,
         timestamp: session.header.timestamp,
       });
     }
@@ -88,22 +100,27 @@ export function groupByProject(sessions: SessionInfo[]): ProjectGroup[] {
   const groups = new Map<string, SessionInfo[]>();
 
   for (const session of sessions) {
-    const cwd = session.header.cwd;
+    const { cwd } = session.header;
     if (!groups.has(cwd)) {
       groups.set(cwd, []);
     }
-    groups.get(cwd)!.push(session);
+    groups.get(cwd)?.push(session);
   }
 
   const result: ProjectGroup[] = [];
   for (const [cwd, projectSessions] of groups) {
     // Sort sessions within project by timestamp (newest first)
-    projectSessions.sort((a, b) => b.header.timestamp.localeCompare(a.header.timestamp));
+    projectSessions.sort((a, b) =>
+      b.header.timestamp.localeCompare(a.header.timestamp)
+    );
 
     result.push({
       cwd,
       sessions: projectSessions,
-      totalEntries: projectSessions.reduce((sum, s) => sum + s.stats.entryCount, 0),
+      totalEntries: projectSessions.reduce(
+        (sum, s) => sum + s.stats.entryCount,
+        0
+      ),
     });
   }
 
@@ -118,21 +135,21 @@ export function groupByProject(sessions: SessionInfo[]): ProjectGroup[] {
  * e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp"
  */
 export function decodeProjectDir(encodedName: string): string {
-  if (!encodedName.startsWith('--') || !encodedName.endsWith('--')) {
+  if (!encodedName.startsWith("--") || !encodedName.endsWith("--")) {
     return encodedName;
   }
-  
+
   const inner = encodedName.slice(2, -2);
-  return '/' + inner.replace(/-/g, '/');
+  return `/${inner.replaceAll("-", "/")}`;
 }
 
 /**
  * Get project name from session path
  */
 export function getProjectName(sessionPath: string): string {
-  const parts = sessionPath.split('/');
-  const sessionsIdx = parts.indexOf('sessions');
-  if (sessionsIdx >= 0 && sessionsIdx < parts.length - 2) {
+  const parts = sessionPath.split("/");
+  const sessionsIdx = parts.indexOf("sessions");
+  if (sessionsIdx !== -1 && sessionsIdx < parts.length - 2) {
     return decodeProjectDir(parts[sessionsIdx + 1]);
   }
   return basename(sessionPath);
@@ -141,8 +158,11 @@ export function getProjectName(sessionPath: string): string {
 /**
  * Filter sessions by project path
  */
-export function filterByProject(sessions: SessionInfo[], projectPath: string): SessionInfo[] {
-  return sessions.filter(s => s.header.cwd === projectPath);
+export function filterByProject(
+  sessions: SessionInfo[],
+  projectPath: string
+): SessionInfo[] {
+  return sessions.filter((s) => s.header.cwd === projectPath);
 }
 
 /**
@@ -153,10 +173,14 @@ export function filterByDateRange(
   startDate?: Date,
   endDate?: Date
 ): SessionInfo[] {
-  return sessions.filter(s => {
+  return sessions.filter((s) => {
     const timestamp = new Date(s.header.timestamp);
-    if (startDate && timestamp < startDate) return false;
-    if (endDate && timestamp > endDate) return false;
+    if (startDate && timestamp < startDate) {
+      return false;
+    }
+    if (endDate && timestamp > endDate) {
+      return false;
+    }
     return true;
   });
 }
@@ -164,11 +188,11 @@ export function filterByDateRange(
 /**
  * Search sessions for text content
  */
-export async function searchSessions(
+export function searchSessions(
   sessions: SessionInfo[],
   query: string
-): Promise<Array<{ session: SessionInfo; matches: string[] }>> {
-  const results: Array<{ session: SessionInfo; matches: string[] }> = [];
+): { session: SessionInfo; matches: string[] }[] {
+  const results: { session: SessionInfo; matches: string[] }[] = [];
   const queryLower = query.toLowerCase();
 
   for (const session of sessions) {
@@ -188,7 +212,7 @@ export async function searchSessions(
     // This is a lightweight preview search
 
     if (matches.length > 0) {
-      results.push({ session, matches });
+      results.push({ matches, session });
     }
   }
 
@@ -221,17 +245,17 @@ export function getOverallStats(sessions: SessionInfo[]): {
     totalTokens += session.stats.totalTokens;
     totalCost += session.stats.totalCost;
     if (session.header.parentSession) {
-      forkCount++;
+      forkCount += 1;
     }
   }
 
   return {
-    totalSessions: sessions.length,
+    forkCount,
+    projectCount: projects.size,
+    totalCost,
     totalEntries,
     totalMessages,
+    totalSessions: sessions.length,
     totalTokens,
-    totalCost,
-    projectCount: projects.size,
-    forkCount,
   };
 }

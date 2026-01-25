@@ -7,8 +7,9 @@ This document outlines the plan to properly integrate the dashboard extension wi
 ## Current State
 
 The dashboard currently:
+
 - ✅ Scans and displays all sessions globally
-- ✅ Shows fork relationships between sessions  
+- ✅ Shows fork relationships between sessions
 - ✅ Extracts and displays topics
 - ✅ Real-time updates via WebSocket
 - ✅ Navigation from dashboard (via command proxying)
@@ -21,6 +22,7 @@ The dashboard currently:
 The core issue is that `ExtensionContext` methods like `navigateTree()`, `fork()`, and `newSession()` are only available in `ExtensionCommandContext` (command handlers), not in regular event handlers.
 
 Current flow:
+
 ```
 /dashboard command → startServer(ctx) → server stores ctx
                                       ↓
@@ -40,7 +42,7 @@ Browser → WS: { type: "navigate", entryId: "abc" }
        ↓
 Server → stores pending request
        ↓
-Server → ctx.ui.notify("Use /dashboard-nav abc") 
+Server → ctx.ui.notify("Use /dashboard-nav abc")
          OR auto-inject via pi.sendUserMessage("/dashboard-nav abc")
        ↓
 /dashboard-nav command handler → ctx.navigateTree(entryId)
@@ -51,15 +53,17 @@ session_tree event → broadcastSessionState()
 **Implementation:**
 
 1. Use `pi.sendUserMessage()` to inject commands programmatically
-2. Register `/dashboard-nav`, `/dashboard-fork`, `/dashboard-switch` commands  
+2. Register `/dashboard-nav`, `/dashboard-fork`, `/dashboard-switch` commands
 3. WebSocket handlers call `pi.sendUserMessage("/dashboard-nav <id>")` instead of notifying
 
 **Pros:**
+
 - Clean separation of concerns
 - Proper context for each action
 - Works with Pi's event system
 
 **Cons:**
+
 - Messages appear in session (could use `deliverAs: "handled"` trick)
 - Slight indirection
 
@@ -92,34 +96,39 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
 **Files:** `extensions/dashboard/index.ts`, `extensions/dashboard/server.ts`
 
 1. Move action callbacks outside `createServer`:
+
    ```typescript
    // index.ts
    let pendingActions: Array<{ type: string; data: any }> = [];
-   
+
    function queueAction(action) {
      pendingActions.push(action);
    }
-   
+
    // In createServer options:
-   onNavigate: (entryId, summarize) => queueAction({ 
-     type: "navigate", 
-     entryId, 
-     summarize 
-   })
+   onNavigate: (entryId, summarize) =>
+     queueAction({
+       type: "navigate",
+       entryId,
+       summarize,
+     });
    ```
 
 2. Process queued actions in command handlers:
+
    ```typescript
    pi.registerCommand("dashboard-process", {
      handler: async (args, ctx) => {
        while (pendingActions.length > 0) {
          const action = pendingActions.shift();
          if (action.type === "navigate") {
-           await ctx.navigateTree(action.entryId, { summarize: action.summarize });
+           await ctx.navigateTree(action.entryId, {
+             summarize: action.summarize,
+           });
          }
          // ... other actions
        }
-     }
+     },
    });
    ```
 
@@ -133,11 +142,13 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
 
 **Goal:** Click node in browser → navigates in Pi
 
-**Files:** 
+**Files:**
+
 - `extensions/dashboard/server.ts`
 - `extensions/dashboard/index.ts`
 
 1. Add `SummarizeCommand` type to server.ts:
+
    ```typescript
    export interface SummarizeCommand {
      type: "summarize";
@@ -147,10 +158,11 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
    ```
 
 2. Update `handleCommand` in server.ts to queue navigation:
+
    ```typescript
    case "navigate": {
-     options.queueAction({ 
-       type: "navigate", 
+     options.queueAction({
+       type: "navigate",
        entryId: command.entryId,
        summarize: command.summarize ?? false
      });
@@ -160,18 +172,19 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
    ```
 
 3. Create hidden `/dashboard-exec` command that processes queue:
+
    ```typescript
    pi.registerCommand("dashboard-exec", {
      description: "Internal: Execute dashboard actions",
      handler: async (args, ctx) => {
        const action = pendingActions.shift();
        if (!action) return;
-       
+
        switch (action.type) {
          case "navigate":
-           await ctx.navigateTree(action.entryId, { 
+           await ctx.navigateTree(action.entryId, {
              summarize: action.summarize,
-             customInstructions: action.customInstructions 
+             customInstructions: action.customInstructions,
            });
            break;
          case "fork":
@@ -181,7 +194,7 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
            // Session switching is more complex...
            break;
        }
-     }
+     },
    });
    ```
 
@@ -196,6 +209,7 @@ If Pi exposes an RPC API, the dashboard could call it directly. Not currently av
 **Goal:** Click "Fork from here" → creates new session forked from that point
 
 Same pattern as navigation:
+
 1. WebSocket sends `{ type: "fork", entryId: "..." }`
 2. Server queues action
 3. Triggers `/dashboard-exec`
@@ -207,19 +221,21 @@ Same pattern as navigation:
 **Goal:** Click session in sidebar → switches to that session
 
 This is more complex because:
-- `ctx.newSession()` creates a *new* session
+
+- `ctx.newSession()` creates a _new_ session
 - There's no direct "switch to existing session" API
 - `/resume` command exists but takes session path
 
 **Options:**
 
 A. **Use `/resume` directly:**
-   ```typescript
-   pi.sendUserMessage(`/resume ${sessionPath}`);
-   ```
-   
+
+```typescript
+pi.sendUserMessage(`/resume ${sessionPath}`);
+```
+
 B. **Internal resume mechanism:**
-   Need to check if Pi exposes session resume programmatically.
+Need to check if Pi exposes session resume programmatically.
 
 **For now:** Notify user with path, let them use `/resume`.
 
@@ -230,26 +246,28 @@ B. **Internal resume mechanism:**
 Pi's tree navigation already supports summarization via `{ summarize: true }`. For standalone summarization:
 
 1. Add a `/dashboard-summarize` command:
+
    ```typescript
    pi.registerCommand("dashboard-summarize", {
      handler: async (args, ctx) => {
        const [entryId] = args.split(" ");
-       
+
        // Use Pi's summarization (if exposed)
        // OR call LLM directly via ctx.model
-       
+
        const entries = ctx.sessionManager.getEntries();
        const branch = getEntriesFromRoot(entries, entryId);
        const text = formatBranchForSummarization(branch);
-       
+
        // Generate summary using current model
        // This requires access to the model API...
-     }
+     },
    });
    ```
 
 **Challenge:** Direct LLM access from extensions is limited. Options:
-- Use `pi.sendUserMessage("Summarize the following branch: ...")` 
+
+- Use `pi.sendUserMessage("Summarize the following branch: ...")`
 - Request Pi to expose a summarization utility
 
 ---
@@ -258,11 +276,11 @@ Pi's tree navigation already supports summarization via `{ summarize: true }`. F
 
 Things we need that Pi doesn't currently expose:
 
-| Need | Current State | Workaround |
-|------|--------------|------------|
-| Switch to existing session | Only `/resume` command | `sendUserMessage("/resume path")` |
-| Direct LLM call from extension | Not exposed | Inject as user message |
-| Get session by path | Not in API | Parse sessionManager entries |
+| Need                           | Current State          | Workaround                        |
+| ------------------------------ | ---------------------- | --------------------------------- |
+| Switch to existing session     | Only `/resume` command | `sendUserMessage("/resume path")` |
+| Direct LLM call from extension | Not exposed            | Inject as user message            |
+| Get session by path            | Not in API             | Parse sessionManager entries      |
 
 ---
 
@@ -302,11 +320,11 @@ pi.registerCommand("dashboard-exec", {
   handler: async (args, ctx) => {
     const action = pendingActions.shift();
     if (!action) return;
-    
+
     switch (action.type) {
       case "navigate":
-        await ctx.navigateTree(action.entryId!, { 
-          summarize: action.summarize 
+        await ctx.navigateTree(action.entryId!, {
+          summarize: action.summarize
         });
         ctx.ui.notify(`Navigated to ${action.entryId!.slice(0, 8)}...`, "success");
         break;
@@ -374,13 +392,13 @@ case "navigate": {
 
 ## Timeline
 
-| Phase | Effort | Priority |
-|-------|--------|----------|
-| Phase 1: Context fix | 1-2 hours | High |
-| Phase 2: Navigation | 2-3 hours | High |
-| Phase 3: Forking | 1 hour | Medium |
-| Phase 4: Session switching | 2-3 hours | Medium |
-| Phase 5: Summarization | 3-4 hours | Low |
+| Phase                      | Effort    | Priority |
+| -------------------------- | --------- | -------- |
+| Phase 1: Context fix       | 1-2 hours | High     |
+| Phase 2: Navigation        | 2-3 hours | High     |
+| Phase 3: Forking           | 1 hour    | Medium   |
+| Phase 4: Session switching | 2-3 hours | Medium   |
+| Phase 5: Summarization     | 3-4 hours | Low      |
 
 Total: ~10-12 hours
 

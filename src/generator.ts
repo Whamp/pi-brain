@@ -3,8 +3,16 @@
  * Creates a self-contained HTML file with embedded CSS and JS
  */
 
-import type { SessionInfo, ForkRelationship, TreeNode, SessionEntry, SessionMessageEntry, AssistantMessage } from './types.js';
-import { groupByProject } from './analyzer.js';
+import  {
+  type SessionInfo,
+  type ForkRelationship,
+  type TreeNode,
+  type SessionEntry,
+  type SessionMessageEntry,
+  type AssistantMessage,
+} from "./types.js";
+
+import { groupByProject } from "./analyzer.js";
 
 /**
  * Compact session info for embedding (removes full content)
@@ -17,7 +25,7 @@ interface CompactSessionInfo {
   parentSession?: string;
   name?: string;
   firstMessage?: string;
-  stats: SessionInfo['stats'];
+  stats: SessionInfo["stats"];
   tree: CompactTreeNode | null;
   leafId: string | null;
 }
@@ -43,7 +51,7 @@ interface CompactTreeNode {
 interface CompactVisualizationData {
   sessions: CompactSessionInfo[];
   forks: ForkRelationship[];
-  projects: Array<{ cwd: string; sessionCount: number; totalEntries: number }>;
+  projects: { cwd: string; sessionCount: number; totalEntries: number }[];
   generatedAt: string;
   version: string;
 }
@@ -53,16 +61,16 @@ interface CompactVisualizationData {
  */
 function compressSession(session: SessionInfo): CompactSessionInfo {
   return {
-    path: session.path,
-    id: session.header.id,
-    timestamp: session.header.timestamp,
     cwd: session.header.cwd,
-    parentSession: session.header.parentSession,
-    name: session.name,
     firstMessage: session.firstMessage,
-    stats: session.stats,
-    tree: session.tree ? compressTree(session.tree) : null,
+    id: session.header.id,
     leafId: session.leafId,
+    name: session.name,
+    parentSession: session.header.parentSession,
+    path: session.path,
+    stats: session.stats,
+    timestamp: session.header.timestamp,
+    tree: session.tree ? compressTree(session.tree) : null,
   };
 }
 
@@ -70,65 +78,65 @@ function compressSession(session: SessionInfo): CompactSessionInfo {
  * Compress tree node
  */
 function compressTree(node: TreeNode): CompactTreeNode {
-  const entry = node.entry;
+  const { entry } = node;
   let role: string | undefined;
-  let label = '';
+  let label = "";
   let content: string | undefined;
   let model: string | undefined;
   let usage: { input: number; output: number; cost?: number } | undefined;
 
-  if (entry.type === 'message') {
+  if (entry.type === "message") {
     const msgEntry = entry as SessionMessageEntry;
     const msg = msgEntry.message;
-    role = msg.role;
-    
-    if (msg.role === 'user') {
+    ({ role } = msg);
+
+    if (msg.role === "user") {
       label = truncateContent(msg.content);
       content = truncateContent(msg.content, 500);
-    } else if (msg.role === 'assistant') {
+    } else if (msg.role === "assistant") {
       const assistantMsg = msg as AssistantMessage;
       label = truncateContent(assistantMsg.content);
       content = truncateContent(assistantMsg.content, 500);
       model = `${assistantMsg.provider}/${assistantMsg.model}`;
       if (assistantMsg.usage) {
         usage = {
+          cost: assistantMsg.usage.cost?.total,
           input: assistantMsg.usage.input || 0,
           output: assistantMsg.usage.output || 0,
-          cost: assistantMsg.usage.cost?.total,
         };
       }
-    } else if (msg.role === 'toolResult') {
+    } else if (msg.role === "toolResult") {
       label = `[${msg.toolName}]`;
       content = truncateContent(msg.content, 200);
     }
-  } else if (entry.type === 'compaction') {
-    label = '[Compaction]';
+  } else if (entry.type === "compaction") {
+    label = "[Compaction]";
     content = (entry as any).summary?.slice(0, 300);
-  } else if (entry.type === 'branch_summary') {
-    label = '[Branch Summary]';
+  } else if (entry.type === "branch_summary") {
+    label = "[Branch Summary]";
     content = (entry as any).summary?.slice(0, 300);
-  } else if (entry.type === 'model_change') {
+  } else if (entry.type === "model_change") {
     const mc = entry as any;
     label = `Model → ${mc.provider}/${mc.modelId}`;
-  } else if (entry.type === 'thinking_level_change') {
+  } else if (entry.type === "thinking_level_change") {
     label = `Thinking → ${(entry as any).thinkingLevel}`;
   } else {
     label = entry.type;
   }
 
   return {
-    id: entry.id,
-    parentId: entry.parentId,
-    type: entry.type,
-    role,
-    label: label.slice(0, 100),
-    timestamp: entry.timestamp,
     children: node.children.map(compressTree),
-    isLeaf: node.isLeaf,
-    isBranchPoint: node.isBranchPoint,
-    labels: node.labels,
     content,
+    id: entry.id,
+    isBranchPoint: node.isBranchPoint,
+    isLeaf: node.isLeaf,
+    label: label.slice(0, 100),
+    labels: node.labels,
     model,
+    parentId: entry.parentId,
+    role,
+    timestamp: entry.timestamp,
+    type: entry.type,
     usage,
   };
 }
@@ -137,20 +145,20 @@ function compressTree(node: TreeNode): CompactTreeNode {
  * Truncate content to a max length
  */
 function truncateContent(content: unknown, maxLength = 100): string {
-  if (typeof content === 'string') {
+  if (typeof content === "string") {
     return content.slice(0, maxLength);
   }
   if (Array.isArray(content)) {
     for (const block of content) {
-      if (block.type === 'text') {
+      if (block.type === "text") {
         return (block.text as string).slice(0, maxLength);
       }
-      if (block.type === 'toolCall') {
+      if (block.type === "toolCall") {
         return `[${block.name}]`;
       }
     }
   }
-  return '';
+  return "";
 }
 
 /**
@@ -161,20 +169,20 @@ export function generateHTML(
   forks: ForkRelationship[]
 ): string {
   const projects = groupByProject(sessions);
-  
+
   // Compress data for embedding
   const compactSessions = sessions.map(compressSession);
-  
+
   const data: CompactVisualizationData = {
-    sessions: compactSessions,
     forks,
-    projects: projects.map(p => ({
+    generatedAt: new Date().toISOString(),
+    projects: projects.map((p) => ({
       cwd: p.cwd,
       sessionCount: p.sessions.length,
       totalEntries: p.totalEntries,
     })),
-    generatedAt: new Date().toISOString(),
-    version: '0.1.0',
+    sessions: compactSessions,
+    version: "0.1.0",
   };
 
   return `<!DOCTYPE html>

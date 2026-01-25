@@ -2,16 +2,30 @@
   "name": "pi-tree-viz",
   "version": "0.1.0",
   "description": "Interactive browser visualization for pi coding agent session trees, branches, and forks",
-  "type": "module",
+  "keywords": [
+    "branches",
+    "coding-agent",
+    "pi",
+    "session",
+    "tree",
+    "visualization"
+  ],
+  "license": "MIT",
+  "author": "",
   "bin": {
     "pi-tree-viz": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
@@ -20,32 +34,29 @@
     "test": "vitest",
     "lint": "biome check src/",
     "format": "biome format --write src/",
-    "prepublishOnly": "npm run build"
-  },
-  "files": [
-    "dist",
-    "templates"
-  ],
-  "keywords": [
-    "pi",
-    "coding-agent",
-    "session",
-    "visualization",
-    "tree",
-    "branches"
-  ],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@types/node": "^22.10.5",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky"
   },
   "dependencies": {
     "commander": "^13.0.0",
     "open": "^10.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "oxfmt": "^0.26.0",
+    "oxlint": "^1.41.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "ultracite": "^7.0.12",
+    "vitest": "^2.1.8"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [
+      "npx ultracite fix"
+    ]
   },
   "engines": {
     "node": ">=20"

@@ -75,7 +75,7 @@ Server components:
 ## Node Type Colors
 
 - 🔵 Blue - User messages
-- 🟢 Green - Assistant messages  
+- 🟢 Green - Assistant messages
 - 🟠 Orange - Tool results
 - 🟣 Purple - Compaction entries
 - 🟡 Yellow - Branch summaries / branch points

@@ -1,91 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pi Session Dashboard</title>
-  <meta name="description" content="Live visualization of pi coding agent session trees">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div id="app">
-    <header id="header">
-      <div class="header-left">
-        <h1>Pi Dashboard</h1>
-        <div id="connection-status" class="status disconnected">
-          <span class="status-dot"></span>
-          <span class="status-text">Connecting...</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pi Session Dashboard</title>
+    <meta
+      name="description"
+      content="Live visualization of pi coding agent session trees"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header id="header">
+        <div class="header-left">
+          <h1>Pi Dashboard</h1>
+          <div id="connection-status" class="status disconnected">
+            <span class="status-dot"></span>
+            <span class="status-text">Connecting...</span>
+          </div>
         </div>
-      </div>
-      <div class="header-right">
-        <div id="agent-status" class="agent-status">
-          <span class="agent-dot"></span>
-          <span class="agent-text">Idle</span>
+        <div class="header-right">
+          <div id="agent-status" class="agent-status">
+            <span class="agent-dot"></span>
+            <span class="agent-text">Idle</span>
+          </div>
+          <div id="session-info" class="session-info"></div>
         </div>
-        <div id="session-info" class="session-info"></div>
-      </div>
-    </header>
+      </header>
 
-    <div id="main-layout">
-      <!-- Session browser sidebar -->
-      <aside id="sidebar">
-        <div class="sidebar-header">
-          <h2>Sessions</h2>
-          <button id="refresh-btn" class="icon-btn" title="Refresh sessions">⟳</button>
-        </div>
-        <div class="search-box">
-          <input type="text" id="search" placeholder="Search...">
-        </div>
-        <nav id="session-list">
-          <div class="empty-state">
-            <p>Current session only</p>
-            <p class="hint">Session browser coming soon</p>
+      <div id="main-layout">
+        <!-- Session browser sidebar -->
+        <aside id="sidebar">
+          <div class="sidebar-header">
+            <h2>Sessions</h2>
+            <button id="refresh-btn" class="icon-btn" title="Refresh sessions">
+              ⟳
+            </button>
           </div>
-        </nav>
-      </aside>
+          <div class="search-box">
+            <input type="text" id="search" placeholder="Search..." />
+          </div>
+          <nav id="session-list">
+            <div class="empty-state">
+              <p>Current session only</p>
+              <p class="hint">Session browser coming soon</p>
+            </div>
+          </nav>
+        </aside>
 
-      <!-- Main tree view -->
-      <main id="tree-panel">
-        <div id="tree-header">
-          <div class="tree-title">
-            <h2 id="session-title">Session Tree</h2>
-            <div id="tree-stats" class="tree-stats"></div>
-          </div>
-          <div class="tree-actions">
-            <button id="expand-all-btn" class="btn btn-sm">Expand All</button>
-            <button id="collapse-all-btn" class="btn btn-sm">Collapse All</button>
-            <button id="zoom-to-leaf-btn" class="btn btn-sm btn-primary">Go to Current</button>
-          </div>
-        </div>
-        <div id="tree-container">
-          <div id="tree-view">
-            <div class="loading-state">
-              <div class="spinner"></div>
-              <p>Loading session...</p>
+        <!-- Main tree view -->
+        <main id="tree-panel">
+          <div id="tree-header">
+            <div class="tree-title">
+              <h2 id="session-title">Session Tree</h2>
+              <div id="tree-stats" class="tree-stats"></div>
+            </div>
+            <div class="tree-actions">
+              <button id="expand-all-btn" class="btn btn-sm">Expand All</button>
+              <button id="collapse-all-btn" class="btn btn-sm">
+                Collapse All
+              </button>
+              <button id="zoom-to-leaf-btn" class="btn btn-sm btn-primary">
+                Go to Current
+              </button>
             </div>
           </div>
-        </div>
-      </main>
-
-      <!-- Details panel -->
-      <aside id="details-panel">
-        <div class="details-header">
-          <h3>Entry Details</h3>
-          <button id="close-details" class="icon-btn" title="Close">×</button>
-        </div>
-        <div id="entry-details">
-          <div class="empty-state">
-            <p>Select a node to view details</p>
+          <div id="tree-container">
+            <div id="tree-view">
+              <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading session...</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div id="entry-actions" class="entry-actions hidden">
-          <button id="navigate-btn" class="btn btn-primary">Navigate Here</button>
-          <button id="fork-btn" class="btn">Fork from Here</button>
-        </div>
-      </aside>
-    </div>
-  </div>
+        </main>
 
-  <script src="app.js"></script>
-</body>
+        <!-- Details panel -->
+        <aside id="details-panel">
+          <div class="details-header">
+            <h3>Entry Details</h3>
+            <button id="close-details" class="icon-btn" title="Close">×</button>
+          </div>
+          <div id="entry-details">
+            <div class="empty-state">
+              <p>Select a node to view details</p>
+            </div>
+          </div>
+          <div id="entry-actions" class="entry-actions hidden">
+            <button id="navigate-btn" class="btn btn-primary">
+              Navigate Here
+            </button>
+            <button id="fork-btn" class="btn">Fork from Here</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
 </html>

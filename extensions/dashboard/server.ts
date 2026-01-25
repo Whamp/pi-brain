@@ -2,14 +2,27 @@
  * HTTP + WebSocket server for the dashboard
  */
 
-import { createServer as createHttpServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { join, dirname } from "node:path";
+import  {
+  type ExtensionAPI,
+  type ExtensionContext,
+  type SessionEntry,
+} from "@mariozechner/pi-coding-agent";
+
 import { readFile } from "node:fs/promises";
+import {
+  createServer as createHttpServer,
+  type IncomingMessage,
+  type ServerResponse,
+} from "node:http";
+import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { WebSocketServer, type WebSocket } from "ws";
-import type { ExtensionAPI, ExtensionContext, SessionEntry } from "@mariozechner/pi-coding-agent";
 
-import { scanSessions, groupByProject, findForkRelationships } from "./lib/analyzer.js";
+import {
+  scanSessions,
+  groupByProject,
+  findForkRelationships,
+} from "./lib/analyzer.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -84,7 +97,13 @@ export interface SummarizeCommand {
   entryId: string;
 }
 
-export type IncomingCommand = NavigateCommand | ForkCommand | SwitchSessionCommand | ListSessionsCommand | GetStateCommand | SummarizeCommand;
+export type IncomingCommand =
+  | NavigateCommand
+  | ForkCommand
+  | SwitchSessionCommand
+  | ListSessionsCommand
+  | GetStateCommand
+  | SummarizeCommand;
 
 /**
  * Action queued for execution via /dashboard-exec command
@@ -122,15 +141,17 @@ export interface DashboardServer {
 /**
  * Create HTTP + WebSocket server for the dashboard
  */
-export async function createServer(options: DashboardServerOptions): Promise<DashboardServer> {
+export async function createServer(
+  options: DashboardServerOptions
+): Promise<DashboardServer> {
   const { port, getSessionData, queueAction } = options;
-  
+
   const clients = new Set<WebSocket>();
-  
+
   // MIME types for static files
   const mimeTypes: Record<string, string> = {
-    ".html": "text/html",
     ".css": "text/css",
+    ".html": "text/html",
     ".js": "application/javascript",
     ".json": "application/json",
     ".png": "image/png",
@@ -140,10 +161,13 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
   /**
    * Serve static files from web directory
    */
-  async function serveStatic(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
+  async function serveStatic(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<boolean> {
     const url = req.url || "/";
     const path = url === "/" ? "/index.html" : url;
-    
+
     // Security: prevent directory traversal
     if (path.includes("..")) {
       res.writeHead(403);
@@ -152,7 +176,7 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
     }
 
     const filePath = join(__dirname, "web", path);
-    const ext = path.substring(path.lastIndexOf("."));
+    const ext = path.slice(path.lastIndexOf("."));
     const contentType = mimeTypes[ext] || "application/octet-stream";
 
     try {
@@ -170,12 +194,12 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
    */
   function handleApi(req: IncomingMessage, res: ServerResponse): boolean {
     const url = req.url || "";
-    
+
     if (url === "/api/state") {
       const data = getSessionData();
-      res.writeHead(200, { 
-        "Content-Type": "application/json",
+      res.writeHead(200, {
         "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
       });
       res.end(JSON.stringify(data));
       return true;
@@ -187,11 +211,15 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
   // Create HTTP server
   const httpServer = createHttpServer(async (req, res) => {
     // Try API first
-    if (handleApi(req, res)) return;
-    
+    if (handleApi(req, res)) {
+      return;
+    }
+
     // Try static files
-    if (await serveStatic(req, res)) return;
-    
+    if (await serveStatic(req, res)) {
+      return;
+    }
+
     // 404
     res.writeHead(404);
     res.end("Not Found");
@@ -205,20 +233,24 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
 
     // Send initial state
     const state = getSessionData();
-    ws.send(JSON.stringify({
-      type: "session_state",
-      data: state,
-    }));
+    ws.send(
+      JSON.stringify({
+        data: state,
+        type: "session_state",
+      })
+    );
 
     ws.on("message", async (data) => {
       try {
         const message = JSON.parse(data.toString()) as IncomingCommand;
         await handleCommand(ws, message);
-      } catch (err) {
-        ws.send(JSON.stringify({
-          type: "error",
-          data: { message: String(err) },
-        }));
+      } catch (error) {
+        ws.send(
+          JSON.stringify({
+            data: { message: String(error) },
+            type: "error",
+          })
+        );
       }
     });
 
@@ -238,60 +270,70 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
     switch (command.type) {
       case "get_state": {
         const state = getSessionData();
-        ws.send(JSON.stringify({
-          type: "response",
-          id: command.id,
-          data: state,
-        }));
+        ws.send(
+          JSON.stringify({
+            data: state,
+            id: command.id,
+            type: "response",
+          })
+        );
         break;
       }
 
       case "navigate": {
         queueAction({
-          type: "navigate",
           entryId: command.entryId,
           summarize: command.summarize ?? false,
+          type: "navigate",
         });
-        ws.send(JSON.stringify({
-          type: "response",
-          data: { queued: true },
-        }));
+        ws.send(
+          JSON.stringify({
+            data: { queued: true },
+            type: "response",
+          })
+        );
         break;
       }
 
       case "fork": {
         queueAction({
-          type: "fork",
           entryId: command.entryId,
+          type: "fork",
         });
-        ws.send(JSON.stringify({
-          type: "response",
-          data: { queued: true },
-        }));
+        ws.send(
+          JSON.stringify({
+            data: { queued: true },
+            type: "response",
+          })
+        );
         break;
       }
 
       case "switch_session": {
         queueAction({
-          type: "switch",
           sessionPath: command.sessionPath,
+          type: "switch",
         });
-        ws.send(JSON.stringify({
-          type: "response",
-          data: { queued: true },
-        }));
+        ws.send(
+          JSON.stringify({
+            data: { queued: true },
+            type: "response",
+          })
+        );
         break;
       }
 
       case "summarize": {
         queueAction({
-          type: "summarize",
           entryId: command.entryId,
+          type: "summarize",
         });
-        ws.send(JSON.stringify({
-          type: "response",
-          data: { queued: true },
-        }));
+        ws.send(
+          JSON.stringify({
+            data: { queued: true },
+            type: "response",
+          })
+        );
         break;
       }
 
@@ -300,20 +342,24 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
           const sessions = await scanSessions();
           const projects = groupByProject(sessions);
           const forks = findForkRelationships(sessions);
-          
-          ws.send(JSON.stringify({
-            type: "response",
-            data: { 
-              projects,
-              forks,
-              totalSessions: sessions.length
-            },
-          }));
-        } catch (err) {
-          ws.send(JSON.stringify({
-            type: "error",
-            data: { message: `Failed to list sessions: ${err}` },
-          }));
+
+          ws.send(
+            JSON.stringify({
+              data: {
+                forks,
+                projects,
+                totalSessions: sessions.length,
+              },
+              type: "response",
+            })
+          );
+        } catch (error) {
+          ws.send(
+            JSON.stringify({
+              data: { message: `Failed to list sessions: ${error}` },
+              type: "error",
+            })
+          );
         }
         break;
       }
@@ -326,7 +372,8 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
   function broadcast(message: WsMessage) {
     const json = JSON.stringify(message);
     for (const client of clients) {
-      if (client.readyState === 1) { // OPEN
+      if (client.readyState === 1) {
+        // OPEN
         client.send(json);
       }
     }
@@ -335,15 +382,15 @@ export async function createServer(options: DashboardServerOptions): Promise<Das
   // Start server
   return new Promise((resolve, reject) => {
     httpServer.on("error", reject);
-    
+
     httpServer.listen(port, () => {
       resolve({
-        port,
         broadcast,
         close: () => {
           wss.close();
           httpServer.close();
         },
+        port,
       });
     });
   });
