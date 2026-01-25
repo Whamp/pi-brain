@@ -32,14 +32,3 @@ export interface PromptVersionRecord {
   file_path: string;
   notes: string | null;
 }
-
-/**
- * Options for prompt version management
- */
-export interface PromptVersionOptions {
-  /** Path to the current prompt file */
-  promptPath: string;
-
-  /** Path to prompts history directory */
-  historyDir: string;
-}
