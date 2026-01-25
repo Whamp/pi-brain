@@ -21,7 +21,7 @@ Track implementation progress. Agents update status as they complete work.
 | 1.2 | Design and implement SQLite schema (see specs/storage.md)                        | done    | -    | 2026-01-25                    |
 | 1.3 | Implement JSON file storage for nodes                                            | done    | 1.2  | 2026-01-25                    |
 | 1.4 | Create configuration system (YAML-based, ~/.pi-brain/config.yaml)                | done    | -    | 2026-01-25                    |
-| 1.5 | Set up prompt file structure with versioning                                     | active  | -    | 2026-01-25                    |
+| 1.5 | Set up prompt file structure with versioning                                     | done    | -    | 2026-01-25                    |
 | 1.6 | Write initial session-analyzer prompt                                            | pending | 1.5  | see specs/session-analyzer.md |
 
 ## Phase 2: Session Parsing
@@ -143,6 +143,23 @@ Track implementation progress. Agents update status as they complete work.
 ## Progress Log
 
 <!-- Agents append entries here after completing tasks -->
+
+## 2026-01-25 09:27 - Task 1.5
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (239 tests total, 45 new prompt tests)
+**Commit**: 8d331b3
+**Notes**: Implemented prompt file structure with versioning per specs/storage.md and specs/session-analyzer.md. Created src/prompt module with:
+
+- Hash-based versioning (8-char SHA-256 prefix of normalized content)
+- Content normalization (collapse whitespace, remove HTML comments)
+- Archive prompts to ~/.pi-brain/prompts/history/v{n}-{hash}-{date}.md
+- Track versions in prompt_versions table
+- getOrCreatePromptVersion for idempotent version management
+- hasOutdatedNodes/getOutdatedNodeCount for reanalysis detection
+- Updated ensureDirectories to create prompts/history/ subdirectory
+
+---
 
 ## 2026-01-25 09:11 - Task 1.4
 
