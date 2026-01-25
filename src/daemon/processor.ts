@@ -110,6 +110,8 @@ export interface AgentNodeOutput {
     }[];
     rlmUsed: boolean;
     codemapAvailable?: boolean;
+    analysisLog?: string;
+    segmentTokenCount?: number;
   };
 }
 
