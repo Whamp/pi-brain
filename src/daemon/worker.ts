@@ -1,0 +1,419 @@
+/**
+ * Worker - Processes analysis jobs from the queue
+ *
+ * Combines queue management, job processing, and error handling
+ * into a cohesive worker that can be run as part of the daemon.
+ *
+ * Based on specs/daemon.md worker pool specification.
+ */
+
+import type Database from "better-sqlite3";
+
+import type { DaemonConfig } from "../config/types.js";
+import type { Node } from "../storage/node-types.js";
+
+import {
+  classifyError,
+  classifyErrorWithContext,
+  formatErrorForStorage,
+  type RetryPolicy,
+  DEFAULT_RETRY_POLICY,
+} from "./errors.js";
+import {
+  consoleLogger,
+  createProcessor,
+  type JobProcessor,
+  type ProcessorLogger,
+} from "./processor.js";
+import {
+  createQueueManager,
+  type AnalysisJob,
+  type QueueManager,
+} from "./queue.js";
+
+// =============================================================================
+// Types
+// =============================================================================
+
+/** Worker configuration */
+export interface WorkerConfig {
+  /** Unique worker identifier */
+  id: string;
+  /** Daemon configuration */
+  daemonConfig: DaemonConfig;
+  /** Retry policy */
+  retryPolicy?: RetryPolicy;
+  /** Logger */
+  logger?: ProcessorLogger;
+  /** Callback when a node is created */
+  onNodeCreated?: (job: AnalysisJob, node: Node) => Promise<void>;
+  /** Callback when a job fails permanently */
+  onJobFailed?: (job: AnalysisJob, error: Error) => Promise<void>;
+  /** Poll interval when queue is empty (ms) */
+  pollIntervalMs?: number;
+}
+
+/** Worker status */
+export interface WorkerStatus {
+  /** Worker ID */
+  id: string;
+  /** Whether worker is running */
+  running: boolean;
+  /** Current job being processed */
+  currentJob: AnalysisJob | null;
+  /** Total jobs processed */
+  jobsProcessed: number;
+  /** Jobs that succeeded */
+  jobsSucceeded: number;
+  /** Jobs that failed */
+  jobsFailed: number;
+  /** When worker started */
+  startedAt: Date | null;
+}
+
+/** Result from processing a single job */
+export interface JobProcessingResult {
+  /** Whether processing succeeded */
+  success: boolean;
+  /** The processed job */
+  job: AnalysisJob;
+  /** Created node ID (if successful) */
+  nodeId?: string;
+  /** Error (if failed) */
+  error?: Error;
+  /** Whether job will be retried */
+  willRetry: boolean;
+  /** Duration in milliseconds */
+  durationMs: number;
+}
+
+// =============================================================================
+// Worker Class
+// =============================================================================
+
+/**
+ * Worker that processes jobs from the analysis queue
+ */
+export class Worker {
+  private readonly id: string;
+  private readonly config: DaemonConfig;
+  private readonly retryPolicy: RetryPolicy;
+  private readonly logger: ProcessorLogger;
+  private readonly onNodeCreated?: (
+    job: AnalysisJob,
+    node: Node
+  ) => Promise<void>;
+  private readonly onJobFailed?: (
+    job: AnalysisJob,
+    error: Error
+  ) => Promise<void>;
+  private readonly pollIntervalMs: number;
+
+  private queue: QueueManager | null = null;
+  private processor: JobProcessor | null = null;
+  private running = false;
+  private currentJob: AnalysisJob | null = null;
+  private startedAt: Date | null = null;
+
+  // Stats
+  private jobsProcessed = 0;
+  private jobsSucceeded = 0;
+  private jobsFailed = 0;
+
+  constructor(config: WorkerConfig) {
+    this.id = config.id;
+    this.config = config.daemonConfig;
+    this.retryPolicy = config.retryPolicy ?? DEFAULT_RETRY_POLICY;
+    this.logger = config.logger ?? consoleLogger;
+    this.onNodeCreated = config.onNodeCreated;
+    this.onJobFailed = config.onJobFailed;
+    this.pollIntervalMs = config.pollIntervalMs ?? 5000;
+  }
+
+  /**
+   * Initialize the worker with database connection
+   */
+  initialize(db: Database.Database): void {
+    this.queue = createQueueManager(db);
+    this.processor = createProcessor({
+      daemonConfig: this.config,
+      logger: this.logger,
+    });
+  }
+
+  /**
+   * Start the worker loop
+   */
+  async start(): Promise<void> {
+    if (!this.queue || !this.processor) {
+      throw new Error("Worker not initialized. Call initialize() first.");
+    }
+
+    if (this.running) {
+      this.logger.warn(`Worker ${this.id} is already running`);
+      return;
+    }
+
+    this.running = true;
+    this.startedAt = new Date();
+    this.logger.info(`Worker ${this.id} started`);
+
+    // Validate environment
+    try {
+      await this.processor.validateEnvironment();
+    } catch (error) {
+      this.logger.error(`Environment validation failed: ${error}`);
+      this.running = false;
+      throw error;
+    }
+
+    // Main loop
+    while (this.running) {
+      const job = this.queue.dequeue(this.id);
+
+      if (job) {
+        await this.processJob(job);
+      } else {
+        // No work available, wait before polling again
+        await this.sleep(this.pollIntervalMs);
+      }
+    }
+
+    this.logger.info(`Worker ${this.id} stopped`);
+  }
+
+  /**
+   * Stop the worker gracefully
+   */
+  stop(): void {
+    this.logger.info(`Worker ${this.id} stopping...`);
+    this.running = false;
+  }
+
+  /**
+   * Check if worker is running
+   */
+  isRunning(): boolean {
+    return this.running;
+  }
+
+  /**
+   * Get the current job being processed
+   */
+  getCurrentJob(): AnalysisJob | null {
+    return this.currentJob;
+  }
+
+  /**
+   * Get worker status
+   */
+  getStatus(): WorkerStatus {
+    return {
+      id: this.id,
+      running: this.running,
+      currentJob: this.currentJob,
+      jobsProcessed: this.jobsProcessed,
+      jobsSucceeded: this.jobsSucceeded,
+      jobsFailed: this.jobsFailed,
+      startedAt: this.startedAt,
+    };
+  }
+
+  /**
+   * Process a single job (can be called directly for testing)
+   */
+  async processJob(job: AnalysisJob): Promise<JobProcessingResult> {
+    if (!this.queue || !this.processor) {
+      throw new Error("Worker not initialized");
+    }
+
+    const startTime = Date.now();
+    this.currentJob = job;
+    this.jobsProcessed++;
+
+    this.logger.info(`Processing job ${job.id}: ${job.type}`);
+
+    try {
+      // Invoke the agent
+      const result = await this.processor.process(job);
+
+      if (result.success && result.nodeData) {
+        // Node storage integration will be added in Phase 4
+        // For now, complete with a placeholder node ID
+        const nodeId = `node-${job.id}`;
+
+        this.queue.complete(job.id, nodeId);
+        this.jobsSucceeded++;
+
+        this.logger.info(`Job ${job.id} completed successfully`);
+
+        // Call callback if provided
+        if (this.onNodeCreated && result.nodeData) {
+          // Convert AgentNodeOutput to Node would happen here
+          // await this.onNodeCreated(job, node);
+        }
+
+        return {
+          success: true,
+          job,
+          nodeId,
+          willRetry: false,
+          durationMs: Date.now() - startTime,
+        };
+      }
+
+      // Processing failed
+      const error = new Error(result.error ?? "Unknown error");
+      return await this.handleJobFailure(job, error, startTime);
+    } catch (error) {
+      return await this.handleJobFailure(
+        job,
+        error instanceof Error ? error : new Error(String(error)),
+        startTime
+      );
+    } finally {
+      this.currentJob = null;
+    }
+  }
+
+  /**
+   * Handle a job failure with proper error classification and retry logic
+   */
+  private async handleJobFailure(
+    job: AnalysisJob,
+    error: Error,
+    startTime: number
+  ): Promise<JobProcessingResult> {
+    if (!this.queue) {
+      throw new Error("Worker not initialized");
+    }
+
+    // Classify the error
+    const classified = classifyErrorWithContext(
+      error,
+      job.retryCount,
+      job.maxRetries,
+      this.retryPolicy
+    );
+
+    this.logger.error(`Job ${job.id} failed: ${classified.description}`);
+
+    // Format error for storage
+    const storedError = formatErrorForStorage(error, classified.category);
+
+    if (classified.shouldRetry) {
+      // Job will be retried
+      this.queue.fail(job.id, storedError);
+
+      this.logger.info(
+        `Job ${job.id} scheduled for retry ${job.retryCount + 1}/${job.maxRetries} ` +
+          `in ${classified.retryDelaySeconds ?? 60}s`
+      );
+
+      return {
+        success: false,
+        job,
+        error,
+        willRetry: true,
+        durationMs: Date.now() - startTime,
+      };
+    }
+
+    // Permanent failure - no more retries
+    // Use failPermanently for permanent errors, fail for exhausted retries
+    if (classified.category.type === "permanent") {
+      this.queue.failPermanently(job.id, storedError);
+    } else {
+      this.queue.fail(job.id, storedError);
+    }
+    this.jobsFailed++;
+
+    this.logger.error(`Job ${job.id} permanently failed: ${error.message}`);
+
+    // Call callback if provided
+    if (this.onJobFailed) {
+      try {
+        await this.onJobFailed(job, error);
+      } catch (error) {
+        this.logger.error(`onJobFailed callback error: ${error}`);
+      }
+    }
+
+    return {
+      success: false,
+      job,
+      error,
+      willRetry: false,
+      durationMs: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Sleep for a specified duration
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+}
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+/**
+ * Create a worker instance
+ */
+export function createWorker(config: WorkerConfig): Worker {
+  return new Worker(config);
+}
+
+/**
+ * Process a single job without the full worker loop
+ * Useful for one-off processing or testing
+ */
+export async function processSingleJob(
+  job: AnalysisJob,
+  config: DaemonConfig,
+  db: Database.Database,
+  logger?: ProcessorLogger
+): Promise<JobProcessingResult> {
+  const worker = new Worker({
+    id: "single-job-worker",
+    daemonConfig: config,
+    logger,
+  });
+
+  worker.initialize(db);
+  return worker.processJob(job);
+}
+
+/**
+ * Handle job error manually (for custom queue implementations)
+ */
+export function handleJobError(
+  error: Error,
+  job: AnalysisJob,
+  retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY
+): {
+  shouldRetry: boolean;
+  retryDelayMinutes: number;
+  formattedError: string;
+  category: ReturnType<typeof classifyError>;
+} {
+  const category = classifyError(error);
+  const classified = classifyErrorWithContext(
+    error,
+    job.retryCount,
+    job.maxRetries,
+    retryPolicy
+  );
+
+  return {
+    shouldRetry: classified.shouldRetry,
+    retryDelayMinutes: Math.ceil((classified.retryDelaySeconds ?? 60) / 60),
+    formattedError: formatErrorForStorage(error, category),
+    category,
+  };
+}

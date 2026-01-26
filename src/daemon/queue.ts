@@ -337,6 +337,28 @@ export class QueueManager {
   }
 
   /**
+   * Mark a job as permanently failed (no retries)
+   *
+   * Use this for errors that will never succeed on retry,
+   * such as file not found or validation errors.
+   */
+  failPermanently(jobId: string, error: string): void {
+    this.db
+      .prepare(
+        `
+      UPDATE analysis_queue
+      SET status = 'failed',
+          completed_at = datetime('now'),
+          error = ?,
+          worker_id = NULL,
+          locked_until = NULL
+      WHERE id = ?
+    `
+      )
+      .run(error, jobId);
+  }
+
+  /**
    * Get a job by ID
    */
   getJob(jobId: string): AnalysisJob | null {

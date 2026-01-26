@@ -74,5 +74,39 @@ export {
   type ProcessorConfig,
 } from "./processor.js";
 
+// Export error handling functionality
+export {
+  classifyError,
+  classifyErrorWithContext,
+  calculateRetryDelay,
+  calculateRetryDelayMinutes,
+  formatErrorForStorage,
+  parseStoredError,
+  isRetryableError,
+  isPermanentError,
+  createTypedError,
+  createFileNotFoundError,
+  createInvalidSessionError,
+  createTimeoutError,
+  createRateLimitError,
+  createValidationError,
+  DEFAULT_RETRY_POLICY,
+  type RetryPolicy,
+  type ErrorCategory,
+  type ErrorCategoryType,
+  type ClassifiedError,
+} from "./errors.js";
+
+// Export worker functionality
+export {
+  Worker,
+  createWorker,
+  processSingleJob,
+  handleJobError,
+  type WorkerConfig,
+  type WorkerStatus,
+  type JobProcessingResult,
+} from "./worker.js";
+
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";

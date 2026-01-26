@@ -48,7 +48,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.5 | Implement pi agent invocation with correct flags       | done    | 3.4      | 2026-01-25       |
 | 3.6 | Parse agent output (JSON mode)                         | done    | 3.5      | 2026-01-25       |
 | 3.7 | Store nodes and edges in database                      | done    | 3.6, 1.2 | 2026-01-25       |
-| 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
+| 3.8 | Implement error handling and retry logic               | done    | 3.4      | 2026-01-25       |
 | 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                  |
 
 ## Phase 4: Node Storage & Queries
@@ -483,6 +483,58 @@ Updated src/storage/index.ts to export node-repository.
   - AgentNodeOutput conversion
   - Integration scenarios
   - Edge creation and querying
+
+---
+
+## 2026-01-25 19:19 - Task 3.8
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (588 tests total, 66 new error/worker tests)
+**Commit**: 52568a2
+**Notes**: Implemented error handling and retry logic per specs/daemon.md. Created:
+
+**Error Classification (`src/daemon/errors.ts`):**
+
+- `ErrorCategory` discriminated union type: transient, permanent, unknown
+- `classifyError()`: Pattern-based error classification
+  - Permanent: file not found, invalid session, schema validation, missing skills
+  - Transient: timeout, rate limit, connection issues, server errors, disk full
+  - Unknown: unrecognized errors (default, retryable with 2 attempts)
+- `classifyErrorWithContext()`: Full classification with retry logic
+- `RetryPolicy` interface with exponential backoff configuration
+- `calculateRetryDelay()` / `calculateRetryDelayMinutes()`: Backoff calculation
+- `formatErrorForStorage()` / `parseStoredError()`: JSON error persistence
+- Helper functions: `isRetryableError()`, `isPermanentError()`, `createTypedError()`
+- Error factories: `createFileNotFoundError()`, `createTimeoutError()`, etc.
+
+**Worker (`src/daemon/worker.ts`):**
+
+- `Worker` class: Processes jobs from the queue with error handling
+  - `initialize()`: Sets up queue and processor
+  - `start()`: Main loop with polling
+  - `stop()`: Graceful shutdown
+  - `processJob()`: Process single job with error classification
+  - `handleJobFailure()`: Routes to `fail()` or `failPermanently()` based on error type
+  - Status tracking: jobsProcessed, jobsSucceeded, jobsFailed
+  - Callbacks: `onNodeCreated`, `onJobFailed` for integration
+- `handleJobError()`: Standalone error handling for custom implementations
+- `processSingleJob()`: One-off job processing utility
+
+**Queue Enhancement (`src/daemon/queue.ts`):**
+
+- Added `failPermanently()`: Immediately marks job as failed without retry
+  - Used for permanent errors like file not found, validation failures
+  - Existing `fail()` handles transient errors with retry logic
+
+**Configuration:**
+
+- Added `.prettierignore` to exclude SQL files from oxfmt formatting
+
+**Test Coverage:**
+
+- 48 error classification tests
+- 18 worker tests
+- Integration tests for queue + worker + error handling
 
 ---
 
