@@ -37,6 +37,9 @@
   let simulation: d3.Simulation<NodeDatum, EdgeDatum>;
   let zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown>;
 
+  // Track previous node positions to preserve layout on updates
+  let nodePositions = new Map<string, { x: number; y: number }>();
+
   // Graph configuration
   const NODE_RADIUS = 12;
   const LABEL_OFFSET = 18;
@@ -143,12 +146,24 @@
       return;
     }
 
-    // Convert nodes to simulation data
-    const simNodes: NodeDatum[] = nodes.map((n) => ({
-      ...n,
-      x: undefined,
-      y: undefined,
-    }));
+    // Save current positions before updating
+    g.select(".nodes")
+      .selectAll<SVGGElement, NodeDatum>("g.node")
+      .each((d) => {
+        if (d.x !== undefined && d.y !== undefined) {
+          nodePositions.set(d.id, { x: d.x, y: d.y });
+        }
+      });
+
+    // Convert nodes to simulation data, preserving positions
+    const simNodes: NodeDatum[] = nodes.map((n) => {
+      const existingPos = nodePositions.get(n.id);
+      return {
+        ...n,
+        x: existingPos?.x,
+        y: existingPos?.y,
+      };
+    });
 
     // Convert edges to simulation links
     const simEdges: EdgeDatum[] = edges.map((e) => ({
@@ -406,9 +421,12 @@
     }
   });
 
-  // Reactivity using $effect
+  // Reactivity using $effect - track nodes and edges length to detect changes
   $effect(() => {
-    if (svg && (nodes || edges)) {
+    // Track the arrays by accessing their length to create a dependency
+    const _nodesLen = nodes.length;
+    const _edgesLen = edges.length;
+    if (svg) {
       updateGraph();
     }
   });

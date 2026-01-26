@@ -12,48 +12,55 @@
   let depth = 2;
 
   // Load connected graph from a node, or list nodes if no selection
-  async function loadGraph() {
+  async function loadGraph(): Promise<void> {
     const nodeId = $nodesStore.selectedNodeId;
 
     if (nodeId) {
       await nodesStore.loadConnected(nodeId, depth);
-    } else {
-      // Load recent nodes when no selection
-      const filters: NodeFilters = {};
-      if (projectFilter) {filters.project = projectFilter;}
-      if (typeFilter) {filters.type = typeFilter;}
-      if (dateRangeFilter) {
-        const from = new Date();
-        from.setDate(from.getDate() - Number.parseInt(dateRangeFilter, 10));
-        filters.from = from.toISOString();
-      }
-      await nodesStore.loadNodes(filters, { limit: 100 });
+      return;
     }
+    // Load recent nodes when no selection
+    const filters: NodeFilters = {};
+    if (projectFilter) {
+      filters.project = projectFilter;
+    }
+    if (typeFilter) {
+      filters.type = typeFilter;
+    }
+    if (dateRangeFilter) {
+      const from = new Date();
+      from.setDate(from.getDate() - Number.parseInt(dateRangeFilter, 10));
+      filters.from = from.toISOString();
+    }
+    await nodesStore.loadNodes(filters, { limit: 100 });
   }
 
-  function handleNodeClick(nodeId: string, _node: Node) {
+  async function handleNodeClick(nodeId: string, _node: Node): Promise<void> {
     nodesStore.selectNode(nodeId);
-    loadGraph();
+    await loadGraph();
   }
 
-  function handleNodeDoubleClick(nodeId: string, _node: Node) {
-    goto(`/nodes/${nodeId}`);
+  async function handleNodeDoubleClick(
+    nodeId: string,
+    _node: Node
+  ): Promise<void> {
+    await goto(`/nodes/${nodeId}`);
   }
 
-  function handleFilterChange() {
+  async function handleFilterChange(): Promise<void> {
     nodesStore.selectNode(null);
-    loadGraph();
+    await loadGraph();
   }
 
-  function handleDepthChange() {
+  async function handleDepthChange(): Promise<void> {
     if ($nodesStore.selectedNodeId) {
-      loadGraph();
+      await loadGraph();
     }
   }
 
-  function clearSelection() {
+  async function clearSelection(): Promise<void> {
     nodesStore.selectNode(null);
-    loadGraph();
+    await loadGraph();
   }
 
   onMount(() => {
