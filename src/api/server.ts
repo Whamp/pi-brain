@@ -24,6 +24,7 @@ import { decisionsRoutes } from "./routes/decisions.js";
 import { edgesRoutes } from "./routes/edges.js";
 import { lessonsRoutes } from "./routes/lessons.js";
 import { nodesRoutes } from "./routes/nodes.js";
+import { queryRoutes } from "./routes/query.js";
 import { quirksRoutes } from "./routes/quirks.js";
 import { searchRoutes } from "./routes/search.js";
 import { sessionsRoutes } from "./routes/sessions.js";
@@ -94,6 +95,7 @@ export async function createServer(
       await api.register(nodesRoutes, { prefix: "/nodes" });
       await api.register(edgesRoutes, { prefix: "/edges" });
       await api.register(searchRoutes, { prefix: "/search" });
+      await api.register(queryRoutes, { prefix: "/query" });
       await api.register(lessonsRoutes, { prefix: "/lessons" });
       await api.register(quirksRoutes, { prefix: "/quirks" });
       await api.register(toolErrorsRoutes, { prefix: "/tool-errors" });
