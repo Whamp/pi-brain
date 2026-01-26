@@ -48,6 +48,7 @@
     "better-sqlite3": "^12.6.2",
     "chokidar": "^5.0.0",
     "commander": "^13.0.0",
+    "croner": "^9.1.0",
     "fastify": "^5.7.1",
     "open": "^10.1.0",
     "yaml": "^2.8.2"

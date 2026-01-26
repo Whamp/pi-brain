@@ -1,5 +1,5 @@
 /**
- * Daemon module - file watching and analysis queue
+ * Daemon module - file watching, analysis queue, and scheduling
  *
  * This module contains:
  * - watcher.ts - File system watching (inotify/chokidar)
@@ -7,6 +7,7 @@
  * - queue.ts - Analysis job queue (SQLite-backed)
  * - processor.ts - Job processing and pi agent invocation
  * - cli.ts - Daemon CLI (start, stop, status)
+ * - scheduler.ts - Cron-based scheduling for nightly jobs
  */
 
 // Export watcher functionality
@@ -136,6 +137,21 @@ export {
   type StartOptions,
   type StopOptions,
 } from "./cli.js";
+
+// Export scheduler functionality
+export {
+  Scheduler,
+  createScheduler,
+  isValidCronExpression,
+  getNextRunTimes,
+  noopLogger as schedulerNoopLogger,
+  consoleLogger as schedulerConsoleLogger,
+  type ScheduledJobType,
+  type ScheduledJobResult,
+  type SchedulerLogger,
+  type SchedulerConfig,
+  type SchedulerStatus,
+} from "./scheduler.js";
 
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";
