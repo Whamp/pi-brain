@@ -54,7 +54,7 @@ export default function brainExtension(pi: ExtensionAPI) {
 
           // Inject detailed answer into conversation as a follow-up message
           if (result.data.answer) {
-            ctx.sendUserMessage(
+            pi.sendUserMessage(
               `Based on pi-brain analysis:\n\n${result.data.answer}`,
               { deliverAs: "followUp" }
             );
