@@ -31,6 +31,8 @@ import {
   getAllProjects,
   getAllTags,
   getAllTopics,
+  getAggregatedQuirks,
+  getAllQuirkModels,
   getConnectedNodes,
   getDescendants,
   getEdge,
@@ -48,11 +50,14 @@ import {
   getNodeToolErrors,
   getNodeTopics,
   getNodeVersion,
+  getQuirksByModel,
   getSubgraph,
   indexNodeForSearch,
   linkNodeToPredecessors,
   listLessons,
   listNodes,
+  listQuirks,
+  countQuirks,
   nodeExistsInDb,
   searchNodes,
   searchNodesAdvanced,
@@ -3148,6 +3153,335 @@ describe("node-repository", () => {
       expect(countLessons(db, { level: "project" })).toBe(1);
       expect(countLessons(db, { level: "model" })).toBe(1);
       expect(countLessons(db, { level: "user" })).toBe(0);
+    });
+  });
+
+  describe("model quirk aggregation", () => {
+    it("should return empty results when no quirks exist", () => {
+      const result = listQuirks(db);
+      expect(result.quirks).toHaveLength(0);
+      expect(result.total).toBe(0);
+    });
+
+    it("should list quirks with filters", () => {
+      // Create node with quirks
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/project1",
+        },
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Tends to be verbose",
+              frequency: "often",
+              workaround: "Ask for concise output",
+              severity: "low",
+            },
+            {
+              model: "anthropic/claude-3",
+              observation: "Uses sed instead of read",
+              frequency: "sometimes",
+              workaround: "Remind to use read tool",
+              severity: "medium",
+            },
+          ],
+        },
+      });
+      createNode(db, node1, options);
+
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/project2",
+        },
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Forgets context easily",
+              frequency: "once",
+              workaround: undefined,
+              severity: "high",
+            },
+          ],
+        },
+      });
+      createNode(db, node2, options);
+
+      // All quirks
+      const all = listQuirks(db);
+      expect(all.quirks).toHaveLength(3);
+      expect(all.total).toBe(3);
+
+      // Filter by model
+      const glmQuirks = listQuirks(db, { model: "zai/glm-4.7" });
+      expect(glmQuirks.quirks).toHaveLength(2);
+      expect(glmQuirks.total).toBe(2);
+
+      const claudeQuirks = listQuirks(db, { model: "anthropic/claude-3" });
+      expect(claudeQuirks.quirks).toHaveLength(1);
+      expect(claudeQuirks.total).toBe(1);
+      expect(claudeQuirks.quirks[0].observation).toBe(
+        "Uses sed instead of read"
+      );
+
+      // Filter by project
+      const project1Quirks = listQuirks(db, { project: "project1" });
+      expect(project1Quirks.quirks).toHaveLength(2);
+
+      // Filter by frequency (minimum)
+      const sometimesOrMore = listQuirks(db, { frequency: "sometimes" });
+      expect(sometimesOrMore.quirks).toHaveLength(2); // sometimes + often
+
+      const oftenOrMore = listQuirks(db, { frequency: "often" });
+      expect(oftenOrMore.quirks).toHaveLength(1);
+      expect(oftenOrMore.quirks[0].observation).toBe("Tends to be verbose");
+    });
+
+    it("should paginate quirk results", () => {
+      // Create multiple quirks
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "model-a",
+              observation: "Quirk 1",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "model-b",
+              observation: "Quirk 2",
+              frequency: "sometimes",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "model-c",
+              observation: "Quirk 3",
+              frequency: "often",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const page1 = listQuirks(db, {}, { limit: 2, offset: 0 });
+      expect(page1.quirks).toHaveLength(2);
+      expect(page1.total).toBe(3);
+      expect(page1.limit).toBe(2);
+      expect(page1.offset).toBe(0);
+
+      const page2 = listQuirks(db, {}, { limit: 2, offset: 2 });
+      expect(page2.quirks).toHaveLength(1);
+      expect(page2.total).toBe(3);
+    });
+
+    it("should get quirks aggregated by model", () => {
+      const node1 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Quirk A",
+              frequency: "often",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "anthropic/claude-3",
+              observation: "Quirk B",
+              frequency: "sometimes",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node1, options);
+
+      const node2 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Quirk C",
+              frequency: "once",
+              workaround: "Fix it",
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node2, options);
+
+      const stats = getQuirksByModel(db);
+
+      expect(stats["zai/glm-4.7"]).toBeDefined();
+      expect(stats["zai/glm-4.7"].count).toBe(2);
+      expect(stats["zai/glm-4.7"].recent).toHaveLength(2);
+
+      expect(stats["anthropic/claude-3"]).toBeDefined();
+      expect(stats["anthropic/claude-3"].count).toBe(1);
+      expect(stats["anthropic/claude-3"].recent).toHaveLength(1);
+      expect(stats["anthropic/claude-3"].recent[0].observation).toBe("Quirk B");
+    });
+
+    it("should count quirks matching filters", () => {
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "model-a",
+              observation: "Q1",
+              frequency: "often",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "model-b",
+              observation: "Q2",
+              frequency: "sometimes",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      expect(countQuirks(db)).toBe(2);
+      expect(countQuirks(db, { model: "model-a" })).toBe(1);
+      expect(countQuirks(db, { model: "model-c" })).toBe(0);
+    });
+
+    it("should get all unique quirk models", () => {
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Q1",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "anthropic/claude-3",
+              observation: "Q2",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "zai/glm-4.7",
+              observation: "Q3",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const models = getAllQuirkModels(db);
+      expect(models).toHaveLength(2);
+      expect(models).toContain("zai/glm-4.7");
+      expect(models).toContain("anthropic/claude-3");
+    });
+
+    it("should aggregate quirks by observation", () => {
+      // Create the same observation from multiple nodes
+      const node1 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Uses sed instead of read",
+              frequency: "often",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node1, options);
+
+      const node2 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "zai/glm-4.7",
+              observation: "Uses sed instead of read",
+              frequency: "sometimes",
+              workaround: undefined,
+              severity: "low",
+            },
+            {
+              model: "zai/glm-4.7",
+              observation: "Unique quirk",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node2, options);
+
+      // Get aggregated quirks with minOccurrences = 2
+      const aggregated = getAggregatedQuirks(db, { minOccurrences: 2 });
+      expect(aggregated).toHaveLength(1);
+      expect(aggregated[0].model).toBe("zai/glm-4.7");
+      expect(aggregated[0].observation).toBe("Uses sed instead of read");
+      expect(aggregated[0].occurrences).toBe(2);
+      expect(aggregated[0].nodeIds).toHaveLength(2);
+      expect(aggregated[0].nodeIds).toContain(node1.id);
+      expect(aggregated[0].nodeIds).toContain(node2.id);
+
+      // Get all aggregated quirks (minOccurrences = 1)
+      const all = getAggregatedQuirks(db);
+      expect(all).toHaveLength(2);
+    });
+
+    it("should include sourceProject in quirk results", () => {
+      const node = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/special-project",
+        },
+        observations: {
+          ...emptyObservations(),
+          modelQuirks: [
+            {
+              model: "test-model",
+              observation: "Test observation",
+              frequency: "once",
+              workaround: undefined,
+              severity: "low",
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const result = listQuirks(db);
+      expect(result.quirks[0].sourceProject).toBe("/home/will/special-project");
     });
   });
 });
