@@ -87,3 +87,25 @@
 - Invokes pi agent with brain-query.md prompt to synthesize answer
 - Returns structured response with answer, summary, confidence, sources
 - Prompt also installed to ~/.pi-brain/prompts/brain-query.md for runtime use
+
+---
+
+## 2026-01-26 12:41 - Task 7.4
+
+**Status**: pending → done
+**Validation**:
+- Created brain skill at skills/brain/SKILL.md
+- Skill follows pi skill conventions with YAML frontmatter (name, description)
+- Description includes trigger keywords for agent activation
+- Body provides guidance on using brain_query tool
+- Includes query type examples, best practices, and when not to use
+- Symlink installed to ~/skills/brain for global availability
+- Added 5 unit tests for skill frontmatter validation
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 752 tests)
+**Commit**: 400e4f9
+**Notes**:
+- Skill provides structured guidance for agents to query the knowledge graph
+- Documents query types: decision lookup, error patterns, model quirks, project history, lessons, techniques
+- Integrates with existing brain_query tool from brain-query extension (Task 7.1)
+- Ready for end-to-end testing in Task 7.6
