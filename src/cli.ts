@@ -24,6 +24,7 @@ import {
   formatDaemonStatus,
   formatQueueStatus,
   formatHealthStatus,
+  rebuildIndex,
 } from "./daemon/index.js";
 import {
   scanSessions,
@@ -256,6 +257,20 @@ daemonCmd
 
     if (result.success) {
       console.log(`${result.message} (job ID: ${result.jobId})`);
+    } else {
+      console.error(result.message);
+      process.exit(1);
+    }
+  });
+
+daemonCmd
+  .command("rebuild-index")
+  .description("Rebuild the SQLite index from JSON files")
+  .option("-c, --config <path>", "Config file path")
+  .action((options) => {
+    const result = rebuildIndex(options.config);
+    if (result.success) {
+      console.log(result.message);
     } else {
       console.error(result.message);
       process.exit(1);

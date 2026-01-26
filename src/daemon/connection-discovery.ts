@@ -7,11 +7,13 @@
 
 import type Database from "better-sqlite3";
 
+import type { Edge } from "../types/index.js";
+
 import {
   createEdge,
   edgeExists,
   getNode,
-  type Edge,
+  getNodeSummary,
   type NodeRow,
 } from "../storage/node-repository.js";
 
@@ -166,8 +168,8 @@ export class ConnectionDiscoverer {
       return { sourceNodeId: nodeId, edges: [] };
     }
 
-    // Use summary from the node row if available, otherwise from metadata
-    const sourceSummary = sourceNode.summary || "";
+    // Use summary from FTS if available
+    const sourceSummary = getNodeSummary(this.db, nodeId) || "";
 
     // 3. Find candidates
     // Look for nodes older than the source node but within the lookback window
@@ -245,7 +247,7 @@ export class ConnectionDiscoverer {
     sourceTimestamp: string,
     days: number,
     limit: number
-  ): NodeRow[] {
+  ): (NodeRow & { summary: string | null })[] {
     const startDate = new Date(sourceTimestamp);
     // Safety check
     if (Number.isNaN(startDate.getTime())) {
@@ -257,14 +259,18 @@ export class ConnectionDiscoverer {
 
     return this.db
       .prepare(`
-      SELECT * FROM nodes
-      WHERE id != ?
-      AND timestamp < ?
-      AND timestamp > ?
-      ORDER BY timestamp DESC
+      SELECT n.*, f.summary 
+      FROM nodes n
+      LEFT JOIN nodes_fts f ON n.id = f.node_id
+      WHERE n.id != ?
+      AND n.timestamp < ?
+      AND n.timestamp > ?
+      ORDER BY n.timestamp DESC
       LIMIT ?
     `)
-      .all(excludeNodeId, sourceTimestamp, limitStr, limit) as NodeRow[];
+      .all(excludeNodeId, sourceTimestamp, limitStr, limit) as (NodeRow & {
+      summary: string | null;
+    })[];
   }
 
   /**

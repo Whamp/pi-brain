@@ -207,3 +207,22 @@
 - The semantic similarity approach uses a lightweight non-LLM implementation for speed and cost efficiency
 - Worker now supports job types that don't require spawning a pi agent
 - Ready for Task 8.4 (reference detection)
+
+## 2026-01-26 14:30 - Task 11.1, 11.3
+
+**Status**: pending → done
+**Validation**:
+- Refactored shared types to `src/types/index.ts` (Task 11.1)
+- Updated backend and frontend to use shared types
+- Fixed frontend type mismatches (DaemonDecisionEntity, refactoring vs refactor, edge types)
+- Implemented `insertNodeToDb` and `clearAllData` in node-repository (Task 11.3)
+- Implemented `rebuild-index` command in daemon CLI (Task 11.3)
+- Refactored `connection-discovery.ts` to use FTS for summaries
+- Verified frontend build (`npm run web:check` passes)
+- Verified all unit and integration tests (`npm test -- --run` passes 24 test files)
+- Verified CLI command (`./dist/cli.js daemon rebuild-index --help` works)
+**Commit**: [hash]
+**Notes**:
+- Addressed "Shared Type Library" and "SQLite Rebuild CLI" TODOs.
+- Created robust foundation for type sharing between monorepo packages.
+- Added recovery mechanism for database corruption/loss via JSON rebuild.

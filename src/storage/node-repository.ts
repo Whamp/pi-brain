@@ -78,6 +78,92 @@ export interface EdgeRow {
 // =============================================================================
 
 /**
+ * Clear all data from the database (nodes, edges, etc.)
+ * Used by rebuild-index CLI
+ */
+export function clearAllData(db: Database.Database): void {
+  db.transaction(() => {
+    // Delete in order to respect FKs (though CASCADE handles it, being explicit is safer)
+    db.prepare("DELETE FROM edges").run();
+    db.prepare("DELETE FROM nodes").run();
+    // FTS table (triggers might handle this, but explicit delete is safe)
+    db.prepare("DELETE FROM nodes_fts").run();
+    // Other tables cascade from nodes
+  })();
+}
+
+/**
+ * Insert a node into the database (without writing JSON file)
+ * Used by createNode and rebuild-index CLI
+ */
+export function insertNodeToDb(
+  db: Database.Database,
+  node: Node,
+  dataFile: string,
+  options: { skipFts?: boolean } = {}
+): void {
+  const insertNode = db.prepare(`
+    INSERT INTO nodes (
+      id, version, session_file, segment_start, segment_end, computer,
+      type, project, is_new_project, had_clear_goal, outcome,
+      tokens_used, cost, duration_minutes,
+      timestamp, analyzed_at, analyzer_version, data_file
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?,
+      ?, ?, ?,
+      ?, ?, ?, ?
+    )
+  `);
+
+  insertNode.run(
+    node.id,
+    node.version,
+    node.source.sessionFile,
+    node.source.segment.startEntryId,
+    node.source.segment.endEntryId,
+    node.source.computer,
+    node.classification.type,
+    node.classification.project,
+    node.classification.isNewProject ? 1 : 0,
+    node.classification.hadClearGoal ? 1 : 0,
+    node.content.outcome,
+    node.metadata.tokensUsed,
+    node.metadata.cost,
+    node.metadata.durationMinutes,
+    node.metadata.timestamp,
+    node.metadata.analyzedAt,
+    node.metadata.analyzerVersion,
+    dataFile
+  );
+
+  // Insert related data
+  const insertTag = db.prepare(
+    "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
+  );
+  for (const tag of node.semantic.tags) {
+    insertTag.run(node.id, tag);
+  }
+
+  const insertTopic = db.prepare(
+    "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
+  );
+  for (const topic of node.semantic.topics) {
+    insertTopic.run(node.id, topic);
+  }
+
+  insertLessons(db, node.id, node.lessons);
+  insertModelQuirks(db, node.id, node.observations.modelQuirks);
+  insertToolErrors(db, node.id, node.observations.toolUseErrors);
+  insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
+
+  // Update FTS index
+  if (!options.skipFts) {
+    indexNodeForSearch(db, node);
+  }
+}
+
+/**
  * Create a node - writes to both SQLite and JSON storage
  * Returns the node with any auto-generated fields filled in
  */
@@ -90,74 +176,8 @@ export function createNode(
     // 1. Write JSON file first
     const dataFile = writeNode(node, options);
 
-    // 2. Insert into nodes table
-    const insertNode = db.prepare(`
-      INSERT INTO nodes (
-        id, version, session_file, segment_start, segment_end, computer,
-        type, project, is_new_project, had_clear_goal, outcome,
-        tokens_used, cost, duration_minutes,
-        timestamp, analyzed_at, analyzer_version, data_file
-      ) VALUES (
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?,
-        ?, ?, ?,
-        ?, ?, ?, ?
-      )
-    `);
-
-    insertNode.run(
-      node.id,
-      node.version,
-      node.source.sessionFile,
-      node.source.segment.startEntryId,
-      node.source.segment.endEntryId,
-      node.source.computer,
-      node.classification.type,
-      node.classification.project,
-      node.classification.isNewProject ? 1 : 0,
-      node.classification.hadClearGoal ? 1 : 0,
-      node.content.outcome,
-      node.metadata.tokensUsed,
-      node.metadata.cost,
-      node.metadata.durationMinutes,
-      node.metadata.timestamp,
-      node.metadata.analyzedAt,
-      node.metadata.analyzerVersion,
-      dataFile
-    );
-
-    // 3. Insert tags
-    const insertTag = db.prepare(
-      "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
-    );
-    for (const tag of node.semantic.tags) {
-      insertTag.run(node.id, tag);
-    }
-
-    // 4. Insert topics
-    const insertTopic = db.prepare(
-      "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
-    );
-    for (const topic of node.semantic.topics) {
-      insertTopic.run(node.id, topic);
-    }
-
-    // 5. Insert lessons from all levels
-    insertLessons(db, node.id, node.lessons);
-
-    // 6. Insert model quirks
-    insertModelQuirks(db, node.id, node.observations.modelQuirks);
-
-    // 7. Insert tool errors
-    insertToolErrors(db, node.id, node.observations.toolUseErrors);
-
-    // 8. Insert daemon decisions
-    insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
-
-    // 9. Update FTS index
-    if (!options.skipFts) {
-      indexNodeForSearch(db, node);
-    }
+    // 2. Insert into database
+    insertNodeToDb(db, node, dataFile, options);
 
     return node;
   })();
@@ -1999,6 +2019,18 @@ export function getAllToolsWithErrors(db: Database.Database): string[] {
 // =============================================================================
 // Query Helpers
 // =============================================================================
+
+/**
+ * Get node summary from FTS index
+ */
+export function getNodeSummary(
+  db: Database.Database,
+  nodeId: string
+): string | null {
+  const stmt = db.prepare("SELECT summary FROM nodes_fts WHERE node_id = ?");
+  const result = stmt.get(nodeId) as { summary: string } | undefined;
+  return result?.summary ?? null;
+}
 
 /**
  * Get tags for a node

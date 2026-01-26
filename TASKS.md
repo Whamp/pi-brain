@@ -140,8 +140,8 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 11: Architecture Hardening
 
-| ID   | Task                                                                        | Status  | Deps | Notes      |
-| ---- | --------------------------------------------------------------------------- | ------- | ---- | ---------- |
-| 11.1 | Refactor: Shared Type Library (extract to `src/types` or configure imports) | active  | 5.1  | 2026-01-26 |
-| 11.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | pending | 3.7  |            |
-| 11.3 | Architecture: SQLite Rebuild CLI (restore DB from JSON)                     | pending | 4.1  |            |
+| ID   | Task                                                                        | Status  | Deps | Notes                                        |
+| ---- | --------------------------------------------------------------------------- | ------- | ---- | -------------------------------------------- |
+| 11.1 | Refactor: Shared Type Library (extract to `src/types` or configure imports) | done    | 5.1  | 2026-01-26 - extracted to src/types/index.ts |
+| 11.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | pending | 3.7  |                                              |
+| 11.3 | Architecture: SQLite Rebuild CLI (restore DB from JSON)                     | done    | 4.1  | 2026-01-26 - added rebuild-index command     |

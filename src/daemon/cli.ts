@@ -26,6 +26,16 @@ import {
 } from "../config/config.js";
 import { openDatabase, migrate } from "../storage/database.js";
 import {
+  clearAllData,
+  insertNodeToDb,
+  linkNodeToPredecessors,
+} from "../storage/node-repository.js";
+import {
+  listNodeFiles,
+  parseNodePath,
+  readNodeFromPath,
+} from "../storage/node-storage.js";
+import {
   checkSkillAvailable,
   REQUIRED_SKILLS,
   OPTIONAL_SKILLS,
@@ -911,6 +921,110 @@ function truncatePath(filePath: string, maxLen: number): string {
     return filePath;
   }
   return "..." + filePath.slice(-(maxLen - 3));
+}
+
+/**
+ * Rebuild the SQLite index from JSON files
+ */
+export function rebuildIndex(configPath?: string): {
+  success: boolean;
+  message: string;
+  count: number;
+} {
+  const config = loadConfig(configPath);
+  const dbPath = path.join(config.hub.databaseDir, "brain.db");
+
+  // Check if daemon is running
+  const { running } = isDaemonRunning();
+  if (running) {
+    return {
+      success: false,
+      message: "Daemon is running. Please stop it before rebuilding the index.",
+      count: 0,
+    };
+  }
+
+  // Ensure database exists
+  const db = openDatabase({ path: dbPath });
+  migrate(db);
+
+  try {
+    console.log("Scanning node files...");
+    const files = listNodeFiles({
+      nodesDir: path.join(config.hub.databaseDir, "nodes"),
+    });
+
+    // Group by ID to find latest versions
+    const latestFiles = new Map<string, { version: number; path: string }>();
+
+    for (const file of files) {
+      const parsed = parseNodePath(file);
+      if (!parsed) {
+        continue;
+      }
+
+      const current = latestFiles.get(parsed.nodeId);
+      if (!current || parsed.version > current.version) {
+        latestFiles.set(parsed.nodeId, { version: parsed.version, path: file });
+      }
+    }
+
+    console.log(
+      `Found ${files.length} files, ${latestFiles.size} unique nodes.`
+    );
+    console.log("Clearing database...");
+
+    clearAllData(db);
+
+    console.log("Inserting nodes...");
+    let count = 0;
+    const allFiles = [...latestFiles.values()];
+    const batchSize = 100;
+
+    const processBatch = db.transaction((files: typeof allFiles) => {
+      for (const { path: filePath } of files) {
+        try {
+          const node = readNodeFromPath(filePath);
+          insertNodeToDb(db, node, filePath);
+
+          // Restore structural links
+          linkNodeToPredecessors(db, node);
+
+          count++;
+        } catch (error) {
+          console.error(`\nFailed to import ${filePath}:`, error);
+        }
+      }
+    });
+
+    // Process in batches
+    for (let i = 0; i < allFiles.length; i += batchSize) {
+      const batch = allFiles.slice(i, i + batchSize);
+
+      processBatch(batch);
+
+      process.stdout.write(`\rInserted ${count} / ${allFiles.length} nodes...`);
+    }
+
+    console.log(`\nRebuild complete. Inserted ${count} nodes.`);
+    console.log(
+      "Note: Any metadata not stored in JSON (like user feedback) has been reset."
+    );
+
+    return {
+      success: true,
+      message: `Index rebuilt successfully. Inserted ${count} nodes.`,
+      count,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Rebuild failed: ${(error as Error).message}`,
+      count: 0,
+    };
+  } finally {
+    db.close();
+  }
 }
 
 /**

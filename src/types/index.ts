@@ -268,6 +268,8 @@ export interface EdgeMetadata {
   lessonId?: string;
   /** For failure_pattern: which pattern */
   patternId?: string;
+  /** Human readable reason for the connection */
+  reason?: string;
 }
 
 export interface Edge {

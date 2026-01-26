@@ -14,9 +14,14 @@ function manualInsertNode(
   timestamp: string = new Date().toISOString()
 ) {
   db.prepare(`
-    INSERT INTO nodes (id, session_file, data_file, timestamp, summary, analyzed_at)
-    VALUES (?, 'test.jsonl', 'test.json', ?, ?, datetime('now'))
-  `).run(id, timestamp, summary);
+    INSERT INTO nodes (id, session_file, data_file, timestamp, analyzed_at)
+    VALUES (?, 'test.jsonl', 'test.json', ?, datetime('now'))
+  `).run(id, timestamp);
+
+  // Insert into FTS
+  db.prepare(`
+    INSERT INTO nodes_fts (node_id, summary) VALUES (?, ?)
+  `).run(id, summary);
 
   for (const tag of tags) {
     db.prepare("INSERT INTO tags (node_id, tag) VALUES (?, ?)").run(id, tag);
@@ -42,8 +47,10 @@ describe("connectionDiscoverer", () => {
         session_file TEXT,
         data_file TEXT,
         timestamp TEXT,
-        summary TEXT,
         analyzed_at TEXT
+      );
+      CREATE VIRTUAL TABLE nodes_fts USING fts5(
+        node_id, summary, decisions, lessons, tags, topics
       );
       CREATE TABLE tags (node_id TEXT, tag TEXT);
       CREATE TABLE topics (node_id TEXT, topic TEXT);
