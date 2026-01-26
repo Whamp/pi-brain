@@ -170,6 +170,7 @@ export class ConnectionDiscoverer {
 
     // Use summary from FTS if available
     const sourceSummary = getNodeSummary(this.db, nodeId) || "";
+    const fullText = this.getNodeFullText(nodeId) || sourceSummary;
 
     // 3. Find candidates
     // Look for nodes older than the source node but within the lookback window
@@ -181,6 +182,10 @@ export class ConnectionDiscoverer {
     );
 
     const newEdges: Edge[] = [];
+
+    // 3b. Detect references (Explicit Node IDs)
+    const referenceEdges = this.detectReferences(nodeId, fullText);
+    newEdges.push(...referenceEdges);
 
     // 4. Compare and create edges
     for (const candidate of candidates) {
@@ -271,6 +276,70 @@ export class ConnectionDiscoverer {
       .all(excludeNodeId, sourceTimestamp, limitStr, limit) as (NodeRow & {
       summary: string | null;
     })[];
+  }
+
+  private getNodeFullText(nodeId: string): string {
+    try {
+      const row = this.db
+        .prepare(
+          "SELECT summary, decisions, lessons FROM nodes_fts WHERE node_id = ?"
+        )
+        .get(nodeId) as
+        | {
+            summary: string;
+            decisions: string;
+            lessons: string;
+          }
+        | undefined;
+
+      if (!row) {
+        return "";
+      }
+      return `${row.summary} ${row.decisions} ${row.lessons}`;
+    } catch {
+      return "";
+    }
+  }
+
+  private detectReferences(sourceNodeId: string, sourceText: string): Edge[] {
+    // Regex for 16-char hex strings (node IDs)
+    // Matches exactly 16 hex chars, surrounded by word boundaries
+    const hexRegex = /\b[a-f0-9]{16}\b/g;
+    const matches = sourceText.match(hexRegex);
+
+    if (!matches) {
+      return [];
+    }
+
+    const uniqueMatches = [...new Set(matches)];
+    const edges: Edge[] = [];
+
+    for (const targetId of uniqueMatches) {
+      if (targetId === sourceNodeId) {
+        continue;
+      }
+
+      // Check if target node exists
+      // Use getNode from node-repository which is imported
+      const targetNode = getNode(this.db, targetId);
+
+      if (targetNode) {
+        // Skip if edge already exists
+        if (edgeExists(this.db, sourceNodeId, targetId)) {
+          continue;
+        }
+
+        // Create reference edge
+        const edge = createEdge(this.db, sourceNodeId, targetId, "reference", {
+          metadata: {
+            reason: "Explicit reference in text",
+          },
+          createdBy: "daemon",
+        });
+        edges.push(edge);
+      }
+    }
+    return edges;
   }
 
   /**

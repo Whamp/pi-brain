@@ -110,7 +110,7 @@ Track implementation progress. Agents update status as they complete work.
 | 8.1  | Implement scheduler (cron-like or systemd timer)      | done    | 3.9          | 2026-01-26 - croner lib, 25 tests    |
 | 8.2  | Implement reanalysis queue population                 | done    | 8.1, 4.2     | 2026-01-26 - scheduler updated       |
 | 8.3  | Implement connection discovery - semantic similarity  | done    | 8.1          | 2026-01-26 - connection-discovery.ts |
-| 8.4  | Implement connection discovery - reference detection  | pending | 8.1          |                                      |
+| 8.4  | Implement connection discovery - reference detection  | active  | 8.1          | 2026-01-26                           |
 | 8.5  | Implement connection discovery - lesson reinforcement | pending | 8.1          |                                      |
 | 8.6  | Implement pattern aggregation - failure patterns      | pending | 8.1, 4.11    |                                      |
 | 8.7  | Implement pattern aggregation - model quirks          | pending | 8.1, 4.10    |                                      |

@@ -159,4 +159,32 @@ describe("connectionDiscoverer", () => {
     const edges = db.prepare("SELECT * FROM edges").all();
     expect(edges).toHaveLength(1); // Still just 1
   });
+
+  it("should detect reference to existing node ID in summary", async () => {
+    const targetId = "a1b2c3d4e5f60000";
+    manualInsertNode(
+      db,
+      targetId,
+      "Original node",
+      [],
+      [],
+      new Date("2026-01-01T00:00:00Z").toISOString()
+    );
+
+    const sourceId = "1234567890abcdef";
+    manualInsertNode(
+      db,
+      sourceId,
+      `This work builds on node ${targetId} and improves it.`,
+      [],
+      [],
+      new Date("2026-01-02T00:00:00Z").toISOString()
+    );
+
+    const result = await discoverer.discover(sourceId);
+
+    expect(result.edges).toHaveLength(1);
+    expect(result.edges[0].type).toBe("reference");
+    expect(result.edges[0].targetNodeId).toBe(targetId);
+  });
 });
