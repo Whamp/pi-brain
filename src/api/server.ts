@@ -24,6 +24,7 @@ import { lessonsRoutes } from "./routes/lessons.js";
 import { nodesRoutes } from "./routes/nodes.js";
 import { quirksRoutes } from "./routes/quirks.js";
 import { searchRoutes } from "./routes/search.js";
+import { sessionsRoutes } from "./routes/sessions.js";
 import { statsRoutes } from "./routes/stats.js";
 import { toolErrorsRoutes } from "./routes/tool-errors.js";
 
@@ -96,6 +97,7 @@ export async function createServer(
       await api.register(toolErrorsRoutes, { prefix: "/tool-errors" });
       await api.register(statsRoutes, { prefix: "/stats" });
       await api.register(daemonRoutes, { prefix: "/daemon" });
+      await api.register(sessionsRoutes, { prefix: "/sessions" });
     },
     { prefix: "/api/v1" }
   );

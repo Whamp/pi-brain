@@ -412,4 +412,271 @@ describe("aPI Server", () => {
       db.close();
     });
   });
+
+  describe("sessions API", () => {
+    it("should list projects when nodes exist", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      // Create nodes in different projects
+      const node1 = createTestNode({
+        id: "node-1",
+        classification: {
+          type: "coding",
+          project: "/home/will/project-alpha",
+          isNewProject: false,
+          hadClearGoal: true,
+          language: "typescript",
+          frameworks: [],
+        },
+        source: {
+          sessionFile: "/sessions/session-1.jsonl",
+          segment: { startEntryId: "e1", endEntryId: "e2", entryCount: 2 },
+          sessionId: "s1",
+          computer: "test",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node-2",
+        classification: {
+          type: "debugging",
+          project: "/home/will/project-beta",
+          isNewProject: false,
+          hadClearGoal: true,
+          language: "typescript",
+          frameworks: [],
+        },
+        source: {
+          sessionFile: "/sessions/session-2.jsonl",
+          segment: { startEntryId: "e1", endEntryId: "e2", entryCount: 2 },
+          sessionId: "s2",
+          computer: "test",
+        },
+      });
+
+      createNode(db, node1, { nodesDir: join(tempDir, "nodes") });
+      createNode(db, node2, { nodesDir: join(tempDir, "nodes") });
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/sessions/projects",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.projects).toHaveLength(2);
+      expect(body.data.total).toBe(2);
+
+      // Check project summaries have expected fields
+      const [project] = body.data.projects;
+      expect(project.project).toBeDefined();
+      expect(project.sessionCount).toBeDefined();
+      expect(project.nodeCount).toBeDefined();
+      expect(project.lastActivity).toBeDefined();
+
+      await app.close();
+      db.close();
+    });
+
+    it("should return empty projects list when no nodes", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/sessions/projects",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.projects).toHaveLength(0);
+      expect(body.data.total).toBe(0);
+
+      await app.close();
+      db.close();
+    });
+
+    it("should list sessions by project", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      // Create nodes in the same project with different sessions
+      const node1 = createTestNode({
+        id: "node-1",
+        classification: {
+          type: "coding",
+          project: "/home/will/project-alpha",
+          isNewProject: false,
+          hadClearGoal: true,
+          language: "typescript",
+          frameworks: [],
+        },
+        source: {
+          sessionFile: "/sessions/session-1.jsonl",
+          segment: { startEntryId: "e1", endEntryId: "e2", entryCount: 2 },
+          sessionId: "s1",
+          computer: "test",
+        },
+        content: {
+          summary: "Test summary 1",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      const node2 = createTestNode({
+        id: "node-2",
+        classification: {
+          type: "debugging",
+          project: "/home/will/project-alpha",
+          isNewProject: false,
+          hadClearGoal: true,
+          language: "typescript",
+          frameworks: [],
+        },
+        source: {
+          sessionFile: "/sessions/session-2.jsonl",
+          segment: { startEntryId: "e1", endEntryId: "e2", entryCount: 2 },
+          sessionId: "s2",
+          computer: "test",
+        },
+        content: {
+          summary: "Test summary 2",
+          outcome: "partial",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+
+      createNode(db, node1, { nodesDir: join(tempDir, "nodes") });
+      createNode(db, node2, { nodesDir: join(tempDir, "nodes") });
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/sessions/by-project/home/will/project-alpha",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.project).toBe("/home/will/project-alpha");
+      expect(body.data.sessions).toHaveLength(2);
+      expect(body.data.total).toBe(2);
+
+      // Check session summaries have expected fields
+      const [session] = body.data.sessions;
+      expect(session.sessionFile).toBeDefined();
+      expect(session.nodeCount).toBeDefined();
+      expect(session.firstTimestamp).toBeDefined();
+      expect(session.lastTimestamp).toBeDefined();
+      expect(session.outcomes).toBeDefined();
+      expect(session.types).toBeDefined();
+
+      await app.close();
+      db.close();
+    });
+
+    it("should return 404 for non-existent project", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/sessions/by-project/home/will/non-existent",
+      });
+
+      expect(response.statusCode).toBe(404);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("error");
+      expect(body.error.code).toBe("NOT_FOUND");
+
+      await app.close();
+      db.close();
+    });
+
+    it("should list nodes by session file", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      const sessionFile = "/sessions/test-session.jsonl";
+      const node1 = createTestNode({
+        id: "node-1",
+        source: {
+          sessionFile,
+          segment: { startEntryId: "e1", endEntryId: "e5", entryCount: 5 },
+          sessionId: "s1",
+          computer: "test",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node-2",
+        source: {
+          sessionFile,
+          segment: { startEntryId: "e6", endEntryId: "e10", entryCount: 5 },
+          sessionId: "s1",
+          computer: "test",
+        },
+      });
+
+      createNode(db, node1, { nodesDir: join(tempDir, "nodes") });
+      createNode(db, node2, { nodesDir: join(tempDir, "nodes") });
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: `/api/v1/sessions/nodes?sessionFile=${encodeURIComponent(sessionFile)}`,
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.sessionFile).toBe(sessionFile);
+      expect(body.data.nodes).toHaveLength(2);
+      expect(body.data.total).toBe(2);
+
+      await app.close();
+      db.close();
+    });
+
+    it("should return 400 when sessionFile param missing", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/sessions/nodes",
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("error");
+      expect(body.error.code).toBe("BAD_REQUEST");
+
+      await app.close();
+      db.close();
+    });
+  });
 });

@@ -182,6 +182,57 @@ export const api = {
         body: JSON.stringify({ query, context }),
       }
     ),
+
+  // Sessions (file browser)
+  getProjects: () =>
+    request<{
+      projects: {
+        project: string;
+        sessionCount: number;
+        nodeCount: number;
+        lastActivity: string;
+      }[];
+      total: number;
+    }>("/sessions/projects"),
+
+  getSessionsByProject: (
+    project: string,
+    options?: { limit?: number; offset?: number }
+  ) =>
+    request<{
+      project: string;
+      sessions: {
+        sessionFile: string;
+        nodeCount: number;
+        firstTimestamp: string;
+        lastTimestamp: string;
+        outcomes: {
+          success: number;
+          partial: number;
+          failed: number;
+          abandoned: number;
+        };
+        types: string[];
+        totalTokens: number;
+        totalCost: number;
+      }[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/sessions/by-project${project}${toQueryString(options ?? {})}`),
+
+  getNodesBySession: (
+    sessionFile: string,
+    options?: { limit?: number; offset?: number }
+  ) =>
+    request<{
+      sessionFile: string;
+      project: string;
+      nodes: Node[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/sessions/nodes${toQueryString({ sessionFile, ...options })}`),
 };
 
 export { ApiError };

@@ -51,6 +51,9 @@
       case "documentation": {
         return "📝";
       }
+      case "configuration": {
+        return "🔧";
+      }
       case "sysadmin": {
         return "⚙️";
       }
@@ -98,6 +101,11 @@
       {#each result.highlights as highlight}
         <div class="highlight-item">
           <span class="highlight-field">{highlight.field}</span>
+          <!-- 
+            SECURITY: @html is used here because the API returns pre-sanitized 
+            snippets with <mark> tags for highlighting. The API escapes all other 
+            HTML entities. See specs/api.md Search API response format.
+          -->
           <span class="highlight-snippet">{@html highlight.snippet}</span>
         </div>
       {/each}

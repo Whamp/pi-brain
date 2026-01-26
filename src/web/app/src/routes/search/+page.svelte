@@ -33,6 +33,7 @@
     "qa",
     "refactor",
     "documentation",
+    "configuration",
     "sysadmin",
     "brainstorm",
     "handoff",
@@ -42,9 +43,21 @@
 
   const allFields = ["summary", "decisions", "lessons", "tags", "topics"];
   let showFieldDropdown = $state(false);
+  let fieldDropdownRef = $state<HTMLDivElement | null>(null);
 
   // Debounce timer
   let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // Click outside handler for field dropdown
+  function handleClickOutside(event: MouseEvent) {
+    if (
+      showFieldDropdown &&
+      fieldDropdownRef &&
+      !fieldDropdownRef.contains(event.target as Node)
+    ) {
+      showFieldDropdown = false;
+    }
+  }
 
   // Computed: check if any filters are active
   function hasActiveFilters(): boolean {
@@ -74,7 +87,10 @@
     return filters;
   }
 
-  onMount(async () => {
+  onMount(() => {
+    // Register click outside handler
+    document.addEventListener("click", handleClickOutside);
+
     // Load filter options
     try {
       // Projects would come from API, for now use empty
@@ -88,8 +104,13 @@
     const q = urlParams.get("q");
     if (q) {
       searchQuery = q;
-      await performSearch();
+      performSearch();
     }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
   });
 
   async function performSearch() {
@@ -146,15 +167,18 @@
     } else {
       selectedFields = [...selectedFields, field];
     }
+    performSearch();
   }
 
   function removeTag(tag: string) {
     selectedTags = selectedTags.filter((t) => t !== tag);
+    performSearch();
   }
 
   function addTag(tag: string) {
     if (tag && !selectedTags.includes(tag)) {
       selectedTags = [...selectedTags, tag];
+      performSearch();
     }
   }
 
@@ -209,7 +233,7 @@
   </header>
 
   <!-- Search Box -->
-  <form class="search-box" onsubmit={handleSearchSubmit}>
+  <form class="search-box" role="search" onsubmit={handleSearchSubmit}>
     <SearchIcon size={20} />
     <input
       type="search"
@@ -249,7 +273,12 @@
         <!-- Field Filter -->
         <div class="filter-group">
           <span class="filter-label" id="search-in-label">Search in</span>
-          <div class="field-dropdown" role="group" aria-labelledby="search-in-label">
+          <div
+            class="field-dropdown"
+            role="group"
+            aria-labelledby="search-in-label"
+            bind:this={fieldDropdownRef}
+          >
             <button
               class="dropdown-trigger"
               onclick={() => (showFieldDropdown = !showFieldDropdown)}
@@ -268,7 +297,10 @@
                   <input
                     type="checkbox"
                     checked={selectedFields.length === 0}
-                    onchange={() => (selectedFields = [])}
+                    onchange={() => {
+                      selectedFields = [];
+                      performSearch();
+                    }}
                   />
                   All fields
                 </label>
@@ -336,6 +368,7 @@
             <input
               type="text"
               placeholder="Add tag..."
+              aria-label="Add tag filter"
               onkeydown={(e) => {
                 if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
                   addTag(e.target.value.trim());

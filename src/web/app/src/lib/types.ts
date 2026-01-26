@@ -240,3 +240,27 @@ export interface NodeFilters {
   computer?: string;
   hadClearGoal?: boolean;
 }
+
+// Session browser types
+export interface ProjectSummary {
+  project: string;
+  sessionCount: number;
+  nodeCount: number;
+  lastActivity: string;
+}
+
+export interface SessionSummary {
+  sessionFile: string;
+  nodeCount: number;
+  firstTimestamp: string;
+  lastTimestamp: string;
+  outcomes: {
+    success: number;
+    partial: number;
+    failed: number;
+    abandoned: number;
+  };
+  types: string[];
+  totalTokens: number;
+  totalCost: number;
+}
