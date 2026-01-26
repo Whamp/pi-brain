@@ -99,7 +99,7 @@ Track implementation progress. Agents update status as they complete work.
 | 7.1 | Implement brain-query extension          | done    | 4.5-4.8 | 2026-01-26 - built & tested  |
 | 7.2 | Implement /brain command                 | done    | 7.1     | Completed in 7.1             |
 | 7.3 | Create query processing (pi agent + RLM) | done    | 7.1     | 2026-01-26 - query-processor |
-| 7.4 | Create brain skill for agent use         | pending | 7.1     |                              |
+| 7.4 | Create brain skill for agent use         | active  | 7.1     | 2026-01-26                   |
 | 7.5 | Implement brain-query tool               | done    | 7.1     | Completed in 7.1             |
 | 7.6 | Test integration end-to-end              | pending | 7.1-7.5 |                              |
 
