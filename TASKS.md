@@ -73,7 +73,7 @@ Track implementation progress. Agents update status as they complete work.
 | --- | ------------------------------------------------------------ | ------- | ------------ | ---------- |
 | 5.1 | Set up web framework (SvelteKit)                             | done    | -            | 2026-01-26 |
 | 5.2 | Implement API routes for queries                             | done    | 5.1, 4.5-4.8 | 2026-01-26 |
-| 5.3 | Build graph visualization component (D3.js) - node rendering | active  | 5.1          | 2026-01-25 |
+| 5.3 | Build graph visualization component (D3.js) - node rendering | done    | 5.1          | 2026-01-26 |
 | 5.4 | Build graph visualization component - edge rendering         | pending | 5.3          |            |
 | 5.5 | Build graph visualization component - zoom, pan, filter      | pending | 5.3          |            |
 | 5.6 | Build graph visualization component - click to select        | pending | 5.3          |            |

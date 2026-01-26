@@ -1,33 +1,27 @@
-Title: Session logs missing "Retry failed" context for auto-retry failures
+Title: Meta-events (retries, compaction, login) are visible in TUI but missing from session logs
 
-### Problem Description
+[I will write the human introduction here explaining that I've been auditing session logs for debugging and noticed discrepancies between what I see on screen vs what is saved.]
 
-When the agent encounters a retryable error (e.g., 503 Capacity Unavailable) and exhausts all auto-retry attempts, the interactive TUI displays a specific error message: `Retry failed after X attempts: ...`.
+### Problem
 
-However, this high-level "retry failure" context is **not persisted** to the session logs (`.jsonl`). The logs only record the underlying API error (e.g., the raw 503 error message) from the final failed attempt.
+Several critical system events displayed in the TUI via `showError()` are not persisted to the `.jsonl` session files. This creates "ghost" errors where the user sees a failure (e.g., "Retry failed", "Compaction cancelled"), but the permanent record shows no trace of it.
 
-This makes debugging difficult because:
+This makes debugging impossible for:
 
-1. It is impossible to distinguish between a single transient error and a persistent outage that failed after multiple retries.
-2. The session log does not accurately reflect the actual execution flow (that retries were attempted and failed).
+1. **Auto-retry exhaustion**: The log shows the final API error but misses the context that `maxRetries` was attempted and failed.
+2. **Compaction failures**: If compaction fails silently (from a log perspective), it's unclear why a session's context window blew up.
+3. **Authentication errors**: Login/logout failures are ephemeral and lost on restart.
 
-### Reproduction Steps
+### Affected Areas
 
-1. Trigger a retryable error (e.g., hit a provider rate limit or force a 503).
-2. Wait for the agent to exhaust `maxRetries` (default: 3).
-3. Observe the TUI displays `Error: Retry failed after 3 attempts: ...`.
-4. Inspect the session log (`.pi/agent/sessions/.../*.jsonl`).
-5. **Observation:** The log contains the raw error message but no record of the "Retry failed" event or attempt count.
+The `showError` method in `interactive-mode.ts` is used for these unpersisted events:
 
-### Expected Behavior
+- `auto_retry_end` (Retry failed after X attempts)
+- Compaction failures (Compaction cancelled/failed)
+- Authentication failures (Login/logout errors)
 
-The session log should persist a record of the retry failure, either by:
+### Proposed Solution
 
-- Wrapping the final error message with the retry context (matching the TUI output).
-- Or recording a distinct system/meta event indicating that auto-retry was attempted and exhausted.
+Modify `AgentSession` or `SessionManager` to support a `system` or `meta` event type, and update `interactive-mode.ts` to persist these events when they occur, ensuring the session log accurately reflects the session's lifecycle.
 
-### Technical Details
-
-- **Location:** `packages/pi-coding-agent/src/modes/interactive/interactive-mode.ts` handles the `auto_retry_end` event and calls `showError()`.
-- **Cause:** `showError()` only updates the ephemeral TUI state and does not call `sessionManager` to write to the session file.
-- **Affected Version:** Current `main` branch.
+This does not add new features, but ensures the existing core features (retry, compaction) are properly auditable.
