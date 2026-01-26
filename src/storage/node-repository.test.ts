@@ -1864,6 +1864,265 @@ describe("node-repository", () => {
       expect(result.nodes).toHaveLength(0);
       expect(result.total).toBe(0);
     });
+
+    it("should filter by single tag", () => {
+      const node1 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt", "security"],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["database", "sql"],
+        },
+      });
+      const node3 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "oauth"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const result = listNodes(db, { tags: ["auth"] });
+
+      expect(result.nodes).toHaveLength(2);
+      expect(result.total).toBe(2);
+      const ids = result.nodes.map((n) => n.id);
+      expect(ids).toContain(node1.id);
+      expect(ids).toContain(node3.id);
+    });
+
+    it("should filter by multiple tags with AND logic", () => {
+      const node1 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt", "security"],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "oauth"],
+        },
+      });
+      const node3 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["jwt", "tokens"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      // Only node1 has BOTH "auth" and "jwt"
+      const result = listNodes(db, { tags: ["auth", "jwt"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.nodes[0].id).toBe(node1.id);
+    });
+
+    it("should filter by single topic", () => {
+      const node1 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          topics: ["authentication", "web security"],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          topics: ["database design"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { topics: ["authentication"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.nodes[0].id).toBe(node1.id);
+    });
+
+    it("should filter by multiple topics with AND logic", () => {
+      const node1 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          topics: ["authentication", "web security", "api design"],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          topics: ["authentication", "mobile apps"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Only node1 has BOTH "authentication" and "api design"
+      const result = listNodes(db, {
+        topics: ["authentication", "api design"],
+      });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.nodes[0].id).toBe(node1.id);
+    });
+
+    it("should combine tags and topics filters", () => {
+      const node1 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt"],
+          topics: ["authentication", "web security"],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt"],
+          topics: ["database design"],
+        },
+      });
+      const node3 = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["database"],
+          topics: ["authentication", "web security"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      // Only node1 has tag "auth" AND topic "authentication"
+      const result = listNodes(db, {
+        tags: ["auth"],
+        topics: ["authentication"],
+      });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.nodes[0].id).toBe(node1.id);
+    });
+
+    it("should combine tags filter with other filters", () => {
+      const node1 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt"],
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "debugging",
+        },
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt"],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Only node1 is "coding" with tag "auth"
+      const result = listNodes(db, { type: "coding", tags: ["auth"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+      expect(result.nodes[0].id).toBe(node1.id);
+    });
+
+    it("should return empty when no nodes have requested tags", () => {
+      const node = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth", "jwt"],
+        },
+      });
+      createNode(db, node, options);
+
+      const result = listNodes(db, { tags: ["nonexistent"] });
+
+      expect(result.nodes).toHaveLength(0);
+      expect(result.total).toBe(0);
+    });
+
+    it("should return empty when no nodes have all requested tags", () => {
+      const node = createTestNode({
+        semantic: {
+          ...createTestNode().semantic,
+          tags: ["auth"],
+        },
+      });
+      createNode(db, node, options);
+
+      // Node has "auth" but not "jwt"
+      const result = listNodes(db, { tags: ["auth", "jwt"] });
+
+      expect(result.nodes).toHaveLength(0);
+      expect(result.total).toBe(0);
+    });
+
+    it("should handle empty tags array", () => {
+      const node = createTestNode();
+      createNode(db, node, options);
+
+      // Empty tags array should not filter
+      const result = listNodes(db, { tags: [] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.total).toBe(1);
+    });
+
+    it("should paginate tag-filtered results correctly", () => {
+      // Create 5 nodes with same tag
+      const nodes: Node[] = [];
+      for (let i = 0; i < 5; i++) {
+        const node = createTestNode({
+          metadata: {
+            ...createTestNode().metadata,
+            timestamp: `2026-01-${String(i + 1).padStart(2, "0")}T00:00:00Z`,
+          },
+          semantic: {
+            ...createTestNode().semantic,
+            tags: ["common-tag"],
+          },
+        });
+        nodes.push(node);
+        createNode(db, node, options);
+      }
+
+      const page1 = listNodes(db, { tags: ["common-tag"] }, { limit: 2 });
+      expect(page1.nodes).toHaveLength(2);
+      expect(page1.total).toBe(5);
+
+      const page2 = listNodes(
+        db,
+        { tags: ["common-tag"] },
+        { limit: 2, offset: 2 }
+      );
+      expect(page2.nodes).toHaveLength(2);
+      expect(page2.total).toBe(5);
+
+      const page3 = listNodes(
+        db,
+        { tags: ["common-tag"] },
+        { limit: 2, offset: 4 }
+      );
+      expect(page3.nodes).toHaveLength(1);
+      expect(page3.total).toBe(5);
+    });
   });
 
   describe("getAllProjects", () => {

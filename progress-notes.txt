@@ -575,3 +575,10 @@ Updated src/storage/index.ts to export node-repository.
 
 - 24 new tests covering all filter combinations, pagination, sorting, edge cases
 - Tests for empty results, max/min limits, invalid sort fields
+
+## 2026-01-25 21:55 - Task 4.6
+
+**Status**: active → done
+**Validation**: npm test passes (666 tests). Added 10 new tests in src/storage/node-repository.test.ts covering multi-tag and multi-topic AND filtering, combination with other filters, and pagination.
+**Commit**: db2ce06
+**Notes**: Extended the query layer to support filtering by tags and topics per specs/api.md. Used subqueries in listNodes to ensure nodes satisfy ALL requested tags/topics.

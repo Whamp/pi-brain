@@ -973,6 +973,10 @@ export interface ListNodesFilters {
   hadClearGoal?: boolean;
   /** Filter by new project flag */
   isNewProject?: boolean;
+  /** Filter by tags (nodes must have ALL specified tags - AND logic) */
+  tags?: string[];
+  /** Filter by topics (nodes must have ALL specified topics - AND logic) */
+  topics?: string[];
 }
 
 /** Pagination and sorting options */
@@ -1045,43 +1049,64 @@ export function listNodes(
   const params: (string | number)[] = [];
 
   if (filters.project !== undefined) {
-    conditions.push("project LIKE ?");
+    conditions.push("n.project LIKE ?");
     params.push(`%${filters.project}%`);
   }
 
   if (filters.type !== undefined) {
-    conditions.push("type = ?");
+    conditions.push("n.type = ?");
     params.push(filters.type);
   }
 
   if (filters.outcome !== undefined) {
-    conditions.push("outcome = ?");
+    conditions.push("n.outcome = ?");
     params.push(filters.outcome);
   }
 
   if (filters.from !== undefined) {
-    conditions.push("timestamp >= ?");
+    conditions.push("n.timestamp >= ?");
     params.push(filters.from);
   }
 
   if (filters.to !== undefined) {
-    conditions.push("timestamp <= ?");
+    conditions.push("n.timestamp <= ?");
     params.push(filters.to);
   }
 
   if (filters.computer !== undefined) {
-    conditions.push("computer = ?");
+    conditions.push("n.computer = ?");
     params.push(filters.computer);
   }
 
   if (filters.hadClearGoal !== undefined) {
-    conditions.push("had_clear_goal = ?");
+    conditions.push("n.had_clear_goal = ?");
     params.push(filters.hadClearGoal ? 1 : 0);
   }
 
   if (filters.isNewProject !== undefined) {
-    conditions.push("is_new_project = ?");
+    conditions.push("n.is_new_project = ?");
     params.push(filters.isNewProject ? 1 : 0);
+  }
+
+  // Tags filter: nodes must have ALL specified tags (AND logic)
+  // Uses a subquery to count matching tags and require count == number of tags
+  if (filters.tags !== undefined && filters.tags.length > 0) {
+    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
+    conditions.push(`(
+      SELECT COUNT(DISTINCT t.tag) FROM tags t
+      WHERE t.node_id = n.id AND t.tag IN (${tagPlaceholders})
+    ) = ?`);
+    params.push(...filters.tags, filters.tags.length);
+  }
+
+  // Topics filter: nodes must have ALL specified topics (AND logic)
+  if (filters.topics !== undefined && filters.topics.length > 0) {
+    const topicPlaceholders = filters.topics.map(() => "?").join(", ");
+    conditions.push(`(
+      SELECT COUNT(DISTINCT tp.topic) FROM topics tp
+      WHERE tp.node_id = n.id AND tp.topic IN (${topicPlaceholders})
+    ) = ?`);
+    params.push(...filters.topics, filters.topics.length);
   }
 
   const whereClause =
@@ -1089,7 +1114,7 @@ export function listNodes(
 
   // Count query for total (before pagination)
   const countStmt = db.prepare(
-    `SELECT COUNT(*) as count FROM nodes ${whereClause}`
+    `SELECT COUNT(*) as count FROM nodes n ${whereClause}`
   );
   const countResult = countStmt.get(...params) as { count: number };
   const total = countResult.count;
@@ -1097,9 +1122,9 @@ export function listNodes(
   // Main query with pagination and sorting
   // Sort field is validated against ALLOWED_SORT_FIELDS so safe for template literal
   const dataStmt = db.prepare(`
-    SELECT * FROM nodes
+    SELECT n.* FROM nodes n
     ${whereClause}
-    ORDER BY ${sort} ${order.toUpperCase()}
+    ORDER BY n.${sort} ${order.toUpperCase()}
     LIMIT ? OFFSET ?
   `);
 
