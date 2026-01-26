@@ -1048,7 +1048,11 @@ export function searchNodesAdvanced(
     if (filters.tags && filters.tags.length > 0) {
       const tagPlaceholders = filters.tags.map(() => "?").join(", ");
       conditions.push(`n.id IN (
-        SELECT node_id FROM tags 
+        SELECT node_id FROM (
+          SELECT node_id, tag FROM tags
+          UNION
+          SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
+        )
         WHERE tag IN (${tagPlaceholders})
         GROUP BY node_id
         HAVING COUNT(DISTINCT tag) = ?
@@ -1164,7 +1168,11 @@ export function countSearchResults(
     if (filters.tags && filters.tags.length > 0) {
       const tagPlaceholders = filters.tags.map(() => "?").join(", ");
       conditions.push(`n.id IN (
-        SELECT node_id FROM tags 
+        SELECT node_id FROM (
+          SELECT node_id, tag FROM tags
+          UNION
+          SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
+        )
         WHERE tag IN (${tagPlaceholders})
         GROUP BY node_id
         HAVING COUNT(DISTINCT tag) = ?
@@ -1324,11 +1332,33 @@ export function listLessons(
     sourceProject: string | null;
   }[];
 
-  // Attach tags to each lesson
-  const lessons = rows.map((row) => {
-    const tags = getLessonTags(db, row.id);
-    return { ...row, tags };
-  });
+  // Attach tags to each lesson efficiently
+  const lessonIds = rows.map((r) => r.id);
+  const lessonMap = new Map<string, string[]>();
+  if (lessonIds.length > 0) {
+    const placeholders = lessonIds.map(() => "?").join(", ");
+    const tagsStmt = db.prepare(`
+      SELECT lesson_id, tag FROM lesson_tags
+      WHERE lesson_id IN (${placeholders})
+    `);
+    const allTags = tagsStmt.all(...lessonIds) as {
+      lesson_id: string;
+      tag: string;
+    }[];
+    for (const { lesson_id, tag } of allTags) {
+      let tags = lessonMap.get(lesson_id);
+      if (!tags) {
+        tags = [];
+        lessonMap.set(lesson_id, tags);
+      }
+      tags.push(tag);
+    }
+  }
+
+  const lessons = rows.map((row) => ({
+    ...row,
+    tags: lessonMap.get(row.id) ?? [],
+  }));
 
   return { lessons, total, limit, offset };
 }
@@ -1750,13 +1780,19 @@ export function listNodes(
   }
 
   // Tags filter: nodes must have ALL specified tags (AND logic)
-  // Uses a subquery to count matching tags and require count == number of tags
+  // Considers both node-level tags and lesson-level tags
   if (filters.tags !== undefined && filters.tags.length > 0) {
     const tagPlaceholders = filters.tags.map(() => "?").join(", ");
-    conditions.push(`(
-      SELECT COUNT(DISTINCT t.tag) FROM tags t
-      WHERE t.node_id = n.id AND t.tag IN (${tagPlaceholders})
-    ) = ?`);
+    conditions.push(`n.id IN (
+      SELECT node_id FROM (
+        SELECT node_id, tag FROM tags
+        UNION
+        SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
+      )
+      WHERE tag IN (${tagPlaceholders})
+      GROUP BY node_id
+      HAVING COUNT(DISTINCT tag) = ?
+    )`);
     params.push(...filters.tags, filters.tags.length);
   }
 
@@ -1992,25 +2028,25 @@ export function getConnectedNodes(
             ? edge.target_node_id
             : edge.source_node_id;
 
-        // Skip if we've already visited this node (prevents cycles)
-        if (visitedNodeIds.has(otherNodeId)) {
-          continue;
+        // Add the edge to results if we haven't seen it yet
+        // Note: multiple edges might exist between the same nodes
+        if (!traversalEdges.some((te) => te.id === edge.id)) {
+          traversalEdges.push({
+            id: edge.id,
+            sourceNodeId: edge.source_node_id,
+            targetNodeId: edge.target_node_id,
+            type: edge.type as EdgeType,
+            metadata: edge.metadata ? JSON.parse(edge.metadata) : {},
+            direction: edgeDirection,
+            hopDistance: currentHop,
+          });
         }
 
-        // Add the edge to results
-        traversalEdges.push({
-          id: edge.id,
-          sourceNodeId: edge.source_node_id,
-          targetNodeId: edge.target_node_id,
-          type: edge.type as EdgeType,
-          metadata: edge.metadata ? JSON.parse(edge.metadata) : {},
-          direction: edgeDirection,
-          hopDistance: currentHop,
-        });
-
-        // Mark node as visited and add to next frontier
-        visitedNodeIds.add(otherNodeId);
-        nextFrontier.add(otherNodeId);
+        // Add to next frontier if we haven't visited this node yet
+        if (!visitedNodeIds.has(otherNodeId)) {
+          visitedNodeIds.add(otherNodeId);
+          nextFrontier.add(otherNodeId);
+        }
       }
     }
 

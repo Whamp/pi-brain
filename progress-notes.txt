@@ -683,3 +683,15 @@ Updated src/storage/index.ts to export node-repository.
   - Deduplication of overlapping results
   - Path finding (direct, multi-hop, same node, no path)
   - Ancestors and descendants helpers
+
+## 2026-01-25 22:55 - Task 4.9
+
+**Status**: active → done
+**Validation**: npm run check passes, npm test passes (706 tests, 3 new lesson aggregation tests).
+**Commit**: 14ceb3e
+**Notes**: Implemented lesson aggregation queries per specs/storage.md and specs/api.md.
+- Created `listLessons(db, filters, options)` for filtered and paginated lesson retrieval.
+- Created `getLessonsByLevel(db, recentLimit)` for level-based statistics and recent lessons.
+- Created `countLessons(db, filters)` helper.
+- Added stable ordering by `created_at DESC, id DESC` for lesson queries.
+- Updated `src/storage/node-repository.test.ts` with tests for lesson filtering by level, project, and tags (AND logic).
