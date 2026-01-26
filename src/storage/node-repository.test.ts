@@ -1199,6 +1199,16 @@ describe("node-repository", () => {
       const results = searchNodes(db, "unique keywords");
       expect(results.some((r) => r.id === node.id)).toBeTruthy();
     });
+
+    it("should return empty array for empty query", () => {
+      const results = searchNodes(db, "");
+      expect(results).toStrictEqual([]);
+    });
+
+    it("should return empty array for whitespace-only query", () => {
+      const results = searchNodes(db, "   ");
+      expect(results).toStrictEqual([]);
+    });
   });
 
   // ===========================================================================

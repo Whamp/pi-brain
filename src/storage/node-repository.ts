@@ -724,9 +724,14 @@ export function searchNodes(
   limit = 20
 ): NodeRow[] {
   // Quote each word to handle special FTS5 characters (hyphens, etc.)
-  const quotedQuery = query
-    .split(/\s+/)
-    .filter((w) => w.length > 0)
+  const words = query.split(/\s+/).filter((w) => w.length > 0);
+
+  // Return empty array for empty/whitespace-only queries
+  if (words.length === 0) {
+    return [];
+  }
+
+  const quotedQuery = words
     .map((word) => `"${word.replaceAll('"', '""')}"`)
     .join(" ");
 
