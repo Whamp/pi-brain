@@ -153,5 +153,11 @@ export {
   type SchedulerStatus,
 } from "./scheduler.js";
 
+// Export connection discovery functionality
+export {
+  ConnectionDiscoverer,
+  type ConnectionResult,
+} from "./connection-discovery.js";
+
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";

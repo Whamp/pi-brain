@@ -155,3 +155,55 @@
 - Scheduler integrates with existing QueueManager and Database
 - Exported from src/daemon/index.ts for use by daemon startup
 - Ready for Task 8.2 (reanalysis queue population) to build on this
+
+## 2026-01-26 13:45 - Task 8.2
+
+**Status**: pending → done
+**Validation**:
+- Updated src/daemon/scheduler.ts to use prompt module's getLatestVersion()
+- Updated runReanalysis() to query prompt_versions table instead of metadata
+- Updated tests in src/daemon/scheduler.test.ts to mock prompt_versions queries
+- Tests verify correct reanalysis queueing with outdated nodes
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 780 tests, 4 skipped)
+**Commit**: da16fb6
+**Notes**:
+- Fixed issue where scheduler was querying non-existent metadata table
+- Scheduler now correctly detects prompt version changes
+- Ready for connection discovery tasks (8.3-8.5)
+
+
+## 2026-01-26 13:45 - Task 8.2
+
+**Status**: pending → done
+**Validation**:
+- Updated src/daemon/scheduler.ts to use prompt module's getLatestVersion()
+- Updated runReanalysis() to query prompt_versions table instead of metadata
+- Updated tests in src/daemon/scheduler.test.ts to mock prompt_versions queries
+- Tests verify correct reanalysis queueing with outdated nodes
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 780 tests, 4 skipped)
+**Commit**: da16fb6
+**Notes**:
+- Fixed issue where scheduler was querying non-existent metadata table
+- Scheduler now correctly detects prompt version changes
+- Ready for connection discovery tasks (8.3-8.5)
+
+
+## 2026-01-26 14:02 - Task 8.3
+
+**Status**: pending → done
+**Validation**:
+- Created src/daemon/connection-discovery.ts with ConnectionDiscoverer class
+- Implemented hybrid similarity algorithm using Jaccard index on tags (weight 0.4), topics (weight 0.3), and summary words (weight 0.3)
+- Added stopwords filtering for summary tokenization
+- Updated src/daemon/worker.ts to handle 'connection_discovery' jobs using ConnectionDiscoverer (bypassing expensive LLM calls)
+- Exported ConnectionDiscoverer from src/daemon/index.ts
+- Added unit tests in src/daemon/connection-discovery.test.ts verifying similarity calculation and edge creation
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 787 tests)
+**Commit**: [hash]
+**Notes**:
+- The semantic similarity approach uses a lightweight non-LLM implementation for speed and cost efficiency
+- Worker now supports job types that don't require spawning a pi agent
+- Ready for Task 8.4 (reference detection)

@@ -22,6 +22,7 @@ import {
   createNode,
   linkNodeToPredecessors,
 } from "../storage/node-repository.js";
+import { ConnectionDiscoverer } from "./connection-discovery.js";
 import {
   classifyError,
   classifyErrorWithContext,
@@ -121,6 +122,7 @@ export class Worker {
 
   private queue: QueueManager | null = null;
   private processor: JobProcessor | null = null;
+  private connectionDiscoverer: ConnectionDiscoverer | null = null;
   private db: Database.Database | null = null;
   private running = false;
   private currentJob: AnalysisJob | null = null;
@@ -151,6 +153,7 @@ export class Worker {
       daemonConfig: this.config.daemon,
       logger: this.logger,
     });
+    this.connectionDiscoverer = new ConnectionDiscoverer(db);
   }
 
   /**
@@ -235,7 +238,12 @@ export class Worker {
    * Process a single job (can be called directly for testing)
    */
   async processJob(job: AnalysisJob): Promise<JobProcessingResult> {
-    if (!this.queue || !this.processor || !this.db) {
+    if (
+      !this.queue ||
+      !this.processor ||
+      !this.db ||
+      !this.connectionDiscoverer
+    ) {
       throw new Error("Worker not initialized");
     }
 
@@ -246,7 +254,32 @@ export class Worker {
     this.logger.info(`Processing job ${job.id}: ${job.type}`);
 
     try {
-      // Invoke the agent
+      // Handle connection discovery jobs specifically
+      if (job.type === "connection_discovery") {
+        const nodeId = job.context?.nodeId as string | undefined;
+        if (!nodeId) {
+          throw new Error("Missing nodeId in connection_discovery job context");
+        }
+
+        const result = await this.connectionDiscoverer.discover(nodeId);
+
+        await this.queue.complete(job.id, nodeId);
+        this.jobsSucceeded++;
+
+        this.logger.info(
+          `Job ${job.id} completed successfully, found ${result.edges.length} connections for node ${nodeId}`
+        );
+
+        return {
+          success: true,
+          job,
+          nodeId,
+          willRetry: false,
+          durationMs: Date.now() - startTime,
+        };
+      }
+
+      // Invoke the agent for other job types
       const result = await this.processor.process(job);
 
       if (result.success && result.nodeData) {

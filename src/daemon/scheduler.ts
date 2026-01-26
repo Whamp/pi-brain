@@ -252,6 +252,7 @@ export class Scheduler {
       }
 
       // Find nodes analyzed with older prompts (or null analyzer_version)
+      // and exclude nodes that are already in the queue for reanalysis
       const outdatedNodes = this.db
         .prepare<
           [string],
@@ -264,8 +265,14 @@ export class Scheduler {
         >(
           `
         SELECT id, session_file, segment_start, segment_end
-        FROM nodes
-        WHERE analyzer_version IS NULL OR analyzer_version != ?
+        FROM nodes n
+        WHERE (analyzer_version IS NULL OR analyzer_version != ?)
+        AND NOT EXISTS (
+          SELECT 1 FROM analysis_queue q
+          WHERE q.type = 'reanalysis'
+          AND q.status IN ('pending', 'running')
+          AND json_extract(q.context, '$.existingNodeId') = n.id
+        )
         ORDER BY timestamp DESC
         LIMIT 100
       `
@@ -322,6 +329,8 @@ export class Scheduler {
       this.logger.info("Starting connection discovery job");
 
       // Get recently analyzed nodes (last 7 days)
+      // that haven't had a connection discovery job recently (last 24h)
+      // and aren't currently queued
       const recentNodes = this.db
         .prepare<
           [],
@@ -331,9 +340,19 @@ export class Scheduler {
           }
         >(
           `
-        SELECT id, session_file FROM nodes
+        SELECT id, session_file FROM nodes n
         WHERE analyzed_at > datetime('now', '-7 days')
+        AND NOT EXISTS (
+          SELECT 1 FROM analysis_queue q
+          WHERE q.type = 'connection_discovery'
+          AND json_extract(q.context, '$.nodeId') = n.id
+          AND (
+            status IN ('pending', 'running')
+            OR (status = 'completed' AND completed_at > datetime('now', '-24 hours'))
+          )
+        )
         ORDER BY analyzed_at DESC
+        LIMIT 100
       `
         )
         .all();
