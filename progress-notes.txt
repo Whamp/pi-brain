@@ -627,4 +627,3 @@ Updated src/storage/index.ts to export node-repository.
   - Search in lessons
   - Limit enforcement (min 1, max 500)
   - countSearchResults function
-

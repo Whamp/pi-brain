@@ -1153,6 +1153,34 @@ export function countSearchResults(
       conditions.push("n.computer = ?");
       params.push(filters.computer);
     }
+    if (filters.hadClearGoal !== undefined) {
+      conditions.push("n.had_clear_goal = ?");
+      params.push(filters.hadClearGoal ? 1 : 0);
+    }
+    if (filters.isNewProject !== undefined) {
+      conditions.push("n.is_new_project = ?");
+      params.push(filters.isNewProject ? 1 : 0);
+    }
+    if (filters.tags && filters.tags.length > 0) {
+      const tagPlaceholders = filters.tags.map(() => "?").join(", ");
+      conditions.push(`n.id IN (
+        SELECT node_id FROM tags 
+        WHERE tag IN (${tagPlaceholders})
+        GROUP BY node_id
+        HAVING COUNT(DISTINCT tag) = ?
+      )`);
+      params.push(...filters.tags, filters.tags.length);
+    }
+    if (filters.topics && filters.topics.length > 0) {
+      const topicPlaceholders = filters.topics.map(() => "?").join(", ");
+      conditions.push(`n.id IN (
+        SELECT node_id FROM topics 
+        WHERE topic IN (${topicPlaceholders})
+        GROUP BY node_id
+        HAVING COUNT(DISTINCT topic) = ?
+      )`);
+      params.push(...filters.topics, filters.topics.length);
+    }
   }
 
   const filterClause =
