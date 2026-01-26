@@ -94,14 +94,14 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 7: Pi Integration
 
-| ID  | Task                                     | Status | Deps    | Notes                        |
-| --- | ---------------------------------------- | ------ | ------- | ---------------------------- |
-| 7.1 | Implement brain-query extension          | done   | 4.5-4.8 | 2026-01-26 - built & tested  |
-| 7.2 | Implement /brain command                 | done   | 7.1     | Completed in 7.1             |
-| 7.3 | Create query processing (pi agent + RLM) | done   | 7.1     | 2026-01-26 - query-processor |
-| 7.4 | Create brain skill for agent use         | done   | 7.1     | 2026-01-26 - skills/brain/   |
-| 7.5 | Implement brain-query tool               | done   | 7.1     | Completed in 7.1             |
-| 7.6 | Test integration end-to-end              | active | 7.1-7.5 | 2026-01-26                   |
+| ID  | Task                                     | Status | Deps    | Notes                          |
+| --- | ---------------------------------------- | ------ | ------- | ------------------------------ |
+| 7.1 | Implement brain-query extension          | done   | 4.5-4.8 | 2026-01-26 - built & tested    |
+| 7.2 | Implement /brain command                 | done   | 7.1     | Completed in 7.1               |
+| 7.3 | Create query processing (pi agent + RLM) | done   | 7.1     | 2026-01-26 - query-processor   |
+| 7.4 | Create brain skill for agent use         | done   | 7.1     | 2026-01-26 - skills/brain/     |
+| 7.5 | Implement brain-query tool               | done   | 7.1     | Completed in 7.1               |
+| 7.6 | Test integration end-to-end              | done   | 7.1-7.5 | 2026-01-26 - extension + tests |
 
 ## Phase 8: Nightly Processing
 

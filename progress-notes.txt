@@ -109,3 +109,26 @@
 - Documents query types: decision lookup, error patterns, model quirks, project history, lessons, techniques
 - Integrates with existing brain_query tool from brain-query extension (Task 7.1)
 - Ready for end-to-end testing in Task 7.6
+
+---
+
+## 2026-01-26 12:53 - Task 7.6
+
+**Status**: pending → done
+**Validation**:
+- Restructured brain-query extension to proper directory structure (index.ts, package.json)
+- Installed extension symlink to ~/.pi/agent/extensions/brain-query
+- Created 7 comprehensive integration tests in src/integration/brain-integration.test.ts
+- Tests verify: node search, model quirks context, tool errors context, empty results, project filtering
+- Slow tests (requiring pi agent) are skipped by default; enable with INTEGRATION_TESTS=1
+- Added E2E browser test script (scripts/e2e-browser-test.sh) using agent-browser
+- Added E2E testing documentation (docs/E2E-TESTING.md)
+- All lint checks pass (npm run check)
+- All tests pass: 755 passed, 4 skipped (npm test -- --run)
+- Full integration tests pass when enabled: 7 tests passing
+**Commit**: 2bf9c8e
+**Notes**:
+- Extension provides /brain command and brain_query tool
+- Integration tests use 60s timeout for pi agent queries
+- Browser E2E test can be run manually after starting dev servers
+- Phase 7 (Pi Integration) is now complete
