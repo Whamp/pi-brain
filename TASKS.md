@@ -47,7 +47,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.4 | Implement job processor (spawns pi agent)              | done    | 3.2      | 2026-01-25       |
 | 3.5 | Implement pi agent invocation with correct flags       | done    | 3.4      | 2026-01-25       |
 | 3.6 | Parse agent output (JSON mode)                         | done    | 3.5      | 2026-01-25       |
-| 3.7 | Store nodes and edges in database                      | active  | 3.6, 1.2 | 2026-01-25       |
+| 3.7 | Store nodes and edges in database                      | done    | 3.6, 1.2 | 2026-01-25       |
 | 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
 | 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                  |
 
@@ -415,6 +415,74 @@ Key design decisions:
 - `-p` with the analysis prompt
 
 The implementation also includes skill availability validation and dynamic skill arg building.
+
+---
+
+## 2026-01-25 16:37 - Task 3.7
+
+**Status**: active → done
+**Validation**: npm run check passes, npm test passes (522 tests total, 42 new node-repository tests)
+**Commit**: 048198e
+**Notes**: Implemented node and edge storage in SQLite per specs/storage.md and specs/node-model.md. Created src/storage/node-repository.ts with:
+
+**Node CRUD:**
+
+- `createNode()`: Stores node in SQLite (indexed fields) + JSON (full content)
+- `getNode()`/`getNodeVersion()`: Query nodes from database
+- `nodeExistsInDb()`: Check if node exists
+- `deleteNode()`: Delete node with cascade to related data
+
+**Edge CRUD:**
+
+- `createEdge()`: Create edge between nodes with metadata
+- `getEdgesFrom()`/`getEdgesTo()`/`getNodeEdges()`: Query edges
+- `getEdge()`: Get edge by ID
+- `deleteEdge()`: Remove edge
+- `edgeExists()`: Check if edge exists (with optional type filter)
+
+**Related Data Storage:**
+
+- Tags and topics for semantic linking
+- Lessons by level with lesson tags
+- Model quirks with frequency/severity
+- Tool errors with context/model
+- Daemon decisions for transparency
+
+**Full-Text Search:**
+
+- `indexNodeForSearch()`: Index node summary, decisions, lessons, tags
+- `searchNodes()`: FTS5-powered search with ranking
+
+**Agent Integration:**
+
+- `agentOutputToNode()`: Converts `AgentNodeOutput` + `NodeConversionContext` → `Node`
+  - Fills source, metadata, classification fields from job context
+  - Calculates tokensUsed, cost, duration from observations
+  - Preserves all lessons, quirks, errors, decisions
+  - Handles optional fields gracefully
+
+**Query Helpers:**
+
+- `getNodeTags()`, `getNodeTopics()`, `getNodeLessons()`
+- `getNodeQuirks()`, `getNodeToolErrors()`
+- `edgeRowToEdge()` for database row conversion
+
+**Fixed FTS Migration:**
+
+- Removed `content=''` option from FTS5 table
+- FTS now stores content to enable proper JOINs on node_id
+- Changed in src/storage/migrations/002_fts.sql
+
+Updated src/storage/index.ts to export node-repository.
+
+**Test Coverage:**
+
+- 42 comprehensive tests covering:
+  - All CRUD operations
+  - FTS search functionality
+  - AgentNodeOutput conversion
+  - Integration scenarios
+  - Edge creation and querying
 
 ---
 
