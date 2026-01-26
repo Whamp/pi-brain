@@ -593,6 +593,15 @@ describe("node-repository", () => {
       expect(allVersions[1].version).toBe(2);
       expect(allVersions[1].previousVersions).toContain(`${node.id}-v1`);
     });
+
+    it("should throw when updating a non-existent node", () => {
+      const node = createTestNode();
+      // Don't call createNode - node doesn't exist in database
+
+      expect(() => updateNode(db, node, options)).toThrow(
+        /does not exist in database/
+      );
+    });
   });
 
   // ===========================================================================

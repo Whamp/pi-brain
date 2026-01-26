@@ -165,6 +165,7 @@ export function createNode(
 
 /**
  * Update a node - writes new JSON version and updates SQLite row.
+ * Throws if the node doesn't exist in the database.
  * Returns the updated node.
  */
 export function updateNode(
@@ -173,6 +174,13 @@ export function updateNode(
   options: RepositoryOptions = {}
 ): Node {
   return db.transaction(() => {
+    // Verify node exists before any side effects
+    if (!nodeExistsInDb(db, node.id)) {
+      throw new Error(
+        `Cannot update node ${node.id}: node does not exist in database. Use createNode for new nodes.`
+      );
+    }
+
     // 1. Write new JSON file (version should be incremented)
     const dataFile = writeNode(node, options);
 
@@ -361,20 +369,20 @@ function insertDaemonDecisions(
 }
 
 /**
- * Get a node by ID (returns the latest version)
+ * Get a node by ID (returns the row from SQLite - always the latest version)
  */
 export function getNode(db: Database.Database, nodeId: string): NodeRow | null {
   const stmt = db.prepare(`
     SELECT * FROM nodes
     WHERE id = ?
-    ORDER BY version DESC
-    LIMIT 1
   `);
   return (stmt.get(nodeId) as NodeRow) ?? null;
 }
 
 /**
- * Get a specific version of a node
+ * Get a specific version of a node from SQLite.
+ * Note: SQLite only stores the current/latest version. For historical versions,
+ * use getAllNodeVersions() which reads from JSON storage.
  */
 export function getNodeVersion(
   db: Database.Database,

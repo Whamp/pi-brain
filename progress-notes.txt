@@ -505,3 +505,14 @@ Updated src/storage/index.ts to export node-repository.
 **Notes**: Task was redundant with 3.7 - marked as "completed in 3.7"
 
 ---
+
+## 2026-01-25 20:43 - Task 4.2
+
+**Status**: active → done
+**Validation**: npm test passes (617 tests). Added comprehensive versioning tests in src/storage/node-repository.test.ts covering version increments, previousVersions linking, and JSON storage persistence across versions.
+**Commit**: fb1c742
+**Notes**: Implemented node versioning (reanalysis) support.
+- Updated `agentOutputToNode` to handle `existingNode` context, correctly incrementing versions and linking `previousVersions`.
+- Added `updateNode` to `node-repository.ts` to update SQLite queryable data while preserving the node ID and writing new versioned JSON files.
+- Added `getAllNodeVersions` to retrieve full history of a node from JSON storage.
+- Fixed a pre-existing race condition/precision issue in `worker.test.ts` where `durationMs` could be 0.
