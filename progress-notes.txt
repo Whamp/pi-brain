@@ -528,3 +528,16 @@ Updated src/storage/index.ts to export node-repository.
 - Integrated prompt versioning into analysis flow.
 - Added session metadata extraction (sessionId, entryCount) to `Worker`.
 - Updated `Worker` and its tests to use full `PiBrainConfig`.
+
+## 2026-01-25 21:32 - Task 4.4
+
+**Status**: pending → done
+**Validation**: npm test passes (630 tests). Added 7 new tests in src/storage/node-repository.test.ts covering tag/topic indexing and FTS search for tags, topics, and lesson tags.
+**Commit**: 159b38c
+**Notes**: Implemented tag/topic indexing for FTS and queries.
+- Created migration 004_fts_update.sql adding topics column to nodes_fts table
+- Updated `indexNodeForSearch` to include topics and aggregate all lesson tags into FTS tags column
+- Added query helpers: `getAllTags()`, `getAllTopics()`, `getLessonTags()`, `getNodesByTag()`, `getNodesByTopic()`
+- Fixed `searchNodes()` to quote words for FTS5 special character handling (hyphens interpreted as NOT operators)
+- Removed `content=''` from FTS5 table - contentless mode prevented proper JOINs on node_id
+
