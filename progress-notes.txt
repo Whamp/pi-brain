@@ -871,3 +871,36 @@ Updated src/storage/index.ts to export node-repository.
 - Zoom/pan with mouse wheel and drag
 - Force simulation with collision detection
 - Accessible with ARIA labels and roles
+
+## 2026-01-26 07:45 - Task 5.7
+
+**Status**: pending → done
+**Validation**: npm run check passes (0 errors), npm run web:check passes (svelte-check 0 errors), npm test passes (730 tests), dev server starts successfully, agent-browser E2E verification of error state
+**Commit**: 43d52b4
+**Notes**: Implemented full node detail panel per specs/web-ui.md.
+
+**New Component (`src/web/app/src/routes/nodes/[id]/+page.svelte`):**
+
+- Header card with outcome icon, summary, project link, type badge, version, metadata
+- Tags row with clickable links to search
+- Key decisions section with collapsible items (what/why/alternatives)
+- Lessons section with grouping toggle (by level or by confidence)
+- Level icons and labels for all 7 lesson types
+- Confidence badges with color coding (high/medium/low)
+- Model observations section (prompting wins, failures, quirks)
+- Connected nodes section (incoming/outgoing edges with type labels)
+- Files touched list with monospace formatting
+- Version history display for reanalyzed nodes
+- Raw session link with computer and entry range metadata
+- Loading spinner, error state with retry button, empty state
+- Responsive two-column layout (main + sidebar)
+
+**API Update (`src/api/routes/nodes.ts`):**
+
+- Updated versions include to return metadata only (version, analyzedAt) instead of full node data
+
+**Browser Verification:**
+
+- Verified page renders with correct layout and navigation
+- Error state displays correctly when API unavailable
+- Retry button present and styled correctly
