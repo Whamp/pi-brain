@@ -15,6 +15,7 @@ import { migrate, openDatabase } from "./database.js";
 import {
   agentOutputToNode,
   countNodes,
+  countSearchResults,
   createEdge,
   createNode,
   deleteEdge,
@@ -46,6 +47,7 @@ import {
   listNodes,
   nodeExistsInDb,
   searchNodes,
+  searchNodesAdvanced,
   updateNode,
   type NodeConversionContext,
   type RepositoryOptions,
@@ -1213,6 +1215,338 @@ describe("node-repository", () => {
     it("should return empty array for whitespace-only query", () => {
       const results = searchNodes(db, "   ");
       expect(results).toStrictEqual([]);
+    });
+  });
+
+  // ===========================================================================
+  // Enhanced Full-Text Search Tests
+  // ===========================================================================
+
+  describe("searchNodesAdvanced", () => {
+    it("should return results with scores and highlights", () => {
+      const node = createTestNode({
+        content: {
+          summary: "Implemented unique authentication with JWT tokens",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node, options);
+
+      const { results, total } = searchNodesAdvanced(
+        db,
+        "unique authentication"
+      );
+      expect(results.length).toBeGreaterThanOrEqual(1);
+      expect(total).toBeGreaterThanOrEqual(1);
+
+      const match = results.find((r) => r.node.id === node.id);
+      expect(match).toBeDefined();
+      expect(typeof match?.score).toBe("number");
+      expect(match?.highlights.length).toBeGreaterThan(0);
+      expect(match?.highlights[0].field).toBe("summary");
+    });
+
+    it("should filter by specific fields", () => {
+      const node1 = createTestNode({
+        content: {
+          summary: "Summary with uniqueFieldTest123",
+          outcome: "success",
+          keyDecisions: [
+            {
+              what: "Decision content",
+              why: "Reason",
+              alternativesConsidered: [],
+            },
+          ],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      const node2 = createTestNode({
+        content: {
+          summary: "Different summary",
+          outcome: "success",
+          keyDecisions: [
+            {
+              what: "uniqueFieldTest123 in decision",
+              why: "Test",
+              alternativesConsidered: [],
+            },
+          ],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Search only in summary field
+      const summaryResults = searchNodesAdvanced(db, "uniqueFieldTest123", {
+        fields: ["summary"],
+      });
+      expect(
+        summaryResults.results.some((r) => r.node.id === node1.id)
+      ).toBeTruthy();
+      expect(
+        summaryResults.results.some((r) => r.node.id === node2.id)
+      ).toBeFalsy();
+
+      // Search only in decisions field
+      const decisionResults = searchNodesAdvanced(db, "uniqueFieldTest123", {
+        fields: ["decisions"],
+      });
+      expect(
+        decisionResults.results.some((r) => r.node.id === node2.id)
+      ).toBeTruthy();
+      expect(
+        decisionResults.results.some((r) => r.node.id === node1.id)
+      ).toBeFalsy();
+    });
+
+    it("should respect pagination options", () => {
+      // Create 10 nodes with same keyword
+      for (let i = 0; i < 10; i++) {
+        const node = createTestNode({
+          content: {
+            summary: `Node ${i} with paginationTestKeyword789`,
+            outcome: "success",
+            keyDecisions: [],
+            filesTouched: [],
+            toolsUsed: [],
+            errorsSeen: [],
+          },
+        });
+        createNode(db, node, options);
+      }
+
+      // Get first page
+      const page1 = searchNodesAdvanced(db, "paginationTestKeyword789", {
+        limit: 3,
+        offset: 0,
+      });
+      expect(page1.results).toHaveLength(3);
+      expect(page1.total).toBe(10);
+      expect(page1.limit).toBe(3);
+      expect(page1.offset).toBe(0);
+
+      // Get second page
+      const page2 = searchNodesAdvanced(db, "paginationTestKeyword789", {
+        limit: 3,
+        offset: 3,
+      });
+      expect(page2.results).toHaveLength(3);
+      expect(page2.offset).toBe(3);
+
+      // Ensure no overlap between pages
+      const page1Ids = new Set(page1.results.map((r) => r.node.id));
+      const page2Ids = new Set(page2.results.map((r) => r.node.id));
+      for (const id of page2Ids) {
+        expect(page1Ids.has(id)).toBeFalsy();
+      }
+    });
+
+    it("should combine search with filters", () => {
+      const node1 = createTestNode({
+        classification: {
+          type: "coding",
+          project: "/home/test/filterCombine",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "filterCombineKeyword456 in coding project",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          type: "debugging",
+          project: "/home/test/other",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "filterCombineKeyword456 in debugging project",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Search with type filter
+      const results = searchNodesAdvanced(db, "filterCombineKeyword456", {
+        filters: { type: "coding" },
+      });
+      expect(results.results.some((r) => r.node.id === node1.id)).toBeTruthy();
+      expect(results.results.some((r) => r.node.id === node2.id)).toBeFalsy();
+    });
+
+    it("should combine search with project filter", () => {
+      const node1 = createTestNode({
+        classification: {
+          type: "coding",
+          project: "/home/test/projectFilter123",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "projectFilterKeyword111 in target project",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          type: "coding",
+          project: "/home/test/other",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "projectFilterKeyword111 in other project",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const results = searchNodesAdvanced(db, "projectFilterKeyword111", {
+        filters: { project: "projectFilter123" },
+      });
+      expect(results.results.some((r) => r.node.id === node1.id)).toBeTruthy();
+      expect(results.results.some((r) => r.node.id === node2.id)).toBeFalsy();
+    });
+
+    it("should return empty results for empty query", () => {
+      const results = searchNodesAdvanced(db, "");
+      expect(results.results).toStrictEqual([]);
+      expect(results.total).toBe(0);
+    });
+
+    it("should return empty results for whitespace-only query", () => {
+      const results = searchNodesAdvanced(db, "   ");
+      expect(results.results).toStrictEqual([]);
+      expect(results.total).toBe(0);
+    });
+
+    it("should search in lessons", () => {
+      const node = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "lessonSearchAdvanced999 unique content",
+              details: "More details",
+              confidence: "high",
+              tags: [],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const results = searchNodesAdvanced(db, "lessonSearchAdvanced999", {
+        fields: ["lessons"],
+      });
+      expect(results.results.some((r) => r.node.id === node.id)).toBeTruthy();
+    });
+
+    it("should enforce max limit of 500", () => {
+      const results = searchNodesAdvanced(db, "test", { limit: 1000 });
+      expect(results.limit).toBe(500);
+    });
+
+    it("should enforce min limit of 1", () => {
+      const results = searchNodesAdvanced(db, "test", { limit: 0 });
+      expect(results.limit).toBe(1);
+    });
+  });
+
+  describe("countSearchResults", () => {
+    it("should count matching results without fetching data", () => {
+      // Create nodes with unique keyword
+      for (let i = 0; i < 5; i++) {
+        const node = createTestNode({
+          content: {
+            summary: `Node ${i} with countSearchKeyword222`,
+            outcome: "success",
+            keyDecisions: [],
+            filesTouched: [],
+            toolsUsed: [],
+            errorsSeen: [],
+          },
+        });
+        createNode(db, node, options);
+      }
+
+      const count = countSearchResults(db, "countSearchKeyword222");
+      expect(count).toBe(5);
+    });
+
+    it("should count with field filter", () => {
+      const node1 = createTestNode({
+        content: {
+          summary: "countFieldFilter333 in summary",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      const node2 = createTestNode({
+        content: {
+          summary: "Different summary",
+          outcome: "success",
+          keyDecisions: [
+            {
+              what: "countFieldFilter333",
+              why: "Test",
+              alternativesConsidered: [],
+            },
+          ],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const summaryCount = countSearchResults(db, "countFieldFilter333", {
+        fields: ["summary"],
+      });
+      expect(summaryCount).toBe(1);
+
+      const allFieldsCount = countSearchResults(db, "countFieldFilter333");
+      expect(allFieldsCount).toBe(2);
+    });
+
+    it("should return 0 for empty query", () => {
+      const count = countSearchResults(db, "");
+      expect(count).toBe(0);
     });
   });
 
