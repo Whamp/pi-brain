@@ -289,11 +289,11 @@ export class Worker {
           nodesDir: join(this.config.hub.databaseDir, "nodes"),
         });
 
-        // 5. Create edges based on boundaries (Task 4.3)
+        // 5. Create structural edges based on session boundaries.
+        // Only for initial analysis - reanalysis preserves existing edges.
         if (job.type === "initial") {
           linkNodeToPredecessors(this.db, node, {
             boundaryType: job.context?.boundaryType,
-            parentSession: session.header.parentSession,
           });
         }
 

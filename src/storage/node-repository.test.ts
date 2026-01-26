@@ -37,6 +37,11 @@ import {
   searchNodes,
   updateNode,
   getAllNodeVersions,
+  getAllTags,
+  getAllTopics,
+  getLessonTags,
+  getNodesByTag,
+  getNodesByTopic,
   type NodeConversionContext,
   type RepositoryOptions,
 } from "./node-repository.js";
@@ -605,6 +610,181 @@ describe("node-repository", () => {
     });
   });
 
+  // ===========================================================================
+  // Tag and Topic Indexing Tests
+  // ===========================================================================
+
+  describe("tag and topic indexing", () => {
+    it("should retrieve all unique tags across nodes and lessons", () => {
+      const node1 = createTestNode({
+        semantic: { tags: ["tag1", "shared"], topics: [] },
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "L1",
+              details: "D1",
+              confidence: "high",
+              tags: ["lesson-tag1"],
+            },
+          ],
+        },
+      });
+      const node2 = createTestNode({
+        semantic: { tags: ["tag2", "shared"], topics: [] },
+        lessons: {
+          ...emptyLessons(),
+          task: [
+            {
+              level: "task",
+              summary: "L2",
+              details: "D2",
+              confidence: "medium",
+              tags: ["lesson-tag2"],
+            },
+          ],
+        },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const allTags = getAllTags(db);
+      expect(allTags).toContain("tag1");
+      expect(allTags).toContain("tag2");
+      expect(allTags).toContain("shared");
+      expect(allTags).toContain("lesson-tag1");
+      expect(allTags).toContain("lesson-tag2");
+      expect(allTags).toHaveLength(5);
+    });
+
+    it("should retrieve all unique topics", () => {
+      const node1 = createTestNode({
+        semantic: { tags: [], topics: ["topic1", "shared-topic"] },
+      });
+      const node2 = createTestNode({
+        semantic: { tags: [], topics: ["topic2", "shared-topic"] },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const allTopics = getAllTopics(db);
+      expect(allTopics).toContain("topic1");
+      expect(allTopics).toContain("topic2");
+      expect(allTopics).toContain("shared-topic");
+      expect(allTopics).toHaveLength(3);
+    });
+
+    it("should get tags for a specific lesson", () => {
+      const node = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "L1",
+              details: "D1",
+              confidence: "high",
+              tags: ["tag-a", "tag-b"],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const lessons = getNodeLessons(db, node.id);
+      const lessonTags = getLessonTags(db, lessons[0].id);
+      expect(lessonTags).toContain("tag-a");
+      expect(lessonTags).toContain("tag-b");
+    });
+
+    it("should find nodes by tag (both node and lesson tags)", () => {
+      const node1 = createTestNode({
+        semantic: { tags: ["search-tag"], topics: [] },
+      });
+      const node2 = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          task: [
+            {
+              level: "task",
+              summary: "L",
+              details: "D",
+              confidence: "high",
+              tags: ["search-tag"],
+            },
+          ],
+        },
+      });
+      const node3 = createTestNode({
+        semantic: { tags: ["other"], topics: [] },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const results = getNodesByTag(db, "search-tag");
+      expect(results).toHaveLength(2);
+      expect(results.map((r) => r.id)).toContain(node1.id);
+      expect(results.map((r) => r.id)).toContain(node2.id);
+      expect(results.map((r) => r.id)).not.toContain(node3.id);
+    });
+
+    it("should find nodes by topic", () => {
+      const node1 = createTestNode({
+        semantic: { tags: [], topics: ["search-topic"] },
+      });
+      const node2 = createTestNode({
+        semantic: { tags: [], topics: ["other"] },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const results = getNodesByTopic(db, "search-topic");
+      expect(results).toHaveLength(1);
+      expect(results[0].id).toBe(node1.id);
+    });
+
+    it("should include topics in FTS index", () => {
+      const node = createTestNode({
+        semantic: {
+          tags: [],
+          topics: ["unique-topic-keyword"],
+        },
+      });
+      createNode(db, node, options);
+
+      const results = searchNodes(db, "unique-topic-keyword");
+      expect(results.some((r) => r.id === node.id)).toBeTruthy();
+    });
+
+    it("should include all lesson tags in FTS tags column", () => {
+      const node = createTestNode({
+        semantic: { tags: ["node-tag"], topics: [] },
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "L",
+              details: "D",
+              confidence: "high",
+              tags: ["unique-lesson-tag"],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const results = searchNodes(db, "unique-lesson-tag");
+      expect(results.some((r) => r.id === node.id)).toBeTruthy();
+    });
+  });
+
   describe("linkNodeToPredecessors", () => {
     it("should create a continuation edge to the previous node in the same session", () => {
       const node1 = createTestNode({
@@ -681,6 +861,64 @@ describe("node-repository", () => {
       expect(edges[0].type).toBe("fork");
       expect(edges[0].sourceNodeId).toBe(parentNode.id);
       expect(edges[0].targetNodeId).toBe(childNode.id);
+    });
+
+    it("should be idempotent - calling multiple times does not create duplicate edges", () => {
+      const node1 = createTestNode({
+        id: "node1",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node2",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:10:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Call multiple times
+      const edges1 = linkNodeToPredecessors(db, node2);
+      const edges2 = linkNodeToPredecessors(db, node2);
+      const edges3 = linkNodeToPredecessors(db, node2);
+
+      // First call creates edge, subsequent calls return empty
+      expect(edges1).toHaveLength(1);
+      expect(edges2).toHaveLength(0);
+      expect(edges3).toHaveLength(0);
+
+      // Only one edge should exist in the database
+      const allEdges = getEdgesTo(db, node2.id);
+      expect(allEdges).toHaveLength(1);
+    });
+
+    it("should fall back to 'continuation' for invalid boundaryType", () => {
+      const node1 = createTestNode({
+        id: "node1",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node2",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:10:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const edges = linkNodeToPredecessors(db, node2, {
+        boundaryType: "invalid_type_that_does_not_exist",
+      });
+      expect(edges).toHaveLength(1);
+      expect(edges[0].type).toBe("continuation");
     });
   });
 

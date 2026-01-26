@@ -476,49 +476,64 @@ export function findFirstNodeInSession(
   return (stmt.get(sessionFile) as NodeRow) ?? null;
 }
 
+/** Valid structural edge types for boundary detection */
+const STRUCTURAL_EDGE_TYPES = new Set<EdgeType>([
+  "continuation",
+  "resume",
+  "fork",
+  "branch",
+  "tree_jump",
+  "compaction",
+]);
+
 /**
- * Automatically link a node to its predecessors based on session structure
+ * Validate and normalize a boundary type to a valid EdgeType
+ */
+function normalizeEdgeType(boundaryType: string | undefined): EdgeType {
+  if (boundaryType && STRUCTURAL_EDGE_TYPES.has(boundaryType as EdgeType)) {
+    return boundaryType as EdgeType;
+  }
+  return "continuation";
+}
+
+/**
+ * Automatically link a node to its predecessors based on session structure.
+ * Creates structural edges based on session continuity and fork relationships.
+ * Idempotent: will not create duplicate edges if called multiple times.
  */
 export function linkNodeToPredecessors(
   db: Database.Database,
   node: Node,
   context: {
     boundaryType?: string;
-    parentSession?: string;
   } = {}
 ): Edge[] {
   const edges: Edge[] = [];
 
   // 1. Continuation Edge - Link to previous node in same session
-  // If we have a segment_start, find the node that ended just before it
+  // Find the most recent node in the same session that isn't this node.
+  // Use timestamp + segment_end for robust ordering even with identical timestamps.
   if (node.source.segment.startEntryId) {
-    // In our boundary detection, the previous segment ends at the entry
-    // immediately before the current segment's start boundary.
-    // However, since we don't have the full session entries here,
-    // we can look for the node whose segment_end is what we expect.
-    // For now, let's look for any node in same session that ends before this one starts.
     const stmt = db.prepare(`
       SELECT * FROM nodes
-      WHERE session_file = ? AND timestamp < ?
-      ORDER BY timestamp DESC, version DESC
+      WHERE session_file = ? AND id != ?
+      ORDER BY timestamp DESC, segment_end DESC, version DESC
       LIMIT 1
     `);
-    const prevRow = stmt.get(
-      node.source.sessionFile,
-      node.metadata.timestamp
-    ) as NodeRow | undefined;
+    const prevRow = stmt.get(node.source.sessionFile, node.id) as
+      | NodeRow
+      | undefined;
 
-    if (prevRow) {
-      // Determine edge type: if boundaryType provided, use it, otherwise 'continuation'
-      const type = (context.boundaryType as EdgeType) || "continuation";
+    if (prevRow && !edgeExists(db, prevRow.id, node.id)) {
+      const type = normalizeEdgeType(context.boundaryType);
       edges.push(createEdge(db, prevRow.id, node.id, type));
     }
   }
 
-  // 2. Fork Edge - Link to parent session if this is the first node
+  // 2. Fork Edge - Link to parent session if this is the first node in a forked session
   if (node.source.parentSession && !edgeExistsInSameSession(db, node.id)) {
     const parentLastNode = findLastNodeInSession(db, node.source.parentSession);
-    if (parentLastNode) {
+    if (parentLastNode && !edgeExists(db, parentLastNode.id, node.id)) {
       edges.push(createEdge(db, parentLastNode.id, node.id, "fork"));
     }
   }
@@ -680,35 +695,50 @@ export function indexNodeForSearch(db: Database.Database, node: Node): void {
     .map((l) => `${l.summary} ${l.details}`)
     .join(" ");
 
-  const tags = node.semantic.tags.join(" ");
+  // Collect all tags from semantic tags and all lesson tags
+  const allLessonTags = Object.values(node.lessons)
+    .flat()
+    .flatMap((l) => l.tags);
+  const combinedTags = [...new Set([...node.semantic.tags, ...allLessonTags])];
+  const tagsStr = combinedTags.join(" ");
+
+  const topicsStr = node.semantic.topics.join(" ");
 
   // Delete existing entry (for updates)
   db.prepare("DELETE FROM nodes_fts WHERE node_id = ?").run(node.id);
 
   // Insert new entry
   db.prepare(`
-    INSERT INTO nodes_fts (node_id, summary, decisions, lessons, tags)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(node.id, node.content.summary, decisions, lessons, tags);
+    INSERT INTO nodes_fts (node_id, summary, decisions, lessons, tags, topics)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(node.id, node.content.summary, decisions, lessons, tagsStr, topicsStr);
 }
 
 /**
  * Search nodes using full-text search
+ * Quotes the query to handle special characters like hyphens
  */
 export function searchNodes(
   db: Database.Database,
   query: string,
   limit = 20
 ): NodeRow[] {
+  // Quote each word to handle special FTS5 characters (hyphens, etc.)
+  const quotedQuery = query
+    .split(/\s+/)
+    .filter((w) => w.length > 0)
+    .map((word) => `"${word.replaceAll('"', '""')}"`)
+    .join(" ");
+
   const stmt = db.prepare(`
-    SELECT n.*, rank
+    SELECT n.*
     FROM nodes n
-    JOIN nodes_fts f ON n.id = f.node_id
+    JOIN nodes_fts ON n.id = nodes_fts.node_id
     WHERE nodes_fts MATCH ?
-    ORDER BY rank
+    ORDER BY nodes_fts.rank
     LIMIT ?
   `);
-  return stmt.all(query, limit) as NodeRow[];
+  return stmt.all(quotedQuery, limit) as NodeRow[];
 }
 
 // =============================================================================
@@ -815,6 +845,73 @@ export function getNodeToolErrors(
     context: string | null;
     model: string | null;
   }[];
+}
+
+/**
+ * Get all unique tags in the system
+ */
+export function getAllTags(db: Database.Database): string[] {
+  const stmt = db.prepare(`
+    SELECT tag FROM (
+      SELECT tag FROM tags
+      UNION
+      SELECT tag FROM lesson_tags
+    ) ORDER BY tag
+  `);
+  const rows = stmt.all() as { tag: string }[];
+  return rows.map((r) => r.tag);
+}
+
+/**
+ * Get all unique topics in the system
+ */
+export function getAllTopics(db: Database.Database): string[] {
+  const stmt = db.prepare("SELECT DISTINCT topic FROM topics ORDER BY topic");
+  const rows = stmt.all() as { topic: string }[];
+  return rows.map((r) => r.topic);
+}
+
+/**
+ * Get tags for a specific lesson
+ */
+export function getLessonTags(
+  db: Database.Database,
+  lessonId: string
+): string[] {
+  const stmt = db.prepare("SELECT tag FROM lesson_tags WHERE lesson_id = ?");
+  const rows = stmt.all(lessonId) as { tag: string }[];
+  return rows.map((r) => r.tag);
+}
+
+/**
+ * Find nodes by tag (matches both node tags and lesson tags)
+ */
+export function getNodesByTag(db: Database.Database, tag: string): NodeRow[] {
+  const stmt = db.prepare(`
+    SELECT DISTINCT n.* FROM nodes n
+    LEFT JOIN tags t ON n.id = t.node_id
+    LEFT JOIN lessons l ON n.id = l.node_id
+    LEFT JOIN lesson_tags lt ON l.id = lt.lesson_id
+    WHERE t.tag = ? OR lt.tag = ?
+    ORDER BY n.timestamp DESC
+  `);
+  return stmt.all(tag, tag) as NodeRow[];
+}
+
+/**
+ * Find nodes by topic
+ */
+export function getNodesByTopic(
+  db: Database.Database,
+  topic: string
+): NodeRow[] {
+  const stmt = db.prepare(`
+    SELECT n.* FROM nodes n
+    JOIN topics t ON n.id = t.node_id
+    WHERE t.topic = ?
+    ORDER BY n.timestamp DESC
+  `);
+  return stmt.all(topic) as NodeRow[];
 }
 
 // =============================================================================

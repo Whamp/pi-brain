@@ -516,3 +516,15 @@ Updated src/storage/index.ts to export node-repository.
 - Added `updateNode` to `node-repository.ts` to update SQLite queryable data while preserving the node ID and writing new versioned JSON files.
 - Added `getAllNodeVersions` to retrieve full history of a node from JSON storage.
 - Fixed a pre-existing race condition/precision issue in `worker.test.ts` where `durationMs` could be 0.
+
+## 2026-01-25 20:51 - Task 4.3
+
+**Status**: pending → done
+**Validation**: npm test passes (621 tests). Added linkNodeToPredecessors tests in src/storage/node-repository.test.ts covering continuation edges, fork edges, and boundary-specific edge types.
+**Commit**: a1b6681
+**Notes**: Implemented automatic edge creation and integrated Worker with storage.
+- Added `linkNodeToPredecessors` to repository for automatic structural linking.
+- Updated `Worker` to use real `createNode` and `linkNodeToPredecessors`.
+- Integrated prompt versioning into analysis flow.
+- Added session metadata extraction (sessionId, entryCount) to `Worker`.
+- Updated `Worker` and its tests to use full `PiBrainConfig`.
