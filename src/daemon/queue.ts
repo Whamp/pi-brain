@@ -372,7 +372,7 @@ export class QueueManager {
   /**
    * Get all pending jobs (optionally filtered by session file)
    */
-  getPendingJobs(sessionFile?: string): AnalysisJob[] {
+  getPendingJobs(sessionFile?: string, limit?: number): AnalysisJob[] {
     let sql = "SELECT * FROM analysis_queue WHERE status = 'pending'";
     const params: unknown[] = [];
 
@@ -382,6 +382,11 @@ export class QueueManager {
     }
 
     sql += " ORDER BY priority ASC, queued_at ASC";
+
+    if (limit !== undefined) {
+      sql += " LIMIT ?";
+      params.push(limit);
+    }
 
     const rows = this.db.prepare(sql).all(...params) as QueueRow[];
     return rows.map((row) => this.parseRow(row));
@@ -691,4 +696,28 @@ export function generateJobId(): string {
  */
 export function createQueueManager(db: Database.Database): QueueManager {
   return new QueueManager(db);
+}
+
+/**
+ * Get aggregated queue status
+ * Used by CLI and API
+ */
+export function getQueueStatusSummary(db: Database.Database): {
+  stats: QueueStats;
+  pendingJobs: AnalysisJob[];
+  runningJobs: AnalysisJob[];
+  recentFailed: AnalysisJob[];
+} {
+  const queue = new QueueManager(db);
+  const stats = queue.getStats();
+  const pendingJobs = queue.getPendingJobs(undefined, 10);
+  const runningJobs = queue.getRunningJobs();
+  const recentFailed = queue.getFailedJobs(5);
+
+  return {
+    stats,
+    pendingJobs,
+    runningJobs,
+    recentFailed,
+  };
 }

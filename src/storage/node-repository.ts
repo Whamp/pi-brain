@@ -1855,10 +1855,10 @@ export function getAggregatedToolErrors(
   }
 
   const whereClause = conditions.join(" AND ");
-  
+
   const groupBy = groupByModel ? "model, tool, errorType" : "tool, errorType";
-  const selectModel = groupByModel 
-    ? "model," 
+  const selectModel = groupByModel
+    ? "model,"
     : "GROUP_CONCAT(DISTINCT model) as modelsList,";
 
   const stmt = db.prepare(`
@@ -1885,7 +1885,14 @@ export function getAggregatedToolErrors(
   }[];
 
   return rows.map((row) => {
-    const result: any = {
+    const result: {
+      tool: string;
+      errorType: string;
+      count: number;
+      recentNodes: string[];
+      model?: string;
+      models?: string[];
+    } = {
       tool: row.tool,
       errorType: row.errorType,
       count: row.count,

@@ -568,7 +568,7 @@ describe("aPI Server", () => {
 
       const response = await app.inject({
         method: "GET",
-        url: "/api/v1/sessions/by-project/home/will/project-alpha",
+        url: "/api/v1/sessions/list?project=/home/will/project-alpha",
       });
 
       expect(response.statusCode).toBe(200);
@@ -600,7 +600,7 @@ describe("aPI Server", () => {
 
       const response = await app.inject({
         method: "GET",
-        url: "/api/v1/sessions/by-project/home/will/non-existent",
+        url: "/api/v1/sessions/list?project=/home/will/non-existent",
       });
 
       expect(response.statusCode).toBe(404);

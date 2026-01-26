@@ -95,7 +95,8 @@
 
   // Helper to get session display name
   function getSessionName(sessionFile: string): string {
-    const parts = sessionFile.split("/");
+    // Handle both / and \ separators for cross-platform compatibility
+    const parts = sessionFile.split(/[/\\]/);
     const filename = parts.at(-1) || sessionFile;
     // Truncate if too long
     return filename.length > 50 ? filename.slice(0, 47) + "..." : filename;

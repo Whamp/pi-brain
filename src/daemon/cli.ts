@@ -31,6 +31,7 @@ import {
   OPTIONAL_SKILLS,
 } from "./processor.js";
 import {
+  getQueueStatusSummary,
   createQueueManager,
   PRIORITY,
   type QueueStats,
@@ -463,20 +464,9 @@ export function getQueueStatus(configPath?: string): QueueStatus {
 
   const db = openDatabase({ path: dbPath });
   migrate(db);
-  const queue = createQueueManager(db);
 
   try {
-    const stats = queue.getStats();
-    const pendingJobs = queue.getPendingJobs().slice(0, 10);
-    const runningJobs = queue.getRunningJobs();
-    const recentFailed = queue.getFailedJobs().slice(0, 5);
-
-    return {
-      stats,
-      pendingJobs,
-      runningJobs,
-      recentFailed,
-    };
+    return getQueueStatusSummary(db);
   } finally {
     db.close();
   }

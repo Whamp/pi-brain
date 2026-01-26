@@ -2185,8 +2185,8 @@ describe("node-repository", () => {
     });
 
     it("should enforce max limit of 100000", () => {
-      const result = listNodes(db, {}, { limit: 200000 });
-      expect(result.limit).toBe(100000);
+      const result = listNodes(db, {}, { limit: 200_000 });
+      expect(result.limit).toBe(100_000);
     });
 
     it("should enforce min limit of 1", () => {

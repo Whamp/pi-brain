@@ -52,3 +52,18 @@
 - Frontend component implemented and integrated into dashboard
 **Commit**: (pending)
 **Notes**: Implemented `GET /decisions` and `POST /decisions/:id/feedback` endpoints, created `DaemonDecisions` Svelte component with interactive feedback buttons, and integrated it into the main dashboard view.
+
+## 2026-01-26 11:05 - Task 7.1, 7.2, 7.5
+
+**Status**: pending → done
+**Validation**:
+- Created `extensions/brain-query.ts` implementing /brain command and brain_query tool
+- Created `extensions/brain-query.test.ts` to verify registration
+- Updated `tsconfig.json` and `vitest.config.ts` to include extension
+- Updated `package.json` to build extension via `tsup`
+- Verified build and lint (npm run build, npm run check)
+- Verified tests pass (npm test)
+**Commit**: [hash]
+**Notes**:
+- The extension code is ready but requires the backend endpoint (Task 7.3) to be fully functional.
+- Implemented robust type safety and error handling.

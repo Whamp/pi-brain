@@ -9,7 +9,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import {
   getAllProjects,
   listNodes,
-  type NodeRow,
+  getSessionSummaries,
 } from "../../storage/node-repository.js";
 import { successResponse, errorResponse } from "../responses.js";
 
@@ -69,17 +69,19 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
       // Count nodes and get last activity for this project
       const result = listNodes(
         db,
-        { project },
+        { exactProject: project },
         { limit: 1, sort: "timestamp", order: "desc" }
       );
 
-      // Get unique session count
-      const allNodes = listNodes(db, { project }, { limit: 10_000 });
-      const sessionFiles = new Set(allNodes.nodes.map((n) => n.session_file));
+      // Get unique session count via aggregation query
+      // This is efficient because it groups by session_file
+      const sessionSummaries = getSessionSummaries(db, project, {
+        limit: 100_000,
+      });
 
       return {
         project,
-        sessionCount: sessionFiles.size,
+        sessionCount: sessionSummaries.length,
         nodeCount: result.total,
         lastActivity:
           result.nodes.length > 0
@@ -107,27 +109,42 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
   });
 
   /**
-   * GET /sessions/by-project/:project - List sessions for a project
+   * GET /sessions/list - List sessions for a project
    */
   app.get(
-    "/by-project/*",
+    "/list",
     async (
       request: FastifyRequest<{
-        Params: { "*": string };
-        Querystring: { limit?: string; offset?: string };
+        Querystring: {
+          project: string;
+          limit?: string;
+          offset?: string;
+        };
       }>,
       reply: FastifyReply
     ) => {
       const startTime = request.startTime ?? Date.now();
       const { db } = app.ctx;
-      const project = "/" + request.params["*"]; // Reconstruct absolute path
+      const { project } = request.query;
       const limit = parseIntParam(request.query.limit) ?? 50;
       const offset = parseIntParam(request.query.offset) ?? 0;
 
-      // Get all nodes for this project
-      const allNodes = listNodes(db, { project }, { limit: 10_000 });
+      if (!project) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse("BAD_REQUEST", "project query parameter is required")
+          );
+      }
 
-      if (allNodes.nodes.length === 0) {
+      // Check if project has any nodes at all
+      const checkResult = listNodes(
+        db,
+        { exactProject: project },
+        { limit: 1 }
+      );
+
+      if (checkResult.total === 0) {
         return reply
           .status(404)
           .send(
@@ -138,83 +155,38 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
           );
       }
 
-      // Group nodes by session file
-      const sessionMap = new Map<string, NodeRow[]>();
-      for (const node of allNodes.nodes) {
-        const sessionFile = node.session_file;
-        const existing = sessionMap.get(sessionFile);
-        if (existing) {
-          existing.push(node);
-        } else {
-          sessionMap.set(sessionFile, [node]);
-        }
-      }
+      // Get session summaries using efficient aggregation
+      // We'll run getSessionSummaries with a high limit to get total count
+      // This is slightly inefficient but better than loading full nodes.
+      const allSummaries = getSessionSummaries(db, project, { limit: 100_000 });
+      const total = allSummaries.length;
 
-      // Build session summaries
-      const sessions: SessionSummary[] = [];
-      for (const [sessionFile, nodes] of sessionMap) {
-        const outcomes = { success: 0, partial: 0, failed: 0, abandoned: 0 };
-        const types = new Set<string>();
-        let totalTokens = 0;
-        let totalCost = 0;
-        let firstTimestamp = nodes[0].timestamp;
-        let lastTimestamp = nodes[0].timestamp;
+      // Now get the page (we could just slice allSummaries, but let's trust the DB limit for the page)
+      // Actually, since we fetched all to count, we can slice here.
+      const pageSummaries = allSummaries.slice(offset, offset + limit);
 
-        for (const node of nodes) {
-          // Count outcomes
-          const { outcome } = node;
-          if (outcome && outcome in outcomes) {
-            outcomes[outcome as keyof typeof outcomes]++;
-          }
-
-          // Collect types
-          if (node.type) {
-            types.add(node.type);
-          }
-
-          // Sum tokens and cost
-          totalTokens += node.tokens_used;
-          totalCost += node.cost;
-
-          // Track timestamp range
-          const ts = node.timestamp;
-          if (ts < firstTimestamp) {
-            firstTimestamp = ts;
-          }
-          if (ts > lastTimestamp) {
-            lastTimestamp = ts;
-          }
-        }
-
-        sessions.push({
-          sessionFile,
-          nodeCount: nodes.length,
-          firstTimestamp,
-          lastTimestamp,
-          outcomes,
-          types: [...types],
-          totalTokens,
-          totalCost,
-        });
-      }
-
-      // Sort by last timestamp (most recent first)
-      sessions.sort(
-        (a, b) =>
-          new Date(b.lastTimestamp).getTime() -
-          new Date(a.lastTimestamp).getTime()
-      );
-
-      // Paginate
-      const total = sessions.length;
-      const paginatedSessions = sessions.slice(offset, offset + limit);
+      const sessions: SessionSummary[] = pageSummaries.map((row) => ({
+        sessionFile: row.sessionFile,
+        nodeCount: row.nodeCount,
+        firstTimestamp: row.firstTimestamp,
+        lastTimestamp: row.lastTimestamp,
+        outcomes: {
+          success: row.successCount,
+          partial: row.partialCount,
+          failed: row.failedCount,
+          abandoned: row.abandonedCount,
+        },
+        types: row.types ? row.types.split(",") : [],
+        totalTokens: row.totalTokens,
+        totalCost: row.totalCost,
+      }));
 
       const durationMs = Date.now() - startTime;
       return reply.send(
         successResponse(
           {
             project,
-            sessions: paginatedSessions,
+            sessions,
             total,
             limit,
             offset,
@@ -257,12 +229,14 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
           );
       }
 
-      // Get all nodes for this session
-      // We query by finding nodes that match the session file
-      const allNodes = listNodes(db, {}, { limit: 10_000 });
-      const sessionNodes = allNodes.nodes.filter(
-        (n) => n.session_file === sessionFile
+      // Get nodes for this session using the database filter
+      const result = listNodes(
+        db,
+        { sessionFile },
+        { limit, offset, sort: "timestamp", order: "asc" }
       );
+      const sessionNodes = result.nodes;
+      const { total } = result;
 
       if (sessionNodes.length === 0) {
         return reply
@@ -275,16 +249,6 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
           );
       }
 
-      // Sort by timestamp
-      sessionNodes.sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      );
-
-      // Paginate
-      const total = sessionNodes.length;
-      const paginatedNodes = sessionNodes.slice(offset, offset + limit);
-
       // Get project from first node
       const [{ project }] = sessionNodes;
 
@@ -294,7 +258,7 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
           {
             sessionFile,
             project,
-            nodes: paginatedNodes,
+            nodes: sessionNodes,
             total,
             limit,
             offset,

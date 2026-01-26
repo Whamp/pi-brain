@@ -96,11 +96,11 @@ Track implementation progress. Agents update status as they complete work.
 
 | ID  | Task                                     | Status  | Deps    | Notes                       |
 | --- | ---------------------------------------- | ------- | ------- | --------------------------- |
-| 7.1 | Implement brain-query extension          | pending | 4.5-4.8 | see specs/pi-integration.md |
-| 7.2 | Implement /brain command                 | pending | 7.1     |                             |
+| 7.1 | Implement brain-query extension          | done    | 4.5-4.8 | 2026-01-26 - built & tested |
+| 7.2 | Implement /brain command                 | done    | 7.1     | Completed in 7.1            |
 | 7.3 | Create query processing (pi agent + RLM) | pending | 7.1     |                             |
 | 7.4 | Create brain skill for agent use         | pending | 7.1     |                             |
-| 7.5 | Implement brain-query tool               | pending | 7.1     |                             |
+| 7.5 | Implement brain-query tool               | done    | 7.1     | Completed in 7.1            |
 | 7.6 | Test integration end-to-end              | pending | 7.1-7.5 |                             |
 
 ## Phase 8: Nightly Processing

@@ -4,13 +4,19 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
+import * as fs from "node:fs";
+import * as path from "node:path";
+
 import {
   isDaemonRunning,
   getProcessUptime,
   readPidFile,
-  getQueueStatus,
-  queueAnalysis,
 } from "../../daemon/cli.js";
+import {
+  getQueueStatusSummary,
+  createQueueManager,
+  PRIORITY,
+} from "../../daemon/queue.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 export async function daemonRoutes(app: FastifyInstance): Promise<void> {
@@ -19,13 +25,14 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
    */
   app.get("/status", async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = request.startTime ?? Date.now();
+    const { db } = app.ctx;
 
     const running = isDaemonRunning();
     const pid = readPidFile();
     const uptime = running ? getProcessUptime() : undefined;
-    
-    // Get queue status
-    const queueStatus = getQueueStatus();
+
+    // Get queue status reusing existing DB connection
+    const queueStatus = getQueueStatusSummary(db);
 
     const durationMs = Date.now() - startTime;
     return reply.send(
@@ -38,12 +45,12 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
           queue: {
             pending: queueStatus.stats.pending,
             running: queueStatus.stats.running,
-            completedToday: queueStatus.stats.completed, // Note: stats.completed is total, not just today, but works for now
+            completedToday: queueStatus.stats.completed,
             failedToday: queueStatus.stats.failed,
           },
-          // Placeholder for worker details as they aren't exposed by cli.ts yet
+          // Placeholder for worker details as they aren't exposed yet
           workers: {
-            total: 1, 
+            total: 1,
             active: queueStatus.stats.running,
             idle: Math.max(0, 1 - queueStatus.stats.running),
           },
@@ -68,9 +75,10 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
       reply: FastifyReply
     ) => {
       const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
 
-      // getQueueStatus takes optional config path
-      const status = getQueueStatus();
+      // Use shared DB connection
+      const status = getQueueStatusSummary(db);
 
       const durationMs = Date.now() - startTime;
       return reply.send(successResponse(status, durationMs));
@@ -92,6 +100,7 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
       reply: FastifyReply
     ) => {
       const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
       const { sessionFile } = request.body ?? {};
 
       if (!sessionFile) {
@@ -100,24 +109,48 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
           .send(errorResponse("BAD_REQUEST", "sessionFile is required"));
       }
 
-      // queueAnalysis takes sessionPath and optional configPath
-      const result = queueAnalysis(sessionFile);
-
-      if (!result.success) {
+      // Validate session file
+      const resolvedPath = path.resolve(sessionFile);
+      if (!fs.existsSync(resolvedPath)) {
         return reply
-          .status(result.message.includes("already queued") ? 409 : 400)
+          .status(400)
           .send(
             errorResponse(
-              result.message.includes("already queued")
-                ? "CONFLICT"
-                : "BAD_REQUEST",
-              result.message
+              "BAD_REQUEST",
+              `Session file not found: ${resolvedPath}`
             )
           );
       }
 
+      if (!resolvedPath.endsWith(".jsonl")) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse("BAD_REQUEST", "Session file must be a .jsonl file")
+          );
+      }
+
+      const queue = createQueueManager(db);
+
+      // Check if already queued
+      if (queue.hasExistingJob(resolvedPath)) {
+        return reply
+          .status(409)
+          .send(
+            errorResponse("CONFLICT", "Session is already queued for analysis")
+          );
+      }
+
+      // Queue with high priority
+      const jobId = queue.enqueue({
+        type: "initial",
+        priority: PRIORITY.USER_TRIGGERED,
+        sessionFile: resolvedPath,
+        context: { userTriggered: true },
+      });
+
       const durationMs = Date.now() - startTime;
-      return reply.send(successResponse({ jobId: result.jobId }, durationMs));
+      return reply.send(successResponse({ jobId }, durationMs));
     }
   );
 }
