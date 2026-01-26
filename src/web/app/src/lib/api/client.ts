@@ -120,12 +120,20 @@ export const api = {
   // Search
   search: (
     query: string,
-    options?: { fields?: string[]; limit?: number; filters?: NodeFilters }
+    options?: {
+      fields?: string[];
+      limit?: number;
+      offset?: number;
+      filters?: NodeFilters;
+    }
   ) => {
     const { filters, ...rest } = options ?? {};
-    return request<{ results: SearchResult[]; total: number }>(
-      `/search${toQueryString({ q: query, ...rest, ...filters })}`
-    );
+    return request<{
+      results: SearchResult[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/search${toQueryString({ q: query, ...rest, ...filters })}`);
   },
 
   // Stats
