@@ -1026,6 +1026,8 @@ const ALLOWED_SORT_FIELDS = new Set<NodeSortField>([
  * - computer (exact match)
  * - hadClearGoal (boolean)
  * - isNewProject (boolean)
+ * - tags (AND logic - nodes must have ALL specified tags)
+ * - topics (AND logic - nodes must have ALL specified topics)
  *
  * Per specs/api.md GET /api/v1/nodes endpoint.
  */
