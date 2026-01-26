@@ -111,6 +111,110 @@ export class PatternAggregator {
   }
 
   /**
+   * Aggregates lessons into lesson patterns.
+   * Groups by level and exact summary text.
+   */
+  public aggregateLessons(): void {
+    const stmt = this.db.prepare(`
+      SELECT l.level, l.summary, l.node_id, l.created_at,
+             GROUP_CONCAT(lt.tag, '|') as tag_list
+      FROM lessons l
+      LEFT JOIN lesson_tags lt ON l.id = lt.lesson_id
+      GROUP BY l.id
+      ORDER BY l.created_at DESC
+    `);
+
+    const groups = new Map<
+      string,
+      {
+        level: string;
+        pattern: string;
+        occurrences: number;
+        tags: Set<string>;
+        nodeIds: string[];
+        lastSeen: string;
+      }
+    >();
+
+    for (const row of stmt.iterate() as IterableIterator<{
+      level: string;
+      summary: string;
+      node_id: string;
+      created_at: string;
+      tag_list: string | null;
+    }>) {
+      const summary = row.summary.trim();
+      const key = `${row.level}:${summary}`;
+
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          level: row.level,
+          pattern: summary,
+          occurrences: 0,
+          tags: new Set(),
+          nodeIds: [],
+          lastSeen: row.created_at,
+        };
+        groups.set(key, group);
+      }
+
+      group.occurrences++;
+
+      // Add tags
+      if (row.tag_list) {
+        for (const tag of row.tag_list.split("|")) {
+          group.tags.add(tag);
+        }
+      }
+
+      // Limit example nodes to 5 recent ones
+      if (group.nodeIds.length < 5) {
+        group.nodeIds.push(row.node_id);
+      }
+    }
+
+    const insertStmt = this.db.prepare(`
+      INSERT INTO lesson_patterns (
+        id, level, pattern, occurrences, tags, example_nodes, last_seen, updated_at
+      ) VALUES (
+        ?, ?, ?, ?, ?, ?, ?, datetime('now')
+      )
+      ON CONFLICT(level, pattern) DO UPDATE SET
+        occurrences = excluded.occurrences,
+        tags = excluded.tags,
+        example_nodes = excluded.example_nodes,
+        last_seen = excluded.last_seen,
+        updated_at = excluded.updated_at
+    `);
+
+    const transaction = this.db.transaction(() => {
+      for (const group of groups.values()) {
+        const id = createHash("sha256")
+          .update(`${group.level}:${group.pattern}`)
+          .digest("hex")
+          .slice(0, 16);
+
+        // eslint-disable-next-line unicorn/no-array-sort
+        const tagsJson = JSON.stringify([...group.tags].sort());
+        const examplesJson = JSON.stringify(group.nodeIds);
+
+        insertStmt.run(
+          id,
+          group.level,
+          group.pattern,
+          group.occurrences,
+          tagsJson,
+          examplesJson,
+          group.lastSeen
+        );
+      }
+    });
+
+    transaction();
+  }
+
+  /**
    * Aggregates model statistics from quirks and tool errors.
    */
   public aggregateModelStats(): void {

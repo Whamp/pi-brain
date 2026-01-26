@@ -226,3 +226,19 @@
 - Addressed "Shared Type Library" and "SQLite Rebuild CLI" TODOs.
 - Created robust foundation for type sharing between monorepo packages.
 - Added recovery mechanism for database corruption/loss via JSON rebuild.
+
+## 2026-01-26 15:52 - Task 8.8, 8.9
+
+**Status**: pending → done
+**Validation**:
+- Created 005_lesson_patterns.sql migration
+- Implemented aggregateLessons() in PatternAggregator
+- Updated scheduler to run all aggregations (failure patterns, model stats, lessons)
+- Added unit tests for lesson aggregation and scheduler integration
+- Verified clearAllData handles new tables
+- All lint checks and tests pass (npm run check, npm test -- --run)
+**Commit**: 8845984
+**Notes**:
+- Lesson aggregation groups lessons by level and exact summary text
+- Scheduler now fully implements the nightly job cycle
+- Ready for dashboard integration (Task 8.10)

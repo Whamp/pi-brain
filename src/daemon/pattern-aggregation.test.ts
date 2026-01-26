@@ -47,6 +47,35 @@ describe("patternAggregator", () => {
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
       );
+
+      CREATE TABLE lessons (
+        id TEXT PRIMARY KEY,
+        node_id TEXT NOT NULL,
+        level TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        details TEXT,
+        confidence TEXT,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE lesson_tags (
+        lesson_id TEXT NOT NULL,
+        tag TEXT NOT NULL,
+        PRIMARY KEY (lesson_id, tag)
+      );
+
+      CREATE TABLE lesson_patterns (
+        id TEXT PRIMARY KEY,
+        level TEXT NOT NULL,
+        pattern TEXT NOT NULL,
+        occurrences INTEGER DEFAULT 1,
+        tags TEXT,
+        example_nodes TEXT,
+        last_seen TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        CONSTRAINT unique_pattern UNIQUE (level, pattern)
+      );
     `);
 
     aggregator = new PatternAggregator(db);
@@ -256,5 +285,99 @@ describe("patternAggregator", () => {
     expect(gpt4Stats?.quirk_count).toBe(2);
     expect(gpt4Stats?.error_count).toBe(1);
     expect(gpt4Stats?.last_used).toBe("2026-01-04T10:00:00Z");
+  });
+
+  interface LessonPatternRow {
+    id: string;
+    level: string;
+    pattern: string;
+    occurrences: number;
+    tags: string;
+    example_nodes: string;
+    last_seen: string;
+  }
+
+  it("should aggregate lessons correctly", () => {
+    // Insert test data
+    const lessons = [
+      {
+        id: "1",
+        node_id: "n1",
+        level: "tool",
+        summary: "Use --run with npm test",
+        tags: ["testing", "npm"],
+        created_at: "2026-01-01T10:00:00Z",
+      },
+      {
+        id: "2",
+        node_id: "n2",
+        level: "tool",
+        summary: "Use --run with npm test",
+        tags: ["testing", "vitest"],
+        created_at: "2026-01-02T10:00:00Z",
+      },
+      {
+        id: "3",
+        node_id: "n3",
+        level: "project",
+        summary: "Architecture is modular",
+        tags: ["architecture"],
+        created_at: "2026-01-03T10:00:00Z",
+      },
+    ];
+
+    const insertLesson = db.prepare(`
+      INSERT INTO lessons (id, node_id, level, summary, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    const insertTag = db.prepare(`
+      INSERT INTO lesson_tags (lesson_id, tag) VALUES (?, ?)
+    `);
+
+    for (const lesson of lessons) {
+      insertLesson.run(
+        lesson.id,
+        lesson.node_id,
+        lesson.level,
+        lesson.summary,
+        lesson.created_at
+      );
+      for (const tag of lesson.tags) {
+        insertTag.run(lesson.id, tag);
+      }
+    }
+
+    // Run aggregation
+    aggregator.aggregateLessons();
+
+    // Verify results
+    const patterns = db
+      .prepare("SELECT * FROM lesson_patterns ORDER BY pattern")
+      .all() as LessonPatternRow[];
+
+    expect(patterns).toHaveLength(2);
+
+    // Check project pattern
+    const projectPattern = patterns.find((p) => p.level === "project");
+    expect(projectPattern).toBeDefined();
+    expect(projectPattern?.pattern).toBe("Architecture is modular");
+    expect(projectPattern?.occurrences).toBe(1);
+    expect(JSON.parse(projectPattern?.tags || "[]")).toContain("architecture");
+
+    // Check tool pattern
+    const toolPattern = patterns.find((p) => p.level === "tool");
+    expect(toolPattern).toBeDefined();
+    expect(toolPattern?.pattern).toBe("Use --run with npm test");
+    expect(toolPattern?.occurrences).toBe(2);
+    expect(toolPattern?.last_seen).toBe("2026-01-02T10:00:00Z");
+
+    const tags = JSON.parse(toolPattern?.tags || "[]");
+    expect(tags).toContain("testing");
+    expect(tags).toContain("npm");
+    expect(tags).toContain("vitest");
+
+    const examples = JSON.parse(toolPattern?.example_nodes || "[]");
+    expect(examples).toStrictEqual(["n2", "n1"]);
   });
 });

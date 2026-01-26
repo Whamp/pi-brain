@@ -1,73 +1,84 @@
-# pi-tree-viz
+# pi-brain
 
-Interactive browser-based visualization for [pi coding agent](https://github.com/mariozechner/pi-coding-agent) session trees, branches, and forks.
+A "second brain" for the [pi coding agent](https://github.com/mariozechner/pi-coding-agent) that analyzes, connects, and learns from every interaction.
 
 ## Overview
 
-Pi sessions are stored as JSONL files with a tree structure. This tool parses session files and generates interactive visualizations to help you:
+pi-brain runs in the background to build a knowledge graph from your coding sessions. It helps you:
 
-- **Explore session history** across all projects
-- **Visualize branching** when you use `/tree` to navigate back
-- **Track fork relationships** between sessions created via `/fork`
-- **Understand compaction** and how context is summarized
-- **Search across sessions** for specific content
+- **Recall Decisions**: "Why did we choose SQLite over Postgres last month?"
+- **Avoid Mistakes**: "What error patterns usually happen with this library?"
+- **Learn Quirks**: "How does this model behave with large file edits?"
+- **Visualize History**: Interactive graph of all sessions, branches, and forks.
 
-## Features
+## Components
 
-### Phase 1: Static Visualizer ✅
-
-CLI tool that generates a self-contained HTML file with an interactive visualization:
-
-```bash
-# Install globally
-npm install -g pi-tree-viz
-
-# Generate visualization
-pi-tree-viz
-
-# Specify output file
-pi-tree-viz --output ./my-sessions.html
-
-# Filter to specific project
-pi-tree-viz --project ~/my-project
-
-# Open in browser after generation
-pi-tree-viz --open
-```
-
-### Phase 2: Live Dashboard ✅
-
-Pi extension with real-time session visualization:
-
-```bash
-# Install the extension
-ln -s /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/dashboard
-
-# Or copy it
-cp -r /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/
-
-# Then in pi, use:
-/dashboard
-```
-
-See [extensions/dashboard/README.md](extensions/dashboard/README.md) for full documentation.
+- **Daemon**: Background service that watches session files and analyzes them.
+- **Knowledge Graph**: SQLite database storing nodes (decisions, errors, patterns) and edges.
+- **Web Dashboard**: SvelteKit app to visualize the graph and track agent performance.
+- **Integration**: `brain-query` extension for pi to access the knowledge graph.
 
 ## Installation
 
 ```bash
-# CLI tool
-npm install -g pi-tree-viz
+# Clone the repository
+git clone https://github.com/yourusername/pi-brain.git
+cd pi-brain
 
-# Extension (symlink to your pi extensions)
-cd ~/.pi/agent/extensions
-ln -s /path/to/pi-tree-viz/extensions/dashboard
+# Install dependencies
+npm install
+
+# Build everything
+npm run build
+
+# Link CLI globally
+npm link
 ```
+
+## Usage
+
+### Daemon
+
+Control the background analysis service:
+
+```bash
+# Start the daemon
+pi-brain daemon start
+
+# Check status
+pi-brain daemon status
+
+# Stop daemon
+pi-brain daemon stop
+```
+
+### Visualization
+
+Generate a standalone HTML visualization of your sessions (legacy feature):
+
+```bash
+pi-brain viz --open
+```
+
+### Pi Integration
+
+Install the `brain-query` extension to let your agent access the brain:
+
+```bash
+# Link the extension to your pi agent
+ln -s $(pwd)/extensions/brain-query ~/.pi/agent/extensions/brain-query
+```
+
+Then in pi, you can use:
+
+- `/brain` command to see status
+- Natural language queries like: "Have we seen this error before?" (uses `brain_query` tool)
 
 ## Documentation
 
-- [docs/RESEARCH.md](docs/RESEARCH.md) - Detailed research on pi's session format
+- [docs/specs/](docs/specs/) - Detailed system specifications
 - [docs/PLAN.md](docs/PLAN.md) - Implementation roadmap
-- [extensions/dashboard/README.md](extensions/dashboard/README.md) - Live dashboard extension
+- [extensions/brain-query/](extensions/brain-query/) - Extension documentation
 
 ## Development
 
@@ -75,14 +86,14 @@ ln -s /path/to/pi-tree-viz/extensions/dashboard
 # Install dependencies
 npm install
 
-# Build CLI
+# Build all packages
 npm run build
 
-# Watch mode
-npm run dev
+# Run tests
+npm test
 
-# Install extension dependencies
-cd extensions/dashboard && npm install
+# Run linter/formatter
+npm run check
 ```
 
 ## License

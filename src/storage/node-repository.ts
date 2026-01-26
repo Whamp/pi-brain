@@ -99,6 +99,12 @@ export function clearAllData(db: Database.Database): void {
       // Table might not exist or other error, ignore
     }
 
+    try {
+      db.prepare("DELETE FROM lesson_patterns").run();
+    } catch {
+      // Table might not exist or other error, ignore
+    }
+
     db.prepare("DELETE FROM nodes").run();
     // FTS table (triggers might handle this, but explicit delete is safe)
     db.prepare("DELETE FROM nodes_fts").run();

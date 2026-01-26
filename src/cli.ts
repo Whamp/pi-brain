@@ -3,7 +3,7 @@
  * CLI for pi-brain
  *
  * Commands:
- * - pi-brain viz       - Generate interactive HTML visualization of pi sessions (legacy pi-tree-viz)
+ * - pi-brain viz       - Generate interactive HTML visualization of pi sessions
  * - pi-brain daemon    - Control the daemon (start, stop, status, queue, analyze)
  * - pi-brain health    - Run health checks
  */
@@ -42,7 +42,7 @@ program
   .version("0.1.0");
 
 // =============================================================================
-// Visualization command (legacy pi-tree-viz)
+// Visualization command
 // =============================================================================
 
 program

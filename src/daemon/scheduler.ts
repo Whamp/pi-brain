@@ -463,6 +463,7 @@ export class Scheduler {
       this.logger.info("Starting pattern aggregation job");
       this.patternAggregator.aggregateFailurePatterns();
       this.patternAggregator.aggregateModelStats();
+      this.patternAggregator.aggregateLessons();
       this.logger.info("Pattern aggregation completed");
     } catch (error) {
       errorMessage = error instanceof Error ? error.message : String(error);

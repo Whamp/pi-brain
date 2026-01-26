@@ -1,20 +1,18 @@
 {
-  "name": "pi-tree-viz",
+  "name": "pi-brain",
   "version": "0.1.0",
-  "description": "Interactive browser visualization for pi coding agent session trees, branches, and forks",
+  "description": "A second brain for the pi coding agent - analyzes, connects, and learns from every session",
   "keywords": [
-    "branches",
+    "analysis",
+    "brain",
     "coding-agent",
-    "pi",
-    "session",
-    "tree",
-    "visualization"
+    "knowledge-graph",
+    "pi"
   ],
   "license": "MIT",
   "author": "",
   "bin": {
-    "pi-brain": "./dist/cli.js",
-    "pi-tree-viz": "./dist/cli.js"
+    "pi-brain": "./dist/cli.js"
   },
   "files": [
     "dist",

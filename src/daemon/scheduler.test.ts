@@ -355,6 +355,47 @@ describe("scheduler", () => {
     });
   });
 
+  describe("triggerPatternAggregation", () => {
+    it("should run pattern aggregation", async () => {
+      // Create a mock DB that can handle the aggregation queries
+      const mockDb = {
+        prepare: vi.fn(() => ({
+          iterate: vi.fn(() => []), // Return empty iterator for aggregation loops
+          run: vi.fn(),
+          all: vi.fn(() => []),
+        })),
+        transaction: vi.fn((fn) => fn),
+      } as unknown as Database.Database;
+
+      scheduler = new Scheduler(defaultConfig, queue, mockDb, logger);
+
+      const result = await scheduler.triggerPatternAggregation();
+
+      expect(result.type).toBe("pattern_aggregation");
+      expect(result.error).toBeUndefined();
+      expect(result.completedAt.getTime()).toBeGreaterThanOrEqual(
+        result.startedAt.getTime()
+      );
+
+      // Verify DB was called (implicitly verifying aggregator was run)
+      expect(mockDb.prepare).toHaveBeenCalled();
+    });
+
+    it("should handle database errors", async () => {
+      const mockDb = {
+        prepare: vi.fn(() => {
+          throw new Error("Aggregation failed");
+        }),
+      } as unknown as Database.Database;
+
+      scheduler = new Scheduler(defaultConfig, queue, mockDb, logger);
+
+      const result = await scheduler.triggerPatternAggregation();
+
+      expect(result.error).toBe("Aggregation failed");
+    });
+  });
+
   describe("invalid cron expressions", () => {
     it("should handle invalid reanalysis schedule gracefully", () => {
       const badConfig: SchedulerConfig = {

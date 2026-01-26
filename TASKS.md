@@ -114,8 +114,8 @@ Track implementation progress. Agents update status as they complete work.
 | 8.5  | Implement connection discovery - lesson reinforcement | done    | 8.1          | 2026-01-26                                  |
 | 8.6  | Implement pattern aggregation - failure patterns      | done    | 8.1, 4.11    | 2026-01-26 - confirmed implemented & tested |
 | 8.7  | Implement pattern aggregation - model quirks          | done    | 8.1, 4.10    | 2026-01-26 - implemented model_stats update |
-| 8.8  | Implement pattern aggregation - lessons               | pending | 8.1, 4.9     |                                             |
-| 8.9  | Update failure_patterns table                         | pending | 8.6          |                                             |
+| 8.8  | Implement pattern aggregation - lessons               | done    | 8.1, 4.9     | 2026-01-26 - implemented with 005 migration |
+| 8.9  | Update failure_patterns table                         | done    | 8.6          | 2026-01-26 - handled by scheduler & aggregator |
 | 8.10 | Surface patterns in dashboard                         | pending | 8.6-8.9, 6.1 |                                             |
 
 ## Phase 9: Multi-Computer Sync

@@ -15,13 +15,13 @@ A Pi extension that provides a live, browser-based visualization of session tree
 ### Option 1: Symlink to pi extensions directory
 
 ```bash
-ln -s /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/dashboard
+ln -s /path/to/pi-brain/extensions/dashboard ~/.pi/agent/extensions/dashboard
 ```
 
 ### Option 2: Copy to pi extensions directory
 
 ```bash
-cp -r /path/to/pi-tree-viz/extensions/dashboard ~/.pi/agent/extensions/
+cp -r /path/to/pi-brain/extensions/dashboard ~/.pi/agent/extensions/
 ```
 
 ## Usage

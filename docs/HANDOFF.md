@@ -88,4 +88,4 @@ Key metrics displayed:
 - Pi extensions: `~/tools/pi-mono/packages/coding-agent/docs/extensions.md`
 - Pi RPC: `~/tools/pi-mono/packages/coding-agent/docs/rpc.md`
 - Ultracite docs: https://docs.ultracite.ai/
-- Project location: `/home/will/projects/pi-tree-viz`
+- Project location: `/home/will/projects/pi-brain`
