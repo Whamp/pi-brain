@@ -22,12 +22,16 @@ import {
   deleteNode,
   edgeExists,
   edgeRowToEdge,
+  findPath,
+  getAncestors,
   getAllComputers,
   getAllNodeTypes,
   getAllNodeVersions,
   getAllProjects,
   getAllTags,
   getAllTopics,
+  getConnectedNodes,
+  getDescendants,
   getEdge,
   getEdgesFrom,
   getEdgesTo,
@@ -42,6 +46,7 @@ import {
   getNodeToolErrors,
   getNodeTopics,
   getNodeVersion,
+  getSubgraph,
   indexNodeForSearch,
   linkNodeToPredecessors,
   listNodes,
@@ -2553,6 +2558,425 @@ describe("node-repository", () => {
       expect(countNodes(db, { type: "coding" })).toBe(2);
       expect(countNodes(db, { type: "debugging" })).toBe(1);
       expect(countNodes(db, { type: "research" })).toBe(0);
+    });
+  });
+
+  describe("getConnectedNodes", () => {
+    it("should return empty result for node with no connections", () => {
+      const node = createTestNode();
+      createNode(db, node, options);
+
+      const result = getConnectedNodes(db, node.id);
+
+      expect(result.rootNodeId).toBe(node.id);
+      expect(result.nodes).toHaveLength(0);
+      expect(result.edges).toHaveLength(0);
+    });
+
+    it("should find directly connected nodes (1 hop)", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      // From A with depth 1, should only find B
+      const result = getConnectedNodes(db, nodeA.id, { depth: 1 });
+
+      expect(result.rootNodeId).toBe(nodeA.id);
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeB.id);
+      expect(result.edges).toHaveLength(1);
+      expect(result.edges[0].targetNodeId).toBe(nodeB.id);
+    });
+
+    it("should find multi-hop connected nodes", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      // From A with depth 2, should find both B and C
+      const result = getConnectedNodes(db, nodeA.id, { depth: 2 });
+
+      expect(result.nodes).toHaveLength(2);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).toContain(nodeB.id);
+      expect(nodeIds).toContain(nodeC.id);
+      expect(result.edges).toHaveLength(2);
+    });
+
+    it("should respect direction=outgoing", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // C -> A -> B (A has both incoming and outgoing)
+      createEdge(db, nodeC.id, nodeA.id, "continuation");
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      // From A, outgoing only should find B
+      const result = getConnectedNodes(db, nodeA.id, { direction: "outgoing" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeB.id);
+    });
+
+    it("should respect direction=incoming", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // C -> A -> B (A has both incoming and outgoing)
+      createEdge(db, nodeC.id, nodeA.id, "continuation");
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      // From A, incoming only should find C
+      const result = getConnectedNodes(db, nodeA.id, { direction: "incoming" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeC.id);
+    });
+
+    it("should respect direction=both (default)", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // C -> A -> B (A has both incoming and outgoing)
+      createEdge(db, nodeC.id, nodeA.id, "continuation");
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      // From A, both should find B and C
+      const result = getConnectedNodes(db, nodeA.id, { direction: "both" });
+
+      expect(result.nodes).toHaveLength(2);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).toContain(nodeB.id);
+      expect(nodeIds).toContain(nodeC.id);
+    });
+
+    it("should filter by edge types", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -fork-> B, A -semantic-> C
+      createEdge(db, nodeA.id, nodeB.id, "fork");
+      createEdge(db, nodeA.id, nodeC.id, "semantic");
+
+      // Filter to only fork edges
+      const result = getConnectedNodes(db, nodeA.id, { edgeTypes: ["fork"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeB.id);
+    });
+
+    it("should avoid cycles in graph traversal", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // Create a cycle: A -> B -> C -> A
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+      createEdge(db, nodeC.id, nodeA.id, "continuation");
+
+      // Should not infinite loop, should find all nodes
+      const result = getConnectedNodes(db, nodeA.id, { depth: 5 });
+
+      expect(result.nodes).toHaveLength(2); // B and C (not A since it's root)
+    });
+
+    it("should include hop distance in edges", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      const result = getConnectedNodes(db, nodeA.id, { depth: 2 });
+
+      // Edge A->B should be at hop 1, edge B->C should be at hop 2
+      const edgeAB = result.edges.find((e) => e.targetNodeId === nodeB.id);
+      const edgeBC = result.edges.find((e) => e.targetNodeId === nodeC.id);
+
+      expect(edgeAB?.hopDistance).toBe(1);
+      expect(edgeBC?.hopDistance).toBe(2);
+    });
+
+    it("should cap depth at maximum 5", () => {
+      // Create chain of 7 nodes
+      const nodes: Node[] = [];
+      for (let i = 0; i < 7; i++) {
+        const node = createTestNode();
+        createNode(db, node, options);
+        nodes.push(node);
+      }
+
+      // Create chain: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6
+      for (let i = 0; i < 6; i++) {
+        createEdge(db, nodes[i].id, nodes[i + 1].id, "continuation");
+      }
+
+      // Request depth 10, should be capped at 5
+      const result = getConnectedNodes(db, nodes[0].id, { depth: 10 });
+
+      // Should only find nodes 1-5 (5 hops), not node 6
+      expect(result.nodes).toHaveLength(5);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).not.toContain(nodes[6].id);
+    });
+
+    it("should handle minimum depth of 1", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      // Request depth 0, should be treated as 1
+      const result = getConnectedNodes(db, nodeA.id, { depth: 0 });
+
+      expect(result.nodes).toHaveLength(1);
+    });
+  });
+
+  describe("getSubgraph", () => {
+    it("should return empty result for empty root list", () => {
+      const result = getSubgraph(db, []);
+
+      expect(result.rootNodeId).toBe("");
+      expect(result.nodes).toHaveLength(0);
+      expect(result.edges).toHaveLength(0);
+    });
+
+    it("should combine results from multiple roots", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      const nodeD = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+      createNode(db, nodeD, options);
+
+      // A -> B, C -> D (two separate chains)
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeC.id, nodeD.id, "continuation");
+
+      const result = getSubgraph(db, [nodeA.id, nodeC.id], { depth: 1 });
+
+      // Should include all 4 nodes
+      expect(result.nodes).toHaveLength(4);
+      expect(result.edges).toHaveLength(2);
+    });
+
+    it("should deduplicate overlapping results", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B <- C (B is reachable from both A and C)
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeC.id, nodeB.id, "continuation");
+
+      const result = getSubgraph(db, [nodeA.id, nodeC.id], { depth: 1 });
+
+      // All 3 nodes, but B only once
+      expect(result.nodes).toHaveLength(3);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds.filter((id) => id === nodeB.id)).toHaveLength(1);
+    });
+  });
+
+  describe("findPath", () => {
+    it("should return null when no path exists", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      // No edge between them
+
+      const result = findPath(db, nodeA.id, nodeB.id);
+
+      expect(result).toBeNull();
+    });
+
+    it("should find direct path between adjacent nodes", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      const result = findPath(db, nodeA.id, nodeB.id);
+
+      expect(result).not.toBeNull();
+      expect(result?.nodeIds).toStrictEqual([nodeA.id, nodeB.id]);
+      expect(result?.edges).toHaveLength(1);
+    });
+
+    it("should find multi-hop path", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      const result = findPath(db, nodeA.id, nodeC.id);
+
+      expect(result).not.toBeNull();
+      expect(result?.nodeIds).toStrictEqual([nodeA.id, nodeB.id, nodeC.id]);
+      expect(result?.edges).toHaveLength(2);
+    });
+
+    it("should find path when same node is from and to", () => {
+      const nodeA = createTestNode();
+      createNode(db, nodeA, options);
+
+      const result = findPath(db, nodeA.id, nodeA.id);
+
+      expect(result).not.toBeNull();
+      expect(result?.nodeIds).toStrictEqual([nodeA.id]);
+      expect(result?.edges).toHaveLength(0);
+    });
+
+    it("should respect maxDepth limit", () => {
+      // Create chain: 0 -> 1 -> 2 -> 3 -> 4
+      const nodes: Node[] = [];
+      for (let i = 0; i < 5; i++) {
+        const node = createTestNode();
+        createNode(db, node, options);
+        nodes.push(node);
+      }
+      for (let i = 0; i < 4; i++) {
+        createEdge(db, nodes[i].id, nodes[i + 1].id, "continuation");
+      }
+
+      // Path exists at depth 4, but limit to 2
+      const result = findPath(db, nodes[0].id, nodes[4].id, { maxDepth: 2 });
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("getAncestors", () => {
+    it("should find nodes leading to a node", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      const result = getAncestors(db, nodeC.id, { maxDepth: 2 });
+
+      expect(result.nodes).toHaveLength(2);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).toContain(nodeA.id);
+      expect(nodeIds).toContain(nodeB.id);
+    });
+
+    it("should filter by edge types", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -fork-> C, B -semantic-> C
+      createEdge(db, nodeA.id, nodeC.id, "fork");
+      createEdge(db, nodeB.id, nodeC.id, "semantic");
+
+      const result = getAncestors(db, nodeC.id, { edgeTypes: ["fork"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeA.id);
+    });
+  });
+
+  describe("getDescendants", () => {
+    it("should find nodes a node leads to", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -> B -> C
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+      createEdge(db, nodeB.id, nodeC.id, "continuation");
+
+      const result = getDescendants(db, nodeA.id, { maxDepth: 2 });
+
+      expect(result.nodes).toHaveLength(2);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).toContain(nodeB.id);
+      expect(nodeIds).toContain(nodeC.id);
+    });
+
+    it("should filter by edge types", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      const nodeC = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+      createNode(db, nodeC, options);
+
+      // A -fork-> B, A -semantic-> C
+      createEdge(db, nodeA.id, nodeB.id, "fork");
+      createEdge(db, nodeA.id, nodeC.id, "semantic");
+
+      const result = getDescendants(db, nodeA.id, { edgeTypes: ["fork"] });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].id).toBe(nodeB.id);
     });
   });
 });
