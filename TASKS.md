@@ -59,7 +59,7 @@ Track implementation progress. Agents update status as they complete work.
 | 4.2  | Implement node versioning (reanalysis)             | done    | 4.1      | 2026-01-25 (implemented updateNode) |
 | 4.3  | Implement edge creation                            | done    | 4.1      | 2026-01-25                          |
 | 4.4  | Implement tag/topic indexing                       | done    | 4.1      | 2026-01-25                          |
-| 4.5  | Build query layer: by project, type, date range    | active  | 4.1      | 2026-01-25                          |
+| 4.5  | Build query layer: by project, type, date range    | done    | 4.1      | 2026-01-25                          |
 | 4.6  | Build query layer: by tags, topics                 | pending | 4.4      |                                     |
 | 4.7  | Build query layer: full-text search on summaries   | pending | 4.1      |                                     |
 | 4.8  | Build query layer: graph traversal (related nodes) | pending | 4.3      |                                     |

@@ -541,3 +541,37 @@ Updated src/storage/index.ts to export node-repository.
 - Fixed `searchNodes()` to quote words for FTS5 special character handling (hyphens interpreted as NOT operators)
 - Removed `content=''` from FTS5 table - contentless mode prevented proper JOINs on node_id
 
+
+## 2026-01-25 21:45 - Task 4.5
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (656 tests, 24 new query layer tests)
+**Commit**: 1b8f94d
+**Notes**: Implemented query layer for filtering nodes by project, type, date range per specs/storage.md and specs/api.md.
+
+**New Functions (`src/storage/node-repository.ts`):**
+
+- `listNodes(db, filters, options)`: Query nodes with comprehensive filtering
+  - Filters: project (partial match), type, outcome, from/to dates, computer, hadClearGoal, isNewProject
+  - Options: limit (1-500), offset, sort (8 fields), order (asc/desc)
+  - Returns: { nodes, total, limit, offset }
+  
+- `getAllProjects(db)`: Get all unique project paths sorted alphabetically
+- `getAllNodeTypes(db)`: Get all unique node types that have been used
+- `getAllComputers(db)`: Get all unique source machines
+- `countNodes(db, filters)`: Count nodes matching filters
+
+**Type exports:**
+
+- `ListNodesFilters`: Filter interface
+- `ListNodesOptions`: Pagination/sorting options
+- `ListNodesResult`: Result shape with nodes and metadata
+- `NodeSortField`: Valid sort field union type
+- `SortOrder`: "asc" | "desc"
+- `NodeTypeFilter`: Valid node type values
+- `OutcomeFilter`: Valid outcome values
+
+**Test Coverage:**
+
+- 24 new tests covering all filter combinations, pagination, sorting, edge cases
+- Tests for empty results, max/min limits, invalid sort fields
