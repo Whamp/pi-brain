@@ -47,7 +47,7 @@ Track implementation progress. Agents update status as they complete work.
 | 3.4 | Implement job processor (spawns pi agent)              | done    | 3.2      | 2026-01-25       |
 | 3.5 | Implement pi agent invocation with correct flags       | done    | 3.4      | 2026-01-25       |
 | 3.6 | Parse agent output (JSON mode)                         | done    | 3.5      | 2026-01-25       |
-| 3.7 | Store nodes and edges in database                      | pending | 3.6, 1.2 |                  |
+| 3.7 | Store nodes and edges in database                      | active  | 3.6, 1.2 | 2026-01-25       |
 | 3.8 | Implement error handling and retry logic               | pending | 3.4      |                  |
 | 3.9 | Implement daemon CLI (start, stop, status, queue info) | pending | 3.1-3.8  |                  |
 
