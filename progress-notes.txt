@@ -777,3 +777,55 @@ Updated src/storage/index.ts to export node-repository.
 - `npm run web:dev` - Start SvelteKit dev server
 - `npm run web:build` - Build for production
 - `npm run web:check` - Run svelte-check
+
+## 2026-01-26 06:12 - Task 5.2
+
+**Status**: pending → done
+**Validation**: npm run check passes (0 errors), npm test passes (730 tests, 11 new API tests)
+**Commit**: a15d10a
+**Notes**: Implemented REST API routes for queries per specs/api.md.
+
+**New Files:**
+- `src/api/server.ts` - Fastify server with CORS and WebSocket support
+- `src/api/responses.ts` - Shared response helpers to avoid import cycles
+- `src/api/routes/nodes.ts` - List, get, and connected nodes endpoints
+- `src/api/routes/edges.ts` - List, get, create, and delete edges
+- `src/api/routes/search.ts` - Full-text search with field filtering
+- `src/api/routes/lessons.ts` - Lessons listing and by-level grouping
+- `src/api/routes/quirks.ts` - Model quirks with aggregation
+- `src/api/routes/tool-errors.ts` - Tool errors with stats
+- `src/api/routes/stats.ts` - Dashboard statistics endpoint
+- `src/api/routes/daemon.ts` - Daemon status, queue, and analyze trigger
+- `src/api/server.test.ts` - 11 tests covering endpoints
+
+**Configuration:**
+- Added `ApiConfig` type (port, host, corsOrigins)
+- Updated `PiBrainConfig` to include api config
+- Added `getDefaultApiConfig()` with sensible defaults
+
+**Dependencies:**
+- Added fastify, @fastify/cors, @fastify/websocket, @sinclair/typebox
+
+**API Endpoints Implemented:**
+- GET /api/v1/nodes - List with filtering, pagination, sorting
+- GET /api/v1/nodes/:id - Get node with optional includes
+- GET /api/v1/nodes/:id/connected - Graph traversal
+- GET /api/v1/edges - List edges
+- GET /api/v1/edges/:id - Get edge
+- POST /api/v1/edges - Create edge
+- DELETE /api/v1/edges/:id - Delete edge
+- GET /api/v1/search - Full-text search
+- GET /api/v1/lessons - List lessons
+- GET /api/v1/lessons/by-level - Group by level
+- GET /api/v1/quirks - List quirks
+- GET /api/v1/quirks/by-model - Group by model
+- GET /api/v1/quirks/aggregated - Aggregate similar quirks
+- GET /api/v1/tool-errors - List errors
+- GET /api/v1/tool-errors/aggregated - Group errors
+- GET /api/v1/tool-errors/stats - Error statistics
+- GET /api/v1/stats - Dashboard statistics
+- GET /api/v1/stats/tool-errors - Tool error stats
+- GET /api/v1/daemon/status - Daemon status
+- GET /api/v1/daemon/queue - Queue status
+- POST /api/v1/daemon/analyze - Trigger analysis
+
