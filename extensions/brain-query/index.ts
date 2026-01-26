@@ -35,7 +35,9 @@ export default function brainExtension(pi: ExtensionAPI) {
             query,
             context: {
               project: ctx.cwd,
-              model: ctx.model,
+              model: ctx.model
+                ? `${ctx.model.provider}/${ctx.model.id}`
+                : undefined,
             },
           }),
         });
@@ -90,7 +92,9 @@ export default function brainExtension(pi: ExtensionAPI) {
             query: params.query,
             context: {
               project: ctx.cwd,
-              model: ctx.model,
+              model: ctx.model
+                ? `${ctx.model.provider}/${ctx.model.id}`
+                : undefined,
             },
           }),
           signal,
