@@ -695,3 +695,15 @@ Updated src/storage/index.ts to export node-repository.
 - Created `countLessons(db, filters)` helper.
 - Added stable ordering by `created_at DESC, id DESC` for lesson queries.
 - Updated `src/storage/node-repository.test.ts` with tests for lesson filtering by level, project, and tags (AND logic).
+
+## 2026-01-25 23:18 - Task 4.10
+
+**Status**: active → done
+**Validation**: npm test passes (714 tests). Added 8 new tests in src/storage/node-repository.test.ts covering quirk listing, filtering (model, project, frequency), pagination, and aggregation.
+**Commit**: 4e1ff89
+**Notes**: Implemented model quirk aggregation queries per specs/storage.md and specs/api.md.
+- Added `listQuirks(db, filters, options)` for filtered and paginated quirk retrieval.
+- Added `getQuirksByModel(db, recentLimit)` for model-level statistics.
+- Added `getAggregatedQuirks(db, options)` for grouping similar observations.
+- Added `getAllQuirkModels(db)` and `countQuirks(db)` helpers.
+- Implemented frequency-based ranking (`once < sometimes < often < always`) for inclusive filtering.

@@ -32,7 +32,9 @@ import {
   getAllTags,
   getAllTopics,
   getAggregatedQuirks,
+  getAggregatedToolErrors,
   getAllQuirkModels,
+  getAllToolsWithErrors,
   getConnectedNodes,
   getDescendants,
   getEdge,
@@ -48,6 +50,7 @@ import {
   getNodesByTopic,
   getNodeTags,
   getNodeToolErrors,
+  getToolErrorStats,
   getNodeTopics,
   getNodeVersion,
   getQuirksByModel,
@@ -57,7 +60,9 @@ import {
   listLessons,
   listNodes,
   listQuirks,
+  listToolErrors,
   countQuirks,
+  countToolErrors,
   nodeExistsInDb,
   searchNodes,
   searchNodesAdvanced,
@@ -3482,6 +3487,226 @@ describe("node-repository", () => {
 
       const result = listQuirks(db);
       expect(result.quirks[0].sourceProject).toBe("/home/will/special-project");
+    });
+  });
+
+  describe("tool error aggregation", () => {
+    it("should list tool errors with filters", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/project1",
+        },
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "match_failed",
+              context: "C1",
+              model: "model-a",
+              wasRetried: true,
+            },
+            {
+              tool: "bash",
+              errorType: "timeout",
+              context: "C2",
+              model: "model-b",
+              wasRetried: false,
+            },
+          ],
+        },
+      });
+      createNode(db, node1, options);
+
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/project2",
+        },
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "permission_denied",
+              context: "C3",
+              model: "model-a",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node2, options);
+
+      // All errors
+      const all = listToolErrors(db);
+      expect(all.errors).toHaveLength(3);
+      expect(all.total).toBe(3);
+
+      // Filter by tool
+      const editErrors = listToolErrors(db, { tool: "edit" });
+      expect(editErrors.errors).toHaveLength(2);
+
+      // Filter by model
+      const modelAErrors = listToolErrors(db, { model: "model-a" });
+      expect(modelAErrors.errors).toHaveLength(2);
+
+      // Filter by project
+      const project1Errors = listToolErrors(db, { project: "project1" });
+      expect(project1Errors.errors).toHaveLength(2);
+    });
+
+    it("should get aggregated tool errors grouped by tool and type", () => {
+      const node1 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "match_failed",
+              context: "C1",
+              model: "model-a",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node1, options);
+
+      const node2 = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "match_failed",
+              context: "C2",
+              model: "model-b",
+              wasRetried: true,
+            },
+            {
+              tool: "bash",
+              errorType: "timeout",
+              context: "C3",
+              model: "model-a",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node2, options);
+
+      const aggregated = getAggregatedToolErrors(db);
+      expect(aggregated).toHaveLength(2);
+
+      const editMatchFailed = aggregated.find(
+        (a) => a.tool === "edit" && a.errorType === "match_failed"
+      );
+      expect(editMatchFailed).toBeDefined();
+      expect(editMatchFailed?.count).toBe(2);
+      expect(editMatchFailed?.models).toContain("model-a");
+      expect(editMatchFailed?.models).toContain("model-b");
+      expect(editMatchFailed?.recentNodes).toContain(node1.id);
+      expect(editMatchFailed?.recentNodes).toContain(node2.id);
+    });
+
+    it("should get tool error stats for dashboard", () => {
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "T1",
+              context: "C1",
+              model: "model-a",
+              wasRetried: true,
+            },
+            {
+              tool: "edit",
+              errorType: "T2",
+              context: "C2",
+              model: "model-b",
+              wasRetried: true,
+            },
+            {
+              tool: "bash",
+              errorType: "T3",
+              context: "C3",
+              model: "model-a",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const stats = getToolErrorStats(db);
+
+      expect(stats.byTool).toHaveLength(2);
+      const editStat = stats.byTool.find((s) => s.tool === "edit");
+      expect(editStat?.count).toBe(2);
+      expect(editStat?.models).toContain("model-a");
+      expect(editStat?.models).toContain("model-b");
+
+      expect(stats.byModel).toHaveLength(2);
+      const modelAStat = stats.byModel.find((s) => s.model === "model-a");
+      expect(modelAStat?.count).toBe(2);
+
+      expect(stats.trends.thisWeek).toBe(3);
+    });
+
+    it("should count tool errors matching filters", () => {
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "T1",
+              context: "C1",
+              model: "model-a",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      expect(countToolErrors(db)).toBe(1);
+      expect(countToolErrors(db, { tool: "edit" })).toBe(1);
+      expect(countToolErrors(db, { tool: "bash" })).toBe(0);
+    });
+
+    it("should get all unique tools with errors", () => {
+      const node = createTestNode({
+        observations: {
+          ...emptyObservations(),
+          toolUseErrors: [
+            {
+              tool: "edit",
+              errorType: "T1",
+              context: "C1",
+              model: "model-a",
+              wasRetried: true,
+            },
+            {
+              tool: "bash",
+              errorType: "T2",
+              context: "C2",
+              model: "model-b",
+              wasRetried: true,
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const tools = getAllToolsWithErrors(db);
+      expect(tools).toHaveLength(2);
+      expect(tools).toContain("edit");
+      expect(tools).toContain("bash");
     });
   });
 });
