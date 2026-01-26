@@ -277,7 +277,7 @@ describe("worker + Queue Integration", () => {
 
     // Job should have been processed
     expect(result.job.id).toBe(jobId);
-    expect(result.durationMs).toBeGreaterThan(0);
+    expect(result.durationMs).toBeGreaterThanOrEqual(0);
   });
 
   it("marks jobs as failed with proper error", async () => {

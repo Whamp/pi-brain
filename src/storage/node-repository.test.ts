@@ -34,6 +34,8 @@ import {
   indexNodeForSearch,
   nodeExistsInDb,
   searchNodes,
+  updateNode,
+  getAllNodeVersions,
   type NodeConversionContext,
   type RepositoryOptions,
 } from "./node-repository.js";
@@ -196,7 +198,8 @@ function createTestAgentOutput(): AgentNodeOutput {
 }
 
 function createTestConversionContext(
-  jobOverrides: Partial<AnalysisJob> = {}
+  jobOverrides: Partial<AnalysisJob> = {},
+  existingNode?: Node
 ): NodeConversionContext {
   const job: AnalysisJob = {
     id: "job-123",
@@ -219,6 +222,7 @@ function createTestConversionContext(
     entryCount: 20,
     analysisDurationMs: 30_000,
     analyzerVersion: "v1-abc123",
+    existingNode,
   };
 }
 
@@ -487,6 +491,107 @@ describe("node-repository", () => {
       expect(getNodeTags(db, node.id)).toHaveLength(0);
       expect(getNodeTopics(db, node.id)).toHaveLength(0);
       expect(getNodeLessons(db, node.id)).toHaveLength(0);
+    });
+  });
+
+  // ===========================================================================
+  // Reanalysis and Versioning Tests
+  // ===========================================================================
+
+  describe("reanalysis and versioning", () => {
+    it("should create a new version of an existing node", () => {
+      const node = createTestNode({
+        semantic: {
+          tags: ["coding"],
+          topics: [],
+        },
+      });
+      createNode(db, node, options);
+
+      // Create new version using agentOutputToNode
+      const output = createTestAgentOutput();
+      output.content.summary = "Updated summary in new version";
+      output.semantic.tags = ["database"];
+      const context = createTestConversionContext({}, node);
+
+      const newNode = agentOutputToNode(output, context);
+      expect(newNode.id).toBe(node.id);
+      expect(newNode.version).toBe(2);
+      expect(newNode.previousVersions).toContain(`${node.id}-v1`);
+
+      // Update in database
+      updateNode(db, newNode, options);
+
+      // Verify in database
+      const row = getNode(db, node.id);
+      expect(row?.version).toBe(2);
+
+      // Verify related data was updated (tags)
+      const tags = getNodeTags(db, node.id);
+      expect(tags).toContain("database"); // From output
+      expect(tags).not.toContain("coding"); // From original node
+    });
+
+    it("should increment version each time reanalyzed", () => {
+      let node = createTestNode();
+      createNode(db, node, options);
+
+      for (let i = 2; i <= 5; i++) {
+        const output = createTestAgentOutput();
+        const context = createTestConversionContext({}, node);
+        node = agentOutputToNode(output, context);
+        updateNode(db, node, options);
+
+        const row = getNode(db, node.id);
+        expect(row?.version).toBe(i);
+      }
+
+      expect(node.previousVersions).toHaveLength(4);
+      expect(node.previousVersions).toContain(`${node.id}-v1`);
+      expect(node.previousVersions).toContain(`${node.id}-v4`);
+    });
+
+    it("should keep previous version JSON files", () => {
+      const node = createTestNode();
+      createNode(db, node, options);
+
+      const output = createTestAgentOutput();
+      const context = createTestConversionContext({}, node);
+      const newNode = agentOutputToNode(output, context);
+      updateNode(db, newNode, options);
+
+      // Check files
+      const nodeDir = path.join(
+        nodesDir,
+        new Date(node.metadata.timestamp).getFullYear().toString(),
+        (new Date(node.metadata.timestamp).getMonth() + 1)
+          .toString()
+          .padStart(2, "0")
+      );
+
+      expect(
+        fs.existsSync(path.join(nodeDir, `${node.id}-v1.json`))
+      ).toBeTruthy();
+      expect(
+        fs.existsSync(path.join(nodeDir, `${node.id}-v2.json`))
+      ).toBeTruthy();
+    });
+
+    it("should retrieve all versions of a node", () => {
+      let node = createTestNode();
+      createNode(db, node, options);
+
+      // Create version 2
+      const output = createTestAgentOutput();
+      const context = createTestConversionContext({}, node);
+      node = agentOutputToNode(output, context);
+      updateNode(db, node, options);
+
+      const allVersions = getAllNodeVersions(node.id, options);
+      expect(allVersions).toHaveLength(2);
+      expect(allVersions[0].version).toBe(1);
+      expect(allVersions[1].version).toBe(2);
+      expect(allVersions[1].previousVersions).toContain(`${node.id}-v1`);
     });
   });
 

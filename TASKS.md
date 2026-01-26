@@ -56,7 +56,7 @@ Track implementation progress. Agents update status as they complete work.
 | ID   | Task                                               | Status  | Deps     | Notes                         |
 | ---- | -------------------------------------------------- | ------- | -------- | ----------------------------- |
 | 4.1  | Implement node creation (with JSON file)           | done    | 1.2, 1.3 | 2026-01-25 (completed in 3.7) |
-| 4.2  | Implement node versioning (reanalysis)             | pending | 4.1      |                               |
+| 4.2  | Implement node versioning (reanalysis)             | active  | 4.1      | 2026-01-25                    |
 | 4.3  | Implement edge creation                            | pending | 4.1      |                               |
 | 4.4  | Implement tag/topic indexing                       | pending | 4.1      |                               |
 | 4.5  | Build query layer: by project, type, date range    | pending | 4.1      |                               |

@@ -10,7 +10,12 @@ import type Database from "better-sqlite3";
 import type { AgentNodeOutput } from "../daemon/processor.js";
 import type { AnalysisJob } from "../daemon/queue.js";
 
-import { writeNode, type NodeStorageOptions } from "./node-storage.js";
+import {
+  listNodeVersions,
+  readNodeFromPath,
+  writeNode,
+  type NodeStorageOptions,
+} from "./node-storage.js";
 import {
   generateNodeId,
   type DaemonDecision,
@@ -150,6 +155,93 @@ export function createNode(
     insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
 
     // 9. Update FTS index
+    if (!options.skipFts) {
+      indexNodeForSearch(db, node);
+    }
+
+    return node;
+  })();
+}
+
+/**
+ * Update a node - writes new JSON version and updates SQLite row.
+ * Returns the updated node.
+ */
+export function updateNode(
+  db: Database.Database,
+  node: Node,
+  options: RepositoryOptions = {}
+): Node {
+  return db.transaction(() => {
+    // 1. Write new JSON file (version should be incremented)
+    const dataFile = writeNode(node, options);
+
+    // 2. Update nodes table
+    const stmt = db.prepare(`
+      UPDATE nodes SET
+        version = ?,
+        type = ?,
+        project = ?,
+        is_new_project = ?,
+        had_clear_goal = ?,
+        outcome = ?,
+        tokens_used = ?,
+        cost = ?,
+        duration_minutes = ?,
+        timestamp = ?,
+        analyzed_at = ?,
+        analyzer_version = ?,
+        data_file = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `);
+
+    stmt.run(
+      node.version,
+      node.classification.type,
+      node.classification.project,
+      node.classification.isNewProject ? 1 : 0,
+      node.classification.hadClearGoal ? 1 : 0,
+      node.content.outcome,
+      node.metadata.tokensUsed,
+      node.metadata.cost,
+      node.metadata.durationMinutes,
+      node.metadata.timestamp,
+      node.metadata.analyzedAt,
+      node.metadata.analyzerVersion,
+      dataFile,
+      node.id
+    );
+
+    // 3. Clear and re-insert related data (tags, topics, lessons, etc.)
+    db.prepare("DELETE FROM tags WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM topics WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM lessons WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM model_quirks WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM tool_errors WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM daemon_decisions WHERE node_id = ?").run(node.id);
+
+    // 4. Re-insert
+    const insertTag = db.prepare(
+      "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
+    );
+    for (const tag of node.semantic.tags) {
+      insertTag.run(node.id, tag);
+    }
+
+    const insertTopic = db.prepare(
+      "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
+    );
+    for (const topic of node.semantic.topics) {
+      insertTopic.run(node.id, topic);
+    }
+
+    insertLessons(db, node.id, node.lessons);
+    insertModelQuirks(db, node.id, node.observations.modelQuirks);
+    insertToolErrors(db, node.id, node.observations.toolUseErrors);
+    insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
+
+    // 5. Update FTS index
     if (!options.skipFts) {
       indexNodeForSearch(db, node);
     }
@@ -302,6 +394,17 @@ export function getNodeVersion(
 export function nodeExistsInDb(db: Database.Database, nodeId: string): boolean {
   const stmt = db.prepare("SELECT 1 FROM nodes WHERE id = ?");
   return stmt.get(nodeId) !== undefined;
+}
+
+/**
+ * Get all versions of a node from JSON storage
+ */
+export function getAllNodeVersions(
+  nodeId: string,
+  options: RepositoryOptions = {}
+): Node[] {
+  const versions = listNodeVersions(nodeId, options);
+  return versions.map((v) => readNodeFromPath(v.path));
 }
 
 /**
@@ -654,6 +757,8 @@ export interface NodeConversionContext {
   analysisDurationMs: number;
   /** Prompt version used for analysis */
   analyzerVersion: string;
+  /** Existing node (if reanalyzing) */
+  existingNode?: Node;
 }
 
 /**
@@ -682,10 +787,20 @@ export function agentOutputToNode(
     0
   );
 
+  // Identity and versioning
+  const id = context.existingNode?.id ?? generateNodeId();
+  const version = (context.existingNode?.version ?? 0) + 1;
+  const previousVersions = context.existingNode
+    ? [
+        ...context.existingNode.previousVersions,
+        `${context.existingNode.id}-v${context.existingNode.version}`,
+      ]
+    : [];
+
   return {
-    id: generateNodeId(),
-    version: 1,
-    previousVersions: [],
+    id,
+    version,
+    previousVersions,
 
     source: {
       sessionFile: context.job.sessionFile,
