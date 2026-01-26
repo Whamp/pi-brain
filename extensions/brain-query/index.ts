@@ -52,12 +52,11 @@ export default function brainExtension(pi: ExtensionAPI) {
         if (result.status === "success" && result.data) {
           ctx.ui.notify(result.data.summary || "Query successful", "info");
 
-          // Inject detailed answer into conversation
+          // Inject detailed answer into conversation as a follow-up message
           if (result.data.answer) {
-            (
-              ctx as unknown as { setNextUserMessage: (msg: string) => void }
-            ).setNextUserMessage(
-              `Based on pi-brain analysis:\n\n${result.data.answer}`
+            ctx.sendUserMessage(
+              `Based on pi-brain analysis:\n\n${result.data.answer}`,
+              { deliverAs: "followUp" }
             );
           }
         } else {

@@ -603,10 +603,16 @@ function parseQueryOutput(
 
   // Find the agent_end event
   const endEvent = events.find((e) => e.type === "agent_end");
-  if (!endEvent?.messages) {
+  if (!endEvent) {
     return {
       success: false,
       error: "No agent_end event found in output",
+    };
+  }
+  if (!endEvent.messages) {
+    return {
+      success: false,
+      error: "agent_end event has no messages",
     };
   }
 
