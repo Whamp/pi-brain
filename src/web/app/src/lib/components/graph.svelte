@@ -46,10 +46,11 @@
   const MAX_LABEL_LENGTH = 30;
 
   // Node type to color mapping
+  // Note: CSS uses --color-node-refactoring but NodeType is "refactor"
   const nodeColors: Record<NodeType, string> = {
     coding: "var(--color-node-coding)",
     debugging: "var(--color-node-debugging)",
-    refactor: "var(--color-node-refactoring)",
+    refactor: "var(--color-node-refactoring)", // CSS var uses "refactoring"
     sysadmin: "var(--color-node-sysadmin)",
     research: "var(--color-node-research)",
     planning: "var(--color-node-planning)",
@@ -421,12 +422,13 @@
     }
   });
 
-  // Reactivity using $effect - track nodes and edges length to detect changes
+  // Reactivity using $effect - trigger update when nodes or edges change
   $effect(() => {
-    // Track the arrays by accessing their length to create a dependency
-    const _nodesLen = nodes.length;
-    const _edgesLen = edges.length;
-    if (svg) {
+    // Access nodes and edges to create dependency on the props
+    // Using join of IDs ensures we detect both length and content changes
+    const _nodeSignature = nodes.map((n) => n.id).join(",");
+    const _edgeSignature = edges.map((e) => e.id).join(",");
+    if (svg && (_nodeSignature !== undefined || _edgeSignature !== undefined)) {
       updateGraph();
     }
   });

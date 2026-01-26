@@ -48,6 +48,7 @@ function createNodesStore() {
         update((s) => ({
           ...s,
           nodes: response.nodes,
+          edges: [], // listNodes doesn't return edges - clear them
           total: response.total,
           limit: response.limit,
           offset: response.offset,

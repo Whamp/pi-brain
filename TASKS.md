@@ -69,17 +69,17 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 5: Web UI - Core
 
-| ID  | Task                                                         | Status  | Deps         | Notes      |
-| --- | ------------------------------------------------------------ | ------- | ------------ | ---------- |
-| 5.1 | Set up web framework (SvelteKit)                             | done    | -            | 2026-01-26 |
-| 5.2 | Implement API routes for queries                             | done    | 5.1, 4.5-4.8 | 2026-01-26 |
-| 5.3 | Build graph visualization component (D3.js) - node rendering | done    | 5.1          | 2026-01-26 |
-| 5.4 | Build graph visualization component - edge rendering         | pending | 5.3          |            |
-| 5.5 | Build graph visualization component - zoom, pan, filter      | pending | 5.3          |            |
-| 5.6 | Build graph visualization component - click to select        | pending | 5.3          |            |
-| 5.7 | Build node detail panel                                      | pending | 5.6          |            |
-| 5.8 | Build search interface                                       | pending | 5.2          |            |
-| 5.9 | Build file browser view                                      | pending | 5.2          |            |
+| ID  | Task                                                         | Status  | Deps         | Notes                                   |
+| --- | ------------------------------------------------------------ | ------- | ------------ | --------------------------------------- |
+| 5.1 | Set up web framework (SvelteKit)                             | done    | -            | 2026-01-26                              |
+| 5.2 | Implement API routes for queries                             | done    | 5.1, 4.5-4.8 | 2026-01-26                              |
+| 5.3 | Build graph visualization component (D3.js) - node rendering | done    | 5.1          | 2026-01-26                              |
+| 5.4 | Build graph visualization component - edge rendering         | done    | 5.3          | 2026-01-26 - force-directed links       |
+| 5.5 | Build graph visualization component - zoom, pan, filter      | done    | 5.3          | 2026-01-26 - +/-/reset/fit, drag, panel |
+| 5.6 | Build graph visualization component - click to select        | done    | 5.3          | 2026-01-26 - click + dblclick navigate  |
+| 5.7 | Build node detail panel                                      | pending | 5.6          |                                         |
+| 5.8 | Build search interface                                       | pending | 5.2          |                                         |
+| 5.9 | Build file browser view                                      | pending | 5.2          |                                         |
 
 ## Phase 6: Web UI - Dashboard
 
