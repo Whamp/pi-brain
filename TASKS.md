@@ -53,19 +53,19 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 4: Node Storage & Queries
 
-| ID   | Task                                               | Status  | Deps     | Notes |
-| ---- | -------------------------------------------------- | ------- | -------- | ----- |
-| 4.1  | Implement node creation (with JSON file)           | pending | 1.2, 1.3 |       |
-| 4.2  | Implement node versioning (reanalysis)             | pending | 4.1      |       |
-| 4.3  | Implement edge creation                            | pending | 4.1      |       |
-| 4.4  | Implement tag/topic indexing                       | pending | 4.1      |       |
-| 4.5  | Build query layer: by project, type, date range    | pending | 4.1      |       |
-| 4.6  | Build query layer: by tags, topics                 | pending | 4.4      |       |
-| 4.7  | Build query layer: full-text search on summaries   | pending | 4.1      |       |
-| 4.8  | Build query layer: graph traversal (related nodes) | pending | 4.3      |       |
-| 4.9  | Implement lesson aggregation queries               | pending | 4.1      |       |
-| 4.10 | Implement model quirk aggregation queries          | pending | 4.1      |       |
-| 4.11 | Implement tool error aggregation queries           | pending | 4.1      |       |
+| ID   | Task                                               | Status  | Deps     | Notes                         |
+| ---- | -------------------------------------------------- | ------- | -------- | ----------------------------- |
+| 4.1  | Implement node creation (with JSON file)           | done    | 1.2, 1.3 | 2026-01-25 (completed in 3.7) |
+| 4.2  | Implement node versioning (reanalysis)             | pending | 4.1      |                               |
+| 4.3  | Implement edge creation                            | pending | 4.1      |                               |
+| 4.4  | Implement tag/topic indexing                       | pending | 4.1      |                               |
+| 4.5  | Build query layer: by project, type, date range    | pending | 4.1      |                               |
+| 4.6  | Build query layer: by tags, topics                 | pending | 4.4      |                               |
+| 4.7  | Build query layer: full-text search on summaries   | pending | 4.1      |                               |
+| 4.8  | Build query layer: graph traversal (related nodes) | pending | 4.3      |                               |
+| 4.9  | Implement lesson aggregation queries               | pending | 4.1      |                               |
+| 4.10 | Implement model quirk aggregation queries          | pending | 4.1      |                               |
+| 4.11 | Implement tool error aggregation queries           | pending | 4.1      |                               |
 
 ## Phase 5: Web UI - Core
 

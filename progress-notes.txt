@@ -492,3 +492,16 @@ Updated src/storage/index.ts to export node-repository.
   - Output formatting for all views
 
 ---
+
+## 2026-01-25 15:30 - Task 4.1
+
+**Status**: pending → done
+**Validation**: This task was already completed as part of Task 3.7 (commit 048198e). Verified that:
+- `createNode()` in node-repository.ts writes to both SQLite and JSON storage
+- `writeNode()` in node-storage.ts creates JSON files in `~/.pi-brain/data/nodes/YYYY/MM/<nodeId>-v<version>.json`
+- The `data_file` column in SQLite stores the path to the JSON file
+- All 42 node-repository tests pass, including comprehensive createNode tests
+**Commit**: N/A (already implemented)
+**Notes**: Task was redundant with 3.7 - marked as "completed in 3.7"
+
+---
