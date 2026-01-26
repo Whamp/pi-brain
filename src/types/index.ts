@@ -302,3 +302,41 @@ export interface NodeVersion {
   analyzedAt: string;
   triggerReason: VersionTrigger;
 }
+
+// =============================================================================
+// Aggregated Pattern Types
+// =============================================================================
+
+export interface AggregatedFailurePattern {
+  id: string;
+  pattern: string;
+  occurrences: number;
+  models: string[]; // List of models where this occurred
+  tools: string[]; // List of tools involved
+  exampleNodes: string[]; // Node IDs
+  lastSeen: string;
+  learningOpportunity?: string;
+  updatedAt: string;
+}
+
+export interface AggregatedModelStats {
+  model: string;
+  totalTokens: number;
+  totalCost: number;
+  totalSessions: number;
+  quirkCount: number;
+  errorCount: number;
+  lastUsed: string;
+  updatedAt: string;
+}
+
+export interface AggregatedLessonPattern {
+  id: string;
+  level: LessonLevel;
+  pattern: string;
+  occurrences: number;
+  tags: string[];
+  exampleNodes: string[]; // Node IDs
+  lastSeen: string;
+  updatedAt: string;
+}

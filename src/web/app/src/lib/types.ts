@@ -27,6 +27,9 @@ import type {
   NodeVersion,
   LessonLevel,
   Confidence,
+  AggregatedFailurePattern,
+  AggregatedModelStats,
+  AggregatedLessonPattern,
 } from "../../../../types/index.js";
 
 // Re-export shared types
@@ -54,6 +57,9 @@ export type {
   NodeVersion,
   LessonLevel,
   Confidence,
+  AggregatedFailurePattern,
+  AggregatedModelStats,
+  AggregatedLessonPattern,
 };
 
 // Extended types with IDs for API responses (Entities)

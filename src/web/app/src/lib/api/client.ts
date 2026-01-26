@@ -12,6 +12,9 @@ import type {
   DaemonStatus,
   NodeFilters,
   DaemonDecisionEntity,
+  AggregatedFailurePattern,
+  AggregatedModelStats,
+  AggregatedLessonPattern,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -196,6 +199,27 @@ export const api = {
       byModel: { model: string; count: number }[];
       trends: { thisWeek: number; lastWeek: number; change: number };
     }>("/stats/tool-errors"),
+
+  // Patterns
+  getFailurePatterns: (options?: {
+    limit?: number;
+    offset?: number;
+    minOccurrences?: number;
+  }) =>
+    request<AggregatedFailurePattern[]>(
+      `/patterns/failures${toQueryString(options ?? {})}`
+    ),
+
+  getModelStats: () => request<AggregatedModelStats[]>("/patterns/models"),
+
+  getLessonPatterns: (options?: {
+    limit?: number;
+    offset?: number;
+    level?: string;
+  }) =>
+    request<AggregatedLessonPattern[]>(
+      `/patterns/lessons${toQueryString(options ?? {})}`
+    ),
 
   getAggregatedToolErrors: (
     filters?: { tool?: string; model?: string },

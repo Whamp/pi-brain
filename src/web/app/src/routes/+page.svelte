@@ -8,10 +8,19 @@
     TrendingUp,
     CircleAlert,
     AlertTriangle,
+    BookOpen,
+    Lightbulb,
   } from "lucide-svelte";
   import { api } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
-  import type { DashboardStats, DaemonStatus, Node } from "$lib/types";
+  import type { 
+    DashboardStats, 
+    DaemonStatus, 
+    Node,
+    AggregatedFailurePattern,
+    AggregatedLessonPattern,
+    AggregatedModelStats
+  } from "$lib/types";
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import Spinner from "$lib/components/spinner.svelte";
 
@@ -24,25 +33,31 @@
     errorType: string;
     count: number;
   }[] = [];
-  let failurePatterns: {
-    tool: string;
-    errorType: string;
-    count: number;
-    models?: string[];
-    learningOpportunity?: string;
-  }[] = [];
+  let failurePatterns: AggregatedFailurePattern[] = [];
+  let lessonPatterns: AggregatedLessonPattern[] = [];
+  let modelStats: AggregatedModelStats[] = [];
   let daemonStatus: DaemonStatus | null = null;
   let loading = true;
   let errorMessage: string | null = null;
 
   onMount(async () => {
     try {
-      const [statsResult, toolErrorsResult, activityResult, patternsResult, daemonResult] =
+      const [
+        statsResult, 
+        toolErrorsResult, 
+        activityResult, 
+        failuresResult, 
+        lessonsResult,
+        modelsResult,
+        daemonResult
+      ] =
         await Promise.allSettled([
           api.getStats(),
-          api.getAggregatedToolErrors({}, { groupByModel: true, limit: 10 }),
+          api.getToolErrorStats(),
           api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" }),
-          api.getAggregatedToolErrors({}, { limit: 3 }),
+          api.getFailurePatterns({ limit: 3 }),
+          api.getLessonPatterns({ limit: 3 }),
+          api.getModelStats(),
           api.getDaemonStatus(),
         ]);
 
@@ -50,20 +65,32 @@
         stats = statsResult.value;
       }
       if (toolErrorsResult.status === "fulfilled") {
-        toolErrors = toolErrorsResult.value;
+        // Flatten the byTool result for the table
+        toolErrors = toolErrorsResult.value.byTool.map(t => ({
+          tool: t.tool,
+          errorType: "various", // The aggregated view doesn't split by type
+          count: t.count,
+          models: t.models?.join(", ")
+        })).slice(0, 10);
       }
       if (activityResult.status === "fulfilled") {
         recentActivity = activityResult.value.nodes;
       }
-      if (patternsResult.status === "fulfilled") {
-        failurePatterns = patternsResult.value;
+      if (failuresResult.status === "fulfilled") {
+        failurePatterns = failuresResult.value;
+      }
+      if (lessonsResult.status === "fulfilled") {
+        lessonPatterns = lessonsResult.value;
+      }
+      if (modelsResult.status === "fulfilled") {
+        modelStats = modelsResult.value;
       }
       if (daemonResult.status === "fulfilled") {
         daemonStatus = daemonResult.value;
       }
 
       // Show error only if all calls failed
-      const allFailed = [statsResult, toolErrorsResult, activityResult, patternsResult, daemonResult]
+      const allFailed = [statsResult, toolErrorsResult, activityResult, failuresResult, daemonResult]
         .every(r => r.status === "rejected");
       if (allFailed) {
         errorMessage = "Failed to load dashboard data. Is the server running?";
@@ -346,35 +373,98 @@
       </section>
     </div>
 
-    <!-- Failure Patterns (full width) -->
-    {#if failurePatterns.length > 0}
-      <section class="card failure-patterns-panel">
+    <!-- Patterns & Insights -->
+    <div class="patterns-grid">
+      <!-- Failure Patterns -->
+      {#if failurePatterns.length > 0}
+        <section class="card failure-patterns-panel">
+          <div class="card-header">
+            <h2 class="card-title">Failure Patterns</h2>
+            <a href="/patterns/failures" class="view-all">View all →</a>
+          </div>
+
+          <div class="patterns-list">
+            {#each failurePatterns as pattern}
+              <div class="pattern-card error">
+                <div class="pattern-header">
+                  <CircleAlert size={16} />
+                  <span class="pattern-title">{pattern.pattern}</span>
+                  <span class="pattern-count">{pattern.occurrences}x</span>
+                </div>
+                <div class="pattern-meta">
+                  Models: {pattern.models.join(", ")} • Last seen {formatDistanceToNow(parseDate(pattern.lastSeen))}
+                </div>
+                {#if pattern.learningOpportunity}
+                  <div class="pattern-learning">
+                    <strong>Learning:</strong> {pattern.learningOpportunity}
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </section>
+      {/if}
+
+      <!-- Lesson Patterns -->
+      {#if lessonPatterns.length > 0}
+        <section class="card lesson-patterns-panel">
+          <div class="card-header">
+            <h2 class="card-title">Lesson Patterns</h2>
+            <a href="/patterns/lessons" class="view-all">View all →</a>
+          </div>
+
+          <div class="patterns-list">
+            {#each lessonPatterns as pattern}
+              <div class="pattern-card success">
+                <div class="pattern-header">
+                  <Lightbulb size={16} />
+                  <span class="pattern-title">{pattern.pattern}</span>
+                  <span class="pattern-count">{pattern.occurrences}x</span>
+                </div>
+                <div class="pattern-meta">
+                  Level: {pattern.level} • Last seen {formatDistanceToNow(parseDate(pattern.lastSeen))}
+                </div>
+                <div class="pattern-tags">
+                  {#each pattern.tags as tag}
+                    <span class="tag">{tag}</span>
+                  {/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </section>
+      {/if}
+    </div>
+
+    <!-- Model Stats -->
+    {#if modelStats.length > 0}
+      <section class="card model-stats-panel">
         <div class="card-header">
-          <h2 class="card-title">Failure Pattern Analysis</h2>
-          <a href="/search?type=failure" class="view-all">View all →</a>
+          <h2 class="card-title">Model Reliability</h2>
+          <a href="/patterns/models" class="view-all">View all →</a>
         </div>
 
-        <div class="patterns-list">
-          {#each failurePatterns as pattern}
-            <div class="pattern-card error">
-              <div class="pattern-header">
-                <CircleAlert size={16} />
-                <span class="pattern-title"
-                  >{pattern.tool} {pattern.errorType}</span
-                >
-                <span class="pattern-count"
-                  >{pattern.count} occurrences</span
-                >
-              </div>
-              <div class="pattern-models">
-                Models: {pattern.models?.join(", ") ?? "Unknown"}
-              </div>
-              <div class="pattern-learning">
-                <strong>Learning:</strong>
-                {pattern.learningOpportunity ?? getLearningFallback(pattern.errorType)}
-              </div>
-            </div>
-          {/each}
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Quirks</th>
+                <th>Errors</th>
+                <th>Last Used</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each modelStats as stat}
+                <tr>
+                  <td><code>{stat.model}</code></td>
+                  <td>{stat.quirkCount}</td>
+                  <td class:count={stat.errorCount > 0}>{stat.errorCount}</td>
+                  <td>{formatDistanceToNow(parseDate(stat.lastUsed))}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
         </div>
       </section>
     {/if}
@@ -688,10 +778,22 @@
     background: var(--color-error);
   }
 
-  /* Failure Patterns */
-  .failure-patterns-panel {
-    margin-top: var(--space-4);
+  /* Patterns Grid */
+  .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
   }
+
+  @media (max-width: 1024px) {
+    .patterns-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Failure Patterns */
+  /* .failure-patterns-panel { margin-top: 0; } */
 
   .patterns-list {
     display: flex;
@@ -703,11 +805,17 @@
     padding: var(--space-3);
     border-radius: var(--radius-md);
     border-left: 3px solid;
+    background: var(--color-bg-elevated);
   }
 
   .pattern-card.error {
     background: rgba(239, 68, 68, 0.05);
     border-color: var(--color-error);
+  }
+
+  .pattern-card.success {
+    background: rgba(34, 197, 94, 0.05);
+    border-color: var(--color-success);
   }
 
   .pattern-header {
@@ -721,6 +829,10 @@
     color: var(--color-error);
   }
 
+  .pattern-card.success .pattern-header {
+    color: var(--color-success);
+  }
+
   .pattern-title {
     font-weight: 600;
     flex: 1;
@@ -732,8 +844,8 @@
     opacity: 0.8;
   }
 
-  .pattern-models {
-    font-size: var(--text-sm);
+  .pattern-meta {
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
     margin-bottom: var(--space-2);
   }
@@ -744,5 +856,25 @@
 
   .pattern-learning strong {
     color: var(--color-text);
+  }
+
+  .pattern-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .tag {
+    font-size: var(--text-xs);
+    padding: 2px 6px;
+    background: var(--color-bg-hover);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* Model Stats */
+  .model-stats-panel {
+    margin-bottom: var(--space-4);
   }
 </style>
