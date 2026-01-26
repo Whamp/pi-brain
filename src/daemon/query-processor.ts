@@ -112,7 +112,7 @@ export async function processQuery(
   logger.info(`Processing query: "${request.query.slice(0, 100)}..."`);
 
   // Step 1: Search for relevant nodes
-  const relevantNodes = await findRelevantNodes(
+  const relevantNodes = findRelevantNodes(
     config.db,
     request.query,
     request.context?.project,
@@ -138,7 +138,7 @@ export async function processQuery(
   }
 
   // Step 3: Check for model quirks and tool errors if query seems related
-  const additionalContext = await gatherAdditionalContext(
+  const additionalContext = gatherAdditionalContext(
     config.db,
     request.query,
     logger
@@ -196,12 +196,12 @@ interface RelevantNode {
 /**
  * Find nodes relevant to the query
  */
-async function findRelevantNodes(
+function findRelevantNodes(
   db: Database,
   query: string,
   project: string | undefined,
   maxNodes: number
-): Promise<RelevantNode[]> {
+): RelevantNode[] {
   // First try full-text search
   const filters: ListNodesFilters | undefined = project
     ? { project }
@@ -256,11 +256,11 @@ interface AdditionalContext {
 /**
  * Gather additional context based on query keywords
  */
-async function gatherAdditionalContext(
+function gatherAdditionalContext(
   db: Database,
   query: string,
   logger: ProcessorLogger
-): Promise<AdditionalContext> {
+): AdditionalContext {
   const context: AdditionalContext = {};
   const lowerQuery = query.toLowerCase();
 
