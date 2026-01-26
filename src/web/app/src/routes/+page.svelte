@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import {
     Activity,
     Zap,
@@ -6,67 +7,72 @@
     TrendingDown,
     TrendingUp,
     CircleAlert,
+    AlertTriangle,
   } from "lucide-svelte";
+  import { api } from "$lib/api/client";
+  import { formatDistanceToNow, parseDate } from "$lib/utils/date";
+  import type { DashboardStats, DaemonStatus, Node } from "$lib/types";
 
-  // Placeholder data - will be fetched from API
-  const stats = {
-    totalNodes: 847,
-    thisWeek: 42,
-    totalTokens: "2.5M",
-    totalCost: "$12.45",
-  };
+  // State
+  let stats: DashboardStats | null = null;
+  let recentActivity: Node[] = [];
+  let toolErrors: {
+    model?: string;
+    tool: string;
+    errorType: string;
+    count: number;
+  }[] = [];
+  let failurePatterns: {
+    tool: string;
+    errorType: string;
+    count: number;
+    models?: string[];
+  }[] = [];
+  let daemonStatus: DaemonStatus | null = null;
+  let loading = true;
+  let error: string | null = null;
 
-  const vagueGoalStats: {
-    thisWeek: number;
-    lastWeek: number;
-    trend: "improving" | "worsening" | "stable";
-  } = {
-    thisWeek: 15,
-    lastWeek: 22,
-    trend: "improving",
-  };
+  onMount(async () => {
+    try {
+      const [statsRes, toolErrorsRes, activityRes, patternsRes, daemonRes] =
+        await Promise.all([
+          api.getStats(),
+          api.getAggregatedToolErrors({}, { groupByModel: true, limit: 10 }),
+          api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" }),
+          api.getAggregatedToolErrors({}, { limit: 3 }),
+          api.getDaemonStatus(),
+        ]);
 
-  const recentActivity = [
-    {
-      id: "1",
-      summary: "Implemented SQLite storage layer",
-      project: "pi-brain",
-      outcome: "success" as const,
-      time: "10m ago",
-    },
-    {
-      id: "2",
-      summary: "Debugging connection pooling issue",
-      project: "webapp",
-      outcome: "partial" as const,
-      time: "2h ago",
-    },
-    {
-      id: "3",
-      summary: "Refactored authentication flow",
-      project: "api-server",
-      outcome: "success" as const,
-      time: "5h ago",
-    },
-  ];
+      stats = statsRes;
+      toolErrors = toolErrorsRes;
+      recentActivity = activityRes.nodes;
+      failurePatterns = patternsRes;
+      daemonStatus = daemonRes;
+    } catch (e) {
+      console.error("Failed to load dashboard data:", e);
+      error = "Failed to load dashboard data. Is the server running?";
+    } finally {
+      loading = false;
+    }
+  });
 
-  const toolErrors = [
-    { model: "claude-sonnet", tool: "edit", error: "exact match", count: 47 },
-    { model: "claude-sonnet", tool: "read", error: "sed usage", count: 15 },
-    { model: "glm-4.7", tool: "bash", error: "timeout", count: 12 },
-    { model: "gemini", tool: "edit", error: "scope", count: 8 },
-  ];
-
-  function getOutcomeIcon(
-    outcome: "success" | "partial" | "failed" | "abandoned"
-  ): string {
-    const icons = {
+  function getOutcomeIcon(outcome: string | null): string {
+    const icons: Record<string, string> = {
       success: "🟢",
       partial: "🟡",
       failed: "🔴",
       abandoned: "⚪",
     };
-    return icons[outcome];
+    return icons[outcome ?? "abandoned"] ?? "⚪";
+  }
+
+  function getTrendLabel(change: number): string {
+    if (Math.abs(change) < 0.01) return "Stable";
+    return change < 0 ? "Improving!" : "Worsening";
+  }
+
+  function formatPercent(val: number): string {
+    return Math.round(val * 100) + "%";
   }
 </script>
 
@@ -83,218 +89,268 @@
     <h1>Dashboard</h1>
   </header>
 
-  <!-- Quick Stats -->
-  <section class="stats-grid" aria-label="Quick statistics">
-    <div class="stat-card">
-      <div class="stat-icon">
-        <Activity size={20} />
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{stats.totalNodes}</div>
-        <div class="stat-label">Total Nodes</div>
-      </div>
+  {#if error}
+    <div class="error-banner">
+      <AlertTriangle size={20} />
+      {error}
     </div>
-
-    <div class="stat-card">
-      <div class="stat-icon accent">
-        <Zap size={20} />
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{stats.thisWeek}</div>
-        <div class="stat-label">This Week</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon">
-        <Activity size={20} />
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{stats.totalTokens}</div>
-        <div class="stat-label">Total Tokens</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-icon success">
-        <DollarSign size={20} />
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{stats.totalCost}</div>
-        <div class="stat-label">Total Cost</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Content Grid -->
-  <div class="dashboard-grid">
-    <!-- Tool Errors Panel -->
-    <section class="card tool-errors-panel">
-      <div class="card-header">
-        <h2 class="card-title">Tool Errors by Model</h2>
-        <a href="/search?type=error" class="view-all">View all →</a>
+  {:else if loading}
+    <div class="loading">Loading dashboard...</div>
+  {:else if stats}
+    <!-- Quick Stats -->
+    <section class="stats-grid" aria-label="Quick statistics">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <Activity size={20} />
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{stats.totals.nodes}</div>
+          <div class="stat-label">Total Nodes</div>
+        </div>
       </div>
 
-      <div class="table-wrapper">
-        <table class="data-table" aria-label="Tool errors grouped by model">
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th>Tool</th>
-              <th>Error</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each toolErrors as error}
+      <div class="stat-card">
+        <div class="stat-icon accent">
+          <Zap size={20} />
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{stats.recent.nodesThisWeek}</div>
+          <div class="stat-label">This Week</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <Activity size={20} />
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">
+            {stats.usage.totalTokens.toLocaleString()}
+          </div>
+          <div class="stat-label">Total Tokens</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <DollarSign size={20} />
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">
+            ${stats.usage.totalCost.toFixed(2)}
+          </div>
+          <div class="stat-label">Total Cost</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <div class="dashboard-grid">
+      <!-- Tool Errors Panel -->
+      <section class="card tool-errors-panel">
+        <div class="card-header">
+          <h2 class="card-title">Tool Errors by Model</h2>
+          <a href="/search?type=error" class="view-all">View all →</a>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" aria-label="Tool errors grouped by model">
+            <thead>
               <tr>
-                <td><code>{error.model}</code></td>
-                <td><code>{error.tool}</code></td>
-                <td>{error.error}</td>
-                <td class="count">{error.count}</td>
+                <th>Model</th>
+                <th>Tool</th>
+                <th>Error</th>
+                <th>Count</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Vague Goal Tracker -->
-    <section class="card vague-goal-panel">
-      <div class="card-header">
-        <h2 class="card-title">Vague Goal Tracker</h2>
-      </div>
-
-      <div class="vague-goal-content">
-        <div class="vague-goal-metric">
-          <span class="metric-label">hadClearGoal: false</span>
-          <div class="metric-value-row">
-            <span class="metric-value">{vagueGoalStats.thisWeek}%</span>
-            <span class="metric-trend" class:improving={vagueGoalStats.trend === "improving"} class:worsening={vagueGoalStats.trend === "worsening"}>
-              {#if vagueGoalStats.trend === "improving"}
-                <TrendingDown size={16} />
-                Improving!
-              {:else if vagueGoalStats.trend === "worsening"}
-                <TrendingUp size={16} />
-                Worsening
-              {:else}
-                Stable
+            </thead>
+            <tbody>
+              {#each toolErrors as error}
+                <tr>
+                  <td><code>{error.model}</code></td>
+                  <td><code>{error.tool}</code></td>
+                  <td>{error.errorType}</td>
+                  <td class="count">{error.count}</td>
+                </tr>
+              {/each}
+              {#if toolErrors.length === 0}
+                <tr>
+                  <td colspan="4" class="empty">No errors recorded</td>
+                </tr>
               {/if}
-            </span>
-          </div>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Vague Goal Tracker -->
+      <section class="card vague-goal-panel">
+        <div class="card-header">
+          <h2 class="card-title">Vague Goal Tracker</h2>
         </div>
 
-        <div class="vague-goal-comparison">
-          <div class="comparison-item">
-            <span class="comparison-label">This week</span>
-            <span class="comparison-value">{vagueGoalStats.thisWeek}%</span>
-          </div>
-          <div class="comparison-item">
-            <span class="comparison-label">Last week</span>
-            <span class="comparison-value">{vagueGoalStats.lastWeek}%</span>
-          </div>
-        </div>
-
-        <a href="/search?hadClearGoal=false" class="view-all"
-          >View sessions →</a
-        >
-      </div>
-    </section>
-
-    <!-- Recent Activity -->
-    <section class="card recent-activity-panel">
-      <div class="card-header">
-        <h2 class="card-title">Recent Activity</h2>
-      </div>
-
-      <ul class="activity-list">
-        {#each recentActivity as activity}
-          <li class="activity-item">
-            <a href="/nodes/{activity.id}" class="activity-link">
-              <span class="activity-outcome"
-                >{getOutcomeIcon(activity.outcome)}</span
+        <div class="vague-goal-content">
+          <div class="vague-goal-metric">
+            <span class="metric-label">hadClearGoal: false</span>
+            <div class="metric-value-row">
+              <span class="metric-value"
+                >{formatPercent(stats.trends.vagueGoals.thisWeek)}</span
               >
-              <div class="activity-content">
-                <span class="activity-summary">{activity.summary}</span>
-                <span class="activity-meta">
-                  {activity.project} • {activity.time}
-                </span>
+              <span
+                class="metric-trend"
+                class:improving={stats.trends.vagueGoals.change < 0}
+                class:worsening={stats.trends.vagueGoals.change > 0}
+              >
+                {#if stats.trends.vagueGoals.change < 0}
+                  <TrendingDown size={16} />
+                {:else if stats.trends.vagueGoals.change > 0}
+                  <TrendingUp size={16} />
+                {/if}
+                {getTrendLabel(stats.trends.vagueGoals.change)}
+              </span>
+            </div>
+          </div>
+
+          <div class="vague-goal-comparison">
+            <div class="comparison-item">
+              <span class="comparison-label">This week</span>
+              <span class="comparison-value"
+                >{formatPercent(stats.trends.vagueGoals.thisWeek)}</span
+              >
+            </div>
+            <div class="comparison-item">
+              <span class="comparison-label">Last week</span>
+              <span class="comparison-value"
+                >{formatPercent(stats.trends.vagueGoals.lastWeek)}</span
+              >
+            </div>
+          </div>
+
+          <a href="/search?hadClearGoal=false" class="view-all"
+            >View sessions →</a
+          >
+        </div>
+      </section>
+
+      <!-- Recent Activity -->
+      <section class="card recent-activity-panel">
+        <div class="card-header">
+          <h2 class="card-title">Recent Activity</h2>
+        </div>
+
+        <ul class="activity-list">
+          {#each recentActivity as activity}
+            <li class="activity-item">
+              <a href="/nodes/{activity.id}" class="activity-link">
+                <span class="activity-outcome"
+                  >{getOutcomeIcon(activity.content.outcome)}</span
+                >
+                <div class="activity-content">
+                  <span class="activity-summary">{activity.content.summary}</span
+                  >
+                  <span class="activity-meta">
+                    {activity.classification.project?.split("/").pop()} • {formatDistanceToNow(
+                      parseDate(activity.metadata.timestamp)
+                    )}
+                  </span>
+                </div>
+              </a>
+            </li>
+          {/each}
+          {#if recentActivity.length === 0}
+            <li class="empty-activity">No recent activity</li>
+          {/if}
+        </ul>
+      </section>
+
+      <!-- Daemon Status -->
+      <section class="card daemon-status-panel">
+        <div class="card-header">
+          <h2 class="card-title">Daemon Status</h2>
+        </div>
+
+        {#if daemonStatus}
+          <div class="daemon-info">
+            <div class="daemon-row">
+              <span class="daemon-label">Status</span>
+              <span class="daemon-value">
+                <span
+                  class="status-dot"
+                  class:success={daemonStatus.running}
+                  class:error={!daemonStatus.running}
+                ></span>
+                {daemonStatus.running ? "Running" : "Stopped"}
+              </span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Started</span>
+              <span class="daemon-value">{daemonStatus.uptime ? formatDistanceToNow(new Date(Date.now() - daemonStatus.uptime * 1000)) : "-"}</span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Queue</span>
+              <span class="daemon-value"
+                >{daemonStatus.queue.pending} pending</span
+              >
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Workers</span>
+              <span class="daemon-value"
+                >{daemonStatus.workers.active}/{daemonStatus.workers.total} active</span
+              >
+            </div>
+          </div>
+        {:else}
+          <div class="daemon-info">
+            <div class="daemon-row">
+              <span class="daemon-label">Status</span>
+              <span class="daemon-value">Unknown</span>
+            </div>
+          </div>
+        {/if}
+      </section>
+    </div>
+
+    <!-- Failure Patterns (full width) -->
+    {#if failurePatterns.length > 0}
+      <section class="card failure-patterns-panel">
+        <div class="card-header">
+          <h2 class="card-title">Failure Pattern Analysis</h2>
+          <a href="/search?type=failure" class="view-all">View all →</a>
+        </div>
+
+        <div class="patterns-list">
+          {#each failurePatterns as pattern}
+            <div class="pattern-card error">
+              <div class="pattern-header">
+                <CircleAlert size={16} />
+                <span class="pattern-title"
+                  >{pattern.tool} {pattern.errorType}</span
+                >
+                <span class="pattern-count"
+                  >{pattern.count} occurrences</span
+                >
               </div>
-            </a>
-          </li>
-        {/each}
-      </ul>
-    </section>
-
-    <!-- Daemon Status -->
-    <section class="card daemon-status-panel">
-      <div class="card-header">
-        <h2 class="card-title">Daemon Status</h2>
-      </div>
-
-      <div class="daemon-info">
-        <div class="daemon-row">
-          <span class="daemon-label">Status</span>
-          <span class="daemon-value">
-            <span class="status-dot success"></span>
-            Running
-          </span>
+              <div class="pattern-models">
+                Models: {pattern.models?.join(", ") ?? "Unknown"}
+              </div>
+              <div class="pattern-learning">
+                <!-- Learning opportunity is not yet in the API, using placeholder logic -->
+                <strong>Learning:</strong>
+                {#if pattern.errorType === "exact_match_failed"}
+                  Read file before editing to verify exact text
+                {:else if pattern.errorType === "timeout"}
+                  Use tmux skill for long-running processes
+                {:else if pattern.errorType === "file_not_found"}
+                  Check file exists before reading/editing
+                {:else}
+                  Review examples for common causes
+                {/if}
+              </div>
+            </div>
+          {/each}
         </div>
-        <div class="daemon-row">
-          <span class="daemon-label">Queue</span>
-          <span class="daemon-value">12 pending</span>
-        </div>
-        <div class="daemon-row">
-          <span class="daemon-label">Workers</span>
-          <span class="daemon-value">1/2 active</span>
-        </div>
-        <div class="daemon-row">
-          <span class="daemon-label">Last analysis</span>
-          <span class="daemon-value">5 min ago</span>
-        </div>
-        <div class="daemon-row">
-          <span class="daemon-label">Next nightly</span>
-          <span class="daemon-value">2:00 AM</span>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Failure Patterns (full width) -->
-  <section class="card failure-patterns-panel">
-    <div class="card-header">
-      <h2 class="card-title">Failure Pattern Analysis</h2>
-      <a href="/search?type=failure" class="view-all">View all →</a>
-    </div>
-
-    <div class="patterns-list">
-      <div class="pattern-card error">
-        <div class="pattern-header">
-          <CircleAlert size={16} />
-          <span class="pattern-title">Edit exact match failures</span>
-          <span class="pattern-count">47 occurrences</span>
-        </div>
-        <div class="pattern-models">
-          Models: claude-sonnet (35), glm-4.7 (12)
-        </div>
-        <div class="pattern-learning">
-          <strong>Learning:</strong> Read file before editing to get exact text
-        </div>
-      </div>
-
-      <div class="pattern-card warning">
-        <div class="pattern-header">
-          <CircleAlert size={16} />
-          <span class="pattern-title">Bash timeout on long operations</span>
-          <span class="pattern-count">12 occurrences</span>
-        </div>
-        <div class="pattern-models">Models: glm-4.7 (8), gemini (4)</div>
-        <div class="pattern-learning">
-          <strong>Learning:</strong> Use tmux skill for long-running processes
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
+    {/if}
+  {/if}
 </div>
 
 <style>
@@ -308,6 +364,24 @@
 
   .page-header h1 {
     font-size: var(--text-2xl);
+  }
+
+  .loading,
+  .error-banner {
+    padding: var(--space-8);
+    text-align: center;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  .error-banner {
+    color: var(--color-error);
+    border-color: var(--color-error);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
   }
 
   /* Stats Grid */
@@ -425,6 +499,12 @@
     color: var(--color-error);
   }
 
+  .empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--space-4);
+  }
+
   /* Vague Goal Panel */
   .vague-goal-content {
     display: flex;
@@ -534,6 +614,13 @@
     color: var(--color-text-muted);
   }
 
+  .empty-activity {
+    padding: var(--space-4);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
   /* Daemon Status */
   .daemon-info {
     display: flex;
@@ -556,6 +643,21 @@
     align-items: center;
     gap: var(--space-2);
     font-weight: 500;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+  }
+
+  .status-dot.success {
+    background: var(--color-success);
+  }
+
+  .status-dot.error {
+    background: var(--color-error);
   }
 
   /* Failure Patterns */
@@ -603,6 +705,7 @@
   .pattern-title {
     font-weight: 600;
     flex: 1;
+    text-transform: capitalize;
   }
 
   .pattern-count {

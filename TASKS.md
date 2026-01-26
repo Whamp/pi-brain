@@ -83,14 +83,14 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 6: Web UI - Dashboard
 
-| ID  | Task                                          | Status  | Deps      | Notes |
-| --- | --------------------------------------------- | ------- | --------- | ----- |
-| 6.1 | Implement tool use failures by model panel    | pending | 5.1, 4.11 |       |
-| 6.2 | Implement vague goal tracker panel            | pending | 5.1, 4.5  |       |
-| 6.3 | Implement recent activity timeline            | pending | 5.1, 4.5  |       |
-| 6.4 | Implement daemon decision log with feedback   | pending | 5.1       |       |
-| 6.5 | Implement quick stats panel                   | pending | 5.1, 4.5  |       |
-| 6.6 | Implement real-time daemon status (WebSocket) | pending | 5.1, 3.9  |       |
+| ID  | Task                                          | Status  | Deps      | Notes                                     |
+| --- | --------------------------------------------- | ------- | --------- | ----------------------------------------- |
+| 6.1 | Implement tool use failures by model panel    | done    | 5.1, 4.11 | 2026-01-26                                |
+| 6.2 | Implement vague goal tracker panel            | done    | 5.1, 4.5  | 2026-01-26                                |
+| 6.3 | Implement recent activity timeline            | done    | 5.1, 4.5  | 2026-01-26                                |
+| 6.4 | Implement daemon decision log with feedback   | pending | 5.1       |                                           |
+| 6.5 | Implement quick stats panel                   | done    | 5.1, 4.5  | 2026-01-26                                |
+| 6.6 | Implement real-time daemon status (WebSocket) | done    | 5.1, 3.9  | 2026-01-26 (status only, not full WS yet) |
 
 ## Phase 7: Pi Integration
 

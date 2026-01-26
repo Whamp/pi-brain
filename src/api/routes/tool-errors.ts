@@ -78,6 +78,7 @@ export async function toolErrorsRoutes(app: FastifyInstance): Promise<void> {
           model?: string;
           limit?: string;
           offset?: string;
+          groupByModel?: string;
         };
       }>,
       reply: FastifyReply
@@ -95,6 +96,7 @@ export async function toolErrorsRoutes(app: FastifyInstance): Promise<void> {
         {
           limit: parseIntParam(query.limit),
           offset: parseIntParam(query.offset),
+          groupByModel: query.groupByModel === "true",
         }
       );
 

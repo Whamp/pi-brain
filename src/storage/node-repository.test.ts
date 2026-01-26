@@ -2184,9 +2184,9 @@ describe("node-repository", () => {
       expect(result.nodes[1].project).toBe("/project/zebra");
     });
 
-    it("should enforce max limit of 500", () => {
-      const result = listNodes(db, {}, { limit: 1000 });
-      expect(result.limit).toBe(500);
+    it("should enforce max limit of 100000", () => {
+      const result = listNodes(db, {}, { limit: 200000 });
+      expect(result.limit).toBe(100000);
     });
 
     it("should enforce min limit of 1", () => {

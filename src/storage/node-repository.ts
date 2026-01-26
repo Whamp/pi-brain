@@ -1816,22 +1816,24 @@ export function listToolErrors(
 }
 
 /**
- * Get aggregated tool errors - grouped by tool and error type.
+ * Get aggregated tool errors - grouped by tool and error type (and optionally model).
  * Per specs/api.md GET /api/v1/tool-errors.
  */
 export function getAggregatedToolErrors(
   db: Database.Database,
   filters: ListToolErrorsFilters = {},
-  options: { limit?: number; offset?: number } = {}
+  options: { limit?: number; offset?: number; groupByModel?: boolean } = {}
 ): {
+  model?: string;
   tool: string;
   errorType: string;
   count: number;
-  models: string[];
+  models?: string[];
   recentNodes: string[];
 }[] {
   const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
   const offset = Math.max(options.offset ?? 0, 0);
+  const groupByModel = options.groupByModel ?? false;
 
   // Build WHERE clause
   const conditions: string[] = ["1=1"];
@@ -1853,37 +1855,51 @@ export function getAggregatedToolErrors(
   }
 
   const whereClause = conditions.join(" AND ");
+  
+  const groupBy = groupByModel ? "model, tool, errorType" : "tool, errorType";
+  const selectModel = groupByModel 
+    ? "model," 
+    : "GROUP_CONCAT(DISTINCT model) as modelsList,";
 
   const stmt = db.prepare(`
     SELECT 
+      ${selectModel}
       tool, 
       error_type as errorType, 
       COUNT(*) as count,
-      GROUP_CONCAT(DISTINCT model) as modelsList,
       GROUP_CONCAT(node_id) as nodeIdsList
     FROM tool_errors te
     WHERE ${whereClause}
-    GROUP BY tool, errorType
-    ORDER BY count DESC, tool, errorType
+    GROUP BY ${groupBy}
+    ORDER BY count DESC, ${groupBy}
     LIMIT ? OFFSET ?
   `);
 
   const rows = stmt.all(...params, limit, offset) as {
+    model?: string;
+    modelsList?: string;
     tool: string;
     errorType: string;
     count: number;
-    modelsList: string | null;
     nodeIdsList: string;
   }[];
 
-  return rows.map((row) => ({
-    tool: row.tool,
-    errorType: row.errorType,
-    count: row.count,
-    models: row.modelsList ? row.modelsList.split(",") : [],
-    // Take up to 5 unique most recent node IDs
-    recentNodes: [...new Set(row.nodeIdsList.split(","))].slice(0, 5),
-  }));
+  return rows.map((row) => {
+    const result: any = {
+      tool: row.tool,
+      errorType: row.errorType,
+      count: row.count,
+      recentNodes: [...new Set(row.nodeIdsList.split(","))].slice(0, 5),
+    };
+
+    if (groupByModel) {
+      result.model = row.model;
+    } else {
+      result.models = row.modelsList ? row.modelsList.split(",") : [];
+    }
+
+    return result;
+  });
 }
 
 /**
@@ -2186,6 +2202,8 @@ export type OutcomeFilter = "success" | "partial" | "failed" | "abandoned";
 export interface ListNodesFilters {
   /** Filter by project path (partial match via LIKE %project%) */
   project?: string;
+  /** Filter by project path (exact match) */
+  exactProject?: string;
   /** Filter by exact node type */
   type?: NodeTypeFilter;
   /** Filter by exact outcome */
@@ -2204,6 +2222,8 @@ export interface ListNodesFilters {
   tags?: string[];
   /** Filter by topics (nodes must have ALL specified topics - AND logic) */
   topics?: string[];
+  /** Filter by session file path */
+  sessionFile?: string;
 }
 
 /** Pagination and sorting options */
@@ -2264,7 +2284,9 @@ export function listNodes(
   options: ListNodesOptions = {}
 ): ListNodesResult {
   // Apply defaults and constraints
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  // Cap at 100,000 to allow for large internal queries (like session aggregation)
+  // while still preventing OOM. API routes should enforce tighter limits.
+  const limit = Math.min(Math.max(options.limit ?? 50, 1), 100_000);
   const offset = Math.max(options.offset ?? 0, 0);
   const sort: NodeSortField = ALLOWED_SORT_FIELDS.has(
     options.sort as NodeSortField
@@ -2280,6 +2302,11 @@ export function listNodes(
   if (filters.project !== undefined) {
     conditions.push("n.project LIKE ?");
     params.push(`%${filters.project}%`);
+  }
+
+  if (filters.exactProject !== undefined) {
+    conditions.push("n.project = ?");
+    params.push(filters.exactProject);
   }
 
   if (filters.type !== undefined) {
@@ -2315,6 +2342,11 @@ export function listNodes(
   if (filters.isNewProject !== undefined) {
     conditions.push("n.is_new_project = ?");
     params.push(filters.isNewProject ? 1 : 0);
+  }
+
+  if (filters.sessionFile !== undefined) {
+    conditions.push("n.session_file = ?");
+    params.push(filters.sessionFile);
   }
 
   // Tags filter: nodes must have ALL specified tags (AND logic)
@@ -2371,6 +2403,58 @@ export function listNodes(
     limit,
     offset,
   };
+}
+
+/**
+ * Session summary row from aggregation query
+ */
+export interface SessionSummaryRow {
+  sessionFile: string;
+  nodeCount: number;
+  firstTimestamp: string;
+  lastTimestamp: string;
+  totalTokens: number;
+  totalCost: number;
+  types: string | null; // comma separated
+  successCount: number;
+  partialCount: number;
+  failedCount: number;
+  abandonedCount: number;
+}
+
+/**
+ * Get aggregated session summaries for a project.
+ * Used for the session browser to avoid loading thousands of nodes.
+ */
+export function getSessionSummaries(
+  db: Database.Database,
+  project: string,
+  options: { limit?: number; offset?: number } = {}
+): SessionSummaryRow[] {
+  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  const offset = Math.max(options.offset ?? 0, 0);
+
+  const stmt = db.prepare(`
+    SELECT
+      session_file as sessionFile,
+      COUNT(*) as nodeCount,
+      MIN(timestamp) as firstTimestamp,
+      MAX(timestamp) as lastTimestamp,
+      SUM(tokens_used) as totalTokens,
+      SUM(cost) as totalCost,
+      GROUP_CONCAT(DISTINCT type) as types,
+      SUM(CASE WHEN outcome = 'success' THEN 1 ELSE 0 END) as successCount,
+      SUM(CASE WHEN outcome = 'partial' THEN 1 ELSE 0 END) as partialCount,
+      SUM(CASE WHEN outcome = 'failed' THEN 1 ELSE 0 END) as failedCount,
+      SUM(CASE WHEN outcome = 'abandoned' THEN 1 ELSE 0 END) as abandonedCount
+    FROM nodes
+    WHERE project = ?
+    GROUP BY session_file
+    ORDER BY lastTimestamp DESC
+    LIMIT ? OFFSET ?
+  `);
+
+  return stmt.all(project, limit, offset) as SessionSummaryRow[];
 }
 
 /**

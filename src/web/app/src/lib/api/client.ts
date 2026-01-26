@@ -146,6 +146,21 @@ export const api = {
       trends: { thisWeek: number; lastWeek: number; change: number };
     }>("/stats/tool-errors"),
 
+  getAggregatedToolErrors: (
+    filters?: { tool?: string; model?: string },
+    options?: { limit?: number; offset?: number; groupByModel?: boolean }
+  ) =>
+    request<
+      {
+        tool: string;
+        errorType: string;
+        count: number;
+        models?: string[];
+        model?: string;
+        recentNodes: string[];
+      }[]
+    >(`/tool-errors/aggregated${toQueryString({ ...filters, ...options })}`),
+
   // Daemon
   getDaemonStatus: () => request<DaemonStatus>("/daemon/status"),
 
@@ -219,7 +234,7 @@ export const api = {
       total: number;
       limit: number;
       offset: number;
-    }>(`/sessions/by-project${project}${toQueryString(options ?? {})}`),
+    }>(`/sessions/list${toQueryString({ project, ...options })}`),
 
   getNodesBySession: (
     sessionFile: string,
