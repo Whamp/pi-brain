@@ -32,6 +32,7 @@ import {
   getNodeTopics,
   getNodeVersion,
   indexNodeForSearch,
+  linkNodeToPredecessors,
   nodeExistsInDb,
   searchNodes,
   updateNode,
@@ -601,6 +602,85 @@ describe("node-repository", () => {
       expect(() => updateNode(db, node, options)).toThrow(
         /does not exist in database/
       );
+    });
+  });
+
+  describe("linkNodeToPredecessors", () => {
+    it("should create a continuation edge to the previous node in the same session", () => {
+      const node1 = createTestNode({
+        id: "node1",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node2",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:10:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const edges = linkNodeToPredecessors(db, node2);
+      expect(edges).toHaveLength(1);
+      expect(edges[0].type).toBe("continuation");
+      expect(edges[0].sourceNodeId).toBe(node1.id);
+      expect(edges[0].targetNodeId).toBe(node2.id);
+    });
+
+    it("should use boundaryType for edge type if provided", () => {
+      const node1 = createTestNode({
+        id: "node1",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        id: "node2",
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-25T10:10:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const edges = linkNodeToPredecessors(db, node2, {
+        boundaryType: "resume",
+      });
+      expect(edges).toHaveLength(1);
+      expect(edges[0].type).toBe("resume");
+    });
+
+    it("should create a fork edge if parentSession is provided and no previous node exists", () => {
+      const parentNode = createTestNode({
+        id: "parent-node",
+        source: {
+          ...createTestNode().source,
+          sessionFile: "/tmp/parent.jsonl",
+        },
+      });
+      createNode(db, parentNode, options);
+
+      const childNode = createTestNode({
+        id: "child-node",
+        source: {
+          ...createTestNode().source,
+          sessionFile: "/tmp/child.jsonl",
+          parentSession: "/tmp/parent.jsonl",
+        },
+      });
+      createNode(db, childNode, options);
+
+      const edges = linkNodeToPredecessors(db, childNode);
+      expect(edges).toHaveLength(1);
+      expect(edges[0].type).toBe("fork");
+      expect(edges[0].sourceNodeId).toBe(parentNode.id);
+      expect(edges[0].targetNodeId).toBe(childNode.id);
     });
   });
 

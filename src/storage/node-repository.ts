@@ -427,6 +427,121 @@ export function deleteNode(db: Database.Database, nodeId: string): boolean {
   return result.changes > 0;
 }
 
+/**
+ * Find a node that contains a specific entry ID as its end boundary
+ */
+export function findNodeByEndEntryId(
+  db: Database.Database,
+  sessionFile: string,
+  entryId: string
+): NodeRow | null {
+  const stmt = db.prepare(`
+    SELECT * FROM nodes
+    WHERE session_file = ? AND segment_end = ?
+    ORDER BY version DESC
+    LIMIT 1
+  `);
+  return (stmt.get(sessionFile, entryId) as NodeRow) ?? null;
+}
+
+/**
+ * Find the latest node for a given session file
+ */
+export function findLastNodeInSession(
+  db: Database.Database,
+  sessionFile: string
+): NodeRow | null {
+  const stmt = db.prepare(`
+    SELECT * FROM nodes
+    WHERE session_file = ?
+    ORDER BY timestamp DESC, version DESC
+    LIMIT 1
+  `);
+  return (stmt.get(sessionFile) as NodeRow) ?? null;
+}
+
+/**
+ * Find the first node for a given session file
+ */
+export function findFirstNodeInSession(
+  db: Database.Database,
+  sessionFile: string
+): NodeRow | null {
+  const stmt = db.prepare(`
+    SELECT * FROM nodes
+    WHERE session_file = ?
+    ORDER BY timestamp ASC, version ASC
+    LIMIT 1
+  `);
+  return (stmt.get(sessionFile) as NodeRow) ?? null;
+}
+
+/**
+ * Automatically link a node to its predecessors based on session structure
+ */
+export function linkNodeToPredecessors(
+  db: Database.Database,
+  node: Node,
+  context: {
+    boundaryType?: string;
+    parentSession?: string;
+  } = {}
+): Edge[] {
+  const edges: Edge[] = [];
+
+  // 1. Continuation Edge - Link to previous node in same session
+  // If we have a segment_start, find the node that ended just before it
+  if (node.source.segment.startEntryId) {
+    // In our boundary detection, the previous segment ends at the entry
+    // immediately before the current segment's start boundary.
+    // However, since we don't have the full session entries here,
+    // we can look for the node whose segment_end is what we expect.
+    // For now, let's look for any node in same session that ends before this one starts.
+    const stmt = db.prepare(`
+      SELECT * FROM nodes
+      WHERE session_file = ? AND timestamp < ?
+      ORDER BY timestamp DESC, version DESC
+      LIMIT 1
+    `);
+    const prevRow = stmt.get(
+      node.source.sessionFile,
+      node.metadata.timestamp
+    ) as NodeRow | undefined;
+
+    if (prevRow) {
+      // Determine edge type: if boundaryType provided, use it, otherwise 'continuation'
+      const type = (context.boundaryType as EdgeType) || "continuation";
+      edges.push(createEdge(db, prevRow.id, node.id, type));
+    }
+  }
+
+  // 2. Fork Edge - Link to parent session if this is the first node
+  if (node.source.parentSession && !edgeExistsInSameSession(db, node.id)) {
+    const parentLastNode = findLastNodeInSession(db, node.source.parentSession);
+    if (parentLastNode) {
+      edges.push(createEdge(db, parentLastNode.id, node.id, "fork"));
+    }
+  }
+
+  return edges;
+}
+
+/**
+ * Check if a node has any incoming edges from the same session
+ */
+function edgeExistsInSameSession(
+  db: Database.Database,
+  nodeId: string
+): boolean {
+  const stmt = db.prepare(`
+    SELECT 1 FROM edges e
+    JOIN nodes s ON e.source_node_id = s.id
+    JOIN nodes t ON e.target_node_id = t.id
+    WHERE t.id = ? AND s.session_file = t.session_file
+  `);
+  return stmt.get(nodeId) !== undefined;
+}
+
 // =============================================================================
 // Edge CRUD Operations
 // =============================================================================

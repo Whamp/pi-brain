@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { DaemonConfig } from "../config/types.js";
+import type { PiBrainConfig } from "../config/types.js";
 
 import { openDatabase, closeDatabase } from "../storage/database.js";
 import { createQueueManager, PRIORITY, type AnalysisJob } from "./queue.js";
@@ -24,29 +24,42 @@ import {
 // Test Helpers
 // =============================================================================
 
-function createTestDaemonConfig(): DaemonConfig {
+function createTestConfig(tempDir: string): PiBrainConfig {
   return {
-    idleTimeoutMinutes: 10,
-    parallelWorkers: 1,
-    maxRetries: 3,
-    retryDelaySeconds: 60,
-    reanalysisSchedule: "0 2 * * *",
-    connectionDiscoverySchedule: "0 3 * * *",
-    provider: "test",
-    model: "test-model",
-    promptFile: "/tmp/prompt.md",
-    maxConcurrentAnalysis: 1,
-    analysisTimeoutMinutes: 30,
-    maxQueueSize: 1000,
+    hub: {
+      sessionsDir: join(tempDir, "sessions"),
+      databaseDir: tempDir,
+      webUiPort: 8765,
+    },
+    spokes: [],
+    daemon: {
+      idleTimeoutMinutes: 10,
+      parallelWorkers: 1,
+      maxRetries: 3,
+      retryDelaySeconds: 60,
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      provider: "test",
+      model: "test-model",
+      promptFile: join(tempDir, "prompt.md"),
+      maxConcurrentAnalysis: 1,
+      analysisTimeoutMinutes: 30,
+      maxQueueSize: 1000,
+    },
+    query: {
+      provider: "test",
+      model: "test-model",
+    },
   };
 }
 
 function createTestWorkerConfig(
+  tempDir: string,
   overrides?: Partial<WorkerConfig>
 ): WorkerConfig {
   return {
     id: "test-worker",
-    daemonConfig: createTestDaemonConfig(),
+    config: createTestConfig(tempDir),
     pollIntervalMs: 10, // Fast polling for tests
     logger: {
       debug: vi.fn(),
@@ -92,7 +105,7 @@ describe("worker", () => {
 
   describe("initialization", () => {
     it("creates worker with config", () => {
-      const config = createTestWorkerConfig();
+      const config = createTestWorkerConfig(tempDir);
       const worker = createWorker(config);
 
       expect(worker).toBeInstanceOf(Worker);
@@ -100,7 +113,7 @@ describe("worker", () => {
     });
 
     it("throws if processJob called before initialize", async () => {
-      const worker = createWorker(createTestWorkerConfig());
+      const worker = createWorker(createTestWorkerConfig(tempDir));
       const job = createMockJob();
 
       await expect(worker.processJob(job)).rejects.toThrow(
@@ -109,7 +122,7 @@ describe("worker", () => {
     });
 
     it("throws if start called before initialize", async () => {
-      const worker = createWorker(createTestWorkerConfig());
+      const worker = createWorker(createTestWorkerConfig(tempDir));
 
       await expect(worker.start()).rejects.toThrow("Worker not initialized");
     });
@@ -117,7 +130,9 @@ describe("worker", () => {
 
   describe("status", () => {
     it("returns correct initial status", () => {
-      const worker = createWorker(createTestWorkerConfig({ id: "worker-1" }));
+      const worker = createWorker(
+        createTestWorkerConfig(tempDir, { id: "worker-1" })
+      );
 
       const status = worker.getStatus();
 
@@ -131,7 +146,7 @@ describe("worker", () => {
     });
 
     it("tracks jobs processed", async () => {
-      const worker = createWorker(createTestWorkerConfig());
+      const worker = createWorker(createTestWorkerConfig(tempDir));
       worker.initialize(db);
 
       // Process a job (will fail because no real pi process)
@@ -145,7 +160,7 @@ describe("worker", () => {
 
   describe("getCurrentJob", () => {
     it("returns null when no job is being processed", () => {
-      const worker = createWorker(createTestWorkerConfig());
+      const worker = createWorker(createTestWorkerConfig(tempDir));
       expect(worker.getCurrentJob()).toBeNull();
     });
   });
@@ -263,7 +278,7 @@ describe("worker + Queue Integration", () => {
     });
 
     // Create worker
-    const worker = createWorker(createTestWorkerConfig());
+    const worker = createWorker(createTestWorkerConfig(tempDir));
     worker.initialize(db);
 
     // Dequeue the job
@@ -287,7 +302,7 @@ describe("worker + Queue Integration", () => {
       maxRetries: 0,
     });
 
-    const worker = createWorker(createTestWorkerConfig());
+    const worker = createWorker(createTestWorkerConfig(tempDir));
     worker.initialize(db);
 
     const job = queue.dequeue("test-worker");
@@ -315,7 +330,7 @@ describe("worker + Queue Integration", () => {
       maxRetries: 2,
     });
 
-    const worker = createWorker(createTestWorkerConfig());
+    const worker = createWorker(createTestWorkerConfig(tempDir));
     worker.initialize(db);
 
     // Dequeue and process the job
@@ -357,7 +372,7 @@ describe("error Classification in Worker", () => {
       error: vi.fn(),
     };
 
-    const worker = createWorker(createTestWorkerConfig({ logger }));
+    const worker = createWorker(createTestWorkerConfig(tempDir, { logger }));
     worker.initialize(db);
 
     const job = createMockJob();
@@ -371,7 +386,7 @@ describe("error Classification in Worker", () => {
     const onJobFailed = vi.fn();
 
     const worker = createWorker(
-      createTestWorkerConfig({
+      createTestWorkerConfig(tempDir, {
         onJobFailed,
       })
     );
@@ -397,7 +412,7 @@ describe("error Classification in Worker", () => {
     };
 
     const worker = createWorker(
-      createTestWorkerConfig({
+      createTestWorkerConfig(tempDir, {
         onJobFailed,
         logger,
       })

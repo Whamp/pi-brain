@@ -9,9 +9,19 @@
 
 import type Database from "better-sqlite3";
 
-import type { DaemonConfig } from "../config/types.js";
+import * as os from "node:os";
+import { join } from "node:path";
+
+import type { PiBrainConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
 
+import { parseSession } from "../parser/session.js";
+import { getOrCreatePromptVersion } from "../prompt/prompt.js";
+import {
+  agentOutputToNode,
+  createNode,
+  linkNodeToPredecessors,
+} from "../storage/node-repository.js";
 import {
   classifyError,
   classifyErrorWithContext,
@@ -39,8 +49,8 @@ import {
 export interface WorkerConfig {
   /** Unique worker identifier */
   id: string;
-  /** Daemon configuration */
-  daemonConfig: DaemonConfig;
+  /** PiBrain configuration */
+  config: PiBrainConfig;
   /** Retry policy */
   retryPolicy?: RetryPolicy;
   /** Logger */
@@ -96,7 +106,7 @@ export interface JobProcessingResult {
  */
 export class Worker {
   private readonly id: string;
-  private readonly config: DaemonConfig;
+  private readonly config: PiBrainConfig;
   private readonly retryPolicy: RetryPolicy;
   private readonly logger: ProcessorLogger;
   private readonly onNodeCreated?: (
@@ -111,6 +121,7 @@ export class Worker {
 
   private queue: QueueManager | null = null;
   private processor: JobProcessor | null = null;
+  private db: Database.Database | null = null;
   private running = false;
   private currentJob: AnalysisJob | null = null;
   private startedAt: Date | null = null;
@@ -122,7 +133,7 @@ export class Worker {
 
   constructor(config: WorkerConfig) {
     this.id = config.id;
-    this.config = config.daemonConfig;
+    this.config = config.config;
     this.retryPolicy = config.retryPolicy ?? DEFAULT_RETRY_POLICY;
     this.logger = config.logger ?? consoleLogger;
     this.onNodeCreated = config.onNodeCreated;
@@ -134,9 +145,10 @@ export class Worker {
    * Initialize the worker with database connection
    */
   initialize(db: Database.Database): void {
+    this.db = db;
     this.queue = createQueueManager(db);
     this.processor = createProcessor({
-      daemonConfig: this.config,
+      daemonConfig: this.config.daemon,
       logger: this.logger,
     });
   }
@@ -223,7 +235,7 @@ export class Worker {
    * Process a single job (can be called directly for testing)
    */
   async processJob(job: AnalysisJob): Promise<JobProcessingResult> {
-    if (!this.queue || !this.processor) {
+    if (!this.queue || !this.processor || !this.db) {
       throw new Error("Worker not initialized");
     }
 
@@ -238,25 +250,69 @@ export class Worker {
       const result = await this.processor.process(job);
 
       if (result.success && result.nodeData) {
-        // Node storage integration will be added in Phase 4
-        // For now, complete with a placeholder node ID
-        const nodeId = `node-${job.id}`;
+        // 1. Parse session for source metadata
+        const session = await parseSession(job.sessionFile);
 
-        this.queue.complete(job.id, nodeId);
+        // 2. Count entries in segment
+        let entryCount = session.entries.length;
+        if (job.segmentStart || job.segmentEnd) {
+          const startIndex = job.segmentStart
+            ? session.entries.findIndex((e) => e.id === job.segmentStart)
+            : 0;
+          const endIndex = job.segmentEnd
+            ? session.entries.findIndex((e) => e.id === job.segmentEnd)
+            : session.entries.length - 1;
+
+          if (startIndex !== -1 && endIndex !== -1) {
+            entryCount = endIndex - startIndex + 1;
+          }
+        }
+
+        // 3. Convert AgentNodeOutput to Node
+        const promptVersion = getOrCreatePromptVersion(
+          this.db,
+          this.config.daemon.promptFile
+        );
+
+        const node = agentOutputToNode(result.nodeData, {
+          job,
+          computer: os.hostname(),
+          sessionId: session.header.id,
+          parentSession: session.header.parentSession,
+          entryCount,
+          analysisDurationMs: result.durationMs,
+          analyzerVersion: promptVersion.version,
+        });
+
+        // 4. Store node in SQLite and JSON
+        createNode(this.db, node, {
+          nodesDir: join(this.config.hub.databaseDir, "nodes"),
+        });
+
+        // 5. Create edges based on boundaries (Task 4.3)
+        if (job.type === "initial") {
+          linkNodeToPredecessors(this.db, node, {
+            boundaryType: job.context?.boundaryType,
+            parentSession: session.header.parentSession,
+          });
+        }
+
+        this.queue.complete(job.id, node.id);
         this.jobsSucceeded++;
 
-        this.logger.info(`Job ${job.id} completed successfully`);
+        this.logger.info(
+          `Job ${job.id} completed successfully, created node ${node.id}`
+        );
 
         // Call callback if provided
-        if (this.onNodeCreated && result.nodeData) {
-          // Convert AgentNodeOutput to Node would happen here
-          // await this.onNodeCreated(job, node);
+        if (this.onNodeCreated) {
+          await this.onNodeCreated(job, node);
         }
 
         return {
           success: true,
           job,
-          nodeId,
+          nodeId: node.id,
           willRetry: false,
           durationMs: Date.now() - startTime,
         };
@@ -375,13 +431,13 @@ export function createWorker(config: WorkerConfig): Worker {
  */
 export async function processSingleJob(
   job: AnalysisJob,
-  config: DaemonConfig,
+  config: PiBrainConfig,
   db: Database.Database,
   logger?: ProcessorLogger
 ): Promise<JobProcessingResult> {
   const worker = new Worker({
     id: "single-job-worker",
-    daemonConfig: config,
+    config,
     logger,
   });
 
