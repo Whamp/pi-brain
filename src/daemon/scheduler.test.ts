@@ -60,16 +60,34 @@ function createMockDatabase(
 ): Database.Database {
   // Create mock prepared statements that return the appropriate data
   const mockPrepare = vi.fn((sql: string) => {
+    if (sql.includes("prompt_versions")) {
+      return {
+        get: vi.fn(() => ({
+          version: "v2-abcdef12",
+          content_hash: "abcdef12",
+          created_at: new Date().toISOString(),
+          file_path: "/path/to/prompt.md",
+        })),
+        all: vi.fn(() => [
+          {
+            version: "v2-abcdef12",
+            content_hash: "abcdef12",
+            created_at: new Date().toISOString(),
+            file_path: "/path/to/prompt.md",
+          },
+        ]),
+      };
+    }
     if (sql.includes("metadata")) {
       return {
-        get: vi.fn(() => ({ value: "1.0.0" })),
-        all: vi.fn(() => [{ value: "1.0.0" }]),
+        get: vi.fn(() => ({ value: "v2-abcdef12" })),
+        all: vi.fn(() => [{ value: "v2-abcdef12" }]),
       };
     }
     if (sql.includes("analyzer_version")) {
       // Return nodes with old version for reanalysis
       const filteredNodes = nodes
-        .filter((n) => n.analyzer_version !== "1.0.0")
+        .filter((n) => n.analyzer_version !== "v2-abcdef12")
         .map((n) => ({
           id: n.id,
           session_file: n.session_file,
@@ -214,12 +232,12 @@ describe("scheduler", () => {
         {
           id: "node-1",
           session_file: "/path/to/session1.jsonl",
-          analyzer_version: "0.9.0",
+          analyzer_version: "v1-12345678",
         },
         {
           id: "node-2",
           session_file: "/path/to/session2.jsonl",
-          analyzer_version: "0.8.0",
+          analyzer_version: "v1-87654321",
         },
       ];
       db = createMockDatabase(nodes);

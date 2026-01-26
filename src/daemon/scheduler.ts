@@ -13,6 +13,8 @@ import { Cron } from "croner";
 import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
+import { getLatestVersion } from "../prompt/prompt.js";
+
 /** Job types that can be scheduled */
 export type ScheduledJobType = "reanalysis" | "connection_discovery";
 
@@ -233,15 +235,23 @@ export class Scheduler {
     try {
       this.logger.info("Starting reanalysis job");
 
-      // Get current prompt version from database metadata
-      const currentVersionRow = this.db
-        .prepare<[], { value: string }>(
-          "SELECT value FROM metadata WHERE key = 'current_prompt_version'"
-        )
-        .get();
-      const currentVersion = currentVersionRow?.value ?? "1.0.0";
+      // Get current prompt version from prompt_versions table
+      const latestVersion = getLatestVersion(this.db);
+      const currentVersion = latestVersion?.version ?? null;
 
-      // Find nodes analyzed with older prompts
+      if (!currentVersion) {
+        this.logger.info(
+          "No prompt versions found in database - skipping reanalysis"
+        );
+        return {
+          type: "reanalysis",
+          startedAt,
+          completedAt: new Date(),
+          itemsQueued: 0,
+        };
+      }
+
+      // Find nodes analyzed with older prompts (or null analyzer_version)
       const outdatedNodes = this.db
         .prepare<
           [string],
@@ -255,7 +265,7 @@ export class Scheduler {
           `
         SELECT id, session_file, segment_start, segment_end
         FROM nodes
-        WHERE analyzer_version != ?
+        WHERE analyzer_version IS NULL OR analyzer_version != ?
         ORDER BY timestamp DESC
         LIMIT 100
       `
