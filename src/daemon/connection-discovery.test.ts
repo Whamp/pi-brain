@@ -63,9 +63,42 @@ describe("connectionDiscoverer", () => {
         created_at TEXT,
         created_by TEXT
       );
+      CREATE TABLE lessons (
+        id TEXT PRIMARY KEY,
+        node_id TEXT,
+        level TEXT,
+        summary TEXT,
+        details TEXT,
+        confidence TEXT,
+        created_at TEXT
+      );
     `);
     discoverer = new ConnectionDiscoverer(db);
   });
+
+  function manualInsertLesson(
+    db: Database.Database,
+    nodeId: string,
+    summary: string,
+    details: string,
+    level = "project"
+  ) {
+    const id = Math.random().toString(36).slice(7);
+    db.prepare(`
+      INSERT INTO lessons (id, node_id, level, summary, details, confidence)
+      VALUES (?, ?, ?, ?, ?, 'high')
+    `).run(id, nodeId, level, summary, details);
+
+    // Update FTS with lesson info
+    const current = db
+      .prepare("SELECT lessons FROM nodes_fts WHERE node_id = ?")
+      .get(nodeId) as { lessons: string } | undefined;
+    const newLessons = (current?.lessons || "") + " " + summary + " " + details;
+    db.prepare("UPDATE nodes_fts SET lessons = ? WHERE node_id = ?").run(
+      newLessons,
+      nodeId
+    );
+  }
 
   it("should calculate similarity correctly", () => {
     const score = discoverer.calculateSimilarity(
@@ -186,5 +219,55 @@ describe("connectionDiscoverer", () => {
     expect(result.edges).toHaveLength(1);
     expect(result.edges[0].type).toBe("reference");
     expect(result.edges[0].targetNodeId).toBe(targetId);
+  });
+
+  it("should detect lesson reinforcement", async () => {
+    // 1. Create candidate node (older) with a lesson
+    const candidateId = "c1c1c1c1c1c1c1c1";
+    manualInsertNode(
+      db,
+      candidateId,
+      "Debugging session",
+      ["debug"],
+      ["coding"],
+      new Date("2026-01-01T10:00:00Z").toISOString()
+    );
+    manualInsertLesson(
+      db,
+      candidateId,
+      "Use explicit logging for async debugging",
+      "When debugging async functions, always add console logs before and after await calls.",
+      "task"
+    );
+
+    // 2. Create source node (newer) with a similar lesson
+    const sourceId = "s1s1s1s1s1s1s1s1";
+    manualInsertNode(
+      db,
+      sourceId,
+      "Another debugging session",
+      ["debug"],
+      ["coding"],
+      new Date("2026-01-02T10:00:00Z").toISOString()
+    );
+    manualInsertLesson(
+      db,
+      sourceId,
+      "Async debugging needs logging",
+      "Always use logging when working with async code to trace execution flow.",
+      "task"
+    );
+
+    // 3. Run discovery
+    // Use lower threshold because summaries are short and stopwords removal might leave few tokens
+    const result = await discoverer.discover(sourceId, { threshold: 0.1 });
+
+    // 4. Verify edge creation
+    const lessonEdge = result.edges.find(
+      (e) => e.type === "lesson_application"
+    );
+    expect(lessonEdge).toBeDefined();
+    expect(lessonEdge?.targetNodeId).toBe(candidateId);
+    expect(lessonEdge?.metadata.reason).toContain("Reinforces lesson");
   });
 });

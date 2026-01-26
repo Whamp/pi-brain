@@ -17,6 +17,15 @@ import {
   type NodeRow,
 } from "../storage/node-repository.js";
 
+interface LessonRow {
+  id: string;
+  node_id: string;
+  level: string;
+  summary: string;
+  details: string;
+  confidence: string;
+}
+
 // Common English stopwords to filter out from summaries
 const STOPWORDS = new Set([
   "a",
@@ -187,6 +196,14 @@ export class ConnectionDiscoverer {
     const referenceEdges = this.detectReferences(nodeId, fullText);
     newEdges.push(...referenceEdges);
 
+    // 3c. Detect lesson reinforcement
+    const lessonEdges = this.detectLessonReinforcement(
+      nodeId,
+      sourceNode.timestamp,
+      threshold
+    );
+    newEdges.push(...lessonEdges);
+
     // 4. Compare and create edges
     for (const candidate of candidates) {
       // Skip if edge already exists
@@ -340,6 +357,126 @@ export class ConnectionDiscoverer {
       }
     }
     return edges;
+  }
+
+  private detectLessonReinforcement(
+    nodeId: string,
+    sourceTimestamp: string,
+    threshold: number
+  ): Edge[] {
+    const lessons = this.getLessons(nodeId);
+    if (lessons.length === 0) {
+      return [];
+    }
+
+    const edges: Edge[] = [];
+
+    for (const lesson of lessons) {
+      // 1. Build query from lesson summary
+      const tokens = this.tokenize(lesson.summary);
+      if (tokens.size < 3) {
+        continue;
+      } // Skip very short lessons
+
+      // Create OR query for FTS
+      // We search specifically in the 'lessons' column
+      const queryTerms = [...tokens].map((t) => `"${t}"`).join(" OR ");
+      const ftsQuery = `lessons:(${queryTerms})`;
+
+      // 2. Find candidates
+      // We look for nodes that have SIMILAR lessons
+      // We exclude the source node and future nodes
+      // Use explicit LIMIT to avoid scanning too many nodes
+      const candidates = this.db
+        .prepare(
+          `
+        SELECT n.id, n.timestamp
+        FROM nodes n
+        JOIN nodes_fts f ON n.id = f.node_id
+        WHERE n.id != ?
+        AND n.timestamp < ?
+        AND nodes_fts MATCH ?
+        LIMIT 20
+      `
+        )
+        .all(nodeId, sourceTimestamp, ftsQuery) as {
+        id: string;
+        timestamp: string;
+      }[];
+
+      for (const candidate of candidates) {
+        // Skip if edge already exists
+        if (edgeExists(this.db, candidate.id, nodeId)) {
+          continue;
+        }
+
+        // Check exact lesson similarity
+        const candidateLessons = this.getLessons(candidate.id);
+        const bestMatch = this.findBestLessonMatch(lesson, candidateLessons);
+
+        if (bestMatch && bestMatch.score >= threshold) {
+          const edge = createEdge(
+            this.db,
+            nodeId,
+            candidate.id,
+            "lesson_application",
+            {
+              metadata: {
+                similarity: bestMatch.score,
+                lessonId: lesson.id,
+                reason: `Reinforces lesson: "${bestMatch.lesson.summary}"`,
+              },
+              createdBy: "daemon",
+            }
+          );
+          edges.push(edge);
+        }
+      }
+    }
+
+    return edges;
+  }
+
+  private getLessons(nodeId: string): LessonRow[] {
+    return this.db
+      .prepare("SELECT * FROM lessons WHERE node_id = ?")
+      .all(nodeId) as LessonRow[];
+  }
+
+  private findBestLessonMatch(
+    targetLesson: LessonRow,
+    candidateLessons: LessonRow[]
+  ): { lesson: LessonRow; score: number } | null {
+    if (candidateLessons.length === 0) {
+      return null;
+    }
+
+    let bestScore = -1;
+    let bestLesson: LessonRow | null = null;
+
+    const targetTokens = this.tokenize(
+      targetLesson.summary + " " + targetLesson.details
+    );
+
+    for (const candidate of candidateLessons) {
+      // Skip lessons of different levels if desired, but "cross-pollination" might be interesting
+      // For now, enforce level match for stricter relevance
+      if (candidate.level !== targetLesson.level) {
+        continue;
+      }
+
+      const candidateTokens = this.tokenize(
+        candidate.summary + " " + candidate.details
+      );
+      const score = this.jaccardIndex(targetTokens, candidateTokens);
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestLesson = candidate;
+      }
+    }
+
+    return bestLesson ? { lesson: bestLesson, score: bestScore } : null;
   }
 
   /**
