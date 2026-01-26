@@ -920,6 +920,250 @@ export function getNodesByTopic(
 }
 
 // =============================================================================
+// Query Layer: List Nodes with Filters
+// =============================================================================
+
+/** Valid sort fields for listNodes */
+export type NodeSortField =
+  | "timestamp"
+  | "analyzed_at"
+  | "project"
+  | "type"
+  | "outcome"
+  | "tokens_used"
+  | "cost"
+  | "duration_minutes";
+
+/** Sort order */
+export type SortOrder = "asc" | "desc";
+
+/** Node type filter values */
+export type NodeTypeFilter =
+  | "coding"
+  | "sysadmin"
+  | "research"
+  | "planning"
+  | "debugging"
+  | "qa"
+  | "brainstorm"
+  | "handoff"
+  | "refactor"
+  | "documentation"
+  | "configuration"
+  | "other";
+
+/** Outcome filter values */
+export type OutcomeFilter = "success" | "partial" | "failed" | "abandoned";
+
+/** Filters for querying nodes */
+export interface ListNodesFilters {
+  /** Filter by project path (partial match via LIKE %project%) */
+  project?: string;
+  /** Filter by exact node type */
+  type?: NodeTypeFilter;
+  /** Filter by exact outcome */
+  outcome?: OutcomeFilter;
+  /** Filter by start date (ISO 8601, inclusive) */
+  from?: string;
+  /** Filter by end date (ISO 8601, inclusive) */
+  to?: string;
+  /** Filter by source computer */
+  computer?: string;
+  /** Filter by whether goal was clear (vague prompting detection) */
+  hadClearGoal?: boolean;
+  /** Filter by new project flag */
+  isNewProject?: boolean;
+}
+
+/** Pagination and sorting options */
+export interface ListNodesOptions {
+  /** Max results to return (default: 50, max: 500) */
+  limit?: number;
+  /** Offset for pagination (default: 0) */
+  offset?: number;
+  /** Sort field (default: "timestamp") */
+  sort?: NodeSortField;
+  /** Sort order (default: "desc") */
+  order?: SortOrder;
+}
+
+/** Result from listNodes query */
+export interface ListNodesResult {
+  /** Matched nodes */
+  nodes: NodeRow[];
+  /** Total count of nodes matching filters (before pagination) */
+  total: number;
+  /** Limit used for the query */
+  limit: number;
+  /** Offset used for the query */
+  offset: number;
+}
+
+/** Allowed sort fields (validated against SQL injection) */
+const ALLOWED_SORT_FIELDS = new Set<NodeSortField>([
+  "timestamp",
+  "analyzed_at",
+  "project",
+  "type",
+  "outcome",
+  "tokens_used",
+  "cost",
+  "duration_minutes",
+]);
+
+/**
+ * List nodes with filters, pagination, and sorting.
+ *
+ * Supports filtering by:
+ * - project (partial match via LIKE)
+ * - type (exact match)
+ * - outcome (exact match)
+ * - date range (from/to on timestamp field)
+ * - computer (exact match)
+ * - hadClearGoal (boolean)
+ * - isNewProject (boolean)
+ *
+ * Per specs/api.md GET /api/v1/nodes endpoint.
+ */
+export function listNodes(
+  db: Database.Database,
+  filters: ListNodesFilters = {},
+  options: ListNodesOptions = {}
+): ListNodesResult {
+  // Apply defaults and constraints
+  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  const offset = Math.max(options.offset ?? 0, 0);
+  const sort: NodeSortField = ALLOWED_SORT_FIELDS.has(
+    options.sort as NodeSortField
+  )
+    ? (options.sort as NodeSortField)
+    : "timestamp";
+  const order: SortOrder = options.order === "asc" ? "asc" : "desc";
+
+  // Build WHERE clause dynamically
+  const conditions: string[] = [];
+  const params: (string | number)[] = [];
+
+  if (filters.project !== undefined) {
+    conditions.push("project LIKE ?");
+    params.push(`%${filters.project}%`);
+  }
+
+  if (filters.type !== undefined) {
+    conditions.push("type = ?");
+    params.push(filters.type);
+  }
+
+  if (filters.outcome !== undefined) {
+    conditions.push("outcome = ?");
+    params.push(filters.outcome);
+  }
+
+  if (filters.from !== undefined) {
+    conditions.push("timestamp >= ?");
+    params.push(filters.from);
+  }
+
+  if (filters.to !== undefined) {
+    conditions.push("timestamp <= ?");
+    params.push(filters.to);
+  }
+
+  if (filters.computer !== undefined) {
+    conditions.push("computer = ?");
+    params.push(filters.computer);
+  }
+
+  if (filters.hadClearGoal !== undefined) {
+    conditions.push("had_clear_goal = ?");
+    params.push(filters.hadClearGoal ? 1 : 0);
+  }
+
+  if (filters.isNewProject !== undefined) {
+    conditions.push("is_new_project = ?");
+    params.push(filters.isNewProject ? 1 : 0);
+  }
+
+  const whereClause =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+  // Count query for total (before pagination)
+  const countStmt = db.prepare(
+    `SELECT COUNT(*) as count FROM nodes ${whereClause}`
+  );
+  const countResult = countStmt.get(...params) as { count: number };
+  const total = countResult.count;
+
+  // Main query with pagination and sorting
+  // Sort field is validated against ALLOWED_SORT_FIELDS so safe for template literal
+  const dataStmt = db.prepare(`
+    SELECT * FROM nodes
+    ${whereClause}
+    ORDER BY ${sort} ${order.toUpperCase()}
+    LIMIT ? OFFSET ?
+  `);
+
+  const nodes = dataStmt.all(...params, limit, offset) as NodeRow[];
+
+  return {
+    nodes,
+    total,
+    limit,
+    offset,
+  };
+}
+
+/**
+ * Get all unique projects in the system
+ */
+export function getAllProjects(db: Database.Database): string[] {
+  const stmt = db.prepare(`
+    SELECT DISTINCT project FROM nodes
+    WHERE project IS NOT NULL
+    ORDER BY project
+  `);
+  const rows = stmt.all() as { project: string }[];
+  return rows.map((r) => r.project);
+}
+
+/**
+ * Get all unique node types that have been used
+ */
+export function getAllNodeTypes(db: Database.Database): string[] {
+  const stmt = db.prepare(`
+    SELECT DISTINCT type FROM nodes
+    WHERE type IS NOT NULL
+    ORDER BY type
+  `);
+  const rows = stmt.all() as { type: string }[];
+  return rows.map((r) => r.type);
+}
+
+/**
+ * Get all unique computers (source machines)
+ */
+export function getAllComputers(db: Database.Database): string[] {
+  const stmt = db.prepare(`
+    SELECT DISTINCT computer FROM nodes
+    WHERE computer IS NOT NULL
+    ORDER BY computer
+  `);
+  const rows = stmt.all() as { computer: string }[];
+  return rows.map((r) => r.computer);
+}
+
+/**
+ * Count nodes matching filters (without fetching data)
+ */
+export function countNodes(
+  db: Database.Database,
+  filters: ListNodesFilters = {}
+): number {
+  const result = listNodes(db, filters, { limit: 1 });
+  return result.total;
+}
+
+// =============================================================================
 // ID Generation
 // =============================================================================
 

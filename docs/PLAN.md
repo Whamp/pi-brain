@@ -31,7 +31,7 @@ When pi-brain is working, you can:
 - Open the graph and immediately see connections you didn't notice
 - Ask `/brain why did auth fail last month` and get a useful answer
 - See a dashboard showing you've been vague-prompting too much this week
-- Have prompts to Claude auto-include reminders about its quirks
+- Have prompts to glm-4.7 auto-include reminders about its quirks
 - Explore the full history of a project's development across sessions
 - Identify patterns in failures that reveal learning opportunities
 

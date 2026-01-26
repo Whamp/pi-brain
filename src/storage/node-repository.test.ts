@@ -14,34 +14,39 @@ import type { AnalysisJob } from "../daemon/queue.js";
 import { migrate, openDatabase } from "./database.js";
 import {
   agentOutputToNode,
+  countNodes,
   createEdge,
   createNode,
   deleteEdge,
   deleteNode,
   edgeExists,
   edgeRowToEdge,
+  getAllComputers,
+  getAllNodeTypes,
+  getAllNodeVersions,
+  getAllProjects,
+  getAllTags,
+  getAllTopics,
   getEdge,
   getEdgesFrom,
   getEdgesTo,
+  getLessonTags,
   getNode,
   getNodeEdges,
   getNodeLessons,
   getNodeQuirks,
+  getNodesByTag,
+  getNodesByTopic,
   getNodeTags,
   getNodeToolErrors,
   getNodeTopics,
   getNodeVersion,
   indexNodeForSearch,
   linkNodeToPredecessors,
+  listNodes,
   nodeExistsInDb,
   searchNodes,
   updateNode,
-  getAllNodeVersions,
-  getAllTags,
-  getAllTopics,
-  getLessonTags,
-  getNodesByTag,
-  getNodesByTopic,
   type NodeConversionContext,
   type RepositoryOptions,
 } from "./node-repository.js";
@@ -1444,6 +1449,517 @@ describe("node-repository", () => {
       expect(edgeExists(db, node1.id, node2.id, "continuation")).toBeTruthy();
       expect(getEdgesFrom(db, node1.id)).toHaveLength(1);
       expect(getEdgesTo(db, node2.id)).toHaveLength(1);
+    });
+  });
+
+  // ===========================================================================
+  // Query Layer: listNodes with Filters
+  // ===========================================================================
+
+  describe("listNodes", () => {
+    it("should return all nodes when no filters provided", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/a",
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/b",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db);
+
+      expect(result.nodes).toHaveLength(2);
+      expect(result.total).toBe(2);
+      expect(result.limit).toBe(50);
+      expect(result.offset).toBe(0);
+    });
+
+    it("should filter by project (partial match)", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/pi-brain",
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/will/projects/other-app",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { project: "pi-brain" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].project).toContain("pi-brain");
+      expect(result.total).toBe(1);
+    });
+
+    it("should filter by type (exact match)", () => {
+      const node1 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "debugging",
+        },
+      });
+      const node3 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const result = listNodes(db, { type: "coding" });
+
+      expect(result.nodes).toHaveLength(2);
+      expect(result.total).toBe(2);
+      for (const node of result.nodes) {
+        expect(node.type).toBe("coding");
+      }
+    });
+
+    it("should filter by outcome", () => {
+      const node1 = createTestNode({
+        content: { ...createTestNode().content, outcome: "success" },
+      });
+      const node2 = createTestNode({
+        content: { ...createTestNode().content, outcome: "failed" },
+      });
+      const node3 = createTestNode({
+        content: { ...createTestNode().content, outcome: "partial" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const result = listNodes(db, { outcome: "failed" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].outcome).toBe("failed");
+    });
+
+    it("should filter by date range (from)", () => {
+      const node1 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-01T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-15T10:00:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { from: "2026-01-10T00:00:00Z" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].timestamp).toBe("2026-01-15T10:00:00Z");
+    });
+
+    it("should filter by date range (to)", () => {
+      const node1 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-01T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-15T10:00:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { to: "2026-01-10T00:00:00Z" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].timestamp).toBe("2026-01-01T10:00:00Z");
+    });
+
+    it("should filter by date range (from and to)", () => {
+      const node1 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-01T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-15T10:00:00Z",
+        },
+      });
+      const node3 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-30T10:00:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const result = listNodes(db, {
+        from: "2026-01-10T00:00:00Z",
+        to: "2026-01-20T00:00:00Z",
+      });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].timestamp).toBe("2026-01-15T10:00:00Z");
+    });
+
+    it("should filter by computer", () => {
+      const node1 = createTestNode({
+        source: { ...createTestNode().source, computer: "desktop" },
+      });
+      const node2 = createTestNode({
+        source: { ...createTestNode().source, computer: "laptop" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { computer: "laptop" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].computer).toBe("laptop");
+    });
+
+    it("should filter by hadClearGoal", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          hadClearGoal: true,
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          hadClearGoal: false,
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const vagueResult = listNodes(db, { hadClearGoal: false });
+      expect(vagueResult.nodes).toHaveLength(1);
+      expect(vagueResult.nodes[0].had_clear_goal).toBe(0);
+
+      const clearResult = listNodes(db, { hadClearGoal: true });
+      expect(clearResult.nodes).toHaveLength(1);
+      expect(clearResult.nodes[0].had_clear_goal).toBe(1);
+    });
+
+    it("should filter by isNewProject", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          isNewProject: true,
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          isNewProject: false,
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, { isNewProject: true });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].is_new_project).toBe(1);
+    });
+
+    it("should combine multiple filters", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "coding",
+          project: "/proj/a",
+        },
+        content: { ...createTestNode().content, outcome: "success" },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "debugging",
+          project: "/proj/a",
+        },
+        content: { ...createTestNode().content, outcome: "success" },
+      });
+      const node3 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "coding",
+          project: "/proj/b",
+        },
+        content: { ...createTestNode().content, outcome: "failed" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const result = listNodes(db, { type: "coding", outcome: "success" });
+
+      expect(result.nodes).toHaveLength(1);
+      expect(result.nodes[0].type).toBe("coding");
+      expect(result.nodes[0].outcome).toBe("success");
+    });
+
+    it("should apply pagination with limit and offset", () => {
+      // Create 5 nodes
+      for (let i = 0; i < 5; i++) {
+        const node = createTestNode({
+          metadata: {
+            ...createTestNode().metadata,
+            timestamp: `2026-01-0${i + 1}T10:00:00Z`,
+          },
+        });
+        createNode(db, node, options);
+      }
+
+      const page1 = listNodes(
+        db,
+        {},
+        { limit: 2, offset: 0, sort: "timestamp", order: "asc" }
+      );
+      expect(page1.nodes).toHaveLength(2);
+      expect(page1.total).toBe(5);
+      expect(page1.nodes[0].timestamp).toBe("2026-01-01T10:00:00Z");
+      expect(page1.nodes[1].timestamp).toBe("2026-01-02T10:00:00Z");
+
+      const page2 = listNodes(
+        db,
+        {},
+        { limit: 2, offset: 2, sort: "timestamp", order: "asc" }
+      );
+      expect(page2.nodes).toHaveLength(2);
+      expect(page2.total).toBe(5);
+      expect(page2.nodes[0].timestamp).toBe("2026-01-03T10:00:00Z");
+      expect(page2.nodes[1].timestamp).toBe("2026-01-04T10:00:00Z");
+
+      const page3 = listNodes(
+        db,
+        {},
+        { limit: 2, offset: 4, sort: "timestamp", order: "asc" }
+      );
+      expect(page3.nodes).toHaveLength(1);
+      expect(page3.total).toBe(5);
+    });
+
+    it("should sort by timestamp descending by default", () => {
+      const node1 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-01T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-15T10:00:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db);
+
+      expect(result.nodes[0].timestamp).toBe("2026-01-15T10:00:00Z");
+      expect(result.nodes[1].timestamp).toBe("2026-01-01T10:00:00Z");
+    });
+
+    it("should sort ascending when order is asc", () => {
+      const node1 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-15T10:00:00Z",
+        },
+      });
+      const node2 = createTestNode({
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-01T10:00:00Z",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, {}, { order: "asc" });
+
+      expect(result.nodes[0].timestamp).toBe("2026-01-01T10:00:00Z");
+      expect(result.nodes[1].timestamp).toBe("2026-01-15T10:00:00Z");
+    });
+
+    it("should sort by project", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/zebra",
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/alpha",
+        },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const result = listNodes(db, {}, { sort: "project", order: "asc" });
+
+      expect(result.nodes[0].project).toBe("/project/alpha");
+      expect(result.nodes[1].project).toBe("/project/zebra");
+    });
+
+    it("should enforce max limit of 500", () => {
+      const result = listNodes(db, {}, { limit: 1000 });
+      expect(result.limit).toBe(500);
+    });
+
+    it("should enforce min limit of 1", () => {
+      const result = listNodes(db, {}, { limit: 0 });
+      expect(result.limit).toBe(1);
+    });
+
+    it("should default to safe sort field for invalid input", () => {
+      const node = createTestNode();
+      createNode(db, node, options);
+
+      // Invalid sort field should fall back to "timestamp"
+      const result = listNodes(db, {}, { sort: "invalid_field" as never });
+
+      expect(result.nodes).toHaveLength(1);
+      // No error thrown, defaults to timestamp
+    });
+
+    it("should return empty result when no nodes match filters", () => {
+      const node = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      createNode(db, node, options);
+
+      const result = listNodes(db, { type: "debugging" });
+
+      expect(result.nodes).toHaveLength(0);
+      expect(result.total).toBe(0);
+    });
+  });
+
+  describe("getAllProjects", () => {
+    it("should return unique projects sorted alphabetically", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/zebra",
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/alpha",
+        },
+      });
+      const node3 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/project/alpha",
+        }, // duplicate
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      const projects = getAllProjects(db);
+
+      expect(projects).toStrictEqual(["/project/alpha", "/project/zebra"]);
+    });
+
+    it("should return empty array when no nodes exist", () => {
+      const projects = getAllProjects(db);
+      expect(projects).toStrictEqual([]);
+    });
+  });
+
+  describe("getAllNodeTypes", () => {
+    it("should return unique node types sorted alphabetically", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "debugging",
+        },
+      });
+      const node2 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const types = getAllNodeTypes(db);
+
+      expect(types).toStrictEqual(["coding", "debugging"]);
+    });
+  });
+
+  describe("getAllComputers", () => {
+    it("should return unique computers sorted alphabetically", () => {
+      const node1 = createTestNode({
+        source: { ...createTestNode().source, computer: "laptop" },
+      });
+      const node2 = createTestNode({
+        source: { ...createTestNode().source, computer: "desktop" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      const computers = getAllComputers(db);
+
+      expect(computers).toStrictEqual(["desktop", "laptop"]);
+    });
+  });
+
+  describe("countNodes", () => {
+    it("should count nodes matching filters", () => {
+      const node1 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          type: "debugging",
+        },
+      });
+      const node3 = createTestNode({
+        classification: { ...createTestNode().classification, type: "coding" },
+      });
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+      createNode(db, node3, options);
+
+      expect(countNodes(db)).toBe(3);
+      expect(countNodes(db, { type: "coding" })).toBe(2);
+      expect(countNodes(db, { type: "debugging" })).toBe(1);
+      expect(countNodes(db, { type: "research" })).toBe(0);
     });
   });
 });
