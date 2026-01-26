@@ -67,11 +67,13 @@
     loadNode();
   });
 
-  // Re-load when nodeId changes
+  // Re-load when nodeId changes (after initial mount)
+  let previousNodeId: string | undefined;
   $effect(() => {
-    if (nodeId) {
+    if (nodeId && previousNodeId !== undefined && nodeId !== previousNodeId) {
       loadNode();
     }
+    previousNodeId = nodeId;
   });
 
   function getOutcomeIcon(outcome: string) {
@@ -170,6 +172,9 @@
       case "branch": {
         return "branch";
       }
+      case "tree_jump": {
+        return "jump";
+      }
       case "continuation": {
         return "continues";
       }
@@ -190,6 +195,12 @@
       }
       case "failure_pattern": {
         return "same pattern";
+      }
+      case "handoff": {
+        return "handoff";
+      }
+      case "temporal": {
+        return "temporal";
       }
       default: {
         return edge.type;
