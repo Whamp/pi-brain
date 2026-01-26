@@ -67,3 +67,23 @@
 **Notes**:
 - The extension code is ready but requires the backend endpoint (Task 7.3) to be fully functional.
 - Implemented robust type safety and error handling.
+
+---
+
+## 2026-01-26 12:26 - Task 7.3
+
+**Status**: pending → done
+**Validation**:
+- Created brain-query.md prompt file for natural language query answering
+- Implemented query-processor.ts with node search, context gathering, and pi agent invocation
+- Created /api/v1/query endpoint with POST for queries and GET /health for availability check
+- Added unit tests for query processor types and API route validation
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 747 tests)
+**Commit**: 4a2a194
+**Notes**:
+- Query processor searches knowledge graph for relevant nodes
+- Gathers additional context (model quirks, tool errors) based on query keywords
+- Invokes pi agent with brain-query.md prompt to synthesize answer
+- Returns structured response with answer, summary, confidence, sources
+- Prompt also installed to ~/.pi-brain/prompts/brain-query.md for runtime use
