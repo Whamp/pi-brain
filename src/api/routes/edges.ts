@@ -46,30 +46,60 @@ export async function edgesRoutes(app: FastifyInstance): Promise<void> {
     ) => {
       const startTime = request.startTime ?? Date.now();
       const { db } = app.ctx;
-      const { nodeId, type, limit, offset } = request.query;
+      const { nodeId, type, createdBy, limit, offset } = request.query;
 
       let edges: ReturnType<typeof getEdgesFrom> = [];
+      let total = 0;
 
       if (nodeId) {
         // Get edges connected to this node (both directions)
         const outgoing = getEdgesFrom(db, nodeId);
         const incoming = getEdgesTo(db, nodeId);
         edges = [...outgoing, ...incoming];
+
+        // Filter by type and createdBy if specified
+        if (type) {
+          edges = edges.filter((e) => e.type === type);
+        }
+        if (createdBy) {
+          edges = edges.filter((e) => e.created_by === createdBy);
+        }
+        total = edges.length;
       } else {
-        // Get all edges (limited query via direct SQL)
+        // Build query with filters applied at SQL level
+        const conditions: string[] = [];
+        const params: (string | number)[] = [];
+
+        if (type) {
+          conditions.push("type = ?");
+          params.push(type);
+        }
+        if (createdBy) {
+          conditions.push("created_by = ?");
+          params.push(createdBy);
+        }
+
+        const whereClause =
+          conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+        // Get total count
+        const countStmt = db.prepare(
+          `SELECT COUNT(*) as count FROM edges ${whereClause}`
+        );
+        const countResult = countStmt.get(...params) as { count: number };
+        total = countResult.count;
+
+        // Get paginated results
+        const limitVal = Math.min(parseIntParam(limit) ?? 50, 500);
+        const offsetVal = parseIntParam(offset) ?? 0;
+
         const stmt = db.prepare(`
           SELECT * FROM edges
+          ${whereClause}
           ORDER BY created_at DESC
           LIMIT ? OFFSET ?
         `);
-        const limitVal = Math.min(parseIntParam(limit) ?? 50, 500);
-        const offsetVal = parseIntParam(offset) ?? 0;
-        edges = stmt.all(limitVal, offsetVal) as typeof edges;
-      }
-
-      // Filter by type if specified
-      if (type) {
-        edges = edges.filter((e) => e.type === type);
+        edges = stmt.all(...params, limitVal, offsetVal) as typeof edges;
       }
 
       const durationMs = Date.now() - startTime;
@@ -77,7 +107,7 @@ export async function edgesRoutes(app: FastifyInstance): Promise<void> {
         successResponse(
           {
             edges,
-            total: edges.length,
+            total,
           },
           durationMs
         )
