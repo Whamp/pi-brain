@@ -173,10 +173,13 @@
             <span class="metric-trend" class:improving={vagueGoalStats.trend === "improving"} class:worsening={vagueGoalStats.trend === "worsening"}>
               {#if vagueGoalStats.trend === "improving"}
                 <TrendingDown size={16} />
-              {:else}
+                Improving!
+              {:else if vagueGoalStats.trend === "worsening"}
                 <TrendingUp size={16} />
+                Worsening
+              {:else}
+                Stable
               {/if}
-              {vagueGoalStats.trend === "improving" ? "Improving!" : "Worsening"}
             </span>
           </div>
         </div>
