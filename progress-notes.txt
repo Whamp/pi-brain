@@ -627,3 +627,59 @@ Updated src/storage/index.ts to export node-repository.
   - Search in lessons
   - Limit enforcement (min 1, max 500)
   - countSearchResults function
+
+## 2026-01-25 22:43 - Task 4.8
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test passes (702 tests, 23 new graph traversal tests)
+**Commit**: 7c7f8ae
+**Notes**: Implemented graph traversal queries per specs/storage.md and specs/api.md.
+
+**New Functions (`src/storage/node-repository.ts`):**
+
+- `getConnectedNodes(db, nodeId, options)`: Multi-hop graph traversal
+  - `depth`: Number of hops to traverse (default: 1, max: 5, capped)
+  - `direction`: "incoming", "outgoing", or "both" (default: "both")
+  - `edgeTypes`: Optional filter for specific edge types only
+  - Returns: `ConnectedNodesResult` with nodes, edges, and rootNodeId
+  - Uses BFS with cycle detection to prevent infinite loops
+  - Tracks hopDistance for each edge in results
+
+- `getSubgraph(db, rootNodeIds, options)`: Traverse from multiple roots
+  - Combines and deduplicates results from multiple starting nodes
+  - Useful for graph visualization with multiple selected nodes
+
+- `findPath(db, fromNodeId, toNodeId, options)`: Find shortest path between two nodes
+  - Uses BFS for shortest path
+  - Returns nodeIds array and edges, or null if no path exists
+  - Respects maxDepth limit (default: 10, max: 20)
+
+- `getAncestors(db, nodeId, options)`: Get nodes leading TO this node
+  - Convenience wrapper for getConnectedNodes with direction="incoming"
+
+- `getDescendants(db, nodeId, options)`: Get nodes this node leads TO
+  - Convenience wrapper for getConnectedNodes with direction="outgoing"
+
+**Type Exports:**
+
+- `TraversalDirection`: "incoming" | "outgoing" | "both"
+- `ConnectedNodesOptions`: { depth?, direction?, edgeTypes? }
+- `TraversalEdge`: Edge with direction and hopDistance
+- `ConnectedNodesResult`: { rootNodeId, nodes, edges }
+
+**Test Coverage:**
+
+- 23 new tests covering:
+  - Empty connections
+  - Single hop traversal
+  - Multi-hop traversal
+  - Direction filtering (incoming, outgoing, both)
+  - Edge type filtering
+  - Cycle handling
+  - Hop distance tracking
+  - Depth capping (max 5)
+  - Minimum depth enforcement
+  - Subgraph from multiple roots
+  - Deduplication of overlapping results
+  - Path finding (direct, multi-hop, same node, no path)
+  - Ancestors and descendants helpers
