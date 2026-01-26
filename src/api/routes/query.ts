@@ -30,6 +30,11 @@ const DEFAULT_QUERY_CONFIG = {
   idleTimeoutMinutes: 10,
   analysisTimeoutMinutes: 5,
   reanalysisSchedule: "0 2 * * *",
+  maxRetries: 3,
+  retryDelaySeconds: 30,
+  connectionDiscoverySchedule: "0 3 * * *",
+  maxConcurrentAnalysis: 2,
+  maxQueueSize: 100,
 };
 
 export async function queryRoutes(app: FastifyInstance): Promise<void> {

@@ -13,14 +13,14 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 import type { DaemonConfig } from "../config/types.js";
-import type { Node } from "../storage/node-types.js";
 
 import {
   searchNodesAdvanced,
   listNodes,
-  getAggregatedModelQuirks,
+  getAggregatedQuirks,
   getAggregatedToolErrors,
   type ListNodesFilters,
+  type NodeRow,
 } from "../storage/node-repository.js";
 import { consoleLogger, type ProcessorLogger } from "./processor.js";
 
@@ -191,9 +191,6 @@ interface RelevantNode {
   project: string;
   outcome: string;
   timestamp: string;
-  lessons: string[];
-  keyDecisions: string[];
-  tags: string[];
 }
 
 /**
@@ -206,53 +203,44 @@ async function findRelevantNodes(
   maxNodes: number
 ): Promise<RelevantNode[]> {
   // First try full-text search
+  const filters: ListNodesFilters | undefined = project
+    ? { project }
+    : undefined;
   const searchResults = searchNodesAdvanced(db, query, {
     limit: maxNodes,
-    filters: project ? { project } : undefined,
+    filters,
   });
 
   if (searchResults.results.length > 0) {
-    return searchResults.results.map((r) => nodeToRelevant(r.node));
+    return searchResults.results.map((r) => nodeRowToRelevant(r.node));
   }
 
   // Fallback: list recent nodes from the project
-  const filters: ListNodesFilters = {};
+  const listFilters: ListNodesFilters = {};
   if (project) {
-    filters.project = project;
+    listFilters.project = project;
   }
 
-  const nodes = listNodes(db, {
-    filters,
+  const nodes = listNodes(db, listFilters, {
     sort: "timestamp",
     order: "desc",
     limit: maxNodes,
   });
 
-  return nodes.nodes.map(nodeToRelevant);
+  return nodes.nodes.map(nodeRowToRelevant);
 }
 
 /**
- * Convert a Node to RelevantNode summary
+ * Convert a NodeRow to RelevantNode summary
  */
-function nodeToRelevant(node: Node): RelevantNode {
+function nodeRowToRelevant(row: NodeRow): RelevantNode {
   return {
-    id: node.id,
-    summary: node.summary,
-    type: node.type,
-    project: node.project,
-    outcome: node.outcome,
-    timestamp: node.timestamp,
-    lessons: [
-      ...node.lessons.project.map((l) => `[project] ${l.summary}`),
-      ...node.lessons.task.map((l) => `[task] ${l.summary}`),
-      ...node.lessons.user.map((l) => `[user] ${l.summary}`),
-      ...node.lessons.model.map((l) => `[model] ${l.summary}`),
-      ...node.lessons.tool.map((l) => `[tool] ${l.summary}`),
-    ].slice(0, 5),
-    keyDecisions: node.keyDecisions
-      .map((d) => `${d.what}: ${d.why}`)
-      .slice(0, 3),
-    tags: node.tags,
+    id: row.id,
+    summary: `Session from ${row.timestamp}`, // NodeRow doesn't have summary directly
+    type: row.type ?? "unknown",
+    project: row.project ?? "unknown",
+    outcome: row.outcome ?? "unknown",
+    timestamp: row.timestamp,
   };
 }
 
@@ -285,11 +273,11 @@ async function gatherAdditionalContext(
     lowerQuery.includes("gemini")
   ) {
     try {
-      const quirks = getAggregatedModelQuirks(db, { limit: 10 });
+      const quirks = getAggregatedQuirks(db, { limit: 10 });
       if (quirks.length > 0) {
         context.modelQuirks = quirks.map(
           (q) =>
-            `${q.model}: ${q.observation} (${q.frequency}, ${q.occurrences}x)`
+            `${q.model}: ${q.observation} (${q.frequency ?? "unknown"}, ${q.occurrences}x)`
         );
       }
     } catch (error) {
@@ -306,7 +294,7 @@ async function gatherAdditionalContext(
     lowerQuery.includes("bash")
   ) {
     try {
-      const errors = getAggregatedToolErrors(db, { limit: 10 });
+      const errors = getAggregatedToolErrors(db, {}, { limit: 10 });
       if (errors.length > 0) {
         context.toolErrors = errors.map(
           (e) => `${e.tool} - ${e.errorType}: ${e.count} occurrences`
@@ -453,25 +441,6 @@ function buildQueryPrompt(
     parts.push(`- **Outcome**: ${node.outcome}`);
     parts.push(`- **Date**: ${node.timestamp}`);
     parts.push(`- **Summary**: ${node.summary}`);
-
-    if (node.keyDecisions.length > 0) {
-      parts.push(`- **Key Decisions**:`);
-      for (const decision of node.keyDecisions) {
-        parts.push(`  - ${decision}`);
-      }
-    }
-
-    if (node.lessons.length > 0) {
-      parts.push(`- **Lessons**:`);
-      for (const lesson of node.lessons) {
-        parts.push(`  - ${lesson}`);
-      }
-    }
-
-    if (node.tags.length > 0) {
-      parts.push(`- **Tags**: ${node.tags.join(", ")}`);
-    }
-
     parts.push("");
   }
 

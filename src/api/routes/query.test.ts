@@ -30,7 +30,7 @@ describe("query routes", () => {
     db.close();
   });
 
-  describe("pOST /api/v1/query", () => {
+  describe("post /api/v1/query", () => {
     it("should reject empty query", async () => {
       const response = await app.inject({
         method: "POST",
@@ -60,7 +60,7 @@ describe("query routes", () => {
     // These tests verify the API structure and validation
   });
 
-  describe("gET /api/v1/query/health", () => {
+  describe("get /api/v1/query/health", () => {
     it("should return availability status", async () => {
       const response = await app.inject({
         method: "GET",
