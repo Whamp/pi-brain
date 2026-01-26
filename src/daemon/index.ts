@@ -6,7 +6,7 @@
  * - watcher-events.ts - Event types for the watcher
  * - queue.ts - Analysis job queue (SQLite-backed)
  * - processor.ts - Job processing and pi agent invocation
- * - cli.ts - Daemon CLI (start, stop, status) (TODO: Phase 3.9)
+ * - cli.ts - Daemon CLI (start, stop, status)
  */
 
 // Export watcher functionality
@@ -107,6 +107,35 @@ export {
   type WorkerStatus,
   type JobProcessingResult,
 } from "./worker.js";
+
+// Export CLI functionality
+export {
+  PID_FILE,
+  LOG_FILE,
+  readPidFile,
+  writePidFile,
+  removePidFile,
+  isProcessRunning,
+  isDaemonRunning,
+  formatUptime,
+  getProcessUptime,
+  startDaemon,
+  stopDaemon,
+  getDaemonStatus,
+  getQueueStatus,
+  queueAnalysis,
+  runHealthChecks,
+  formatDaemonStatus,
+  formatQueueStatus,
+  formatHealthStatus,
+  type DaemonStatus,
+  type QueueStatus,
+  type HealthCheckResult,
+  type HealthStatus,
+  type OutputOptions,
+  type StartOptions,
+  type StopOptions,
+} from "./cli.js";
 
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";

@@ -13,6 +13,7 @@
   "license": "MIT",
   "author": "",
   "bin": {
+    "pi-brain": "./dist/cli.js",
     "pi-tree-viz": "./dist/cli.js"
   },
   "files": [

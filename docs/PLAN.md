@@ -1234,6 +1234,18 @@ Lessons learned in one project may apply to others:
 - Architecture decision in project A might inform project B
 - Same bug pattern across projects
 
+### Graphviz Export (Nice to Have)
+
+Add [Graphviz](https://graphviz.org/) as an optional export/rendering backend:
+
+- Generate DOT format exports for the knowledge graph
+- Produce publication-quality SVG/PNG/PDF diagrams
+- Use DOT's hierarchical layout algorithm for cleaner DAG visualization
+- Enable terminal-friendly ASCII graph rendering via `graph-easy`
+- Support static graph snapshots for reports and documentation
+
+This would complement D3.js (used for interactive web visualization) with static export capabilities.
+
 ---
 
 ## Open Questions

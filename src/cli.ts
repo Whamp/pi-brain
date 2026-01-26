@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 /**
- * CLI for pi-tree-viz
- * Generate interactive HTML visualization of pi sessions
+ * CLI for pi-brain
+ *
+ * Commands:
+ * - pi-brain viz       - Generate interactive HTML visualization of pi sessions (legacy pi-tree-viz)
+ * - pi-brain daemon    - Control the daemon (start, stop, status, queue, analyze)
+ * - pi-brain health    - Run health checks
  */
 
 import { Command } from "commander";
@@ -10,6 +14,17 @@ import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import open from "open";
 
+import {
+  startDaemon,
+  stopDaemon,
+  getDaemonStatus,
+  getQueueStatus,
+  queueAnalysis,
+  runHealthChecks,
+  formatDaemonStatus,
+  formatQueueStatus,
+  formatHealthStatus,
+} from "./daemon/index.js";
 import {
   scanSessions,
   findForkRelationships,
@@ -21,11 +36,19 @@ import { generateHTML } from "./web/generator.js";
 const program = new Command();
 
 program
-  .name("pi-tree-viz")
+  .name("pi-brain")
+  .description("A second brain for pi coding agent sessions")
+  .version("0.1.0");
+
+// =============================================================================
+// Visualization command (legacy pi-tree-viz)
+// =============================================================================
+
+program
+  .command("viz")
   .description(
     "Generate interactive HTML visualization of pi coding agent sessions"
   )
-  .version("0.1.0")
   .option("-o, --output <path>", "Output HTML file", "pi-sessions.html")
   .option(
     "-d, --session-dir <path>",
@@ -131,5 +154,140 @@ program
       process.exit(1);
     }
   });
+
+// =============================================================================
+// Daemon command
+// =============================================================================
+
+const daemonCmd = program
+  .command("daemon")
+  .description("Control the pi-brain daemon");
+
+daemonCmd
+  .command("start")
+  .description("Start the daemon")
+  .option("-f, --foreground", "Run in foreground (for debugging)")
+  .option("-c, --config <path>", "Config file path")
+  .action(async (options) => {
+    const result = await startDaemon({
+      foreground: options.foreground,
+      configPath: options.config,
+    });
+
+    if (result.success) {
+      console.log(result.message);
+      if (options.foreground) {
+        console.log("Press Ctrl+C to stop");
+        // In foreground mode, the daemon process would continue here
+        // For now, we just exit since the actual daemon loop isn't implemented
+        process.on("SIGINT", () => {
+          console.log("\nDaemon stopped");
+          process.exit(0);
+        });
+        process.on("SIGTERM", () => {
+          console.log("\nDaemon stopped");
+          process.exit(0);
+        });
+        // Keep process running
+        await new Promise(() => {});
+      }
+    } else {
+      console.error(result.message);
+      process.exit(1);
+    }
+  });
+
+daemonCmd
+  .command("stop")
+  .description("Stop the daemon")
+  .option("--force", "Force stop without waiting for current job")
+  .action(async (options) => {
+    const result = await stopDaemon({ force: options.force });
+
+    if (result.success) {
+      console.log(result.message);
+    } else {
+      console.error(result.message);
+      process.exit(1);
+    }
+  });
+
+daemonCmd
+  .command("status")
+  .description("Show daemon status")
+  .option("-c, --config <path>", "Config file path")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    const status = getDaemonStatus(options.config);
+
+    if (options.json) {
+      console.log(JSON.stringify(status, null, 2));
+    } else {
+      console.log(formatDaemonStatus(status));
+    }
+  });
+
+daemonCmd
+  .command("queue")
+  .description("Show analysis queue status")
+  .option("-c, --config <path>", "Config file path")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    try {
+      const queueStatus = getQueueStatus(options.config);
+
+      if (options.json) {
+        console.log(JSON.stringify(queueStatus, null, 2));
+      } else {
+        console.log(formatQueueStatus(queueStatus));
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+daemonCmd
+  .command("analyze <path>")
+  .description("Queue a session for analysis")
+  .option("-c, --config <path>", "Config file path")
+  .action((sessionPath, options) => {
+    const result = queueAnalysis(sessionPath, options.config);
+
+    if (result.success) {
+      console.log(`${result.message} (job ID: ${result.jobId})`);
+    } else {
+      console.error(result.message);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Health command
+// =============================================================================
+
+program
+  .command("health")
+  .description("Run health checks")
+  .option("-c, --config <path>", "Config file path")
+  .option("--json", "Output as JSON")
+  .action(async (options) => {
+    const status = await runHealthChecks(options.config);
+
+    if (options.json) {
+      console.log(JSON.stringify(status, null, 2));
+    } else {
+      console.log(formatHealthStatus(status));
+    }
+
+    // Exit with error code if not healthy
+    if (!status.healthy) {
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Parse and run
+// =============================================================================
 
 program.parse();
