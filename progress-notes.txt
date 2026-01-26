@@ -582,3 +582,49 @@ Updated src/storage/index.ts to export node-repository.
 **Validation**: npm test passes (666 tests). Added 10 new tests in src/storage/node-repository.test.ts covering multi-tag and multi-topic AND filtering, combination with other filters, and pagination.
 **Commit**: 99e74d1
 **Notes**: Extended the query layer to support filtering by tags and topics per specs/api.md. Used subqueries in listNodes to ensure nodes satisfy ALL requested tags/topics.
+
+## 2026-01-25 22:10 - Task 4.7
+
+**Status**: active → done
+**Validation**: npm run check passes, npm test passes (679 tests, 13 new enhanced search tests)
+**Commit**: 691676e
+**Notes**: Implemented enhanced full-text search with scores and highlights per specs/storage.md and specs/api.md.
+
+**New Functions (`src/storage/node-repository.ts`):**
+
+- `searchNodesAdvanced(db, query, options)`: Enhanced FTS with:
+  - `SearchResult` with node, score (FTS5 rank), and highlights
+  - Field-specific search via `fields` option (summary, decisions, lessons, tags, topics)
+  - Pagination via `limit` and `offset`
+  - Integration with `ListNodesFilters` for combined search + filtering
+  - Returns `SearchNodesResult` with results, total, limit, offset
+
+- `countSearchResults(db, query, options)`: Count-only search for pagination UI
+
+**Helper Functions (internal):**
+
+- `quoteSearchQuery()`: Quote terms for FTS5 special character handling
+- `buildFieldQuery()`: Build FTS5 column filter syntax for field-specific search
+- `extractSnippet()`: Intelligent snippet extraction around matched terms
+- `findHighlights()`: Identify which fields matched and extract snippets
+
+**Type Exports:**
+
+- `SearchField`: "summary" | "decisions" | "lessons" | "tags" | "topics"
+- `SearchHighlight`: { field, snippet }
+- `SearchResult`: { node, score, highlights }
+- `SearchOptions`: { fields?, limit?, offset?, filters? }
+- `SearchNodesResult`: { results, total, limit, offset }
+
+**Test Coverage:**
+
+- 13 new tests covering:
+  - Results with scores and highlights
+  - Field-specific search filtering
+  - Pagination (limit/offset, total count, no overlap)
+  - Combined search with filters (type, project)
+  - Empty/whitespace query handling
+  - Search in lessons
+  - Limit enforcement (min 1, max 500)
+  - countSearchResults function
+
