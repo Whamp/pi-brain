@@ -63,6 +63,7 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     retryDelaySeconds: 60,
     reanalysisSchedule: "0 2 * * *",
     connectionDiscoverySchedule: "0 3 * * *",
+    patternAggregationSchedule: "0 3 * * *",
     provider: "zai",
     model: "glm-4.7",
     promptFile: path.join(
@@ -262,6 +263,9 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     connectionDiscoverySchedule:
       raw.daemon?.connection_discovery_schedule ??
       defaults.daemon.connectionDiscoverySchedule,
+    patternAggregationSchedule:
+      raw.daemon?.pattern_aggregation_schedule ??
+      defaults.daemon.patternAggregationSchedule,
     provider: raw.daemon?.provider ?? defaults.daemon.provider,
     model: raw.daemon?.model ?? defaults.daemon.model,
     promptFile: raw.daemon?.prompt_file
@@ -289,6 +293,12 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     daemon.connectionDiscoverySchedule,
     "daemon.connection_discovery_schedule"
   );
+  if (daemon.patternAggregationSchedule) {
+    validateCronSchedule(
+      daemon.patternAggregationSchedule,
+      "daemon.pattern_aggregation_schedule"
+    );
+  }
   validatePositiveInt(
     daemon.maxConcurrentAnalysis,
     "daemon.max_concurrent_analysis"
@@ -464,6 +474,8 @@ daemon:
   parallel_workers: 1
   max_retries: 3
   reanalysis_schedule: "0 2 * * *"  # 2am nightly
+  connection_discovery_schedule: "0 3 * * *"  # 3am nightly
+  pattern_aggregation_schedule: "0 3 * * *"   # 3am nightly
   provider: zai
   model: glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md

@@ -22,7 +22,7 @@ interface LessonRow {
   node_id: string;
   level: string;
   summary: string;
-  details: string;
+  details: string | null;
   confidence: string;
 }
 
@@ -200,7 +200,8 @@ export class ConnectionDiscoverer {
     const lessonEdges = this.detectLessonReinforcement(
       nodeId,
       sourceNode.timestamp,
-      threshold
+      threshold,
+      limit
     );
     newEdges.push(...lessonEdges);
 
@@ -362,7 +363,8 @@ export class ConnectionDiscoverer {
   private detectLessonReinforcement(
     nodeId: string,
     sourceTimestamp: string,
-    threshold: number
+    threshold: number,
+    limit: number
   ): Edge[] {
     const lessons = this.getLessons(nodeId);
     if (lessons.length === 0) {
@@ -374,9 +376,9 @@ export class ConnectionDiscoverer {
     for (const lesson of lessons) {
       // 1. Build query from lesson summary
       const tokens = this.tokenize(lesson.summary);
-      if (tokens.size < 3) {
+      if (tokens.size === 0) {
         continue;
-      } // Skip very short lessons
+      } // Skip empty lessons
 
       // Create OR query for FTS
       // We search specifically in the 'lessons' column
@@ -392,21 +394,21 @@ export class ConnectionDiscoverer {
           `
         SELECT n.id, n.timestamp
         FROM nodes n
-        JOIN nodes_fts f ON n.id = f.node_id
+        JOIN nodes_fts ON n.id = nodes_fts.node_id
         WHERE n.id != ?
         AND n.timestamp < ?
         AND nodes_fts MATCH ?
-        LIMIT 20
+        LIMIT ?
       `
         )
-        .all(nodeId, sourceTimestamp, ftsQuery) as {
+        .all(nodeId, sourceTimestamp, ftsQuery, limit) as {
         id: string;
         timestamp: string;
       }[];
 
       for (const candidate of candidates) {
         // Skip if edge already exists
-        if (edgeExists(this.db, candidate.id, nodeId)) {
+        if (edgeExists(this.db, nodeId, candidate.id)) {
           continue;
         }
 
@@ -423,7 +425,7 @@ export class ConnectionDiscoverer {
             {
               metadata: {
                 similarity: bestMatch.score,
-                lessonId: lesson.id,
+                lessonId: bestMatch.lesson.id,
                 reason: `Reinforces lesson: "${bestMatch.lesson.summary}"`,
               },
               createdBy: "daemon",
@@ -455,7 +457,7 @@ export class ConnectionDiscoverer {
     let bestLesson: LessonRow | null = null;
 
     const targetTokens = this.tokenize(
-      targetLesson.summary + " " + targetLesson.details
+      targetLesson.summary + " " + (targetLesson.details || "")
     );
 
     for (const candidate of candidateLessons) {
@@ -466,7 +468,7 @@ export class ConnectionDiscoverer {
       }
 
       const candidateTokens = this.tokenize(
-        candidate.summary + " " + candidate.details
+        candidate.summary + " " + (candidate.details || "")
       );
       const score = this.jaccardIndex(targetTokens, candidateTokens);
 

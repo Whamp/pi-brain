@@ -14,16 +14,21 @@ import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
 import { getLatestVersion } from "../prompt/prompt.js";
+import { PatternAggregator } from "./pattern-aggregation.js";
 
 /** Job types that can be scheduled */
-export type ScheduledJobType = "reanalysis" | "connection_discovery";
+export type ScheduledJobType =
+  | "reanalysis"
+  | "connection_discovery"
+  | "pattern_aggregation";
 
 /** Result of a scheduled job execution */
 export interface ScheduledJobResult {
   type: ScheduledJobType;
   startedAt: Date;
   completedAt: Date;
-  itemsQueued: number;
+  itemsQueued?: number;
+  itemsProcessed?: number;
   error?: string;
 }
 
@@ -55,6 +60,9 @@ export interface SchedulerConfig {
 
   /** Cron schedule for connection discovery */
   connectionDiscoverySchedule: string;
+
+  /** Cron schedule for pattern aggregation (optional) */
+  patternAggregationSchedule?: string;
 }
 
 /** Scheduler state */
@@ -75,16 +83,21 @@ export interface SchedulerStatus {
 export class Scheduler {
   private reanalysisJob: Cron | null = null;
   private connectionDiscoveryJob: Cron | null = null;
+  private patternAggregationJob: Cron | null = null;
   private running = false;
   private lastReanalysisResult: ScheduledJobResult | null = null;
   private lastConnectionDiscoveryResult: ScheduledJobResult | null = null;
+  private lastPatternAggregationResult: ScheduledJobResult | null = null;
+  private patternAggregator: PatternAggregator;
 
   constructor(
     private config: SchedulerConfig,
     private queue: QueueManager,
     private db: Database.Database,
     private logger: SchedulerLogger = noopLogger
-  ) {}
+  ) {
+    this.patternAggregator = new PatternAggregator(db);
+  }
 
   /**
    * Start the scheduler - creates cron jobs for each configured schedule
@@ -145,6 +158,30 @@ export class Scheduler {
       }
     }
 
+    // Start pattern aggregation job if schedule is configured
+    if (this.config.patternAggregationSchedule) {
+      try {
+        this.patternAggregationJob = new Cron(
+          this.config.patternAggregationSchedule,
+          { name: "pattern_aggregation" },
+          async () => {
+            try {
+              await this.runPatternAggregation();
+            } catch (error) {
+              this.logger.error(`Pattern aggregation cron error: ${error}`);
+            }
+          }
+        );
+        this.logger.info(
+          `Pattern aggregation scheduled: ${this.config.patternAggregationSchedule} (next: ${this.patternAggregationJob.nextRun()?.toISOString() ?? "unknown"})`
+        );
+      } catch (error) {
+        this.logger.error(
+          `Invalid pattern aggregation schedule "${this.config.patternAggregationSchedule}": ${error}`
+        );
+      }
+    }
+
     this.logger.info("Scheduler started");
   }
 
@@ -165,6 +202,11 @@ export class Scheduler {
     if (this.connectionDiscoveryJob) {
       this.connectionDiscoveryJob.stop();
       this.connectionDiscoveryJob = null;
+    }
+
+    if (this.patternAggregationJob) {
+      this.patternAggregationJob.stop();
+      this.patternAggregationJob = null;
     }
 
     this.running = false;
@@ -204,6 +246,16 @@ export class Scheduler {
       });
     }
 
+    if (this.config.patternAggregationSchedule) {
+      jobs.push({
+        type: "pattern_aggregation",
+        schedule: this.config.patternAggregationSchedule,
+        nextRun: this.patternAggregationJob?.nextRun() ?? null,
+        lastRun: this.lastPatternAggregationResult?.completedAt ?? null,
+        lastResult: this.lastPatternAggregationResult ?? undefined,
+      });
+    }
+
     return {
       running: this.running,
       jobs,
@@ -222,6 +274,13 @@ export class Scheduler {
    */
   async triggerConnectionDiscovery(): Promise<ScheduledJobResult> {
     return this.runConnectionDiscovery();
+  }
+
+  /**
+   * Manually trigger pattern aggregation job
+   */
+  async triggerPatternAggregation(): Promise<ScheduledJobResult> {
+    return this.runPatternAggregation();
   }
 
   /**
@@ -392,6 +451,37 @@ export class Scheduler {
     this.lastConnectionDiscoveryResult = result;
     return result;
   }
+
+  /**
+   * Run pattern aggregation - aggregates tool errors into failure patterns
+   */
+  private async runPatternAggregation(): Promise<ScheduledJobResult> {
+    const startedAt = new Date();
+    let errorMessage: string | undefined;
+
+    try {
+      this.logger.info("Starting pattern aggregation job");
+      this.patternAggregator.aggregateFailurePatterns();
+      this.patternAggregator.aggregateModelStats();
+      this.logger.info("Pattern aggregation completed");
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Pattern aggregation job failed: ${errorMessage}`);
+    }
+
+    const result: ScheduledJobResult = {
+      type: "pattern_aggregation",
+      startedAt,
+      completedAt: new Date(),
+      // Pattern aggregation processes all records, so count isn't easily available
+      // without changing the aggregator interface
+      itemsProcessed: undefined,
+      error: errorMessage,
+    };
+
+    this.lastPatternAggregationResult = result;
+    return result;
+  }
 }
 
 /**
@@ -407,6 +497,7 @@ export function createScheduler(
     {
       reanalysisSchedule: config.reanalysisSchedule,
       connectionDiscoverySchedule: config.connectionDiscoverySchedule,
+      patternAggregationSchedule: config.patternAggregationSchedule,
     },
     queue,
     db,

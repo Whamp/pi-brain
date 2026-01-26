@@ -74,8 +74,10 @@ export class PatternAggregator {
         example_nodes = excluded.example_nodes,
         last_seen = excluded.last_seen,
         updated_at = excluded.updated_at,
+        pattern = excluded.pattern,
+        tools = excluded.tools,
         -- Preserve existing learning opportunity if user customized it
-        learning_opportunity = COALESCE(failure_patterns.learning_opportunity, excluded.learning_opportunity)
+        learning_opportunity = COALESCE(learning_opportunity, excluded.learning_opportunity)
     `);
 
     const transaction = this.db.transaction(() => {
@@ -86,7 +88,8 @@ export class PatternAggregator {
           .slice(0, 16); // Short ID is enough
 
         const pattern = `Error '${group.errorType}' in tool '${group.tool}'`;
-        const modelsJson = JSON.stringify([...group.models].toSorted());
+        // eslint-disable-next-line unicorn/no-array-sort
+        const modelsJson = JSON.stringify([...group.models].sort());
         const toolsJson = JSON.stringify([group.tool]);
         const examplesJson = JSON.stringify(group.nodeIds);
         const learningOpportunity = `Investigate why ${group.tool} fails with ${group.errorType}`;
@@ -100,6 +103,89 @@ export class PatternAggregator {
           examplesJson,
           group.lastSeen,
           learningOpportunity
+        );
+      }
+    });
+
+    transaction();
+  }
+
+  /**
+   * Aggregates model statistics from quirks and tool errors.
+   */
+  public aggregateModelStats(): void {
+    const quirksStmt = this.db.prepare(`
+      SELECT model, COUNT(*) as count, MAX(created_at) as last_seen
+      FROM model_quirks
+      GROUP BY model
+    `);
+
+    const errorsStmt = this.db.prepare(`
+      SELECT model, COUNT(*) as count, MAX(created_at) as last_seen
+      FROM tool_errors
+      WHERE model IS NOT NULL
+      GROUP BY model
+    `);
+
+    const statsMap = new Map<
+      string,
+      { quirkCount: number; errorCount: number; lastUsed: string }
+    >();
+
+    for (const row of quirksStmt.iterate() as IterableIterator<{
+      model: string;
+      count: number;
+      last_seen: string;
+    }>) {
+      const stats = statsMap.get(row.model) ?? {
+        quirkCount: 0,
+        errorCount: 0,
+        lastUsed: row.last_seen,
+      };
+      stats.quirkCount = row.count;
+      if (row.last_seen > stats.lastUsed) {
+        stats.lastUsed = row.last_seen;
+      }
+      statsMap.set(row.model, stats);
+    }
+
+    for (const row of errorsStmt.iterate() as IterableIterator<{
+      model: string;
+      count: number;
+      last_seen: string;
+    }>) {
+      const stats = statsMap.get(row.model) ?? {
+        quirkCount: 0,
+        errorCount: 0,
+        lastUsed: row.last_seen,
+      };
+      stats.errorCount = row.count;
+      if (row.last_seen > stats.lastUsed) {
+        stats.lastUsed = row.last_seen;
+      }
+      statsMap.set(row.model, stats);
+    }
+
+    const insertStmt = this.db.prepare(`
+      INSERT INTO model_stats (
+        model, quirk_count, error_count, last_used, updated_at
+      ) VALUES (
+        ?, ?, ?, ?, datetime('now')
+      )
+      ON CONFLICT(model) DO UPDATE SET
+        quirk_count = excluded.quirk_count,
+        error_count = excluded.error_count,
+        last_used = MAX(last_used, excluded.last_used),
+        updated_at = excluded.updated_at
+    `);
+
+    const transaction = this.db.transaction(() => {
+      for (const [model, stats] of statsMap.entries()) {
+        insertStmt.run(
+          model,
+          stats.quirkCount,
+          stats.errorCount,
+          stats.lastUsed
         );
       }
     });

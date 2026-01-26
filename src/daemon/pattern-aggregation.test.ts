@@ -180,4 +180,81 @@ describe("patternAggregator", () => {
     // Should be n10, n9, n8, n7, n6 (descending order of created_at)
     expect(examples).toStrictEqual(["n10", "n9", "n8", "n7", "n6"]);
   });
+
+  interface ModelStatsRow {
+    model: string;
+    total_tokens: number;
+    total_cost: number;
+    total_sessions: number;
+    quirk_count: number;
+    error_count: number;
+    last_used: string;
+    updated_at: string;
+  }
+
+  it("should aggregate model stats correctly", () => {
+    // Create model_quirks and model_stats tables
+    db.exec(`
+      CREATE TABLE model_quirks (
+        id TEXT PRIMARY KEY,
+        node_id TEXT NOT NULL,
+        model TEXT NOT NULL,
+        observation TEXT NOT NULL,
+        frequency TEXT,
+        workaround TEXT,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE model_stats (
+        model TEXT PRIMARY KEY,
+        total_tokens INTEGER DEFAULT 0,
+        total_cost REAL DEFAULT 0.0,
+        total_sessions INTEGER DEFAULT 0,
+        quirk_count INTEGER DEFAULT 0,
+        error_count INTEGER DEFAULT 0,
+        last_used TEXT,
+        updated_at TEXT DEFAULT (datetime('now'))
+      );
+    `);
+
+    // Insert test data for quirks
+    db.prepare(`
+      INSERT INTO model_quirks (id, node_id, model, observation, created_at)
+      VALUES
+        ('1', 'n1', 'gpt-4', 'obs1', '2026-01-01T10:00:00Z'),
+        ('2', 'n2', 'gpt-4', 'obs2', '2026-01-02T10:00:00Z'),
+        ('3', 'n3', 'claude-3', 'obs1', '2026-01-03T10:00:00Z')
+    `).run();
+
+    // Insert test data for errors (using existing tool_errors table)
+    db.prepare(`
+      INSERT INTO tool_errors (id, node_id, tool, error_type, model, created_at)
+      VALUES
+        ('e1', 'n4', 'git', 'error', 'gpt-4', '2026-01-04T10:00:00Z'),
+        ('e2', 'n5', 'git', 'error', 'claude-3', '2026-01-05T10:00:00Z'),
+        ('e3', 'n6', 'git', 'error', 'claude-3', '2026-01-06T10:00:00Z')
+    `).run();
+
+    // Run aggregation
+    aggregator.aggregateModelStats();
+
+    // Verify results
+    const stats = db
+      .prepare("SELECT * FROM model_stats ORDER BY model")
+      .all() as ModelStatsRow[];
+
+    expect(stats).toHaveLength(2);
+
+    const claudeStats = stats.find((s) => s.model === "claude-3");
+    expect(claudeStats).toBeDefined();
+    expect(claudeStats?.quirk_count).toBe(1);
+    expect(claudeStats?.error_count).toBe(2);
+    expect(claudeStats?.last_used).toBe("2026-01-06T10:00:00Z");
+
+    const gpt4Stats = stats.find((s) => s.model === "gpt-4");
+    expect(gpt4Stats).toBeDefined();
+    expect(gpt4Stats?.quirk_count).toBe(2);
+    expect(gpt4Stats?.error_count).toBe(1);
+    expect(gpt4Stats?.last_used).toBe("2026-01-04T10:00:00Z");
+  });
 });
