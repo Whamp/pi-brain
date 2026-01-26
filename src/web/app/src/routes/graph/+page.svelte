@@ -4,6 +4,7 @@
   import type { Node, NodeFilters, NodeType } from "$lib/types";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { parseDate, formatDateShort } from "$lib/utils/date";
 
   // Filters state
   let projectFilter = "";
@@ -89,7 +90,7 @@
   </header>
 
   <div class="graph-layout">
-    <div class="graph-main">
+    <div class="graph-main" class:has-error={$nodesStore.error}>
       <Graph
         nodes={$nodesStore.nodes}
         edges={$nodesStore.edges}
@@ -183,7 +184,12 @@
       {#if $selectedNode}
         <section class="selected-node-section">
           <h2>Selected Node</h2>
-          <div class="node-preview">
+          <div class="node-preview" class:loading={$nodesStore.loading}>
+            {#if $nodesStore.loading}
+              <div class="preview-loading-overlay">
+                <div class="loading-spinner-small"></div>
+              </div>
+            {/if}
             <div class="node-type" data-type={$selectedNode.classification.type}>
               {$selectedNode.classification.type}
             </div>
@@ -196,7 +202,7 @@
                 {$selectedNode.content.outcome}
               </span>
               <span class="date">
-                {new Date($selectedNode.metadata.timestamp).toLocaleDateString()}
+                {formatDateShort(parseDate($selectedNode.metadata.timestamp))}
               </span>
             </div>
             {#if $selectedNode.semantic.tags.length > 0}
@@ -316,6 +322,20 @@
     min-height: 400px;
   }
 
+  .graph-main.has-error {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .graph-main.has-error::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-bg);
+    opacity: 0.3;
+    z-index: 1;
+  }
+
   .loading-overlay {
     position: absolute;
     top: 50%;
@@ -418,6 +438,29 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    position: relative;
+  }
+
+  .node-preview.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .preview-loading-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+  }
+
+  .loading-spinner-small {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
   }
 
   .node-type {

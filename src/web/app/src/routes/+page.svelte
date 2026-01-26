@@ -13,6 +13,7 @@
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { DashboardStats, DaemonStatus, Node } from "$lib/types";
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
 
   // State
   let stats: DashboardStats | null = null;
@@ -28,6 +29,7 @@
     errorType: string;
     count: number;
     models?: string[];
+    learningOpportunity?: string;
   }[] = [];
   let daemonStatus: DaemonStatus | null = null;
   let loading = true;
@@ -35,8 +37,8 @@
 
   onMount(async () => {
     try {
-      const [statsRes, toolErrorsRes, activityRes, patternsRes, daemonRes] =
-        await Promise.all([
+      const [statsResult, toolErrorsResult, activityResult, patternsResult, daemonResult] =
+        await Promise.allSettled([
           api.getStats(),
           api.getAggregatedToolErrors({}, { groupByModel: true, limit: 10 }),
           api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" }),
@@ -44,11 +46,28 @@
           api.getDaemonStatus(),
         ]);
 
-      stats = statsRes;
-      toolErrors = toolErrorsRes;
-      recentActivity = activityRes.nodes;
-      failurePatterns = patternsRes;
-      daemonStatus = daemonRes;
+      if (statsResult.status === "fulfilled") {
+        stats = statsResult.value;
+      }
+      if (toolErrorsResult.status === "fulfilled") {
+        toolErrors = toolErrorsResult.value;
+      }
+      if (activityResult.status === "fulfilled") {
+        recentActivity = activityResult.value.nodes;
+      }
+      if (patternsResult.status === "fulfilled") {
+        failurePatterns = patternsResult.value;
+      }
+      if (daemonResult.status === "fulfilled") {
+        daemonStatus = daemonResult.value;
+      }
+
+      // Show error only if all calls failed
+      const allFailed = [statsResult, toolErrorsResult, activityResult, patternsResult, daemonResult]
+        .every(r => r.status === "rejected");
+      if (allFailed) {
+        errorMessage = "Failed to load dashboard data. Is the server running?";
+      }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
       errorMessage = "Failed to load dashboard data. Is the server running?";
@@ -56,6 +75,18 @@
       loading = false;
     }
   });
+
+  // Fallback learning recommendations when API doesn't provide them
+  function getLearningFallback(errorType: string): string {
+    const fallbacks: Record<string, string> = {
+      exact_match_failed: "Read file before editing to verify exact text",
+      timeout: "Use tmux skill for long-running processes",
+      file_not_found: "Check file exists before reading/editing",
+      permission_denied: "Verify file permissions before access",
+      syntax_error: "Validate syntax before executing",
+    };
+    return fallbacks[errorType] ?? "Review examples for common causes";
+  }
 
   function getOutcomeIcon(outcome: string | null): string {
     const icons: Record<string, string> = {
@@ -91,12 +122,14 @@
   </header>
 
   {#if errorMessage}
-    <div class="error-banner">
+    <div class="error-banner" role="alert">
       <AlertTriangle size={20} />
       {errorMessage}
     </div>
   {:else if loading}
-    <div class="loading">Loading dashboard...</div>
+    <div class="loading" role="status" aria-live="polite">
+      <Spinner message="Loading dashboard..." />
+    </div>
   {:else if stats}
     <!-- Quick Stats -->
     <section class="stats-grid" aria-label="Quick statistics">
@@ -337,17 +370,8 @@
                 Models: {pattern.models?.join(", ") ?? "Unknown"}
               </div>
               <div class="pattern-learning">
-                <!-- Learning opportunity is not yet in the API, using placeholder logic -->
                 <strong>Learning:</strong>
-                {#if pattern.errorType === "exact_match_failed"}
-                  Read file before editing to verify exact text
-                {:else if pattern.errorType === "timeout"}
-                  Use tmux skill for long-running processes
-                {:else if pattern.errorType === "file_not_found"}
-                  Check file exists before reading/editing
-                {:else}
-                  Review examples for common causes
-                {/if}
+                {pattern.learningOpportunity ?? getLearningFallback(pattern.errorType)}
               </div>
             </div>
           {/each}
@@ -686,11 +710,6 @@
     border-color: var(--color-error);
   }
 
-  .pattern-card.warning {
-    background: rgba(234, 179, 8, 0.05);
-    border-color: var(--color-warning);
-  }
-
   .pattern-header {
     display: flex;
     align-items: center;
@@ -700,10 +719,6 @@
 
   .pattern-card.error .pattern-header {
     color: var(--color-error);
-  }
-
-  .pattern-card.warning .pattern-header {
-    color: var(--color-warning);
   }
 
   .pattern-title {

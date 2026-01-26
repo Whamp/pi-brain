@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { onMount } from "svelte";
   import {
     ArrowLeft,
     ArrowRight,
@@ -21,6 +20,7 @@
     ExternalLink,
   } from "lucide-svelte";
   import { api } from "$lib/api/client";
+  import { parseDate } from "$lib/utils/date";
   import type { Node, Edge, LessonLevel } from "$lib/types";
 
   const nodeId = $derived(page.params.id);
@@ -63,17 +63,11 @@
     }
   }
 
-  onMount(() => {
-    loadNode();
-  });
-
-  // Re-load when nodeId changes (after initial mount)
-  let previousNodeId: string | undefined;
+  // Load node on mount and when nodeId changes
   $effect(() => {
-    if (nodeId && previousNodeId !== undefined && nodeId !== previousNodeId) {
+    if (nodeId) {
       loadNode();
     }
-    previousNodeId = nodeId;
   });
 
   function getOutcomeIcon(outcome: string) {
@@ -117,7 +111,7 @@
   }
 
   function formatDate(isoString: string): string {
-    const date = new Date(isoString);
+    const date = parseDate(isoString);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",

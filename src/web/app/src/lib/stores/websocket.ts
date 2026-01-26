@@ -16,6 +16,28 @@ interface WSState {
 const MAX_RECONNECT_DELAY = 60_000; // 1 minute max
 const BASE_DELAY = 1000; // 1 second base
 
+function getDefaultWsUrl(): string {
+  if (typeof window === "undefined") {
+    return "ws://localhost:8765/ws";
+  }
+
+  // Check for explicit env override first
+  if (import.meta.env?.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL as string;
+  }
+
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+
+  // Dev mode: use fixed port if running on common dev hosts
+  const devHosts = ["localhost", "127.0.0.1", "0.0.0.0"];
+  const isDevHost = devHosts.includes(window.location.hostname);
+  const host = isDevHost
+    ? `${window.location.hostname}:8765`
+    : window.location.host;
+
+  return `${protocol}//${host}/ws`;
+}
+
 function createWebSocketStore() {
   const { subscribe, set, update } = writable<WSState>({
     connected: false,
@@ -77,13 +99,16 @@ function createWebSocketStore() {
     reconnectTimeout = setTimeout(() => connect(), delay);
   }
 
-  function connect(url = "ws://localhost:8765/ws") {
+  function connect(url?: string) {
+    // Derive WebSocket URL from current location if not provided
+    const wsUrl = url ?? getDefaultWsUrl();
+
     if (ws?.readyState === WebSocket.OPEN) {
       return;
     }
 
     try {
-      ws = new WebSocket(url);
+      ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         reconnectAttempts = 0; // Reset on successful connection
@@ -99,10 +124,11 @@ function createWebSocketStore() {
       };
 
       ws.onclose = (event) => {
-        set({ connected: false, reconnecting: true, error: null });
-
         // Don't reconnect if closed intentionally (code 1000)
-        if (event.code !== 1000) {
+        if (event.code === 1000) {
+          set({ connected: false, reconnecting: false, error: null });
+        } else {
+          set({ connected: false, reconnecting: true, error: null });
           scheduleReconnect();
         }
       };

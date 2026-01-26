@@ -14,7 +14,22 @@ import type {
   DaemonDecision,
 } from "$lib/types";
 
-const DEFAULT_BASE_URL = "http://localhost:8765/api/v1";
+// Use environment variable, or derive from window.location in browser
+function getDefaultBaseUrl(): string {
+  // Check for environment variable (SSR or build-time)
+  if (import.meta.env?.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // In browser, derive from current location
+  if (typeof window !== "undefined") {
+    return `${window.location.protocol}//${window.location.host}/api/v1`;
+  }
+  // Fallback for SSR
+  return "http://localhost:8765/api/v1";
+}
+
+const DEFAULT_BASE_URL = getDefaultBaseUrl();
+const DEFAULT_TIMEOUT_MS = 30_000;
 
 interface ApiResponse<T> {
   status: "success" | "error";
@@ -30,20 +45,37 @@ interface ApiResponse<T> {
   };
 }
 
-class ApiError extends Error {
+interface ApiErrorOptions {
   code: string;
+  message: string;
   details?: Record<string, unknown>;
+}
 
-  constructor(
-    code: string,
-    message: string,
-    details?: Record<string, unknown>
-  ) {
-    super(message);
-    this.name = "ApiError";
-    this.code = code;
-    this.details = details;
-  }
+function createApiError(options: ApiErrorOptions): Error {
+  const error = new Error(options.message);
+  error.name = "ApiError";
+  (error as Error & { code: string; details?: Record<string, unknown> }).code =
+    options.code;
+  (
+    error as Error & { code: string; details?: Record<string, unknown> }
+  ).details = options.details;
+  return error;
+}
+
+function createTimeoutError(timeoutMs: number): Error {
+  const error = new Error(`Request timed out after ${timeoutMs}ms`);
+  error.name = "TimeoutError";
+  return error;
+}
+
+function isApiError(
+  error: unknown
+): error is Error & { code: string; details?: Record<string, unknown> } {
+  return error instanceof Error && error.name === "ApiError";
+}
+
+function isTimeoutError(error: unknown): error is Error {
+  return error instanceof Error && error.name === "TimeoutError";
 }
 
 function toQueryString(params: Record<string, unknown>): string {
@@ -68,23 +100,41 @@ function toQueryString(params: Record<string, unknown>): string {
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
-  baseUrl: string = DEFAULT_BASE_URL
+  baseUrl: string = DEFAULT_BASE_URL,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS
 ): Promise<T> {
-  const response = await fetch(`${baseUrl}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  const json: ApiResponse<T> = await response.json();
+  try {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
 
-  if (json.status === "error" && json.error) {
-    throw new ApiError(json.error.code, json.error.message, json.error.details);
+    const json: ApiResponse<T> = await response.json();
+
+    if (json.status === "error" && json.error) {
+      throw createApiError({
+        code: json.error.code,
+        message: json.error.message,
+        details: json.error.details,
+      });
+    }
+
+    return json.data as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw createTimeoutError(timeoutMs);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return json.data as T;
 }
 
 export const api = {
@@ -159,6 +209,7 @@ export const api = {
         models?: string[];
         model?: string;
         recentNodes: string[];
+        learningOpportunity?: string;
       }[]
     >(`/tool-errors/aggregated${toQueryString({ ...filters, ...options })}`),
 
@@ -274,6 +325,42 @@ export const api = {
       limit: number;
       offset: number;
     }>(`/sessions/nodes${toQueryString({ sessionFile, ...options })}`),
+
+  // Configuration
+  getDaemonConfig: () =>
+    request<{
+      provider: string;
+      model: string;
+      idleTimeoutMinutes: number;
+      parallelWorkers: number;
+      defaults: { provider: string; model: string };
+    }>("/config/daemon"),
+
+  updateDaemonConfig: (config: {
+    provider?: string;
+    model?: string;
+    idleTimeoutMinutes?: number;
+    parallelWorkers?: number;
+  }) =>
+    request<{
+      provider: string;
+      model: string;
+      idleTimeoutMinutes: number;
+      parallelWorkers: number;
+      message: string;
+    }>("/config/daemon", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
+  getProviders: () =>
+    request<{
+      providers: {
+        id: string;
+        name: string;
+        models: string[];
+      }[];
+    }>("/config/providers"),
 };
 
-export { ApiError };
+export { createApiError, createTimeoutError, isApiError, isTimeoutError };

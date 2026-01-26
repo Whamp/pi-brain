@@ -70,7 +70,7 @@
                <button 
                 class="feedback-btn" 
                 class:active={decision.userFeedback === 'good'}
-                on:click={() => handleFeedback(decision.id, 'good')}
+                onclick={() => handleFeedback(decision.id, 'good')}
                 title="Good decision"
                 disabled={feedbackLoading[decision.id]}
               >
@@ -79,7 +79,7 @@
               <button 
                 class="feedback-btn" 
                 class:active={decision.userFeedback === 'bad'}
-                on:click={() => handleFeedback(decision.id, 'bad')}
+                onclick={() => handleFeedback(decision.id, 'bad')}
                 title="Bad decision"
                 disabled={feedbackLoading[decision.id]}
               >
@@ -145,7 +145,7 @@
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-md);
     padding: var(--space-3);
-    background: var(--color-bg-subtle);
+    background: var(--color-bg-elevated);
   }
 
   .decision-header {
@@ -184,8 +184,8 @@
   }
 
   .feedback-btn.active {
-    color: var(--color-primary);
-    background: var(--color-primary-subtle);
+    color: var(--color-accent);
+    background: var(--color-accent-muted);
   }
   
   .feedback-btn:disabled {

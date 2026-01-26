@@ -1,6 +1,7 @@
 <script lang="ts">
   import "../app.css";
   import { page } from "$app/state";
+  import { onMount } from "svelte";
   import {
     LayoutDashboard,
     Network,
@@ -9,6 +10,9 @@
     Settings,
     Brain,
   } from "lucide-svelte";
+  import { wsStore } from "$lib/stores/websocket";
+  import { daemonStore } from "$lib/stores/daemon";
+  import ErrorFallback from "$lib/components/error-fallback.svelte";
 
   interface NavItem {
     href: string;
@@ -30,6 +34,16 @@
   }
 
   let { children } = $props();
+
+  onMount(() => {
+    // Load initial daemon status and connect WebSocket
+    daemonStore.loadStatus();
+    wsStore.connect();
+
+    return () => {
+      wsStore.disconnect();
+    };
+  });
 </script>
 
 <div class="app-layout">
@@ -61,14 +75,33 @@
 
     <div class="sidebar-footer">
       <div class="daemon-status">
-        <span class="status-dot success"></span>
-        <span class="status-text">Daemon running</span>
+        <span
+          class="status-dot"
+          class:success={$daemonStore.status?.running}
+          class:error={$daemonStore.status && !$daemonStore.status.running}
+        ></span>
+        <span class="status-text">
+          {#if $daemonStore.loading}
+            Checking...
+          {:else if $daemonStore.status?.running}
+            Daemon running
+          {:else if $daemonStore.status}
+            Daemon stopped
+          {:else}
+            Daemon unknown
+          {/if}
+        </span>
       </div>
     </div>
   </aside>
 
   <main class="main-content">
-    {@render children()}
+    <svelte:boundary>
+      {@render children()}
+      {#snippet failed(error, reset)}
+        <ErrorFallback error={error instanceof Error ? error : new Error(String(error))} {reset} />
+      {/snippet}
+    </svelte:boundary>
   </main>
 </div>
 
@@ -154,6 +187,21 @@
     gap: var(--space-2);
     font-size: var(--text-xs);
     color: var(--color-text-muted);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-text-subtle);
+  }
+
+  .status-dot.success {
+    background: var(--color-success);
+  }
+
+  .status-dot.error {
+    background: var(--color-error);
   }
 
   .main-content {

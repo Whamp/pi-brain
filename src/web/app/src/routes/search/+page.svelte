@@ -92,12 +92,7 @@
     document.addEventListener("click", handleClickOutside);
 
     // Load filter options
-    try {
-      // Projects would come from API, for now use empty
-      availableProjects = [];
-    } catch (error) {
-      console.error("Failed to load filter options:", error);
-    }
+    loadFilterOptions();
 
     // Check if query is in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -112,6 +107,15 @@
       document.removeEventListener("click", handleClickOutside);
     };
   });
+
+  async function loadFilterOptions(): Promise<void> {
+    try {
+      const data = await api.getProjects();
+      availableProjects = data.projects.map(p => p.project);
+    } catch (error) {
+      console.error("Failed to load filter options:", error);
+    }
+  }
 
   async function performSearch() {
     if (!searchQuery.trim()) {
@@ -385,7 +389,7 @@
   <!-- Search Results -->
   <div class="results-container">
     {#if loading && results.length === 0}
-      <div class="loading-state">
+      <div class="loading-state" role="status" aria-live="polite">
         <div class="spinner"></div>
         <p>Searching...</p>
       </div>
@@ -411,7 +415,7 @@
         </p>
       </div>
     {:else}
-      <div class="results-info">
+      <div class="results-info" role="status" aria-live="polite">
         <p class="results-count">
           Found {total} result{total !== 1 ? "s" : ""} for "{searchQuery}"
         </p>

@@ -46,11 +46,10 @@
   const MAX_LABEL_LENGTH = 30;
 
   // Node type to color mapping
-  // Note: CSS uses --color-node-refactoring but NodeType is "refactor"
   const nodeColors: Record<NodeType, string> = {
     coding: "var(--color-node-coding)",
     debugging: "var(--color-node-debugging)",
-    refactor: "var(--color-node-refactoring)", // CSS var uses "refactoring"
+    refactor: "var(--color-node-refactor)",
     sysadmin: "var(--color-node-sysadmin)",
     research: "var(--color-node-research)",
     planning: "var(--color-node-planning)",
@@ -381,37 +380,54 @@
       );
   }
 
-  // Handle resize
+  // Handle resize with debouncing
+  let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+
   function handleResize(): void {
-    if (!container || !svg) {
-      return;
-    }
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (!container || !svg) {
+        return;
+      }
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
 
-    svg.attr("width", width).attr("height", height);
+      svg.attr("width", width).attr("height", height);
 
-    // Update center force
-    const centerForce = simulation.force<d3.ForceCenter<NodeDatum>>("center");
-    if (centerForce) {
-      centerForce.x(width / 2).y(height / 2);
-    }
+      // Update center force
+      const centerForce = simulation.force<d3.ForceCenter<NodeDatum>>("center");
+      if (centerForce) {
+        centerForce.x(width / 2).y(height / 2);
+      }
 
-    simulation.alpha(0.1).restart();
+      simulation.alpha(0.1).restart();
+    }, 100);
   }
 
   // Lifecycle
   onMount(() => {
     initGraph();
-    window.addEventListener("resize", handleResize);
   });
 
   onDestroy(() => {
-    window.removeEventListener("resize", handleResize);
     if (simulation) {
       simulation.stop();
     }
+    clearTimeout(resizeTimeout);
+  });
+
+  // ResizeObserver for precise container tracking with cleanup
+  $effect(() => {
+    if (!container) {
+      return;
+    }
+    const observer = new ResizeObserver(() => handleResize());
+    observer.observe(container);
+    return () => {
+      observer.disconnect();
+      clearTimeout(resizeTimeout);
+    };
   });
 
   // Reactivity using $effect - trigger update when nodes or edges change

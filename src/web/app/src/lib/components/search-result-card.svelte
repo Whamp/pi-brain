@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { SearchResult, NodeType, Outcome } from "$lib/types";
-  import { formatDistanceToNow } from "$lib/utils/date";
+  import { formatDistanceToNow, parseDate } from "$lib/utils/date";
+  import SafeHighlight from "./safe-highlight.svelte";
 
   interface Props {
     result: SearchResult;
@@ -75,7 +76,7 @@
   const projectName = $derived(node.classification.project.split("/").pop() ?? "unknown");
   const outcomeIcon = $derived(getOutcomeIcon(node.content.outcome));
   const typeIcon = $derived(getNodeIcon(node.classification.type));
-  const timeAgo = $derived(formatDistanceToNow(new Date(node.metadata.timestamp)));
+  const timeAgo = $derived(formatDistanceToNow(parseDate(node.metadata.timestamp)));
 </script>
 
 <a href="/nodes/{node.id}" class="result-card">
@@ -101,12 +102,9 @@
       {#each result.highlights as highlight}
         <div class="highlight-item">
           <span class="highlight-field">{highlight.field}</span>
-          <!-- 
-            SECURITY: @html is used here because the API returns pre-sanitized 
-            snippets with <mark> tags for highlighting. The API escapes all other 
-            HTML entities. See specs/api.md Search API response format.
-          -->
-          <span class="highlight-snippet">{@html highlight.snippet}</span>
+          <span class="highlight-snippet">
+            <SafeHighlight snippet={highlight.snippet} />
+          </span>
         </div>
       {/each}
     </div>
@@ -230,13 +228,6 @@
     font-size: var(--text-sm);
     line-height: 1.5;
     color: var(--color-text-muted);
-  }
-
-  :global(.highlight-snippet mark) {
-    background: var(--color-accent-muted);
-    color: var(--color-accent);
-    padding: 0 2px;
-    border-radius: 2px;
   }
 
   .tags {

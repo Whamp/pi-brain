@@ -2,7 +2,13 @@
 export * from "./types";
 
 // Re-export API client
-export { api, ApiError } from "./api/client";
+export {
+  api,
+  createApiError,
+  createTimeoutError,
+  isApiError,
+  isTimeoutError,
+} from "./api/client";
 
 // Re-export stores
 export { nodesStore, selectedNode } from "./stores/nodes";

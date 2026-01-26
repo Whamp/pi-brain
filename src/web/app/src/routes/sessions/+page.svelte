@@ -5,7 +5,7 @@
 
 <script lang="ts">
   import { api } from "$lib/api/client";
-  import { formatDistanceToNow, formatDate } from "$lib/utils/date";
+  import { formatDistanceToNow, formatDate, parseDate } from "$lib/utils/date";
   import {
     FolderTree,
     Folder,
@@ -203,7 +203,7 @@
 
   <!-- Loading State -->
   {#if loading}
-    <div class="loading-state">
+    <div class="loading-state" role="status" aria-live="polite">
       <Loader2 size={32} class="spinner" />
       <p>Loading...</p>
     </div>
@@ -249,7 +249,7 @@
               </span>
               <span class="meta-item" title="Last activity">
                 <Clock size={14} />
-                {formatDistanceToNow(new Date(project.lastActivity))}
+                {formatDistanceToNow(parseDate(project.lastActivity))}
               </span>
             </div>
             <ChevronRight size={18} class="file-chevron" />
@@ -283,7 +283,7 @@
                 </span>
                 <span class="meta-item" title="Duration">
                   <Clock size={12} />
-                  {formatDate(new Date(session.firstTimestamp))}
+                  {formatDate(parseDate(session.firstTimestamp))}
                 </span>
               </div>
               <div class="session-types">
@@ -358,7 +358,7 @@
               <div class="node-meta">
                 <span title="Timestamp">
                   <Clock size={12} />
-                  {formatDistanceToNow(new Date(node.metadata.timestamp))}
+                  {formatDistanceToNow(parseDate(node.metadata.timestamp))}
                 </span>
                 <span title="Duration">
                   {node.metadata.durationMinutes} min
@@ -718,9 +718,9 @@
     color: var(--color-node-debugging);
   }
 
-  .type-refactoring {
+  .type-refactor {
     background: #8b5cf620;
-    color: var(--color-node-refactoring);
+    color: var(--color-node-refactor);
   }
 
   .type-sysadmin {
