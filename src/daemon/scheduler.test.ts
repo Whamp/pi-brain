@@ -2,9 +2,10 @@
  * Tests for the scheduler module
  */
 
+import type Database from "better-sqlite3";
+
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
-import type { Database } from "../storage/database.js";
 import type { QueueManager, JobInput } from "./queue.js";
 
 import {
@@ -56,39 +57,53 @@ function createMockDatabase(
     analyzer_version?: string;
     analyzed_at?: string;
   }[] = []
-): Database {
-  return {
-    get: vi.fn(async (sql: string) => {
-      if (sql.includes("metadata")) {
-        return { value: "1.0.0" };
-      }
-      return null;
-    }),
-    all: vi.fn(async (sql: string) => {
-      if (sql.includes("analyzer_version")) {
-        // Return nodes with old version for reanalysis
-        return nodes
-          .filter((n) => n.analyzer_version !== "1.0.0")
-          .map((n) => ({
-            id: n.id,
-            session_file: n.session_file,
-            segment_start: n.segment_start ?? null,
-            segment_end: n.segment_end ?? null,
-          }));
-      }
-      if (sql.includes("analyzed_at")) {
-        // Return recent nodes for connection discovery
-        return nodes.map((n) => ({
+): Database.Database {
+  // Create mock prepared statements that return the appropriate data
+  const mockPrepare = vi.fn((sql: string) => {
+    if (sql.includes("metadata")) {
+      return {
+        get: vi.fn(() => ({ value: "1.0.0" })),
+        all: vi.fn(() => [{ value: "1.0.0" }]),
+      };
+    }
+    if (sql.includes("analyzer_version")) {
+      // Return nodes with old version for reanalysis
+      const filteredNodes = nodes
+        .filter((n) => n.analyzer_version !== "1.0.0")
+        .map((n) => ({
           id: n.id,
           session_file: n.session_file,
+          segment_start: n.segment_start ?? null,
+          segment_end: n.segment_end ?? null,
         }));
-      }
-      return [];
-    }),
-    run: vi.fn(async () => ({ changes: 0, lastInsertRowid: 0 })),
-    exec: vi.fn(async () => {}),
-    close: vi.fn(async () => {}),
-  } as unknown as Database;
+      return {
+        get: vi.fn(() => filteredNodes[0] ?? null),
+        all: vi.fn(() => filteredNodes),
+      };
+    }
+    if (sql.includes("analyzed_at")) {
+      // Return recent nodes for connection discovery
+      const mappedNodes = nodes.map((n) => ({
+        id: n.id,
+        session_file: n.session_file,
+      }));
+      return {
+        get: vi.fn(() => mappedNodes[0] ?? null),
+        all: vi.fn(() => mappedNodes),
+      };
+    }
+    // Default empty result
+    return {
+      get: vi.fn(() => null),
+      all: vi.fn(() => []),
+    };
+  });
+
+  return {
+    prepare: mockPrepare,
+    exec: vi.fn(),
+    close: vi.fn(),
+  } as unknown as Database.Database;
 }
 
 // Capture logger for testing
@@ -105,7 +120,7 @@ function createCapturingLogger(): SchedulerLogger & { messages: string[] } {
 describe("scheduler", () => {
   let scheduler: Scheduler;
   let queue: ReturnType<typeof createMockQueue>;
-  let db: Database;
+  let db: Database.Database;
   let logger: ReturnType<typeof createCapturingLogger>;
 
   const defaultConfig: SchedulerConfig = {
@@ -240,11 +255,15 @@ describe("scheduler", () => {
 
     it("should handle database errors", async () => {
       db = {
-        ...createMockDatabase(),
-        all: vi.fn(async () => {
-          throw new Error("Database connection failed");
-        }),
-      } as unknown as Database;
+        prepare: vi.fn(() => ({
+          get: vi.fn(() => {
+            throw new Error("Database connection failed");
+          }),
+          all: vi.fn(() => {
+            throw new Error("Database connection failed");
+          }),
+        })),
+      } as unknown as Database.Database;
       scheduler = new Scheduler(defaultConfig, queue, db, logger);
 
       const result = await scheduler.triggerReanalysis();
@@ -300,11 +319,15 @@ describe("scheduler", () => {
 
     it("should handle database errors", async () => {
       db = {
-        ...createMockDatabase(),
-        all: vi.fn(async () => {
-          throw new Error("Query timeout");
-        }),
-      } as unknown as Database;
+        prepare: vi.fn(() => ({
+          get: vi.fn(() => {
+            throw new Error("Query timeout");
+          }),
+          all: vi.fn(() => {
+            throw new Error("Query timeout");
+          }),
+        })),
+      } as unknown as Database.Database;
       scheduler = new Scheduler(defaultConfig, queue, db, logger);
 
       const result = await scheduler.triggerConnectionDiscovery();

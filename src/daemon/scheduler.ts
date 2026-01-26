@@ -6,10 +6,11 @@
  * - Connection discovery: Find semantic connections between nodes
  */
 
+import type Database from "better-sqlite3";
+
 import { Cron } from "croner";
 
 import type { DaemonConfig } from "../config/types.js";
-import type { Database } from "../storage/database.js";
 import type { QueueManager } from "./queue.js";
 
 /** Job types that can be scheduled */
@@ -79,7 +80,7 @@ export class Scheduler {
   constructor(
     private config: SchedulerConfig,
     private queue: QueueManager,
-    private db: Database,
+    private db: Database.Database,
     private logger: SchedulerLogger = noopLogger
   ) {}
 
@@ -100,7 +101,13 @@ export class Scheduler {
         this.reanalysisJob = new Cron(
           this.config.reanalysisSchedule,
           { name: "reanalysis" },
-          () => this.runReanalysis()
+          async () => {
+            try {
+              await this.runReanalysis();
+            } catch (error) {
+              this.logger.error(`Reanalysis cron error: ${error}`);
+            }
+          }
         );
         this.logger.info(
           `Reanalysis scheduled: ${this.config.reanalysisSchedule} (next: ${this.reanalysisJob.nextRun()?.toISOString() ?? "unknown"})`
@@ -118,7 +125,13 @@ export class Scheduler {
         this.connectionDiscoveryJob = new Cron(
           this.config.connectionDiscoverySchedule,
           { name: "connection_discovery" },
-          () => this.runConnectionDiscovery()
+          async () => {
+            try {
+              await this.runConnectionDiscovery();
+            } catch (error) {
+              this.logger.error(`Connection discovery cron error: ${error}`);
+            }
+          }
         );
         this.logger.info(
           `Connection discovery scheduled: ${this.config.connectionDiscoverySchedule} (next: ${this.connectionDiscoveryJob.nextRun()?.toISOString() ?? "unknown"})`
@@ -221,27 +234,33 @@ export class Scheduler {
       this.logger.info("Starting reanalysis job");
 
       // Get current prompt version from database metadata
-      const currentVersionRow = await this.db.get<{ value: string }>(
-        "SELECT value FROM metadata WHERE key = 'current_prompt_version'"
-      );
+      const currentVersionRow = this.db
+        .prepare<[], { value: string }>(
+          "SELECT value FROM metadata WHERE key = 'current_prompt_version'"
+        )
+        .get();
       const currentVersion = currentVersionRow?.value ?? "1.0.0";
 
       // Find nodes analyzed with older prompts
-      const outdatedNodes = await this.db.all<{
-        id: string;
-        session_file: string;
-        segment_start: string | null;
-        segment_end: string | null;
-      }>(
-        `
+      const outdatedNodes = this.db
+        .prepare<
+          [string],
+          {
+            id: string;
+            session_file: string;
+            segment_start: string | null;
+            segment_end: string | null;
+          }
+        >(
+          `
         SELECT id, session_file, segment_start, segment_end
         FROM nodes
         WHERE analyzer_version != ?
         ORDER BY timestamp DESC
         LIMIT 100
-      `,
-        [currentVersion]
-      );
+      `
+        )
+        .all(currentVersion);
 
       this.logger.info(
         `Found ${outdatedNodes.length} nodes for reanalysis (current version: ${currentVersion})`
@@ -293,16 +312,21 @@ export class Scheduler {
       this.logger.info("Starting connection discovery job");
 
       // Get recently analyzed nodes (last 7 days)
-      const recentNodes = await this.db.all<{
-        id: string;
-        session_file: string;
-      }>(
-        `
+      const recentNodes = this.db
+        .prepare<
+          [],
+          {
+            id: string;
+            session_file: string;
+          }
+        >(
+          `
         SELECT id, session_file FROM nodes
         WHERE analyzed_at > datetime('now', '-7 days')
         ORDER BY analyzed_at DESC
       `
-      );
+        )
+        .all();
 
       this.logger.info(
         `Found ${recentNodes.length} recent nodes for connection discovery`
@@ -347,7 +371,7 @@ export class Scheduler {
 export function createScheduler(
   config: DaemonConfig,
   queue: QueueManager,
-  db: Database,
+  db: Database.Database,
   logger?: SchedulerLogger
 ): Scheduler {
   return new Scheduler(
