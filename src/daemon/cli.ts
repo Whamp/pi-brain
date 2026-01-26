@@ -976,45 +976,66 @@ export function rebuildIndex(configPath?: string): {
 
     clearAllData(db);
 
-    console.log("Inserting nodes...");
-    let count = 0;
+    // Phase 1: Insert Nodes
+    console.log("Phase 1: Inserting nodes...");
+    let insertCount = 0;
     const allFiles = [...latestFiles.values()];
     const batchSize = 100;
 
-    const processBatch = db.transaction((files: typeof allFiles) => {
+    const processInsertBatch = db.transaction((files: typeof allFiles) => {
       for (const { path: filePath } of files) {
         try {
           const node = readNodeFromPath(filePath);
           insertNodeToDb(db, node, filePath);
-
-          // Restore structural links
-          linkNodeToPredecessors(db, node);
-
-          count++;
+          insertCount++;
         } catch (error) {
           console.error(`\nFailed to import ${filePath}:`, error);
         }
       }
     });
 
-    // Process in batches
     for (let i = 0; i < allFiles.length; i += batchSize) {
       const batch = allFiles.slice(i, i + batchSize);
+      processInsertBatch(batch);
+      process.stdout.write(
+        `\rInserted ${insertCount} / ${allFiles.length} nodes...`
+      );
+    }
+    console.log(`\nInserted ${insertCount} nodes.`);
 
-      processBatch(batch);
+    // Phase 2: Link Nodes
+    console.log("Phase 2: Linking nodes...");
+    let linkCount = 0;
 
-      process.stdout.write(`\rInserted ${count} / ${allFiles.length} nodes...`);
+    const processLinkBatch = db.transaction((files: typeof allFiles) => {
+      for (const { path: filePath } of files) {
+        try {
+          const node = readNodeFromPath(filePath);
+          linkNodeToPredecessors(db, node);
+          linkCount++;
+        } catch (error) {
+          console.error(`\nFailed to link ${filePath}:`, error);
+        }
+      }
+    });
+
+    for (let i = 0; i < allFiles.length; i += batchSize) {
+      const batch = allFiles.slice(i, i + batchSize);
+      processLinkBatch(batch);
+      process.stdout.write(
+        `\rLinked ${linkCount} / ${allFiles.length} nodes...`
+      );
     }
 
-    console.log(`\nRebuild complete. Inserted ${count} nodes.`);
+    console.log(`\nRebuild complete. Processed ${insertCount} nodes.`);
     console.log(
       "Note: Any metadata not stored in JSON (like user feedback) has been reset."
     );
 
     return {
       success: true,
-      message: `Index rebuilt successfully. Inserted ${count} nodes.`,
-      count,
+      message: `Index rebuilt successfully. Processed ${insertCount} nodes.`,
+      count: insertCount,
     };
   } catch (error) {
     return {

@@ -85,6 +85,20 @@ export function clearAllData(db: Database.Database): void {
   db.transaction(() => {
     // Delete in order to respect FKs (though CASCADE handles it, being explicit is safer)
     db.prepare("DELETE FROM edges").run();
+
+    // Clear queue and patterns
+    try {
+      db.prepare("DELETE FROM analysis_queue").run();
+    } catch {
+      // Table might not exist or other error, ignore
+    }
+
+    try {
+      db.prepare("DELETE FROM failure_patterns").run();
+    } catch {
+      // Table might not exist or other error, ignore
+    }
+
     db.prepare("DELETE FROM nodes").run();
     // FTS table (triggers might handle this, but explicit delete is safe)
     db.prepare("DELETE FROM nodes_fts").run();
