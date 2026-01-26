@@ -1198,6 +1198,214 @@ export function countSearchResults(
 }
 
 // =============================================================================
+// Query Layer: Lessons
+// =============================================================================
+
+/** Filters for querying lessons */
+export interface ListLessonsFilters {
+  /** Filter by lesson level (model, project, etc.) */
+  level?: string;
+  /** Filter by source project (partial match via LIKE %project%) */
+  project?: string;
+  /** Filter by tags (AND logic - lessons must have ALL specified tags) */
+  tags?: string[];
+  /** Filter by exact confidence level */
+  confidence?: string;
+}
+
+/** Pagination options for lessons */
+export interface ListLessonsOptions {
+  /** Max results to return (default: 50, max: 500) */
+  limit?: number;
+  /** Offset for pagination (default: 0) */
+  offset?: number;
+}
+
+/** Result from listLessons query */
+export interface ListLessonsResult {
+  /** Matched lessons with metadata */
+  lessons: {
+    id: string;
+    nodeId: string;
+    level: string;
+    summary: string;
+    details: string | null;
+    confidence: string | null;
+    tags: string[];
+    sourceProject: string | null;
+    createdAt: string;
+  }[];
+  /** Total count of lessons matching filters (before pagination) */
+  total: number;
+  /** Limit used for the query */
+  limit: number;
+  /** Offset used for the query */
+  offset: number;
+}
+
+/**
+ * List lessons with filters and pagination.
+ *
+ * Supports filtering by:
+ * - level (exact match)
+ * - project (partial match via nodes table)
+ * - tags (AND logic via lesson_tags table)
+ * - confidence (exact match)
+ *
+ * Per specs/api.md GET /api/v1/lessons endpoint.
+ */
+export function listLessons(
+  db: Database.Database,
+  filters: ListLessonsFilters = {},
+  options: ListLessonsOptions = {}
+): ListLessonsResult {
+  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  const offset = Math.max(options.offset ?? 0, 0);
+
+  // Build WHERE clause
+  const conditions: string[] = ["1=1"];
+  const params: (string | number)[] = [];
+
+  if (filters.level) {
+    conditions.push("l.level = ?");
+    params.push(filters.level);
+  }
+
+  if (filters.confidence) {
+    conditions.push("l.confidence = ?");
+    params.push(filters.confidence);
+  }
+
+  if (filters.project) {
+    conditions.push("n.project LIKE ?");
+    params.push(`%${filters.project}%`);
+  }
+
+  if (filters.tags && filters.tags.length > 0) {
+    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
+    conditions.push(`(
+      SELECT COUNT(DISTINCT lt.tag) FROM lesson_tags lt
+      WHERE lt.lesson_id = l.id AND lt.tag IN (${tagPlaceholders})
+    ) = ?`);
+    params.push(...filters.tags, filters.tags.length);
+  }
+
+  const whereClause = conditions.join(" AND ");
+
+  // Count total
+  const countStmt = db.prepare(`
+    SELECT COUNT(*) as count
+    FROM lessons l
+    JOIN nodes n ON l.node_id = n.id
+    WHERE ${whereClause}
+  `);
+  const total = (countStmt.get(...params) as { count: number }).count;
+
+  // Fetch lessons with tags and project info
+  const dataStmt = db.prepare(`
+    SELECT 
+      l.id, l.node_id as nodeId, l.level, l.summary, l.details, l.confidence, l.created_at as createdAt,
+      n.project as sourceProject
+    FROM lessons l
+    JOIN nodes n ON l.node_id = n.id
+    WHERE ${whereClause}
+    ORDER BY l.created_at DESC, l.id DESC
+    LIMIT ? OFFSET ?
+  `);
+
+  const rows = dataStmt.all(...params, limit, offset) as {
+    id: string;
+    nodeId: string;
+    level: string;
+    summary: string;
+    details: string | null;
+    confidence: string | null;
+    createdAt: string;
+    sourceProject: string | null;
+  }[];
+
+  // Attach tags to each lesson
+  const lessons = rows.map((row) => {
+    const tags = getLessonTags(db, row.id);
+    return { ...row, tags };
+  });
+
+  return { lessons, total, limit, offset };
+}
+
+/** Result from getLessonsByLevel */
+export type LessonsByLevelResult = Record<
+  string,
+  {
+    count: number;
+    recent: {
+      id: string;
+      summary: string;
+      createdAt: string;
+    }[];
+  }
+>;
+
+/**
+ * Get aggregated lesson stats by level.
+ * Returns counts and most recent lessons for each level.
+ *
+ * Per specs/api.md GET /api/v1/lessons/by-level endpoint.
+ */
+export function getLessonsByLevel(
+  db: Database.Database,
+  recentLimit = 5
+): LessonsByLevelResult {
+  const levels = [
+    "project",
+    "task",
+    "user",
+    "model",
+    "tool",
+    "skill",
+    "subagent",
+  ];
+  const result: LessonsByLevelResult = {};
+
+  for (const level of levels) {
+    // Get count
+    const countStmt = db.prepare(
+      "SELECT COUNT(*) as count FROM lessons WHERE level = ?"
+    );
+    const { count } = countStmt.get(level) as { count: number };
+
+    // Get recent
+    const recentStmt = db.prepare(`
+      SELECT id, summary, created_at as createdAt
+      FROM lessons
+      WHERE level = ?
+      ORDER BY created_at DESC, id DESC
+      LIMIT ?
+    `);
+    const recent = recentStmt.all(level, recentLimit) as {
+      id: string;
+      summary: string;
+      createdAt: string;
+    }[];
+
+    result[level] = { count, recent };
+  }
+
+  return result;
+}
+
+/**
+ * Count lessons matching filters (without fetching data)
+ */
+export function countLessons(
+  db: Database.Database,
+  filters: ListLessonsFilters = {}
+): number {
+  const result = listLessons(db, filters, { limit: 1 });
+  return result.total;
+}
+
+// =============================================================================
 // Query Helpers
 // =============================================================================
 

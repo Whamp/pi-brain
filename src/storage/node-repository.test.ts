@@ -14,6 +14,7 @@ import type { AnalysisJob } from "../daemon/queue.js";
 import { migrate, openDatabase } from "./database.js";
 import {
   agentOutputToNode,
+  countLessons,
   countNodes,
   countSearchResults,
   createEdge,
@@ -35,6 +36,7 @@ import {
   getEdge,
   getEdgesFrom,
   getEdgesTo,
+  getLessonsByLevel,
   getLessonTags,
   getNode,
   getNodeEdges,
@@ -49,6 +51,7 @@ import {
   getSubgraph,
   indexNodeForSearch,
   linkNodeToPredecessors,
+  listLessons,
   listNodes,
   nodeExistsInDb,
   searchNodes,
@@ -2994,6 +2997,157 @@ describe("node-repository", () => {
 
       expect(result.nodes).toHaveLength(1);
       expect(result.nodes[0].id).toBe(nodeB.id);
+    });
+  });
+
+  // ===========================================================================
+  // Lesson Aggregation Tests
+  // ===========================================================================
+
+  describe("lesson aggregation", () => {
+    it("should list lessons with filters and pagination", () => {
+      const node1 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/test/project1",
+        },
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "Lesson 1",
+              details: "D1",
+              confidence: "high",
+              tags: ["tag1"],
+            },
+          ],
+        },
+      });
+      const node2 = createTestNode({
+        classification: {
+          ...createTestNode().classification,
+          project: "/home/test/project2",
+        },
+        lessons: {
+          ...emptyLessons(),
+          model: [
+            {
+              level: "model",
+              summary: "Lesson 2",
+              details: "D2",
+              confidence: "medium",
+              tags: ["tag1", "tag2"],
+            },
+          ],
+        },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Filter by level
+      const modelLessons = listLessons(db, { level: "model" });
+      expect(modelLessons.lessons).toHaveLength(1);
+      expect(modelLessons.lessons[0].summary).toBe("Lesson 2");
+
+      // Filter by project
+      const project1Lessons = listLessons(db, { project: "project1" });
+      expect(project1Lessons.lessons).toHaveLength(1);
+      expect(project1Lessons.lessons[0].summary).toBe("Lesson 1");
+
+      // Filter by tags (AND logic)
+      const tag1Lessons = listLessons(db, { tags: ["tag1"] });
+      expect(tag1Lessons.lessons).toHaveLength(2);
+
+      const tag2Lessons = listLessons(db, { tags: ["tag1", "tag2"] });
+      expect(tag2Lessons.lessons).toHaveLength(1);
+      expect(tag2Lessons.lessons[0].summary).toBe("Lesson 2");
+
+      // Pagination
+      const paginated = listLessons(db, {}, { limit: 1 });
+      expect(paginated.lessons).toHaveLength(1);
+      expect(paginated.total).toBe(2);
+    });
+
+    it("should get lessons by level statistics", () => {
+      const node = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "P1",
+              details: "D1",
+              confidence: "high",
+              tags: [],
+            },
+            {
+              level: "project",
+              summary: "P2",
+              details: "D2",
+              confidence: "high",
+              tags: [],
+            },
+          ],
+          model: [
+            {
+              level: "model",
+              summary: "M1",
+              details: "D3",
+              confidence: "medium",
+              tags: [],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      const stats = getLessonsByLevel(db);
+
+      expect(stats.project.count).toBe(2);
+      expect(stats.project.recent).toHaveLength(2);
+      const summaries = stats.project.recent.map((r) => r.summary);
+      expect(summaries).toContain("P1");
+      expect(summaries).toContain("P2");
+
+      expect(stats.model.count).toBe(1);
+      expect(stats.model.recent).toHaveLength(1);
+      expect(stats.model.recent[0].summary).toBe("M1");
+
+      expect(stats.user.count).toBe(0);
+      expect(stats.user.recent).toHaveLength(0);
+    });
+
+    it("should count lessons matching filters", () => {
+      const node = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project",
+              summary: "P1",
+              details: "D1",
+              confidence: "high",
+              tags: [],
+            },
+          ],
+          model: [
+            {
+              level: "model",
+              summary: "M1",
+              details: "D3",
+              confidence: "medium",
+              tags: [],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      expect(countLessons(db, { level: "project" })).toBe(1);
+      expect(countLessons(db, { level: "model" })).toBe(1);
+      expect(countLessons(db, { level: "user" })).toBe(0);
     });
   });
 });
