@@ -2798,9 +2798,26 @@ describe("node-repository", () => {
 
       const result = getSubgraph(db, [nodeA.id, nodeC.id], { depth: 1 });
 
-      // Should include all 4 nodes
+      // Should include all 4 nodes (both roots A,C and their connections B,D)
       expect(result.nodes).toHaveLength(4);
       expect(result.edges).toHaveLength(2);
+    });
+
+    it("should include root node for single root", () => {
+      const nodeA = createTestNode();
+      const nodeB = createTestNode();
+      createNode(db, nodeA, options);
+      createNode(db, nodeB, options);
+
+      createEdge(db, nodeA.id, nodeB.id, "continuation");
+
+      const result = getSubgraph(db, [nodeA.id], { depth: 1 });
+
+      // Should include both root A and connected B
+      expect(result.nodes).toHaveLength(2);
+      const nodeIds = result.nodes.map((n) => n.id);
+      expect(nodeIds).toContain(nodeA.id);
+      expect(nodeIds).toContain(nodeB.id);
     });
 
     it("should deduplicate overlapping results", () => {

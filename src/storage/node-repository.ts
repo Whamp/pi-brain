@@ -1835,7 +1835,8 @@ export function getConnectedNodes(
  * Get the subgraph for visualization - returns nodes and edges
  * within a given depth from multiple root nodes.
  *
- * Useful for rendering a graph view starting from multiple selected nodes.
+ * Unlike getConnectedNodes, this INCLUDES the root nodes in the result,
+ * which is useful for rendering a graph view starting from selected nodes.
  */
 export function getSubgraph(
   db: Database.Database,
@@ -1846,12 +1847,8 @@ export function getSubgraph(
     return { rootNodeId: "", nodes: [], edges: [] };
   }
 
-  // For single root, use the optimized single-node traversal
-  if (rootNodeIds.length === 1) {
-    return getConnectedNodes(db, rootNodeIds[0], options);
-  }
-
-  // For multiple roots, combine results and deduplicate
+  // Combine results from all roots and deduplicate
+  // Note: We always include root nodes in the result (unlike getConnectedNodes)
   const allNodeIds = new Set<string>(rootNodeIds);
   const allEdges = new Map<string, TraversalEdge>();
 
