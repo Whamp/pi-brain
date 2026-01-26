@@ -98,6 +98,20 @@ export interface QueryConfig {
 }
 
 /**
+ * API server configuration
+ */
+export interface ApiConfig {
+  /** Port for the API server */
+  port: number;
+
+  /** Host to bind to */
+  host: string;
+
+  /** CORS allowed origins for development */
+  corsOrigins: string[];
+}
+
+/**
  * Complete pi-brain configuration
  */
 export interface PiBrainConfig {
@@ -112,6 +126,9 @@ export interface PiBrainConfig {
 
   /** Query settings */
   query: QueryConfig;
+
+  /** API server settings */
+  api: ApiConfig;
 }
 
 /**
@@ -147,5 +164,10 @@ export interface RawConfig {
   query?: {
     provider?: string;
     model?: string;
+  };
+  api?: {
+    port?: number;
+    host?: string;
+    cors_origins?: string[];
   };
 }

@@ -1,0 +1,103 @@
+/**
+ * Search API routes
+ */
+
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+
+import {
+  searchNodesAdvanced,
+  type SearchOptions,
+  type SearchField,
+  type ListNodesFilters,
+} from "../../storage/node-repository.js";
+import { successResponse } from "../responses.js";
+
+/**
+ * Parse comma-separated string to array
+ */
+function parseArrayParam(value: string | undefined): string[] | undefined {
+  if (!value) {
+    return undefined;
+  }
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Parse integer query param
+ */
+function parseIntParam(value: string | undefined): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const num = Number.parseInt(value, 10);
+  return Number.isNaN(num) ? undefined : num;
+}
+
+export async function searchRoutes(app: FastifyInstance): Promise<void> {
+  /**
+   * GET /search - Full-text search across nodes
+   */
+  app.get(
+    "/",
+    async (
+      request: FastifyRequest<{
+        Querystring: {
+          q?: string;
+          fields?: string;
+          limit?: string;
+          offset?: string;
+          project?: string;
+          type?: string;
+          outcome?: string;
+          from?: string;
+          to?: string;
+          tags?: string;
+          topics?: string;
+        };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
+      const { query } = request;
+
+      const searchQuery = query.q ?? "";
+
+      // Build filters from query params
+      const filters: ListNodesFilters = {
+        project: query.project,
+        type: query.type as ListNodesFilters["type"],
+        outcome: query.outcome as ListNodesFilters["outcome"],
+        from: query.from,
+        to: query.to,
+        tags: parseArrayParam(query.tags),
+        topics: parseArrayParam(query.topics),
+      };
+
+      const options: SearchOptions = {
+        fields: parseArrayParam(query.fields) as SearchField[] | undefined,
+        limit: parseIntParam(query.limit),
+        offset: parseIntParam(query.offset),
+        filters,
+      };
+
+      const result = searchNodesAdvanced(db, searchQuery, options);
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            results: result.results,
+            total: result.total,
+            limit: result.limit,
+            offset: result.offset,
+          },
+          durationMs
+        )
+      );
+    }
+  );
+}

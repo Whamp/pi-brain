@@ -504,6 +504,11 @@ describe("sessionWatcher", () => {
           provider: "zai",
           model: "glm-4.7",
         },
+        api: {
+          port: 8765,
+          host: "127.0.0.1",
+          corsOrigins: [],
+        },
       };
 
       const configWatcher = SessionWatcher.fromConfig(config);

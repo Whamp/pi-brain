@@ -1,11 +1,13 @@
 /**
  * API module - REST and WebSocket endpoints
  *
- * This module will contain:
- * - server.ts - HTTP/WebSocket server
- * - routes.ts - API route handlers
- * - queries.ts - Query endpoint implementations
+ * This module provides the HTTP API server for pi-brain.
  */
 
-/** Placeholder for API module version - implementation in Phase 5 */
-export const API_MODULE_VERSION = "0.0.0";
+export {
+  createServer,
+  startServer,
+  successResponse,
+  errorResponse,
+} from "./server.js";
+export type { ServerContext, ApiErrorCode } from "./server.js";

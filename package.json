@@ -42,9 +42,13 @@
     "web:check": "npm run check --prefix src/web/app"
   },
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/websocket": "^11.2.0",
+    "@sinclair/typebox": "^0.34.48",
     "better-sqlite3": "^12.6.2",
     "chokidar": "^5.0.0",
     "commander": "^13.0.0",
+    "fastify": "^5.7.1",
     "open": "^10.1.0",
     "yaml": "^2.8.2"
   },

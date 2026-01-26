@@ -50,6 +50,11 @@ function createTestConfig(tempDir: string): PiBrainConfig {
       provider: "test",
       model: "test-model",
     },
+    api: {
+      port: 8765,
+      host: "127.0.0.1",
+      corsOrigins: [],
+    },
   };
 }
 

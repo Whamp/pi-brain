@@ -12,6 +12,7 @@ import type {
   HubConfig,
   DaemonConfig,
   QueryConfig,
+  ApiConfig,
   SpokeConfig,
   RawConfig,
   SyncMethod,
@@ -87,6 +88,21 @@ export function getDefaultQueryConfig(): QueryConfig {
 }
 
 /**
+ * Default API configuration
+ */
+export function getDefaultApiConfig(): ApiConfig {
+  return {
+    port: 8765,
+    host: "127.0.0.1",
+    corsOrigins: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://127.0.0.1:5173",
+    ],
+  };
+}
+
+/**
  * Get complete default configuration
  */
 export function getDefaultConfig(): PiBrainConfig {
@@ -95,6 +111,7 @@ export function getDefaultConfig(): PiBrainConfig {
     spokes: [],
     daemon: getDefaultDaemonConfig(),
     query: getDefaultQueryConfig(),
+    api: getDefaultApiConfig(),
   };
 }
 
@@ -288,7 +305,16 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     model: raw.query?.model ?? defaults.query.model,
   };
 
-  return { hub, spokes, daemon, query };
+  // Transform API config
+  const api: ApiConfig = {
+    port: raw.api?.port ?? defaults.api.port,
+    host: raw.api?.host ?? defaults.api.host,
+    corsOrigins: raw.api?.cors_origins ?? defaults.api.corsOrigins,
+  };
+
+  validatePort(api.port, "api.port");
+
+  return { hub, spokes, daemon, query, api };
 }
 
 /**
