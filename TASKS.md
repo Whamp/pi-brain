@@ -105,9 +105,9 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 8: Nightly Processing
 
-| ID   | Task                                                  | Status  | Deps         | Notes      |
-| ---- | ----------------------------------------------------- | ------- | ------------ | ---------- |
-| 8.1  | Implement scheduler (cron-like or systemd timer)      | active  | 3.9          | 2026-01-26 |
+| ID   | Task                                                  | Status | Deps         | Notes                                       |
+| ---- | ----------------------------------------------------- | ------ | ------------ | ------------------------------------------- |
+| 8.1  | Implement scheduler (cron-like or systemd timer)      | done   | 3.9          | 2026-01-26 - croner lib, 25 tests           |
 | 8.2  | Implement reanalysis queue population                 | pending | 8.1, 4.2     |            |
 | 8.3  | Implement connection discovery - semantic similarity  | pending | 8.1          |            |
 | 8.4  | Implement connection discovery - reference detection  | pending | 8.1          |            |
