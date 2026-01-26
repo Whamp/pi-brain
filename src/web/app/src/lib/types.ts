@@ -130,19 +130,20 @@ export interface Node {
     cost: number;
     durationMinutes: number;
     timestamp: string;
+    analyzedAt: string;
+    analyzerVersion: string;
   };
   semantic: {
     tags: string[];
     topics: string[];
   };
   daemonMeta: {
-    analyzedAt: string;
-    analyzerVersion: string;
-    daemonDecisions: {
+    decisions: {
       timestamp: string;
       decision: string;
       reasoning: string;
     }[];
+    rlmUsed: boolean;
   };
 }
 

@@ -904,3 +904,45 @@ Updated src/storage/index.ts to export node-repository.
 - Verified page renders with correct layout and navigation
 - Error state displays correctly when API unavailable
 - Retry button present and styled correctly
+
+## 2026-01-26 07:58 - Task 5.8
+
+**Status**: pending → done
+**Validation**: npm run check passes (0 errors), npm run web:check passes (svelte-check 0 errors), npm test passes (730 tests), dev server starts successfully
+**Commit**: 603bf79
+**Notes**: Implemented full search interface per specs/web-ui.md and specs/api.md.
+
+**New Files:**
+- `src/web/app/src/lib/components/search-result-card.svelte` - Result card component with:
+  - Match score percentage display
+  - Highlighted search snippets using `{@html}`
+  - Node type and outcome icons
+  - Relative time formatting
+  - Tags display
+  - Svelte 5 runes ($props, $derived)
+
+- `src/web/app/src/lib/utils/date.ts` - Date formatting utilities:
+  - `formatDistanceToNow()` - Relative time (e.g., "5 minutes ago")
+  - `formatDate()` - Full date with time
+  - `formatDateShort()` - Short date
+  - `formatDateForInput()` - YYYY-MM-DD for inputs
+
+**Updated Files:**
+- `src/web/app/src/routes/search/+page.svelte` - Complete search page:
+  - Search box with debounced input (300ms)
+  - Filter panel with field selection dropdown
+  - Type, outcome, project, and tags filters
+  - Results list with SearchResultCard components
+  - Pagination with "load more" button
+  - Loading spinner, error state with retry, empty states
+  - Proper ARIA labels for accessibility
+
+- `src/web/app/src/lib/api/client.ts` - Added offset parameter to search method
+
+**Features:**
+- Full-text search across summaries, lessons, decisions, tags, topics
+- Field-specific search filtering
+- Combined search with node filters (type, outcome, project, tags)
+- Match highlighting with score display
+- Keyboard-accessible filter controls
+- Responsive design

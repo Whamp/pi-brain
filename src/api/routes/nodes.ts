@@ -182,7 +182,7 @@ export async function nodesRoutes(app: FastifyInstance): Promise<void> {
         const allVersions = getAllNodeVersions(id);
         responseData.versions = allVersions.map((v) => ({
           version: v.version,
-          analyzedAt: v.daemonMeta?.analyzedAt ?? v.metadata?.timestamp,
+          analyzedAt: v.metadata.analyzedAt,
         }));
       }
 
