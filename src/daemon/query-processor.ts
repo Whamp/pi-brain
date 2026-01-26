@@ -172,7 +172,7 @@ export async function processQuery(
   const { response } = result;
   response.relatedNodes = relevantNodes.map((n, idx) => ({
     id: n.id,
-    relevance: 1 - idx * 0.1, // Simple relevance decay
+    relevance: Math.max(0.1, 1 - idx * 0.1), // Simple relevance decay, min 0.1
     summary: n.summary,
   }));
 
