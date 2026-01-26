@@ -229,6 +229,17 @@ export interface DaemonStatus {
   };
 }
 
+export interface DaemonDecision {
+  id: string;
+  nodeId: string;
+  timestamp: string;
+  decision: string;
+  reasoning: string;
+  userFeedback: string | null;
+  sourceProject: string | null;
+  sourceSession: string | null;
+}
+
 // Filter types
 export interface NodeFilters {
   project?: string;

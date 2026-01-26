@@ -12,6 +12,7 @@
   import { api } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { DashboardStats, DaemonStatus, Node } from "$lib/types";
+  import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
 
   // State
   let stats: DashboardStats | null = null;
@@ -30,7 +31,7 @@
   }[] = [];
   let daemonStatus: DaemonStatus | null = null;
   let loading = true;
-  let error: string | null = null;
+  let errorMessage: string | null = null;
 
   onMount(async () => {
     try {
@@ -48,9 +49,9 @@
       recentActivity = activityRes.nodes;
       failurePatterns = patternsRes;
       daemonStatus = daemonRes;
-    } catch (e) {
-      console.error("Failed to load dashboard data:", e);
-      error = "Failed to load dashboard data. Is the server running?";
+    } catch (error) {
+      console.error("Failed to load dashboard data:", error);
+      errorMessage = "Failed to load dashboard data. Is the server running?";
     } finally {
       loading = false;
     }
@@ -67,7 +68,7 @@
   }
 
   function getTrendLabel(change: number): string {
-    if (Math.abs(change) < 0.01) return "Stable";
+    if (Math.abs(change) < 0.01) {return "Stable";}
     return change < 0 ? "Improving!" : "Worsening";
   }
 
@@ -89,10 +90,10 @@
     <h1>Dashboard</h1>
   </header>
 
-  {#if error}
+  {#if errorMessage}
     <div class="error-banner">
       <AlertTriangle size={20} />
-      {error}
+      {errorMessage}
     </div>
   {:else if loading}
     <div class="loading">Loading dashboard...</div>
@@ -261,6 +262,9 @@
           {/if}
         </ul>
       </section>
+
+      <!-- Daemon Decisions -->
+      <DaemonDecisions />
 
       <!-- Daemon Status -->
       <section class="card daemon-status-panel">

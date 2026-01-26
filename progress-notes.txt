@@ -41,3 +41,14 @@
 - Checked error states (when daemon offline)
 - Verified loading states
 - Verified formatting of dates and numbers
+
+## 2026-01-26 10:47 - Task 6.4
+
+**Status**: pending → done
+**Validation**:
+- Unit tests for `decision-repository` (CRUD, filtering, feedback update)
+- API integration tests (ensure server starts and endpoints are registered)
+- Linter checks passed
+- Frontend component implemented and integrated into dashboard
+**Commit**: (pending)
+**Notes**: Implemented `GET /decisions` and `POST /decisions/:id/feedback` endpoints, created `DaemonDecisions` Svelte component with interactive feedback buttons, and integrated it into the main dashboard view.

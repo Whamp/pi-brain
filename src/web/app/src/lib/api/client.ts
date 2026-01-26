@@ -11,6 +11,7 @@ import type {
   DashboardStats,
   DaemonStatus,
   NodeFilters,
+  DaemonDecision,
 } from "$lib/types";
 
 const DEFAULT_BASE_URL = "http://localhost:8765/api/v1";
@@ -187,6 +188,31 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ sessionFile, priority }),
     }),
+
+  getDecisions: (
+    filters?: {
+      decision?: string;
+      project?: string;
+      from?: string;
+      to?: string;
+    },
+    options?: { limit?: number; offset?: number }
+  ) =>
+    request<{
+      decisions: DaemonDecision[];
+      total: number;
+      limit: number;
+      offset: number;
+    }>(`/decisions${toQueryString({ ...filters, ...options })}`),
+
+  updateDecisionFeedback: (id: string, feedback: string | null) =>
+    request<{ id: string; feedback: string | null; updated: boolean }>(
+      `/decisions/${id}/feedback`,
+      {
+        method: "POST",
+        body: JSON.stringify({ feedback }),
+      }
+    ),
 
   // Query (natural language)
   query: (query: string, context?: { project?: string }) =>

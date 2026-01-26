@@ -19,6 +19,7 @@ import type { ApiConfig } from "../config/types.js";
 
 import { errorResponse } from "./responses.js";
 import { daemonRoutes } from "./routes/daemon.js";
+import { decisionsRoutes } from "./routes/decisions.js";
 import { edgesRoutes } from "./routes/edges.js";
 import { lessonsRoutes } from "./routes/lessons.js";
 import { nodesRoutes } from "./routes/nodes.js";
@@ -97,6 +98,7 @@ export async function createServer(
       await api.register(toolErrorsRoutes, { prefix: "/tool-errors" });
       await api.register(statsRoutes, { prefix: "/stats" });
       await api.register(daemonRoutes, { prefix: "/daemon" });
+      await api.register(decisionsRoutes, { prefix: "/decisions" });
       await api.register(sessionsRoutes, { prefix: "/sessions" });
     },
     { prefix: "/api/v1" }
