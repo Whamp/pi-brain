@@ -193,9 +193,6 @@
       case "handoff": {
         return "handoff";
       }
-      case "temporal": {
-        return "temporal";
-      }
       default: {
         return edge.type;
       }

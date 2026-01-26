@@ -138,4 +138,10 @@ Track implementation progress. Agents update status as they complete work.
 | 10.4 | Create feedback loop: quirk → prompt fix → measure improvement | pending | 10.3      |                              |
 | 10.5 | Build "insights to prompts" UI                                 | pending | 10.3, 5.1 |                              |
 
----
+## Phase 11: Architecture Hardening
+
+| ID   | Task                                                                        | Status  | Deps | Notes      |
+| ---- | --------------------------------------------------------------------------- | ------- | ---- | ---------- |
+| 11.1 | Refactor: Shared Type Library (extract to `src/types` or configure imports) | active  | 5.1  | 2026-01-26 |
+| 11.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | pending | 3.7  |            |
+| 11.3 | Architecture: SQLite Rebuild CLI (restore DB from JSON)                     | pending | 4.1  |            |

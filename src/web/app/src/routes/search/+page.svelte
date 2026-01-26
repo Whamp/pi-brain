@@ -31,7 +31,7 @@
     "research",
     "planning",
     "qa",
-    "refactor",
+    "refactoring",
     "documentation",
     "configuration",
     "sysadmin",

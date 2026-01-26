@@ -2,10 +2,10 @@
   import { onMount } from "svelte";
   import { BrainCircuit, ThumbsUp, ThumbsDown, Filter, X } from "lucide-svelte";
   import { api } from "$lib/api/client";
-  import type { DaemonDecision } from "$lib/types";
+  import type { DaemonDecisionEntity } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
 
-  let decisions: DaemonDecision[] = $state([]);
+  let decisions: DaemonDecisionEntity[] = $state([]);
   let loading = $state(true);
   let errorMessage: string | null = $state(null);
   let feedbackLoading: Record<string, boolean> = $state({});

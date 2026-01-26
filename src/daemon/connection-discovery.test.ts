@@ -10,12 +10,13 @@ function manualInsertNode(
   id: string,
   summary: string,
   tags: string[],
-  topics: string[]
+  topics: string[],
+  timestamp: string = new Date().toISOString()
 ) {
   db.prepare(`
     INSERT INTO nodes (id, session_file, data_file, timestamp, summary, analyzed_at)
-    VALUES (?, 'test.jsonl', 'test.json', datetime('now'), ?, datetime('now'))
-  `).run(id, summary);
+    VALUES (?, 'test.jsonl', 'test.json', ?, ?, datetime('now'))
+  `).run(id, timestamp, summary);
 
   for (const tag of tags) {
     db.prepare("INSERT INTO tags (node_id, tag) VALUES (?, ?)").run(id, tag);
@@ -81,26 +82,32 @@ describe("connectionDiscoverer", () => {
   });
 
   it("should find candidates and create edges", async () => {
+    // Recent node (Source)
     manualInsertNode(
       db,
       "1",
       "This is about typescript and sql",
       ["ts", "sql"],
-      ["coding"]
+      ["coding"],
+      new Date("2026-01-02T12:00:00Z").toISOString()
     );
+    // Older node (Candidate)
     manualInsertNode(
       db,
       "2",
       "Another typescript sql session",
       ["ts", "sql"],
-      ["coding"]
+      ["coding"],
+      new Date("2026-01-01T12:00:00Z").toISOString()
     );
+    // Older unrelated node
     manualInsertNode(
       db,
       "3",
       "Something completely different",
       ["rust", "web"],
-      ["other"]
+      ["other"],
+      new Date("2026-01-01T10:00:00Z").toISOString()
     );
 
     const result = await discoverer.discover("1", { threshold: 0.5 });
@@ -118,8 +125,23 @@ describe("connectionDiscoverer", () => {
   });
 
   it("should not duplicate edges", async () => {
-    manualInsertNode(db, "1", "Ts sql", ["ts"], []);
-    manualInsertNode(db, "2", "Ts sql", ["ts"], []);
+    // Timestamps must differ for the new logic (source > target)
+    manualInsertNode(
+      db,
+      "1",
+      "Ts sql",
+      ["ts"],
+      [],
+      new Date("2026-01-02T12:00:00Z").toISOString()
+    );
+    manualInsertNode(
+      db,
+      "2",
+      "Ts sql",
+      ["ts"],
+      [],
+      new Date("2026-01-01T12:00:00Z").toISOString()
+    );
 
     // Create edge manually first
     createEdge(db, "1", "2", "semantic");

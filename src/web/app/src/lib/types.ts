@@ -3,158 +3,80 @@
  * These mirror the backend types from src/types.ts
  */
 
-// Node types
-export type NodeType =
-  | "coding"
-  | "sysadmin"
-  | "research"
-  | "planning"
-  | "debugging"
-  | "qa"
-  | "brainstorm"
-  | "handoff"
-  | "refactor"
-  | "documentation"
-  | "configuration"
-  | "other";
+import type {
+  Node,
+  Edge,
+  Lesson,
+  ModelQuirk,
+  ToolError,
+  NodeType,
+  Outcome,
+  Decision,
+  DaemonDecision,
+  DaemonMeta,
+  NodeSource,
+  NodeClassification,
+  NodeContent,
+  NodeMetadata,
+  SemanticData,
+  LessonsByLevel,
+  ModelObservations,
+  EdgeType,
+  EdgeMetadata,
+  VersionTrigger,
+  NodeVersion,
+  LessonLevel,
+  Confidence,
+} from "../../../../types/index.js";
 
-export type Outcome = "success" | "partial" | "failed" | "abandoned";
+// Re-export shared types
+export type {
+  Node,
+  Edge,
+  Lesson,
+  ModelQuirk,
+  ToolError,
+  NodeType,
+  Outcome,
+  Decision,
+  DaemonDecision,
+  DaemonMeta,
+  NodeSource,
+  NodeClassification,
+  NodeContent,
+  NodeMetadata,
+  SemanticData,
+  LessonsByLevel,
+  ModelObservations,
+  EdgeType,
+  EdgeMetadata,
+  VersionTrigger,
+  NodeVersion,
+  LessonLevel,
+  Confidence,
+};
 
-export type LessonLevel =
-  | "project"
-  | "task"
-  | "user"
-  | "model"
-  | "tool"
-  | "skill"
-  | "subagent";
-
-export type Confidence = "high" | "medium" | "low";
-
-export type EdgeType =
-  | "fork"
-  | "branch"
-  | "tree_jump"
-  | "handoff"
-  | "resume"
-  | "compaction"
-  | "semantic"
-  | "temporal"
-  | "continuation"
-  | "reference"
-  | "lesson_application"
-  | "failure_pattern";
-
-// Core interfaces
-export interface Lesson {
+// Extended types with IDs for API responses (Entities)
+export interface LessonEntity extends Omit<Lesson, "tags"> {
   id: string;
-  level: LessonLevel;
-  summary: string;
-  details: string;
-  confidence: Confidence;
-  tags: string[];
-}
-
-export interface LessonsByLevel {
-  project: Lesson[];
-  task: Lesson[];
-  user: Lesson[];
-  model: Lesson[];
-  tool: Lesson[];
-  skill: Lesson[];
-  subagent: Lesson[];
-}
-
-export interface Decision {
-  what: string;
-  why: string;
-  alternativesConsidered: string[];
-}
-
-export interface ModelQuirk {
-  id: string;
-  model: string;
-  observation: string;
-  frequency: "once" | "sometimes" | "often" | "always";
-  workaround?: string;
-}
-
-export interface ToolError {
-  id: string;
-  tool: string;
-  errorType: string;
-  context: string;
-  model: string;
-}
-
-export interface Node {
-  id: string;
-  version: number;
-  previousVersions: string[];
-  source: {
-    sessionFile: string;
-    segment: {
-      startEntryId: string;
-      endEntryId: string;
-    };
-    computer: string;
-  };
-  classification: {
-    type: NodeType;
-    project: string;
-    isNewProject: boolean;
-    hadClearGoal: boolean;
-  };
-  content: {
-    summary: string;
-    outcome: Outcome;
-    keyDecisions: Decision[];
-    filesTouched: string[];
-  };
-  lessons: LessonsByLevel;
-  observations: {
-    modelsUsed: {
-      provider: string;
-      model: string;
-      tokensInput: number;
-      tokensOutput: number;
-      cost: number;
-    }[];
-    promptingWins: string[];
-    promptingFailures: string[];
-    modelQuirks: ModelQuirk[];
-    toolUseErrors: ToolError[];
-  };
-  metadata: {
-    tokensUsed: number;
-    cost: number;
-    durationMinutes: number;
-    timestamp: string;
-    analyzedAt: string;
-    analyzerVersion: string;
-  };
-  semantic: {
-    tags: string[];
-    topics: string[];
-  };
-  daemonMeta: {
-    decisions: {
-      timestamp: string;
-      decision: string;
-      reasoning: string;
-    }[];
-    rlmUsed: boolean;
-  };
-}
-
-export interface Edge {
-  id: string;
-  sourceNodeId: string;
-  targetNodeId: string;
-  type: EdgeType;
-  metadata: Record<string, unknown>;
+  nodeId: string;
+  sourceProject: string | null;
   createdAt: string;
-  createdBy: "boundary" | "daemon" | "user";
+  tags: string[]; // API returns tags
+}
+
+export interface ModelQuirkEntity extends ModelQuirk {
+  id: string;
+  nodeId: string;
+  sourceProject: string | null;
+  createdAt: string;
+}
+
+export interface ToolErrorEntity extends ToolError {
+  id: string;
+  nodeId: string;
+  sourceProject: string | null;
+  createdAt: string;
 }
 
 // API response types
@@ -229,7 +151,9 @@ export interface DaemonStatus {
   };
 }
 
-export interface DaemonDecision {
+// DaemonDecision in shared types is the embedded one (no ID, etc)
+// We need the entity version for lists
+export interface DaemonDecisionEntity {
   id: string;
   nodeId: string;
   timestamp: string;

@@ -11,7 +11,7 @@ import type {
   DashboardStats,
   DaemonStatus,
   NodeFilters,
-  DaemonDecision,
+  DaemonDecisionEntity,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -250,7 +250,7 @@ export const api = {
     options?: { limit?: number; offset?: number }
   ) =>
     request<{
-      decisions: DaemonDecision[];
+      decisions: DaemonDecisionEntity[];
       total: number;
       limit: number;
       offset: number;

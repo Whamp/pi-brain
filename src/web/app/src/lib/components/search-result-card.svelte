@@ -46,7 +46,7 @@
       case "planning": {
         return "📋";
       }
-      case "refactor": {
+      case "refactoring": {
         return "🔄";
       }
       case "documentation": {

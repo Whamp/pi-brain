@@ -170,8 +170,13 @@ export class ConnectionDiscoverer {
     const sourceSummary = sourceNode.summary || "";
 
     // 3. Find candidates
-    // Look for nodes in the last N days, excluding self
-    const candidates = this.findCandidates(nodeId, daysToLookBack, limit);
+    // Look for nodes older than the source node but within the lookback window
+    const candidates = this.findCandidates(
+      nodeId,
+      sourceNode.timestamp,
+      daysToLookBack,
+      limit
+    );
 
     const newEdges: Edge[] = [];
 
@@ -237,18 +242,29 @@ export class ConnectionDiscoverer {
 
   private findCandidates(
     excludeNodeId: string,
+    sourceTimestamp: string,
     days: number,
     limit: number
   ): NodeRow[] {
+    const startDate = new Date(sourceTimestamp);
+    // Safety check
+    if (Number.isNaN(startDate.getTime())) {
+      return [];
+    }
+    const limitDate = new Date(startDate);
+    limitDate.setDate(limitDate.getDate() - days);
+    const limitStr = limitDate.toISOString();
+
     return this.db
       .prepare(`
       SELECT * FROM nodes
       WHERE id != ?
-      AND timestamp > datetime('now', '-' || ? || ' days')
+      AND timestamp < ?
+      AND timestamp > ?
       ORDER BY timestamp DESC
       LIMIT ?
     `)
-      .all(excludeNodeId, days, limit) as NodeRow[];
+      .all(excludeNodeId, sourceTimestamp, limitStr, limit) as NodeRow[];
   }
 
   /**
@@ -297,7 +313,7 @@ export class ConnectionDiscoverer {
     return new Set(
       text
         .toLowerCase()
-        .replaceAll(/[^\w\s]/g, "") // Remove punctuation
+        .replaceAll(/[^\w\s]/g, " ") // Replace punctuation with space
         .split(/\s+/)
         .filter((w) => w.length > 2 && !STOPWORDS.has(w))
     );

@@ -49,7 +49,7 @@
   const nodeColors: Record<NodeType, string> = {
     coding: "var(--color-node-coding)",
     debugging: "var(--color-node-debugging)",
-    refactor: "var(--color-node-refactor)",
+    refactoring: "var(--color-node-refactor)",
     sysadmin: "var(--color-node-sysadmin)",
     research: "var(--color-node-research)",
     planning: "var(--color-node-planning)",
@@ -59,6 +59,7 @@
     qa: "var(--color-node-qa)",
     handoff: "var(--color-node-handoff)",
     other: "var(--color-node-other)",
+    data: "var(--color-node-other)",
   };
 
   function getNodeColor(type: NodeType): string {
