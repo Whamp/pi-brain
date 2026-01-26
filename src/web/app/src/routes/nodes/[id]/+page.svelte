@@ -2,7 +2,7 @@
   import { page } from "$app/state";
   import { ArrowLeft } from "lucide-svelte";
 
-  const nodeId = page.params.id;
+  const nodeId = $derived(page.params.id);
 </script>
 
 <svelte:head>

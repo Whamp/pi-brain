@@ -121,10 +121,12 @@ export const api = {
   search: (
     query: string,
     options?: { fields?: string[]; limit?: number; filters?: NodeFilters }
-  ) =>
-    request<{ results: SearchResult[]; total: number }>(
-      `/search${toQueryString({ q: query, ...options })}`
-    ),
+  ) => {
+    const { filters, ...rest } = options ?? {};
+    return request<{ results: SearchResult[]; total: number }>(
+      `/search${toQueryString({ q: query, ...rest, ...filters })}`
+    );
+  },
 
   // Stats
   getStats: () => request<DashboardStats>("/stats"),
