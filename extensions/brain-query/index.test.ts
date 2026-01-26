@@ -2,7 +2,7 @@ import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 import { describe, it, expect, vi } from "vitest";
 
-import brainExtension from "./brain-query.js";
+import brainExtension from "./index.js";
 
 describe("brainExtension", () => {
   it("should register command and tool", () => {

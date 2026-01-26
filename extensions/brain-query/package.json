@@ -1,0 +1,10 @@
+{
+  "name": "brain-query",
+  "version": "0.1.0",
+  "description": "Query the pi-brain knowledge graph from pi",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.14"
+  }
+}
