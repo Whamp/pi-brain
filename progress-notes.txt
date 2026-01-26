@@ -718,3 +718,62 @@ Updated src/storage/index.ts to export node-repository.
 - Added `getAggregatedToolErrors(db, filters, options)` for grouped views.
 - Added `getToolErrorStats(db)` for high-level dashboard metrics (by tool, by model, trends).
 - Added `getAllToolsWithErrors(db)` and `countToolErrors(db)` helpers.
+
+## 2026-01-26 00:01 - Task 5.1
+
+**Status**: pending → done
+**Validation**: npm run check passes (0 errors/warnings), npm run web:check passes (svelte-check 0 errors), npm test passes (719 tests), dev server starts successfully on port 5173
+**Commit**: c964b0c
+**Notes**: Set up SvelteKit web framework per specs/web-ui.md.
+
+**Project Structure (`src/web/app/`):**
+- SvelteKit with TypeScript, Svelte 5
+- D3.js and lucide-svelte installed
+- Design system with CSS variables
+
+**Design System (`src/app.css`):**
+- Dark theme colors (bg, text, accent, status, node types, edge types)
+- Typography (Inter font, JetBrains Mono for code)
+- Spacing scale, border radii, shadows, transitions
+- Component utilities (cards, buttons, tags, status dots)
+
+**Layout (`src/routes/+layout.svelte`):**
+- Fixed sidebar with navigation (Dashboard, Graph, Search, Sessions, Settings)
+- Lucide icons for nav items
+- Daemon status indicator in footer
+- Responsive mobile styles (sidebar hidden)
+
+**Dashboard (`src/routes/+page.svelte`):**
+- Quick stats grid (total nodes, this week, tokens, cost)
+- Tool errors by model table
+- Vague goal tracker with trend indicator
+- Recent activity timeline
+- Daemon status panel
+- Failure pattern analysis cards
+
+**Placeholder Pages:**
+- `/graph` - Graph visualization placeholder
+- `/search` - Search with input box
+- `/sessions` - Session browser placeholder
+- `/settings` - Settings placeholder
+- `/nodes/[id]` - Node detail placeholder with back link
+
+**API Client (`src/lib/api/client.ts`):**
+- Typed request helper with error handling
+- Methods for nodes, search, stats, daemon endpoints
+- Query string builder
+
+**Stores (`src/lib/stores/`):**
+- `nodes.ts` - Node data, selection, filters, pagination
+- `daemon.ts` - Daemon status
+- `websocket.ts` - WebSocket connection with exponential backoff reconnect
+
+**Types (`src/lib/types.ts`):**
+- Node, Edge, Lesson, Decision interfaces
+- API response types
+- Filter types
+
+**NPM Scripts Added:**
+- `npm run web:dev` - Start SvelteKit dev server
+- `npm run web:build` - Build for production
+- `npm run web:check` - Run svelte-check
