@@ -160,5 +160,8 @@ export {
   type ConnectionResult,
 } from "./connection-discovery.js";
 
+// Export pattern aggregation functionality
+export { PatternAggregator } from "./pattern-aggregation.js";
+
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";
