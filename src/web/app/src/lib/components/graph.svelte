@@ -336,18 +336,10 @@
   }
 
   export function resetZoom(): void {
-    if (!container) {
-      return;
-    }
-    const width = container.clientWidth;
-    const height = container.clientHeight;
     svg
       .transition()
       .duration(300)
-      .call(
-        zoomBehavior.transform,
-        d3.zoomIdentity.translate(width / 2, height / 2).scale(1)
-      );
+      .call(zoomBehavior.transform, d3.zoomIdentity);
   }
 
   export function fitToContent(): void {
