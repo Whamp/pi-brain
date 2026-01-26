@@ -946,3 +946,70 @@ Updated src/storage/index.ts to export node-repository.
 - Match highlighting with score display
 - Keyboard-accessible filter controls
 - Responsive design
+
+## 2026-01-26 09:14 - Task 5.9
+
+**Status**: pending → done
+**Validation**: npm run check passes (0 errors), npm run web:check passes (svelte-check 0 errors), npm test passes (736 tests, 6 new API tests), dev server starts successfully, web build succeeds
+**Commit**: f4d3ad2
+**Notes**: Implemented full file browser view per specs/web-ui.md.
+
+**New API Routes (`src/api/routes/sessions.ts`):**
+
+- `GET /sessions/projects`: List all projects with summary stats
+  - Returns project path, session count, node count, last activity
+  - Sorted by most recent activity
+- `GET /sessions/by-project/*`: List sessions for a specific project
+  - Groups nodes by session file
+  - Returns session file, node count, timestamp range, outcomes, types, tokens, cost
+  - Supports pagination (limit/offset)
+- `GET /sessions/nodes?sessionFile=<path>`: List nodes for a specific session
+  - Returns nodes sorted by timestamp
+  - Supports pagination
+
+**API Client Updates (`src/web/app/src/lib/api/client.ts`):**
+
+- `getProjects()`: Fetch project summaries
+- `getSessionsByProject(project, options)`: Fetch sessions for a project
+- `getNodesBySession(sessionFile, options)`: Fetch nodes for a session
+
+**New Types (`src/web/app/src/lib/types.ts`):**
+
+- `ProjectSummary`: Project browser data shape
+- `SessionSummary`: Session browser data shape
+
+**Session Browser Page (`src/web/app/src/routes/sessions/+page.svelte`):**
+
+- Three-level navigation: All Projects → Project Sessions → Session Nodes
+- Breadcrumb navigation with clickable path components
+- Project cards showing:
+  - Project name and full path
+  - Session count, node count
+  - Last activity time (relative)
+- Session cards showing:
+  - Session filename
+  - Node count, date
+  - Type badges (coding, debugging, etc.)
+  - Outcome badges (success/partial/failed counts)
+  - Total tokens and cost
+- Node list showing:
+  - Sequential index
+  - Type badge with color coding
+  - Outcome icon and label
+  - Summary text
+  - Metadata (timestamp, duration, tokens)
+  - Tags (up to 5 with overflow indicator)
+  - Link to node detail page
+- States: Loading spinner, error with retry, empty states
+- Svelte 5 runes ($state, $effect, @const)
+- Accessible: ARIA labels, no invalid role assignments
+
+**Test Coverage:**
+
+- 6 new tests in src/api/server.test.ts covering:
+  - List projects with nodes
+  - Empty projects list
+  - List sessions by project
+  - 404 for non-existent project
+  - List nodes by session file
+  - 400 for missing sessionFile param

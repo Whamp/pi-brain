@@ -79,7 +79,7 @@ Track implementation progress. Agents update status as they complete work.
 | 5.6 | Build graph visualization component - click to select        | done   | 5.3          | 2026-01-26 - click + dblclick navigate  |
 | 5.7 | Build node detail panel                                      | done   | 5.6          | 2026-01-26 - browser verified           |
 | 5.8 | Build search interface                                       | done   | 5.2          | 2026-01-26 - filters, pagination, cards |
-| 5.9 | Build file browser view                                      | active | 5.2          | 2026-01-26                              |
+| 5.9 | Build file browser view                                      | done   | 5.2          | 2026-01-26 - sessions API + browser UI  |
 
 ## Phase 6: Web UI - Dashboard
 
