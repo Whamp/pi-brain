@@ -36,7 +36,10 @@
     "check": "ultracite check",
     "fix": "ultracite fix",
     "prepublishOnly": "npm run build",
-    "prepare": "husky"
+    "prepare": "husky",
+    "web:dev": "npm run dev --prefix src/web/app",
+    "web:build": "npm run build --prefix src/web/app",
+    "web:check": "npm run check --prefix src/web/app"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

@@ -65,21 +65,21 @@ Track implementation progress. Agents update status as they complete work.
 | 4.8  | Build query layer: graph traversal (related nodes) | done   | 4.3      | 2026-01-25                          |
 | 4.9  | Implement lesson aggregation queries               | done   | 4.1      | 2026-01-25                          |
 | 4.10 | Implement model quirk aggregation queries          | done   | 4.1      | 2026-01-25                          |
-| 4.11 | Implement tool error aggregation queries           | active | 4.1      | 2026-01-25                          |
+| 4.11 | Implement tool error aggregation queries           | done   | 4.1      | 2026-01-25                          |
 
 ## Phase 5: Web UI - Core
 
-| ID  | Task                                                         | Status  | Deps         | Notes               |
-| --- | ------------------------------------------------------------ | ------- | ------------ | ------------------- |
-| 5.1 | Set up web framework (SvelteKit)                             | pending | -            | see specs/web-ui.md |
-| 5.2 | Implement API routes for queries                             | pending | 5.1, 4.5-4.8 | see specs/api.md    |
-| 5.3 | Build graph visualization component (D3.js) - node rendering | pending | 5.1          |                     |
-| 5.4 | Build graph visualization component - edge rendering         | pending | 5.3          |                     |
-| 5.5 | Build graph visualization component - zoom, pan, filter      | pending | 5.3          |                     |
-| 5.6 | Build graph visualization component - click to select        | pending | 5.3          |                     |
-| 5.7 | Build node detail panel                                      | pending | 5.6          |                     |
-| 5.8 | Build search interface                                       | pending | 5.2          |                     |
-| 5.9 | Build file browser view                                      | pending | 5.2          |                     |
+| ID  | Task                                                         | Status  | Deps         | Notes            |
+| --- | ------------------------------------------------------------ | ------- | ------------ | ---------------- |
+| 5.1 | Set up web framework (SvelteKit)                             | active  | -            | 2026-01-25       |
+| 5.2 | Implement API routes for queries                             | pending | 5.1, 4.5-4.8 | see specs/api.md |
+| 5.3 | Build graph visualization component (D3.js) - node rendering | pending | 5.1          |                  |
+| 5.4 | Build graph visualization component - edge rendering         | pending | 5.3          |                  |
+| 5.5 | Build graph visualization component - zoom, pan, filter      | pending | 5.3          |                  |
+| 5.6 | Build graph visualization component - click to select        | pending | 5.3          |                  |
+| 5.7 | Build node detail panel                                      | pending | 5.6          |                  |
+| 5.8 | Build search interface                                       | pending | 5.2          |                  |
+| 5.9 | Build file browser view                                      | pending | 5.2          |                  |
 
 ## Phase 6: Web UI - Dashboard
 

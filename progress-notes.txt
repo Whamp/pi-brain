@@ -707,3 +707,14 @@ Updated src/storage/index.ts to export node-repository.
 - Added `getAggregatedQuirks(db, options)` for grouping similar observations.
 - Added `getAllQuirkModels(db)` and `countQuirks(db)` helpers.
 - Implemented frequency-based ranking (`once < sometimes < often < always`) for inclusive filtering.
+
+## 2026-01-25 23:19 - Task 4.11
+
+**Status**: active → done
+**Validation**: npm test passes (719 tests). Added 5 new tests in src/storage/node-repository.test.ts covering individual error listing, grouping, dashboard stats, and trends.
+**Commit**: a29e5f2
+**Notes**: Implemented tool error aggregation queries per specs/storage.md and specs/api.md.
+- Added `listToolErrors(db, filters, options)` for filtered individual error retrieval.
+- Added `getAggregatedToolErrors(db, filters, options)` for grouped views.
+- Added `getToolErrorStats(db)` for high-level dashboard metrics (by tool, by model, trends).
+- Added `getAllToolsWithErrors(db)` and `countToolErrors(db)` helpers.
