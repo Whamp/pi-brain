@@ -591,3 +591,34 @@
 - Context churn threshold is 10 unique file reads/ls before counting as churn event
 - Abandoned restart requires: outcome=abandoned, restart within 30 mins, file overlap >= 30%
 - Ready for Task 11.2 (Delight signal detection)
+
+---
+
+## 2026-01-26 21:26 - Task 11.2
+
+**Status**: pending → done
+**Validation**:
+- Created delight signal detection functions in src/parser/signals.ts:
+  - detectResilientRecovery(): detects tool error → model retry → success (no user intervention)
+  - detectOneShotSuccess(): detects 3+ tool calls with zero user corrections
+  - detectExplicitPraise(): detects genuine praise (thanks, perfect, great, etc.) with sarcasm filtering
+  - calculateDelightScore(): weighted score (resilient=0.4, one-shot=0.4, praise=0.3, cap at 1.0)
+  - detectDelightSignals(): main entry point combining all signals
+- Added 34 new tests in signals.test.ts covering:
+  - Resilient recovery scenarios (6 tests)
+  - One-shot success detection (5 tests)
+  - Explicit praise detection (14 tests)
+  - Score calculation (5 tests)
+  - Combined signal detection (4 tests)
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1059 passed, 4 skipped)
+**Commit**: 26929d5
+**Notes**:
+- DelightSignals type already existed in src/types/index.ts from Task 11.1
+- Detection logic handles edge cases:
+  - User praise AFTER recovery doesnt count as intervention
+  - Sarcastic phrases filtered (e.g., "great, another error")
+  - Minimal acknowledgments (ok, yes) dont break one-shot success
+  - Questions treated as corrections (indicate confusion)
+- Ready for Task 11.3 (Update Node model to include signals)
+
