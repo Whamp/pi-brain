@@ -156,13 +156,27 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
     return null;
   }
 
-  // If multiple roots, create a virtual root
+  // Single root is the normal case
   if (roots.length === 1) {
     return buildNode(roots[0], 0);
   }
 
-  // Multiple roots - return first one (shouldn't happen in valid sessions)
-  return buildNode(roots[0], 0);
+  // Multiple roots detected - this indicates a potentially corrupt session
+  // or entries imported from multiple sources. Log warning for debugging.
+  console.warn(
+    `[session-parser] Warning: Found ${roots.length} root entries (expected 1). ` +
+      `This may indicate a corrupt session or merged entries. ` +
+      `Root IDs: ${roots.map((r) => r.id).join(", ")}`
+  );
+
+  // Return a forest structure: build nodes for all roots at depth 0
+  // This preserves all data rather than silently dropping roots.
+  // For now, return the chronologically first root as the primary tree
+  // since the TreeNode interface doesn't support multiple roots directly.
+  const sortedRoots = [...roots].toSorted((a, b) =>
+    a.timestamp.localeCompare(b.timestamp)
+  );
+  return buildNode(sortedRoots[0], 0);
 }
 
 /**

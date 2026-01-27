@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 38
-- Total symbols: 187
-  - function: 112
-  - interface: 44
-  - variable: 13
+- Total symbols: 191
+  - function: 114
+  - interface: 45
+  - variable: 14
   - class: 10
   - type: 8
 
@@ -1006,89 +1006,99 @@ src/daemon/worker.ts [1-536]
     - better-sqlite3
     - node:path
 
-src/parser/analyzer.ts [1-279]
+src/parser/analyzer.ts [1-336]
   function:
     16-18: getDefaultSessionDir(): string [exported]
       /** Default session directory */
       refs out: 2 [call: 2]
         - src/parser/analyzer.ts:17: call join -> external
         - src/parser/analyzer.ts:17: call homedir -> external
-    23-70: async scanSessions(sessionDir?: string): Promise<{}> [exported]
-      /** Scan session directory and parse all sessions */
-      refs out: 10 [call: 7, instantiate: 1, type: 2]
-        - src/parser/analyzer.ts:25: type Promise -> external
-        - src/parser/analyzer.ts:25: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:36: call isDirectory -> external
-        - src/parser/analyzer.ts:44: call endsWith -> external
-        - src/parser/analyzer.ts:51: call push -> external
-        - src/parser/analyzer.ts:53: call warn -> external
-        - src/parser/analyzer.ts:57: call warn -> external
-        - src/parser/analyzer.ts:61: instantiate Error -> external
-        - src/parser/analyzer.ts:67: call sort -> external
-        - src/parser/analyzer.ts:67: call localeCompare -> external
-    75-95: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+    31-43: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+      /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
+      refs out: 6 [call: 4, type: 2]
+        - src/parser/analyzer.ts:33: type Promise -> external
+        - src/parser/analyzer.ts:33: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:35: call scanSessionsIterator -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:36: call push -> external
+        - src/parser/analyzer.ts:40: call sort -> external
+        - src/parser/analyzer.ts:40: call localeCompare -> external
+    60-102: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+      /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
+      refs out: 7 [call: 4, instantiate: 1, type: 2]
+        - src/parser/analyzer.ts:62: type AsyncGenerator -> external
+        - src/parser/analyzer.ts:62: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:72: call isDirectory -> external
+        - src/parser/analyzer.ts:80: call endsWith -> external
+        - src/parser/analyzer.ts:89: call warn -> external
+        - src/parser/analyzer.ts:93: call warn -> external
+        - src/parser/analyzer.ts:97: instantiate Error -> external
+    107-127: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
       refs out: 5 [call: 3, type: 2]
-        - src/parser/analyzer.ts:76: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:77: type ForkRelationship -> src/types.ts
-        - src/parser/analyzer.ts:82: call push -> external
-        - src/parser/analyzer.ts:92: call sort -> external
-        - src/parser/analyzer.ts:92: call localeCompare -> external
-    100-132: groupByProject(sessions: SessionInfo[]): {} [exported]
+        - src/parser/analyzer.ts:108: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:109: type ForkRelationship -> src/types.ts
+        - src/parser/analyzer.ts:114: call push -> external
+        - src/parser/analyzer.ts:124: call sort -> external
+        - src/parser/analyzer.ts:124: call localeCompare -> external
+    132-164: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
       refs out: 11 [call: 9, type: 2]
-        - src/parser/analyzer.ts:100: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:100: type ProjectGroup -> src/types.ts
-        - src/parser/analyzer.ts:105: call has -> external
-        - src/parser/analyzer.ts:106: call set -> external
-        - src/parser/analyzer.ts:108: call push -> external
-        - src/parser/analyzer.ts:108: call get -> external
-        - src/parser/analyzer.ts:114: call sort -> external
-        - src/parser/analyzer.ts:115: call localeCompare -> external
-        - src/parser/analyzer.ts:118: call push -> external
-        - src/parser/analyzer.ts:121: call reduce -> external
-    148-159: decodeProjectDir(encodedName: string): string [exported]
+        - src/parser/analyzer.ts:132: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:132: type ProjectGroup -> src/types.ts
+        - src/parser/analyzer.ts:137: call has -> external
+        - src/parser/analyzer.ts:138: call set -> external
+        - src/parser/analyzer.ts:140: call push -> external
+        - src/parser/analyzer.ts:140: call get -> external
+        - src/parser/analyzer.ts:146: call sort -> external
+        - src/parser/analyzer.ts:147: call localeCompare -> external
+        - src/parser/analyzer.ts:150: call push -> external
+        - src/parser/analyzer.ts:153: call reduce -> external
+    185-196: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
       refs out: 3 [call: 3]
-        - src/parser/analyzer.ts:149: call startsWith -> external
-        - src/parser/analyzer.ts:149: call endsWith -> external
-        - src/parser/analyzer.ts:158: call replaceAll -> external
-    166-173: getProjectName(sessionPath: string): string [exported]
+        - src/parser/analyzer.ts:186: call startsWith -> external
+        - src/parser/analyzer.ts:186: call endsWith -> external
+        - src/parser/analyzer.ts:195: call replaceAll -> external
+    210-217: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
       refs out: 2 [call: 2]
-        - src/parser/analyzer.ts:170: call decodeProjectDir -> src/parser/analyzer.ts
-        - src/parser/analyzer.ts:172: call basename -> external
-    178-183: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+        - src/parser/analyzer.ts:214: call decodeProjectDir -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:216: call basename -> external
+    228-230: getProjectNameFromSession(session: SessionInfo): string [exported]
+      /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
+      refs out: 1 [type: 1]
+        - src/parser/analyzer.ts:228: type SessionInfo -> src/types.ts
+    235-240: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/analyzer.ts:179: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:181: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:182: call filter -> external
-    188-203: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+        - src/parser/analyzer.ts:236: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:238: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:239: call filter -> external
+    245-260: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
       refs out: 5 [call: 1, type: 4]
-        - src/parser/analyzer.ts:189: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:190: type Date -> external
-        - src/parser/analyzer.ts:191: type Date -> external
-        - src/parser/analyzer.ts:192: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:193: call filter -> external
-    208-237: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+        - src/parser/analyzer.ts:246: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:247: type Date -> external
+        - src/parser/analyzer.ts:248: type Date -> external
+        - src/parser/analyzer.ts:249: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:250: call filter -> external
+    265-294: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
       refs out: 9 [call: 7, type: 2]
-        - src/parser/analyzer.ts:209: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:211: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:219: call includes -> external
-        - src/parser/analyzer.ts:219: call toLowerCase -> external
-        - src/parser/analyzer.ts:220: call push -> external
-        - src/parser/analyzer.ts:224: call includes -> external
-        - src/parser/analyzer.ts:224: call toLowerCase -> external
-        - src/parser/analyzer.ts:225: call push -> external
-        - src/parser/analyzer.ts:232: call push -> external
-    242-278: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+        - src/parser/analyzer.ts:266: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:268: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:276: call includes -> external
+        - src/parser/analyzer.ts:276: call toLowerCase -> external
+        - src/parser/analyzer.ts:277: call push -> external
+        - src/parser/analyzer.ts:281: call includes -> external
+        - src/parser/analyzer.ts:281: call toLowerCase -> external
+        - src/parser/analyzer.ts:282: call push -> external
+        - src/parser/analyzer.ts:289: call push -> external
+    299-335: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/analyzer.ts:242: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:259: call add -> external
+        - src/parser/analyzer.ts:299: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:316: call add -> external
   imports:
     - ../types.js
     - ./session.js
@@ -1102,59 +1112,71 @@ src/parser/boundary.test.ts [1-776]
     - ./boundary.js
     - vitest
 
-src/parser/boundary.ts [1-408]
+src/parser/boundary.ts [1-571]
   class:
-    99-176: class LeafTracker [exported]
+    214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
   interface:
-    29-40: interface Boundary [exported]
+    39-50: interface Boundary [exported]
       /** A detected boundary in the session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:31: type BoundaryType -> src/parser/boundary.ts
-        - src/parser/boundary.ts:39: type BoundaryMetadata -> src/parser/boundary.ts
-    45-58: interface BoundaryMetadata [exported]
+        - src/parser/boundary.ts:41: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:49: type BoundaryMetadata -> src/parser/boundary.ts
+    55-70: interface BoundaryMetadata [exported]
       /** Metadata for different boundary types */
-    63-76: interface Segment [exported]
+    75-88: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
       refs out: 1 [type: 1]
-        - src/parser/boundary.ts:69: type Boundary -> src/parser/boundary.ts
-    375-379: interface BoundaryStats [exported]
+        - src/parser/boundary.ts:81: type Boundary -> src/parser/boundary.ts
+    103-109: interface BoundaryOptions [exported]
+      /** Options for boundary detection */
+    533-537: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:377: type Record -> external
-        - src/parser/boundary.ts:377: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:535: type Record -> external
+        - src/parser/boundary.ts:535: type BoundaryType -> src/parser/boundary.ts
   type:
-    24-24: BoundaryType = "branch" | "tree_jump" | "compaction" | "resume" [exported]
+    29-34: BoundaryType = | "branch"
+  | "tree_jump"
+  | "compaction"
+  | "resume"
+  | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    188-289: detectBoundaries(entries: SessionEntry[]): {} [exported]
+    304-443: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Detect all boundaries in a list of session entries */
-      refs out: 9 [call: 7, type: 2]
-        - src/parser/boundary.ts:188: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:188: type Boundary -> src/parser/boundary.ts
-        - src/parser/boundary.ts:197: call has -> external
-        - src/parser/boundary.ts:204: call push -> external
-        - src/parser/boundary.ts:218: call push -> external
-        - src/parser/boundary.ts:248: call push -> external
-        - src/parser/boundary.ts:270: call push -> external
-        - src/parser/boundary.ts:276: call round -> external
-        - src/parser/boundary.ts:283: call LeafTracker.update -> src/parser/boundary.ts
-    299-370: extractSegments(entries: SessionEntry[]): {} [exported]
+      refs out: 14 [call: 11, type: 3]
+        - src/parser/boundary.ts:305: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:306: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:307: type Boundary -> src/parser/boundary.ts
+        - src/parser/boundary.ts:318: call has -> external
+        - src/parser/boundary.ts:325: call push -> external
+        - src/parser/boundary.ts:339: call push -> external
+        - src/parser/boundary.ts:354: call push -> external
+        - src/parser/boundary.ts:358: call LeafTracker.getCurrentLeaf -> src/parser/boundary.ts
+        - src/parser/boundary.ts:379: call push -> external
+        - src/parser/boundary.ts:383: call LeafTracker.getPreviousEntryId -> src/parser/boundary.ts
+    454-528: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-      refs out: 8 [call: 6, type: 2]
-        - src/parser/boundary.ts:299: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:299: type Segment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:317: call push -> external
-        - src/parser/boundary.ts:318: call set -> external
-        - src/parser/boundary.ts:355: call push -> external
-        - src/parser/boundary.ts:355: call createSegment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:366: call push -> external
-        - src/parser/boundary.ts:366: call createSegment -> src/parser/boundary.ts
-    387-407: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+      refs out: 9 [call: 6, type: 3]
+        - src/parser/boundary.ts:455: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:456: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:457: type Segment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:475: call push -> external
+        - src/parser/boundary.ts:476: call set -> external
+        - src/parser/boundary.ts:513: call push -> external
+        - src/parser/boundary.ts:513: call createSegment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:524: call push -> external
+        - src/parser/boundary.ts:524: call createSegment -> src/parser/boundary.ts
+    546-570: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
-      refs out: 2 [type: 2]
-        - src/parser/boundary.ts:387: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:387: type BoundaryStats -> src/parser/boundary.ts
+      refs out: 3 [type: 3]
+        - src/parser/boundary.ts:547: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:548: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:549: type BoundaryStats -> src/parser/boundary.ts
+  variable:
+    98-98: 10 [exported]
+      /** Default minimum gap in minutes to trigger a resume boundary. Can be overridden via BoundaryOptions.resumeGapMinutes. */
   imports:
     - ../types.js
 
@@ -1231,7 +1253,7 @@ src/parser/session.test.ts [1-1128]
     - ./session.js
     - vitest
 
-src/parser/session.ts [1-401]
+src/parser/session.ts [1-415]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
@@ -1247,9 +1269,9 @@ src/parser/session.ts [1-401]
         - src/parser/session.ts:45: instantiate Error -> external
         - src/parser/session.ts:59: call push -> external
         - src/parser/session.ts:61: call warn -> external
-    87-166: buildTree(entries: SessionEntry[]): any [exported]
+    87-180: buildTree(entries: SessionEntry[]): any [exported]
       /** Build a tree structure from entries */
-      refs out: 14 [call: 12, type: 2]
+      refs out: 17 [call: 15, type: 2]
         - src/parser/session.ts:87: type SessionEntry -> src/types.ts
         - src/parser/session.ts:87: type TreeNode -> src/types.ts
         - src/parser/session.ts:95: call set -> external
@@ -1260,50 +1282,50 @@ src/parser/session.ts [1-401]
         - src/parser/session.ts:113: call sort -> external
         - src/parser/session.ts:113: call localeCompare -> external
         - src/parser/session.ts:122: call has -> external
-    172-196: findLeaf(entries: SessionEntry[]): string [exported]
+    186-210: findLeaf(entries: SessionEntry[]): string [exported]
       /** Find the current leaf entry ID The leaf is the latest entry that has no children */
       refs out: 3 [call: 2, type: 1]
-        - src/parser/session.ts:172: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:181: call add -> external
-        - src/parser/session.ts:188: call has -> external
-    201-213: findBranchPoints(entries: SessionEntry[]): {} [exported]
+        - src/parser/session.ts:186: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:195: call add -> external
+        - src/parser/session.ts:202: call has -> external
+    215-227: findBranchPoints(entries: SessionEntry[]): {} [exported]
       /** Find branch points (entries with multiple children) */
       refs out: 6 [call: 5, type: 1]
-        - src/parser/session.ts:201: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:206: call set -> external
-        - src/parser/session.ts:206: call get -> external
-        - src/parser/session.ts:210: call map -> external
-        - src/parser/session.ts:210: call filter -> external
-        - src/parser/session.ts:210: call entries -> external
-    218-286: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+        - src/parser/session.ts:215: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:220: call set -> external
+        - src/parser/session.ts:220: call get -> external
+        - src/parser/session.ts:224: call map -> external
+        - src/parser/session.ts:224: call filter -> external
+        - src/parser/session.ts:224: call entries -> external
+    232-300: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
       refs out: 4 [call: 1, type: 3]
-        - src/parser/session.ts:219: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:220: type TreeNode -> src/types.ts
-        - src/parser/session.ts:221: type SessionStats -> src/types.ts
-        - src/parser/session.ts:244: call add -> external
-    333-352: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+        - src/parser/session.ts:233: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:234: type TreeNode -> src/types.ts
+        - src/parser/session.ts:235: type SessionStats -> src/types.ts
+        - src/parser/session.ts:258: call add -> external
+    347-366: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
       refs out: 6 [call: 3, type: 3]
-        - src/parser/session.ts:334: type UserMessage -> src/types.ts
-        - src/parser/session.ts:334: type AssistantMessage -> src/types.ts
-        - src/parser/session.ts:340: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:343: call isArray -> external
-        - src/parser/session.ts:346: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:346: type TextContent -> src/types.ts
-    368-390: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+        - src/parser/session.ts:348: type UserMessage -> src/types.ts
+        - src/parser/session.ts:348: type AssistantMessage -> src/types.ts
+        - src/parser/session.ts:354: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:357: call isArray -> external
+        - src/parser/session.ts:360: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:360: type TextContent -> src/types.ts
+    382-404: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
       refs out: 4 [call: 2, type: 2]
-        - src/parser/session.ts:369: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:371: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:374: call set -> external
-        - src/parser/session.ts:385: call unshift -> external
-    395-400: getEntry(entries: SessionEntry[], id: string): any [exported]
+        - src/parser/session.ts:383: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:385: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:388: call set -> external
+        - src/parser/session.ts:399: call unshift -> external
+    409-414: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/session.ts:396: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:398: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:399: call find -> external
+        - src/parser/session.ts:410: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:412: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:413: call find -> external
   imports:
     - ../types.js
     - node:fs/promises
@@ -1429,4 +1451,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,419 (codebase: ~930,744)
+Estimated tokens: 18,908 (codebase: ~935,789)

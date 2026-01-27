@@ -6,12 +6,17 @@
  * - tree_jump: Tree navigation without summary (parentId mismatch)
  * - compaction: Context compaction event
  * - resume: 10+ minute timestamp gap
+ * - handoff: Explicit session handoff to another agent/model
  */
 
 import type {
   BranchSummaryEntry,
   CompactionEntry,
+  CustomEntry,
   SessionEntry,
+  SessionMessageEntry,
+  TextContent,
+  UserMessage,
 } from "../types.js";
 
 // =============================================================================
@@ -21,7 +26,12 @@ import type {
 /**
  * Types of boundaries that can occur within a session
  */
-export type BoundaryType = "branch" | "tree_jump" | "compaction" | "resume";
+export type BoundaryType =
+  | "branch"
+  | "tree_jump"
+  | "compaction"
+  | "resume"
+  | "handoff";
 
 /**
  * A detected boundary in the session
@@ -55,6 +65,8 @@ export interface BoundaryMetadata {
   expectedParentId?: string;
   /** For tree_jump: the actual parent */
   actualParentId?: string;
+  /** For handoff: the target agent/model/session being handed off to */
+  handoffTarget?: string;
 }
 
 /**
@@ -79,11 +91,114 @@ export interface Segment {
 // Constants
 // =============================================================================
 
-/** Minimum gap in minutes to trigger a resume boundary */
-const RESUME_GAP_MINUTES = 10;
+/**
+ * Default minimum gap in minutes to trigger a resume boundary.
+ * Can be overridden via BoundaryOptions.resumeGapMinutes.
+ */
+export const DEFAULT_RESUME_GAP_MINUTES = 10;
+
+/**
+ * Options for boundary detection
+ */
+export interface BoundaryOptions {
+  /**
+   * Minimum gap in minutes to trigger a resume boundary.
+   * @default 10
+   */
+  resumeGapMinutes?: number;
+}
+
+/**
+ * Handoff detection patterns - matches user messages indicating a handoff.
+ * Case-insensitive matching against message text content.
+ *
+ * Examples that match:
+ * - "handoff to claude"
+ * - "hand this off to the architect"
+ * - "passing to security-auditor"
+ * - "continue with worker agent"
+ */
+const HANDOFF_PATTERNS = [
+  /\bhandoff\s+to\s+(\S+)/i,
+  /\bhand\s+(?:this\s+)?off\s+to\s+(\S+)/i,
+  /\bpassing\s+to\s+(\S+)/i,
+  /\bcontinue\s+with\s+(\S+)\s+agent/i,
+];
+
+/** CustomEntry type for explicit handoff markers (for future upstream support) */
+const HANDOFF_CUSTOM_TYPE = "handoff";
 
 /** Entry types that don't participate in the conversation tree */
 const METADATA_ENTRY_TYPES = new Set(["label", "session_info"]);
+
+// =============================================================================
+// Handoff Detection Helpers
+// =============================================================================
+
+/**
+ * Extract text content from a user message
+ */
+function extractUserMessageText(entry: SessionMessageEntry): string | null {
+  const { message } = entry;
+  if (message.role !== "user") {
+    return null;
+  }
+  const userMsg = message as UserMessage;
+  if (typeof userMsg.content === "string") {
+    return userMsg.content;
+  }
+  if (Array.isArray(userMsg.content)) {
+    for (const block of userMsg.content) {
+      if (block.type === "text") {
+        return (block as TextContent).text;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Detect handoff from a user message using heuristic patterns
+ *
+ * @param {string} text - The message text to check
+ * @returns {string | null} The handoff target if detected, null otherwise
+ */
+function detectHandoffFromMessage(text: string): string | null {
+  for (const pattern of HANDOFF_PATTERNS) {
+    const match = pattern.exec(text);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  return null;
+}
+
+/**
+ * Check if a custom entry is an explicit handoff marker
+ *
+ * When pi upstream supports explicit handoff entries, they will be
+ * CustomEntry with customType === "handoff" and data containing target info.
+ */
+function isExplicitHandoffEntry(entry: SessionEntry): {
+  isHandoff: boolean;
+  target?: string;
+} {
+  if (entry.type !== "custom") {
+    return { isHandoff: false };
+  }
+  const customEntry = entry as CustomEntry;
+  if (customEntry.customType !== HANDOFF_CUSTOM_TYPE) {
+    return { isHandoff: false };
+  }
+  // Extract target from data if present
+  const target =
+    typeof customEntry.data === "object" &&
+    customEntry.data !== null &&
+    "target" in customEntry.data
+      ? String((customEntry.data as Record<string, unknown>).target)
+      : undefined;
+  return { isHandoff: true, target };
+}
 
 // =============================================================================
 // Leaf Tracker
@@ -183,9 +298,15 @@ export class LeafTracker {
  * Detect all boundaries in a list of session entries
  *
  * @param {SessionEntry[]} entries Session entries to analyze
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {Boundary[]} Array of detected boundaries, in order of occurrence
  */
-export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
+export function detectBoundaries(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): Boundary[] {
+  const resumeGapMinutes =
+    options.resumeGapMinutes ?? DEFAULT_RESUME_GAP_MINUTES;
   const boundaries: Boundary[] = [];
   const leafTracker = new LeafTracker();
 
@@ -226,13 +347,46 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
       });
     }
 
-    // 3. Tree jump (parentId doesn't match current leaf)
+    // 3. Handoff detection (explicit marker or heuristic)
+    // Check custom entries for explicit handoff markers
+    const explicitHandoff = isExplicitHandoffEntry(entry);
+    if (explicitHandoff.isHandoff) {
+      boundaries.push({
+        type: "handoff",
+        entryId: entry.id,
+        timestamp: entry.timestamp,
+        previousEntryId: leafTracker.getCurrentLeaf() ?? undefined,
+        metadata: {
+          handoffTarget: explicitHandoff.target,
+        },
+      });
+    }
+
+    // 4. Tree jump (parentId doesn't match current leaf)
     // Only check for message entries since they're the main conversation flow
     // Skip if the previous entry was a branch_summary (that's already captured as a branch boundary)
     else if (entry.type === "message") {
+      const msgEntry = entry as SessionMessageEntry;
       const currentLeaf = leafTracker.getCurrentLeaf();
       const previousWasBranchSummary =
         previousNonMetadataEntry?.type === "branch_summary";
+
+      // Check for handoff heuristic in user messages
+      const messageText = extractUserMessageText(msgEntry);
+      if (messageText) {
+        const handoffTarget = detectHandoffFromMessage(messageText);
+        if (handoffTarget) {
+          boundaries.push({
+            type: "handoff",
+            entryId: entry.id,
+            timestamp: entry.timestamp,
+            previousEntryId: leafTracker.getPreviousEntryId() ?? undefined,
+            metadata: {
+              handoffTarget,
+            },
+          });
+        }
+      }
 
       // A tree jump occurs when:
       // - We have a current leaf
@@ -258,7 +412,7 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
       }
     }
 
-    // 4. Resume detection (10+ minute gap)
+    // 5. Resume detection (10+ minute gap)
     // Check against the previous non-metadata entry
     if (previousEntryForGap) {
       const gapMs =
@@ -266,7 +420,7 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
         new Date(previousEntryForGap.timestamp).getTime();
       const gapMinutes = gapMs / (1000 * 60);
 
-      if (gapMinutes >= RESUME_GAP_MINUTES) {
+      if (gapMinutes >= resumeGapMinutes) {
         boundaries.push({
           type: "resume",
           entryId: entry.id,
@@ -294,9 +448,13 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
  * A segment is a contiguous span of entries. Boundaries define the split points.
  *
  * @param {SessionEntry[]} entries Session entries to segment
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {Segment[]} Array of segments
  */
-export function extractSegments(entries: SessionEntry[]): Segment[] {
+export function extractSegments(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): Segment[] {
   // Filter out metadata-only entries for segmentation
   const contentEntries = entries.filter(
     (e) => !METADATA_ENTRY_TYPES.has(e.type)
@@ -306,7 +464,7 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
     return [];
   }
 
-  const boundaries = detectBoundaries(entries);
+  const boundaries = detectBoundaries(entries, options);
   const segments: Segment[] = [];
 
   // Create a map of entry ID to boundaries for quick lookup
@@ -382,17 +540,22 @@ export interface BoundaryStats {
  * Calculate statistics about boundaries in a session
  *
  * @param {SessionEntry[]} entries Session entries to analyze
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {BoundaryStats} Statistics about detected boundaries
  */
-export function getBoundaryStats(entries: SessionEntry[]): BoundaryStats {
-  const boundaries = detectBoundaries(entries);
-  const segments = extractSegments(entries);
+export function getBoundaryStats(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): BoundaryStats {
+  const boundaries = detectBoundaries(entries, options);
+  const segments = extractSegments(entries, options);
 
   const byType: Record<BoundaryType, number> = {
     branch: 0,
     tree_jump: 0,
     compaction: 0,
     resume: 0,
+    handoff: 0,
   };
 
   for (const boundary of boundaries) {

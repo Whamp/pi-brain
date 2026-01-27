@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 76,
-    "totalSymbols": 1005,
+    "totalSymbols": 1013,
     "byLanguage": {
       "typescript": 76
     },
     "bySymbolKind": {
-      "function": 448,
+      "function": 453,
       "type": 37,
-      "interface": 239,
-      "variable": 99,
+      "interface": 240,
+      "variable": 101,
       "class": 11,
       "constructor": 10,
       "method": 114,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32584,
-  "codebase_tokens": 930744,
+  "total_tokens": 33127,
+  "codebase_tokens": 935789,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9848,10 +9848,10 @@
       "language": "typescript",
       "lines": [
         1,
-        279
+        336
       ],
       "detail_level": "full",
-      "token_estimate": 493,
+      "token_estimate": 720,
       "symbols": [
         {
           "name": "getDefaultSessionDir",
@@ -9877,8 +9877,8 @@
           "kind": "function",
           "signature": "async scanSessions(sessionDir?: string): Promise<{}>",
           "lines": [
-            23,
-            70
+            31,
+            43
           ],
           "exported": true,
           "is_default": false,
@@ -9887,7 +9887,26 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Scan session directory and parse all sessions",
+          "comment": "Scan session directory and parse all sessions\n\nNote: This function loads all sessions into memory. For large session\nhistories (thousands of sessions), consider using `scanSessionsIterator`\nwhich processes sessions one at a time.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "scanSessionsIterator",
+          "kind": "function",
+          "signature": "async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown>",
+          "lines": [
+            60,
+            102
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Async generator that yields sessions one at a time for memory efficiency\n\nUse this instead of `scanSessions` when processing large session histories\n(hundreds or thousands of sessions) to avoid loading all sessions into memory.\nSessions are yielded in file system order, not sorted by timestamp.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -9896,8 +9915,8 @@
           "kind": "function",
           "signature": "findForkRelationships(sessions: SessionInfo[]): {}",
           "lines": [
-            75,
-            95
+            107,
+            127
           ],
           "exported": true,
           "is_default": false,
@@ -9915,8 +9934,8 @@
           "kind": "function",
           "signature": "groupByProject(sessions: SessionInfo[]): {}",
           "lines": [
-            100,
-            132
+            132,
+            164
           ],
           "exported": true,
           "is_default": false,
@@ -9934,8 +9953,8 @@
           "kind": "function",
           "signature": "decodeProjectDir(encodedName: string): string",
           "lines": [
-            148,
-            159
+            185,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -9953,8 +9972,8 @@
           "kind": "function",
           "signature": "getProjectName(sessionPath: string): string",
           "lines": [
-            166,
-            173
+            210,
+            217
           ],
           "exported": true,
           "is_default": false,
@@ -9968,12 +9987,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "getProjectNameFromSession",
+          "kind": "function",
+          "signature": "getProjectNameFromSession(session: SessionInfo): string",
+          "lines": [
+            228,
+            230
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get project name from a SessionInfo object (preferred over getProjectName)\n\nThis function returns the accurate project path from the session header,\nwhich is not affected by the lossy directory name encoding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "filterByProject",
           "kind": "function",
           "signature": "filterByProject(sessions: SessionInfo[], projectPath: string): {}",
           "lines": [
-            178,
-            183
+            235,
+            240
           ],
           "exported": true,
           "is_default": false,
@@ -9991,8 +10029,8 @@
           "kind": "function",
           "signature": "filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {}",
           "lines": [
-            188,
-            203
+            245,
+            260
           ],
           "exported": true,
           "is_default": false,
@@ -10010,8 +10048,8 @@
           "kind": "function",
           "signature": "searchSessions(sessions: SessionInfo[], query: string): {}",
           "lines": [
-            208,
-            237
+            265,
+            294
           ],
           "exported": true,
           "is_default": false,
@@ -10029,8 +10067,8 @@
           "kind": "function",
           "signature": "getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; }",
           "lines": [
-            242,
-            278
+            299,
+            335
           ],
           "exported": true,
           "is_default": false,
@@ -10060,18 +10098,18 @@
       "language": "typescript",
       "lines": [
         1,
-        408
+        571
       ],
       "detail_level": "full",
-      "token_estimate": 693,
+      "token_estimate": 1009,
       "symbols": [
         {
           "name": "BoundaryType",
           "kind": "type",
-          "signature": "BoundaryType = \"branch\" | \"tree_jump\" | \"compaction\" | \"resume\"",
+          "signature": "BoundaryType = | \"branch\"\n  | \"tree_jump\"\n  | \"compaction\"\n  | \"resume\"\n  | \"handoff\"",
           "lines": [
-            24,
-            24
+            29,
+            34
           ],
           "exported": true,
           "is_default": false,
@@ -10089,8 +10127,8 @@
           "kind": "interface",
           "signature": "Boundary",
           "lines": [
-            29,
-            40
+            39,
+            50
           ],
           "exported": true,
           "is_default": false,
@@ -10108,8 +10146,8 @@
           "kind": "interface",
           "signature": "BoundaryMetadata",
           "lines": [
-            45,
-            58
+            55,
+            70
           ],
           "exported": true,
           "is_default": false,
@@ -10127,8 +10165,8 @@
           "kind": "interface",
           "signature": "Segment",
           "lines": [
-            63,
-            76
+            75,
+            88
           ],
           "exported": true,
           "is_default": false,
@@ -10142,12 +10180,50 @@
           "outgoing_refs": null
         },
         {
-          "name": "RESUME_GAP_MINUTES",
+          "name": "DEFAULT_RESUME_GAP_MINUTES",
           "kind": "variable",
           "signature": "10",
           "lines": [
-            83,
-            83
+            98,
+            98
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default minimum gap in minutes to trigger a resume boundary.\nCan be overridden via BoundaryOptions.resumeGapMinutes.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BoundaryOptions",
+          "kind": "interface",
+          "signature": "BoundaryOptions",
+          "lines": [
+            103,
+            109
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for boundary detection",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HANDOFF_PATTERNS",
+          "kind": "variable",
+          "signature": "{}",
+          "lines": [
+            121,
+            126
           ],
           "exported": false,
           "is_default": false,
@@ -10156,7 +10232,26 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Minimum gap in minutes to trigger a resume boundary",
+          "comment": "Handoff detection patterns - matches user messages indicating a handoff.\nCase-insensitive matching against message text content.\n\nExamples that match:\n- \"handoff to claude\"\n- \"hand this off to the architect\"\n- \"passing to security-auditor\"\n- \"continue with worker agent\"",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HANDOFF_CUSTOM_TYPE",
+          "kind": "variable",
+          "signature": "\"handoff\"",
+          "lines": [
+            129,
+            129
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "CustomEntry type for explicit handoff markers (for future upstream support)",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -10165,8 +10260,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            86,
-            86
+            132,
+            132
           ],
           "exported": false,
           "is_default": false,
@@ -10180,12 +10275,69 @@
           "outgoing_refs": null
         },
         {
+          "name": "extractUserMessageText",
+          "kind": "function",
+          "signature": "extractUserMessageText(entry: SessionMessageEntry): string",
+          "lines": [
+            141,
+            158
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Extract text content from a user message",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "detectHandoffFromMessage",
+          "kind": "function",
+          "signature": "detectHandoffFromMessage(text: string): string",
+          "lines": [
+            166,
+            174
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Detect handoff from a user message using heuristic patterns",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isExplicitHandoffEntry",
+          "kind": "function",
+          "signature": "isExplicitHandoffEntry(entry: SessionEntry): { isHandoff: boolean; target?: string; }",
+          "lines": [
+            182,
+            201
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a custom entry is an explicit handoff marker\n\nWhen pi upstream supports explicit handoff entries, they will be\nCustomEntry with customType === \"handoff\" and data containing target info.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "LeafTracker",
           "kind": "class",
           "signature": "LeafTracker",
           "lines": [
-            99,
-            176
+            214,
+            291
           ],
           "exported": true,
           "is_default": false,
@@ -10203,8 +10355,8 @@
           "kind": "property",
           "signature": "childrenOf",
           "lines": [
-            101,
-            101
+            216,
+            216
           ],
           "exported": false,
           "is_default": false,
@@ -10222,8 +10374,8 @@
           "kind": "property",
           "signature": "latestEntryId: string | null",
           "lines": [
-            103,
-            103
+            218,
+            218
           ],
           "exported": false,
           "is_default": false,
@@ -10241,8 +10393,8 @@
           "kind": "property",
           "signature": "previousEntryId: string | null",
           "lines": [
-            105,
-            105
+            220,
+            220
           ],
           "exported": false,
           "is_default": false,
@@ -10260,8 +10412,8 @@
           "kind": "property",
           "signature": "previousTimestamp: string | null",
           "lines": [
-            107,
-            107
+            222,
+            222
           ],
           "exported": false,
           "is_default": false,
@@ -10279,8 +10431,8 @@
           "kind": "method",
           "signature": "update(entry: SessionEntry): void",
           "lines": [
-            112,
-            126
+            227,
+            241
           ],
           "exported": false,
           "is_default": false,
@@ -10298,8 +10450,8 @@
           "kind": "method",
           "signature": "getCurrentLeaf(): string",
           "lines": [
-            134,
-            136
+            249,
+            251
           ],
           "exported": false,
           "is_default": false,
@@ -10317,8 +10469,8 @@
           "kind": "method",
           "signature": "getPreviousEntryId(): string",
           "lines": [
-            141,
-            143
+            256,
+            258
           ],
           "exported": false,
           "is_default": false,
@@ -10336,8 +10488,8 @@
           "kind": "method",
           "signature": "getPreviousTimestamp(): string",
           "lines": [
-            148,
-            150
+            263,
+            265
           ],
           "exported": false,
           "is_default": false,
@@ -10355,8 +10507,8 @@
           "kind": "method",
           "signature": "isLeaf(entryId: string): boolean",
           "lines": [
-            155,
-            157
+            270,
+            272
           ],
           "exported": false,
           "is_default": false,
@@ -10374,8 +10526,8 @@
           "kind": "method",
           "signature": "isBranchPoint(entryId: string): boolean",
           "lines": [
-            162,
-            165
+            277,
+            280
           ],
           "exported": false,
           "is_default": false,
@@ -10393,8 +10545,8 @@
           "kind": "method",
           "signature": "reset(): void",
           "lines": [
-            170,
-            175
+            285,
+            290
           ],
           "exported": false,
           "is_default": false,
@@ -10410,10 +10562,10 @@
         {
           "name": "detectBoundaries",
           "kind": "function",
-          "signature": "detectBoundaries(entries: SessionEntry[]): {}",
+          "signature": "detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {}",
           "lines": [
-            188,
-            289
+            304,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -10429,10 +10581,10 @@
         {
           "name": "extractSegments",
           "kind": "function",
-          "signature": "extractSegments(entries: SessionEntry[]): {}",
+          "signature": "extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {}",
           "lines": [
-            299,
-            370
+            454,
+            528
           ],
           "exported": true,
           "is_default": false,
@@ -10450,8 +10602,8 @@
           "kind": "interface",
           "signature": "BoundaryStats",
           "lines": [
-            375,
-            379
+            533,
+            537
           ],
           "exported": true,
           "is_default": false,
@@ -10467,10 +10619,10 @@
         {
           "name": "getBoundaryStats",
           "kind": "function",
-          "signature": "getBoundaryStats(entries: SessionEntry[]): BoundaryStats",
+          "signature": "getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats",
           "lines": [
-            387,
-            407
+            546,
+            570
           ],
           "exported": true,
           "is_default": false,
@@ -10667,7 +10819,7 @@
       "language": "typescript",
       "lines": [
         1,
-        401
+        415
       ],
       "detail_level": "full",
       "token_estimate": 435,
@@ -10716,7 +10868,7 @@
           "signature": "buildTree(entries: SessionEntry[]): any",
           "lines": [
             87,
-            166
+            180
           ],
           "exported": true,
           "is_default": false,
@@ -10734,8 +10886,8 @@
           "kind": "function",
           "signature": "findLeaf(entries: SessionEntry[]): string",
           "lines": [
-            172,
-            196
+            186,
+            210
           ],
           "exported": true,
           "is_default": false,
@@ -10753,8 +10905,8 @@
           "kind": "function",
           "signature": "findBranchPoints(entries: SessionEntry[]): {}",
           "lines": [
-            201,
-            213
+            215,
+            227
           ],
           "exported": true,
           "is_default": false,
@@ -10772,8 +10924,8 @@
           "kind": "function",
           "signature": "calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats",
           "lines": [
-            218,
-            286
+            232,
+            300
           ],
           "exported": true,
           "is_default": false,
@@ -10791,8 +10943,8 @@
           "kind": "function",
           "signature": "calculateMaxDepth(node: TreeNode): number",
           "lines": [
-            291,
-            296
+            305,
+            310
           ],
           "exported": false,
           "is_default": false,
@@ -10810,8 +10962,8 @@
           "kind": "function",
           "signature": "findSessionName(entries: SessionEntry[]): string",
           "lines": [
-            301,
-            313
+            315,
+            327
           ],
           "exported": false,
           "is_default": false,
@@ -10829,8 +10981,8 @@
           "kind": "function",
           "signature": "findFirstMessage(entries: SessionEntry[]): string",
           "lines": [
-            318,
-            328
+            332,
+            342
           ],
           "exported": false,
           "is_default": false,
@@ -10848,8 +11000,8 @@
           "kind": "function",
           "signature": "extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string",
           "lines": [
-            333,
-            352
+            347,
+            366
           ],
           "exported": true,
           "is_default": false,
@@ -10867,8 +11019,8 @@
           "kind": "function",
           "signature": "truncate(str: string, maxLength: number): string",
           "lines": [
-            357,
-            363
+            371,
+            377
           ],
           "exported": false,
           "is_default": false,
@@ -10886,8 +11038,8 @@
           "kind": "function",
           "signature": "getPathToEntry(entries: SessionEntry[], targetId: string): {}",
           "lines": [
-            368,
-            390
+            382,
+            404
           ],
           "exported": true,
           "is_default": false,
@@ -10905,8 +11057,8 @@
           "kind": "function",
           "signature": "getEntry(entries: SessionEntry[], id: string): any",
           "lines": [
-            395,
-            400
+            409,
+            414
           ],
           "exported": true,
           "is_default": false,
