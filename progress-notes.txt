@@ -359,3 +359,34 @@
 - Different stability thresholds allow for network sync delays on spoke sessions
 - isFromSpoke() method enables differentiated handling downstream (e.g., in worker for computer field)
 - Also included uncommitted Task 9.3 security additions (rsync extra_args validation)
+
+---
+
+## 2026-01-26 17:48 - Task 9.5
+
+**Status**: pending → done
+**Validation**:
+- Added getComputerFromPath() helper in src/config/config.ts
+- For spoke sessions, returns the spoke name from config
+- For local sessions (hub), returns os.hostname()
+- Uses proper path boundary checking (e.g., /synced/laptop doesn't match /synced/laptop-backup)
+- Updated worker to use getComputerFromPath() instead of hardcoded os.hostname()
+- Added 7 unit tests for getComputerFromPath() covering:
+  - Local sessions → hostname
+  - Spoke sessions → spoke name
+  - Multiple spokes
+  - Disabled spokes
+  - Trailing slashes
+  - Path boundary checking
+  - Empty spokes
+- Fixed watcher isFromSpoke() path boundary checking (uncommitted from 9.4)
+- Added 2 tests for watcher path boundary edge cases
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 853 passed, 4 skipped)
+**Commit**: cb3d0be
+**Notes**:
+- The computer field now correctly identifies which machine a session came from
+- For local hub sessions: uses the hostname (e.g., "desktop")
+- For synced spoke sessions: uses the spoke name from config (e.g., "laptop", "server")
+- This enables filtering and grouping nodes by source computer in the UI
+- Phase 9 (Multi-Computer Sync) is now complete

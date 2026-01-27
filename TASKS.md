@@ -126,7 +126,7 @@ Track implementation progress. Agents update status as they complete work.
 | 9.2 | Implement rsync-based sync option            | done   | 3.1      | 2026-01-26 - sync module, CLI, docs      |
 | 9.3 | Implement spoke configuration in config.yaml | done   | 1.4      | 2026-01-26 - enabled, schedule, rsyncOpt |
 | 9.4 | Daemon watches synced directories            | done   | 3.1, 9.3 | 2026-01-26                               |
-| 9.5 | Computer field populated correctly           | active | 3.7      | 2026-01-26                               |
+| 9.5 | Computer field populated correctly           | done   | 3.7      | 2026-01-26 - spoke name or hostname      |
 
 ## Phase 10: Prompt Learning Pipeline
 
