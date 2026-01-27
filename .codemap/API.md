@@ -384,11 +384,12 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.ts [1-562]
+src/daemon/connection-discovery.ts [1-623]
   class:
-    146-561: class ConnectionDiscoverer [exported]
+    162-622: class ConnectionDiscoverer [exported]
+      /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    141-144: interface ConnectionResult [exported]
+    141-146: interface ConnectionResult [exported]
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
@@ -1829,4 +1830,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,806 (codebase: ~936,458)
+Estimated tokens: 22,871 (codebase: ~936,753)

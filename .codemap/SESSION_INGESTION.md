@@ -215,13 +215,14 @@ src/daemon/connection-discovery.test.ts [1-440]
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-562]
+src/daemon/connection-discovery.ts [1-623]
   class:
-    146-561: class ConnectionDiscoverer [exported]
+    162-622: class ConnectionDiscoverer [exported]
+      /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    141-144: interface ConnectionResult [exported]
+    141-146: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:143: type Edge -> src/types/index.ts
+        - src/daemon/connection-discovery.ts:145: type Edge -> src/types/index.ts
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
@@ -944,7 +945,8 @@ src/daemon/worker.ts [1-536]
   interface:
     55-70: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 8 [type: 8]
+      refs out: 9 [type: 9]
+        - src/daemon/worker.ts:59: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:61: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:63: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:65: type AnalysisJob -> src/daemon/queue.ts
@@ -972,8 +974,9 @@ src/daemon/worker.ts [1-536]
         - src/daemon/worker.ts:485: instantiate Worker -> src/daemon/worker.ts
     492-506: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-      refs out: 7 [call: 2, type: 5]
+      refs out: 8 [call: 2, type: 6]
         - src/daemon/worker.ts:493: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:494: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:495: type Database -> external
         - src/daemon/worker.ts:496: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:497: type Promise -> external
@@ -1448,4 +1451,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,839 (codebase: ~936,090)
+Estimated tokens: 18,943 (codebase: ~936,750)

@@ -139,17 +139,58 @@ const STOPWORDS = new Set([
 ]);
 
 export interface ConnectionResult {
+  /** The ID of the source node that connections were discovered for */
   sourceNodeId: string;
+  /** Array of newly created edges */
   edges: Edge[];
 }
 
+/**
+ * Discovers semantic connections between nodes in the knowledge graph.
+ *
+ * Uses keyword/tag similarity, explicit references, and lesson reinforcement
+ * patterns to find related nodes. Does not use LLM - relies on FTS and
+ * Jaccard similarity for performance.
+ *
+ * @example
+ * ```typescript
+ * const discoverer = new ConnectionDiscoverer(db);
+ * const result = await discoverer.discover(nodeId, { threshold: 0.3 });
+ * console.log(`Found ${result.edges.length} connections`);
+ * ```
+ */
 export class ConnectionDiscoverer {
+  /**
+   * Create a new ConnectionDiscoverer instance
+   * @param {Database.Database} db - SQLite database connection
+   */
   constructor(private db: Database.Database) {}
 
   /**
    * Discover and create connections for a node
-   * @param {string} nodeId The ID of the node to find connections for
-   * @param {object} options Configuration options
+   *
+   * Analyzes the source node and finds semantically related older nodes.
+   * Creates edges of three types:
+   * - `semantic`: Nodes with similar tags/topics/summaries
+   * - `reference`: Nodes explicitly referenced by ID in text
+   * - `lesson_application`: Nodes with matching lessons learned
+   *
+   * @param {string} nodeId - The ID of the node to find connections for
+   * @param {object} options - Configuration options
+   * @param {number} [options.threshold] - Minimum similarity score (0-1) to create edge (default: 0.2)
+   * @param {number} [options.limit] - Maximum number of candidate nodes to check (default: 50)
+   * @param {number} [options.daysToLookBack] - How far back to search for connections (default: 30)
+   * @returns {Promise<ConnectionResult>} Promise resolving to the source node ID and array of created edges
+   * @throws {Error} If the node ID is not found in the database
+   *
+   * @example
+   * ```typescript
+   * const result = await discoverer.discover('abc123', {
+   *   threshold: 0.25,
+   *   limit: 100,
+   *   daysToLookBack: 60
+   * });
+   * ```
    */
   public async discover(
     nodeId: string,
@@ -508,11 +549,31 @@ export class ConnectionDiscoverer {
   }
 
   /**
-   * Calculate similarity score between two nodes (0-1)
-   * Uses weighted average of:
-   * - Jaccard index of tags (weight 0.4)
-   * - Jaccard index of topics (weight 0.3)
-   * - Jaccard index of summary words (weight 0.3)
+   * Calculate similarity score between two nodes
+   *
+   * Uses a weighted average of Jaccard indices:
+   * - Tags: 40% weight
+   * - Topics: 30% weight
+   * - Summary words (tokenized, stopwords removed): 30% weight
+   *
+   * @param {object} a - First node's metadata (tags, topics, summary text)
+   * @param {Set<string>} a.tags - Tags from the first node
+   * @param {Set<string>} a.topics - Topics from the first node
+   * @param {string} a.summary - Summary text from the first node
+   * @param {object} b - Second node's metadata (tags, topics, summary text)
+   * @param {Set<string>} b.tags - Tags from the second node
+   * @param {Set<string>} b.topics - Topics from the second node
+   * @param {string} b.summary - Summary text from the second node
+   * @returns {number} Similarity score from 0 (no similarity) to 1 (identical)
+   *
+   * @example
+   * ```typescript
+   * const score = discoverer.calculateSimilarity(
+   *   { tags: new Set(['typescript', 'api']), topics: new Set(['backend']), summary: 'Built REST API' },
+   *   { tags: new Set(['typescript', 'web']), topics: new Set(['backend']), summary: 'Created web API' }
+   * );
+   * // score ≈ 0.5
+   * ```
    */
   public calculateSimilarity(
     a: { tags: Set<string>; topics: Set<string>; summary: string },

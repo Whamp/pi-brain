@@ -282,9 +282,10 @@ src/daemon/connection-discovery.test.ts [1-440]
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-562]
+src/daemon/connection-discovery.ts [1-623]
   class:
-    146-561: class ConnectionDiscoverer [exported]
+    162-622: class ConnectionDiscoverer [exported]
+      /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
       refs in: 7 [import: 2, instantiate: 2, reexport: 1, type: 2]
         - src/daemon/connection-discovery.test.ts:5: import (module)
         - src/daemon/connection-discovery.test.ts:39: type discoverer
@@ -294,9 +295,9 @@ src/daemon/connection-discovery.ts [1-562]
         - src/daemon/worker.ts:130: type Worker.connectionDiscoverer
         - src/daemon/worker.ts:161: instantiate Worker.initialize
   interface:
-    141-144: interface ConnectionResult [exported]
+    141-146: interface ConnectionResult [exported]
       refs in: 2 [reexport: 1, type: 1]
-        - src/daemon/connection-discovery.ts:161: type ConnectionDiscoverer.discover
+        - src/daemon/connection-discovery.ts:202: type ConnectionDiscoverer.discover
         - src/daemon/index.ts:160: reexport (module)
   imports:
     - ../storage/node-repository.js
@@ -1657,8 +1658,8 @@ src/storage/node-repository.ts [1-3311]
       /** Node row from the database */
       refs in: 31 [import: 2, type: 29]
         - src/daemon/connection-discovery.ts:17: import (module)
-        - src/daemon/connection-discovery.ts:273: type ConnectionDiscoverer.findCandidates
-        - src/daemon/connection-discovery.ts:294: type ConnectionDiscoverer.findCandidates
+        - src/daemon/connection-discovery.ts:314: type ConnectionDiscoverer.findCandidates
+        - src/daemon/connection-discovery.ts:335: type ConnectionDiscoverer.findCandidates
         - src/daemon/query-processor.ts:23: import (module)
         - src/daemon/query-processor.ts:236: type nodeRowToRelevant
         - src/storage/node-repository.ts:532: type getNode
@@ -1937,8 +1938,8 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/cli.test.ts:597: call retrieved
         - src/daemon/cli.test.ts:678: call retrieved
         - src/daemon/connection-discovery.ts:15: import (module)
-        - src/daemon/connection-discovery.ts:167: call ConnectionDiscoverer.sourceNode
-        - src/daemon/connection-discovery.ts:352: call ConnectionDiscoverer.targetNode
+        - src/daemon/connection-discovery.ts:208: call ConnectionDiscoverer.sourceNode
+        - src/daemon/connection-discovery.ts:393: call ConnectionDiscoverer.targetNode
         - src/storage/node-repository.test.ts:45: import (module)
         - src/storage/node-repository.test.ts:301: call row
         - src/storage/node-repository.test.ts:439: call result
@@ -2004,9 +2005,9 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/connection-discovery.test.ts:4: import (module)
         - src/daemon/connection-discovery.test.ts:190: call (module)
         - src/daemon/connection-discovery.ts:13: import (module)
-        - src/daemon/connection-discovery.ts:234: call ConnectionDiscoverer.edge
-        - src/daemon/connection-discovery.ts:361: call ConnectionDiscoverer.edge
-        - src/daemon/connection-discovery.ts:446: call ConnectionDiscoverer.edge
+        - src/daemon/connection-discovery.ts:275: call ConnectionDiscoverer.edge
+        - src/daemon/connection-discovery.ts:402: call ConnectionDiscoverer.edge
+        - src/daemon/connection-discovery.ts:487: call ConnectionDiscoverer.edge
         - src/storage/node-repository.test.ts:20: import (module)
         - src/storage/node-repository.test.ts:1100: call edge
         - src/storage/node-repository.test.ts:1117: call edge
@@ -2050,9 +2051,9 @@ src/storage/node-repository.ts [1-3311]
       /** Check if an edge exists between two nodes */
       refs in: 12 [call: 10, import: 2]
         - src/daemon/connection-discovery.ts:14: import (module)
-        - src/daemon/connection-discovery.ts:211: call ConnectionDiscoverer.discover
-        - src/daemon/connection-discovery.ts:356: call ConnectionDiscoverer.detectReferences
-        - src/daemon/connection-discovery.ts:437: call ConnectionDiscoverer.detectLessonReinforcement
+        - src/daemon/connection-discovery.ts:252: call ConnectionDiscoverer.discover
+        - src/daemon/connection-discovery.ts:397: call ConnectionDiscoverer.detectReferences
+        - src/daemon/connection-discovery.ts:478: call ConnectionDiscoverer.detectLessonReinforcement
         - src/storage/node-repository.test.ts:24: import (module)
         - src/storage/node-repository.test.ts:1199: call (module)
         - src/storage/node-repository.test.ts:1209: call (module)
@@ -2198,7 +2199,7 @@ src/storage/node-repository.ts [1-3311]
       /** Get node summary from FTS index */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/connection-discovery.ts:16: import (module)
-        - src/daemon/connection-discovery.ts:181: call ConnectionDiscoverer.sourceSummary
+        - src/daemon/connection-discovery.ts:222: call ConnectionDiscoverer.sourceSummary
     2176-2180: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
       refs in: 6 [call: 5, import: 1]
@@ -2672,4 +2673,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 39
-Estimated tokens: 35,446 (codebase: ~936,090)
+Estimated tokens: 35,512 (codebase: ~936,750)
