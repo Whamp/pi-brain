@@ -736,3 +736,38 @@
 - This violated eslint-plugin-jest/no-conditional-expect rule
 - The fix uses proper assertions that fail if preconditions aren't met
 - Deleted TODO-f8b10687 as the issue is now resolved
+
+---
+
+## 2026-01-26 22:21 - Task 11.6
+
+**Status**: pending → done
+**Validation**:
+- Implemented `analyzeClusters()` method in FacetDiscovery class
+- Created `prompts/cluster-analyzer.md` system prompt for LLM analysis
+- Features:
+  - Gets pending clusters that need naming (status='pending', name=null)
+  - Retrieves representative nodes for each cluster
+  - Builds prompt with node summaries, types, projects, and outcomes
+  - Invokes pi agent with cluster-analyzer.md system prompt
+  - Parses JSON response (name, description, confidence, reasoning)
+  - Updates cluster with name and description on success
+  - Respects explicit promptFile config without fallback
+- Added new types:
+  - ClusterAnalysisConfig (provider, model, promptFile, timeoutMinutes)
+  - ClusterAnalysisResult (per-cluster result with name/description/error)
+  - ClusterAnalysisBatchResult (batch metrics and results array)
+- Exported new types and classes from daemon/index.ts
+- Added 5 tests:
+  - Empty results when no pending clusters
+  - Skip clusters that already have names
+  - Error on missing prompt file (with explicit path)
+  - Limit option respected
+  - Representative nodes correctly retrieved
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1115 passed, 4 skipped)
+**Commit**: ff10460
+**Notes**:
+- The implementation follows the query-processor pattern for pi spawning
+- Tests use mock embedding provider and non-existent prompt paths to avoid spawning pi
+- Ready for Task 11.7 (News Feed UI) and 11.9 (add clustering to nightly scheduler)
