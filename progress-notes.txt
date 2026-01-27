@@ -138,3 +138,32 @@ Only 2 minor tasks remain pending:
 - All consumers (worker.ts, tests) continue to import from node-repository.ts via re-exports
 - Re-exports maintain backward compatibility
 - All 1198 tests pass
+
+---
+
+## 2026-01-27 15:31 - Task 13.4
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1198 passed, 4 skipped)
+**Commit**: 67abd8a
+
+**Summary**: Extracted full-text search operations from node-repository.ts to search-repository.ts
+
+**Files created:**
+- `src/storage/search-repository.ts` (531 lines) - FTS operations
+
+**Extracted:**
+- Types: `SearchField`, `SearchFilters`, `SearchHighlight`, `SearchResult`, `SearchOptions`, `SearchNodesResult`
+- Functions: `indexNodeForSearch`, `searchNodes`, `searchNodesAdvanced`, `countSearchResults`
+- Helper functions (internal): `quoteSearchQuery`, `buildFieldQuery`, `extractSnippet`, `findHighlights`, `buildFilterClause`
+
+**Changes:**
+- `node-repository.ts` reduced from 2829 to 2332 lines (-497 lines)
+- Added imports and re-exports for backward compatibility
+- Updated storage barrel (index.ts) to include search-repository.ts
+- Introduced `SearchFilters` type (subset of `ListNodesFilters` relevant to search operations)
+
+**Notes:** 
+- All consumers continue to import from node-repository.ts via re-exports
+- The `buildFilterClause` helper was refactored to reduce code duplication between `searchNodesAdvanced` and `countSearchResults`
+- All 1198 tests pass

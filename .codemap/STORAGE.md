@@ -446,4 +446,4 @@ src/storage/search-repository.ts [1-532]
 
 ---
 Files: 11
-Estimated tokens: 6,690 (codebase: ~956,901)
+Estimated tokens: 6,690 (codebase: ~957,645)
