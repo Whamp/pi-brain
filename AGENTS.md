@@ -3,6 +3,7 @@
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
 
 ## Important Writing Standards
+
 @~/.pi/agent/skills/writing-clearly-and-concisely/SKILL.md
 
 ## Toolchain

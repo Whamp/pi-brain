@@ -6,6 +6,7 @@
  * - pi-brain viz       - Generate interactive HTML visualization of pi sessions
  * - pi-brain daemon    - Control the daemon (start, stop, status, queue, analyze)
  * - pi-brain health    - Run health checks
+ * - pi-brain sync      - Manage session sync from spokes
  */
 
 import { Command } from "commander";
@@ -14,6 +15,7 @@ import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import open from "open";
 
+import { loadConfig } from "./config/index.js";
 import {
   startDaemon,
   stopDaemon,
@@ -32,6 +34,12 @@ import {
   getDefaultSessionDir,
   getOverallStats,
 } from "./parser/analyzer.js";
+import {
+  getSyncStatus,
+  formatSyncStatus,
+  runRsync,
+  listSpokeSessions,
+} from "./sync/index.js";
 import { generateHTML } from "./web/generator.js";
 
 const program = new Command();
@@ -297,6 +305,171 @@ program
 
     // Exit with error code if not healthy
     if (!status.healthy) {
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Sync command
+// =============================================================================
+
+const syncCmd = program
+  .command("sync")
+  .description("Manage session sync from spoke machines");
+
+syncCmd
+  .command("status")
+  .description("Show sync status for all spokes")
+  .option("-c, --config <path>", "Config file path")
+  .option("--json", "Output as JSON")
+  .action(async (options) => {
+    try {
+      const config = loadConfig(options.config);
+      const status = await getSyncStatus(config);
+
+      if (options.json) {
+        console.log(JSON.stringify(status, null, 2));
+      } else {
+        console.log(formatSyncStatus(status));
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+syncCmd
+  .command("run")
+  .description("Run rsync for configured spokes")
+  .option("-c, --config <path>", "Config file path")
+  .option("-s, --spoke <name>", "Sync specific spoke only")
+  .option("-n, --dry-run", "Show what would be transferred without syncing")
+  .option("--delete", "Delete files on hub that don't exist on spoke")
+  .option("--bwlimit <kbps>", "Bandwidth limit in KB/s", "0")
+  .action(async (options) => {
+    try {
+      const config = loadConfig(options.config);
+      const rsyncSpokes = config.spokes.filter((s) => s.syncMethod === "rsync");
+
+      if (rsyncSpokes.length === 0) {
+        console.error("No spokes configured with rsync sync method.");
+        console.error(
+          "\nTo configure rsync spokes, add to ~/.pi-brain/config.yaml:"
+        );
+        console.error("  spokes:");
+        console.error("    - name: laptop");
+        console.error("      sync_method: rsync");
+        console.error("      source: user@laptop:~/.pi/agent/sessions");
+        console.error("      path: ~/.pi-brain/synced/laptop");
+        process.exit(1);
+      }
+
+      // Filter to specific spoke if requested
+      let spokesToSync = rsyncSpokes;
+      if (options.spoke) {
+        spokesToSync = rsyncSpokes.filter((s) => s.name === options.spoke);
+        if (spokesToSync.length === 0) {
+          console.error(
+            `Spoke "${options.spoke}" not found or not configured for rsync.`
+          );
+          console.error("\nAvailable rsync spokes:");
+          for (const s of rsyncSpokes) {
+            console.error(`  - ${s.name}`);
+          }
+          process.exit(1);
+        }
+      }
+
+      const bwLimit = Number.parseInt(options.bwlimit, 10);
+
+      console.log(options.dryRun ? "Dry run mode\n" : "Starting sync...\n");
+
+      let hasErrors = false;
+
+      for (const spoke of spokesToSync) {
+        console.log(`Syncing ${spoke.name}...`);
+
+        const result = await runRsync(spoke, {
+          dryRun: options.dryRun,
+          delete: options.delete,
+          bwLimit,
+        });
+
+        if (result.success) {
+          console.log(`  ✓ ${result.message} (${result.durationMs}ms)`);
+        } else {
+          console.error(`  ✗ ${result.message}`);
+          if (result.error) {
+            console.error(`    Error: ${result.error}`);
+          }
+          hasErrors = true;
+        }
+      }
+
+      console.log("");
+      if (hasErrors) {
+        console.error("Some syncs failed.");
+        process.exit(1);
+      } else {
+        console.log("All syncs completed successfully.");
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+syncCmd
+  .command("list")
+  .description("List sessions from spokes")
+  .option("-c, --config <path>", "Config file path")
+  .option("-s, --spoke <name>", "List sessions for specific spoke only")
+  .option("-l, --long", "Show full paths")
+  .action((options) => {
+    try {
+      const config = loadConfig(options.config);
+
+      let { spokes } = config;
+      if (options.spoke) {
+        spokes = spokes.filter((s) => s.name === options.spoke);
+        if (spokes.length === 0) {
+          console.error(`Spoke "${options.spoke}" not found.`);
+          console.error("\nAvailable spokes:");
+          for (const s of config.spokes) {
+            console.error(`  - ${s.name}`);
+          }
+          process.exit(1);
+        }
+      }
+
+      if (spokes.length === 0) {
+        console.error("No spokes configured.");
+        process.exit(1);
+      }
+
+      for (const spoke of spokes) {
+        const sessions = listSpokeSessions(spoke.path);
+
+        console.log(
+          `${spoke.name} (${spoke.syncMethod}): ${sessions.length} sessions`
+        );
+
+        if (sessions.length > 0) {
+          for (const session of sessions) {
+            if (options.long) {
+              console.log(`  ${session}`);
+            } else {
+              // Show relative path from spoke directory
+              const relative = session.slice(spoke.path.length + 1);
+              console.log(`  ${relative}`);
+            }
+          }
+        }
+
+        console.log("");
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
       process.exit(1);
     }
   });

@@ -123,7 +123,7 @@ Track implementation progress. Agents update status as they complete work.
 | ID  | Task                                         | Status  | Deps     | Notes                           |
 | --- | -------------------------------------------- | ------- | -------- | ------------------------------- |
 | 9.1 | Document Syncthing setup for spokes          | done    | -        | 2026-01-26 - SYNCTHING-SETUP.md |
-| 9.2 | Implement rsync-based sync option            | pending | 3.1      |                                 |
+| 9.2 | Implement rsync-based sync option            | active  | 3.1      | 2026-01-26                      |
 | 9.3 | Implement spoke configuration in config.yaml | pending | 1.4      |                                 |
 | 9.4 | Daemon watches synced directories            | pending | 3.1, 9.3 |                                 |
 | 9.5 | Computer field populated correctly           | pending | 3.7      |                                 |
