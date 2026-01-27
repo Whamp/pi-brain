@@ -715,3 +715,24 @@
 - Task 11.5a created for lint fix (TODO-f8b10687)
 - Task 11.6 will add LLM cluster analysis and naming
 - Task 11.9 will add clustering to nightly scheduler
+
+---
+
+## 2026-01-26 22:12 - Task 11.5a
+
+**Status**: pending → done
+**Validation**:
+- Fixed 9 conditional expect lint violations in facet-discovery tests
+- Replaced `if (firstCluster) { expect(...) }` patterns with guard assertions
+- Tests now use `expect(clusters.length).toBeGreaterThan(0)` before accessing elements
+- This ensures tests fail properly if no clusters are created vs silently passing
+- Used nullish coalescing for fallback cluster selection in one test
+- Fixed unrelated hex literal casing issue (converted to decimal equivalent)
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1110 passed, 4 skipped)
+**Commit**: f686df4
+**Notes**:
+- The original pattern wrapped expects in `if (firstCluster)` blocks
+- This violated eslint-plugin-jest/no-conditional-expect rule
+- The fix uses proper assertions that fail if preconditions aren't met
+- Deleted TODO-f8b10687 as the issue is now resolved
