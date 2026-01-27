@@ -11,59 +11,34 @@ import type { AgentNodeOutput } from "../daemon/processor.js";
 import type { AnalysisJob } from "../daemon/queue.js";
 
 import {
+  insertDaemonDecisions,
+  insertLessons,
+  insertModelQuirks,
+  insertToolErrors,
+  type NodeRow,
+  type RepositoryOptions,
+} from "./node-crud.js";
+import {
   listNodeVersions,
   readNodeFromPath,
   writeNode,
-  type NodeStorageOptions,
 } from "./node-storage.js";
 import {
   generateDeterministicNodeId,
   generateNodeId,
-  type DaemonDecision,
   type Edge,
   type EdgeMetadata,
   type EdgeType,
-  type LessonsByLevel,
-  type ModelQuirk,
   type Node,
   type NodeSignals,
-  type ToolError,
 } from "./node-types.js";
 
-// =============================================================================
-// Types
-// =============================================================================
+// Re-export types from node-crud.ts for backward compatibility
+export type { NodeRow, RepositoryOptions } from "./node-crud.js";
 
-/** Options for node repository operations */
-export interface RepositoryOptions extends NodeStorageOptions {
-  /** Skip FTS indexing */
-  skipFts?: boolean;
-}
-
-/** Node row from the database */
-export interface NodeRow {
-  id: string;
-  version: number;
-  session_file: string;
-  segment_start: string | null;
-  segment_end: string | null;
-  computer: string | null;
-  type: string | null;
-  project: string | null;
-  is_new_project: number;
-  had_clear_goal: number;
-  outcome: string | null;
-  tokens_used: number;
-  cost: number;
-  duration_minutes: number;
-  timestamp: string;
-  analyzed_at: string;
-  analyzer_version: string | null;
-  data_file: string;
-  signals: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// =============================================================================
+// Types (EdgeRow stays here until edge-repository.ts is extracted)
+// =============================================================================
 
 /** Edge row from the database */
 export interface EdgeRow {
@@ -420,116 +395,6 @@ export function updateNode(
 
     return node;
   })();
-}
-
-/**
- * Insert lessons for a node
- */
-function insertLessons(
-  db: Database.Database,
-  nodeId: string,
-  lessonsByLevel: LessonsByLevel
-): void {
-  const insertLesson = db.prepare(`
-    INSERT INTO lessons (id, node_id, level, summary, details, confidence)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-
-  const insertLessonTag = db.prepare(
-    "INSERT OR IGNORE INTO lesson_tags (lesson_id, tag) VALUES (?, ?)"
-  );
-
-  for (const [_level, lessons] of Object.entries(lessonsByLevel)) {
-    for (const lesson of lessons) {
-      const lessonId = generateLessonId();
-      insertLesson.run(
-        lessonId,
-        nodeId,
-        lesson.level,
-        lesson.summary,
-        lesson.details,
-        lesson.confidence
-      );
-
-      for (const tag of lesson.tags) {
-        insertLessonTag.run(lessonId, tag);
-      }
-    }
-  }
-}
-
-/**
- * Insert model quirks for a node
- */
-function insertModelQuirks(
-  db: Database.Database,
-  nodeId: string,
-  quirks: ModelQuirk[]
-): void {
-  const insertQuirk = db.prepare(`
-    INSERT INTO model_quirks (id, node_id, model, observation, frequency, workaround)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-
-  for (const quirk of quirks) {
-    insertQuirk.run(
-      generateQuirkId(),
-      nodeId,
-      quirk.model,
-      quirk.observation,
-      quirk.frequency,
-      quirk.workaround ?? null
-    );
-  }
-}
-
-/**
- * Insert tool errors for a node
- */
-function insertToolErrors(
-  db: Database.Database,
-  nodeId: string,
-  errors: ToolError[]
-): void {
-  const insertError = db.prepare(`
-    INSERT INTO tool_errors (id, node_id, tool, error_type, context, model)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
-
-  for (const error of errors) {
-    insertError.run(
-      generateErrorId(),
-      nodeId,
-      error.tool,
-      error.errorType,
-      error.context,
-      error.model
-    );
-  }
-}
-
-/**
- * Insert daemon decisions for a node
- */
-function insertDaemonDecisions(
-  db: Database.Database,
-  nodeId: string,
-  decisions: DaemonDecision[]
-): void {
-  const insertDecision = db.prepare(`
-    INSERT INTO daemon_decisions (id, node_id, timestamp, decision, reasoning)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  for (const decision of decisions) {
-    insertDecision.run(
-      generateDecisionId(),
-      nodeId,
-      decision.timestamp,
-      decision.decision,
-      decision.reasoning
-    );
-  }
 }
 
 /**
@@ -3065,24 +2930,8 @@ export function getDescendants(
 }
 
 // =============================================================================
-// ID Generation
+// ID Generation (edge ID generator stays here until edge-repository.ts is extracted)
 // =============================================================================
-
-function generateLessonId(): string {
-  return `les_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-function generateQuirkId(): string {
-  return `qrk_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-function generateErrorId(): string {
-  return `err_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-function generateDecisionId(): string {
-  return `dec_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
 
 function generateEdgeId(): string {
   return `edg_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;

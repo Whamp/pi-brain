@@ -34,6 +34,18 @@ src/daemon/index.ts
         - [builtin] path
       - src/daemon/queue.ts
         - [external] better-sqlite3
+      - src/storage/node-crud.ts
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
       - src/storage/node-storage.ts
         - src/storage/node-types.ts
           - src/types/index.ts
@@ -66,6 +78,18 @@ src/daemon/index.ts
         - [builtin] os
         - [builtin] path
       - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-crud.ts
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
         - [external] better-sqlite3
       - src/storage/node-storage.ts
         - src/storage/node-types.ts
@@ -190,6 +214,18 @@ src/daemon/index.ts
           - [builtin] path
         - src/daemon/queue.ts
           - [external] better-sqlite3
+        - src/storage/node-crud.ts
+          - src/storage/node-storage.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [builtin] fs
+            - [builtin] os
+            - [builtin] path
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
         - src/storage/node-storage.ts
           - src/storage/node-types.ts
             - src/types/index.ts
@@ -251,6 +287,18 @@ src/daemon/index.ts
         - [builtin] os
         - [builtin] path
       - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-crud.ts
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
         - [external] better-sqlite3
       - src/storage/node-storage.ts
         - src/storage/node-types.ts

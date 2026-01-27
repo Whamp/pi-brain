@@ -5,4 +5,5 @@
 export * from "./database.js";
 export * from "./node-types.js";
 export * from "./node-storage.js";
+export * from "./node-crud.js";
 export * from "./node-repository.js";
