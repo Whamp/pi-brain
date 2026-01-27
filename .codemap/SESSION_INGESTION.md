@@ -993,7 +993,7 @@ src/daemon/worker.ts [1-536]
     - better-sqlite3
     - node:path
 
-src/parser/analyzer.ts [1-263]
+src/parser/analyzer.ts [1-279]
   function:
     16-18: getDefaultSessionDir(): string [exported]
       /** Default session directory */
@@ -1034,48 +1034,48 @@ src/parser/analyzer.ts [1-263]
         - src/parser/analyzer.ts:115: call localeCompare -> external
         - src/parser/analyzer.ts:118: call push -> external
         - src/parser/analyzer.ts:121: call reduce -> external
-    138-145: decodeProjectDir(encodedName: string): string [exported]
-      /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" */
+    148-159: decodeProjectDir(encodedName: string): string [exported]
+      /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
       refs out: 3 [call: 3]
-        - src/parser/analyzer.ts:139: call startsWith -> external
-        - src/parser/analyzer.ts:139: call endsWith -> external
-        - src/parser/analyzer.ts:144: call replaceAll -> external
-    150-157: getProjectName(sessionPath: string): string [exported]
+        - src/parser/analyzer.ts:149: call startsWith -> external
+        - src/parser/analyzer.ts:149: call endsWith -> external
+        - src/parser/analyzer.ts:158: call replaceAll -> external
+    166-173: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
       refs out: 2 [call: 2]
-        - src/parser/analyzer.ts:154: call decodeProjectDir -> src/parser/analyzer.ts
-        - src/parser/analyzer.ts:156: call basename -> external
-    162-167: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+        - src/parser/analyzer.ts:170: call decodeProjectDir -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:172: call basename -> external
+    178-183: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/analyzer.ts:163: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:165: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:166: call filter -> external
-    172-187: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+        - src/parser/analyzer.ts:179: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:181: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:182: call filter -> external
+    188-203: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
       refs out: 5 [call: 1, type: 4]
-        - src/parser/analyzer.ts:173: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:174: type Date -> external
-        - src/parser/analyzer.ts:175: type Date -> external
-        - src/parser/analyzer.ts:176: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:177: call filter -> external
-    192-221: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+        - src/parser/analyzer.ts:189: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:190: type Date -> external
+        - src/parser/analyzer.ts:191: type Date -> external
+        - src/parser/analyzer.ts:192: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:193: call filter -> external
+    208-237: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
       refs out: 9 [call: 7, type: 2]
-        - src/parser/analyzer.ts:193: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:195: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:203: call includes -> external
-        - src/parser/analyzer.ts:203: call toLowerCase -> external
-        - src/parser/analyzer.ts:204: call push -> external
-        - src/parser/analyzer.ts:208: call includes -> external
-        - src/parser/analyzer.ts:208: call toLowerCase -> external
-        - src/parser/analyzer.ts:209: call push -> external
-        - src/parser/analyzer.ts:216: call push -> external
-    226-262: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+        - src/parser/analyzer.ts:209: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:211: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:219: call includes -> external
+        - src/parser/analyzer.ts:219: call toLowerCase -> external
+        - src/parser/analyzer.ts:220: call push -> external
+        - src/parser/analyzer.ts:224: call includes -> external
+        - src/parser/analyzer.ts:224: call toLowerCase -> external
+        - src/parser/analyzer.ts:225: call push -> external
+        - src/parser/analyzer.ts:232: call push -> external
+    242-278: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/analyzer.ts:226: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:243: call add -> external
+        - src/parser/analyzer.ts:242: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:259: call add -> external
   imports:
     - ../types.js
     - ./session.js
@@ -1415,4 +1415,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,243 (codebase: ~926,022)
+Estimated tokens: 18,339 (codebase: ~925,872)
