@@ -38,3 +38,16 @@ Only 2 minor tasks remain pending:
 - 1.5: Configurable RESUME_GAP_MINUTES (8bade30)
 
 **Notes**: All tasks in CODE-REVIEW-TASKS-phase2-parsing.md and TASKS.md are now marked done. Project appears complete.
+
+---
+
+## 2026-01-27 13:30 - Task 11R.3
+
+**Status**: pending → done
+**Validation**: 2 new tests for graceful degradation pass (openrouter + openai providers)
+**Commit**: 4bd3a8c
+**Notes**: 
+- Modified runClustering to log warning and return early with success instead of throwing when embedding API key is missing
+- Added 'warn' method to SchedulerLogger interface and all implementations
+- Updated config template with clearer comments about API key requirement
+- Total tests: 1181 passed, 4 skipped
