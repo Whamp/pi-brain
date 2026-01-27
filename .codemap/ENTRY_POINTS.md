@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 23 files
+- typescript: 25 files
 
 ## Statistics
-- Total files: 23
-- Total symbols: 55
-  - function: 41
-  - interface: 7
+- Total files: 25
+- Total symbols: 61
+  - function: 45
+  - interface: 9
   - variable: 6
   - type: 1
 
@@ -365,6 +365,52 @@ src/api/routes/sessions.ts [1-272]
     - ../responses.js
     - fastify
 
+src/api/routes/signals.test.ts [1-307]
+  imports:
+    - ../../storage/node-storage.js
+    - ../../types/index.js
+    - ./signals.js
+    - better-sqlite3
+    - fastify
+    - vitest
+
+src/api/routes/signals.ts [1-263]
+  interface:
+    20-36: interface AbandonedRestartPattern
+    38-51: interface FrictionSummary
+  function:
+    57-114: async signalsRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 12 [call: 6, type: 6]
+        - src/api/routes/signals.ts:57: type FastifyInstance -> external
+        - src/api/routes/signals.ts:57: type Promise -> external
+        - src/api/routes/signals.ts:63: call get -> external
+        - src/api/routes/signals.ts:66: type FastifyRequest -> external
+        - src/api/routes/signals.ts:69: type FastifyReply -> external
+    123-173: getAbandonedRestartPatterns(db: Database.Database, limit: number, offset: number): {}
+      /** Get abandoned restart patterns by scanning node JSON files */
+      refs out: 3 [call: 1, type: 2]
+        - src/api/routes/signals.ts:124: type Database -> external
+        - src/api/routes/signals.ts:127: type AbandonedRestartPattern -> src/api/routes/signals.ts
+        - src/api/routes/signals.ts:152: call push -> external
+    178-190: countAbandonedRestartPatterns(db: Database.Database): number
+      /** Count total abandoned restart patterns */
+      refs out: 1 [type: 1]
+        - src/api/routes/signals.ts:178: type Database -> external
+    195-262: getFrictionSummary(db: Database.Database): FrictionSummary
+      /** Get friction summary statistics */
+      refs out: 6 [call: 4, type: 2]
+        - src/api/routes/signals.ts:195: type Database -> external
+        - src/api/routes/signals.ts:195: type FrictionSummary -> src/api/routes/signals.ts
+        - src/api/routes/signals.ts:198: call setDate -> external
+        - src/api/routes/signals.ts:198: call getDate -> external
+        - src/api/routes/signals.ts:241: call set -> external
+  imports:
+    - ../../storage/node-storage.js
+    - ../../types/index.js
+    - ../responses.js
+    - better-sqlite3
+    - fastify
+
 src/api/routes/stats.ts [1-165]
   function:
     16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
@@ -432,30 +478,30 @@ src/api/server.test.ts [1-683]
     - node:path
     - vitest
 
-src/api/server.ts [1-177]
+src/api/server.ts [1-179]
   interface:
-    45-48: interface ServerContext [exported]
+    46-49: interface ServerContext [exported]
       /** Server context passed to route handlers */
       refs out: 2 [type: 2]
-        - src/api/server.ts:46: type Database -> external
-        - src/api/server.ts:47: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:47: type Database -> external
+        - src/api/server.ts:48: type ApiConfig -> src/config/types.ts
   function:
-    62-150: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    63-152: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-      refs out: 30 [call: 25, instantiate: 1, type: 4]
-        - src/api/server.ts:63: type Database -> external
-        - src/api/server.ts:64: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:65: type Promise -> external
-        - src/api/server.ts:65: type FastifyInstance -> external
-        - src/api/server.ts:73: call register -> external
-    155-169: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+      refs out: 31 [call: 26, instantiate: 1, type: 4]
+        - src/api/server.ts:64: type Database -> external
+        - src/api/server.ts:65: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:66: type Promise -> external
+        - src/api/server.ts:66: type FastifyInstance -> external
+        - src/api/server.ts:74: call register -> external
+    157-171: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
       /** Start the API server */
       refs out: 6 [call: 2, type: 4]
-        - src/api/server.ts:156: type Database -> external
-        - src/api/server.ts:157: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:158: type Promise -> external
-        - src/api/server.ts:158: type FastifyInstance -> external
-        - src/api/server.ts:161: call listen -> external
+        - src/api/server.ts:158: type Database -> external
+        - src/api/server.ts:159: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:160: type Promise -> external
+        - src/api/server.ts:160: type FastifyInstance -> external
+        - src/api/server.ts:163: call listen -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -473,6 +519,7 @@ src/api/server.ts [1-177]
     - ./routes/quirks.js
     - ./routes/search.js
     - ./routes/sessions.js
+    - ./routes/signals.js
     - ./routes/stats.js
     - ./routes/tool-errors.js
     - @fastify/cors
@@ -521,5 +568,5 @@ src/cli.ts [1-1047]
     - open
 
 ---
-Files: 23
-Estimated tokens: 5,395 (codebase: ~913,295)
+Files: 25
+Estimated tokens: 5,920 (codebase: ~918,675)

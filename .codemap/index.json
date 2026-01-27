@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 74,
-    "totalSymbols": 991,
+    "totalFiles": 75,
+    "totalSymbols": 1000,
     "byLanguage": {
-      "typescript": 74
+      "typescript": 75
     },
     "bySymbolKind": {
-      "function": 441,
+      "function": 445,
       "type": 37,
-      "interface": 234,
+      "interface": 239,
       "variable": 97,
       "class": 11,
       "constructor": 10,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 31866,
-  "codebase_tokens": 913997,
+  "total_tokens": 32107,
+  "codebase_tokens": 921948,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1088,6 +1088,142 @@
       ]
     },
     {
+      "path": "src/api/routes/signals.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        263
+      ],
+      "detail_level": "full",
+      "token_estimate": 192,
+      "symbols": [
+        {
+          "name": "AbandonedRestartPattern",
+          "kind": "interface",
+          "signature": "AbandonedRestartPattern",
+          "lines": [
+            20,
+            36
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "FrictionSummary",
+          "kind": "interface",
+          "signature": "FrictionSummary",
+          "lines": [
+            38,
+            51
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "signalsRoutes",
+          "kind": "function",
+          "signature": "async signalsRoutes(app: FastifyInstance): Promise<void>",
+          "lines": [
+            57,
+            114
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAbandonedRestartPatterns",
+          "kind": "function",
+          "signature": "getAbandonedRestartPatterns(db: Database.Database, limit: number, offset: number): {}",
+          "lines": [
+            123,
+            173
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get abandoned restart patterns by scanning node JSON files",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "countAbandonedRestartPatterns",
+          "kind": "function",
+          "signature": "countAbandonedRestartPatterns(db: Database.Database): number",
+          "lines": [
+            178,
+            190
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Count total abandoned restart patterns",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getFrictionSummary",
+          "kind": "function",
+          "signature": "getFrictionSummary(db: Database.Database): FrictionSummary",
+          "lines": [
+            195,
+            262
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get friction summary statistics",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../../storage/node-storage.js",
+        "../../types/index.js",
+        "../responses.js",
+        "better-sqlite3",
+        "fastify"
+      ]
+    },
+    {
       "path": "src/api/routes/stats.ts",
       "language": "typescript",
       "lines": [
@@ -1209,18 +1345,18 @@
       "language": "typescript",
       "lines": [
         1,
-        177
+        179
       ],
       "detail_level": "full",
-      "token_estimate": 249,
+      "token_estimate": 256,
       "symbols": [
         {
           "name": "ServerContext",
           "kind": "interface",
           "signature": "ServerContext",
           "lines": [
-            45,
-            48
+            46,
+            49
           ],
           "exported": true,
           "is_default": false,
@@ -1238,8 +1374,8 @@
           "kind": "function",
           "signature": "async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance>",
           "lines": [
-            62,
-            150
+            63,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -1257,8 +1393,8 @@
           "kind": "function",
           "signature": "async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance>",
           "lines": [
-            155,
-            169
+            157,
+            171
           ],
           "exported": true,
           "is_default": false,
@@ -1292,6 +1428,7 @@
         "./routes/quirks.js",
         "./routes/search.js",
         "./routes/sessions.js",
+        "./routes/signals.js",
         "./routes/stats.js",
         "./routes/tool-errors.js",
         "@fastify/cors",
@@ -19035,7 +19172,7 @@
       "language": "typescript",
       "lines": [
         1,
-        446
+        457
       ],
       "detail_level": "full",
       "token_estimate": 192,
@@ -19045,8 +19182,8 @@
           "kind": "function",
           "signature": "getDefaultBaseUrl(): string",
           "lines": [
-            27,
-            38
+            29,
+            40
           ],
           "exported": false,
           "is_default": false,
@@ -19064,8 +19201,8 @@
           "kind": "variable",
           "signature": "string",
           "lines": [
-            40,
-            40
+            42,
+            42
           ],
           "exported": false,
           "is_default": false,
@@ -19083,8 +19220,8 @@
           "kind": "variable",
           "signature": "30000",
           "lines": [
-            41,
-            41
+            43,
+            43
           ],
           "exported": false,
           "is_default": false,
@@ -19102,8 +19239,8 @@
           "kind": "interface",
           "signature": "ApiResponse<T>",
           "lines": [
-            43,
-            55
+            45,
+            57
           ],
           "exported": false,
           "is_default": false,
@@ -19121,8 +19258,8 @@
           "kind": "interface",
           "signature": "ApiErrorOptions",
           "lines": [
-            57,
-            61
+            59,
+            63
           ],
           "exported": false,
           "is_default": false,
@@ -19140,8 +19277,8 @@
           "kind": "function",
           "signature": "createApiError(options: ApiErrorOptions): Error",
           "lines": [
-            63,
-            72
+            65,
+            74
           ],
           "exported": true,
           "is_default": false,
@@ -19159,8 +19296,8 @@
           "kind": "function",
           "signature": "createTimeoutError(timeoutMs: number): Error",
           "lines": [
-            74,
-            78
+            76,
+            80
           ],
           "exported": true,
           "is_default": false,
@@ -19178,8 +19315,8 @@
           "kind": "function",
           "signature": "isApiError(error: unknown): boolean",
           "lines": [
-            80,
-            84
+            82,
+            86
           ],
           "exported": true,
           "is_default": false,
@@ -19197,8 +19334,8 @@
           "kind": "function",
           "signature": "isTimeoutError(error: unknown): boolean",
           "lines": [
-            86,
-            88
+            88,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -19216,8 +19353,8 @@
           "kind": "function",
           "signature": "toQueryString(params: Record<string, unknown>): string",
           "lines": [
-            90,
-            107
+            92,
+            109
           ],
           "exported": false,
           "is_default": false,
@@ -19235,8 +19372,8 @@
           "kind": "function",
           "signature": "async request<T>(endpoint: string, options: RequestInit = {}, baseUrl: string = DEFAULT_BASE_URL, timeoutMs: number = DEFAULT_TIMEOUT_MS): Promise<T>",
           "lines": [
-            109,
-            147
+            111,
+            149
           ],
           "exported": false,
           "is_default": false,
@@ -19254,8 +19391,8 @@
           "kind": "variable",
           "signature": "api",
           "lines": [
-            149,
-            443
+            151,
+            454
           ],
           "exported": true,
           "is_default": false,
@@ -19647,10 +19784,10 @@
       "language": "typescript",
       "lines": [
         1,
-        244
+        285
       ],
       "detail_level": "full",
-      "token_estimate": 237,
+      "token_estimate": 279,
       "symbols": [
         {
           "name": "LessonEntity",
@@ -19925,6 +20062,63 @@
           "lines": [
             238,
             243
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AbandonedRestartPattern",
+          "kind": "interface",
+          "signature": "AbandonedRestartPattern",
+          "lines": [
+            246,
+            262
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AbandonedRestartsResponse",
+          "kind": "interface",
+          "signature": "AbandonedRestartsResponse",
+          "lines": [
+            264,
+            269
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "FrictionSummary",
+          "kind": "interface",
+          "signature": "FrictionSummary",
+          "lines": [
+            271,
+            284
           ],
           "exported": true,
           "is_default": false,

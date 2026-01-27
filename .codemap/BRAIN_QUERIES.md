@@ -2452,17 +2452,17 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:218: call (module)
     107-114: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 16 [call: 9, import: 7]
+      refs in: 19 [call: 11, import: 8]
         - src/api/routes/nodes.ts:22: import (module)
         - src/api/routes/nodes.ts:148: call node
+        - src/api/routes/signals.ts:13: import (module)
+        - src/api/routes/signals.ts:145: call node
+        - src/api/routes/signals.ts:219: call node
         - src/daemon/cli.ts:36: import (module)
         - src/daemon/cli.ts:988: call node
         - src/daemon/cli.ts:1013: call node
         - src/daemon/insight-aggregation.ts:20: import (module)
         - src/daemon/insight-aggregation.ts:400: call InsightAggregator.aggregatePromptingPatterns
-        - src/prompt/effectiveness.test.ts:11: import (module)
-        - src/prompt/effectiveness.ts:22: import (module)
-        - src/prompt/effectiveness.ts:263: call node
     119-128: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
       /** Check if a node file exists */
       refs in: 3 [call: 2, import: 1]
@@ -2680,4 +2680,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 38
-Estimated tokens: 35,444 (codebase: ~913,997)
+Estimated tokens: 35,440 (codebase: ~921,948)

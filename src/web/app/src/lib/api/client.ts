@@ -21,6 +21,8 @@ import type {
   ClusterListResponse,
   ClusterWithNodes,
   ClusterStatus,
+  AbandonedRestartsResponse,
+  FrictionSummary,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -440,6 +442,15 @@ export const api = {
         body: JSON.stringify({ status }),
       }
     ),
+
+  // Signals (friction/delight patterns)
+  getAbandonedRestarts: (options?: { limit?: number; offset?: number }) =>
+    request<AbandonedRestartsResponse>(
+      `/signals/abandoned-restarts${toQueryString(options ?? {})}`
+    ),
+
+  getFrictionSummary: () =>
+    request<FrictionSummary>("/signals/friction-summary"),
 };
 
 export { createApiError, createTimeoutError, isApiError, isTimeoutError };

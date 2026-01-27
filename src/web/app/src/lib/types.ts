@@ -241,3 +241,44 @@ export interface ClusterListResponse {
   limit: number;
   offset: number;
 }
+
+// Signals types for friction/delight tracking
+export interface AbandonedRestartPattern {
+  /** Node that was abandoned */
+  abandonedNodeId: string;
+  abandonedSummary: string;
+  abandonedProject: string;
+  abandonedTimestamp: string;
+  /** Node that restarted the work (may not be available) */
+  restartNodeId?: string;
+  restartSummary?: string;
+  restartTimestamp?: string;
+  /** Model used in abandoned session */
+  model?: string;
+  /** Files touched in abandoned session */
+  filesTouched: string[];
+  /** Friction score of the abandoned node */
+  frictionScore: number;
+}
+
+export interface AbandonedRestartsResponse {
+  patterns: AbandonedRestartPattern[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface FrictionSummary {
+  /** Total nodes with high friction (score > 0.5) */
+  highFrictionCount: number;
+  /** Total abandoned restart patterns */
+  abandonedRestartCount: number;
+  /** Total rephrasing cascade events */
+  rephrasingCascadeCount: number;
+  /** Total tool loop events */
+  toolLoopCount: number;
+  /** Total context churn events */
+  contextChurnCount: number;
+  /** Models with highest friction */
+  modelFriction: { model: string; count: number }[];
+}

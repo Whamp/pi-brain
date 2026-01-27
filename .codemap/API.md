@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 74 files
+- typescript: 75 files
 
 ## Statistics
-- Total files: 74
-- Total symbols: 576
-  - function: 317
-  - interface: 185
+- Total files: 75
+- Total symbols: 580
+  - function: 318
+  - interface: 188
   - type: 37
   - variable: 26
   - class: 11
@@ -159,6 +159,16 @@ src/api/routes/sessions.ts [1-272]
     - ../responses.js
     - fastify
 
+src/api/routes/signals.ts [1-263]
+  function:
+    57-114: async signalsRoutes(app: FastifyInstance): Promise<void> [exported]
+  imports:
+    - ../../storage/node-storage.js
+    - ../../types/index.js
+    - ../responses.js
+    - better-sqlite3
+    - fastify
+
 src/api/routes/stats.ts [1-165]
   function:
     16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
@@ -176,14 +186,14 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-177]
+src/api/server.ts [1-179]
   interface:
-    45-48: interface ServerContext [exported]
+    46-49: interface ServerContext [exported]
       /** Server context passed to route handlers */
   function:
-    62-150: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    63-152: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    155-169: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    157-171: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -202,6 +212,7 @@ src/api/server.ts [1-177]
     - ./routes/quirks.js
     - ./routes/search.js
     - ./routes/sessions.js
+    - ./routes/signals.js
     - ./routes/stats.js
     - ./routes/tool-errors.js
     - @fastify/cors
@@ -1688,14 +1699,14 @@ src/types/index.ts [1-661]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-446]
+src/web/app/src/lib/api/client.ts [1-457]
   function:
-    63-72: createApiError(options: ApiErrorOptions): Error [exported]
-    74-78: createTimeoutError(timeoutMs: number): Error [exported]
-    80-84: isApiError(error: unknown): boolean [exported]
-    86-88: isTimeoutError(error: unknown): boolean [exported]
+    65-74: createApiError(options: ApiErrorOptions): Error [exported]
+    76-80: createTimeoutError(timeoutMs: number): Error [exported]
+    82-86: isApiError(error: unknown): boolean [exported]
+    88-90: isTimeoutError(error: unknown): boolean [exported]
   variable:
-    149-443: api [exported]
+    151-454: api [exported]
   imports:
     - $lib/types
 
@@ -1732,7 +1743,7 @@ src/web/app/src/lib/stores/websocket.ts [1-175]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-244]
+src/web/app/src/lib/types.ts [1-285]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
@@ -1749,6 +1760,9 @@ src/web/app/src/lib/types.ts [1-244]
     229-231: interface ClusterWithNodes extends Cluster [exported]
     233-236: interface ClusterFeedResponse [exported]
     238-243: interface ClusterListResponse [exported]
+    246-262: interface AbandonedRestartPattern [exported]
+    264-269: interface AbandonedRestartsResponse [exported]
+    271-284: interface FrictionSummary [exported]
   imports:
     - ../../../../types/index.js
 
@@ -1783,5 +1797,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 74
-Estimated tokens: 21,925 (codebase: ~913,295)
+Files: 75
+Estimated tokens: 22,038 (codebase: ~916,274)

@@ -32,6 +32,7 @@ import { queryRoutes } from "./routes/query.js";
 import { quirksRoutes } from "./routes/quirks.js";
 import { searchRoutes } from "./routes/search.js";
 import { sessionsRoutes } from "./routes/sessions.js";
+import { signalsRoutes } from "./routes/signals.js";
 import { statsRoutes } from "./routes/stats.js";
 import { toolErrorsRoutes } from "./routes/tool-errors.js";
 
@@ -112,6 +113,7 @@ export async function createServer(
       await api.register(configRoutes, { prefix: "/config" });
       await api.register(clustersRoutes, { prefix: "" });
       await api.register(agentsRoutes, { prefix: "/agents" });
+      await api.register(signalsRoutes, { prefix: "/signals" });
     },
     { prefix: "/api/v1" }
   );
