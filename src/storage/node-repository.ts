@@ -60,6 +60,7 @@ export interface NodeRow {
   analyzed_at: string;
   analyzer_version: string | null;
   data_file: string;
+  signals: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -129,12 +130,12 @@ export function insertNodeToDb(
       id, version, session_file, segment_start, segment_end, computer,
       type, project, is_new_project, had_clear_goal, outcome,
       tokens_used, cost, duration_minutes,
-      timestamp, analyzed_at, analyzer_version, data_file
+      timestamp, analyzed_at, analyzer_version, data_file, signals
     ) VALUES (
       ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?,
       ?, ?, ?,
-      ?, ?, ?, ?
+      ?, ?, ?, ?, ?
     )
   `);
 
@@ -156,7 +157,8 @@ export function insertNodeToDb(
     node.metadata.timestamp,
     node.metadata.analyzedAt,
     node.metadata.analyzerVersion,
-    dataFile
+    dataFile,
+    node.signals ? JSON.stringify(node.signals) : null
   );
 
   // Insert related data
@@ -250,6 +252,7 @@ export function upsertNode(
         analyzed_at = ?,
         analyzer_version = ?,
         data_file = ?,
+        signals = ?,
         updated_at = datetime('now')
       WHERE id = ?
     `);
@@ -268,6 +271,7 @@ export function upsertNode(
       node.metadata.analyzedAt,
       node.metadata.analyzerVersion,
       dataFile,
+      node.signals ? JSON.stringify(node.signals) : null,
       node.id
     );
 
@@ -358,6 +362,7 @@ export function updateNode(
         analyzed_at = ?,
         analyzer_version = ?,
         data_file = ?,
+        signals = ?,
         updated_at = datetime('now')
       WHERE id = ?
     `);
@@ -376,6 +381,7 @@ export function updateNode(
       node.metadata.analyzedAt,
       node.metadata.analyzerVersion,
       dataFile,
+      node.signals ? JSON.stringify(node.signals) : null,
       node.id
     );
 

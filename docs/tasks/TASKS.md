@@ -175,8 +175,8 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 11 Remediation: Signals & Insights Polish
 
-| ID    | Task                                                                    | Status  | Deps  | Notes      |
-| ----- | ----------------------------------------------------------------------- | ------- | ----- | ---------- |
-| 11R.1 | Wire up Abandoned Restart detection (worker integration + test)         | done    | 11.1  | 2026-01-27 |
-| 11R.2 | Refine Signals API & Storage (schema migration + DB column for signals) | pending | 11R.1 | -          |
-| 11R.3 | Clustering graceful degradation when embedding API key missing          | done    | 11.9a | 2026-01-27 |
+| ID    | Task                                                                    | Status | Deps  | Notes      |
+| ----- | ----------------------------------------------------------------------- | ------ | ----- | ---------- |
+| 11R.1 | Wire up Abandoned Restart detection (worker integration + test)         | done   | 11.1  | 2026-01-27 |
+| 11R.2 | Refine Signals API & Storage (schema migration + DB column for signals) | done   | 11R.1 | 2026-01-27 |
+| 11R.3 | Clustering graceful degradation when embedding API key missing          | done   | 11.9a | 2026-01-27 |

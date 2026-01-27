@@ -365,52 +365,50 @@ src/api/routes/sessions.ts [1-272]
     - ../responses.js
     - fastify
 
-src/api/routes/signals.test.ts [1-317]
+src/api/routes/signals.test.ts [1-306]
   function:
-    24-30: createTestApiConfig(): ApiConfig
+    14-20: createTestApiConfig(): ApiConfig
       /** Create a minimal valid API config for tests */
+      refs out: 1 [type: 1]
+        - src/api/routes/signals.test.ts:14: type ApiConfig -> src/config/types.ts
   imports:
     - ../../config/types.js
-    - ../../storage/node-storage.js
-    - ../../types/index.js
     - ./signals.js
     - better-sqlite3
     - fastify
     - vitest
 
-src/api/routes/signals.ts [1-263]
+src/api/routes/signals.ts [1-260]
   interface:
-    20-36: interface AbandonedRestartPattern
-    38-51: interface FrictionSummary
+    19-33: interface AbandonedRestartPattern
+    35-48: interface FrictionSummary
   function:
-    57-114: async signalsRoutes(app: FastifyInstance): Promise<void> [exported]
+    54-111: async signalsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 12 [call: 6, type: 6]
-        - src/api/routes/signals.ts:57: type FastifyInstance -> external
-        - src/api/routes/signals.ts:57: type Promise -> external
-        - src/api/routes/signals.ts:63: call get -> external
-        - src/api/routes/signals.ts:66: type FastifyRequest -> external
-        - src/api/routes/signals.ts:69: type FastifyReply -> external
-    123-173: getAbandonedRestartPatterns(db: Database.Database, limit: number, offset: number): {}
-      /** Get abandoned restart patterns by scanning node JSON files */
+        - src/api/routes/signals.ts:54: type FastifyInstance -> external
+        - src/api/routes/signals.ts:54: type Promise -> external
+        - src/api/routes/signals.ts:60: call get -> external
+        - src/api/routes/signals.ts:63: type FastifyRequest -> external
+        - src/api/routes/signals.ts:66: type FastifyReply -> external
+    122-166: getAbandonedRestartPatterns(db: Database.Database, limit: number, offset: number): {}
+      /** Get abandoned restart patterns by querying the signals column. Uses SQLite's json_extract to query the stored signals JSON. */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/signals.ts:124: type Database -> external
-        - src/api/routes/signals.ts:127: type AbandonedRestartPattern -> src/api/routes/signals.ts
-        - src/api/routes/signals.ts:152: call push -> external
-    178-190: countAbandonedRestartPatterns(db: Database.Database): number
-      /** Count total abandoned restart patterns */
+        - src/api/routes/signals.ts:123: type Database -> external
+        - src/api/routes/signals.ts:126: type AbandonedRestartPattern -> src/api/routes/signals.ts
+        - src/api/routes/signals.ts:153: call push -> external
+    173-181: countAbandonedRestartPatterns(db: Database.Database): number
+      /** Count total abandoned restart patterns using the signals column. This is now accurate instead of an approximation. */
       refs out: 1 [type: 1]
-        - src/api/routes/signals.ts:178: type Database -> external
-    195-262: getFrictionSummary(db: Database.Database): FrictionSummary
-      /** Get friction summary statistics */
-      refs out: 6 [call: 4, type: 2]
-        - src/api/routes/signals.ts:195: type Database -> external
-        - src/api/routes/signals.ts:195: type FrictionSummary -> src/api/routes/signals.ts
-        - src/api/routes/signals.ts:198: call setDate -> external
-        - src/api/routes/signals.ts:198: call getDate -> external
-        - src/api/routes/signals.ts:241: call set -> external
+        - src/api/routes/signals.ts:173: type Database -> external
+    188-259: getFrictionSummary(db: Database.Database): FrictionSummary
+      /** Get friction summary statistics using the signals column. Queries are now efficient using SQLite's json_extract. */
+      refs out: 4 [call: 2, type: 2]
+        - src/api/routes/signals.ts:188: type Database -> external
+        - src/api/routes/signals.ts:188: type FrictionSummary -> src/api/routes/signals.ts
+        - src/api/routes/signals.ts:190: call setDate -> external
+        - src/api/routes/signals.ts:190: call getDate -> external
   imports:
-    - ../../storage/node-repository.js
-    - ../../storage/node-storage.js
+    - ../../types/index.js
     - ../responses.js
     - better-sqlite3
     - fastify
@@ -574,4 +572,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 5,999 (codebase: ~944,260)
+Estimated tokens: 6,039 (codebase: ~949,494)
