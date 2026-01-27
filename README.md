@@ -22,7 +22,7 @@ pi-brain runs in the background to build a knowledge graph from your coding sess
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/pi-brain.git
+git clone https://github.com/Whamp/pi-brain.git
 cd pi-brain
 
 # Install dependencies

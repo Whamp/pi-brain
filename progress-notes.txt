@@ -20,3 +20,17 @@ Main branch: major/pi-brain
    - Use length-prefix encoding for robustness
 
 ---
+
+## 2026-01-27 09:27 - Task 1.1, 1.2, 1.3
+
+**Status**: pending → done (all three tasks)
+**Validation**:
+- Task 1.1: Comment added at src/storage/node-repository.ts:235-237 explaining why source fields (session_file, segment_start, segment_end, computer) are omitted from UPDATE statement
+- Task 1.2: DELETE statements now prepared into named variables (deleteTags, deleteTopics, deleteLessons, deleteModelQuirks, deleteToolErrors, deleteDaemonDecisions) before execution at lines 275-293
+- Task 1.3: Length-prefix encoding implemented in generateDeterministicNodeId() at src/storage/node-types.ts:48 using format "len:value|len:value|len:value"
+- All 1167 tests pass
+- npm run check passes
+**Commit**: 294c730
+**Notes**:
+- All three code review issues were addressed in a single commit
+- TASKS.md status corrected to reflect completed work
