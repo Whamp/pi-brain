@@ -4,8 +4,5 @@ node_modules/
 # Build output
 dist/
 
-# SQL files - oxfmt doesn't understand SQL well
-*.sql
-
 # Auto-generated codemap documentation
 .codemap/
