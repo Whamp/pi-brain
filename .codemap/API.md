@@ -124,9 +124,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-199]
+src/api/routes/query.ts [1-202]
   function:
-    41-198: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    44-201: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/query-processor.js
     - ../responses.js
@@ -229,42 +229,42 @@ src/cli.ts [1-1047]
     - node:path
     - open
 
-src/config/config.ts [1-680]
+src/config/config.ts [1-696]
   class:
-    432-440: class ConfigError extends Error [exported]
+    444-452: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
       /** Expand ~ in paths to home directory */
     48-54: getDefaultHubConfig(): HubConfig [exported]
       /** Default hub configuration */
-    59-81: getDefaultDaemonConfig(): DaemonConfig [exported]
+    59-86: getDefaultDaemonConfig(): DaemonConfig [exported]
       /** Default daemon configuration */
-    86-91: getDefaultQueryConfig(): QueryConfig [exported]
+    91-96: getDefaultQueryConfig(): QueryConfig [exported]
       /** Default query configuration */
-    96-106: getDefaultApiConfig(): ApiConfig [exported]
+    101-111: getDefaultApiConfig(): ApiConfig [exported]
       /** Default API configuration */
-    111-119: getDefaultConfig(): PiBrainConfig [exported]
+    116-124: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    310-427: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    315-439: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    445-491: loadConfig(configPath?: string): PiBrainConfig [exported]
+    457-503: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    496-501: ensureConfigDir(configDir?: string): void [exported]
+    508-513: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    506-541: ensureDirectories(config: PiBrainConfig): void [exported]
+    518-553: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    546-598: writeDefaultConfig(configPath?: string): void [exported]
+    558-614: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    603-611: getSessionDirs(config: PiBrainConfig): {} [exported]
+    619-627: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    616-618: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    632-634: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    623-627: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    639-643: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    632-639: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    648-655: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    650-679: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    666-695: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -283,7 +283,7 @@ src/config/index.ts [1-36]
     - ./config.js
     - ./types.js
 
-src/config/types.ts [1-216]
+src/config/types.ts [1-236]
   interface:
     16-28: interface RsyncOptions [exported]
       /** Rsync-specific options for spoke configuration */
@@ -291,15 +291,15 @@ src/config/types.ts [1-216]
       /** Spoke machine configuration Spokes are secondary machines that sync sessions to the hub */
     61-70: interface HubConfig [exported]
       /** Hub configuration The hub is the primary computer where daemon runs */
-    76-118: interface DaemonConfig [exported]
+    76-133: interface DaemonConfig [exported]
       /** Daemon configuration Controls the background analysis process */
-    124-130: interface QueryConfig [exported]
+    139-145: interface QueryConfig [exported]
       /** Query configuration Controls the /brain query interface */
-    135-144: interface ApiConfig [exported]
+    150-159: interface ApiConfig [exported]
       /** API server configuration */
-    149-164: interface PiBrainConfig [exported]
+    164-179: interface PiBrainConfig [exported]
       /** Complete pi-brain configuration */
-    170-215: interface RawConfig [exported]
+    185-235: interface RawConfig [exported]
       /** Raw YAML configuration (snake_case, before transformation) This matches the YAML file structure */
   type:
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
@@ -437,9 +437,9 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/facet-discovery.ts [1-1666]
+src/daemon/facet-discovery.ts [1-1721]
   class:
-    594-1637: class FacetDiscovery [exported]
+    649-1692: class FacetDiscovery [exported]
   interface:
     91-100: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -449,13 +449,13 @@ src/daemon/facet-discovery.ts [1-1666]
       /** Result from analyzing multiple clusters */
     132-136: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-    582-586: interface FacetDiscoveryLogger [exported]
+    637-641: interface FacetDiscoveryLogger [exported]
   function:
-    141-168: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    141-180: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-    310-377: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    365-432: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
-    420-439: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    475-494: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
   imports:
     - ../types/index.js
@@ -610,18 +610,18 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-757]
+src/daemon/scheduler.ts [1-791]
   class:
-    115-696: class Scheduler [exported]
+    130-725: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
     59-63: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    80-98: interface SchedulerConfig [exported]
+    80-113: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    101-110: interface SchedulerStatus [exported]
+    116-125: interface SchedulerStatus [exported]
       /** Scheduler state */
   type:
     42-46: ScheduledJobType = | "reanalysis"
@@ -630,11 +630,11 @@ src/daemon/scheduler.ts [1-757]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    701-720: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    730-754: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    726-735: isValidCronExpression(expression: string): boolean [exported]
+    760-769: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    740-756: getNextRunTimes(expression: string, count = 5): {} [exported]
+    774-790: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
     66-70: SchedulerLogger [exported]
@@ -1782,4 +1782,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 74
-Estimated tokens: 21,866 (codebase: ~911,588)
+Estimated tokens: 21,867 (codebase: ~912,603)

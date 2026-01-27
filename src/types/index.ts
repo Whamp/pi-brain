@@ -623,13 +623,13 @@ export interface ClusteringRun {
  * Configuration for the embedding provider
  */
 export interface EmbeddingConfig {
-  /** Provider type: 'ollama', 'openai', or 'mock' for testing */
-  provider: "ollama" | "openai" | "mock";
-  /** Model name (e.g., 'nomic-embed-text', 'text-embedding-3-small') */
+  /** Provider type: 'ollama', 'openai', 'openrouter', or 'mock' for testing */
+  provider: "ollama" | "openai" | "openrouter" | "mock";
+  /** Model name (e.g., 'nomic-embed-text', 'text-embedding-3-small', 'qwen/qwen3-embedding-8b') */
   model: string;
-  /** Base URL for the API (default: http://localhost:11434 for Ollama) */
+  /** Base URL for the API (default depends on provider) */
   baseUrl?: string;
-  /** API key (required for OpenAI) */
+  /** API key (required for OpenAI/OpenRouter) */
   apiKey?: string;
   /** Dimension of embeddings (default: depends on model) */
   dimensions?: number;

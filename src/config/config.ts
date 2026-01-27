@@ -66,6 +66,11 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     connectionDiscoverySchedule: "0 3 * * *",
     patternAggregationSchedule: "0 3 * * *",
     clusteringSchedule: "0 4 * * *",
+    embeddingProvider: "openrouter" as const,
+    embeddingModel: "qwen/qwen3-embedding-8b",
+    embeddingApiKey: undefined,
+    embeddingBaseUrl: undefined,
+    embeddingDimensions: undefined,
     provider: "zai",
     model: "glm-4.7",
     promptFile: path.join(
@@ -359,6 +364,13 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
       defaults.daemon.patternAggregationSchedule,
     clusteringSchedule:
       raw.daemon?.clustering_schedule ?? defaults.daemon.clusteringSchedule,
+    embeddingProvider:
+      raw.daemon?.embedding_provider ?? defaults.daemon.embeddingProvider,
+    embeddingModel:
+      raw.daemon?.embedding_model ?? defaults.daemon.embeddingModel,
+    embeddingApiKey: raw.daemon?.embedding_api_key,
+    embeddingBaseUrl: raw.daemon?.embedding_base_url,
+    embeddingDimensions: raw.daemon?.embedding_dimensions,
     provider: raw.daemon?.provider ?? defaults.daemon.provider,
     model: raw.daemon?.model ?? defaults.daemon.model,
     promptFile: raw.daemon?.prompt_file
@@ -584,6 +596,10 @@ daemon:
   connection_discovery_schedule: "0 3 * * *"  # 3am nightly
   pattern_aggregation_schedule: "0 3 * * *"   # 3am nightly
   clustering_schedule: "0 4 * * *"            # 4am nightly
+  embedding_provider: openrouter             # or: ollama, openai, mock
+  embedding_model: qwen/qwen3-embedding-8b   # for semantic clustering
+  # embedding_api_key: sk-...                # required for openrouter/openai
+  # embedding_base_url: https://...          # optional, for custom endpoints
   provider: zai
   model: glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md

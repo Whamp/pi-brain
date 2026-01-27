@@ -98,6 +98,21 @@ export interface DaemonConfig {
   /** Cron schedule for facet discovery/clustering (optional) */
   clusteringSchedule: string;
 
+  /** Embedding provider for clustering ('openrouter', 'ollama', 'openai', 'mock') */
+  embeddingProvider: "ollama" | "openai" | "openrouter" | "mock";
+
+  /** Embedding model name (e.g., 'qwen/qwen3-embedding-8b') */
+  embeddingModel: string;
+
+  /** Embedding API key (required for openrouter/openai) */
+  embeddingApiKey?: string;
+
+  /** Embedding API base URL (for custom endpoints) */
+  embeddingBaseUrl?: string;
+
+  /** Embedding dimensions (optional, defaults based on model) */
+  embeddingDimensions?: number;
+
   /** Model provider for analysis (e.g., "zai", "anthropic") */
   provider: string;
 
@@ -196,6 +211,11 @@ export interface RawConfig {
     connection_discovery_schedule?: string;
     pattern_aggregation_schedule?: string;
     clustering_schedule?: string;
+    embedding_provider?: "ollama" | "openai" | "openrouter" | "mock";
+    embedding_model?: string;
+    embedding_api_key?: string;
+    embedding_base_url?: string;
+    embedding_dimensions?: number;
     provider?: string;
     model?: string;
     prompt_file?: string;

@@ -155,6 +155,18 @@ export function createEmbeddingProvider(
       return createOpenAIProvider(
         config.model,
         config.apiKey,
+        config.baseUrl ?? "https://api.openai.com/v1",
+        config.dimensions
+      );
+    }
+    case "openrouter": {
+      if (!config.apiKey) {
+        throw new Error("OpenRouter embedding provider requires apiKey");
+      }
+      return createOpenRouterProvider(
+        config.model ?? "qwen/qwen3-embedding-8b",
+        config.apiKey,
+        config.baseUrl ?? "https://openrouter.ai/api/v1",
         config.dimensions
       );
     }
@@ -217,6 +229,7 @@ function createOllamaProvider(
 function createOpenAIProvider(
   model: string,
   apiKey: string,
+  baseUrl: string,
   dims?: number
 ): EmbeddingProvider {
   const dimensions = dims ?? (model.includes("3-small") ? 1536 : 3072);
@@ -225,7 +238,7 @@ function createOpenAIProvider(
     modelName: model,
     dimensions,
     async embed(texts: string[]): Promise<number[][]> {
-      const response = await fetch("https://api.openai.com/v1/embeddings", {
+      const response = await fetch(`${baseUrl}/embeddings`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -237,6 +250,48 @@ function createOpenAIProvider(
       if (!response.ok) {
         const error = await response.text();
         throw new Error(`OpenAI embedding failed: ${response.status} ${error}`);
+      }
+
+      interface EmbeddingData {
+        embedding: number[];
+        index: number;
+      }
+      const data = (await response.json()) as { data: EmbeddingData[] };
+
+      const sorted = data.data.toSorted((a, b) => a.index - b.index);
+      return sorted.map((d) => d.embedding);
+    },
+  };
+}
+
+/**
+ * Create OpenRouter embedding provider
+ * Uses OpenAI-compatible API at https://openrouter.ai/api/v1
+ */
+function createOpenRouterProvider(
+  model: string,
+  apiKey: string,
+  baseUrl: string,
+  dims = 4096 // qwen/qwen3-embedding-8b outputs 4096 dimensions by default
+): EmbeddingProvider {
+  return {
+    modelName: model,
+    dimensions: dims,
+    async embed(texts: string[]): Promise<number[][]> {
+      const response = await fetch(`${baseUrl}/embeddings`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model, input: texts }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(
+          `OpenRouter embedding failed: ${response.status} ${error}`
+        );
       }
 
       interface EmbeddingData {

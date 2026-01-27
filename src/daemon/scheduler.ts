@@ -95,6 +95,21 @@ export interface SchedulerConfig {
 
   /** Model name for LLM cluster analysis */
   model?: string;
+
+  /** Embedding provider for clustering */
+  embeddingProvider?: "ollama" | "openai" | "openrouter" | "mock";
+
+  /** Embedding model name */
+  embeddingModel?: string;
+
+  /** Embedding API key */
+  embeddingApiKey?: string;
+
+  /** Embedding API base URL */
+  embeddingBaseUrl?: string;
+
+  /** Embedding dimensions */
+  embeddingDimensions?: number;
 }
 
 /** Scheduler state */
@@ -643,11 +658,25 @@ export class Scheduler {
     try {
       this.logger.info("Starting clustering job");
 
-      // Create FacetDiscovery instance with mock embedding for now
-      // In production, this would use configured embedding provider
+      // Build embedding config from scheduler config
+      const embeddingProvider = this.config.embeddingProvider ?? "mock";
+      const embeddingConfig = {
+        provider: embeddingProvider,
+        model: this.config.embeddingModel ?? "qwen/qwen3-embedding-8b",
+        apiKey: this.config.embeddingApiKey,
+        baseUrl: this.config.embeddingBaseUrl,
+        dimensions: this.config.embeddingDimensions,
+      };
+
+      if (embeddingProvider === "mock") {
+        this.logger.info(
+          "Using mock embeddings - configure embedding_provider for semantic clustering"
+        );
+      }
+
       const facetDiscovery = new FacetDiscovery(
         this.db,
-        { provider: "mock", dimensions: 384 },
+        embeddingConfig,
         { algorithm: "hdbscan", minClusterSize: 3 },
         {
           info: (msg: string) => this.logger.info(`[facet] ${msg}`),
@@ -659,8 +688,8 @@ export class Scheduler {
       );
 
       // Run facet discovery to create clusters
-      const { clustersCreated: createdCount } = await facetDiscovery.run();
-      clustersCreated = createdCount;
+      const result = await facetDiscovery.run();
+      clustersCreated = result.clusters.length;
       this.logger.info(`Created ${clustersCreated} clusters`);
 
       // Analyze unnamed clusters with LLM if provider/model configured
@@ -712,6 +741,11 @@ export function createScheduler(
       clusteringSchedule: config.clusteringSchedule,
       provider: config.provider,
       model: config.model,
+      embeddingProvider: config.embeddingProvider,
+      embeddingModel: config.embeddingModel,
+      embeddingApiKey: config.embeddingApiKey,
+      embeddingBaseUrl: config.embeddingBaseUrl,
+      embeddingDimensions: config.embeddingDimensions,
     },
     queue,
     db,

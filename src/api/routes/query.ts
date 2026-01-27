@@ -34,6 +34,9 @@ const DEFAULT_QUERY_CONFIG = {
   retryDelaySeconds: 30,
   connectionDiscoverySchedule: "0 3 * * *",
   patternAggregationSchedule: "0 3 * * *",
+  clusteringSchedule: "0 4 * * *",
+  embeddingProvider: "mock" as const,
+  embeddingModel: "mock",
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,
 };

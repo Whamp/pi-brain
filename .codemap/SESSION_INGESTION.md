@@ -216,8 +216,6 @@ src/daemon/connection-discovery.ts [1-549]
     146-548: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
-      refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:143: type Edge -> src/types/index.ts
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
@@ -351,9 +349,9 @@ src/daemon/facet-discovery.test.ts [1-833]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1666]
+src/daemon/facet-discovery.ts [1-1721]
   class:
-    594-1637: class FacetDiscovery [exported]
+    649-1692: class FacetDiscovery [exported]
   interface:
     91-100: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -367,29 +365,31 @@ src/daemon/facet-discovery.ts [1-1666]
       /** Interface for embedding providers */
       refs out: 1 [type: 1]
         - src/daemon/facet-discovery.ts:133: type Promise -> external
-    582-586: interface FacetDiscoveryLogger [exported]
+    637-641: interface FacetDiscoveryLogger [exported]
   function:
-    141-168: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    141-180: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 7 [call: 3, instantiate: 2, type: 2]
+      refs out: 9 [call: 4, instantiate: 3, type: 2]
         - src/daemon/facet-discovery.ts:142: type EmbeddingConfig -> src/types/index.ts
         - src/daemon/facet-discovery.ts:143: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:146: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:153: instantiate Error -> external
         - src/daemon/facet-discovery.ts:155: call createOpenAIProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:162: call createMockProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:165: instantiate Error -> external
-    310-377: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+        - src/daemon/facet-discovery.ts:164: instantiate Error -> external
+        - src/daemon/facet-discovery.ts:166: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:174: call createMockProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:177: instantiate Error -> external
+    365-432: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs out: 3 [call: 2, type: 1]
-        - src/daemon/facet-discovery.ts:314: type KMeansResult -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:321: call map -> external
-        - src/daemon/facet-discovery.ts:322: call map -> external
-    420-439: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+        - src/daemon/facet-discovery.ts:369: type KMeansResult -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:376: call map -> external
+        - src/daemon/facet-discovery.ts:377: call map -> external
+    475-494: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs out: 2 [call: 2]
-        - src/daemon/facet-discovery.ts:426: call fill -> external
-        - src/daemon/facet-discovery.ts:426: call from -> external
+        - src/daemon/facet-discovery.ts:481: call fill -> external
+        - src/daemon/facet-discovery.ts:481: call from -> external
   imports:
     - ../types/index.js
     - better-sqlite3
@@ -450,7 +450,7 @@ src/daemon/pattern-aggregation.ts [1-326]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-665]
+src/daemon/processor.test.ts [1-668]
   imports:
     - ./processor.js
     - ./queue.js
@@ -715,9 +715,9 @@ src/daemon/scheduler.test.ts [1-718]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-757]
+src/daemon/scheduler.ts [1-791]
   class:
-    115-696: class Scheduler [exported]
+    130-725: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
@@ -728,15 +728,15 @@ src/daemon/scheduler.ts [1-757]
         - src/daemon/scheduler.ts:52: type Date -> external
     59-63: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    80-98: interface SchedulerConfig [exported]
+    80-113: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    101-110: interface SchedulerStatus [exported]
+    116-125: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs out: 4 [type: 4]
-        - src/daemon/scheduler.ts:104: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:106: type Date -> external
-        - src/daemon/scheduler.ts:107: type Date -> external
-        - src/daemon/scheduler.ts:108: type ScheduledJobResult -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:119: type ScheduledJobType -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:121: type Date -> external
+        - src/daemon/scheduler.ts:122: type Date -> external
+        - src/daemon/scheduler.ts:123: type ScheduledJobResult -> src/daemon/scheduler.ts
   type:
     42-46: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -744,26 +744,26 @@ src/daemon/scheduler.ts [1-757]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    701-720: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    730-754: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:702: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:703: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:704: type Database -> external
-        - src/daemon/scheduler.ts:705: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:706: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:707: instantiate Scheduler -> src/daemon/scheduler.ts
-    726-735: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:731: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:732: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:733: type Database -> external
+        - src/daemon/scheduler.ts:734: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:735: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:736: instantiate Scheduler -> src/daemon/scheduler.ts
+    760-769: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:730: call Cron.stop -> external
-    740-756: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:764: call Cron.stop -> external
+    774-790: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:740: type Date -> external
-        - src/daemon/scheduler.ts:747: call push -> external
-        - src/daemon/scheduler.ts:748: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:751: call Cron.stop -> external
+        - src/daemon/scheduler.ts:774: type Date -> external
+        - src/daemon/scheduler.ts:781: call push -> external
+        - src/daemon/scheduler.ts:782: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:785: call Cron.stop -> external
   variable:
     66-70: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -852,7 +852,7 @@ src/daemon/watcher-events.ts [1-117]
       refs out: 1 [type: 1]
         - src/daemon/watcher-events.ts:37: type const -> external
 
-src/daemon/watcher.test.ts [1-835]
+src/daemon/watcher.test.ts [1-844]
   imports:
     - ./index.js
     - node:fs/promises
@@ -903,7 +903,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-442]
+src/daemon/worker.test.ts [1-445]
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -922,11 +922,10 @@ src/daemon/worker.ts [1-535]
   interface:
     55-70: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 8 [type: 8]
+      refs out: 7 [type: 7]
         - src/daemon/worker.ts:61: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:63: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:65: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:65: type Node -> src/types/index.ts
         - src/daemon/worker.ts:65: type Promise -> external
         - src/daemon/worker.ts:67: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:67: type Error -> external
@@ -1325,25 +1324,21 @@ src/parser/signals.ts [1-1043]
         - src/parser/signals.ts:428: call hasGenuineSuccessIndicator -> src/parser/signals.ts
     479-507: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 2 [call: 1, type: 1]
         - src/parser/signals.ts:479: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:479: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:497: call push -> external
-        - src/parser/signals.ts:498: type ManualFlag -> src/types/index.ts
     518-546: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 5 [call: 4, type: 1]
-        - src/parser/signals.ts:518: type FrictionSignals -> src/types/index.ts
+      refs out: 4 [call: 4]
         - src/parser/signals.ts:522: call min -> external
         - src/parser/signals.ts:525: call min -> external
         - src/parser/signals.ts:528: call min -> external
         - src/parser/signals.ts:545: call min -> external
     569-601: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:570: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:571: type FrictionDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:572: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:598: call calculateFrictionScore -> src/parser/signals.ts
     611-642: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1393,15 +1388,13 @@ src/parser/signals.ts [1-1043]
         - src/parser/signals.ts:946: call hasGenuinePraise -> src/parser/signals.ts
     987-1006: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:987: type DelightSignals -> src/types/index.ts
+      refs out: 1 [call: 1]
         - src/parser/signals.ts:1005: call min -> external
     1023-1042: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:1024: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:1025: type DelightDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:1026: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1039: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types.js
@@ -1409,4 +1402,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,155 (codebase: ~911,527)
+Estimated tokens: 18,035 (codebase: ~912,845)
