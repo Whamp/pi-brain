@@ -208,16 +208,16 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-322]
+src/daemon/connection-discovery.test.ts [1-386]
   imports:
     - ../storage/node-repository.js
     - ./connection-discovery.js
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-549]
+src/daemon/connection-discovery.ts [1-559]
   class:
-    146-548: class ConnectionDiscoverer [exported]
+    146-558: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
@@ -1415,4 +1415,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,243 (codebase: ~925,280)
+Estimated tokens: 18,243 (codebase: ~925,873)

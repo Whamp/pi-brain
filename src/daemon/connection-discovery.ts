@@ -382,6 +382,9 @@ export class ConnectionDiscoverer {
     }
 
     const edges: Edge[] = [];
+    // Track targets we've already created edges for to avoid duplicates
+    // when multiple lessons match the same candidate node
+    const seenTargets = new Set<string>();
 
     for (const lesson of lessons) {
       // 1. Build query from lesson summary
@@ -420,7 +423,13 @@ export class ConnectionDiscoverer {
       }[];
 
       for (const candidate of candidates) {
-        // Skip if edge already exists
+        // Skip if we've already created an edge to this target
+        // (happens when multiple lessons match the same candidate)
+        if (seenTargets.has(candidate.id)) {
+          continue;
+        }
+
+        // Skip if edge already exists in database
         if (edgeExists(this.db, nodeId, candidate.id)) {
           continue;
         }
@@ -445,6 +454,7 @@ export class ConnectionDiscoverer {
             }
           );
           edges.push(edge);
+          seenTargets.add(candidate.id);
         }
       }
     }

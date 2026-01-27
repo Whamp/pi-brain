@@ -318,4 +318,68 @@ describe("connectionDiscoverer", () => {
     // May or may not find a match depending on tokenization, but shouldn't crash
     expect(result.sourceNodeId).toBe(sourceId);
   });
+
+  it("should deduplicate edges when multiple lessons match same candidate", async () => {
+    // 1. Create candidate node (older) with a lesson
+    const candidateId = "d1d1d1d1d1d1d1d1";
+    manualInsertNode(
+      db,
+      candidateId,
+      "Debugging session with async and logging",
+      ["debug", "logging"],
+      ["coding"],
+      new Date("2026-01-01T10:00:00Z").toISOString()
+    );
+    manualInsertLesson(
+      db,
+      candidateId,
+      "Use explicit logging for async debugging",
+      "When debugging async functions, always add console logs.",
+      "task"
+    );
+    manualInsertLesson(
+      db,
+      candidateId,
+      "Logging helps trace async execution",
+      "Add logs before and after await calls to trace flow.",
+      "task"
+    );
+
+    // 2. Create source node (newer) with TWO lessons that could both match the candidate
+    const sourceId = "d2d2d2d2d2d2d2d2";
+    manualInsertNode(
+      db,
+      sourceId,
+      "Another debugging session with async and logging",
+      ["debug", "logging"],
+      ["coding"],
+      new Date("2026-01-02T10:00:00Z").toISOString()
+    );
+    // First lesson that matches candidate
+    manualInsertLesson(
+      db,
+      sourceId,
+      "Async debugging needs logging",
+      "Always use logging when working with async code.",
+      "task"
+    );
+    // Second lesson that also matches candidate (similar topic)
+    manualInsertLesson(
+      db,
+      sourceId,
+      "Trace async flow with console logs",
+      "Use console logs before and after await for debugging.",
+      "task"
+    );
+
+    // 3. Run discovery
+    const result = await discoverer.discover(sourceId, { threshold: 0.1 });
+
+    // 4. Verify only ONE edge is created to the candidate, not two
+    const lessonEdges = result.edges.filter(
+      (e) => e.type === "lesson_application"
+    );
+    expect(lessonEdges).toHaveLength(1);
+    expect(lessonEdges[0].targetNodeId).toBe(candidateId);
+  });
 });

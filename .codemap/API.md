@@ -384,9 +384,9 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.ts [1-549]
+src/daemon/connection-discovery.ts [1-559]
   class:
-    146-548: class ConnectionDiscoverer [exported]
+    146-558: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
   imports:
@@ -1803,4 +1803,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,310 (codebase: ~924,935)
+Estimated tokens: 22,310 (codebase: ~925,389)

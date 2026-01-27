@@ -271,16 +271,16 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-322]
+src/daemon/connection-discovery.test.ts [1-386]
   imports:
     - ../storage/node-repository.js
     - ./connection-discovery.js
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-549]
+src/daemon/connection-discovery.ts [1-559]
   class:
-    146-548: class ConnectionDiscoverer [exported]
+    146-558: class ConnectionDiscoverer [exported]
       refs in: 7 [import: 2, instantiate: 2, reexport: 1, type: 2]
         - src/daemon/connection-discovery.test.ts:5: import (module)
         - src/daemon/connection-discovery.test.ts:39: type discoverer
@@ -1985,7 +1985,7 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/connection-discovery.ts:13: import (module)
         - src/daemon/connection-discovery.ts:234: call ConnectionDiscoverer.edge
         - src/daemon/connection-discovery.ts:361: call ConnectionDiscoverer.edge
-        - src/daemon/connection-discovery.ts:433: call ConnectionDiscoverer.edge
+        - src/daemon/connection-discovery.ts:442: call ConnectionDiscoverer.edge
         - src/storage/node-repository.test.ts:20: import (module)
         - src/storage/node-repository.test.ts:1100: call edge
         - src/storage/node-repository.test.ts:1117: call edge
@@ -2031,7 +2031,7 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/connection-discovery.ts:14: import (module)
         - src/daemon/connection-discovery.ts:211: call ConnectionDiscoverer.discover
         - src/daemon/connection-discovery.ts:356: call ConnectionDiscoverer.detectReferences
-        - src/daemon/connection-discovery.ts:424: call ConnectionDiscoverer.detectLessonReinforcement
+        - src/daemon/connection-discovery.ts:433: call ConnectionDiscoverer.detectLessonReinforcement
         - src/storage/node-repository.test.ts:24: import (module)
         - src/storage/node-repository.test.ts:1199: call (module)
         - src/storage/node-repository.test.ts:1209: call (module)
@@ -2651,4 +2651,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 38
-Estimated tokens: 35,295 (codebase: ~925,280)
+Estimated tokens: 35,295 (codebase: ~925,873)

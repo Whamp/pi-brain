@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 32381,
-  "codebase_tokens": 925280,
+  "codebase_tokens": 925873,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -3003,7 +3003,7 @@
       "language": "typescript",
       "lines": [
         1,
-        549
+        559
       ],
       "detail_level": "full",
       "token_estimate": 482,
@@ -3071,7 +3071,7 @@
           "signature": "ConnectionDiscoverer",
           "lines": [
             146,
-            548
+            558
           ],
           "exported": true,
           "is_default": false,
@@ -3223,7 +3223,7 @@
           "signature": "detectLessonReinforcement(nodeId: string, sourceTimestamp: string, threshold: number, limit: number): {}",
           "lines": [
             373,
-            453
+            463
           ],
           "exported": false,
           "is_default": false,
@@ -3241,8 +3241,8 @@
           "kind": "method",
           "signature": "getLessons(nodeId: string): {}",
           "lines": [
-            455,
-            459
+            465,
+            469
           ],
           "exported": false,
           "is_default": false,
@@ -3260,8 +3260,8 @@
           "kind": "method",
           "signature": "findBestLessonMatch(targetLesson: LessonRow, candidateLessons: LessonRow[]): { lesson: LessonRow; score: number; }",
           "lines": [
-            461,
-            495
+            471,
+            505
           ],
           "exported": false,
           "is_default": false,
@@ -3279,8 +3279,8 @@
           "kind": "method",
           "signature": "calculateSimilarity(a: { tags: Set<string>; topics: Set<string>; summary: string }, b: { tags: Set<string>; topics: Set<string>; summary: string }): number",
           "lines": [
-            504,
-            517
+            514,
+            527
           ],
           "exported": false,
           "is_default": false,
@@ -3298,8 +3298,8 @@
           "kind": "method",
           "signature": "jaccardIndex(setA: Set<string>, setB: Set<string>): number",
           "lines": [
-            519,
-            533
+            529,
+            543
           ],
           "exported": false,
           "is_default": false,
@@ -3317,8 +3317,8 @@
           "kind": "method",
           "signature": "tokenize(text: string): Set<string>",
           "lines": [
-            535,
-            547
+            545,
+            557
           ],
           "exported": false,
           "is_default": false,
