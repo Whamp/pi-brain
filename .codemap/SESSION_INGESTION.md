@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 38
-- Total symbols: 187
-  - function: 112
+- Total symbols: 189
+  - function: 114
   - interface: 44
   - variable: 13
   - class: 10
@@ -1006,89 +1006,99 @@ src/daemon/worker.ts [1-536]
     - better-sqlite3
     - node:path
 
-src/parser/analyzer.ts [1-279]
+src/parser/analyzer.ts [1-336]
   function:
     16-18: getDefaultSessionDir(): string [exported]
       /** Default session directory */
       refs out: 2 [call: 2]
         - src/parser/analyzer.ts:17: call join -> external
         - src/parser/analyzer.ts:17: call homedir -> external
-    23-70: async scanSessions(sessionDir?: string): Promise<{}> [exported]
-      /** Scan session directory and parse all sessions */
-      refs out: 10 [call: 7, instantiate: 1, type: 2]
-        - src/parser/analyzer.ts:25: type Promise -> external
-        - src/parser/analyzer.ts:25: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:36: call isDirectory -> external
-        - src/parser/analyzer.ts:44: call endsWith -> external
-        - src/parser/analyzer.ts:51: call push -> external
-        - src/parser/analyzer.ts:53: call warn -> external
-        - src/parser/analyzer.ts:57: call warn -> external
-        - src/parser/analyzer.ts:61: instantiate Error -> external
-        - src/parser/analyzer.ts:67: call sort -> external
-        - src/parser/analyzer.ts:67: call localeCompare -> external
-    75-95: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+    31-43: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+      /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
+      refs out: 6 [call: 4, type: 2]
+        - src/parser/analyzer.ts:33: type Promise -> external
+        - src/parser/analyzer.ts:33: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:35: call scanSessionsIterator -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:36: call push -> external
+        - src/parser/analyzer.ts:40: call sort -> external
+        - src/parser/analyzer.ts:40: call localeCompare -> external
+    60-102: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+      /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
+      refs out: 7 [call: 4, instantiate: 1, type: 2]
+        - src/parser/analyzer.ts:62: type AsyncGenerator -> external
+        - src/parser/analyzer.ts:62: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:72: call isDirectory -> external
+        - src/parser/analyzer.ts:80: call endsWith -> external
+        - src/parser/analyzer.ts:89: call warn -> external
+        - src/parser/analyzer.ts:93: call warn -> external
+        - src/parser/analyzer.ts:97: instantiate Error -> external
+    107-127: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
       refs out: 5 [call: 3, type: 2]
-        - src/parser/analyzer.ts:76: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:77: type ForkRelationship -> src/types.ts
-        - src/parser/analyzer.ts:82: call push -> external
-        - src/parser/analyzer.ts:92: call sort -> external
-        - src/parser/analyzer.ts:92: call localeCompare -> external
-    100-132: groupByProject(sessions: SessionInfo[]): {} [exported]
+        - src/parser/analyzer.ts:108: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:109: type ForkRelationship -> src/types.ts
+        - src/parser/analyzer.ts:114: call push -> external
+        - src/parser/analyzer.ts:124: call sort -> external
+        - src/parser/analyzer.ts:124: call localeCompare -> external
+    132-164: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
       refs out: 11 [call: 9, type: 2]
-        - src/parser/analyzer.ts:100: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:100: type ProjectGroup -> src/types.ts
-        - src/parser/analyzer.ts:105: call has -> external
-        - src/parser/analyzer.ts:106: call set -> external
-        - src/parser/analyzer.ts:108: call push -> external
-        - src/parser/analyzer.ts:108: call get -> external
-        - src/parser/analyzer.ts:114: call sort -> external
-        - src/parser/analyzer.ts:115: call localeCompare -> external
-        - src/parser/analyzer.ts:118: call push -> external
-        - src/parser/analyzer.ts:121: call reduce -> external
-    148-159: decodeProjectDir(encodedName: string): string [exported]
+        - src/parser/analyzer.ts:132: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:132: type ProjectGroup -> src/types.ts
+        - src/parser/analyzer.ts:137: call has -> external
+        - src/parser/analyzer.ts:138: call set -> external
+        - src/parser/analyzer.ts:140: call push -> external
+        - src/parser/analyzer.ts:140: call get -> external
+        - src/parser/analyzer.ts:146: call sort -> external
+        - src/parser/analyzer.ts:147: call localeCompare -> external
+        - src/parser/analyzer.ts:150: call push -> external
+        - src/parser/analyzer.ts:153: call reduce -> external
+    185-196: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
       refs out: 3 [call: 3]
-        - src/parser/analyzer.ts:149: call startsWith -> external
-        - src/parser/analyzer.ts:149: call endsWith -> external
-        - src/parser/analyzer.ts:158: call replaceAll -> external
-    166-173: getProjectName(sessionPath: string): string [exported]
+        - src/parser/analyzer.ts:186: call startsWith -> external
+        - src/parser/analyzer.ts:186: call endsWith -> external
+        - src/parser/analyzer.ts:195: call replaceAll -> external
+    210-217: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
       refs out: 2 [call: 2]
-        - src/parser/analyzer.ts:170: call decodeProjectDir -> src/parser/analyzer.ts
-        - src/parser/analyzer.ts:172: call basename -> external
-    178-183: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+        - src/parser/analyzer.ts:214: call decodeProjectDir -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:216: call basename -> external
+    228-230: getProjectNameFromSession(session: SessionInfo): string [exported]
+      /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
+      refs out: 1 [type: 1]
+        - src/parser/analyzer.ts:228: type SessionInfo -> src/types.ts
+    235-240: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/analyzer.ts:179: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:181: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:182: call filter -> external
-    188-203: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+        - src/parser/analyzer.ts:236: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:238: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:239: call filter -> external
+    245-260: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
       refs out: 5 [call: 1, type: 4]
-        - src/parser/analyzer.ts:189: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:190: type Date -> external
-        - src/parser/analyzer.ts:191: type Date -> external
-        - src/parser/analyzer.ts:192: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:193: call filter -> external
-    208-237: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+        - src/parser/analyzer.ts:246: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:247: type Date -> external
+        - src/parser/analyzer.ts:248: type Date -> external
+        - src/parser/analyzer.ts:249: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:250: call filter -> external
+    265-294: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
       refs out: 9 [call: 7, type: 2]
-        - src/parser/analyzer.ts:209: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:211: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:219: call includes -> external
-        - src/parser/analyzer.ts:219: call toLowerCase -> external
-        - src/parser/analyzer.ts:220: call push -> external
-        - src/parser/analyzer.ts:224: call includes -> external
-        - src/parser/analyzer.ts:224: call toLowerCase -> external
-        - src/parser/analyzer.ts:225: call push -> external
-        - src/parser/analyzer.ts:232: call push -> external
-    242-278: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+        - src/parser/analyzer.ts:266: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:268: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:276: call includes -> external
+        - src/parser/analyzer.ts:276: call toLowerCase -> external
+        - src/parser/analyzer.ts:277: call push -> external
+        - src/parser/analyzer.ts:281: call includes -> external
+        - src/parser/analyzer.ts:281: call toLowerCase -> external
+        - src/parser/analyzer.ts:282: call push -> external
+        - src/parser/analyzer.ts:289: call push -> external
+    299-335: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/analyzer.ts:242: type SessionInfo -> src/types.ts
-        - src/parser/analyzer.ts:259: call add -> external
+        - src/parser/analyzer.ts:299: type SessionInfo -> src/types.ts
+        - src/parser/analyzer.ts:316: call add -> external
   imports:
     - ../types.js
     - ./session.js
@@ -1434,4 +1444,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,452 (codebase: ~932,954)
+Estimated tokens: 18,771 (codebase: ~933,880)

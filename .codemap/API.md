@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 76
-- Total symbols: 582
-  - function: 320
+- Total symbols: 584
+  - function: 322
   - interface: 188
   - type: 37
   - variable: 26
@@ -783,27 +783,31 @@ src/index.ts [1-54]
     - ./types.js
     - ./web/generator.js
 
-src/parser/analyzer.ts [1-279]
+src/parser/analyzer.ts [1-336]
   function:
     16-18: getDefaultSessionDir(): string [exported]
       /** Default session directory */
-    23-70: async scanSessions(sessionDir?: string): Promise<{}> [exported]
-      /** Scan session directory and parse all sessions */
-    75-95: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+    31-43: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+      /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
+    60-102: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+      /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
+    107-127: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
-    100-132: groupByProject(sessions: SessionInfo[]): {} [exported]
+    132-164: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
-    148-159: decodeProjectDir(encodedName: string): string [exported]
+    185-196: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
-    166-173: getProjectName(sessionPath: string): string [exported]
+    210-217: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
-    178-183: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+    228-230: getProjectNameFromSession(session: SessionInfo): string [exported]
+      /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
+    235-240: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
-    188-203: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+    245-260: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
-    208-237: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+    265-294: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
-    242-278: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+    299-335: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
   imports:
     - ../types.js
@@ -1820,4 +1824,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,491 (codebase: ~932,086)
+Estimated tokens: 22,718 (codebase: ~933,653)

@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 76,
-    "totalSymbols": 1010,
+    "totalSymbols": 1012,
     "byLanguage": {
       "typescript": 76
     },
     "bySymbolKind": {
-      "function": 451,
+      "function": 453,
       "type": 37,
       "interface": 239,
       "variable": 101,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32835,
-  "codebase_tokens": 932954,
+  "total_tokens": 33062,
+  "codebase_tokens": 933880,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9848,10 +9848,10 @@
       "language": "typescript",
       "lines": [
         1,
-        279
+        336
       ],
       "detail_level": "full",
-      "token_estimate": 493,
+      "token_estimate": 720,
       "symbols": [
         {
           "name": "getDefaultSessionDir",
@@ -9877,8 +9877,8 @@
           "kind": "function",
           "signature": "async scanSessions(sessionDir?: string): Promise<{}>",
           "lines": [
-            23,
-            70
+            31,
+            43
           ],
           "exported": true,
           "is_default": false,
@@ -9887,7 +9887,26 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Scan session directory and parse all sessions",
+          "comment": "Scan session directory and parse all sessions\n\nNote: This function loads all sessions into memory. For large session\nhistories (thousands of sessions), consider using `scanSessionsIterator`\nwhich processes sessions one at a time.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "scanSessionsIterator",
+          "kind": "function",
+          "signature": "async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown>",
+          "lines": [
+            60,
+            102
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Async generator that yields sessions one at a time for memory efficiency\n\nUse this instead of `scanSessions` when processing large session histories\n(hundreds or thousands of sessions) to avoid loading all sessions into memory.\nSessions are yielded in file system order, not sorted by timestamp.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -9896,8 +9915,8 @@
           "kind": "function",
           "signature": "findForkRelationships(sessions: SessionInfo[]): {}",
           "lines": [
-            75,
-            95
+            107,
+            127
           ],
           "exported": true,
           "is_default": false,
@@ -9915,8 +9934,8 @@
           "kind": "function",
           "signature": "groupByProject(sessions: SessionInfo[]): {}",
           "lines": [
-            100,
-            132
+            132,
+            164
           ],
           "exported": true,
           "is_default": false,
@@ -9934,8 +9953,8 @@
           "kind": "function",
           "signature": "decodeProjectDir(encodedName: string): string",
           "lines": [
-            148,
-            159
+            185,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -9953,8 +9972,8 @@
           "kind": "function",
           "signature": "getProjectName(sessionPath: string): string",
           "lines": [
-            166,
-            173
+            210,
+            217
           ],
           "exported": true,
           "is_default": false,
@@ -9968,12 +9987,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "getProjectNameFromSession",
+          "kind": "function",
+          "signature": "getProjectNameFromSession(session: SessionInfo): string",
+          "lines": [
+            228,
+            230
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get project name from a SessionInfo object (preferred over getProjectName)\n\nThis function returns the accurate project path from the session header,\nwhich is not affected by the lossy directory name encoding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "filterByProject",
           "kind": "function",
           "signature": "filterByProject(sessions: SessionInfo[], projectPath: string): {}",
           "lines": [
-            178,
-            183
+            235,
+            240
           ],
           "exported": true,
           "is_default": false,
@@ -9991,8 +10029,8 @@
           "kind": "function",
           "signature": "filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {}",
           "lines": [
-            188,
-            203
+            245,
+            260
           ],
           "exported": true,
           "is_default": false,
@@ -10010,8 +10048,8 @@
           "kind": "function",
           "signature": "searchSessions(sessions: SessionInfo[], query: string): {}",
           "lines": [
-            208,
-            237
+            265,
+            294
           ],
           "exported": true,
           "is_default": false,
@@ -10029,8 +10067,8 @@
           "kind": "function",
           "signature": "getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; }",
           "lines": [
-            242,
-            278
+            299,
+            335
           ],
           "exported": true,
           "is_default": false,

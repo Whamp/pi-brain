@@ -19,12 +19,48 @@ export function getDefaultSessionDir(): string {
 
 /**
  * Scan session directory and parse all sessions
+ *
+ * Note: This function loads all sessions into memory. For large session
+ * histories (thousands of sessions), consider using `scanSessionsIterator`
+ * which processes sessions one at a time.
+ *
+ * @param {string} [sessionDir] - Optional session directory path (defaults to ~/.pi/agent/sessions)
+ * @returns {Promise<SessionInfo[]>} Array of all parsed sessions, sorted by timestamp (newest first)
+ * @see scanSessionsIterator for memory-efficient iteration over large histories
  */
 export async function scanSessions(
   sessionDir?: string
 ): Promise<SessionInfo[]> {
-  const dir = sessionDir || getDefaultSessionDir();
   const sessions: SessionInfo[] = [];
+  for await (const session of scanSessionsIterator(sessionDir)) {
+    sessions.push(session);
+  }
+
+  // Sort by timestamp (newest first)
+  sessions.sort((a, b) => b.header.timestamp.localeCompare(a.header.timestamp));
+
+  return sessions;
+}
+
+/**
+ * Async generator that yields sessions one at a time for memory efficiency
+ *
+ * Use this instead of `scanSessions` when processing large session histories
+ * (hundreds or thousands of sessions) to avoid loading all sessions into memory.
+ * Sessions are yielded in file system order, not sorted by timestamp.
+ *
+ * @param {string} [sessionDir] - Optional session directory path (defaults to ~/.pi/agent/sessions)
+ * @yields {SessionInfo} Parsed session info, one at a time
+ * @example
+ * for await (const session of scanSessionsIterator()) {
+ *   // Process each session individually
+ *   console.log(session.header.cwd, session.stats.entryCount);
+ * }
+ */
+export async function* scanSessionsIterator(
+  sessionDir?: string
+): AsyncGenerator<SessionInfo, void, unknown> {
+  const dir = sessionDir || getDefaultSessionDir();
 
   try {
     const projectDirs = await readdir(dir);
@@ -48,7 +84,7 @@ export async function scanSessions(
           const sessionPath = join(projectPath, sessionFile);
           try {
             const session = await parseSession(sessionPath);
-            sessions.push(session);
+            yield session;
           } catch (error) {
             console.warn(`Failed to parse session ${sessionPath}:`, error);
           }
@@ -62,11 +98,7 @@ export async function scanSessions(
       cause: error,
     });
   }
-
-  // Sort by timestamp (newest first)
-  sessions.sort((a, b) => b.header.timestamp.localeCompare(a.header.timestamp));
-
-  return sessions;
+  // Generator ends naturally - no explicit return needed
 }
 
 /**
@@ -143,7 +175,12 @@ export function groupByProject(sessions: SessionInfo[]): ProjectGroup[] {
  * Prefer using session.header.cwd which contains the accurate original path.
  * This function is only useful for display purposes when session data is unavailable.
  *
- * @deprecated Use session.header.cwd for accurate project paths
+ * @deprecated Since 0.1.0. Use `session.header.cwd` for accurate project paths.
+ *             This function exists only for legacy compatibility when session data
+ *             is unavailable. The encoding is lossy and may produce incorrect paths.
+ * @param {string} encodedName - The encoded project directory name (e.g., "--home-will--")
+ * @returns {string} The decoded path (may be incorrect due to lossy encoding)
+ * @see SessionInfo.header.cwd for the accurate project path
  */
 export function decodeProjectDir(encodedName: string): string {
   if (!encodedName.startsWith("--") || !encodedName.endsWith("--")) {
@@ -161,7 +198,14 @@ export function decodeProjectDir(encodedName: string): string {
 /**
  * Get project name from session path
  *
- * @deprecated Prefer using session.header.cwd directly for accurate paths
+ * @deprecated Since 0.1.0. Use `session.header.cwd` directly for accurate paths.
+ *             This function relies on the lossy `decodeProjectDir` function.
+ *             When you have a SessionInfo object, use `session.header.cwd` instead.
+ *             When you only have a path, use `getProjectNameFromSession(session)` instead.
+ * @param {string} sessionPath - The path to the session file
+ * @returns {string} The decoded project name (may be incorrect)
+ * @see SessionInfo.header.cwd for the accurate project path
+ * @see getProjectNameFromSession for the preferred alternative
  */
 export function getProjectName(sessionPath: string): string {
   const parts = sessionPath.split("/");
@@ -170,6 +214,19 @@ export function getProjectName(sessionPath: string): string {
     return decodeProjectDir(parts[sessionsIdx + 1]);
   }
   return basename(sessionPath);
+}
+
+/**
+ * Get project name from a SessionInfo object (preferred over getProjectName)
+ *
+ * This function returns the accurate project path from the session header,
+ * which is not affected by the lossy directory name encoding.
+ *
+ * @param {SessionInfo} session - The parsed session info
+ * @returns {string} The accurate project working directory
+ */
+export function getProjectNameFromSession(session: SessionInfo): string {
+  return session.header.cwd;
 }
 
 /**
