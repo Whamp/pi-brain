@@ -770,7 +770,7 @@ src/index.ts [1-54]
     - ./types.js
     - ./web/generator.js
 
-src/parser/analyzer.ts [1-263]
+src/parser/analyzer.ts [1-279]
   function:
     16-18: getDefaultSessionDir(): string [exported]
       /** Default session directory */
@@ -780,17 +780,17 @@ src/parser/analyzer.ts [1-263]
       /** Find fork relationships between sessions */
     100-132: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
-    138-145: decodeProjectDir(encodedName: string): string [exported]
-      /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" */
-    150-157: getProjectName(sessionPath: string): string [exported]
+    148-159: decodeProjectDir(encodedName: string): string [exported]
+      /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
+    166-173: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
-    162-167: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+    178-183: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
-    172-187: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+    188-203: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
-    192-221: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+    208-237: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
-    226-262: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+    242-278: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
   imports:
     - ../types.js
@@ -799,7 +799,7 @@ src/parser/analyzer.ts [1-263]
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-400]
+src/parser/boundary.ts [1-408]
   class:
     99-176: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
@@ -810,7 +810,7 @@ src/parser/boundary.ts [1-400]
       /** Metadata for different boundary types */
     63-76: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
-    367-371: interface BoundaryStats [exported]
+    375-379: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
     24-24: BoundaryType = "branch" | "tree_jump" | "compaction" | "resume" [exported]
@@ -818,9 +818,9 @@ src/parser/boundary.ts [1-400]
   function:
     188-289: detectBoundaries(entries: SessionEntry[]): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    299-362: extractSegments(entries: SessionEntry[]): {} [exported]
+    299-370: extractSegments(entries: SessionEntry[]): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    379-399: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+    387-407: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
   imports:
     - ../types.js
@@ -1803,4 +1803,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,310 (codebase: ~925,873)
+Estimated tokens: 22,406 (codebase: ~925,983)

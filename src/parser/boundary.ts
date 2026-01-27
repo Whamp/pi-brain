@@ -309,21 +309,27 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
   const boundaries = detectBoundaries(entries);
   const segments: Segment[] = [];
 
-  // Create a map of entry ID to boundary for quick lookup
-  const boundaryByEntryId = new Map<string, Boundary>();
+  // Create a map of entry ID to boundaries for quick lookup
+  // Multiple boundaries can occur at the same entry (e.g., resume + branch)
+  const boundariesByEntryId = new Map<string, Boundary[]>();
   for (const boundary of boundaries) {
-    boundaryByEntryId.set(boundary.entryId, boundary);
+    const existing = boundariesByEntryId.get(boundary.entryId) ?? [];
+    existing.push(boundary);
+    boundariesByEntryId.set(boundary.entryId, existing);
   }
 
   // Helper to create a segment from a slice of entries
   // Precondition: segmentEntries.length > 0 (ensured by caller)
-  function createSegment(segmentEntries: SessionEntry[]): Segment {
+  function createSegment(
+    segmentEntries: SessionEntry[],
+    endingBoundaries: Boundary[]
+  ): Segment {
     const [first, ...rest] = segmentEntries;
     const last = rest.length > 0 ? (rest.at(-1) ?? first) : first;
     return {
       startEntryId: first.id,
       endEntryId: last.id,
-      boundaries: [],
+      boundaries: endingBoundaries,
       entryCount: segmentEntries.length,
       startTimestamp: first.timestamp,
       endTimestamp: last.timestamp,
@@ -334,17 +340,19 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
 
   for (let i = 0; i < contentEntries.length; i++) {
     const entry = contentEntries[i];
-    const boundary = boundaryByEntryId.get(entry.id);
+    const entryBoundaries = boundariesByEntryId.get(entry.id);
 
-    if (boundary) {
+    if (entryBoundaries) {
       // A boundary at entry[i] means:
       // - Previous segment ends at entry[i-1]
       // - New segment starts at entry[i]
+      // The boundary is what caused the split, so it belongs to the ending segment
 
       if (i > segmentStartIndex) {
         // Create segment for entries before this boundary
+        // Attach the boundaries that caused this split
         const segmentEntries = contentEntries.slice(segmentStartIndex, i);
-        segments.push(createSegment(segmentEntries));
+        segments.push(createSegment(segmentEntries, entryBoundaries));
       }
 
       // Update segment start for next iteration
@@ -352,10 +360,10 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
     }
   }
 
-  // Handle the final segment
+  // Handle the final segment (no boundaries at the end)
   if (segmentStartIndex < contentEntries.length) {
     const segmentEntries = contentEntries.slice(segmentStartIndex);
-    segments.push(createSegment(segmentEntries));
+    segments.push(createSegment(segmentEntries, []));
   }
 
   return segments;

@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32381,
-  "codebase_tokens": 926022,
+  "total_tokens": 32477,
+  "codebase_tokens": 926963,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9764,10 +9764,10 @@
       "language": "typescript",
       "lines": [
         1,
-        263
+        279
       ],
       "detail_level": "full",
-      "token_estimate": 397,
+      "token_estimate": 493,
       "symbols": [
         {
           "name": "getDefaultSessionDir",
@@ -9850,8 +9850,8 @@
           "kind": "function",
           "signature": "decodeProjectDir(encodedName: string): string",
           "lines": [
-            138,
-            145
+            148,
+            159
           ],
           "exported": true,
           "is_default": false,
@@ -9860,7 +9860,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Decode project directory name to path\ne.g., \"--home-will-projects-myapp--\" → \"/home/will/projects/myapp\"",
+          "comment": "Decode project directory name to path\ne.g., \"--home-will-projects-myapp--\" → \"/home/will/projects/myapp\"\n\n**Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped.\nThis means \"--home-will-projects-pi-brain--\" could be either:\n  - /home/will/projects/pi-brain (correct)\n  - /home/will/projects/pi/brain (wrong)\n\nPrefer using session.header.cwd which contains the accurate original path.\nThis function is only useful for display purposes when session data is unavailable.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -9869,8 +9869,8 @@
           "kind": "function",
           "signature": "getProjectName(sessionPath: string): string",
           "lines": [
-            150,
-            157
+            166,
+            173
           ],
           "exported": true,
           "is_default": false,
@@ -9888,8 +9888,8 @@
           "kind": "function",
           "signature": "filterByProject(sessions: SessionInfo[], projectPath: string): {}",
           "lines": [
-            162,
-            167
+            178,
+            183
           ],
           "exported": true,
           "is_default": false,
@@ -9907,8 +9907,8 @@
           "kind": "function",
           "signature": "filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {}",
           "lines": [
-            172,
-            187
+            188,
+            203
           ],
           "exported": true,
           "is_default": false,
@@ -9926,8 +9926,8 @@
           "kind": "function",
           "signature": "searchSessions(sessions: SessionInfo[], query: string): {}",
           "lines": [
-            192,
-            221
+            208,
+            237
           ],
           "exported": true,
           "is_default": false,
@@ -9945,8 +9945,8 @@
           "kind": "function",
           "signature": "getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; }",
           "lines": [
-            226,
-            262
+            242,
+            278
           ],
           "exported": true,
           "is_default": false,
@@ -9976,7 +9976,7 @@
       "language": "typescript",
       "lines": [
         1,
-        400
+        408
       ],
       "detail_level": "full",
       "token_estimate": 693,
@@ -10348,7 +10348,7 @@
           "signature": "extractSegments(entries: SessionEntry[]): {}",
           "lines": [
             299,
-            362
+            370
           ],
           "exported": true,
           "is_default": false,
@@ -10366,8 +10366,8 @@
           "kind": "interface",
           "signature": "BoundaryStats",
           "lines": [
-            367,
-            371
+            375,
+            379
           ],
           "exported": true,
           "is_default": false,
@@ -10385,8 +10385,8 @@
           "kind": "function",
           "signature": "getBoundaryStats(entries: SessionEntry[]): BoundaryStats",
           "lines": [
-            379,
-            399
+            387,
+            407
           ],
           "exported": true,
           "is_default": false,

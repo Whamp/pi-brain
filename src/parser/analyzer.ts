@@ -134,6 +134,16 @@ export function groupByProject(sessions: SessionInfo[]): ProjectGroup[] {
 /**
  * Decode project directory name to path
  * e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp"
+ *
+ * **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped.
+ * This means "--home-will-projects-pi-brain--" could be either:
+ *   - /home/will/projects/pi-brain (correct)
+ *   - /home/will/projects/pi/brain (wrong)
+ *
+ * Prefer using session.header.cwd which contains the accurate original path.
+ * This function is only useful for display purposes when session data is unavailable.
+ *
+ * @deprecated Use session.header.cwd for accurate project paths
  */
 export function decodeProjectDir(encodedName: string): string {
   if (!encodedName.startsWith("--") || !encodedName.endsWith("--")) {
@@ -141,11 +151,17 @@ export function decodeProjectDir(encodedName: string): string {
   }
 
   const inner = encodedName.slice(2, -2);
+
+  // Pi encodes paths by replacing /\: with -
+  // Since hyphens aren't escaped, decoding is lossy.
+  // We decode naively but callers should prefer session.header.cwd
   return `/${inner.replaceAll("-", "/")}`;
 }
 
 /**
  * Get project name from session path
+ *
+ * @deprecated Prefer using session.header.cwd directly for accurate paths
  */
 export function getProjectName(sessionPath: string): string {
   const parts = sessionPath.split("/");

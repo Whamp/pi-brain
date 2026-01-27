@@ -1,78 +1,21 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-092619
-Created: 2026-01-27 09:26
+Branch: fix/code-review-20260127-105321
+Created: 2026-01-27 10:53
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-1. [P2] src/storage/node-repository.ts:234-268 - UPDATE statement missing source fields
-   - upsertNode UPDATE doesn't update session_file, segment_start, segment_end, computer
-   - These are intentionally immutable (ID is deterministic from these values)
-   - Add comment explaining why they're omitted
+1. P1: `decodeProjectDir()` in analyzer.ts naively replaces all `-` with `/`
+   - Corrupts paths like `pi-brain` → `pi/brain`
+   - Need to check pi's actual encoding scheme
 
-2. [P3] src/storage/node-repository.ts:269-274 - Repeated db.prepare calls
-   - DELETE statements call db.prepare() separately for each table
-   - Cache these prepared statements like insertTag/insertTopic
+2. P2: `extractSegments()` in boundary.ts never populates boundaries field
+   - Segments created with `boundaries: []` 
+   - Loses semantic context about why segments were split
 
-3. [P3] src/storage/node-types.ts:38-42 - Input encoding not normalized
-   - Uses ":" as separator which could theoretically collide
-   - Use length-prefix encoding for robustness
-
----
-
-## 2026-01-27 09:27 - Task 1.1, 1.2, 1.3
-
-**Status**: pending → done (all three tasks)
-**Validation**:
-- Task 1.1: Comment added at src/storage/node-repository.ts:235-237 explaining why source fields (session_file, segment_start, segment_end, computer) are omitted from UPDATE statement
-- Task 1.2: DELETE statements now prepared into named variables (deleteTags, deleteTopics, deleteLessons, deleteModelQuirks, deleteToolErrors, deleteDaemonDecisions) before execution at lines 275-293
-- Task 1.3: Length-prefix encoding implemented in generateDeterministicNodeId() at src/storage/node-types.ts:48 using format "len:value|len:value|len:value"
-- All 1167 tests pass
-- npm run check passes
-**Commit**: 294c730
-**Notes**:
-- All three code review issues were addressed in a single commit
-- TASKS.md status corrected to reflect completed work
+3. P2: `boundaryByEntryId` Map can overwrite boundaries
+   - If two boundary types occur at same entry, only last is kept
+   - Should use Map<string, Boundary[]> instead
 
 ---
-
-## 2026-01-27 10:45 - Phase 12 Tasks Verification
-
-**Status**: Phase 12 marked as complete
-**Tasks Verified**:
-- 12.1 Shared Type Library: `src/types/index.ts` exists (661 lines)
-- 12.2 Idempotent Ingestion: Commit 6fbfa05 with deterministic node IDs
-- 12.3 SQLite Rebuild CLI: `daemon rebuild-index` command implemented
-
-**New Test Coverage Added**:
-- 6 tests for `rebuildIndex` function in `src/daemon/cli.test.ts`
-  - Empty nodes dir returns count 0
-  - Single node file rebuilds correctly
-  - Multiple node files rebuild correctly
-  - Latest version used when multiple versions exist
-  - Database cleared before rebuild
-  - Malformed JSON files handled gracefully
-
-**Validation**: All 1173 tests pass, npm run check clean
-**Commit**: 26800ce
-**Notes**:
-- Also committed directory reorganization: specs/ → docs/specs/, docs ops files → docs/ops/
-- PLAN.md updated to mark Phase 12 tasks as complete
-
----
-
-## 2026-01-27 10:50 - Task 12.4
-
-**Status**: pending → done
-**Validation**:
-- Added `seenTargets` Set to track targets already connected in detectLessonReinforcement
-- Skip candidates already in seenTargets before database edge check
-- Add candidate.id to seenTargets after creating edge
-- New test: "should deduplicate edges when multiple lessons match same candidate"
-- All 1174 tests pass (1 new test)
-- npm run check passes
-**Commit**: 46a119c
-**Notes**:
-- Fix prevents duplicate edges when multiple lessons on source node match same candidate
-- Related TODO-6347f019 marked as done
