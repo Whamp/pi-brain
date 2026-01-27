@@ -220,7 +220,7 @@ function createMockProvider(dims: number): EmbeddingProvider {
         for (let i = 0; i < dims; i++) {
           // Simple LCG for deterministic pseudo-random values
           seed = Math.abs(Math.imul(seed, 1_664_525) + 1_013_904_223);
-          embedding.push((seed / 0x7f_ff_ff_ff) * 2 - 1);
+          embedding.push((seed / 2_147_483_647) * 2 - 1);
         }
 
         // Normalize

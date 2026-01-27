@@ -452,15 +452,12 @@ describe("facetDiscovery", () => {
       await discovery.run();
 
       const clusters = discovery.getClusters();
-      expect(Array.isArray(clusters)).toBeTruthy();
+      expect(clusters.length).toBeGreaterThan(0);
 
-      // Validate first cluster if it exists
       const [firstCluster] = clusters;
-      if (firstCluster) {
-        const nodes = discovery.getClusterNodes(firstCluster.id);
-        expect(nodes.length).toBeGreaterThan(0);
-        expect(nodes[0].clusterId).toBe(firstCluster.id);
-      }
+      const nodes = discovery.getClusterNodes(firstCluster.id);
+      expect(nodes.length).toBeGreaterThan(0);
+      expect(nodes[0].clusterId).toBe(firstCluster.id);
     });
 
     it("should filter to representative nodes only", async () => {
@@ -474,18 +471,17 @@ describe("facetDiscovery", () => {
       await discovery.run();
 
       const clusters = discovery.getClusters();
-      expect(Array.isArray(clusters)).toBeTruthy();
+      expect(clusters.length).toBeGreaterThan(0);
 
-      // Find a suitable cluster
-      const suitableCluster = clusters.find((c) => c.nodeCount >= 5);
-      if (suitableCluster) {
-        const representatives = discovery.getClusterNodes(suitableCluster.id, {
-          representativeOnly: true,
-        });
+      // Find a suitable cluster (or use first if none with 5+)
+      const suitableCluster =
+        clusters.find((c) => c.nodeCount >= 5) ?? clusters[0];
+      const representatives = discovery.getClusterNodes(suitableCluster.id, {
+        representativeOnly: true,
+      });
 
-        expect(representatives.length).toBeLessThanOrEqual(5);
-        expect(representatives.every((n) => n.isRepresentative)).toBeTruthy();
-      }
+      expect(representatives.length).toBeLessThanOrEqual(5);
+      expect(representatives.every((n) => n.isRepresentative)).toBeTruthy();
     });
   });
 
@@ -499,16 +495,14 @@ describe("facetDiscovery", () => {
       await discovery.run();
 
       const clusters = discovery.getClusters();
-      expect(Array.isArray(clusters)).toBeTruthy();
+      expect(clusters.length).toBeGreaterThan(0);
 
       const [firstCluster] = clusters;
-      if (firstCluster) {
-        discovery.updateClusterStatus(firstCluster.id, "confirmed");
+      discovery.updateClusterStatus(firstCluster.id, "confirmed");
 
-        const updated = discovery.getClusters({ status: "confirmed" });
-        expect(updated).toHaveLength(1);
-        expect(updated[0].id).toBe(firstCluster.id);
-      }
+      const updated = discovery.getClusters({ status: "confirmed" });
+      expect(updated).toHaveLength(1);
+      expect(updated[0].id).toBe(firstCluster.id);
     });
 
     it("should update status to dismissed", async () => {
@@ -520,15 +514,13 @@ describe("facetDiscovery", () => {
       await discovery.run();
 
       const clusters = discovery.getClusters();
-      expect(Array.isArray(clusters)).toBeTruthy();
+      expect(clusters.length).toBeGreaterThan(0);
 
       const [firstCluster] = clusters;
-      if (firstCluster) {
-        discovery.updateClusterStatus(firstCluster.id, "dismissed");
+      discovery.updateClusterStatus(firstCluster.id, "dismissed");
 
-        const dismissed = discovery.getClusters({ status: "dismissed" });
-        expect(dismissed).toHaveLength(1);
-      }
+      const dismissed = discovery.getClusters({ status: "dismissed" });
+      expect(dismissed).toHaveLength(1);
     });
   });
 
@@ -542,23 +534,21 @@ describe("facetDiscovery", () => {
       await discovery.run();
 
       const clusters = discovery.getClusters();
-      expect(Array.isArray(clusters)).toBeTruthy();
+      expect(clusters.length).toBeGreaterThan(0);
 
       const [firstCluster] = clusters;
-      if (firstCluster) {
-        discovery.updateClusterDetails(
-          firstCluster.id,
-          "Auth Patterns",
-          "Sessions related to authentication implementation"
-        );
+      discovery.updateClusterDetails(
+        firstCluster.id,
+        "Auth Patterns",
+        "Sessions related to authentication implementation"
+      );
 
-        const updated = discovery.getClusters();
-        const cluster = updated.find((c) => c.id === firstCluster.id);
-        expect(cluster?.name).toBe("Auth Patterns");
-        expect(cluster?.description).toBe(
-          "Sessions related to authentication implementation"
-        );
-      }
+      const updated = discovery.getClusters();
+      const cluster = updated.find((c) => c.id === firstCluster.id);
+      expect(cluster?.name).toBe("Auth Patterns");
+      expect(cluster?.description).toBe(
+        "Sessions related to authentication implementation"
+      );
     });
   });
 
