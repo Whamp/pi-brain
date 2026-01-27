@@ -85,8 +85,8 @@ export default function dashboardExtension(pi: ExtensionAPI) {
     const entries = sm.getEntries();
     const branch = sm.getBranch();
     const leafId = sm.getLeafId();
-    const sessionFile = sm.getSessionFile();
-    const sessionId = sm.getSessionId();
+    const sessionFile = sm.getSessionFile() ?? null;
+    const sessionId = sm.getSessionId() ?? null;
 
     return {
       branch,
@@ -166,7 +166,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
 
       try {
         await ctx.navigateTree(entryId, { summarize });
-        ctx.ui.notify(`Navigated to ${entryId.slice(0, 8)}...`, "success");
+        ctx.ui.notify(`Navigated to ${entryId.slice(0, 8)}...`, "info");
       } catch (error) {
         ctx.ui.notify(`Navigation failed: ${error}`, "error");
       }
@@ -184,7 +184,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
 
       try {
         await ctx.fork(args.trim());
-        ctx.ui.notify(`Forked from ${args.slice(0, 8)}...`, "success");
+        ctx.ui.notify(`Forked from ${args.slice(0, 8)}...`, "info");
       } catch (error) {
         ctx.ui.notify(`Fork failed: ${error}`, "error");
       }
@@ -214,7 +214,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
             });
             ctx.ui.notify(
               `Navigated to ${action.entryId.slice(0, 8)}...`,
-              "success"
+              "info"
             );
           } catch (error) {
             ctx.ui.notify(`Navigation failed: ${error}`, "error");
@@ -231,7 +231,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
             await ctx.fork(action.entryId);
             ctx.ui.notify(
               `Forked from ${action.entryId.slice(0, 8)}...`,
-              "success"
+              "info"
             );
           } catch (error) {
             ctx.ui.notify(`Fork failed: ${error}`, "error");
@@ -266,7 +266,7 @@ export default function dashboardExtension(pi: ExtensionAPI) {
             await ctx.navigateTree(action.entryId, { summarize: true });
             ctx.ui.notify(
               `Summarized and navigated to ${action.entryId.slice(0, 8)}...`,
-              "success"
+              "info"
             );
           } catch (error) {
             ctx.ui.notify(`Summarization failed: ${error}`, "error");

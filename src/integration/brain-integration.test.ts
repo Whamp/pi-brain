@@ -123,6 +123,7 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
     },
     daemonMeta: {
       decisions: [],
+      rlmUsed: false,
     },
   };
 
@@ -207,7 +208,7 @@ describe("brain integration", () => {
             topics: ["authentication"],
           },
         });
-        createNode(db, node, { noJsonWrite: true });
+        createNode(db, node, { skipFts: true });
 
         // Query should find the node via search
         const response = await app.inject({
@@ -265,12 +266,13 @@ describe("brain integration", () => {
                 observation: "Uses sed/cat instead of read tool",
                 frequency: "often",
                 workaround: "Add reminder in system prompt",
+                severity: "medium",
               },
             ],
             toolUseErrors: [],
           },
         });
-        createNode(db, node, { noJsonWrite: true });
+        createNode(db, node, { skipFts: true });
 
         // Query about model quirks
         const response = await app.inject({
@@ -328,11 +330,12 @@ describe("brain integration", () => {
                 errorType: "whitespace_mismatch",
                 context: "Trailing whitespace caused match failure",
                 model: "anthropic/claude-sonnet-4-20250514",
+                wasRetried: false,
               },
             ],
           },
         });
-        createNode(db, node, { noJsonWrite: true });
+        createNode(db, node, { skipFts: true });
 
         // Query about tool errors
         const response = await app.inject({
@@ -402,8 +405,8 @@ describe("brain integration", () => {
             hadClearGoal: true,
           },
         });
-        createNode(db, node1, { noJsonWrite: true });
-        createNode(db, node2, { noJsonWrite: true });
+        createNode(db, node1, { skipFts: true });
+        createNode(db, node2, { skipFts: true });
 
         // Query with project context
         const response = await app.inject({
@@ -450,7 +453,7 @@ describe("extension registration", () => {
     const mockPi = {
       registerCommand: vi.fn(),
       registerTool: vi.fn(),
-    };
+    } as unknown as Parameters<typeof brainExtension>[0];
 
     // Call extension
     brainExtension(mockPi);

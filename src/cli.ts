@@ -15,6 +15,8 @@ import { writeFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import open from "open";
 
+import type { AggregatedInsight } from "./types/index.js";
+
 import { loadConfig } from "./config/index.js";
 import {
   startDaemon,
@@ -513,7 +515,7 @@ promptCmd
   .action((options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const genOptions = {
@@ -581,7 +583,7 @@ promptCmd
   .action((options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const insights = listInsights(db, {
@@ -632,7 +634,7 @@ promptCmd
   .action(async (id, options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const insight = getInsight(db, id);
@@ -664,7 +666,7 @@ promptCmd
   .action(async (id, options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const insight = getInsight(db, id);
@@ -698,7 +700,7 @@ promptCmd
   .action(async (options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const days = Number.parseInt(options.days, 10);
@@ -717,7 +719,7 @@ promptCmd
         end: now.toISOString(),
       };
 
-      let insightsToMeasure = [];
+      let insightsToMeasure: AggregatedInsight[] = [];
       if (options.id) {
         const insight = getInsight(db, options.id);
         if (insight) {
@@ -786,7 +788,7 @@ promptCmd
   .action((options) => {
     try {
       const config = loadConfig(options.config);
-      const db = openDatabase(config.hub.databaseDir);
+      const db = openDatabase({ path: config.hub.databaseDir });
       migrate(db);
 
       const result = injectInsights(db, {

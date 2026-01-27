@@ -627,6 +627,7 @@ describe("jobProcessor", () => {
           retryDelaySeconds: 60,
           reanalysisSchedule: "0 2 * * *",
           connectionDiscoverySchedule: "0 3 * * *",
+          patternAggregationSchedule: "0 3 * * *",
           provider: "zai",
           model: "glm-4.7",
           promptFile: "/path/to/prompt.md",

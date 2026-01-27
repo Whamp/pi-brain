@@ -51,8 +51,8 @@ const DEFAULT_MIN_SESSIONS = 10;
 // Chi-square critical value for p < 0.05 with 1 degree of freedom
 const CHI_SQUARE_CRITICAL = 3.841;
 
-// SQL LIKE escape character
-const LIKE_ESCAPE_CHAR = "\\";
+// SQL LIKE escape character (const assertion for type safety)
+const LIKE_ESCAPE_CHAR = "\\" as const;
 
 // Maximum nodes to read from disk for prompting pattern counting
 // This bounds file I/O to prevent performance issues with large date ranges
@@ -248,6 +248,13 @@ function countPromptingPatternOccurrences(
     dateRange.end,
     MAX_PROMPTING_PATTERN_NODES
   ) as unknown as NodeDataFileRow[];
+
+  // Log warning if results were truncated (may affect accuracy)
+  if (rows.length === MAX_PROMPTING_PATTERN_NODES) {
+    console.warn(
+      `[effectiveness] Pattern counting truncated at ${MAX_PROMPTING_PATTERN_NODES} nodes for insight ${insight.id}. Results may be approximate.`
+    );
+  }
 
   let count = 0;
 

@@ -42,6 +42,74 @@ const ABANDONED_RESTART_WINDOW_MINUTES = 30;
 const COMPLEX_TASK_TOOL_CALL_THRESHOLD = 3;
 
 // =============================================================================
+// Shared Pattern Constants
+// =============================================================================
+
+/**
+ * Patterns indicating sarcasm or frustration (false positives for praise/success)
+ */
+const SARCASM_NEGATION_PATTERNS: readonly RegExp[] = [
+  /i'?m done trying/i,
+  /done with this/i,
+  /great[,.]?\s*(another|more|yet)/i,
+  /thanks for nothing/i,
+  /perfect[,.]?\s*(now|another|more)/i,
+  /not working/i,
+  /still (not|broken|failing)/i,
+  /sarcasti/i,
+] as const;
+
+/**
+ * Patterns indicating genuine praise or success
+ */
+const PRAISE_PATTERNS: readonly RegExp[] = [
+  /\bthanks?\b/,
+  /\bthank you\b/,
+  /\bperfect\b/,
+  /\bgreat\b/,
+  /\bawesome\b/,
+  /\bexcellent\b/,
+  /\blooks good\b/,
+  /\bthat works\b/,
+  /\ball (done|set|good)\b/,
+  /\bnice work?\b/,
+  /\bgood job\b/,
+  /\bwell done\b/,
+  /\bbrilliant\b/,
+  /\bamazing\b/,
+  /\bfantastic\b/,
+  /\bwonderful\b/,
+  /\blgtm\b/,
+  /\bship it\b/,
+  /👍/,
+  /🎉/,
+  /✅/,
+] as const;
+
+/**
+ * Patterns indicating user correction or confusion
+ */
+const CORRECTION_PATTERNS: readonly RegExp[] = [
+  /\bno\b/,
+  /\bwrong\b/,
+  /\bincorrect\b/,
+  /\bnot what\b/,
+  /\binstead\b/,
+  /\bactually\b/,
+  /\bshould be\b/,
+  /\bchange\b/,
+  /\bfix\b/,
+  /\btry again\b/,
+  /\bretry\b/,
+  /\bplease\b.*\binstead\b/,
+  // Question patterns that indicate confusion (more specific than just /?$/)
+  /\bwhy\b.*\?$/i,
+  /\bwhat went wrong\b/i,
+  /\bwhat happened\b/i,
+  /\bcan you (fix|try|redo)\b/i,
+] as const;
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -186,11 +254,20 @@ function normalizeErrorMessage(msg: string): string {
 
 /**
  * Extract directory path from an ls command
+ *
+ * Note: This handles basic cases including options but does not fully
+ * parse shell quoting. Paths with spaces in quotes may not be extracted correctly.
  */
 function extractLsDirectory(cmd: string): string {
   // Handle "ls" with no args
   if (cmd === "ls") {
     return ".";
+  }
+
+  // Handle quoted paths (single or double quotes)
+  const quotedMatch = cmd.match(/ls\s+(?:-\S+\s+)*["']([^"']+)["']/);
+  if (quotedMatch?.[1]) {
+    return quotedMatch[1];
   }
 
   // Extract path from "ls [options] path"
@@ -377,37 +454,15 @@ function extractTextFromContent(content: ContentBlock[]): string {
 function hasGenuineSuccessIndicator(text: string): boolean {
   const lower = text.toLowerCase();
 
-  // Negation patterns that indicate frustration, not success
-  const negationPatterns = [
-    /i'?m done trying/i,
-    /done with this/i,
-    /great[,.]?\s*(another|more|yet)/i,
-    /thanks for nothing/i,
-    /perfect[,.]?\s*(now|another|more)/i,
-    /not working/i,
-    /still (not|broken|failing)/i,
-  ];
-
-  for (const pattern of negationPatterns) {
+  // Check for sarcasm/negation first
+  for (const pattern of SARCASM_NEGATION_PATTERNS) {
     if (pattern.test(text)) {
       return false;
     }
   }
 
-  // Positive patterns - success indicators
-  const successPatterns = [
-    /\bthanks\b/i,
-    /\bthank you\b/i,
-    /\bperfect\b/i,
-    /\bgreat\b/i,
-    /\bawesome\b/i,
-    /\bexcellent\b/i,
-    /\blooks good\b/i,
-    /\bthat works\b/i,
-    /\ball (done|set|good)\b/i,
-  ];
-
-  for (const pattern of successPatterns) {
+  // Check for praise patterns
+  for (const pattern of PRAISE_PATTERNS) {
     if (pattern.test(lower)) {
       return true;
     }
@@ -844,50 +899,20 @@ function isUserCorrection(text: string): boolean {
     return false;
   }
 
-  // Praise patterns - not corrections
-  const praisePatterns = [
-    /\bthanks?\b/,
-    /\bthank you\b/,
-    /\bperfect\b/,
-    /\bgreat\b/,
-    /\bawesome\b/,
-    /\bexcellent\b/,
-    /\blooks good\b/,
-    /\bthat works\b/,
-    /\bnice\b/,
-    /\bgood job\b/,
-    /\bwell done\b/,
-    /^ok$/,
-    /^okay$/,
-    /^yes$/,
-    /^👍/,
-    /^lgtm\b/,
-  ];
-
-  for (const pattern of praisePatterns) {
+  // Check for praise patterns first - not corrections
+  for (const pattern of PRAISE_PATTERNS) {
     if (pattern.test(lower)) {
       return false;
     }
   }
 
-  // Correction indicators
-  const correctionPatterns = [
-    /\bno\b/,
-    /\bwrong\b/,
-    /\bincorrect\b/,
-    /\bnot what\b/,
-    /\binstead\b/,
-    /\bactually\b/,
-    /\bshould be\b/,
-    /\bchange\b/,
-    /\bfix\b/,
-    /\btry again\b/,
-    /\bretry\b/,
-    /\bplease\b.*\binstead\b/,
-    /\?$/, // Questions often indicate confusion/need for clarification
-  ];
+  // Also check acknowledgment patterns
+  if (/^ok$/i.test(lower) || /^okay$/i.test(lower) || /^yes$/i.test(lower)) {
+    return false;
+  }
 
-  for (const pattern of correctionPatterns) {
+  // Check for correction patterns
+  for (const pattern of CORRECTION_PATTERNS) {
     if (pattern.test(lower)) {
       return true;
     }
@@ -933,50 +958,15 @@ export function detectExplicitPraise(entries: SessionEntry[]): boolean {
 function hasGenuinePraise(text: string): boolean {
   const lower = text.toLowerCase();
 
-  // Negation patterns that indicate frustration, not praise
-  const negationPatterns = [
-    /i'?m done trying/i,
-    /done with this/i,
-    /great[,.]?\s*(another|more|yet)/i,
-    /thanks for nothing/i,
-    /perfect[,.]?\s*(now|another|more)/i,
-    /not working/i,
-    /still (not|broken|failing)/i,
-    /sarcasti/i,
-  ];
-
-  for (const pattern of negationPatterns) {
+  // Check for sarcasm/negation first
+  for (const pattern of SARCASM_NEGATION_PATTERNS) {
     if (pattern.test(text)) {
       return false;
     }
   }
 
-  // Genuine praise patterns
-  const praisePatterns = [
-    /\bthanks?\b/,
-    /\bthank you\b/,
-    /\bperfect\b/,
-    /\bgreat\b/,
-    /\bawesome\b/,
-    /\bexcellent\b/,
-    /\blooks good\b/,
-    /\bthat works\b/,
-    /\ball (done|set|good)\b/,
-    /\bnice work\b/,
-    /\bgood job\b/,
-    /\bwell done\b/,
-    /\bbrilliant\b/,
-    /\bamazing\b/,
-    /\bfantastic\b/,
-    /\bwonderful\b/,
-    /\blgtm\b/,
-    /\bship it\b/,
-    /👍/,
-    /🎉/,
-    /✅/,
-  ];
-
-  for (const pattern of praisePatterns) {
+  // Check for praise patterns
+  for (const pattern of PRAISE_PATTERNS) {
     if (pattern.test(lower)) {
       return true;
     }

@@ -38,7 +38,8 @@ describe("decisionRepository", () => {
       previousVersions: [],
       source: {
         sessionFile: "session.jsonl",
-        segment: { startEntryId: "1", endEntryId: "2" },
+        sessionId: "session-1",
+        segment: { startEntryId: "1", endEntryId: "2", entryCount: 2 },
         computer: "test-pc",
       },
       classification: {
@@ -52,6 +53,8 @@ describe("decisionRepository", () => {
         outcome: "success",
         keyDecisions: [],
         filesTouched: [],
+        toolsUsed: [],
+        errorsSeen: [],
       },
       lessons: {
         project: [],
@@ -90,7 +93,7 @@ describe("decisionRepository", () => {
       },
     };
 
-    createNode(db, node, { skipFts: true, skipJsonWrite: true });
+    createNode(db, node, { skipFts: true });
 
     const result = listDecisions(db);
     expect(result.decisions).toHaveLength(1);
@@ -160,7 +163,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true, skipJsonWrite: true }
+      { skipFts: true }
     );
 
     // Create node 2
@@ -223,7 +226,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true, skipJsonWrite: true }
+      { skipFts: true }
     );
 
     const resA = listDecisions(db, { project: "proj-a" });
@@ -296,7 +299,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true, skipJsonWrite: true }
+      { skipFts: true }
     );
 
     const [decision] = listDecisions(db).decisions;

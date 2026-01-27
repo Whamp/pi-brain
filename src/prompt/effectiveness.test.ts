@@ -5,7 +5,6 @@
 import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type * as NodeStorage from "../storage/node-storage.js";
 import type { DateRange, Node } from "../types/index.js";
 
 import { migrate } from "../storage/database.js";
@@ -25,8 +24,8 @@ import {
 } from "./effectiveness.js";
 
 // Mock node storage
-vi.mock<typeof NodeStorage>("../storage/node-storage.js", (importActual) => ({
-  ...importActual(),
+// oxlint-disable-next-line eslint-plugin-jest/no-untyped-mock-factory -- type parameter conflicts with consistent-type-imports rule
+vi.mock("../storage/node-storage.js", () => ({
   readNodeFromPath: vi.fn() as unknown as typeof readNodeFromPath,
 }));
 

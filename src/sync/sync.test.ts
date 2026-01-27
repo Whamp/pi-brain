@@ -305,6 +305,7 @@ describe("status", () => {
             syncMethod: "rsync" as const,
             path: spokePath,
             source: "user@host:~/sessions",
+            enabled: true,
           },
         ],
         daemon: {} as never,

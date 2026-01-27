@@ -39,6 +39,7 @@ function createTestConfig(tempDir: string): PiBrainConfig {
       retryDelaySeconds: 60,
       reanalysisSchedule: "0 2 * * *",
       connectionDiscoverySchedule: "0 3 * * *",
+      patternAggregationSchedule: "0 3 * * *",
       provider: "test",
       model: "test-model",
       promptFile: join(tempDir, "prompt.md"),

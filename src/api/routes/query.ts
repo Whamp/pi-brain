@@ -33,6 +33,7 @@ const DEFAULT_QUERY_CONFIG = {
   maxRetries: 3,
   retryDelaySeconds: 30,
   connectionDiscoverySchedule: "0 3 * * *",
+  patternAggregationSchedule: "0 3 * * *",
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,
 };

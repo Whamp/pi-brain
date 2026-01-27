@@ -158,7 +158,10 @@ describe("connectionDiscoverer", () => {
     expect(result.edges[0].type).toBe("semantic");
 
     // Check DB
-    const edges = db.prepare("SELECT * FROM edges").all();
+    const edges = db.prepare("SELECT * FROM edges").all() as {
+      source_node_id: string;
+      target_node_id: string;
+    }[];
     expect(edges).toHaveLength(1);
     expect(edges[0].source_node_id).toBe("1");
     expect(edges[0].target_node_id).toBe("2");

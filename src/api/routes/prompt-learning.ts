@@ -89,7 +89,7 @@ export async function promptLearningRoutes(
       if (!/^[\da-f]{16}$/i.test(insightId)) {
         return reply
           .status(400)
-          .send(errorResponse("Invalid insightId format", 400));
+          .send(errorResponse("BAD_REQUEST", "Invalid insightId format"));
       }
 
       const history = getEffectivenessHistory(db, insightId);
@@ -114,25 +114,40 @@ export async function promptLearningRoutes(
       const startTime = request.startTime ?? Date.now();
       const { db } = app.ctx;
       const { insightId } = request.params;
+
+      // Validate request body exists
+      if (!request.body || typeof request.body !== "object") {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", "Request body required"));
+      }
+
       const { enabled } = request.body;
 
       // Validate insightId format (16 hex chars)
       if (!/^[\da-f]{16}$/i.test(insightId)) {
         return reply
           .status(400)
-          .send(errorResponse("Invalid insightId format", 400));
+          .send(errorResponse("BAD_REQUEST", "Invalid insightId format"));
       }
 
       // Validate enabled field
       if (typeof enabled !== "boolean") {
         return reply
           .status(400)
-          .send(errorResponse("Invalid 'enabled' field: must be boolean", 400));
+          .send(
+            errorResponse(
+              "BAD_REQUEST",
+              "Invalid 'enabled' field: must be boolean"
+            )
+          );
       }
 
       const insight = getInsight(db, insightId);
       if (!insight) {
-        return reply.status(404).send(errorResponse("Insight not found", 404));
+        return reply
+          .status(404)
+          .send(errorResponse("NOT_FOUND", "Insight not found"));
       }
 
       updateInsightPrompt(

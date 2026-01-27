@@ -254,11 +254,8 @@ export async function runRsync(
 
     // Parse rsync error
     const stderr = execError.stderr ?? "";
-    const parsedError = parseRsyncError(
-      stderr,
-      spoke.source,
-      execError.code ?? null
-    );
+    const exitCode = typeof execError.code === "number" ? execError.code : null;
+    const parsedError = parseRsyncError(stderr, spoke.source, exitCode);
 
     return createFailedResult(
       spoke.name,

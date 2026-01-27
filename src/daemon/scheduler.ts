@@ -500,6 +500,11 @@ export class Scheduler {
         `Found ${needingMeasurement.length} insights needing measurement`
       );
 
+      // Prepare statement once before loop for better performance
+      const versionStmt = this.db.prepare(
+        "SELECT created_at FROM prompt_versions WHERE version = ?"
+      );
+
       for (const insight of needingMeasurement) {
         try {
           // If we have a prompt version for this insight, use its creation date as the split point
@@ -508,11 +513,9 @@ export class Scheduler {
           );
 
           if (insight.promptVersion) {
-            const versionRow = this.db
-              .prepare(
-                "SELECT created_at FROM prompt_versions WHERE version = ?"
-              )
-              .get(insight.promptVersion) as { created_at: string } | undefined;
+            const versionRow = versionStmt.get(insight.promptVersion) as
+              | { created_at: string }
+              | undefined;
             if (versionRow) {
               splitDate = new Date(versionRow.created_at);
             }
