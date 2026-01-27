@@ -193,3 +193,39 @@ Only 2 minor tasks remain pending:
 **Notes:** 
 - All consumers continue to import from node-repository.ts via re-exports
 - All 1198 tests pass
+
+---
+
+## 2026-01-27 15:51 - Integration Repair Tasks 2.1, 2.3, 2.5
+
+**Status**: pending → done
+**Validation**: 
+- `npm run build` copies migrations to dist/ (11 SQL files)
+- Daemon starts without crashing, worker idles with warning when skills missing
+- API server accessible at http://127.0.0.1:8765 (health + stats endpoints work)
+- Vite proxy configured for /api routes
+- All 1198 tests pass
+
+**Commit**: 2cdb47b
+
+**Summary**: Fixed critical integration issues blocking web UI ↔ backend connection
+
+**Task 2.1 - Fix Build Pipeline**:
+- Added `copy-assets` script to package.json
+- Migrations now copied after tsup build
+
+**Task 2.2 - Worker Initialization**:
+- Already fixed in prior session (worker.initialize(db) exists)
+
+**Task 2.3 - Non-Fatal Environment Validation**:
+- Changed validateRequiredSkills to return EnvironmentValidationResult
+- Worker now idles with warning instead of crashing
+- API server continues running when skills missing
+- Worker periodically rechecks environment (every 30s)
+
+**Task 2.5 - Vite Proxy Configuration**:
+- Added /api proxy to vite.config.ts targeting localhost:8765
+
+**Remaining from integration-repair-plan.md**:
+- 2.4 Frontend Error Handling (graceful API failure display)
+- 2.6 RLM Skill Installation (or skip since worker now gracefully handles missing skills)
