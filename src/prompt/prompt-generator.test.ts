@@ -3,9 +3,6 @@
  */
 
 import Database from "better-sqlite3";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { AggregatedInsight } from "../types/index.js";
@@ -466,17 +463,14 @@ describe("formatPromptAdditionsDocument", () => {
 
 describe("generatePromptAdditionsFromDb", () => {
   let db: Database.Database;
-  let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), "pi-brain-prompt-test-"));
     db = new Database(":memory:");
     migrate(db);
   });
 
   afterEach(() => {
     db.close();
-    rmSync(tmpDir, { recursive: true, force: true });
   });
 
   function insertInsight(values: {

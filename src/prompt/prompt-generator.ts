@@ -9,7 +9,7 @@
 
 import type Database from "better-sqlite3";
 
-import type { AggregatedInsight } from "../types/index.js";
+import type { AggregatedInsight, PromptAddition } from "../types/index.js";
 
 import {
   listInsights,
@@ -20,18 +20,7 @@ import {
 // Types
 // =============================================================================
 
-export interface PromptAddition {
-  /** provider/model format */
-  model: string;
-  /** Section header */
-  section: string;
-  /** Order in prompt (lower = higher priority) */
-  priority: number;
-  /** Formatted markdown content */
-  content: string;
-  /** Insight IDs used to generate this addition */
-  sourceInsights: string[];
-}
+// PromptAddition is imported from src/types/index.ts
 
 export interface GeneratePromptOptions {
   /** Minimum confidence to include (default: 0.5) */
@@ -253,9 +242,7 @@ export function generatePromptAdditions(
   }
 
   // Sort by model name for consistent ordering
-  additions.sort((a, b) => a.model.localeCompare(b.model));
-
-  return additions;
+  return additions.toSorted((a, b) => a.model.localeCompare(b.model));
 }
 
 /**
@@ -335,10 +322,13 @@ export function updateInsightPromptTexts(
     }
   }
 
-  // Update each insight with its prompt text
-  for (const [insightId, { content }] of insightContents) {
-    updateInsightPrompt(db, insightId, content, true, promptVersion);
-  }
+  // Update each insight with its prompt text in a transaction
+  // to prevent inconsistent state on errors
+  db.transaction(() => {
+    for (const [insightId, { content }] of insightContents) {
+      updateInsightPrompt(db, insightId, content, true, promptVersion);
+    }
+  })();
 }
 
 /**
