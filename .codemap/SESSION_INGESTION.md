@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 38
-- Total symbols: 189
+- Total symbols: 191
   - function: 114
-  - interface: 44
-  - variable: 13
+  - interface: 45
+  - variable: 14
   - class: 10
   - type: 8
 
@@ -1112,9 +1112,9 @@ src/parser/boundary.test.ts [1-776]
     - ./boundary.js
     - vitest
 
-src/parser/boundary.ts [1-543]
+src/parser/boundary.ts [1-571]
   class:
-    200-277: class LeafTracker [exported]
+    214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
   interface:
     39-50: interface Boundary [exported]
@@ -1128,11 +1128,13 @@ src/parser/boundary.ts [1-543]
       /** A segment is a contiguous span of entries between boundaries */
       refs out: 1 [type: 1]
         - src/parser/boundary.ts:81: type Boundary -> src/parser/boundary.ts
-    509-513: interface BoundaryStats [exported]
+    103-109: interface BoundaryOptions [exported]
+      /** Options for boundary detection */
+    533-537: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:511: type Record -> external
-        - src/parser/boundary.ts:511: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:535: type Record -> external
+        - src/parser/boundary.ts:535: type BoundaryType -> src/parser/boundary.ts
   type:
     29-34: BoundaryType = | "branch"
   | "tree_jump"
@@ -1141,35 +1143,40 @@ src/parser/boundary.ts [1-543]
   | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    289-423: detectBoundaries(entries: SessionEntry[]): {} [exported]
+    304-443: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Detect all boundaries in a list of session entries */
-      refs out: 13 [call: 11, type: 2]
-        - src/parser/boundary.ts:289: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:289: type Boundary -> src/parser/boundary.ts
-        - src/parser/boundary.ts:298: call has -> external
-        - src/parser/boundary.ts:305: call push -> external
-        - src/parser/boundary.ts:319: call push -> external
-        - src/parser/boundary.ts:334: call push -> external
-        - src/parser/boundary.ts:338: call LeafTracker.getCurrentLeaf -> src/parser/boundary.ts
-        - src/parser/boundary.ts:359: call push -> external
-        - src/parser/boundary.ts:363: call LeafTracker.getPreviousEntryId -> src/parser/boundary.ts
-        - src/parser/boundary.ts:382: call push -> external
-    433-504: extractSegments(entries: SessionEntry[]): {} [exported]
+      refs out: 14 [call: 11, type: 3]
+        - src/parser/boundary.ts:305: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:306: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:307: type Boundary -> src/parser/boundary.ts
+        - src/parser/boundary.ts:318: call has -> external
+        - src/parser/boundary.ts:325: call push -> external
+        - src/parser/boundary.ts:339: call push -> external
+        - src/parser/boundary.ts:354: call push -> external
+        - src/parser/boundary.ts:358: call LeafTracker.getCurrentLeaf -> src/parser/boundary.ts
+        - src/parser/boundary.ts:379: call push -> external
+        - src/parser/boundary.ts:383: call LeafTracker.getPreviousEntryId -> src/parser/boundary.ts
+    454-528: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-      refs out: 8 [call: 6, type: 2]
-        - src/parser/boundary.ts:433: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:433: type Segment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:451: call push -> external
-        - src/parser/boundary.ts:452: call set -> external
-        - src/parser/boundary.ts:489: call push -> external
-        - src/parser/boundary.ts:489: call createSegment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:500: call push -> external
-        - src/parser/boundary.ts:500: call createSegment -> src/parser/boundary.ts
-    521-542: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+      refs out: 9 [call: 6, type: 3]
+        - src/parser/boundary.ts:455: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:456: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:457: type Segment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:475: call push -> external
+        - src/parser/boundary.ts:476: call set -> external
+        - src/parser/boundary.ts:513: call push -> external
+        - src/parser/boundary.ts:513: call createSegment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:524: call push -> external
+        - src/parser/boundary.ts:524: call createSegment -> src/parser/boundary.ts
+    546-570: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
-      refs out: 2 [type: 2]
-        - src/parser/boundary.ts:521: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:521: type BoundaryStats -> src/parser/boundary.ts
+      refs out: 3 [type: 3]
+        - src/parser/boundary.ts:547: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:548: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:549: type BoundaryStats -> src/parser/boundary.ts
+  variable:
+    98-98: 10 [exported]
+      /** Default minimum gap in minutes to trigger a resume boundary. Can be overridden via BoundaryOptions.resumeGapMinutes. */
   imports:
     - ../types.js
 
@@ -1444,4 +1451,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,771 (codebase: ~933,880)
+Estimated tokens: 18,908 (codebase: ~934,934)

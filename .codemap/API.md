@@ -5,11 +5,11 @@
 
 ## Statistics
 - Total files: 76
-- Total symbols: 584
+- Total symbols: 586
   - function: 322
-  - interface: 188
+  - interface: 189
   - type: 37
-  - variable: 26
+  - variable: 27
   - class: 11
 
 ---
@@ -816,9 +816,9 @@ src/parser/analyzer.ts [1-336]
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-543]
+src/parser/boundary.ts [1-571]
   class:
-    200-277: class LeafTracker [exported]
+    214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
   interface:
     39-50: interface Boundary [exported]
@@ -827,7 +827,9 @@ src/parser/boundary.ts [1-543]
       /** Metadata for different boundary types */
     75-88: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
-    509-513: interface BoundaryStats [exported]
+    103-109: interface BoundaryOptions [exported]
+      /** Options for boundary detection */
+    533-537: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
     29-34: BoundaryType = | "branch"
@@ -837,12 +839,15 @@ src/parser/boundary.ts [1-543]
   | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    289-423: detectBoundaries(entries: SessionEntry[]): {} [exported]
+    304-443: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    433-504: extractSegments(entries: SessionEntry[]): {} [exported]
+    454-528: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    521-542: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+    546-570: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
+  variable:
+    98-98: 10 [exported]
+      /** Default minimum gap in minutes to trigger a resume boundary. Can be overridden via BoundaryOptions.resumeGapMinutes. */
   imports:
     - ../types.js
 
@@ -1824,4 +1829,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,718 (codebase: ~933,653)
+Estimated tokens: 22,806 (codebase: ~934,070)

@@ -91,8 +91,22 @@ export interface Segment {
 // Constants
 // =============================================================================
 
-/** Minimum gap in minutes to trigger a resume boundary */
-const RESUME_GAP_MINUTES = 10;
+/**
+ * Default minimum gap in minutes to trigger a resume boundary.
+ * Can be overridden via BoundaryOptions.resumeGapMinutes.
+ */
+export const DEFAULT_RESUME_GAP_MINUTES = 10;
+
+/**
+ * Options for boundary detection
+ */
+export interface BoundaryOptions {
+  /**
+   * Minimum gap in minutes to trigger a resume boundary.
+   * @default 10
+   */
+  resumeGapMinutes?: number;
+}
 
 /**
  * Handoff detection patterns - matches user messages indicating a handoff.
@@ -284,9 +298,15 @@ export class LeafTracker {
  * Detect all boundaries in a list of session entries
  *
  * @param {SessionEntry[]} entries Session entries to analyze
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {Boundary[]} Array of detected boundaries, in order of occurrence
  */
-export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
+export function detectBoundaries(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): Boundary[] {
+  const resumeGapMinutes =
+    options.resumeGapMinutes ?? DEFAULT_RESUME_GAP_MINUTES;
   const boundaries: Boundary[] = [];
   const leafTracker = new LeafTracker();
 
@@ -400,7 +420,7 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
         new Date(previousEntryForGap.timestamp).getTime();
       const gapMinutes = gapMs / (1000 * 60);
 
-      if (gapMinutes >= RESUME_GAP_MINUTES) {
+      if (gapMinutes >= resumeGapMinutes) {
         boundaries.push({
           type: "resume",
           entryId: entry.id,
@@ -428,9 +448,13 @@ export function detectBoundaries(entries: SessionEntry[]): Boundary[] {
  * A segment is a contiguous span of entries. Boundaries define the split points.
  *
  * @param {SessionEntry[]} entries Session entries to segment
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {Segment[]} Array of segments
  */
-export function extractSegments(entries: SessionEntry[]): Segment[] {
+export function extractSegments(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): Segment[] {
   // Filter out metadata-only entries for segmentation
   const contentEntries = entries.filter(
     (e) => !METADATA_ENTRY_TYPES.has(e.type)
@@ -440,7 +464,7 @@ export function extractSegments(entries: SessionEntry[]): Segment[] {
     return [];
   }
 
-  const boundaries = detectBoundaries(entries);
+  const boundaries = detectBoundaries(entries, options);
   const segments: Segment[] = [];
 
   // Create a map of entry ID to boundaries for quick lookup
@@ -516,11 +540,15 @@ export interface BoundaryStats {
  * Calculate statistics about boundaries in a session
  *
  * @param {SessionEntry[]} entries Session entries to analyze
+ * @param {BoundaryOptions} [options] Optional configuration for boundary detection
  * @returns {BoundaryStats} Statistics about detected boundaries
  */
-export function getBoundaryStats(entries: SessionEntry[]): BoundaryStats {
-  const boundaries = detectBoundaries(entries);
-  const segments = extractSegments(entries);
+export function getBoundaryStats(
+  entries: SessionEntry[],
+  options: BoundaryOptions = {}
+): BoundaryStats {
+  const boundaries = detectBoundaries(entries, options);
+  const segments = extractSegments(entries, options);
 
   const byType: Record<BoundaryType, number> = {
     branch: 0,

@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 76,
-    "totalSymbols": 1012,
+    "totalSymbols": 1013,
     "byLanguage": {
       "typescript": 76
     },
     "bySymbolKind": {
       "function": 453,
       "type": 37,
-      "interface": 239,
+      "interface": 240,
       "variable": 101,
       "class": 11,
       "constructor": 10,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 33062,
-  "codebase_tokens": 933880,
+  "total_tokens": 33127,
+  "codebase_tokens": 934934,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -10098,10 +10098,10 @@
       "language": "typescript",
       "lines": [
         1,
-        543
+        571
       ],
       "detail_level": "full",
-      "token_estimate": 944,
+      "token_estimate": 1009,
       "symbols": [
         {
           "name": "BoundaryType",
@@ -10180,21 +10180,40 @@
           "outgoing_refs": null
         },
         {
-          "name": "RESUME_GAP_MINUTES",
+          "name": "DEFAULT_RESUME_GAP_MINUTES",
           "kind": "variable",
           "signature": "10",
           "lines": [
-            95,
-            95
+            98,
+            98
           ],
-          "exported": false,
+          "exported": true,
           "is_default": false,
           "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Minimum gap in minutes to trigger a resume boundary",
+          "comment": "Default minimum gap in minutes to trigger a resume boundary.\nCan be overridden via BoundaryOptions.resumeGapMinutes.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BoundaryOptions",
+          "kind": "interface",
+          "signature": "BoundaryOptions",
+          "lines": [
+            103,
+            109
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for boundary detection",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -10203,8 +10222,8 @@
           "kind": "variable",
           "signature": "{}",
           "lines": [
-            107,
-            112
+            121,
+            126
           ],
           "exported": false,
           "is_default": false,
@@ -10222,8 +10241,8 @@
           "kind": "variable",
           "signature": "\"handoff\"",
           "lines": [
-            115,
-            115
+            129,
+            129
           ],
           "exported": false,
           "is_default": false,
@@ -10241,8 +10260,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            118,
-            118
+            132,
+            132
           ],
           "exported": false,
           "is_default": false,
@@ -10260,8 +10279,8 @@
           "kind": "function",
           "signature": "extractUserMessageText(entry: SessionMessageEntry): string",
           "lines": [
-            127,
-            144
+            141,
+            158
           ],
           "exported": false,
           "is_default": false,
@@ -10279,8 +10298,8 @@
           "kind": "function",
           "signature": "detectHandoffFromMessage(text: string): string",
           "lines": [
-            152,
-            160
+            166,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -10298,8 +10317,8 @@
           "kind": "function",
           "signature": "isExplicitHandoffEntry(entry: SessionEntry): { isHandoff: boolean; target?: string; }",
           "lines": [
-            168,
-            187
+            182,
+            201
           ],
           "exported": false,
           "is_default": false,
@@ -10317,8 +10336,8 @@
           "kind": "class",
           "signature": "LeafTracker",
           "lines": [
-            200,
-            277
+            214,
+            291
           ],
           "exported": true,
           "is_default": false,
@@ -10336,8 +10355,8 @@
           "kind": "property",
           "signature": "childrenOf",
           "lines": [
-            202,
-            202
+            216,
+            216
           ],
           "exported": false,
           "is_default": false,
@@ -10355,8 +10374,8 @@
           "kind": "property",
           "signature": "latestEntryId: string | null",
           "lines": [
-            204,
-            204
+            218,
+            218
           ],
           "exported": false,
           "is_default": false,
@@ -10374,8 +10393,8 @@
           "kind": "property",
           "signature": "previousEntryId: string | null",
           "lines": [
-            206,
-            206
+            220,
+            220
           ],
           "exported": false,
           "is_default": false,
@@ -10393,8 +10412,8 @@
           "kind": "property",
           "signature": "previousTimestamp: string | null",
           "lines": [
-            208,
-            208
+            222,
+            222
           ],
           "exported": false,
           "is_default": false,
@@ -10412,8 +10431,8 @@
           "kind": "method",
           "signature": "update(entry: SessionEntry): void",
           "lines": [
-            213,
-            227
+            227,
+            241
           ],
           "exported": false,
           "is_default": false,
@@ -10431,8 +10450,8 @@
           "kind": "method",
           "signature": "getCurrentLeaf(): string",
           "lines": [
-            235,
-            237
+            249,
+            251
           ],
           "exported": false,
           "is_default": false,
@@ -10450,8 +10469,8 @@
           "kind": "method",
           "signature": "getPreviousEntryId(): string",
           "lines": [
-            242,
-            244
+            256,
+            258
           ],
           "exported": false,
           "is_default": false,
@@ -10469,8 +10488,8 @@
           "kind": "method",
           "signature": "getPreviousTimestamp(): string",
           "lines": [
-            249,
-            251
+            263,
+            265
           ],
           "exported": false,
           "is_default": false,
@@ -10488,8 +10507,8 @@
           "kind": "method",
           "signature": "isLeaf(entryId: string): boolean",
           "lines": [
-            256,
-            258
+            270,
+            272
           ],
           "exported": false,
           "is_default": false,
@@ -10507,8 +10526,8 @@
           "kind": "method",
           "signature": "isBranchPoint(entryId: string): boolean",
           "lines": [
-            263,
-            266
+            277,
+            280
           ],
           "exported": false,
           "is_default": false,
@@ -10526,8 +10545,8 @@
           "kind": "method",
           "signature": "reset(): void",
           "lines": [
-            271,
-            276
+            285,
+            290
           ],
           "exported": false,
           "is_default": false,
@@ -10543,10 +10562,10 @@
         {
           "name": "detectBoundaries",
           "kind": "function",
-          "signature": "detectBoundaries(entries: SessionEntry[]): {}",
+          "signature": "detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {}",
           "lines": [
-            289,
-            423
+            304,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -10562,10 +10581,10 @@
         {
           "name": "extractSegments",
           "kind": "function",
-          "signature": "extractSegments(entries: SessionEntry[]): {}",
+          "signature": "extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {}",
           "lines": [
-            433,
-            504
+            454,
+            528
           ],
           "exported": true,
           "is_default": false,
@@ -10583,8 +10602,8 @@
           "kind": "interface",
           "signature": "BoundaryStats",
           "lines": [
-            509,
-            513
+            533,
+            537
           ],
           "exported": true,
           "is_default": false,
@@ -10600,10 +10619,10 @@
         {
           "name": "getBoundaryStats",
           "kind": "function",
-          "signature": "getBoundaryStats(entries: SessionEntry[]): BoundaryStats",
+          "signature": "getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats",
           "lines": [
-            521,
-            542
+            546,
+            570
           ],
           "exported": true,
           "is_default": false,
