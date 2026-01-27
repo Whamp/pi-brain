@@ -25,6 +25,8 @@ export interface Node {
   metadata: NodeMetadata;
   semantic: SemanticData;
   daemonMeta: DaemonMeta;
+  /** Friction/delight signals (optional, populated by signal detection) */
+  signals?: NodeSignals;
 }
 
 export interface NodeSource {
@@ -417,10 +419,18 @@ export interface EffectivenessResult {
   beforeRate: number;
   /** Occurrences per session after prompt was added */
   afterRate: number;
+  /** Raw occurrence count before prompt was added */
+  beforeCount: number;
+  /** Raw occurrence count after prompt was added */
+  afterCount: number;
   /** Percentage improvement (positive = fewer occurrences = better) */
   improvement: number;
   /** Whether we have enough data to be confident */
   significant: boolean;
+  /** Number of sessions in before period */
+  beforeSessions: number;
+  /** Number of sessions in after period */
+  afterSessions: number;
 }
 
 /**
@@ -462,4 +472,63 @@ export interface PromptEffectiveness {
   measuredAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+// =============================================================================
+// Signals Types (specs/signals.md)
+// =============================================================================
+
+/**
+ * Manual flag recorded by user via /brain --flag command
+ */
+export interface ManualFlag {
+  /** Flag type: quirk, failure, win, or generic note */
+  type: "quirk" | "failure" | "win" | "note";
+  /** User's message */
+  message: string;
+  /** ISO 8601 timestamp when flag was recorded */
+  timestamp: string;
+}
+
+/**
+ * Friction signals detected in a session segment
+ */
+export interface FrictionSignals {
+  /** Overall friction score (0.0-1.0) */
+  score: number;
+  /** Number of rephrasing cascades (3+ user messages without tool call) */
+  rephrasingCount: number;
+  /** Count of context churn events (frequent read/ls on different files) */
+  contextChurnCount: number;
+  /** Whether this segment was abandoned and restarted within 30 mins */
+  abandonedRestart: boolean;
+  /** Number of tool loops (same tool fails 3+ times with same error) */
+  toolLoopCount: number;
+  /** Model this node switched FROM (if this is a model switch retry) */
+  modelSwitchFrom?: string;
+  /** Whether session ended mid-task without handoff or success */
+  silentTermination: boolean;
+}
+
+/**
+ * Delight signals detected in a session segment
+ */
+export interface DelightSignals {
+  /** Overall delight score (0.0-1.0) */
+  score: number;
+  /** Model recovered from tool error without user intervention */
+  resilientRecovery: boolean;
+  /** Complex task completed with zero user corrections */
+  oneShotSuccess: boolean;
+  /** User expressed explicit praise */
+  explicitPraise: boolean;
+}
+
+/**
+ * Combined signals for a node
+ */
+export interface NodeSignals {
+  friction: FrictionSignals;
+  delight: DelightSignals;
+  manualFlags: ManualFlag[];
 }
