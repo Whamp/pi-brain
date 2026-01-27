@@ -97,7 +97,7 @@ export interface SchedulerConfig {
   model?: string;
 
   /** Embedding provider for clustering */
-  embeddingProvider?: "ollama" | "openai" | "openrouter" | "mock";
+  embeddingProvider?: "ollama" | "openai" | "openrouter";
 
   /** Embedding model name */
   embeddingModel?: string;
@@ -659,7 +659,19 @@ export class Scheduler {
       this.logger.info("Starting clustering job");
 
       // Build embedding config from scheduler config
-      const embeddingProvider = this.config.embeddingProvider ?? "mock";
+      const embeddingProvider = this.config.embeddingProvider ?? "openrouter";
+
+      // Require API key for openrouter and openai
+      if (
+        (embeddingProvider === "openrouter" ||
+          embeddingProvider === "openai") &&
+        !this.config.embeddingApiKey
+      ) {
+        throw new Error(
+          `Clustering requires embedding_api_key for ${embeddingProvider} provider`
+        );
+      }
+
       const embeddingConfig = {
         provider: embeddingProvider,
         model: this.config.embeddingModel ?? "qwen/qwen3-embedding-8b",
@@ -667,12 +679,6 @@ export class Scheduler {
         baseUrl: this.config.embeddingBaseUrl,
         dimensions: this.config.embeddingDimensions,
       };
-
-      if (embeddingProvider === "mock") {
-        this.logger.info(
-          "Using mock embeddings - configure embedding_provider for semantic clustering"
-        );
-      }
 
       const facetDiscovery = new FacetDiscovery(
         this.db,

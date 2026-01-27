@@ -596,9 +596,9 @@ daemon:
   connection_discovery_schedule: "0 3 * * *"  # 3am nightly
   pattern_aggregation_schedule: "0 3 * * *"   # 3am nightly
   clustering_schedule: "0 4 * * *"            # 4am nightly
-  embedding_provider: openrouter             # or: ollama, openai, mock
+  embedding_provider: openrouter             # or: ollama, openai
   embedding_model: qwen/qwen3-embedding-8b   # for semantic clustering
-  # embedding_api_key: sk-...                # required for openrouter/openai
+  # embedding_api_key: sk-or-v1-...          # required for openrouter/openai
   # embedding_base_url: https://...          # optional, for custom endpoints
   provider: zai
   model: glm-4.7

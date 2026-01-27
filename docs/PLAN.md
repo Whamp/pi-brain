@@ -1287,7 +1287,7 @@ This would complement D3.js (used for interactive web visualization) with static
 
 ## Open Questions
 
-1. **Embedding model**: For semantic similarity, should we use local embeddings (slower, free) or API (faster, cost)?
+1. **Embedding model**: For semantic similarity, should we use local embeddings (slower, free) or API (faster, cost)? use this model Qwen/Qwen3-Embedding-8B https://huggingface.co/Qwen/Qwen3-Embedding-8B can be locally or through a third party api. default to third party api, we need to find a free one. use can override this in config.yaml with their local model via local api. personally i need to set this model up locally on my win48 machine. config on this machine for win48 experiments will be here: ~/models/qwen/Qwen3-Embedding-8B
 
 2. **Session segment size**: How much context to include when analyzing a segment? Just the segment, or also surrounding context?
 

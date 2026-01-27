@@ -41,7 +41,7 @@ function createTestConfig(tempDir: string): PiBrainConfig {
       connectionDiscoverySchedule: "0 3 * * *",
       patternAggregationSchedule: "0 3 * * *",
       clusteringSchedule: "0 4 * * *",
-      embeddingProvider: "mock" as const,
+      embeddingProvider: "openrouter" as const,
       embeddingModel: "mock",
       provider: "test",
       model: "test-model",

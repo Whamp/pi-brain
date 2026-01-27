@@ -136,6 +136,19 @@ export interface EmbeddingProvider {
 }
 
 /**
+ * Type guard to check if value is an EmbeddingProvider
+ */
+function isEmbeddingProvider(
+  value: EmbeddingConfig | EmbeddingProvider
+): value is EmbeddingProvider {
+  return (
+    typeof (value as EmbeddingProvider).embed === "function" &&
+    typeof (value as EmbeddingProvider).dimensions === "number" &&
+    typeof (value as EmbeddingProvider).modelName === "string"
+  );
+}
+
+/**
  * Create an embedding provider from config
  */
 export function createEmbeddingProvider(
@@ -169,9 +182,6 @@ export function createEmbeddingProvider(
         config.baseUrl ?? "https://openrouter.ai/api/v1",
         config.dimensions
       );
-    }
-    case "mock": {
-      return createMockProvider(config.dimensions ?? 384);
     }
     default: {
       throw new Error(`Unknown embedding provider: ${config.provider}`);
@@ -307,9 +317,10 @@ function createOpenRouterProvider(
 }
 
 /**
- * Create mock embedding provider for testing
+ * Create mock embedding provider for testing only.
+ * Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests.
  */
-function createMockProvider(dims: number): EmbeddingProvider {
+export function createMockEmbeddingProvider(dims = 384): EmbeddingProvider {
   return {
     modelName: "mock",
     dimensions: dims,
@@ -336,7 +347,6 @@ function createMockProvider(dims: number): EmbeddingProvider {
 
 /**
  * Simple string hash for mock embeddings
- * Uses absolute value for overflow handling
  */
 function hashString(str: string): number {
   let hash = 0;
@@ -653,11 +663,14 @@ export class FacetDiscovery {
 
   constructor(
     private db: Database.Database,
-    embeddingConfig: EmbeddingConfig,
+    embeddingConfigOrProvider: EmbeddingConfig | EmbeddingProvider,
     clusteringConfig?: ClusteringConfig,
     logger?: FacetDiscoveryLogger
   ) {
-    this.provider = createEmbeddingProvider(embeddingConfig);
+    // Accept either a config object or a pre-built provider (for testing)
+    this.provider = isEmbeddingProvider(embeddingConfigOrProvider)
+      ? embeddingConfigOrProvider
+      : createEmbeddingProvider(embeddingConfigOrProvider);
     this.clusteringConfig = clusteringConfig ?? {
       algorithm: "hdbscan",
       minClusterSize: DEFAULT_MIN_CLUSTER_SIZE,

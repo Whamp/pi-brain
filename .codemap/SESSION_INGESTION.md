@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 37
-- Total symbols: 186
-  - function: 111
+- Total symbols: 187
+  - function: 112
   - interface: 44
   - variable: 13
   - class: 10
@@ -339,7 +339,7 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/facet-discovery.test.ts [1-833]
+src/daemon/facet-discovery.test.ts [1-827]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -349,9 +349,9 @@ src/daemon/facet-discovery.test.ts [1-833]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1721]
+src/daemon/facet-discovery.ts [1-1734]
   class:
-    649-1692: class FacetDiscovery [exported]
+    659-1705: class FacetDiscovery [exported]
   interface:
     91-100: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -365,31 +365,34 @@ src/daemon/facet-discovery.ts [1-1721]
       /** Interface for embedding providers */
       refs out: 1 [type: 1]
         - src/daemon/facet-discovery.ts:133: type Promise -> external
-    637-641: interface FacetDiscoveryLogger [exported]
+    647-651: interface FacetDiscoveryLogger [exported]
   function:
-    141-180: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 9 [call: 4, instantiate: 3, type: 2]
-        - src/daemon/facet-discovery.ts:142: type EmbeddingConfig -> src/types/index.ts
-        - src/daemon/facet-discovery.ts:143: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:146: call createOllamaProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:153: instantiate Error -> external
-        - src/daemon/facet-discovery.ts:155: call createOpenAIProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:164: instantiate Error -> external
-        - src/daemon/facet-discovery.ts:166: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:174: call createMockProvider -> src/daemon/facet-discovery.ts
+      refs out: 8 [call: 3, instantiate: 3, type: 2]
+        - src/daemon/facet-discovery.ts:155: type EmbeddingConfig -> src/types/index.ts
+        - src/daemon/facet-discovery.ts:156: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:159: call createOllamaProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:166: instantiate Error -> external
+        - src/daemon/facet-discovery.ts:168: call createOpenAIProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:177: instantiate Error -> external
-    365-432: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+        - src/daemon/facet-discovery.ts:179: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:187: instantiate Error -> external
+    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+      /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
+      refs out: 1 [type: 1]
+        - src/daemon/facet-discovery.ts:323: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs out: 3 [call: 2, type: 1]
-        - src/daemon/facet-discovery.ts:369: type KMeansResult -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:376: call map -> external
-        - src/daemon/facet-discovery.ts:377: call map -> external
-    475-494: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+        - src/daemon/facet-discovery.ts:379: type KMeansResult -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:386: call map -> external
+        - src/daemon/facet-discovery.ts:387: call map -> external
+    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs out: 2 [call: 2]
-        - src/daemon/facet-discovery.ts:481: call fill -> external
-        - src/daemon/facet-discovery.ts:481: call from -> external
+        - src/daemon/facet-discovery.ts:491: call fill -> external
+        - src/daemon/facet-discovery.ts:491: call from -> external
   imports:
     - ../types/index.js
     - better-sqlite3
@@ -715,9 +718,9 @@ src/daemon/scheduler.test.ts [1-718]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-791]
+src/daemon/scheduler.ts [1-797]
   class:
-    130-725: class Scheduler [exported]
+    130-731: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
@@ -744,26 +747,26 @@ src/daemon/scheduler.ts [1-791]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    730-754: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    736-760: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:731: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:732: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:733: type Database -> external
-        - src/daemon/scheduler.ts:734: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:735: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:736: instantiate Scheduler -> src/daemon/scheduler.ts
-    760-769: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:737: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:738: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:739: type Database -> external
+        - src/daemon/scheduler.ts:740: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:741: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:742: instantiate Scheduler -> src/daemon/scheduler.ts
+    766-775: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:764: call Cron.stop -> external
-    774-790: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:770: call Cron.stop -> external
+    780-796: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:774: type Date -> external
-        - src/daemon/scheduler.ts:781: call push -> external
-        - src/daemon/scheduler.ts:782: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:785: call Cron.stop -> external
+        - src/daemon/scheduler.ts:780: type Date -> external
+        - src/daemon/scheduler.ts:787: call push -> external
+        - src/daemon/scheduler.ts:788: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:791: call Cron.stop -> external
   variable:
     66-70: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -1402,4 +1405,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,035 (codebase: ~912,845)
+Estimated tokens: 18,099 (codebase: ~913,295)

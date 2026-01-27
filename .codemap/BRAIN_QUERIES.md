@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 38
-- Total symbols: 276
-  - function: 160
+- Total symbols: 277
+  - function: 161
   - interface: 74
   - type: 17
   - variable: 16
@@ -482,7 +482,7 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/facet-discovery.test.ts [1-833]
+src/daemon/facet-discovery.test.ts [1-827]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -492,91 +492,103 @@ src/daemon/facet-discovery.test.ts [1-833]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1721]
+src/daemon/facet-discovery.ts [1-1734]
   class:
-    649-1692: class FacetDiscovery [exported]
+    659-1705: class FacetDiscovery [exported]
       refs in: 11 [import: 2, instantiate: 5, reexport: 1, type: 3]
-        - src/daemon/facet-discovery.test.ts:15: import (module)
-        - src/daemon/facet-discovery.test.ts:304: type discovery
-        - src/daemon/facet-discovery.test.ts:311: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:616: type discovery
-        - src/daemon/facet-discovery.test.ts:623: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:666: type discovery
-        - src/daemon/facet-discovery.test.ts:673: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:772: instantiate discoveryWithMore
+        - src/daemon/facet-discovery.test.ts:16: import (module)
+        - src/daemon/facet-discovery.test.ts:300: type discovery
+        - src/daemon/facet-discovery.test.ts:307: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:611: type discovery
+        - src/daemon/facet-discovery.test.ts:618: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:661: type discovery
+        - src/daemon/facet-discovery.test.ts:668: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:766: instantiate discoveryWithMore
         - src/daemon/index.ts:168: reexport (module)
         - src/daemon/scheduler.ts:24: import (module)
   interface:
     91-100: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:1208: type FacetDiscovery.analyzeClusters
-        - src/daemon/facet-discovery.ts:1269: type FacetDiscovery.analyzeCluster
-        - src/daemon/facet-discovery.ts:1416: type FacetDiscovery.invokeClusterAnalysisAgent
+        - src/daemon/facet-discovery.ts:1221: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1282: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:1429: type FacetDiscovery.invokeClusterAnalysisAgent
         - src/daemon/index.ts:174: reexport (module)
     105-113: interface ClusterAnalysisResult [exported]
       /** Result from analyzing a single cluster */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/facet-discovery.ts:122: type ClusterAnalysisBatchResult
-        - src/daemon/facet-discovery.ts:1231: type FacetDiscovery.results
-        - src/daemon/facet-discovery.ts:1270: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:1244: type FacetDiscovery.results
+        - src/daemon/facet-discovery.ts:1283: type FacetDiscovery.analyzeCluster
         - src/daemon/index.ts:175: reexport (module)
     118-123: interface ClusterAnalysisBatchResult [exported]
       /** Result from analyzing multiple clusters */
       refs in: 2 [reexport: 1, type: 1]
-        - src/daemon/facet-discovery.ts:1210: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1223: type FacetDiscovery.analyzeClusters
         - src/daemon/index.ts:176: reexport (module)
     132-136: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-      refs in: 7 [reexport: 1, type: 6]
-        - src/daemon/facet-discovery.ts:143: type createEmbeddingProvider
-        - src/daemon/facet-discovery.ts:188: type createOllamaProvider
-        - src/daemon/facet-discovery.ts:234: type createOpenAIProvider
-        - src/daemon/facet-discovery.ts:276: type createOpenRouterProvider
-        - src/daemon/facet-discovery.ts:312: type createMockProvider
-        - src/daemon/facet-discovery.ts:650: type FacetDiscovery.provider
-        - src/daemon/index.ts:172: reexport (module)
-    637-641: interface FacetDiscoveryLogger [exported]
+      refs in: 13 [reexport: 1, type: 12]
+        - src/daemon/facet-discovery.ts:142: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:143: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:145: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:146: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:147: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:156: type createEmbeddingProvider
+        - src/daemon/facet-discovery.ts:198: type createOllamaProvider
+        - src/daemon/facet-discovery.ts:244: type createOpenAIProvider
+        - src/daemon/facet-discovery.ts:286: type createOpenRouterProvider
+        - src/daemon/facet-discovery.ts:323: type createMockEmbeddingProvider
+    647-651: interface FacetDiscoveryLogger [exported]
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:643: type noopLogger
-        - src/daemon/facet-discovery.ts:652: type FacetDiscovery.logger
-        - src/daemon/facet-discovery.ts:658: type FacetDiscovery.constructor
+        - src/daemon/facet-discovery.ts:653: type noopLogger
+        - src/daemon/facet-discovery.ts:662: type FacetDiscovery.logger
+        - src/daemon/facet-discovery.ts:668: type FacetDiscovery.constructor
         - src/daemon/index.ts:173: reexport (module)
   function:
-    141-180: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs in: 8 [call: 6, import: 1, reexport: 1]
+      refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:14: import (module)
-        - src/daemon/facet-discovery.test.ts:78: call provider
-        - src/daemon/facet-discovery.test.ts:90: call (module)
-        - src/daemon/facet-discovery.test.ts:98: call provider
-        - src/daemon/facet-discovery.test.ts:112: call provider
-        - src/daemon/facet-discovery.test.ts:126: call provider
-        - src/daemon/facet-discovery.ts:660: call FacetDiscovery.constructor
+        - src/daemon/facet-discovery.test.ts:80: call (module)
+        - src/daemon/facet-discovery.test.ts:89: call (module)
+        - src/daemon/facet-discovery.ts:673: call FacetDiscovery.constructor
         - src/daemon/index.ts:169: reexport (module)
-    365-432: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+      /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
+      refs in: 9 [call: 8, import: 1]
+        - src/daemon/facet-discovery.test.ts:15: import (module)
+        - src/daemon/facet-discovery.test.ts:99: call provider
+        - src/daemon/facet-discovery.test.ts:106: call provider
+        - src/daemon/facet-discovery.test.ts:116: call provider
+        - src/daemon/facet-discovery.test.ts:126: call provider
+        - src/daemon/facet-discovery.test.ts:307: call (module)
+        - src/daemon/facet-discovery.test.ts:618: call (module)
+        - src/daemon/facet-discovery.test.ts:668: call (module)
+        - src/daemon/facet-discovery.test.ts:768: call discoveryWithMore
+    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs in: 8 [call: 6, import: 1, reexport: 1]
-        - src/daemon/facet-discovery.test.ts:17: import (module)
-        - src/daemon/facet-discovery.test.ts:145: call result
-        - src/daemon/facet-discovery.test.ts:155: call result
-        - src/daemon/facet-discovery.test.ts:177: call result
-        - src/daemon/facet-discovery.test.ts:197: call result
-        - src/daemon/facet-discovery.test.ts:208: call result
-        - src/daemon/facet-discovery.ts:893: call FacetDiscovery.result
+        - src/daemon/facet-discovery.test.ts:18: import (module)
+        - src/daemon/facet-discovery.test.ts:141: call result
+        - src/daemon/facet-discovery.test.ts:151: call result
+        - src/daemon/facet-discovery.test.ts:173: call result
+        - src/daemon/facet-discovery.test.ts:193: call result
+        - src/daemon/facet-discovery.test.ts:204: call result
+        - src/daemon/facet-discovery.ts:906: call FacetDiscovery.result
         - src/daemon/index.ts:170: reexport (module)
-    475-494: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs in: 10 [call: 8, import: 1, reexport: 1]
-        - src/daemon/facet-discovery.test.ts:16: import (module)
-        - src/daemon/facet-discovery.test.ts:221: call labels
-        - src/daemon/facet-discovery.test.ts:227: call labels
-        - src/daemon/facet-discovery.test.ts:247: call labels
-        - src/daemon/facet-discovery.test.ts:273: call labels
-        - src/daemon/facet-discovery.test.ts:293: call labels6
-        - src/daemon/facet-discovery.test.ts:589: call labels
-        - src/daemon/facet-discovery.test.ts:605: call labels
-        - src/daemon/facet-discovery.ts:897: call FacetDiscovery.clusterEmbeddings
+        - src/daemon/facet-discovery.test.ts:17: import (module)
+        - src/daemon/facet-discovery.test.ts:217: call labels
+        - src/daemon/facet-discovery.test.ts:223: call labels
+        - src/daemon/facet-discovery.test.ts:243: call labels
+        - src/daemon/facet-discovery.test.ts:269: call labels
+        - src/daemon/facet-discovery.test.ts:289: call labels6
+        - src/daemon/facet-discovery.test.ts:584: call labels
+        - src/daemon/facet-discovery.test.ts:600: call labels
+        - src/daemon/facet-discovery.ts:910: call FacetDiscovery.clusterEmbeddings
         - src/daemon/index.ts:171: reexport (module)
   imports:
     - ../types/index.js
@@ -1040,9 +1052,9 @@ src/daemon/scheduler.test.ts [1-718]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-791]
+src/daemon/scheduler.ts [1-797]
   class:
-    130-725: class Scheduler [exported]
+    130-731: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
       refs in: 25 [import: 1, instantiate: 21, reexport: 1, type: 2]
         - src/daemon/index.ts:144: reexport (module)
@@ -1078,7 +1090,7 @@ src/daemon/scheduler.ts [1-791]
         - src/daemon/scheduler.ts:66: type noopLogger
         - src/daemon/scheduler.ts:73: type consoleLogger
         - src/daemon/scheduler.ts:147: type Scheduler.constructor
-        - src/daemon/scheduler.ts:734: type createScheduler
+        - src/daemon/scheduler.ts:740: type createScheduler
     80-113: interface SchedulerConfig [exported]
       /** Scheduler configuration */
       refs in: 15 [import: 1, reexport: 1, type: 13]
@@ -1109,13 +1121,13 @@ src/daemon/scheduler.ts [1-791]
         - src/daemon/scheduler.ts:50: type ScheduledJobResult
         - src/daemon/scheduler.ts:119: type SchedulerStatus
   function:
-    730-754: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    736-760: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:478: call scheduler
-    760-769: isValidCronExpression(expression: string): boolean [exported]
+    766-775: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:146: reexport (module)
@@ -1128,7 +1140,7 @@ src/daemon/scheduler.ts [1-791]
         - src/daemon/scheduler.test.ts:497: call (module)
         - src/daemon/scheduler.test.ts:498: call (module)
         - src/daemon/scheduler.test.ts:499: call (module)
-    774-790: getNextRunTimes(expression: string, count = 5): {} [exported]
+    780-796: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
@@ -2668,4 +2680,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 38
-Estimated tokens: 35,219 (codebase: ~912,845)
+Estimated tokens: 35,444 (codebase: ~913,295)

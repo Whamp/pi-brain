@@ -629,7 +629,7 @@ describe("jobProcessor", () => {
           connectionDiscoverySchedule: "0 3 * * *",
           patternAggregationSchedule: "0 3 * * *",
           clusteringSchedule: "0 4 * * *",
-          embeddingProvider: "mock",
+          embeddingProvider: "openrouter",
           embeddingModel: "mock",
           provider: "zai",
           model: "glm-4.7",

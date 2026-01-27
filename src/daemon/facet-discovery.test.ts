@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { openDatabase } from "../storage/database.js";
 import {
   createEmbeddingProvider,
+  createMockEmbeddingProvider,
   FacetDiscovery,
   hdbscanClustering,
   kMeansClustering,
@@ -74,17 +75,6 @@ function insertTestNodes(
 // =============================================================================
 
 describe("createEmbeddingProvider", () => {
-  it("should create a mock provider", () => {
-    const provider = createEmbeddingProvider({
-      provider: "mock",
-      model: "mock",
-      dimensions: 128,
-    });
-
-    expect(provider.dimensions).toBe(128);
-    expect(provider.modelName).toBe("mock");
-  });
-
   it("should throw for OpenAI without API key", () => {
     expect(() =>
       createEmbeddingProvider({
@@ -94,12 +84,26 @@ describe("createEmbeddingProvider", () => {
     ).toThrow("OpenAI embedding provider requires apiKey");
   });
 
-  it("mock provider should generate deterministic embeddings", async () => {
-    const provider = createEmbeddingProvider({
-      provider: "mock",
-      model: "mock",
-      dimensions: 64,
-    });
+  it("should throw for OpenRouter without API key", () => {
+    expect(() =>
+      createEmbeddingProvider({
+        provider: "openrouter",
+        model: "qwen/qwen3-embedding-8b",
+      })
+    ).toThrow("OpenRouter embedding provider requires apiKey");
+  });
+});
+
+describe("createMockEmbeddingProvider", () => {
+  it("should create a mock provider with specified dimensions", () => {
+    const provider = createMockEmbeddingProvider(128);
+
+    expect(provider.dimensions).toBe(128);
+    expect(provider.modelName).toBe("mock");
+  });
+
+  it("should generate deterministic embeddings", async () => {
+    const provider = createMockEmbeddingProvider(64);
 
     const emb1 = await provider.embed(["hello world"]);
     const emb2 = await provider.embed(["hello world"]);
@@ -108,12 +112,8 @@ describe("createEmbeddingProvider", () => {
     expect(emb1[0]).toHaveLength(64);
   });
 
-  it("mock provider should generate normalized embeddings", async () => {
-    const provider = createEmbeddingProvider({
-      provider: "mock",
-      model: "mock",
-      dimensions: 128,
-    });
+  it("should generate normalized embeddings", async () => {
+    const provider = createMockEmbeddingProvider(128);
 
     const [embedding] = await provider.embed(["test"]);
 
@@ -122,12 +122,8 @@ describe("createEmbeddingProvider", () => {
     expect(magnitude).toBeCloseTo(1, 5);
   });
 
-  it("mock provider should generate different embeddings for different text", async () => {
-    const provider = createEmbeddingProvider({
-      provider: "mock",
-      model: "mock",
-      dimensions: 64,
-    });
+  it("should generate different embeddings for different text", async () => {
+    const provider = createMockEmbeddingProvider(64);
 
     const [emb1] = await provider.embed(["hello"]);
     const [emb2] = await provider.embed(["goodbye"]);
@@ -308,11 +304,10 @@ describe("facetDiscovery", () => {
     const testSetup = createTestDb();
     ({ db } = testSetup);
     ({ cleanup } = testSetup);
-    discovery = new FacetDiscovery(
-      db,
-      { provider: "mock", model: "mock", dimensions: 64 },
-      { algorithm: "kmeans", numClusters: 3 }
-    );
+    discovery = new FacetDiscovery(db, createMockEmbeddingProvider(64), {
+      algorithm: "kmeans",
+      numClusters: 3,
+    });
   });
 
   afterEach(() => {
@@ -620,11 +615,11 @@ describe("facetDiscovery with HDBSCAN", () => {
     const testSetup = createTestDb();
     ({ db } = testSetup);
     ({ cleanup } = testSetup);
-    discovery = new FacetDiscovery(
-      db,
-      { provider: "mock", model: "mock", dimensions: 64 },
-      { algorithm: "hdbscan", minClusterSize: 2, minSamples: 2 }
-    );
+    discovery = new FacetDiscovery(db, createMockEmbeddingProvider(64), {
+      algorithm: "hdbscan",
+      minClusterSize: 2,
+      minSamples: 2,
+    });
   });
 
   afterEach(() => {
@@ -670,11 +665,10 @@ describe("analyzeClusters", () => {
     const testSetup = createTestDb();
     ({ db } = testSetup);
     ({ cleanup } = testSetup);
-    discovery = new FacetDiscovery(
-      db,
-      { provider: "mock", model: "mock", dimensions: 64 },
-      { algorithm: "kmeans", numClusters: 2 }
-    );
+    discovery = new FacetDiscovery(db, createMockEmbeddingProvider(64), {
+      algorithm: "kmeans",
+      numClusters: 2,
+    });
   });
 
   afterEach(() => {
@@ -771,7 +765,7 @@ describe("analyzeClusters", () => {
     // Use kmeans with 3 clusters
     const discoveryWithMore = new FacetDiscovery(
       db,
-      { provider: "mock", model: "mock", dimensions: 64 },
+      createMockEmbeddingProvider(64),
       { algorithm: "kmeans", numClusters: 3 }
     );
 

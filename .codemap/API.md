@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 74
-- Total symbols: 575
-  - function: 316
+- Total symbols: 576
+  - function: 317
   - interface: 185
   - type: 37
   - variable: 26
@@ -437,9 +437,9 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/facet-discovery.ts [1-1721]
+src/daemon/facet-discovery.ts [1-1734]
   class:
-    649-1692: class FacetDiscovery [exported]
+    659-1705: class FacetDiscovery [exported]
   interface:
     91-100: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -449,13 +449,15 @@ src/daemon/facet-discovery.ts [1-1721]
       /** Result from analyzing multiple clusters */
     132-136: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-    637-641: interface FacetDiscoveryLogger [exported]
+    647-651: interface FacetDiscoveryLogger [exported]
   function:
-    141-180: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-    365-432: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+      /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
+    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
-    475-494: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
   imports:
     - ../types/index.js
@@ -610,9 +612,9 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-791]
+src/daemon/scheduler.ts [1-797]
   class:
-    130-725: class Scheduler [exported]
+    130-731: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
@@ -630,11 +632,11 @@ src/daemon/scheduler.ts [1-791]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    730-754: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    736-760: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    760-769: isValidCronExpression(expression: string): boolean [exported]
+    766-775: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    774-790: getNextRunTimes(expression: string, count = 5): {} [exported]
+    780-796: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
     66-70: SchedulerLogger [exported]
@@ -1782,4 +1784,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 74
-Estimated tokens: 21,867 (codebase: ~912,603)
+Estimated tokens: 21,925 (codebase: ~913,011)

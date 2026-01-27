@@ -35,7 +35,7 @@ const DEFAULT_QUERY_CONFIG = {
   connectionDiscoverySchedule: "0 3 * * *",
   patternAggregationSchedule: "0 3 * * *",
   clusteringSchedule: "0 4 * * *",
-  embeddingProvider: "mock" as const,
+  embeddingProvider: "openrouter" as const,
   embeddingModel: "mock",
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,

@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 74,
-    "totalSymbols": 990,
+    "totalSymbols": 991,
     "byLanguage": {
       "typescript": 74
     },
     "bySymbolKind": {
-      "function": 440,
+      "function": 441,
       "type": 37,
       "interface": 234,
       "variable": 97,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 31803,
-  "codebase_tokens": 912845,
+  "total_tokens": 31866,
+  "codebase_tokens": 913295,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -3626,10 +3626,10 @@
       "language": "typescript",
       "lines": [
         1,
-        1721
+        1734
       ],
       "detail_level": "full",
-      "token_estimate": 1718,
+      "token_estimate": 1781,
       "symbols": [
         {
           "name": "EMBEDDING_BATCH_SIZE",
@@ -3841,12 +3841,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "isEmbeddingProvider",
+          "kind": "function",
+          "signature": "isEmbeddingProvider(value: EmbeddingConfig | EmbeddingProvider): boolean",
+          "lines": [
+            141,
+            149
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Type guard to check if value is an EmbeddingProvider",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "createEmbeddingProvider",
           "kind": "function",
           "signature": "createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider",
           "lines": [
-            141,
-            180
+            154,
+            190
           ],
           "exported": true,
           "is_default": false,
@@ -3864,8 +3883,8 @@
           "kind": "function",
           "signature": "createOllamaProvider(model: string, baseUrl: string): EmbeddingProvider",
           "lines": [
-            185,
-            224
+            195,
+            234
           ],
           "exported": false,
           "is_default": false,
@@ -3883,8 +3902,8 @@
           "kind": "function",
           "signature": "createOpenAIProvider(model: string, apiKey: string, baseUrl: string, dims?: number): EmbeddingProvider",
           "lines": [
-            229,
-            265
+            239,
+            275
           ],
           "exported": false,
           "is_default": false,
@@ -3902,8 +3921,8 @@
           "kind": "function",
           "signature": "createOpenRouterProvider(model: string, apiKey: string, baseUrl: string, dims = 4096): EmbeddingProvider",
           "lines": [
-            271,
-            307
+            281,
+            317
           ],
           "exported": false,
           "is_default": false,
@@ -3917,21 +3936,21 @@
           "outgoing_refs": null
         },
         {
-          "name": "createMockProvider",
+          "name": "createMockEmbeddingProvider",
           "kind": "function",
-          "signature": "createMockProvider(dims: number): EmbeddingProvider",
+          "signature": "createMockEmbeddingProvider(dims = 384): EmbeddingProvider",
           "lines": [
-            312,
-            335
+            323,
+            346
           ],
-          "exported": false,
+          "exported": true,
           "is_default": false,
           "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Create mock embedding provider for testing",
+          "comment": "Create mock embedding provider for testing only.\nNot exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -3940,8 +3959,8 @@
           "kind": "function",
           "signature": "hashString(str: string): number",
           "lines": [
-            341,
-            348
+            351,
+            358
           ],
           "exported": false,
           "is_default": false,
@@ -3950,7 +3969,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Simple string hash for mock embeddings\nUses absolute value for overflow handling",
+          "comment": "Simple string hash for mock embeddings",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -3959,8 +3978,8 @@
           "kind": "interface",
           "signature": "KMeansResult",
           "lines": [
-            357,
-            360
+            367,
+            370
           ],
           "exported": false,
           "is_default": false,
@@ -3978,8 +3997,8 @@
           "kind": "function",
           "signature": "kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult",
           "lines": [
-            365,
-            432
+            375,
+            442
           ],
           "exported": true,
           "is_default": false,
@@ -3997,8 +4016,8 @@
           "kind": "function",
           "signature": "kMeansPlusPlusInit(embeddings: number[][], k: number): {}",
           "lines": [
-            437,
-            470
+            447,
+            480
           ],
           "exported": false,
           "is_default": false,
@@ -4016,8 +4035,8 @@
           "kind": "function",
           "signature": "hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {}",
           "lines": [
-            475,
-            494
+            485,
+            504
           ],
           "exported": true,
           "is_default": false,
@@ -4035,8 +4054,8 @@
           "kind": "function",
           "signature": "computeDistanceMatrix(embeddings: number[][]): {}",
           "lines": [
-            496,
-            511
+            506,
+            521
           ],
           "exported": false,
           "is_default": false,
@@ -4054,8 +4073,8 @@
           "kind": "function",
           "signature": "computeCoreDistances(distances: number[][], minSamples: number): {}",
           "lines": [
-            513,
-            521
+            523,
+            531
           ],
           "exported": false,
           "is_default": false,
@@ -4073,8 +4092,8 @@
           "kind": "function",
           "signature": "computeMutualReachability(distances: number[][], coreDistances: number[]): {}",
           "lines": [
-            523,
-            541
+            533,
+            551
           ],
           "exported": false,
           "is_default": false,
@@ -4092,8 +4111,8 @@
           "kind": "function",
           "signature": "extractClusters(reachability: number[][], n: number, minClusterSize: number): {}",
           "lines": [
-            543,
-            622
+            553,
+            632
           ],
           "exported": false,
           "is_default": false,
@@ -4111,8 +4130,8 @@
           "kind": "function",
           "signature": "euclideanDistance(a: number[], b: number[]): number",
           "lines": [
-            624,
-            631
+            634,
+            641
           ],
           "exported": false,
           "is_default": false,
@@ -4130,8 +4149,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryLogger",
           "lines": [
-            637,
-            641
+            647,
+            651
           ],
           "exported": true,
           "is_default": false,
@@ -4149,8 +4168,8 @@
           "kind": "variable",
           "signature": "FacetDiscoveryLogger",
           "lines": [
-            643,
-            647
+            653,
+            657
           ],
           "exported": false,
           "is_default": false,
@@ -4168,8 +4187,8 @@
           "kind": "class",
           "signature": "FacetDiscovery",
           "lines": [
-            649,
-            1692
+            659,
+            1705
           ],
           "exported": true,
           "is_default": false,
@@ -4187,8 +4206,8 @@
           "kind": "property",
           "signature": "provider: EmbeddingProvider",
           "lines": [
-            650,
-            650
+            660,
+            660
           ],
           "exported": false,
           "is_default": false,
@@ -4206,8 +4225,8 @@
           "kind": "property",
           "signature": "clusteringConfig: ClusteringConfig",
           "lines": [
-            651,
-            651
+            661,
+            661
           ],
           "exported": false,
           "is_default": false,
@@ -4225,8 +4244,8 @@
           "kind": "property",
           "signature": "logger: FacetDiscoveryLogger",
           "lines": [
-            652,
-            652
+            662,
+            662
           ],
           "exported": false,
           "is_default": false,
@@ -4242,10 +4261,10 @@
         {
           "name": "constructor",
           "kind": "constructor",
-          "signature": "constructor(private db: Database.Database, embeddingConfig: EmbeddingConfig, clusteringConfig?: ClusteringConfig, logger?: FacetDiscoveryLogger)",
+          "signature": "constructor(private db: Database.Database, embeddingConfigOrProvider: EmbeddingConfig | EmbeddingProvider, clusteringConfig?: ClusteringConfig, logger?: FacetDiscoveryLogger)",
           "lines": [
-            654,
-            666
+            664,
+            679
           ],
           "exported": false,
           "is_default": false,
@@ -4263,8 +4282,8 @@
           "kind": "method",
           "signature": "async run(options?: {\n    signalType?: ClusterSignalType;\n    model?: string;\n    maxNodes?: number;\n  }): Promise<FacetDiscoveryResult>",
           "lines": [
-            668,
-            736
+            681,
+            749
           ],
           "exported": false,
           "is_default": false,
@@ -4282,8 +4301,8 @@
           "kind": "method",
           "signature": "getNodesForClustering(maxNodes: number, _signalType?: ClusterSignalType, model?: string): {}",
           "lines": [
-            738,
-            772
+            751,
+            785
           ],
           "exported": false,
           "is_default": false,
@@ -4301,8 +4320,8 @@
           "kind": "method",
           "signature": "async embedNodes(nodes: NodeSummaryRow[], runId: string): Promise<{}>",
           "lines": [
-            774,
-            834
+            787,
+            847
           ],
           "exported": false,
           "is_default": false,
@@ -4320,8 +4339,8 @@
           "kind": "method",
           "signature": "buildEmbeddingText(node: NodeSummaryRow): string",
           "lines": [
-            836,
-            845
+            849,
+            858
           ],
           "exported": false,
           "is_default": false,
@@ -4339,8 +4358,8 @@
           "kind": "method",
           "signature": "getCachedEmbeddings(nodeIds: string[]): {}",
           "lines": [
-            847,
-            867
+            860,
+            880
           ],
           "exported": false,
           "is_default": false,
@@ -4358,8 +4377,8 @@
           "kind": "method",
           "signature": "cacheEmbedding(nodeId: string, embedding: number[], inputText: string): void",
           "lines": [
-            869,
-            882
+            882,
+            895
           ],
           "exported": false,
           "is_default": false,
@@ -4377,8 +4396,8 @@
           "kind": "method",
           "signature": "clusterEmbeddings(embeddings: { nodeId: string; embedding: number[] }[]): {}",
           "lines": [
-            884,
-            902
+            897,
+            915
           ],
           "exported": false,
           "is_default": false,
@@ -4396,8 +4415,8 @@
           "kind": "method",
           "signature": "createClusters(_nodes: NodeSummaryRow[], embeddings: { nodeId: string; embedding: number[] }[], labels: number[], runId: string, signalType?: ClusterSignalType, model?: string): {}",
           "lines": [
-            904,
-            996
+            917,
+            1009
           ],
           "exported": false,
           "is_default": false,
@@ -4415,8 +4434,8 @@
           "kind": "method",
           "signature": "computeCentroid(embeddings: number[][]): {}",
           "lines": [
-            998,
-            1017
+            1011,
+            1030
           ],
           "exported": false,
           "is_default": false,
@@ -4434,8 +4453,8 @@
           "kind": "method",
           "signature": "completeRun(runId: string, clusters: Cluster[], nodesEmbedded: number, nodesClustered: number, clustersCreated: number): FacetDiscoveryResult",
           "lines": [
-            1019,
-            1045
+            1032,
+            1058
           ],
           "exported": false,
           "is_default": false,
@@ -4453,8 +4472,8 @@
           "kind": "method",
           "signature": "failRun(runId: string, error: string): void",
           "lines": [
-            1047,
-            1059
+            1060,
+            1072
           ],
           "exported": false,
           "is_default": false,
@@ -4472,8 +4491,8 @@
           "kind": "method",
           "signature": "getClusteringRun(runId: string): any",
           "lines": [
-            1061,
-            1084
+            1074,
+            1097
           ],
           "exported": false,
           "is_default": false,
@@ -4491,8 +4510,8 @@
           "kind": "method",
           "signature": "getClusters(options?: {\n    status?: string;\n    signalType?: ClusterSignalType;\n    limit?: number;\n  }): {}",
           "lines": [
-            1086,
-            1130
+            1099,
+            1143
           ],
           "exported": false,
           "is_default": false,
@@ -4510,8 +4529,8 @@
           "kind": "method",
           "signature": "getClusterNodes(clusterId: string, options?: { representativeOnly?: boolean }): {}",
           "lines": [
-            1132,
-            1162
+            1145,
+            1175
           ],
           "exported": false,
           "is_default": false,
@@ -4529,8 +4548,8 @@
           "kind": "method",
           "signature": "updateClusterStatus(clusterId: string, status: \"confirmed\" | \"dismissed\"): void",
           "lines": [
-            1164,
-            1177
+            1177,
+            1190
           ],
           "exported": false,
           "is_default": false,
@@ -4548,8 +4567,8 @@
           "kind": "method",
           "signature": "updateClusterDetails(clusterId: string, name: string, description: string): void",
           "lines": [
-            1179,
-            1191
+            1192,
+            1204
           ],
           "exported": false,
           "is_default": false,
@@ -4567,8 +4586,8 @@
           "kind": "method",
           "signature": "async analyzeClusters(config: ClusterAnalysisConfig, options?: { limit?: number }): Promise<ClusterAnalysisBatchResult>",
           "lines": [
-            1207,
-            1262
+            1220,
+            1275
           ],
           "exported": false,
           "is_default": false,
@@ -4586,8 +4605,8 @@
           "kind": "method",
           "signature": "async analyzeCluster(cluster: Cluster, config: ClusterAnalysisConfig): Promise<ClusterAnalysisResult>",
           "lines": [
-            1267,
-            1329
+            1280,
+            1342
           ],
           "exported": false,
           "is_default": false,
@@ -4605,8 +4624,8 @@
           "kind": "method",
           "signature": "getNodeSummaries(nodeIds: string[]): {}",
           "lines": [
-            1334,
-            1355
+            1347,
+            1368
           ],
           "exported": false,
           "is_default": false,
@@ -4624,8 +4643,8 @@
           "kind": "method",
           "signature": "buildClusterAnalysisPrompt(nodes: NodeSummaryRow[], cluster: Cluster): string",
           "lines": [
-            1360,
-            1409
+            1373,
+            1422
           ],
           "exported": false,
           "is_default": false,
@@ -4643,8 +4662,8 @@
           "kind": "method",
           "signature": "async invokeClusterAnalysisAgent(prompt: string, config: ClusterAnalysisConfig): Promise<{ success: boolean; name?: string; description?: string; confidence?: \"high\" | \"medium\" | \"low\"; reasoning?: string; error?: string; }>",
           "lines": [
-            1414,
-            1513
+            1427,
+            1526
           ],
           "exported": false,
           "is_default": false,
@@ -4662,8 +4681,8 @@
           "kind": "method",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number): Promise<{ stdout: string; stderr: string; exitCode: number; timedOut: boolean; spawnError?: string; }>",
           "lines": [
-            1518,
-            1606
+            1531,
+            1619
           ],
           "exported": false,
           "is_default": false,
@@ -4681,8 +4700,8 @@
           "kind": "method",
           "signature": "parseClusterAnalysisOutput(stdout: string): { success: boolean; name?: string; description?: string; confidence?: \"high\" | \"medium\" | \"low\"; reasoning?: string; error?: string; }",
           "lines": [
-            1611,
-            1691
+            1624,
+            1704
           ],
           "exported": false,
           "is_default": false,
@@ -4700,8 +4719,8 @@
           "kind": "function",
           "signature": "generateId(): string",
           "lines": [
-            1698,
-            1700
+            1711,
+            1713
           ],
           "exported": false,
           "is_default": false,
@@ -4719,8 +4738,8 @@
           "kind": "function",
           "signature": "serializeEmbedding(embedding: number[]): Buffer",
           "lines": [
-            1702,
-            1708
+            1715,
+            1721
           ],
           "exported": false,
           "is_default": false,
@@ -4738,8 +4757,8 @@
           "kind": "function",
           "signature": "deserializeEmbedding(buffer: Buffer): {}",
           "lines": [
-            1710,
-            1716
+            1723,
+            1729
           ],
           "exported": false,
           "is_default": false,
@@ -4757,8 +4776,8 @@
           "kind": "function",
           "signature": "countNoise(labels: number[]): number",
           "lines": [
-            1718,
-            1720
+            1731,
+            1733
           ],
           "exported": false,
           "is_default": false,
@@ -7205,7 +7224,7 @@
       "language": "typescript",
       "lines": [
         1,
-        791
+        797
       ],
       "detail_level": "full",
       "token_estimate": 1056,
@@ -7406,7 +7425,7 @@
           "signature": "Scheduler",
           "lines": [
             130,
-            725
+            731
           ],
           "exported": true,
           "is_default": false,
@@ -7862,7 +7881,7 @@
           "signature": "async runClustering(): Promise<ScheduledJobResult>",
           "lines": [
             652,
-            724
+            730
           ],
           "exported": false,
           "is_default": false,
@@ -7880,8 +7899,8 @@
           "kind": "function",
           "signature": "createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler",
           "lines": [
-            730,
-            754
+            736,
+            760
           ],
           "exported": true,
           "is_default": false,
@@ -7899,8 +7918,8 @@
           "kind": "function",
           "signature": "isValidCronExpression(expression: string): boolean",
           "lines": [
-            760,
-            769
+            766,
+            775
           ],
           "exported": true,
           "is_default": false,
@@ -7918,8 +7937,8 @@
           "kind": "function",
           "signature": "getNextRunTimes(expression: string, count = 5): {}",
           "lines": [
-            774,
-            790
+            780,
+            796
           ],
           "exported": true,
           "is_default": false,
