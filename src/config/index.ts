@@ -10,6 +10,7 @@ export type {
   SpokeConfig,
   SyncMethod,
   RawConfig,
+  RsyncOptions,
 } from "./types.js";
 
 export {
@@ -24,6 +25,9 @@ export {
   ensureDirectories,
   writeDefaultConfig,
   getSessionDirs,
+  getEnabledSpokes,
+  getRsyncSpokes,
+  getScheduledRsyncSpokes,
   ConfigError,
   DEFAULT_CONFIG_DIR,
   DEFAULT_CONFIG_PATH,

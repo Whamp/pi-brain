@@ -79,7 +79,7 @@ export function getSpokeStatus(spoke: SpokeConfig): SpokeStatus {
     syncMethod: spoke.syncMethod,
     path: spoke.path,
     source: spoke.source,
-    enabled: true, // Could be extended to support enabled flag in config
+    enabled: spoke.enabled,
     exists,
     sessionCount,
     lastSync,
@@ -153,10 +153,18 @@ export function formatSyncStatus(status: SyncStatus): string {
     lines.push("Spokes:");
 
     for (const spoke of status.spokes) {
-      const statusIcon = spoke.exists ? "✓" : "✗";
+      let statusIcon: string;
+      if (spoke.enabled) {
+        statusIcon = spoke.exists ? "✓" : "✗";
+      } else {
+        statusIcon = "○";
+      }
       const syncInfo = spoke.lastSyncFormatted ?? "never synced";
+      const enabledInfo = spoke.enabled ? "" : " (disabled)";
 
-      lines.push(`  ${statusIcon} ${spoke.name} (${spoke.syncMethod})`);
+      lines.push(
+        `  ${statusIcon} ${spoke.name} (${spoke.syncMethod})${enabledInfo}`
+      );
       lines.push(`      Sessions: ${spoke.sessionCount}`);
       lines.push(`      Path: ${spoke.path}`);
 
@@ -168,7 +176,14 @@ export function formatSyncStatus(status: SyncStatus): string {
       lines.push("");
     }
 
-    lines.push(`Total spoke sessions: ${status.totalSpokeSessionCount}`);
+    const enabledSpokes = status.spokes.filter((s) => s.enabled);
+    const enabledSessionCount = enabledSpokes.reduce(
+      (sum, s) => sum + s.sessionCount,
+      0
+    );
+    lines.push(
+      `Total spoke sessions: ${enabledSessionCount} (${enabledSpokes.length} enabled spokes)`
+    );
   }
 
   if (!status.rsyncAvailable) {

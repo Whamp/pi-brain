@@ -11,6 +11,23 @@
 export type SyncMethod = "syncthing" | "rsync" | "api";
 
 /**
+ * Rsync-specific options for spoke configuration
+ */
+export interface RsyncOptions {
+  /** Bandwidth limit in KB/s (0 = unlimited) */
+  bwLimit?: number;
+
+  /** Delete files on destination that don't exist on source */
+  delete?: boolean;
+
+  /** Additional rsync arguments (e.g., ["--exclude=*.tmp"]) */
+  extraArgs?: string[];
+
+  /** Timeout in seconds for rsync operations */
+  timeoutSeconds?: number;
+}
+
+/**
  * Spoke machine configuration
  * Spokes are secondary machines that sync sessions to the hub
  */
@@ -26,6 +43,15 @@ export interface SpokeConfig {
 
   /** For rsync: source path (e.g., user@server:~/.pi/agent/sessions) */
   source?: string;
+
+  /** Whether this spoke is enabled (default: true) */
+  enabled: boolean;
+
+  /** For rsync: cron schedule for automatic sync (e.g., "0 *\/15 * * *") */
+  schedule?: string;
+
+  /** For rsync: additional rsync options */
+  rsyncOptions?: RsyncOptions;
 }
 
 /**
@@ -149,6 +175,14 @@ export interface RawConfig {
     sync_method?: string;
     path?: string;
     source?: string;
+    enabled?: boolean;
+    schedule?: string;
+    rsync_options?: {
+      bw_limit?: number;
+      delete?: boolean;
+      extra_args?: string[];
+      timeout_seconds?: number;
+    };
   }[];
   daemon?: {
     idle_timeout_minutes?: number;

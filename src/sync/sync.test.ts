@@ -188,6 +188,7 @@ describe("status", () => {
         syncMethod: "rsync",
         path: tmpDir,
         source: "user@host:~/.pi/agent/sessions",
+        enabled: true,
       };
 
       const status = getSpokeStatus(spoke);
@@ -206,6 +207,7 @@ describe("status", () => {
         name: "missing-spoke",
         syncMethod: "rsync",
         path: "/non/existent/path",
+        enabled: true,
       };
 
       const status = getSpokeStatus(spoke);
@@ -223,11 +225,31 @@ describe("status", () => {
         name: "test-spoke",
         syncMethod: "syncthing",
         path: tmpDir,
+        enabled: true,
       };
 
       const status = getSpokeStatus(spoke);
 
       expect(status.sessionCount).toBe(2);
+    });
+
+    it("should report enabled status correctly", () => {
+      const enabledSpoke: SpokeConfig = {
+        name: "enabled-spoke",
+        syncMethod: "syncthing",
+        path: tmpDir,
+        enabled: true,
+      };
+
+      const disabledSpoke: SpokeConfig = {
+        name: "disabled-spoke",
+        syncMethod: "syncthing",
+        path: tmpDir,
+        enabled: false,
+      };
+
+      expect(getSpokeStatus(enabledSpoke).enabled).toBeTruthy();
+      expect(getSpokeStatus(disabledSpoke).enabled).toBeFalsy();
     });
   });
 

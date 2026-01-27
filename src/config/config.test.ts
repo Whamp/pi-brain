@@ -21,6 +21,9 @@ import {
   ensureDirectories,
   writeDefaultConfig,
   getSessionDirs,
+  getEnabledSpokes,
+  getRsyncSpokes,
+  getScheduledRsyncSpokes,
   ConfigError,
 } from "./config.js";
 
@@ -211,6 +214,7 @@ describe("transformConfig", () => {
     expect(config.spokes).toHaveLength(1);
     expect(config.spokes[0].name).toBe("laptop");
     expect(config.spokes[0].syncMethod).toBe("syncthing");
+    expect(config.spokes[0].enabled).toBeTruthy();
   });
 
   it("transforms rsync spoke with source", () => {
@@ -227,6 +231,65 @@ describe("transformConfig", () => {
     const config = transformConfig(raw);
     expect(config.spokes[0].syncMethod).toBe("rsync");
     expect(config.spokes[0].source).toBe("user@server:~/.pi/sessions");
+    expect(config.spokes[0].enabled).toBeTruthy();
+  });
+
+  it("transforms spoke with enabled: false", () => {
+    const raw: RawConfig = {
+      spokes: [
+        {
+          name: "laptop",
+          sync_method: "syncthing",
+          path: "/synced/laptop",
+          enabled: false,
+        },
+      ],
+    };
+    const config = transformConfig(raw);
+    expect(config.spokes[0].enabled).toBeFalsy();
+  });
+
+  it("transforms rsync spoke with schedule", () => {
+    const raw: RawConfig = {
+      spokes: [
+        {
+          name: "server",
+          sync_method: "rsync",
+          path: "/synced/server",
+          source: "user@server:~/.pi/sessions",
+          schedule: "0 0 * * *",
+        },
+      ],
+    };
+    const config = transformConfig(raw);
+    expect(config.spokes[0].schedule).toBe("0 0 * * *");
+  });
+
+  it("transforms rsync spoke with rsync_options", () => {
+    const raw: RawConfig = {
+      spokes: [
+        {
+          name: "server",
+          sync_method: "rsync",
+          path: "/synced/server",
+          source: "user@server:~/.pi/sessions",
+          rsync_options: {
+            bw_limit: 1000,
+            delete: true,
+            extra_args: ["--exclude=*.tmp"],
+            timeout_seconds: 600,
+          },
+        },
+      ],
+    };
+    const config = transformConfig(raw);
+    expect(config.spokes[0].rsyncOptions).toBeDefined();
+    expect(config.spokes[0].rsyncOptions?.bwLimit).toBe(1000);
+    expect(config.spokes[0].rsyncOptions?.delete).toBeTruthy();
+    expect(config.spokes[0].rsyncOptions?.extraArgs).toStrictEqual([
+      "--exclude=*.tmp",
+    ]);
+    expect(config.spokes[0].rsyncOptions?.timeoutSeconds).toBe(600);
   });
 
   it("expands spoke path with tilde", () => {
@@ -379,6 +442,87 @@ describe("transformConfig", () => {
         spokes: [{ name: "test", sync_method: "rsync", path: "/test" }],
       };
       expect(() => transformConfig(raw)).toThrow("requires source field");
+    });
+
+    it("rejects schedule on non-rsync spoke", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "syncthing",
+            path: "/test",
+            schedule: "0 0 * * *",
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow(
+        "has schedule but sync_method is not rsync"
+      );
+    });
+
+    it("rejects rsync_options on non-rsync spoke", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "syncthing",
+            path: "/test",
+            rsync_options: { bw_limit: 100 },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow(
+        "has rsync_options but sync_method is not rsync"
+      );
+    });
+
+    it("rejects invalid spoke schedule", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            schedule: "invalid",
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow("Invalid cron schedule");
+    });
+
+    it("rejects negative bw_limit", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            rsync_options: { bw_limit: -1 },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow(
+        "invalid rsync_options.bw_limit"
+      );
+    });
+
+    it("rejects zero timeout_seconds", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            rsync_options: { timeout_seconds: 0 },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow(
+        "invalid rsync_options.timeout_seconds"
+      );
     });
 
     it("rejects duplicate spoke names", () => {
@@ -673,8 +817,18 @@ describe("getSessionDirs", () => {
   it("includes spoke directories", () => {
     const config = getDefaultConfig();
     config.spokes = [
-      { name: "laptop", syncMethod: "syncthing", path: "/synced/laptop" },
-      { name: "server", syncMethod: "rsync", path: "/synced/server" },
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+      },
     ];
     const dirs = getSessionDirs(config);
     expect(dirs).toHaveLength(3);
@@ -683,7 +837,12 @@ describe("getSessionDirs", () => {
   it("includes hub directory first", () => {
     const config = getDefaultConfig();
     config.spokes = [
-      { name: "laptop", syncMethod: "syncthing", path: "/synced/laptop" },
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
     ];
     const dirs = getSessionDirs(config);
     expect(dirs[0]).toBe(config.hub.sessionsDir);
@@ -692,11 +851,156 @@ describe("getSessionDirs", () => {
   it("includes all spoke paths", () => {
     const config = getDefaultConfig();
     config.spokes = [
-      { name: "laptop", syncMethod: "syncthing", path: "/synced/laptop" },
-      { name: "server", syncMethod: "rsync", path: "/synced/server" },
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+      },
     ];
     const dirs = getSessionDirs(config);
     expect(dirs).toContain("/synced/laptop");
     expect(dirs).toContain("/synced/server");
+  });
+
+  it("excludes disabled spokes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: false,
+      },
+    ];
+    const dirs = getSessionDirs(config);
+    expect(dirs).toHaveLength(2);
+    expect(dirs).toContain("/synced/laptop");
+    expect(dirs).not.toContain("/synced/server");
+  });
+});
+
+describe("getEnabledSpokes", () => {
+  it("returns empty array when no spokes", () => {
+    const config = getDefaultConfig();
+    expect(getEnabledSpokes(config)).toStrictEqual([]);
+  });
+
+  it("returns only enabled spokes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: false,
+      },
+      {
+        name: "desktop",
+        syncMethod: "syncthing",
+        path: "/synced/desktop",
+        enabled: true,
+      },
+    ];
+    const enabled = getEnabledSpokes(config);
+    expect(enabled).toHaveLength(2);
+    expect(enabled.map((s) => s.name)).toStrictEqual(["laptop", "desktop"]);
+  });
+});
+
+describe("getRsyncSpokes", () => {
+  it("returns only enabled rsync spokes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+        source: "u@h:/p",
+      },
+      {
+        name: "other",
+        syncMethod: "rsync",
+        path: "/synced/other",
+        enabled: false,
+        source: "u@h:/o",
+      },
+    ];
+    const rsync = getRsyncSpokes(config);
+    expect(rsync).toHaveLength(1);
+    expect(rsync[0].name).toBe("server");
+  });
+});
+
+describe("getScheduledRsyncSpokes", () => {
+  it("returns only rsync spokes with schedule", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+        source: "u@h:/p",
+        schedule: "0 0 * * *",
+      },
+      {
+        name: "other",
+        syncMethod: "rsync",
+        path: "/synced/other",
+        enabled: true,
+        source: "u@h:/o",
+      },
+    ];
+    const scheduled = getScheduledRsyncSpokes(config);
+    expect(scheduled).toHaveLength(1);
+    expect(scheduled[0].name).toBe("server");
+  });
+
+  it("excludes disabled scheduled spokes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: false,
+        source: "u@h:/p",
+        schedule: "0 0 * * *",
+      },
+    ];
+    const scheduled = getScheduledRsyncSpokes(config);
+    expect(scheduled).toHaveLength(0);
   });
 });

@@ -16,6 +16,7 @@ import type {
   SpokeConfig,
   RawConfig,
   SyncMethod,
+  RsyncOptions,
 } from "./types.js";
 
 /**
@@ -159,11 +160,73 @@ function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
     );
   }
 
+  // Validate schedule if provided (only valid for rsync)
+  if (spoke.schedule) {
+    if (syncMethod !== "rsync") {
+      throw new Error(
+        `Spoke "${spoke.name}" has schedule but sync_method is not rsync`
+      );
+    }
+    validateCronSchedule(spoke.schedule, `spokes[${index}].schedule`);
+  }
+
+  // Transform rsync_options if provided
+  let rsyncOptions: RsyncOptions | undefined;
+  if (spoke.rsync_options) {
+    if (syncMethod !== "rsync") {
+      throw new Error(
+        `Spoke "${spoke.name}" has rsync_options but sync_method is not rsync`
+      );
+    }
+
+    rsyncOptions = {};
+
+    if (spoke.rsync_options.bw_limit !== undefined) {
+      if (
+        !Number.isInteger(spoke.rsync_options.bw_limit) ||
+        spoke.rsync_options.bw_limit < 0
+      ) {
+        throw new Error(
+          `Spoke "${spoke.name}" has invalid rsync_options.bw_limit: must be a non-negative integer`
+        );
+      }
+      rsyncOptions.bwLimit = spoke.rsync_options.bw_limit;
+    }
+
+    if (spoke.rsync_options.delete !== undefined) {
+      rsyncOptions.delete = spoke.rsync_options.delete;
+    }
+
+    if (spoke.rsync_options.extra_args !== undefined) {
+      if (!Array.isArray(spoke.rsync_options.extra_args)) {
+        throw new TypeError(
+          `Spoke "${spoke.name}" has invalid rsync_options.extra_args: must be an array`
+        );
+      }
+      rsyncOptions.extraArgs = spoke.rsync_options.extra_args;
+    }
+
+    if (spoke.rsync_options.timeout_seconds !== undefined) {
+      if (
+        !Number.isInteger(spoke.rsync_options.timeout_seconds) ||
+        spoke.rsync_options.timeout_seconds < 1
+      ) {
+        throw new Error(
+          `Spoke "${spoke.name}" has invalid rsync_options.timeout_seconds: must be a positive integer`
+        );
+      }
+      rsyncOptions.timeoutSeconds = spoke.rsync_options.timeout_seconds;
+    }
+  }
+
   return {
     name: spoke.name,
     syncMethod,
     path: expandPath(spoke.path),
     source: spoke.source,
+    enabled: spoke.enabled ?? true,
+    schedule: spoke.schedule,
+    rsyncOptions,
   };
 }
 
@@ -462,11 +525,19 @@ hub:
 spokes: []
   # - name: laptop
   #   sync_method: syncthing  # syncthing, rsync, or api
-  #   path: /synced/laptop-sessions
+  #   path: ~/.pi-brain/synced/laptop
+  #   enabled: true  # optional, defaults to true
+  #
   # - name: server
   #   sync_method: rsync
   #   source: user@server:~/.pi/agent/sessions
-  #   path: /synced/server-sessions
+  #   path: ~/.pi-brain/synced/server
+  #   enabled: true
+  #   schedule: "*/15 * * * *"  # optional: sync every 15 minutes
+  #   rsync_options:            # optional rsync settings
+  #     bw_limit: 1000          # KB/s bandwidth limit
+  #     delete: false           # delete files not on source
+  #     timeout_seconds: 300    # timeout for rsync operations
 
 # Daemon behavior
 daemon:
@@ -490,12 +561,42 @@ query:
 }
 
 /**
- * Get all session directories to watch (hub + spokes)
+ * Get all session directories to watch (hub + enabled spokes)
  */
 export function getSessionDirs(config: PiBrainConfig): string[] {
   const dirs = [config.hub.sessionsDir];
   for (const spoke of config.spokes) {
-    dirs.push(spoke.path);
+    if (spoke.enabled) {
+      dirs.push(spoke.path);
+    }
   }
   return dirs;
+}
+
+/**
+ * Get enabled spokes from configuration
+ */
+export function getEnabledSpokes(config: PiBrainConfig): SpokeConfig[] {
+  return config.spokes.filter((spoke) => spoke.enabled);
+}
+
+/**
+ * Get rsync spokes (enabled spokes with rsync sync method)
+ */
+export function getRsyncSpokes(config: PiBrainConfig): SpokeConfig[] {
+  return config.spokes.filter(
+    (spoke) => spoke.enabled && spoke.syncMethod === "rsync"
+  );
+}
+
+/**
+ * Get scheduled rsync spokes (rsync spokes with a schedule)
+ */
+export function getScheduledRsyncSpokes(config: PiBrainConfig): SpokeConfig[] {
+  return config.spokes.filter(
+    (spoke) =>
+      spoke.enabled &&
+      spoke.syncMethod === "rsync" &&
+      spoke.schedule !== undefined
+  );
 }

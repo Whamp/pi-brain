@@ -126,13 +126,26 @@ export async function runRsync(
   options: RsyncOptions = {}
 ): Promise<RsyncResult> {
   const startTime = Date.now();
+
+  // Merge spoke's rsyncOptions with passed options (passed options take precedence)
+  const spokeOpts = spoke.rsyncOptions ?? {};
+  const mergedOptions: RsyncOptions = {
+    bwLimit: options.bwLimit ?? spokeOpts.bwLimit ?? 0,
+    dryRun: options.dryRun ?? false,
+    delete: options.delete ?? spokeOpts.delete ?? false,
+    extraArgs: options.extraArgs ?? spokeOpts.extraArgs ?? [],
+    timeoutMs:
+      options.timeoutMs ??
+      (spokeOpts.timeoutSeconds ? spokeOpts.timeoutSeconds * 1000 : 300_000),
+  };
+
   const {
-    bwLimit = 0,
-    dryRun = false,
-    delete: doDelete = false,
-    extraArgs = [],
-    timeoutMs = 300_000,
-  } = options;
+    bwLimit,
+    dryRun,
+    delete: doDelete,
+    extraArgs,
+    timeoutMs,
+  } = mergedOptions;
 
   // Validate spoke has rsync method and source
   if (spoke.syncMethod !== "rsync") {
