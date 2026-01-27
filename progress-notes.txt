@@ -858,3 +858,32 @@
 - Supports LLM synthesis via pi agent or fallback template generation
 - Follows spec from signals.md Section 4 (Model-Specific AGENTS.md)
 - Integrates with InsightAggregator from Task 10.1 and clusters from Task 11.5/11.6
+
+---
+
+## 2026-01-27 06:27 - Task 11.9
+
+**Status**: pending → done
+**Validation**:
+- Added clusteringSchedule field to DaemonConfig and RawConfig types
+- Updated config.ts to handle the new schedule (default: "0 4 * * *")
+- Extended ScheduledJobType to include "clustering"
+- Added clusteringJob cron to Scheduler class with start/stop/status support
+- Added triggerClustering() method for manual triggering
+- Implemented runClustering() that runs FacetDiscovery.run() and analyzeClusters()
+- Updated createScheduler() to pass clusteringSchedule and provider/model config
+- Added 7 new tests covering:
+  - Clustering job appears in status when configured
+  - Clustering job excluded when not configured
+  - Logs schedule info on start
+  - Handles invalid cron gracefully
+  - triggerClustering returns proper result
+  - Updates lastResult in status
+  - Provider/model config passed for LLM analysis
+- All 1145 tests pass (7 new)
+- npm run check passes
+**Commit**: f95272c
+**Notes**:
+- Clustering uses mock embedding provider in scheduler (production would use configured provider)
+- Integrates with FacetDiscovery from Task 11.5 and LLM cluster analysis from Task 11.6
+- Follows spec from specs/signals.md Section 3 (Facet Discovery) and specs/daemon.md
