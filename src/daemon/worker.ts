@@ -188,15 +188,23 @@ export class Worker {
         this.logger.warn(
           `Missing skills: ${envStatus.missingSkills.join(", ")}. Worker will idle until skills are installed.`
         );
-      } else {
+      } else if (envStatus.missingPromptFile) {
         this.logger.warn(
-          "Environment validation failed (prompt file missing?). Worker will idle."
+          `Prompt file not found: ${envStatus.missingPromptFile}. Worker will idle until file exists.`
         );
+      } else {
+        this.logger.warn("Environment validation failed. Worker will idle.");
       }
       // Worker stays running but doesn't process jobs - allows API to still work
-      // Re-check environment periodically
+      // Re-check environment periodically with interruptible sleep
       while (this.running) {
-        await this.sleep(30_000); // Check every 30 seconds
+        // Use shorter sleep intervals (1s) for faster shutdown, check 30 times for ~30s total
+        for (let i = 0; i < 30 && this.running; i++) {
+          await this.sleep(1000);
+        }
+        if (!this.running) {
+          break;
+        }
         const recheck = await this.processor.validateEnvironment();
         if (recheck.valid) {
           this.logger.info("Environment now valid. Resuming job processing.");

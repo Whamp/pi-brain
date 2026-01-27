@@ -526,9 +526,9 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-770]
+src/daemon/processor.ts [1-773]
   class:
-    709-762: class JobProcessor [exported]
+    711-765: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
@@ -539,30 +539,30 @@ src/daemon/processor.ts [1-770]
       /** Skill availability information */
     135-140: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    202-207: interface EnvironmentValidationResult [exported]
+    202-209: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    699-704: interface ProcessorConfig [exported]
+    701-706: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
     170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
     183-199: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    213-225: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    231-237: async buildSkillsArg(): Promise<string> [exported]
+    233-239: async buildSkillsArg(): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
-    246-278: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    311-427: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    533-602: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    608-641: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    646-692: isValidNodeOutput(obj: unknown): boolean [exported]
+    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    767-769: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
     143-148: ProcessorLogger [exported]
@@ -738,9 +738,9 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-586]
+src/daemon/worker.ts [1-594]
   class:
-    116-525: class Worker [exported]
+    116-533: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     58-73: interface WorkerConfig [exported]
@@ -750,11 +750,11 @@ src/daemon/worker.ts [1-586]
     94-107: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    534-536: createWorker(config: WorkerConfig): Worker [exported]
+    542-544: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    542-556: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    550-564: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    561-585: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    569-593: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -1902,4 +1902,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 81
-Estimated tokens: 23,588 (codebase: ~962,521)
+Estimated tokens: 23,588 (codebase: ~962,590)

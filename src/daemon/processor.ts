@@ -204,6 +204,8 @@ export interface EnvironmentValidationResult {
   valid: boolean;
   /** Missing skill names */
   missingSkills: string[];
+  /** Path to missing prompt file, if validation failed due to missing prompt */
+  missingPromptFile?: string;
 }
 
 /**
@@ -754,6 +756,7 @@ export class JobProcessor {
       return {
         valid: false,
         missingSkills: [],
+        missingPromptFile: this.config.promptFile,
       };
     }
 
