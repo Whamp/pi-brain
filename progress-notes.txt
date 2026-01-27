@@ -390,3 +390,31 @@
 - For synced spoke sessions: uses the spoke name from config (e.g., "laptop", "server")
 - This enables filtering and grouping nodes by source computer in the UI
 - Phase 9 (Multi-Computer Sync) is now complete
+
+---
+
+## 2026-01-26 18:25 - Task 10.1
+
+**Status**: pending → done
+**Validation**:
+- Created InsightAggregator class that aggregates:
+  - Model quirks from model_quirks table
+  - Tool errors from tool_errors table
+  - Lessons at model/tool/user levels from lessons table
+  - Prompting wins/failures from node JSON files
+- Added migration 007_aggregated_insights.sql with new table schema
+- Added AggregatedInsight and related types to src/types/index.ts
+- Added pattern-repository functions for querying insights:
+  - listInsights with filtering by type, model, tool, frequency, confidence
+  - getInsight, getInsightsByModel, countInsights, updateInsightPrompt
+- Integrated InsightAggregator into scheduler's pattern aggregation job
+- Added 7 tests for InsightAggregator covering all aggregation sources
+- Added 11 tests for pattern-repository insight functions
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 880 passed, 4 skipped)
+**Commit**: eb0ad98
+**Notes**:
+- InsightAggregator runs as part of the nightly pattern aggregation job
+- Insights are stored with frequency, confidence, severity, and examples
+- Ready for Task 10.2 (Generate model-specific prompt additions)
+- The aggregated_insights table includes prompt_text and prompt_included fields for Phase 10.2+
