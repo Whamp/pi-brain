@@ -95,6 +95,9 @@ export interface DaemonConfig {
   /** Cron schedule for pattern aggregation (optional) */
   patternAggregationSchedule: string;
 
+  /** Cron schedule for facet discovery/clustering (optional) */
+  clusteringSchedule: string;
+
   /** Model provider for analysis (e.g., "zai", "anthropic") */
   provider: string;
 
@@ -192,6 +195,7 @@ export interface RawConfig {
     reanalysis_schedule?: string;
     connection_discovery_schedule?: string;
     pattern_aggregation_schedule?: string;
+    clustering_schedule?: string;
     provider?: string;
     model?: string;
     prompt_file?: string;

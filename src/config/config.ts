@@ -65,6 +65,7 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     reanalysisSchedule: "0 2 * * *",
     connectionDiscoverySchedule: "0 3 * * *",
     patternAggregationSchedule: "0 3 * * *",
+    clusteringSchedule: "0 4 * * *",
     provider: "zai",
     model: "glm-4.7",
     promptFile: path.join(
@@ -356,6 +357,8 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     patternAggregationSchedule:
       raw.daemon?.pattern_aggregation_schedule ??
       defaults.daemon.patternAggregationSchedule,
+    clusteringSchedule:
+      raw.daemon?.clustering_schedule ?? defaults.daemon.clusteringSchedule,
     provider: raw.daemon?.provider ?? defaults.daemon.provider,
     model: raw.daemon?.model ?? defaults.daemon.model,
     promptFile: raw.daemon?.prompt_file
@@ -387,6 +390,12 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     validateCronSchedule(
       daemon.patternAggregationSchedule,
       "daemon.pattern_aggregation_schedule"
+    );
+  }
+  if (daemon.clusteringSchedule) {
+    validateCronSchedule(
+      daemon.clusteringSchedule,
+      "daemon.clustering_schedule"
     );
   }
   validatePositiveInt(
@@ -574,6 +583,7 @@ daemon:
   reanalysis_schedule: "0 2 * * *"  # 2am nightly
   connection_discovery_schedule: "0 3 * * *"  # 3am nightly
   pattern_aggregation_schedule: "0 3 * * *"   # 3am nightly
+  clustering_schedule: "0 4 * * *"            # 4am nightly
   provider: zai
   model: glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md

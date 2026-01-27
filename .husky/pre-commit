@@ -19,3 +19,6 @@ fi
 
 # Run tests (with --run to avoid watch mode)
 npm test -- --run
+
+# Refresh codemap documentation
+./scripts/refresh-codemap.sh

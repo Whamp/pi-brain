@@ -39,8 +39,30 @@ The pre-commit hook runs:
 1. `npm run fix` - Auto-fix lint issues
 2. `npx oxfmt --write .` - Auto-fix formatting
 3. `npm test -- --run` - Run tests
+4. `./scripts/refresh-codemap.sh` - Refresh agent navigation maps
 
 If any step fails, the commit is blocked.
+
+---
+
+## Codebase Navigation
+
+This project uses **codemap** to provide structured navigation aids for agents. These are stored in the `.codemap/` directory and auto-refreshed on every commit.
+
+| Guide                                                          | Description                                  |
+| -------------------------------------------------------------- | -------------------------------------------- |
+| [.codemap/README.md](.codemap/README.md)                       | **Start here** - Overview of navigation maps |
+| [.codemap/API.md](.codemap/API.md)                             | Public API surface (exported symbols)        |
+| [.codemap/STORAGE.md](.codemap/STORAGE.md)                     | Data model and storage layer                 |
+| [.codemap/SESSION_INGESTION.md](.codemap/SESSION_INGESTION.md) | Ingestion pipeline flow                      |
+| [.codemap/BRAIN_QUERIES.md](.codemap/BRAIN_QUERIES.md)         | Knowledge graph query patterns               |
+| [.codemap/index.json](.codemap/index.json)                     | Complete machine-readable symbol index       |
+
+**Usage for Agents:**
+
+- Always check `.codemap/API.md` before implementing new features.
+- Use `codemap callers <symbol>` to understand how a function is used.
+- Use `codemap call-graph <symbol>` to trace complex data flows.
 
 ---
 

@@ -1,0 +1,258 @@
+src/daemon/index.ts
+  - src/daemon/cli.ts
+    - src/config/config.ts
+      - src/config/types.ts
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [external] yaml
+    - src/config/types.ts
+    - src/daemon/processor.ts
+      - src/config/types.ts
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+    - src/storage/database.ts
+      - [external] better-sqlite3
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [builtin] url
+    - src/storage/node-repository.ts
+      - src/daemon/processor.ts
+        - src/config/types.ts
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - [builtin] child_process
+        - [builtin] fs/promises
+        - [builtin] os
+        - [builtin] path
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/storage/node-types.ts
+        - src/types/index.ts
+      - [external] better-sqlite3
+    - src/storage/node-storage.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+    - [builtin] child_process
+    - [builtin] fs
+    - [builtin] path
+  - src/daemon/connection-discovery.ts
+    - src/storage/node-repository.ts
+      - src/daemon/processor.ts
+        - src/config/types.ts
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - [builtin] child_process
+        - [builtin] fs/promises
+        - [builtin] os
+        - [builtin] path
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/storage/node-types.ts
+        - src/types/index.ts
+      - [external] better-sqlite3
+    - src/types/index.ts
+    - [external] better-sqlite3
+  - src/daemon/errors.ts
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+  - src/daemon/facet-discovery.ts
+    - src/types/index.ts
+    - [external] better-sqlite3
+    - [builtin] child_process
+    - [builtin] crypto
+    - [builtin] fs/promises
+    - [builtin] os
+    - [builtin] path
+    - [builtin] url
+  - src/daemon/pattern-aggregation.ts
+    - [external] better-sqlite3
+    - [builtin] crypto
+  - src/daemon/processor.ts
+    - src/config/types.ts
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+    - [builtin] child_process
+    - [builtin] fs/promises
+    - [builtin] os
+    - [builtin] path
+  - src/daemon/queue.ts
+    - [external] better-sqlite3
+  - src/daemon/scheduler.ts
+    - src/config/types.ts
+    - src/daemon/facet-discovery.ts
+      - src/types/index.ts
+      - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] crypto
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+      - [builtin] url
+    - src/daemon/insight-aggregation.ts
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/types/index.ts
+      - [external] better-sqlite3
+      - [builtin] crypto
+    - src/daemon/pattern-aggregation.ts
+      - [external] better-sqlite3
+      - [builtin] crypto
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+    - src/prompt/effectiveness.ts
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/storage/pattern-repository.ts
+        - src/types/index.ts
+        - [external] better-sqlite3
+      - src/types/index.ts
+      - [external] better-sqlite3
+      - [builtin] crypto
+    - src/prompt/prompt.ts
+      - src/prompt/types.ts
+      - [external] better-sqlite3
+      - [builtin] crypto
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [builtin] url
+    - [external] better-sqlite3
+    - [external] croner
+  - src/daemon/watcher-events.ts
+  - src/daemon/watcher.ts
+    - src/config/config.ts
+      - src/config/types.ts
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [external] yaml
+    - src/config/types.ts
+    - src/daemon/watcher-events.ts
+    - [external] chokidar
+    - [builtin] fs
+    - [builtin] fs/promises
+    - [builtin] path
+  - src/daemon/worker.ts
+    - src/config/config.ts
+      - src/config/types.ts
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [external] yaml
+    - src/config/types.ts
+    - src/daemon/connection-discovery.ts
+      - src/storage/node-repository.ts
+        - src/daemon/processor.ts
+          - src/config/types.ts
+          - src/daemon/queue.ts
+            - [external] better-sqlite3
+          - [builtin] child_process
+          - [builtin] fs/promises
+          - [builtin] os
+          - [builtin] path
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [external] better-sqlite3
+      - src/types/index.ts
+      - [external] better-sqlite3
+    - src/daemon/errors.ts
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+    - src/daemon/processor.ts
+      - src/config/types.ts
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+    - src/parser/index.ts
+      - src/parser/analyzer.ts
+        - src/parser/session.ts
+          - src/types.ts
+          - [builtin] fs/promises
+        - src/types.ts
+        - [builtin] fs/promises
+        - [builtin] os
+        - [builtin] path
+      - src/parser/boundary.ts
+        - src/types.ts
+      - src/parser/session.ts
+        - src/types.ts
+        - [builtin] fs/promises
+      - src/parser/signals.ts
+        - src/types.ts
+        - src/types/index.ts
+    - src/prompt/prompt.ts
+      - src/prompt/types.ts
+      - [external] better-sqlite3
+      - [builtin] crypto
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+      - [builtin] url
+    - src/storage/node-repository.ts
+      - src/daemon/processor.ts
+        - src/config/types.ts
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - [builtin] child_process
+        - [builtin] fs/promises
+        - [builtin] os
+        - [builtin] path
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/storage/node-types.ts
+        - src/types/index.ts
+      - [external] better-sqlite3
+    - src/storage/node-types.ts
+      - src/types/index.ts
+    - [external] better-sqlite3
+    - [builtin] path

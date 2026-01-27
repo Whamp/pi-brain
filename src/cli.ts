@@ -936,7 +936,7 @@ agentsCmd
     "Output directory (default: ~/.pi/agent/contexts)"
   )
   .option("--provider <provider>", "LLM provider for synthesis", "zai")
-  .option("--model <model>", "LLM model for synthesis", "glm-4.7")
+  .option("--synthesis-model <model>", "LLM model for synthesis", "glm-4.7")
   .option("--no-llm", "Skip LLM synthesis, use fallback template")
   .option("--min-confidence <n>", "Minimum confidence (0.0-1.0)", "0.5")
   .option("--min-frequency <n>", "Minimum frequency", "2")
@@ -951,20 +951,18 @@ agentsCmd
 
       const generatorConfig = {
         provider: options.llm === false ? undefined : options.provider,
-        model: options.llm === false ? undefined : options.model,
+        model: options.llm === false ? undefined : options.synthesisModel,
         minConfidence: Number.parseFloat(options.minConfidence),
         minFrequency: Number.parseInt(options.minFrequency, 10),
         outputDir: options.outputDir,
       };
 
-      // Use preview if --no-llm, otherwise full generation
-      const result =
-        options.llm === false
-          ? await previewAgentsForModel(db, targetModel, {
-              ...generatorConfig,
-              // Force fallback by not providing LLM config
-            })
-          : await generateAgentsForModel(db, targetModel, generatorConfig);
+      // Always use generateAgentsForModel - it handles fallback when LLM config is undefined
+      const result = await generateAgentsForModel(
+        db,
+        targetModel,
+        generatorConfig
+      );
 
       db.close();
 

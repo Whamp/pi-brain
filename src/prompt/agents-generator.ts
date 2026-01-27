@@ -101,6 +101,10 @@ interface ClusterRow {
   signal_type: string | null;
   related_model: string | null;
   status: string;
+  algorithm: string;
+  min_cluster_size: number | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // =============================================================================
@@ -192,7 +196,8 @@ function getFrictionClustersForModel(
   model: string
 ): Cluster[] {
   const stmt = db.prepare(`
-    SELECT id, name, description, node_count, signal_type, related_model, status
+    SELECT id, name, description, node_count, signal_type, related_model, status,
+           algorithm, min_cluster_size, created_at, updated_at
     FROM clusters
     WHERE (related_model = ? OR related_model IS NULL)
       AND signal_type = 'friction'
@@ -210,13 +215,13 @@ function getFrictionClustersForModel(
     description: row.description,
     nodeCount: row.node_count,
     signalType: row.signal_type as "friction" | "delight" | null,
-    relatedModel: row.related_model,
+    relatedModel: row.related_model ?? undefined,
     status: row.status as "pending" | "confirmed" | "dismissed",
-    algorithm: "unknown",
-    minClusterSize: null,
+    algorithm: row.algorithm,
+    minClusterSize: row.min_cluster_size ?? undefined,
     centroid: null,
-    createdAt: "",
-    updatedAt: "",
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   }));
 }
 

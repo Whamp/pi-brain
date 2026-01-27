@@ -4,6 +4,8 @@
  * Uses cron expressions from config to schedule:
  * - Reanalysis: Re-process nodes with older prompt versions
  * - Connection discovery: Find semantic connections between nodes
+ * - Pattern aggregation: Aggregate failure patterns and model stats
+ * - Clustering: Run facet discovery to find patterns across nodes
  */
 
 import type Database from "better-sqlite3";
@@ -19,6 +21,7 @@ import {
   measureAndStoreEffectiveness,
 } from "../prompt/effectiveness.js";
 import { getLatestVersion } from "../prompt/prompt.js";
+import { FacetDiscovery } from "./facet-discovery.js";
 import { InsightAggregator } from "./insight-aggregation.js";
 import { PatternAggregator } from "./pattern-aggregation.js";
 
@@ -39,7 +42,8 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 export type ScheduledJobType =
   | "reanalysis"
   | "connection_discovery"
-  | "pattern_aggregation";
+  | "pattern_aggregation"
+  | "clustering";
 
 /** Result of a scheduled job execution */
 export interface ScheduledJobResult {
@@ -82,6 +86,15 @@ export interface SchedulerConfig {
 
   /** Cron schedule for pattern aggregation (optional) */
   patternAggregationSchedule?: string;
+
+  /** Cron schedule for facet discovery/clustering (optional) */
+  clusteringSchedule?: string;
+
+  /** Model provider for LLM cluster analysis */
+  provider?: string;
+
+  /** Model name for LLM cluster analysis */
+  model?: string;
 }
 
 /** Scheduler state */
@@ -103,10 +116,12 @@ export class Scheduler {
   private reanalysisJob: Cron | null = null;
   private connectionDiscoveryJob: Cron | null = null;
   private patternAggregationJob: Cron | null = null;
+  private clusteringJob: Cron | null = null;
   private running = false;
   private lastReanalysisResult: ScheduledJobResult | null = null;
   private lastConnectionDiscoveryResult: ScheduledJobResult | null = null;
   private lastPatternAggregationResult: ScheduledJobResult | null = null;
+  private lastClusteringResult: ScheduledJobResult | null = null;
   private patternAggregator: PatternAggregator;
   private insightAggregator: InsightAggregator;
 
@@ -203,6 +218,30 @@ export class Scheduler {
       }
     }
 
+    // Start clustering job if schedule is configured
+    if (this.config.clusteringSchedule) {
+      try {
+        this.clusteringJob = new Cron(
+          this.config.clusteringSchedule,
+          { name: "clustering" },
+          async () => {
+            try {
+              await this.runClustering();
+            } catch (error) {
+              this.logger.error(`Clustering cron error: ${error}`);
+            }
+          }
+        );
+        this.logger.info(
+          `Clustering scheduled: ${this.config.clusteringSchedule} (next: ${this.clusteringJob.nextRun()?.toISOString() ?? "unknown"})`
+        );
+      } catch (error) {
+        this.logger.error(
+          `Invalid clustering schedule "${this.config.clusteringSchedule}": ${error}`
+        );
+      }
+    }
+
     this.logger.info("Scheduler started");
   }
 
@@ -228,6 +267,11 @@ export class Scheduler {
     if (this.patternAggregationJob) {
       this.patternAggregationJob.stop();
       this.patternAggregationJob = null;
+    }
+
+    if (this.clusteringJob) {
+      this.clusteringJob.stop();
+      this.clusteringJob = null;
     }
 
     this.running = false;
@@ -277,6 +321,16 @@ export class Scheduler {
       });
     }
 
+    if (this.config.clusteringSchedule) {
+      jobs.push({
+        type: "clustering",
+        schedule: this.config.clusteringSchedule,
+        nextRun: this.clusteringJob?.nextRun() ?? null,
+        lastRun: this.lastClusteringResult?.completedAt ?? null,
+        lastResult: this.lastClusteringResult ?? undefined,
+      });
+    }
+
     return {
       running: this.running,
       jobs,
@@ -302,6 +356,13 @@ export class Scheduler {
    */
   async triggerPatternAggregation(): Promise<ScheduledJobResult> {
     return this.runPatternAggregation();
+  }
+
+  /**
+   * Manually trigger clustering job
+   */
+  async triggerClustering(): Promise<ScheduledJobResult> {
+    return this.runClustering();
   }
 
   /**
@@ -568,6 +629,70 @@ export class Scheduler {
     this.lastPatternAggregationResult = result;
     return result;
   }
+
+  /**
+   * Run clustering - discovers patterns across nodes using embedding + clustering
+   * and analyzes clusters with LLM to generate names/descriptions
+   */
+  private async runClustering(): Promise<ScheduledJobResult> {
+    const startedAt = new Date();
+    let clustersCreated = 0;
+    let clustersAnalyzed = 0;
+    let errorMessage: string | undefined;
+
+    try {
+      this.logger.info("Starting clustering job");
+
+      // Create FacetDiscovery instance with mock embedding for now
+      // In production, this would use configured embedding provider
+      const facetDiscovery = new FacetDiscovery(
+        this.db,
+        { provider: "mock", dimensions: 384 },
+        { algorithm: "hdbscan", minClusterSize: 3 },
+        {
+          info: (msg: string) => this.logger.info(`[facet] ${msg}`),
+          error: (msg: string) => this.logger.error(`[facet] ${msg}`),
+          debug: this.logger.debug
+            ? (msg: string) => this.logger.debug?.(`[facet] ${msg}`)
+            : undefined,
+        }
+      );
+
+      // Run facet discovery to create clusters
+      const { clustersCreated: createdCount } = await facetDiscovery.run();
+      clustersCreated = createdCount;
+      this.logger.info(`Created ${clustersCreated} clusters`);
+
+      // Analyze unnamed clusters with LLM if provider/model configured
+      if (this.config.provider && this.config.model && clustersCreated > 0) {
+        this.logger.info("Analyzing clusters with LLM");
+        const analysisResult = await facetDiscovery.analyzeClusters({
+          provider: this.config.provider,
+          model: this.config.model,
+        });
+        clustersAnalyzed = analysisResult.succeeded;
+        this.logger.info(
+          `Analyzed ${clustersAnalyzed} clusters (${analysisResult.failed} failed)`
+        );
+      }
+
+      this.logger.info("Clustering job completed");
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Clustering job failed: ${errorMessage}`);
+    }
+
+    const result: ScheduledJobResult = {
+      type: "clustering",
+      startedAt,
+      completedAt: new Date(),
+      itemsProcessed: clustersCreated + clustersAnalyzed,
+      error: errorMessage,
+    };
+
+    this.lastClusteringResult = result;
+    return result;
+  }
 }
 
 /**
@@ -584,6 +709,9 @@ export function createScheduler(
       reanalysisSchedule: config.reanalysisSchedule,
       connectionDiscoverySchedule: config.connectionDiscoverySchedule,
       patternAggregationSchedule: config.patternAggregationSchedule,
+      clusteringSchedule: config.clusteringSchedule,
+      provider: config.provider,
+      model: config.model,
     },
     queue,
     db,

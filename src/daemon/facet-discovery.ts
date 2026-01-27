@@ -1622,10 +1622,10 @@ export class FacetDiscovery {
 
       return {
         success: true,
-        name: json.name,
-        description: json.description,
-        confidence: json.confidence,
-        reasoning: json.reasoning,
+        name: String(json.name),
+        description: String(json.description),
+        confidence: json.confidence as "high" | "medium" | "low" | undefined,
+        reasoning: json.reasoning as string | undefined,
       };
     } catch (error) {
       return {

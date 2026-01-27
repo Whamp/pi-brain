@@ -41,6 +41,17 @@ const VALID_FLAG_TYPES: readonly FlagType[] = [
   "note",
 ] as const;
 
+/** Aliases for backwards compatibility */
+const FLAG_TYPE_ALIASES: Record<string, FlagType> = {
+  failure: "fail",
+};
+
+/** Normalize flag type, applying aliases */
+function normalizeFlagType(type: string): string {
+  const lower = type.toLowerCase();
+  return FLAG_TYPE_ALIASES[lower] ?? lower;
+}
+
 /**
  * Parse --flag or -f arguments from input
  * Formats:
@@ -71,7 +82,7 @@ function parseFlagCommand(input: string): {
 
   if (inlineType) {
     // Format: --flag:type message
-    const normalizedInlineType = inlineType.toLowerCase();
+    const normalizedInlineType = normalizeFlagType(inlineType);
     if (!VALID_FLAG_TYPES.includes(normalizedInlineType as FlagType)) {
       return {
         isFlag: true,
@@ -92,14 +103,15 @@ function parseFlagCommand(input: string): {
       };
     }
 
-    if (!VALID_FLAG_TYPES.includes(typeArg as FlagType)) {
+    const normalizedTypeArg = normalizeFlagType(typeArg);
+    if (!VALID_FLAG_TYPES.includes(normalizedTypeArg as FlagType)) {
       return {
         isFlag: true,
         error: `Invalid flag type "${typeArg}". Valid types: ${VALID_FLAG_TYPES.join(", ")}`,
       };
     }
 
-    flagType = typeArg as FlagType;
+    flagType = normalizedTypeArg as FlagType;
     message = parts.slice(1).join(" ");
   }
 

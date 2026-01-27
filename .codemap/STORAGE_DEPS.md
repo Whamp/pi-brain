@@ -1,0 +1,35 @@
+src/storage/index.ts
+  - src/storage/database.ts
+    - [external] better-sqlite3
+    - [builtin] fs
+    - [builtin] os
+    - [builtin] path
+    - [builtin] url
+  - src/storage/node-repository.ts
+    - src/daemon/processor.ts
+      - src/config/types.ts
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+    - src/daemon/queue.ts
+      - [external] better-sqlite3
+    - src/storage/node-storage.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
+    - src/storage/node-types.ts
+      - src/types/index.ts
+    - [external] better-sqlite3
+  - src/storage/node-storage.ts
+    - src/storage/node-types.ts
+      - src/types/index.ts
+    - [builtin] fs
+    - [builtin] os
+    - [builtin] path
+  - src/storage/node-types.ts
+    - src/types/index.ts

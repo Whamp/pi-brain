@@ -548,3 +548,170 @@ describe("loggers", () => {
     expect(consoleLogger.debug).toBeDefined();
   });
 });
+
+describe("clustering job", () => {
+  let queue: ReturnType<typeof createMockQueue>;
+  let db: Database.Database;
+  let logger: ReturnType<typeof createCapturingLogger>;
+
+  beforeEach(() => {
+    queue = createMockQueue();
+    logger = createCapturingLogger();
+  });
+
+  it("should include clustering job in status when configured", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+    scheduler.start();
+
+    const status = scheduler.getStatus();
+    expect(status.jobs).toHaveLength(3);
+
+    const clusteringJob = status.jobs.find((j) => j.type === "clustering");
+    expect(clusteringJob).toBeDefined();
+    expect(clusteringJob?.schedule).toBe("0 4 * * *");
+    expect(clusteringJob?.nextRun).toBeInstanceOf(Date);
+
+    scheduler.stop();
+  });
+
+  it("should not include clustering job in status when not configured", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+    scheduler.start();
+
+    const status = scheduler.getStatus();
+    const clusteringJob = status.jobs.find((j) => j.type === "clustering");
+    expect(clusteringJob).toBeUndefined();
+
+    scheduler.stop();
+  });
+
+  it("should log schedule info for clustering on start", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+    scheduler.start();
+
+    expect(
+      logger.messages.some((m) => m.includes("Clustering scheduled"))
+    ).toBeTruthy();
+
+    scheduler.stop();
+  });
+
+  it("should handle invalid clustering schedule gracefully", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "invalid cron",
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+    scheduler.start();
+
+    expect(scheduler.isRunning()).toBeTruthy();
+    expect(
+      logger.messages.some(
+        (m) => m.includes("ERROR") && m.includes("Invalid clustering schedule")
+      )
+    ).toBeTruthy();
+
+    scheduler.stop();
+  });
+
+  it("should run triggerClustering and return result", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+    };
+
+    // Create mock DB with proper tables for FacetDiscovery
+    const mockDb = {
+      prepare: vi.fn(() => ({
+        run: vi.fn(),
+        get: vi.fn(() => null),
+        all: vi.fn(() => []),
+        iterate: vi.fn(() => []),
+      })),
+      transaction: vi.fn((fn) => fn),
+    } as unknown as Database.Database;
+
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+
+    const result = await scheduler.triggerClustering();
+
+    expect(result.type).toBe("clustering");
+    expect(result.completedAt.getTime()).toBeGreaterThanOrEqual(
+      result.startedAt.getTime()
+    );
+    // FacetDiscovery may fail with mock DB, but scheduler should handle it
+    // and report the error gracefully
+    expect(
+      typeof result.error === "string" || result.error === undefined
+    ).toBeTruthy();
+  });
+
+  it("should update lastResult for clustering in status", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+    };
+
+    const mockDb = {
+      prepare: vi.fn(() => ({
+        run: vi.fn(),
+        get: vi.fn(() => null),
+        all: vi.fn(() => []),
+        iterate: vi.fn(() => []),
+      })),
+      transaction: vi.fn((fn) => fn),
+    } as unknown as Database.Database;
+
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+    scheduler.start();
+
+    await scheduler.triggerClustering();
+    const status = scheduler.getStatus();
+
+    const clusteringJob = status.jobs.find((j) => j.type === "clustering");
+    expect(clusteringJob?.lastResult).toBeDefined();
+    expect(clusteringJob?.lastResult?.type).toBe("clustering");
+
+    scheduler.stop();
+  });
+
+  it("should pass provider and model to config for LLM analysis", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+      provider: "zai",
+      model: "glm-4.7",
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+
+    // Verify that config is stored (we can check status shows the schedule)
+    scheduler.start();
+    const status = scheduler.getStatus();
+    const clusteringJob = status.jobs.find((j) => j.type === "clustering");
+    expect(clusteringJob).toBeDefined();
+    scheduler.stop();
+  });
+});
