@@ -27,7 +27,7 @@ src/daemon/insight-aggregation.ts [1-553]
         - src/daemon/insight-aggregation.test.ts:492: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:552: instantiate aggregator
         - src/daemon/scheduler.ts:25: import (module)
-        - src/daemon/scheduler.ts:141: type Scheduler.insightAggregator
+        - src/daemon/scheduler.ts:153: type Scheduler.insightAggregator
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -205,7 +205,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/cli.ts:46: import (module)
         - src/cli.ts:748: call result
         - src/daemon/scheduler.ts:21: import (module)
-        - src/daemon/scheduler.ts:607: call Scheduler.runPatternAggregation
+        - src/daemon/scheduler.ts:623: call Scheduler.runPatternAggregation
         - src/prompt/effectiveness.test.ts:22: import (module)
         - src/prompt/effectiveness.test.ts:711: call result
         - src/prompt/effectiveness.test.ts:752: call result1
@@ -234,7 +234,7 @@ src/prompt/effectiveness.ts [1-881]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
       refs in: 6 [call: 4, import: 2]
         - src/daemon/scheduler.ts:20: import (module)
-        - src/daemon/scheduler.ts:576: call Scheduler.needingMeasurement
+        - src/daemon/scheduler.ts:592: call Scheduler.needingMeasurement
         - src/prompt/effectiveness.test.ts:19: import (module)
         - src/prompt/effectiveness.test.ts:933: call needing
         - src/prompt/effectiveness.test.ts:957: call needing
@@ -248,7 +248,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/cli.ts:45: import (module)
         - src/cli.ts:767: call disabled
         - src/daemon/scheduler.ts:19: import (module)
-        - src/daemon/scheduler.ts:623: call Scheduler.disabled
+        - src/daemon/scheduler.ts:639: call Scheduler.disabled
         - src/prompt/effectiveness.test.ts:13: import (module)
         - src/prompt/effectiveness.test.ts:1035: call disabled
         - src/prompt/effectiveness.test.ts:1068: call disabled
@@ -577,7 +577,7 @@ src/prompt/prompt.ts [1-388]
       /** Get the latest prompt version from database */
       refs in: 5 [call: 3, import: 2]
         - src/daemon/scheduler.ts:23: import (module)
-        - src/daemon/scheduler.ts:395: call Scheduler.latestVersion
+        - src/daemon/scheduler.ts:407: call Scheduler.latestVersion
         - src/prompt/prompt.test.ts:28: import (module)
         - src/prompt/prompt.test.ts:235: call (module)
         - src/prompt/prompt.test.ts:251: call result
@@ -783,4 +783,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 14
-Estimated tokens: 10,774 (codebase: ~935,789)
+Estimated tokens: 10,774 (codebase: ~936,090)

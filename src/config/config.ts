@@ -66,6 +66,10 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     connectionDiscoverySchedule: "0 3 * * *",
     patternAggregationSchedule: "0 3 * * *",
     clusteringSchedule: "0 4 * * *",
+    reanalysisLimit: 100,
+    connectionDiscoveryLimit: 100,
+    connectionDiscoveryLookbackDays: 7,
+    connectionDiscoveryCooldownHours: 24,
     embeddingProvider: "openrouter" as const,
     embeddingModel: "qwen/qwen3-embedding-8b",
     embeddingApiKey: undefined,
@@ -364,6 +368,17 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
       defaults.daemon.patternAggregationSchedule,
     clusteringSchedule:
       raw.daemon?.clustering_schedule ?? defaults.daemon.clusteringSchedule,
+    reanalysisLimit:
+      raw.daemon?.reanalysis_limit ?? defaults.daemon.reanalysisLimit,
+    connectionDiscoveryLimit:
+      raw.daemon?.connection_discovery_limit ??
+      defaults.daemon.connectionDiscoveryLimit,
+    connectionDiscoveryLookbackDays:
+      raw.daemon?.connection_discovery_lookback_days ??
+      defaults.daemon.connectionDiscoveryLookbackDays,
+    connectionDiscoveryCooldownHours:
+      raw.daemon?.connection_discovery_cooldown_hours ??
+      defaults.daemon.connectionDiscoveryCooldownHours,
     embeddingProvider:
       raw.daemon?.embedding_provider ?? defaults.daemon.embeddingProvider,
     embeddingModel:
@@ -419,6 +434,19 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     "daemon.analysis_timeout_minutes"
   );
   validatePositiveInt(daemon.maxQueueSize, "daemon.max_queue_size");
+  validatePositiveInt(daemon.reanalysisLimit, "daemon.reanalysis_limit");
+  validatePositiveInt(
+    daemon.connectionDiscoveryLimit,
+    "daemon.connection_discovery_limit"
+  );
+  validatePositiveInt(
+    daemon.connectionDiscoveryLookbackDays,
+    "daemon.connection_discovery_lookback_days"
+  );
+  validatePositiveInt(
+    daemon.connectionDiscoveryCooldownHours,
+    "daemon.connection_discovery_cooldown_hours"
+  );
 
   // Transform query config
   const query: QueryConfig = {

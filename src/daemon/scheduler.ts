@@ -90,6 +90,18 @@ export interface SchedulerConfig {
   /** Cron schedule for facet discovery/clustering (optional) */
   clusteringSchedule?: string;
 
+  /** Max nodes to queue for reanalysis per run */
+  reanalysisLimit: number;
+
+  /** Max nodes to queue for connection discovery per run */
+  connectionDiscoveryLimit: number;
+
+  /** Days to look back for recent nodes in connection discovery */
+  connectionDiscoveryLookbackDays: number;
+
+  /** Hours before re-running connection discovery on a node */
+  connectionDiscoveryCooldownHours: number;
+
   /** Model provider for LLM cluster analysis */
   provider?: string;
 
@@ -412,7 +424,7 @@ export class Scheduler {
       // Uses denormalized target_node_id column for performance (indexed)
       const outdatedNodes = this.db
         .prepare<
-          [string],
+          [string, number],
           {
             id: string;
             session_file: string;
@@ -431,10 +443,10 @@ export class Scheduler {
           AND q.target_node_id = n.id
         )
         ORDER BY timestamp DESC
-        LIMIT 100
+        LIMIT ?
       `
         )
-        .all(currentVersion);
+        .all(currentVersion, this.config.reanalysisLimit);
 
       this.logger.info(
         `Found ${outdatedNodes.length} nodes for reanalysis (current version: ${currentVersion})`
@@ -485,13 +497,17 @@ export class Scheduler {
     try {
       this.logger.info("Starting connection discovery job");
 
-      // Get recently analyzed nodes (last 7 days)
-      // that haven't had a connection discovery job recently (last 24h)
+      // Get recently analyzed nodes (configurable lookback period)
+      // that haven't had a connection discovery job recently (configurable cooldown)
       // and aren't currently queued
       // Uses denormalized target_node_id column for performance (indexed)
+      const lookbackDays = this.config.connectionDiscoveryLookbackDays;
+      const cooldownHours = this.config.connectionDiscoveryCooldownHours;
+      const limit = this.config.connectionDiscoveryLimit;
+
       const recentNodes = this.db
         .prepare<
-          [],
+          [number, number, number],
           {
             id: string;
             session_file: string;
@@ -499,21 +515,21 @@ export class Scheduler {
         >(
           `
         SELECT id, session_file FROM nodes n
-        WHERE analyzed_at > datetime('now', '-7 days')
+        WHERE analyzed_at > datetime('now', '-' || ? || ' days')
         AND NOT EXISTS (
           SELECT 1 FROM analysis_queue q
           WHERE q.type = 'connection_discovery'
           AND q.target_node_id = n.id
           AND (
             status IN ('pending', 'running')
-            OR (status = 'completed' AND completed_at > datetime('now', '-24 hours'))
+            OR (status = 'completed' AND completed_at > datetime('now', '-' || ? || ' hours'))
           )
         )
         ORDER BY analyzed_at DESC
-        LIMIT 100
+        LIMIT ?
       `
         )
-        .all();
+        .all(lookbackDays, cooldownHours, limit);
 
       this.logger.info(
         `Found ${recentNodes.length} recent nodes for connection discovery`
@@ -745,6 +761,10 @@ export function createScheduler(
       connectionDiscoverySchedule: config.connectionDiscoverySchedule,
       patternAggregationSchedule: config.patternAggregationSchedule,
       clusteringSchedule: config.clusteringSchedule,
+      reanalysisLimit: config.reanalysisLimit,
+      connectionDiscoveryLimit: config.connectionDiscoveryLimit,
+      connectionDiscoveryLookbackDays: config.connectionDiscoveryLookbackDays,
+      connectionDiscoveryCooldownHours: config.connectionDiscoveryCooldownHours,
       provider: config.provider,
       model: config.model,
       embeddingProvider: config.embeddingProvider,
