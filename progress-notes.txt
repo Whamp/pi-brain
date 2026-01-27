@@ -771,3 +771,35 @@
 - The implementation follows the query-processor pattern for pi spawning
 - Tests use mock embedding provider and non-existent prompt paths to avoid spawning pi
 - Ready for Task 11.7 (News Feed UI) and 11.9 (add clustering to nightly scheduler)
+
+---
+
+## 2026-01-27 03:55 - Task 11.7
+
+**Status**: pending → done
+**Validation**:
+- Created clusters API routes (`src/api/routes/clusters.ts`) with endpoints:
+  - GET /clusters - List all clusters with optional status/signalType filters
+  - GET /clusters/:id - Get single cluster with all nodes
+  - POST /clusters/:id/status - Update cluster status (confirm/dismiss)
+  - GET /clusters/feed - Get named pending clusters for news feed
+- Routes properly join with nodes_fts table to get node summaries
+- Added oxlint rule exception for Fastify async handlers (oxc/no-async-endpoint-handlers)
+- Created News Feed Svelte component with:
+  - Display of named pending clusters from facet discovery
+  - Confirm/Dismiss buttons for user feedback
+  - Signal type indicators (friction/delight/neutral)
+  - Representative node examples with links
+  - Responsive layout with proper styling
+- Added API client methods for clusters (getClusterFeed, getClusters, getCluster, updateClusterStatus)
+- Added cluster types to frontend (ClusterWithNodes, ClusterNodeWithDetails, ClusterFeedResponse)
+- Integrated News Feed component into dashboard page
+- Added 11 tests for clusters API endpoints covering all CRUD operations
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1126 passed, 4 skipped)
+**Commit**: 0bc7803
+**Notes**:
+- The News Feed surfaces clusters discovered by the facet discovery pipeline (Task 11.5)
+- Users can confirm patterns (adds them as permanent insights) or dismiss them
+- Clusters need to be named by the LLM cluster analysis (Task 11.6) to appear in the feed
+- UI follows spec from web-ui.md and signals.md for Dashboard News Feed

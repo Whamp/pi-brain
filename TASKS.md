@@ -154,7 +154,7 @@ Track implementation progress. Agents update status as they complete work.
 | 11.5  | Implement facet discovery pipeline (embedding + clustering)             | done    | 8.1  | 2026-01-26 - see 11.5a for lint fix |
 | 11.5a | Fix conditional expects in facet-discovery tests                        | done    | 11.5 | 2026-01-26                          |
 | 11.6  | Implement LLM cluster analysis and naming                               | done    | 11.5 | 2026-01-26                          |
-| 11.7  | Build "News Feed" UI component for clusters and signals                 | active  | 5.1  | 2026-01-27                          |
+| 11.7  | Build "News Feed" UI component for clusters and signals                 | done    | 5.1  | 2026-01-27                          |
 | 11.8  | Implement Model-Specific AGENTS.md generator                            | pending | 10.1 |                                     |
 | 11.9  | Add clustering job to nightly scheduler                                 | pending | 8.1  |                                     |
 | 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | pending | 11.1 |                                     |
