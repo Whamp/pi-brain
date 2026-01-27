@@ -136,7 +136,7 @@ Track implementation progress. Agents update status as they complete work.
 | 10.2  | Generate model-specific prompt additions                                               | done    | 10.1      | 2026-01-26                     |
 | 10.3  | Implement skill-based prompt injection (brain-insights skill)                          | done    | 10.2      | 2026-01-26                     |
 | 10.4  | Create `prompt_effectiveness` table migration                                          | done    | 10.3      | 2026-01-26                     |
-| 10.5  | Implement `measureEffectiveness()` function                                            | active  | 10.4      | 2026-01-26                     |
+| 10.5  | Implement `measureEffectiveness()` function                                            | done    | 10.4      | 2026-01-26                     |
 | 10.6  | Implement auto-disable for ineffective insights                                        | pending | 10.5      |                                |
 | 10.7  | Add effectiveness tracking to nightly pipeline                                         | pending | 10.6      |                                |
 | 10.8  | Build prompt learning dashboard UI (`/prompt-learning` route)                          | pending | 10.7, 5.1 |                                |

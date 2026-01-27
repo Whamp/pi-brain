@@ -525,3 +525,36 @@
 - Table design follows specs/prompt-learning.md schema
 - Sessions counts added for rate calculations (not in original spec but needed)
 - Ready for Task 10.5 (Implement measureEffectiveness() function)
+
+---
+
+## 2026-01-26 19:45 - Task 10.5
+
+**Status**: pending → done
+**Validation**:
+- Created effectiveness.ts with core measurement functions:
+  - measureEffectiveness(): Compares occurrence rates before/after prompt was added
+  - measureAndStoreEffectiveness(): Measures and persists result to prompt_effectiveness table
+  - countSessions(): Counts unique sessions within a date range
+  - countNodes(): Counts nodes within a date range
+  - countOccurrences(): Counts insight occurrences by type (quirk, tool_error, lesson, win, failure)
+  - calculateAverageSeverity(): Converts severity level to numeric value (0.0-1.0)
+  - isStatisticallySignificant(): Simplified chi-square test for p < 0.05
+  - getEffectivenessHistory(): Returns measurement history for an insight
+  - getLatestEffectiveness(): Returns most recent measurement
+  - getInsightsNeedingMeasurement(): Finds insights that need re-measurement
+- Added migration 009_effectiveness_unique.sql for unique constraint on (insight_id, prompt_version)
+- Updated database.test.ts to verify unique constraint
+- Added 25 comprehensive tests covering all functions
+- Exported new functions from prompt/index.ts
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 966 passed, 4 skipped)
+**Commit**: c6e2b41
+**Notes**:
+- Occurrence counting varies by insight type:
+  - quirk: Counts model_quirks rows matching pattern and model
+  - tool_error: Counts tool_errors rows matching tool and model
+  - lesson: Counts lessons rows matching pattern (model/tool/user levels)
+  - win/failure: Reads node JSON files and counts prompting wins/failures
+- Statistical significance requires minimum 10 sessions in each period
+- Ready for Task 10.6 (Implement auto-disable for ineffective insights)
