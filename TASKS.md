@@ -105,28 +105,28 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 8: Nightly Processing
 
-| ID   | Task                                                  | Status  | Deps         | Notes                                       |
-| ---- | ----------------------------------------------------- | ------- | ------------ | ------------------------------------------- |
-| 8.1  | Implement scheduler (cron-like or systemd timer)      | done    | 3.9          | 2026-01-26 - croner lib, 25 tests           |
-| 8.2  | Implement reanalysis queue population                 | done    | 8.1, 4.2     | 2026-01-26 - scheduler updated              |
-| 8.3  | Implement connection discovery - semantic similarity  | done    | 8.1          | 2026-01-26 - connection-discovery.ts        |
-| 8.4  | Implement connection discovery - reference detection  | done    | 8.1          | 2026-01-26 - Node IDs                       |
-| 8.5  | Implement connection discovery - lesson reinforcement | done    | 8.1          | 2026-01-26                                  |
-| 8.6  | Implement pattern aggregation - failure patterns      | done    | 8.1, 4.11    | 2026-01-26 - confirmed implemented & tested |
-| 8.7  | Implement pattern aggregation - model quirks          | done    | 8.1, 4.10    | 2026-01-26 - implemented model_stats update |
-| 8.8  | Implement pattern aggregation - lessons               | done    | 8.1, 4.9     | 2026-01-26 - implemented with 005 migration |
-| 8.9  | Update failure_patterns table                         | done    | 8.6          | 2026-01-26 - handled by scheduler & aggregator |
-| 8.10 | Surface patterns in dashboard                         | pending | 8.6-8.9, 6.1 |                                             |
+| ID   | Task                                                  | Status | Deps         | Notes                                          |
+| ---- | ----------------------------------------------------- | ------ | ------------ | ---------------------------------------------- |
+| 8.1  | Implement scheduler (cron-like or systemd timer)      | done   | 3.9          | 2026-01-26 - croner lib, 25 tests              |
+| 8.2  | Implement reanalysis queue population                 | done   | 8.1, 4.2     | 2026-01-26 - scheduler updated                 |
+| 8.3  | Implement connection discovery - semantic similarity  | done   | 8.1          | 2026-01-26 - connection-discovery.ts           |
+| 8.4  | Implement connection discovery - reference detection  | done   | 8.1          | 2026-01-26 - Node IDs                          |
+| 8.5  | Implement connection discovery - lesson reinforcement | done   | 8.1          | 2026-01-26                                     |
+| 8.6  | Implement pattern aggregation - failure patterns      | done   | 8.1, 4.11    | 2026-01-26 - confirmed implemented & tested    |
+| 8.7  | Implement pattern aggregation - model quirks          | done   | 8.1, 4.10    | 2026-01-26 - implemented model_stats update    |
+| 8.8  | Implement pattern aggregation - lessons               | done   | 8.1, 4.9     | 2026-01-26 - implemented with 005 migration    |
+| 8.9  | Update failure_patterns table                         | done   | 8.6          | 2026-01-26 - handled by scheduler & aggregator |
+| 8.10 | Surface patterns in dashboard                         | done   | 8.6-8.9, 6.1 | 2026-01-26                                     |
 
 ## Phase 9: Multi-Computer Sync
 
-| ID  | Task                                         | Status  | Deps     | Notes                      |
-| --- | -------------------------------------------- | ------- | -------- | -------------------------- |
-| 9.1 | Document Syncthing setup for spokes          | pending | -        | see specs/sync-protocol.md |
-| 9.2 | Implement rsync-based sync option            | pending | 3.1      |                            |
-| 9.3 | Implement spoke configuration in config.yaml | pending | 1.4      |                            |
-| 9.4 | Daemon watches synced directories            | pending | 3.1, 9.3 |                            |
-| 9.5 | Computer field populated correctly           | pending | 3.7      |                            |
+| ID  | Task                                         | Status  | Deps     | Notes      |
+| --- | -------------------------------------------- | ------- | -------- | ---------- |
+| 9.1 | Document Syncthing setup for spokes          | active  | -        | 2026-01-26 |
+| 9.2 | Implement rsync-based sync option            | pending | 3.1      |            |
+| 9.3 | Implement spoke configuration in config.yaml | pending | 1.4      |            |
+| 9.4 | Daemon watches synced directories            | pending | 3.1, 9.3 |            |
+| 9.5 | Computer field populated correctly           | pending | 3.7      |            |
 
 ## Phase 10: Prompt Learning Pipeline
 
