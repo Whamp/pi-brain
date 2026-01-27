@@ -911,7 +911,7 @@ src/daemon/query-processor.ts [1-720]
       /** Query response to return to the client */
       refs in: 5 [import: 1, type: 4]
         - src/api/routes/query.ts:15: import (module)
-        - src/api/routes/query.ts:100: type response
+        - src/api/routes/query.ts:102: type response
         - src/daemon/query-processor.ts:71: type AgentQueryResult
         - src/daemon/query-processor.ts:108: type processQuery
         - src/daemon/query-processor.ts:581: type ParseResult
@@ -924,7 +924,7 @@ src/daemon/query-processor.ts [1-720]
       /** Process a natural language query against the knowledge graph */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/query.ts:13: import (module)
-        - src/api/routes/query.ts:100: call response
+        - src/api/routes/query.ts:102: call response
   imports:
     - ../config/types.js
     - ../storage/node-repository.js
@@ -1898,17 +1898,17 @@ src/storage/node-repository.ts [1-3311]
         - src/storage/node-repository.ts:230: call upsertNode
     192-206: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-      refs in: 235 [call: 233, import: 2]
-        - src/storage/decision-repository.test.ts:13: import (module)
-        - src/storage/decision-repository.test.ts:96: call (module)
-        - src/storage/decision-repository.test.ts:107: call (module)
-        - src/storage/decision-repository.test.ts:170: call (module)
-        - src/storage/decision-repository.test.ts:243: call (module)
-        - src/storage/node-repository.test.ts:21: import (module)
-        - src/storage/node-repository.test.ts:296: call created
-        - src/storage/node-repository.test.ts:316: call (module)
-        - src/storage/node-repository.test.ts:332: call (module)
-        - src/storage/node-repository.test.ts:364: call (module)
+      refs in: 246 [call: 243, import: 3]
+        - src/api/server.test.ts:14: import (module)
+        - src/api/server.test.ts:204: call (module)
+        - src/api/server.test.ts:252: call (module)
+        - src/api/server.test.ts:253: call (module)
+        - src/api/server.test.ts:300: call (module)
+        - src/api/server.test.ts:458: call (module)
+        - src/api/server.test.ts:459: call (module)
+        - src/api/server.test.ts:564: call (module)
+        - src/api/server.test.ts:565: call (module)
+        - src/api/server.test.ts:640: call (module)
     217-322: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
@@ -2672,4 +2672,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 39
-Estimated tokens: 35,483 (codebase: ~929,297)
+Estimated tokens: 35,446 (codebase: ~930,223)

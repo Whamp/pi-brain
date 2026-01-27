@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32570,
-  "codebase_tokens": 929297,
+  "total_tokens": 32584,
+  "codebase_tokens": 930223,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -800,7 +800,7 @@
       "language": "typescript",
       "lines": [
         1,
-        202
+        204
       ],
       "detail_level": "full",
       "token_estimate": 91,
@@ -830,7 +830,7 @@
           "signature": "async queryRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             44,
-            201
+            203
           ],
           "exported": true,
           "is_default": false,
@@ -1345,10 +1345,10 @@
       "language": "typescript",
       "lines": [
         1,
-        179
+        183
       ],
       "detail_level": "full",
-      "token_estimate": 256,
+      "token_estimate": 270,
       "symbols": [
         {
           "name": "ServerContext",
@@ -1356,7 +1356,7 @@
           "signature": "ServerContext",
           "lines": [
             46,
-            49
+            51
           ],
           "exported": true,
           "is_default": false,
@@ -1372,10 +1372,10 @@
         {
           "name": "createServer",
           "kind": "function",
-          "signature": "async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance>",
+          "signature": "async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance>",
           "lines": [
-            63,
-            152
+            65,
+            155
           ],
           "exported": true,
           "is_default": false,
@@ -1391,10 +1391,10 @@
         {
           "name": "startServer",
           "kind": "function",
-          "signature": "async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance>",
+          "signature": "async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance>",
           "lines": [
-            157,
-            171
+            160,
+            175
           ],
           "exported": true,
           "is_default": false,

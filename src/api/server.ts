@@ -15,7 +15,7 @@ import Fastify, {
   type FastifyReply,
 } from "fastify";
 
-import type { ApiConfig } from "../config/types.js";
+import type { ApiConfig, DaemonConfig } from "../config/types.js";
 
 import { errorResponse } from "./responses.js";
 import { agentsRoutes } from "./routes/agents.js";
@@ -46,6 +46,8 @@ export type { ApiErrorCode } from "./responses.js";
 export interface ServerContext {
   db: Database;
   config: ApiConfig;
+  /** Optional full daemon config for routes that need it (e.g., query) */
+  daemonConfig?: DaemonConfig;
 }
 
 /**
@@ -62,7 +64,8 @@ declare module "fastify" {
  */
 export async function createServer(
   db: Database,
-  config: ApiConfig
+  config: ApiConfig,
+  daemonConfig?: DaemonConfig
 ): Promise<FastifyInstance> {
   const app = Fastify({
     logger: {
@@ -85,7 +88,7 @@ export async function createServer(
   });
 
   // Decorate with context
-  const context: ServerContext = { db, config };
+  const context: ServerContext = { db, config, daemonConfig };
   app.decorate("ctx", context);
 
   // Health check endpoint
@@ -156,9 +159,10 @@ export async function createServer(
  */
 export async function startServer(
   db: Database,
-  config: ApiConfig
+  config: ApiConfig,
+  daemonConfig?: DaemonConfig
 ): Promise<FastifyInstance> {
-  const app = await createServer(db, config);
+  const app = await createServer(db, config, daemonConfig);
 
   await app.listen({
     port: config.port,

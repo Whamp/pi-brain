@@ -124,9 +124,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-202]
+src/api/routes/query.ts [1-204]
   function:
-    44-201: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    44-203: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/query-processor.js
     - ../responses.js
@@ -186,14 +186,14 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-179]
+src/api/server.ts [1-183]
   interface:
-    46-49: interface ServerContext [exported]
+    46-51: interface ServerContext [exported]
       /** Server context passed to route handlers */
   function:
-    63-152: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    65-155: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    157-171: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    160-175: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -1816,4 +1816,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,471 (codebase: ~928,220)
+Estimated tokens: 22,485 (codebase: ~929,400)

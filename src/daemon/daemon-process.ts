@@ -136,7 +136,7 @@ async function main(): Promise<void> {
   console.log("[daemon] Worker started");
 
   // Start API server
-  const server = await startServer(db, config.api);
+  const server = await startServer(db, config.api, config.daemon);
   console.log(
     `[daemon] API server listening on http://${config.api.host}:${config.api.port}`
   );
