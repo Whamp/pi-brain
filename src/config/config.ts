@@ -626,7 +626,9 @@ daemon:
   clustering_schedule: "0 4 * * *"            # 4am nightly
   embedding_provider: openrouter             # or: ollama, openai
   embedding_model: qwen/qwen3-embedding-8b   # for semantic clustering
-  # embedding_api_key: sk-or-v1-...          # required for openrouter/openai
+  # embedding_api_key: sk-or-v1-...          # REQUIRED for openrouter/openai providers
+                                             # Get a key at: https://openrouter.ai/keys
+                                             # Without this, clustering is skipped (no error)
   # embedding_base_url: https://...          # optional, for custom endpoints
   provider: zai
   model: glm-4.7

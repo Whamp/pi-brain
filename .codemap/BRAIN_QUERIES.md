@@ -122,8 +122,8 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:399: call stopDaemon
         - src/daemon/cli.ts:417: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:166: call shutdown
-        - src/daemon/daemon-process.ts:189: call (module)
+        - src/daemon/daemon-process.ts:167: call shutdown
+        - src/daemon/daemon-process.ts:190: call (module)
     159-167: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
       refs in: 7 [call: 5, import: 1, reexport: 1]
@@ -304,7 +304,7 @@ src/daemon/connection-discovery.ts [1-623]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-193]
+src/daemon/daemon-process.ts [1-194]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -672,7 +672,7 @@ src/daemon/insight-aggregation.ts [1-553]
         - src/daemon/insight-aggregation.test.ts:492: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:552: instantiate aggregator
         - src/daemon/scheduler.ts:25: import (module)
-        - src/daemon/scheduler.ts:153: type Scheduler.insightAggregator
+        - src/daemon/scheduler.ts:156: type Scheduler.insightAggregator
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -694,8 +694,8 @@ src/daemon/pattern-aggregation.ts [1-332]
         - src/daemon/pattern-aggregation.test.ts:21: type aggregator
         - src/daemon/pattern-aggregation.test.ts:81: instantiate (module)
         - src/daemon/scheduler.ts:26: import (module)
-        - src/daemon/scheduler.ts:152: type Scheduler.patternAggregator
-        - src/daemon/scheduler.ts:161: instantiate Scheduler.constructor
+        - src/daemon/scheduler.ts:155: type Scheduler.patternAggregator
+        - src/daemon/scheduler.ts:164: instantiate Scheduler.constructor
   imports:
     - better-sqlite3
     - node:crypto
@@ -904,11 +904,15 @@ src/daemon/query-processor.ts [1-727]
   interface:
     32-45: interface QueryRequest [exported]
       /** Query request from the API */
-      refs in: 1 [type: 1]
+      refs in: 3 [import: 1, type: 2]
+        - src/api/routes/query.ts:14: import (module)
+        - src/api/routes/query.ts:93: type queryRequest
         - src/daemon/query-processor.ts:106: type processQuery
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
-      refs in: 3 [type: 3]
+      refs in: 5 [import: 1, type: 4]
+        - src/api/routes/query.ts:15: import (module)
+        - src/api/routes/query.ts:102: type response
         - src/daemon/query-processor.ts:71: type AgentQueryResult
         - src/daemon/query-processor.ts:108: type processQuery
         - src/daemon/query-processor.ts:588: type ParseResult
@@ -919,6 +923,9 @@ src/daemon/query-processor.ts [1-727]
   function:
     105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/query.ts:13: import (module)
+        - src/api/routes/query.ts:102: call response
   imports:
     - ../config/types.js
     - ../storage/node-repository.js
@@ -1068,71 +1075,71 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-723]
+src/daemon/scheduler.test.ts [1-876]
   imports:
     - ./queue.js
     - ./scheduler.js
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-817]
+src/daemon/scheduler.ts [1-831]
   class:
-    142-747: class Scheduler [exported]
+    145-761: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
-      refs in: 25 [import: 1, instantiate: 21, reexport: 1, type: 2]
+      refs in: 28 [import: 1, instantiate: 24, reexport: 1, type: 2]
         - src/daemon/index.ts:144: reexport (module)
         - src/daemon/scheduler.test.ts:12: import (module)
-        - src/daemon/scheduler.test.ts:139: type scheduler
-        - src/daemon/scheduler.test.ts:153: instantiate (module)
-        - src/daemon/scheduler.test.ts:244: instantiate (module)
-        - src/daemon/scheduler.test.ts:266: instantiate (module)
-        - src/daemon/scheduler.test.ts:285: instantiate (module)
-        - src/daemon/scheduler.test.ts:301: instantiate (module)
-        - src/daemon/scheduler.test.ts:321: instantiate (module)
-        - src/daemon/scheduler.test.ts:349: instantiate (module)
+        - src/daemon/scheduler.test.ts:140: type scheduler
+        - src/daemon/scheduler.test.ts:154: instantiate (module)
+        - src/daemon/scheduler.test.ts:245: instantiate (module)
+        - src/daemon/scheduler.test.ts:267: instantiate (module)
+        - src/daemon/scheduler.test.ts:286: instantiate (module)
+        - src/daemon/scheduler.test.ts:302: instantiate (module)
+        - src/daemon/scheduler.test.ts:322: instantiate (module)
+        - src/daemon/scheduler.test.ts:350: instantiate (module)
   interface:
     49-56: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
-      refs in: 18 [reexport: 1, type: 17]
+      refs in: 19 [reexport: 1, type: 18]
         - src/daemon/index.ts:151: reexport (module)
-        - src/daemon/scheduler.ts:135: type SchedulerStatus
-        - src/daemon/scheduler.ts:148: type Scheduler.lastReanalysisResult
-        - src/daemon/scheduler.ts:149: type Scheduler.lastConnectionDiscoveryResult
-        - src/daemon/scheduler.ts:150: type Scheduler.lastPatternAggregationResult
-        - src/daemon/scheduler.ts:151: type Scheduler.lastClusteringResult
-        - src/daemon/scheduler.ts:370: type Scheduler.triggerReanalysis
-        - src/daemon/scheduler.ts:377: type Scheduler.triggerConnectionDiscovery
-        - src/daemon/scheduler.ts:384: type Scheduler.triggerPatternAggregation
-        - src/daemon/scheduler.ts:391: type Scheduler.triggerClustering
-    59-63: interface SchedulerLogger [exported]
+        - src/daemon/scheduler.ts:138: type SchedulerStatus
+        - src/daemon/scheduler.ts:151: type Scheduler.lastReanalysisResult
+        - src/daemon/scheduler.ts:152: type Scheduler.lastConnectionDiscoveryResult
+        - src/daemon/scheduler.ts:153: type Scheduler.lastPatternAggregationResult
+        - src/daemon/scheduler.ts:154: type Scheduler.lastClusteringResult
+        - src/daemon/scheduler.ts:373: type Scheduler.triggerReanalysis
+        - src/daemon/scheduler.ts:380: type Scheduler.triggerConnectionDiscovery
+        - src/daemon/scheduler.ts:387: type Scheduler.triggerPatternAggregation
+        - src/daemon/scheduler.ts:394: type Scheduler.triggerClustering
+    59-64: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
       refs in: 7 [import: 1, reexport: 1, type: 5]
         - src/daemon/index.ts:152: reexport (module)
         - src/daemon/scheduler.test.ts:19: import (module)
         - src/daemon/scheduler.test.ts:128: type createCapturingLogger
-        - src/daemon/scheduler.ts:66: type noopLogger
-        - src/daemon/scheduler.ts:73: type consoleLogger
-        - src/daemon/scheduler.ts:159: type Scheduler.constructor
-        - src/daemon/scheduler.ts:756: type createScheduler
-    80-125: interface SchedulerConfig [exported]
+        - src/daemon/scheduler.ts:67: type noopLogger
+        - src/daemon/scheduler.ts:75: type consoleLogger
+        - src/daemon/scheduler.ts:162: type Scheduler.constructor
+        - src/daemon/scheduler.ts:770: type createScheduler
+    83-128: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-      refs in: 15 [import: 1, reexport: 1, type: 13]
+      refs in: 17 [import: 1, reexport: 1, type: 15]
         - src/daemon/index.ts:153: reexport (module)
         - src/daemon/scheduler.test.ts:18: import (module)
-        - src/daemon/scheduler.test.ts:144: type defaultConfig
-        - src/daemon/scheduler.test.ts:406: type badConfig
-        - src/daemon/scheduler.test.ts:423: type badConfig
-        - src/daemon/scheduler.test.ts:443: type config
-        - src/daemon/scheduler.test.ts:456: type config
-        - src/daemon/scheduler.test.ts:568: type config
-        - src/daemon/scheduler.test.ts:589: type config
-        - src/daemon/scheduler.test.ts:605: type config
-    128-137: interface SchedulerStatus [exported]
+        - src/daemon/scheduler.test.ts:145: type defaultConfig
+        - src/daemon/scheduler.test.ts:485: type badConfig
+        - src/daemon/scheduler.test.ts:502: type badConfig
+        - src/daemon/scheduler.test.ts:522: type config
+        - src/daemon/scheduler.test.ts:535: type config
+        - src/daemon/scheduler.test.ts:647: type config
+        - src/daemon/scheduler.test.ts:668: type config
+        - src/daemon/scheduler.test.ts:684: type config
+    131-140: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:154: reexport (module)
-        - src/daemon/scheduler.ts:318: type Scheduler.getStatus
-        - src/daemon/scheduler.ts:319: type Scheduler.jobs
+        - src/daemon/scheduler.ts:321: type Scheduler.getStatus
+        - src/daemon/scheduler.ts:322: type Scheduler.jobs
   type:
     42-46: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -1142,44 +1149,44 @@ src/daemon/scheduler.ts [1-817]
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:150: reexport (module)
         - src/daemon/scheduler.ts:50: type ScheduledJobResult
-        - src/daemon/scheduler.ts:131: type SchedulerStatus
+        - src/daemon/scheduler.ts:134: type SchedulerStatus
   function:
-    752-780: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    766-794: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
         - src/daemon/daemon-process.ts:80: call scheduler
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
-        - src/daemon/scheduler.test.ts:483: call scheduler
-    786-795: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.test.ts:562: call scheduler
+    800-809: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:146: reexport (module)
         - src/daemon/scheduler.test.ts:14: import (module)
-        - src/daemon/scheduler.test.ts:494: call (module)
-        - src/daemon/scheduler.test.ts:495: call (module)
-        - src/daemon/scheduler.test.ts:496: call (module)
-        - src/daemon/scheduler.test.ts:497: call (module)
-        - src/daemon/scheduler.test.ts:498: call (module)
-        - src/daemon/scheduler.test.ts:502: call (module)
-        - src/daemon/scheduler.test.ts:503: call (module)
-        - src/daemon/scheduler.test.ts:504: call (module)
-    800-816: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.test.ts:573: call (module)
+        - src/daemon/scheduler.test.ts:574: call (module)
+        - src/daemon/scheduler.test.ts:575: call (module)
+        - src/daemon/scheduler.test.ts:576: call (module)
+        - src/daemon/scheduler.test.ts:577: call (module)
+        - src/daemon/scheduler.test.ts:581: call (module)
+        - src/daemon/scheduler.test.ts:582: call (module)
+        - src/daemon/scheduler.test.ts:583: call (module)
+    814-830: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
         - src/daemon/scheduler.test.ts:15: import (module)
-        - src/daemon/scheduler.test.ts:512: call times
-        - src/daemon/scheduler.test.ts:534: call (module)
-        - src/daemon/scheduler.test.ts:538: call times
+        - src/daemon/scheduler.test.ts:591: call times
+        - src/daemon/scheduler.test.ts:613: call (module)
+        - src/daemon/scheduler.test.ts:617: call times
   variable:
-    66-70: SchedulerLogger [exported]
+    67-72: SchedulerLogger [exported]
       /** Default no-op logger */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:148: reexport (module)
         - src/daemon/scheduler.test.ts:16: import (module)
-    73-77: SchedulerLogger [exported]
+    75-80: SchedulerLogger [exported]
       /** Console logger for production use */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:149: reexport (module)
@@ -1262,8 +1269,8 @@ src/daemon/watcher-events.ts [1-117]
       /** Helper to get session path from a session event */
       refs in: 13 [call: 9, import: 2, reexport: 2]
         - src/daemon/daemon-process.ts:22: import (module)
-        - src/daemon/daemon-process.ts:94: call sessionPath
-        - src/daemon/daemon-process.ts:112: call sessionPath
+        - src/daemon/daemon-process.ts:95: call sessionPath
+        - src/daemon/daemon-process.ts:113: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
         - src/daemon/watcher.test.ts:228: call (module)
@@ -1302,7 +1309,7 @@ src/daemon/watcher.ts [1-582]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
       refs in: 22 [import: 2, instantiate: 14, reexport: 2, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
-        - src/daemon/daemon-process.ts:88: instantiate watcher
+        - src/daemon/daemon-process.ts:89: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
         - src/daemon/watcher.test.ts:53: type waitForEvent
@@ -2666,4 +2673,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 39
-Estimated tokens: 35,416 (codebase: ~941,234)
+Estimated tokens: 35,512 (codebase: ~943,169)

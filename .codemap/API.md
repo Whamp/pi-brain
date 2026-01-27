@@ -124,9 +124,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-204]
+src/api/routes/query.ts [1-205]
   function:
-    44-203: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    44-204: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/query-processor.js
     - ../responses.js
@@ -240,7 +240,7 @@ src/cli.ts [1-1047]
     - node:path
     - open
 
-src/config/config.ts [1-724]
+src/config/config.ts [1-726]
   class:
     472-480: class ConfigError extends Error [exported]
       /** Configuration loading errors */
@@ -265,17 +265,17 @@ src/config/config.ts [1-724]
       /** Ensure the config directory exists */
     546-581: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    586-642: writeDefaultConfig(configPath?: string): void [exported]
+    586-644: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    647-655: getSessionDirs(config: PiBrainConfig): {} [exported]
+    649-657: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    660-662: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    662-664: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    667-671: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    669-673: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    676-683: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    678-685: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    694-723: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    696-725: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -395,7 +395,7 @@ src/daemon/connection-discovery.ts [1-623]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-193]
+src/daemon/daemon-process.ts [1-194]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -637,18 +637,18 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-817]
+src/daemon/scheduler.ts [1-831]
   class:
-    142-747: class Scheduler [exported]
+    145-761: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
-    59-63: interface SchedulerLogger [exported]
+    59-64: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    80-125: interface SchedulerConfig [exported]
+    83-128: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    128-137: interface SchedulerStatus [exported]
+    131-140: interface SchedulerStatus [exported]
       /** Scheduler state */
   type:
     42-46: ScheduledJobType = | "reanalysis"
@@ -657,16 +657,16 @@ src/daemon/scheduler.ts [1-817]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    752-780: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    766-794: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    786-795: isValidCronExpression(expression: string): boolean [exported]
+    800-809: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    800-816: getNextRunTimes(expression: string, count = 5): {} [exported]
+    814-830: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
-    66-70: SchedulerLogger [exported]
+    67-72: SchedulerLogger [exported]
       /** Default no-op logger */
-    73-77: SchedulerLogger [exported]
+    75-80: SchedulerLogger [exported]
       /** Console logger for production use */
   imports:
     - ../config/types.js
@@ -1830,4 +1830,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,871 (codebase: ~941,122)
+Estimated tokens: 22,871 (codebase: ~941,453)

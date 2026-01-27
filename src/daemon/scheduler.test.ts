@@ -130,6 +130,7 @@ function createCapturingLogger(): SchedulerLogger & { messages: string[] } {
   return {
     messages,
     info: (msg: string) => messages.push(`INFO: ${msg}`),
+    warn: (msg: string) => messages.push(`WARN: ${msg}`),
     error: (msg: string) => messages.push(`ERROR: ${msg}`),
     debug: (msg: string) => messages.push(`DEBUG: ${msg}`),
   };
@@ -384,6 +385,84 @@ describe("scheduler", () => {
       expect(typeof result.itemsProcessed).toBe("number");
       // With empty iterators, all counts should be 0
       expect(result.itemsProcessed).toBe(0);
+    });
+
+    it("should count unique patterns aggregated", async () => {
+      // Mock data for counting: tool errors create 2 unique patterns, model stats create 2 models, lessons create 1 pattern
+      const toolErrors = [
+        {
+          tool: "bash",
+          error_type: "timeout",
+          model: "claude",
+          node_id: "n1",
+          created_at: "2026-01-01",
+        },
+        {
+          tool: "bash",
+          error_type: "timeout",
+          model: "gpt4",
+          node_id: "n2",
+          created_at: "2026-01-02",
+        },
+        {
+          tool: "read",
+          error_type: "not_found",
+          model: "claude",
+          node_id: "n3",
+          created_at: "2026-01-03",
+        },
+      ];
+      const quirks = [
+        { model: "claude", count: 5, last_seen: "2026-01-01" },
+        { model: "gpt4", count: 3, last_seen: "2026-01-02" },
+      ];
+      const lessons = [
+        {
+          level: "session",
+          summary: "Use async",
+          node_id: "n1",
+          created_at: "2026-01-01",
+          tag_list: null,
+        },
+        {
+          level: "session",
+          summary: "Use async",
+          node_id: "n2",
+          created_at: "2026-01-02",
+          tag_list: null,
+        },
+      ];
+
+      const mockDb = {
+        prepare: vi.fn((sql: string) => ({
+          iterate: vi.fn(() => {
+            // Match query to data based on SQL content
+            if (sql.includes("FROM tool_errors") && sql.includes("ORDER BY")) {
+              return toolErrors[Symbol.iterator]();
+            }
+            if (sql.includes("FROM model_quirks")) {
+              return quirks[Symbol.iterator]();
+            }
+            if (sql.includes("FROM tool_errors") && sql.includes("GROUP BY")) {
+              return [][Symbol.iterator](); // No grouped errors for model stats
+            }
+            if (sql.includes("FROM lessons")) {
+              return lessons[Symbol.iterator]();
+            }
+            return [][Symbol.iterator]();
+          }),
+          run: vi.fn(),
+          get: vi.fn(),
+          all: vi.fn(() => []),
+        })),
+        transaction: vi.fn((fn) => fn),
+      } as unknown as Database.Database;
+
+      scheduler = new Scheduler(defaultConfig, queue, mockDb, logger);
+      const result = await scheduler.triggerPatternAggregation();
+
+      // 2 unique failure patterns + 2 models + 1 unique lesson pattern = 5
+      expect(result.itemsProcessed).toBe(5);
     });
 
     it("should handle database errors", async () => {
@@ -718,5 +797,79 @@ describe("clustering job", () => {
     const clusteringJob = status.jobs.find((j) => j.type === "clustering");
     expect(clusteringJob).toBeDefined();
     scheduler.stop();
+  });
+
+  it("should skip clustering gracefully when embedding API key is missing for openrouter", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+      embeddingProvider: "openrouter",
+      embeddingModel: "qwen/qwen3-embedding-8b",
+      // Note: embeddingApiKey is intentionally not set
+    };
+
+    const mockDb = {
+      prepare: vi.fn(() => ({
+        run: vi.fn(),
+        get: vi.fn(() => null),
+        all: vi.fn(() => []),
+        iterate: vi.fn(() => []),
+      })),
+      transaction: vi.fn((fn) => fn),
+    } as unknown as Database.Database;
+
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+
+    const result = await scheduler.triggerClustering();
+
+    // Should complete successfully with 0 items processed (skipped)
+    expect(result.type).toBe("clustering");
+    expect(result.itemsProcessed).toBe(0);
+    expect(result.error).toBeUndefined();
+    expect(result.completedAt.getTime()).toBeGreaterThanOrEqual(
+      result.startedAt.getTime()
+    );
+
+    // Should have logged a warning
+    expect(
+      logger.messages.some((m) => m.includes("Clustering skipped"))
+    ).toBeTruthy();
+  });
+
+  it("should skip clustering gracefully when embedding API key is missing for openai", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      clusteringSchedule: "0 4 * * *",
+      embeddingProvider: "openai",
+      // Note: embeddingApiKey is intentionally not set
+    };
+
+    const mockDb = {
+      prepare: vi.fn(() => ({
+        run: vi.fn(),
+        get: vi.fn(() => null),
+        all: vi.fn(() => []),
+        iterate: vi.fn(() => []),
+      })),
+      transaction: vi.fn((fn) => fn),
+    } as unknown as Database.Database;
+
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+
+    const result = await scheduler.triggerClustering();
+
+    // Should complete successfully with 0 items processed (skipped)
+    expect(result.type).toBe("clustering");
+    expect(result.itemsProcessed).toBe(0);
+    expect(result.error).toBeUndefined();
+
+    // Should have logged a warning mentioning openai
+    expect(
+      logger.messages.some(
+        (m) => m.includes("Clustering skipped") && m.includes("openai")
+      )
+    ).toBeTruthy();
   });
 });

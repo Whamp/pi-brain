@@ -1,6 +1,38 @@
+// extensions/brain-query/index.ts
+
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 import { Type } from "@sinclair/typebox";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import * as yaml from "yaml";
+
+// Define a minimal config type for the extension (to avoid dependency on src/config/types.ts which may not be available in dist)
+interface ExtensionConfig {
+  api?: {
+    port?: number;
+    host?: string;
+  };
+}
+
+// Function to read port from config file (similar to src/config/config.ts but standalone)
+function getApiPort(): number {
+  const DEFAULT_PORT = 8765;
+  const CONFIG_PATH = path.join(os.homedir(), ".pi-brain", "config.yaml");
+
+  try {
+    if (!fs.existsSync(CONFIG_PATH)) {
+      return DEFAULT_PORT;
+    }
+    const content = fs.readFileSync(CONFIG_PATH, "utf8");
+    const config = yaml.parse(content) as ExtensionConfig;
+    return config?.api?.port ?? DEFAULT_PORT;
+  } catch {
+    // Fallback to default on error
+    return DEFAULT_PORT;
+  }
+}
 
 interface BrainQueryResponse {
   status: "success" | "error";
@@ -156,6 +188,10 @@ function parseGenerateCommand(input: string): {
 }
 
 export default function brainExtension(pi: ExtensionAPI) {
+  // Read port from config once at startup
+  const port = getApiPort();
+  const API_BASE = `http://localhost:${port}`;
+
   // Register /brain command for USER queries, manual flags, and AGENTS.md generation
   // Usage:
   //   /brain <question>           - Query the knowledge graph
@@ -216,7 +252,7 @@ export default function brainExtension(pi: ExtensionAPI) {
         try {
           // Call the agents generate API
           const response = await fetch(
-            `http://localhost:8765/api/v1/agents/generate/${encodeURIComponent(modelToGenerate)}`,
+            `${API_BASE}/api/v1/agents/generate/${encodeURIComponent(modelToGenerate)}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -272,7 +308,7 @@ export default function brainExtension(pi: ExtensionAPI) {
 
       try {
         // Query the brain API
-        const response = await fetch("http://localhost:8765/api/v1/query", {
+        const response = await fetch(`${API_BASE}/api/v1/query`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -329,7 +365,7 @@ export default function brainExtension(pi: ExtensionAPI) {
     }),
     async execute(toolCallId, params, onUpdate, ctx, signal) {
       try {
-        const response = await fetch("http://localhost:8765/api/v1/query", {
+        const response = await fetch(`${API_BASE}/api/v1/query`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

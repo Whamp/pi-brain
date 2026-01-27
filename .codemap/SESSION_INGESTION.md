@@ -228,7 +228,7 @@ src/daemon/connection-discovery.ts [1-623]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-193]
+src/daemon/daemon-process.ts [1-194]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -732,16 +732,16 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-723]
+src/daemon/scheduler.test.ts [1-876]
   imports:
     - ./queue.js
     - ./scheduler.js
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-817]
+src/daemon/scheduler.ts [1-831]
   class:
-    142-747: class Scheduler [exported]
+    145-761: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
@@ -750,17 +750,17 @@ src/daemon/scheduler.ts [1-817]
         - src/daemon/scheduler.ts:50: type ScheduledJobType -> src/daemon/scheduler.ts
         - src/daemon/scheduler.ts:51: type Date -> external
         - src/daemon/scheduler.ts:52: type Date -> external
-    59-63: interface SchedulerLogger [exported]
+    59-64: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    80-125: interface SchedulerConfig [exported]
+    83-128: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    128-137: interface SchedulerStatus [exported]
+    131-140: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs out: 4 [type: 4]
-        - src/daemon/scheduler.ts:131: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:133: type Date -> external
-        - src/daemon/scheduler.ts:134: type Date -> external
-        - src/daemon/scheduler.ts:135: type ScheduledJobResult -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:134: type ScheduledJobType -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:136: type Date -> external
+        - src/daemon/scheduler.ts:137: type Date -> external
+        - src/daemon/scheduler.ts:138: type ScheduledJobResult -> src/daemon/scheduler.ts
   type:
     42-46: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -768,38 +768,39 @@ src/daemon/scheduler.ts [1-817]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    752-780: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    766-794: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:753: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:754: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:755: type Database -> external
-        - src/daemon/scheduler.ts:756: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:757: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:758: instantiate Scheduler -> src/daemon/scheduler.ts
-    786-795: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:767: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:768: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:769: type Database -> external
+        - src/daemon/scheduler.ts:770: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:771: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:772: instantiate Scheduler -> src/daemon/scheduler.ts
+    800-809: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:790: call Cron.stop -> external
-    800-816: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:804: call Cron.stop -> external
+    814-830: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:800: type Date -> external
-        - src/daemon/scheduler.ts:807: call push -> external
-        - src/daemon/scheduler.ts:808: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:811: call Cron.stop -> external
+        - src/daemon/scheduler.ts:814: type Date -> external
+        - src/daemon/scheduler.ts:821: call push -> external
+        - src/daemon/scheduler.ts:822: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:825: call Cron.stop -> external
   variable:
-    66-70: SchedulerLogger [exported]
+    67-72: SchedulerLogger [exported]
       /** Default no-op logger */
       refs out: 1 [type: 1]
-        - src/daemon/scheduler.ts:66: type SchedulerLogger -> src/daemon/scheduler.ts
-    73-77: SchedulerLogger [exported]
+        - src/daemon/scheduler.ts:67: type SchedulerLogger -> src/daemon/scheduler.ts
+    75-80: SchedulerLogger [exported]
       /** Console logger for production use */
-      refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:73: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:74: call log -> external
-        - src/daemon/scheduler.ts:75: call error -> external
-        - src/daemon/scheduler.ts:76: call debug -> external
+      refs out: 5 [call: 4, type: 1]
+        - src/daemon/scheduler.ts:75: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:76: call log -> external
+        - src/daemon/scheduler.ts:77: call warn -> external
+        - src/daemon/scheduler.ts:78: call error -> external
+        - src/daemon/scheduler.ts:79: call debug -> external
   imports:
     - ../config/types.js
     - ../prompt/effectiveness.js
@@ -1452,4 +1453,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,964 (codebase: ~941,234)
+Estimated tokens: 18,979 (codebase: ~943,169)

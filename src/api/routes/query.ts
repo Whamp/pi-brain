@@ -103,7 +103,8 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
           db,
           daemonConfig: effectiveConfig,
           queryPromptFile: path.join(
-            process.cwd(),
+            os.homedir(),
+            ".pi-brain",
             "prompts",
             "brain-query.md"
           ),

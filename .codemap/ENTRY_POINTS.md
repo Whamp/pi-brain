@@ -275,9 +275,9 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-204]
+src/api/routes/query.ts [1-205]
   function:
-    44-203: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    44-204: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 35 [call: 28, instantiate: 1, type: 6]
         - src/api/routes/query.ts:44: type FastifyInstance -> external
         - src/api/routes/query.ts:44: type Promise -> external
@@ -462,6 +462,8 @@ src/api/server.test.ts [1-683]
         - src/api/server.test.ts:28: call existsSync -> external
         - src/api/server.test.ts:29: call rmSync -> external
     33-39: createTestApiConfig(): ApiConfig
+      refs out: 1 [type: 1]
+        - src/api/server.test.ts:33: type ApiConfig -> src/config/types.ts
     41-111: createTestNode(overrides: Partial<Node> = {}): Node
       refs out: 8 [call: 3, instantiate: 2, type: 3]
         - src/api/server.test.ts:41: type Partial -> external
@@ -484,25 +486,27 @@ src/api/server.ts [1-183]
   interface:
     46-51: interface ServerContext [exported]
       /** Server context passed to route handlers */
-      refs out: 1 [type: 1]
+      refs out: 3 [type: 3]
         - src/api/server.ts:47: type Database -> external
+        - src/api/server.ts:48: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:50: type DaemonConfig -> src/config/types.ts
   function:
     65-155: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-      refs out: 30 [call: 26, instantiate: 1, type: 3]
+      refs out: 32 [call: 26, instantiate: 1, type: 5]
         - src/api/server.ts:66: type Database -> external
+        - src/api/server.ts:67: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:68: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:69: type Promise -> external
         - src/api/server.ts:69: type FastifyInstance -> external
-        - src/api/server.ts:77: call register -> external
-        - src/api/server.ts:83: call register -> external
     160-175: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Start the API server */
-      refs out: 5 [call: 2, type: 3]
+      refs out: 7 [call: 2, type: 5]
         - src/api/server.ts:161: type Database -> external
+        - src/api/server.ts:162: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:163: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:164: type Promise -> external
         - src/api/server.ts:164: type FastifyInstance -> external
-        - src/api/server.ts:167: call listen -> external
-        - src/api/server.ts:172: call info -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -570,4 +574,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 5,922 (codebase: ~941,122)
+Estimated tokens: 5,999 (codebase: ~941,453)

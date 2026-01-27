@@ -79,6 +79,7 @@ async function main(): Promise<void> {
   // Create scheduler for nightly jobs (takes full DaemonConfig)
   const scheduler = createScheduler(config.daemon, queue, db, {
     info: (msg: string) => console.log(`[scheduler] ${msg}`),
+    warn: (msg: string) => console.warn(`[scheduler] ${msg}`),
     error: (msg: string) => console.error(`[scheduler] ${msg}`),
     debug: (msg: string) => console.debug(`[scheduler] ${msg}`),
   });

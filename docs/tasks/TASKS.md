@@ -172,3 +172,11 @@ Track implementation progress. Agents update status as they complete work.
 | 12.5 | Return counts from PatternAggregator methods for status reporting           | done   | 8.6  | TODO-10af064f 2026-01-27                     |
 | 12.6 | Make hardcoded limits configurable in nightly processing                    | done   | 8.1  | 2026-01-27                                   |
 | 12.7 | Add JSDoc to connection-discovery.ts public methods                         | done   | 8.3  | 2026-01-27                                   |
+
+## Phase 11 Remediation: Signals & Insights Polish
+
+| ID    | Task                                                                    | Status  | Deps  | Notes      |
+| ----- | ----------------------------------------------------------------------- | ------- | ----- | ---------- |
+| 11R.1 | Wire up Abandoned Restart detection (worker integration + test)         | pending | 11.1  | -          |
+| 11R.2 | Refine Signals API & Storage (schema migration + DB column for signals) | pending | 11R.1 | -          |
+| 11R.3 | Clustering graceful degradation when embedding API key missing          | active  | 11.9a | 2026-01-27 |

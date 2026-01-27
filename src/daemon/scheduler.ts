@@ -58,6 +58,7 @@ export interface ScheduledJobResult {
 /** Logger interface for scheduler */
 export interface SchedulerLogger {
   info: (message: string) => void;
+  warn: (message: string) => void;
   error: (message: string) => void;
   debug?: (message: string) => void;
 }
@@ -65,6 +66,7 @@ export interface SchedulerLogger {
 /** Default no-op logger */
 export const noopLogger: SchedulerLogger = {
   info: () => {},
+  warn: () => {},
   error: () => {},
   debug: () => {},
 };
@@ -72,6 +74,7 @@ export const noopLogger: SchedulerLogger = {
 /** Console logger for production use */
 export const consoleLogger: SchedulerLogger = {
   info: (message: string) => console.log(`[scheduler] ${message}`),
+  warn: (message: string) => console.warn(`[scheduler] ${message}`),
   error: (message: string) => console.error(`[scheduler] ${message}`),
   debug: (message: string) => console.debug(`[scheduler] ${message}`),
 };
@@ -578,6 +581,7 @@ export class Scheduler {
 
     try {
       this.logger.info("Starting pattern aggregation job");
+      // Each aggregator returns the count of unique patterns/models aggregated
       const failurePatterns = this.patternAggregator.aggregateFailurePatterns();
       const modelStats = this.patternAggregator.aggregateModelStats();
       const lessonPatterns = this.patternAggregator.aggregateLessons();
@@ -677,15 +681,25 @@ export class Scheduler {
       // Build embedding config from scheduler config
       const embeddingProvider = this.config.embeddingProvider ?? "openrouter";
 
-      // Require API key for openrouter and openai
+      // Skip clustering if API key is missing for providers that require it
       if (
         (embeddingProvider === "openrouter" ||
           embeddingProvider === "openai") &&
         !this.config.embeddingApiKey
       ) {
-        throw new Error(
-          `Clustering requires embedding_api_key for ${embeddingProvider} provider`
+        this.logger.warn(
+          `Clustering skipped: No embedding API key configured for ${embeddingProvider} provider. ` +
+            `Set 'embedding_api_key' in config.yaml to enable semantic clustering.`
         );
+        const result: ScheduledJobResult = {
+          type: "clustering",
+          startedAt,
+          completedAt: new Date(),
+          itemsProcessed: 0,
+          error: undefined,
+        };
+        this.lastClusteringResult = result;
+        return result;
       }
 
       const embeddingConfig = {
