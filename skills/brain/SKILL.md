@@ -34,7 +34,7 @@ Record observations directly into the session for later analysis using `/brain -
 
 ```
 /brain --flag quirk Claude keeps using sed instead of read tool
-/brain --flag failure This caching approach caused race conditions
+/brain --flag fail This caching approach caused race conditions
 /brain --flag win One-shot implementation with clear spec worked perfectly
 /brain --flag note Remember to check edge cases for empty arrays
 ```
@@ -48,12 +48,12 @@ Short form:
 
 ### Flag Types
 
-| Type      | Use For                                    |
-| --------- | ------------------------------------------ |
-| `quirk`   | Model-specific behaviors worth remembering |
-| `failure` | Approaches that didn't work (and why)      |
-| `win`     | Techniques that worked exceptionally well  |
-| `note`    | General observations for future reference  |
+| Type    | Use For                                    |
+| ------- | ------------------------------------------ |
+| `quirk` | Model-specific behaviors worth remembering |
+| `fail`  | Approaches that didn't work (and why)      |
+| `win`   | Techniques that worked exceptionally well  |
+| `note`  | General observations for future reference  |
 
 Flags are extracted during session analysis and become part of the node's `signals.manualFlags` field.
 

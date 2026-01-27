@@ -18,6 +18,7 @@ import Fastify, {
 import type { ApiConfig } from "../config/types.js";
 
 import { errorResponse } from "./responses.js";
+import { agentsRoutes } from "./routes/agents.js";
 import { clustersRoutes } from "./routes/clusters.js";
 import { configRoutes } from "./routes/config.js";
 import { daemonRoutes } from "./routes/daemon.js";
@@ -110,6 +111,7 @@ export async function createServer(
       await api.register(sessionsRoutes, { prefix: "/sessions" });
       await api.register(configRoutes, { prefix: "/config" });
       await api.register(clustersRoutes, { prefix: "" });
+      await api.register(agentsRoutes, { prefix: "/agents" });
     },
     { prefix: "/api/v1" }
   );

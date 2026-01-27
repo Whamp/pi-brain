@@ -803,3 +803,18 @@
 - Users can confirm patterns (adds them as permanent insights) or dismiss them
 - Clusters need to be named by the LLM cluster analysis (Task 11.6) to appear in the feed
 - UI follows spec from web-ui.md and signals.md for Dashboard News Feed
+
+---
+
+## 2026-01-27 04:40 - Code Review Fixes for Task 11.7
+
+**Status**: Code review findings addressed
+**Validation**: All 1126 tests pass, lint clean
+**Commit**: a75523a
+
+### Fixes Applied:
+1. **[P0] Route ordering**: Moved /clusters/feed before /clusters/:id to prevent route shadowing
+2. **[P2] Error display**: Added per-item error state with auto-clear for failed confirm/dismiss actions
+3. **[P2] N+1 queries**: Replaced N+1 query pattern with batched query using window function (ROW_NUMBER)
+4. **[P3] Code cleanup**: Extracted ClusterRow and ClusterNodeRow interfaces to file scope, added mapClusterRow and mapNodeRow helpers
+

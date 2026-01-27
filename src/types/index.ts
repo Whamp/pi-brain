@@ -482,8 +482,8 @@ export interface PromptEffectiveness {
  * Manual flag recorded by user via /brain --flag command
  */
 export interface ManualFlag {
-  /** Flag type: quirk, failure, win, or generic note */
-  type: "quirk" | "failure" | "win" | "note";
+  /** Flag type: quirk, fail, win, or generic note */
+  type: "quirk" | "fail" | "win" | "note";
   /** User's message */
   message: string;
   /** ISO 8601 timestamp when flag was recorded */

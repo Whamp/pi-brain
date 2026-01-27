@@ -68,7 +68,7 @@ describe("/brain --flag command", () => {
     await commandHandler("", ctx);
 
     expect(ctx.ui.notify).toHaveBeenCalledWith(
-      "Usage: /brain <question> OR /brain --flag <type> <message>",
+      "Usage: /brain <question> | --flag <type> <message> | generate agents.md for <model>",
       "error"
     );
   });
@@ -82,20 +82,20 @@ describe("/brain --flag command", () => {
     });
     expect(ctx.ui.notify).toHaveBeenCalledWith(
       "Recorded quirk: Claude uses sed instead of read",
-      "success"
+      "info"
     );
   });
 
   it("should record a flag with -f short syntax", async () => {
-    await commandHandler("-f failure This approach did not work", ctx);
+    await commandHandler("-f fail This approach did not work", ctx);
 
     expect(pi.appendEntry).toHaveBeenCalledWith("brain_flag", {
-      type: "failure",
+      type: "fail",
       message: "This approach did not work",
     });
     expect(ctx.ui.notify).toHaveBeenCalledWith(
-      "Recorded failure: This approach did not work",
-      "success"
+      "Recorded fail: This approach did not work",
+      "info"
     );
   });
 
@@ -118,7 +118,7 @@ describe("/brain --flag command", () => {
   });
 
   it("should accept all valid flag types", async () => {
-    const types = ["quirk", "failure", "win", "note"] as const;
+    const types = ["quirk", "fail", "win", "note"] as const;
 
     for (const type of types) {
       pi.appendEntry.mockClear();
@@ -135,7 +135,7 @@ describe("/brain --flag command", () => {
 
     expect(pi.appendEntry).not.toHaveBeenCalled();
     expect(ctx.ui.notify).toHaveBeenCalledWith(
-      'Invalid flag type "invalid". Valid types: quirk, failure, win, note',
+      'Invalid flag type "invalid". Valid types: quirk, fail, win, note',
       "error"
     );
   });
@@ -226,5 +226,136 @@ describe("/brain --flag command", () => {
       type: "note",
       message: "Message with multiple words here",
     });
+  });
+});
+
+describe("/brain generate agents.md command", () => {
+  let pi: ReturnType<typeof createMockPi>;
+  let ctx: ReturnType<typeof createMockCtx>;
+  let commandHandler: (args: string, ctx: unknown) => Promise<void>;
+
+  function createMockPi() {
+    return {
+      registerCommand: vi.fn(),
+      registerTool: vi.fn(),
+      appendEntry: vi.fn(),
+      sendUserMessage: vi.fn(),
+    };
+  }
+
+  function createMockCtx() {
+    return {
+      ui: {
+        notify: vi.fn(),
+      },
+      cwd: "/test/project",
+      model: null,
+    };
+  }
+
+  beforeEach(() => {
+    pi = createMockPi();
+    ctx = createMockCtx();
+    brainExtension(pi as unknown as ExtensionAPI);
+    // Extract the command handler
+    commandHandler = pi.registerCommand.mock.calls[0][1].handler;
+  });
+
+  it("should parse generate agents.md for <model> command", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      json: async () => ({
+        status: "success",
+        model: "zai/glm-4.7",
+        outputPath: "/home/user/.pi/agent/contexts/zai_glm-4.7.md",
+        stats: {
+          quirksIncluded: 3,
+          winsIncluded: 2,
+          toolErrorsIncluded: 1,
+          failuresIncluded: 0,
+          lessonsIncluded: 1,
+          clustersIncluded: 0,
+        },
+      }),
+    } as Response);
+
+    await commandHandler("generate agents.md for zai/glm-4.7", ctx);
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "http://localhost:8765/api/v1/agents/generate/zai%2Fglm-4.7",
+      expect.objectContaining({
+        method: "POST",
+      })
+    );
+
+    expect(ctx.ui.notify).toHaveBeenCalledWith(
+      "Generating AGENTS.md for zai/glm-4.7...",
+      "info"
+    );
+
+    expect(ctx.ui.notify).toHaveBeenCalledWith(
+      expect.stringContaining("/home/user/.pi/agent/contexts/zai_glm-4.7.md"),
+      "info"
+    );
+
+    fetchSpy.mockRestore();
+  });
+
+  it("should handle missing model in generate command", async () => {
+    await commandHandler("generate agents.md for", ctx);
+
+    expect(ctx.ui.notify).toHaveBeenCalledWith(
+      expect.stringContaining("Missing model"),
+      "error"
+    );
+  });
+
+  it("should handle API errors", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      json: async () => ({
+        status: "error",
+        error: "No insights found",
+      }),
+    } as Response);
+
+    await commandHandler("generate agents.md for unknown/model", ctx);
+
+    expect(ctx.ui.notify).toHaveBeenCalledWith(
+      "Failed: No insights found",
+      "error"
+    );
+
+    fetchSpy.mockRestore();
+  });
+
+  it("should handle network errors", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockRejectedValue(new Error("Connection refused"));
+
+    await commandHandler("generate agents.md for zai/glm-4.7", ctx);
+
+    expect(ctx.ui.notify).toHaveBeenCalledWith(
+      "Generation failed: Connection refused",
+      "error"
+    );
+
+    fetchSpy.mockRestore();
+  });
+
+  it("should not match partial generate commands", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockRejectedValue(new Error("Network error"));
+
+    // This should be treated as a query, not a generate command
+    await commandHandler("generate something else", ctx);
+
+    // Should hit the query path
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "http://localhost:8765/api/v1/query",
+      expect.any(Object)
+    );
+
+    fetchSpy.mockRestore();
   });
 });

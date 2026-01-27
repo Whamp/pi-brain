@@ -9,3 +9,4 @@ export * from "./prompt.js";
 export * from "./prompt-generator.js";
 export * from "./prompt-injector.js";
 export * from "./effectiveness.js";
+export * from "./agents-generator.js";

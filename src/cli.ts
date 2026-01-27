@@ -37,6 +37,11 @@ import {
   getOverallStats,
 } from "./parser/analyzer.js";
 import {
+  generateAgentsForModel,
+  listModelsWithInsights,
+  previewAgentsForModel,
+} from "./prompt/agents-generator.js";
+import {
   autoDisableIneffectiveInsights,
   measureAndStoreEffectiveness,
 } from "./prompt/effectiveness.js";
@@ -876,6 +881,159 @@ promptCmd
             "  Run 'pi-brain prompt-learning inject' to inject insights."
           );
         }
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Agents command (Model-Specific AGENTS.md)
+// =============================================================================
+
+const agentsCmd = program
+  .command("agents")
+  .description("Generate model-specific AGENTS.md files");
+
+agentsCmd
+  .command("list")
+  .description("List all models with insights")
+  .option("-c, --config <path>", "Config file path")
+  .action((options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase({ path: config.hub.databaseDir });
+      migrate(db);
+
+      const models = listModelsWithInsights(db);
+
+      if (models.length === 0) {
+        console.log("No models with insights found.");
+        console.log(
+          "\nRun 'pi-brain daemon start' and analyze sessions to collect insights."
+        );
+      } else {
+        console.log(`Found ${models.length} models with insights:\n`);
+        for (const model of models) {
+          console.log(`  ${model}`);
+        }
+      }
+
+      db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+agentsCmd
+  .command("generate <model>")
+  .description("Generate AGENTS.md for a specific model")
+  .option("-c, --config <path>", "Config file path")
+  .option(
+    "-o, --output-dir <path>",
+    "Output directory (default: ~/.pi/agent/contexts)"
+  )
+  .option("--provider <provider>", "LLM provider for synthesis", "zai")
+  .option("--model <model>", "LLM model for synthesis", "glm-4.7")
+  .option("--no-llm", "Skip LLM synthesis, use fallback template")
+  .option("--min-confidence <n>", "Minimum confidence (0.0-1.0)", "0.5")
+  .option("--min-frequency <n>", "Minimum frequency", "2")
+  .option("--json", "Output as JSON")
+  .action(async (targetModel, options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase({ path: config.hub.databaseDir });
+      migrate(db);
+
+      console.log(`Generating AGENTS.md for ${targetModel}...`);
+
+      const generatorConfig = {
+        provider: options.llm === false ? undefined : options.provider,
+        model: options.llm === false ? undefined : options.model,
+        minConfidence: Number.parseFloat(options.minConfidence),
+        minFrequency: Number.parseInt(options.minFrequency, 10),
+        outputDir: options.outputDir,
+      };
+
+      // Use preview if --no-llm, otherwise full generation
+      const result =
+        options.llm === false
+          ? await previewAgentsForModel(db, targetModel, {
+              ...generatorConfig,
+              // Force fallback by not providing LLM config
+            })
+          : await generateAgentsForModel(db, targetModel, generatorConfig);
+
+      db.close();
+
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+        return;
+      }
+
+      if (result.success) {
+        console.log(`✓ Generated AGENTS.md for ${targetModel}`);
+        if (result.outputPath) {
+          console.log(`  Path: ${result.outputPath}`);
+        }
+        if (result.stats) {
+          console.log(`  Statistics:`);
+          console.log(`    Quirks: ${result.stats.quirksIncluded}`);
+          console.log(`    Wins: ${result.stats.winsIncluded}`);
+          console.log(`    Tool errors: ${result.stats.toolErrorsIncluded}`);
+          console.log(`    Failures: ${result.stats.failuresIncluded}`);
+          console.log(`    Lessons: ${result.stats.lessonsIncluded}`);
+          console.log(
+            `    Friction clusters: ${result.stats.clustersIncluded}`
+          );
+        }
+      } else {
+        console.error(`✗ Failed: ${result.error}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+agentsCmd
+  .command("preview <model>")
+  .description("Preview AGENTS.md content without saving")
+  .option("-c, --config <path>", "Config file path")
+  .option("--provider <provider>", "LLM provider for synthesis", "zai")
+  .option("--synthesis-model <model>", "LLM model for synthesis", "glm-4.7")
+  .option("--no-llm", "Skip LLM synthesis, use fallback template")
+  .option("--min-confidence <n>", "Minimum confidence (0.0-1.0)", "0.5")
+  .option("--min-frequency <n>", "Minimum frequency", "2")
+  .action(async (targetModel, options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase({ path: config.hub.databaseDir });
+      migrate(db);
+
+      const generatorConfig = {
+        provider: options.llm === false ? undefined : options.provider,
+        model: options.llm === false ? undefined : options.synthesisModel,
+        minConfidence: Number.parseFloat(options.minConfidence),
+        minFrequency: Number.parseInt(options.minFrequency, 10),
+      };
+
+      const result = await previewAgentsForModel(
+        db,
+        targetModel,
+        generatorConfig
+      );
+
+      db.close();
+
+      if (result.success && result.content) {
+        console.log(result.content);
+      } else {
+        console.error(`Error: ${result.error}`);
+        process.exit(1);
       }
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);

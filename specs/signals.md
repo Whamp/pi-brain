@@ -72,23 +72,34 @@ Allows the user to explicitly flag events during a session without disrupting th
 
 ### Syntax
 
-The user invokes a specific command in the `pi` agent. The agent should **not** respond with text, but simply record the event in the session.
+The user invokes a specific command in the `pi` agent.
 
-**Command:** `/brain` (with arguments)
+**Command:** `/brain --flag <type> <message>`
 
-**Arguments:**
+**Flag Types:**
 
-- `--flag <message>`: Generic flag.
-- `--quirk <message>`: Flag a model quirk.
-- `--fail <message>`: Flag a failure.
-- `--win <message>`: Flag a win.
+| Type    | Use For                                    |
+| ------- | ------------------------------------------ |
+| `quirk` | Model-specific behaviors worth remembering |
+| `fail`  | Approaches that didn't work (and why)      |
+| `win`   | Techniques that worked exceptionally well  |
+| `note`  | General observations for future reference  |
+
+**Formats:**
+
+- `--flag <type> <message>` - Standard form
+- `-f <type> <message>` - Short form
+- `--flag:<type> <message>` - Colon syntax
+- `-f:<type> <message>` - Short colon syntax
 
 **Examples:**
 
 ```
-/brain --flag this is an example of a weird gemini-3-pro failure
-/brain --quirk gemini-3-pro hates markdown in descriptions
-/brain --win this prompt worked perfectly
+/brain --flag quirk gemini-3-pro hates markdown in descriptions
+/brain --flag fail This caching approach caused race conditions
+/brain --flag win One-shot implementation with clear spec worked perfectly
+/brain -f note Remember to check edge cases
+/brain -f:win Perfect first try
 ```
 
 ### Implementation
@@ -96,8 +107,8 @@ The user invokes a specific command in the `pi` agent. The agent should **not** 
 1.  **Pi Extension**: A `brain` extension registers the `/brain` command.
 2.  **Handling**:
     - The command parses the flags.
-    - It writes a `CustomEntry` (or similar) to the session file with type `brain_flag`.
-    - It returns an empty/invisible response to the user so the chat isn't cluttered.
+    - It writes a `CustomEntry` to the session file with type `brain_flag`.
+    - It shows a brief notification confirming the flag was recorded (via `ctx.ui.notify`), without injecting a message into the agent conversation.
 3.  **Analysis**: The `session-analyzer` reads these `brain_flag` entries and adds them to `node.signals.manualFlags`.
 
 ## 3. Facet Discovery (Clustering)

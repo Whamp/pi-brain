@@ -15,12 +15,28 @@ interface BrainQueryResponse {
   };
 }
 
+interface AgentsGenerateResponse {
+  status: "success" | "error";
+  model?: string;
+  outputPath?: string;
+  content?: string;
+  stats?: {
+    quirksIncluded: number;
+    winsIncluded: number;
+    toolErrorsIncluded: number;
+    lessonsIncluded: number;
+    failuresIncluded: number;
+    clustersIncluded: number;
+  };
+  error?: string;
+}
+
 /** Valid flag types for manual notation */
-type FlagType = "quirk" | "failure" | "win" | "note";
+type FlagType = "quirk" | "fail" | "win" | "note";
 
 const VALID_FLAG_TYPES: readonly FlagType[] = [
   "quirk",
-  "failure",
+  "fail",
   "win",
   "note",
 ] as const;
@@ -97,18 +113,49 @@ function parseFlagCommand(input: string): {
   return { isFlag: true, type: flagType, message };
 }
 
+/**
+ * Parse "generate agents.md for <model>" command
+ * Formats:
+ *   /brain generate agents.md for zai/glm-4.7
+ *   /brain generate agents.md for anthropic/claude-sonnet-4-20250514
+ */
+function parseGenerateCommand(input: string): {
+  isGenerate: boolean;
+  model?: string;
+  error?: string;
+} {
+  // Check for "generate agents.md for" pattern
+  // Match with or without a model at the end
+  const generateMatch = input.match(/^generate\s+agents\.md\s+for(\s+(.*))?$/i);
+  if (!generateMatch) {
+    return { isGenerate: false };
+  }
+
+  const model = generateMatch[2]?.trim();
+  if (!model) {
+    return {
+      isGenerate: true,
+      error:
+        "Missing model. Usage: /brain generate agents.md for <provider/model>",
+    };
+  }
+
+  return { isGenerate: true, model };
+}
+
 export default function brainExtension(pi: ExtensionAPI) {
-  // Register /brain command for USER queries and manual flags
+  // Register /brain command for USER queries, manual flags, and AGENTS.md generation
   // Usage:
   //   /brain <question>           - Query the knowledge graph
   //   /brain --flag <type> <msg>  - Record a manual flag
   //   /brain -f <type> <msg>      - Record a manual flag (short form)
+  //   /brain generate agents.md for <model> - Generate model-specific AGENTS.md
   pi.registerCommand("brain", {
     description: "Query the pi-brain knowledge graph",
     handler: async (input, ctx) => {
       if (!input) {
         ctx.ui.notify(
-          "Usage: /brain <question> OR /brain --flag <type> <message>",
+          "Usage: /brain <question> | --flag <type> <message> | generate agents.md for <model>",
           "error"
         );
         return;
@@ -132,8 +179,79 @@ export default function brainExtension(pi: ExtensionAPI) {
 
         ctx.ui.notify(
           `Recorded ${flagResult.type}: ${flagResult.message}`,
-          "success"
+          "info"
         );
+        return;
+      }
+
+      // Check if this is a generate agents.md command
+      const generateResult = parseGenerateCommand(input);
+
+      if (generateResult.isGenerate) {
+        if (generateResult.error) {
+          ctx.ui.notify(generateResult.error, "error");
+          return;
+        }
+
+        const modelToGenerate = generateResult.model;
+        if (!modelToGenerate) {
+          ctx.ui.notify("Missing model name", "error");
+          return;
+        }
+
+        ctx.ui.notify(`Generating AGENTS.md for ${modelToGenerate}...`, "info");
+
+        try {
+          // Call the agents generate API
+          const response = await fetch(
+            `http://localhost:8765/api/v1/agents/generate/${encodeURIComponent(modelToGenerate)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({}),
+            }
+          );
+
+          const result = (await response.json()) as AgentsGenerateResponse;
+
+          if (result.status === "success") {
+            ctx.ui.notify(
+              `Generated AGENTS.md at ${result.outputPath}`,
+              "info"
+            );
+
+            // Provide details via a follow-up message
+            const { stats } = result;
+            if (stats) {
+              const total =
+                stats.quirksIncluded +
+                stats.winsIncluded +
+                stats.toolErrorsIncluded +
+                stats.failuresIncluded +
+                stats.lessonsIncluded +
+                stats.clustersIncluded;
+
+              pi.sendUserMessage(
+                `AGENTS.md generated for ${result.model} with ${total} insights:\n` +
+                  `- Quirks: ${stats.quirksIncluded}\n` +
+                  `- Wins: ${stats.winsIncluded}\n` +
+                  `- Tool errors: ${stats.toolErrorsIncluded}\n` +
+                  `- Failures: ${stats.failuresIncluded}\n` +
+                  `- Lessons: ${stats.lessonsIncluded}\n` +
+                  `- Friction clusters: ${stats.clustersIncluded}\n\n` +
+                  `Output: ${result.outputPath}`,
+                { deliverAs: "followUp" }
+              );
+            }
+          } else {
+            ctx.ui.notify(`Failed: ${result.error}`, "error");
+          }
+        } catch (error) {
+          ctx.ui.notify(
+            `Generation failed: ${(error as Error).message}`,
+            "error"
+          );
+        }
         return;
       }
 

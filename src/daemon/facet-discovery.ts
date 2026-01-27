@@ -18,6 +18,7 @@ import { randomBytes } from "node:crypto";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type {
   Cluster,
@@ -1152,6 +1153,16 @@ export class FacetDiscovery {
     config: ClusterAnalysisConfig,
     options?: { limit?: number }
   ): Promise<ClusterAnalysisBatchResult> {
+    // Validate config
+    if (!config.provider || typeof config.provider !== "string") {
+      throw new Error(
+        "ClusterAnalysisConfig.provider must be a non-empty string"
+      );
+    }
+    if (!config.model || typeof config.model !== "string") {
+      throw new Error("ClusterAnalysisConfig.model must be a non-empty string");
+    }
+
     const limit = options?.limit ?? 10;
 
     // Get pending clusters that need analysis
@@ -1170,18 +1181,16 @@ export class FacetDiscovery {
       const result = await this.analyzeCluster(cluster, config);
       results.push(result);
 
-      if (result.success) {
+      if (result.success && result.name && result.description) {
         succeeded++;
-        // Update the cluster with name and description
-        if (result.name && result.description) {
-          this.updateClusterDetails(
-            cluster.id,
-            result.name,
-            result.description
-          );
-        }
+        this.updateClusterDetails(cluster.id, result.name, result.description);
       } else {
         failed++;
+        // Mark as failed if success was true but name/description missing
+        if (result.success) {
+          result.success = false;
+          result.error = "LLM returned empty name or description";
+        }
       }
     }
 
@@ -1368,7 +1377,7 @@ export class FacetDiscovery {
     const promptFile = config.promptFile ?? defaultPromptFile;
 
     // Check if prompt file exists
-    // Only fall back to project prompts dir if using default path (not explicit config)
+    // Only fall back to module-relative prompts dir if using default path (not explicit config)
     let actualPromptFile = promptFile;
     try {
       await fs.access(promptFile);
@@ -1381,9 +1390,12 @@ export class FacetDiscovery {
         };
       }
 
-      // Try project prompts dir as fallback
+      // Try module-relative prompts dir as fallback (project root relative to src/daemon/)
+      const moduleDir = path.dirname(fileURLToPath(import.meta.url));
       const projectPromptFile = path.join(
-        process.cwd(),
+        moduleDir,
+        "..",
+        "..",
         "prompts",
         "cluster-analyzer.md"
       );
@@ -1448,7 +1460,7 @@ export class FacetDiscovery {
   /**
    * Spawn a pi process and wait for completion
    */
-  private async spawnPiProcess(
+  private spawnPiProcess(
     args: string[],
     timeoutMinutes: number
   ): Promise<{
@@ -1481,11 +1493,24 @@ export class FacetDiscovery {
         stdio: ["ignore", "pipe", "pipe"],
       });
 
+      // Don't keep the event loop alive for this process
+      proc.unref();
+
+      // Set up timeout with SIGTERM, then SIGKILL after grace period
       const timeout = setTimeout(() => {
-        proc.kill("SIGTERM");
         this.logger.error(
-          `Cluster analysis timed out after ${timeoutMinutes}m`
+          `Cluster analysis timed out after ${timeoutMinutes}m, sending SIGTERM`
         );
+        proc.kill("SIGTERM");
+
+        // Force SIGKILL after 5 second grace period (fire and forget)
+        setTimeout(() => {
+          this.logger.error(
+            "Process did not exit after SIGTERM, sending SIGKILL"
+          );
+          proc.kill("SIGKILL");
+        }, 5000);
+
         complete({
           stdout,
           stderr,
@@ -1573,16 +1598,20 @@ export class FacetDiscovery {
       .join("\n");
 
     // Try to extract JSON from the response
+    // Priority: fenced code block > bare JSON object (non-greedy, matching balanced braces)
     const jsonMatch =
       textContent.match(/```json\n([\s\S]*?)\n```/) ||
-      textContent.match(/\{[\s\S]*"name"[\s\S]*"description"[\s\S]*\}/);
+      textContent.match(
+        /\{[^{}]*"name"\s*:\s*"[^"]*"[^{}]*"description"\s*:\s*"[^"]*"[^{}]*\}/
+      );
 
     if (!jsonMatch) {
       return { success: false, error: "No JSON found in response" };
     }
 
     try {
-      const json = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+      const jsonStr = jsonMatch[1] || jsonMatch[0];
+      const json = JSON.parse(jsonStr) as Record<string, unknown>;
 
       if (!json.name || !json.description) {
         return {
