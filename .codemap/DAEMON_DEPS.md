@@ -29,6 +29,8 @@ src/daemon/index.ts
           - src/types/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
+      - src/storage/lesson-repository.ts
+        - [external] better-sqlite3
       - src/storage/node-conversion.ts
         - src/daemon/processor.ts
           - src/config/types.ts
@@ -99,6 +101,8 @@ src/daemon/index.ts
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/lesson-repository.ts
         - [external] better-sqlite3
       - src/storage/node-conversion.ts
         - src/daemon/processor.ts
@@ -261,6 +265,8 @@ src/daemon/index.ts
             - src/types/index.ts
             - [builtin] crypto
           - [external] better-sqlite3
+        - src/storage/lesson-repository.ts
+          - [external] better-sqlite3
         - src/storage/node-conversion.ts
           - src/daemon/processor.ts
             - src/config/types.ts
@@ -360,6 +366,8 @@ src/daemon/index.ts
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/lesson-repository.ts
         - [external] better-sqlite3
       - src/storage/node-conversion.ts
         - src/daemon/processor.ts
