@@ -869,25 +869,25 @@ src/parser/index.ts [1-9]
     - ./session.js
     - ./signals.js
 
-src/parser/session.ts [1-401]
+src/parser/session.ts [1-415]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
     33-82: parseSessionContent(content: string, filePath: string): SessionInfo [exported]
       /** Parse session content from string */
-    87-166: buildTree(entries: SessionEntry[]): any [exported]
+    87-180: buildTree(entries: SessionEntry[]): any [exported]
       /** Build a tree structure from entries */
-    172-196: findLeaf(entries: SessionEntry[]): string [exported]
+    186-210: findLeaf(entries: SessionEntry[]): string [exported]
       /** Find the current leaf entry ID The leaf is the latest entry that has no children */
-    201-213: findBranchPoints(entries: SessionEntry[]): {} [exported]
+    215-227: findBranchPoints(entries: SessionEntry[]): {} [exported]
       /** Find branch points (entries with multiple children) */
-    218-286: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+    232-300: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
-    333-352: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+    347-366: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
-    368-390: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+    382-404: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
-    395-400: getEntry(entries: SessionEntry[], id: string): any [exported]
+    409-414: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
   imports:
     - ../types.js
@@ -1820,4 +1820,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,491 (codebase: ~930,378)
+Estimated tokens: 22,491 (codebase: ~932,086)

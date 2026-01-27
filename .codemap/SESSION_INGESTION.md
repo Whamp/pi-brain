@@ -1236,7 +1236,7 @@ src/parser/session.test.ts [1-1128]
     - ./session.js
     - vitest
 
-src/parser/session.ts [1-401]
+src/parser/session.ts [1-415]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
@@ -1252,9 +1252,9 @@ src/parser/session.ts [1-401]
         - src/parser/session.ts:45: instantiate Error -> external
         - src/parser/session.ts:59: call push -> external
         - src/parser/session.ts:61: call warn -> external
-    87-166: buildTree(entries: SessionEntry[]): any [exported]
+    87-180: buildTree(entries: SessionEntry[]): any [exported]
       /** Build a tree structure from entries */
-      refs out: 14 [call: 12, type: 2]
+      refs out: 17 [call: 15, type: 2]
         - src/parser/session.ts:87: type SessionEntry -> src/types.ts
         - src/parser/session.ts:87: type TreeNode -> src/types.ts
         - src/parser/session.ts:95: call set -> external
@@ -1265,50 +1265,50 @@ src/parser/session.ts [1-401]
         - src/parser/session.ts:113: call sort -> external
         - src/parser/session.ts:113: call localeCompare -> external
         - src/parser/session.ts:122: call has -> external
-    172-196: findLeaf(entries: SessionEntry[]): string [exported]
+    186-210: findLeaf(entries: SessionEntry[]): string [exported]
       /** Find the current leaf entry ID The leaf is the latest entry that has no children */
       refs out: 3 [call: 2, type: 1]
-        - src/parser/session.ts:172: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:181: call add -> external
-        - src/parser/session.ts:188: call has -> external
-    201-213: findBranchPoints(entries: SessionEntry[]): {} [exported]
+        - src/parser/session.ts:186: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:195: call add -> external
+        - src/parser/session.ts:202: call has -> external
+    215-227: findBranchPoints(entries: SessionEntry[]): {} [exported]
       /** Find branch points (entries with multiple children) */
       refs out: 6 [call: 5, type: 1]
-        - src/parser/session.ts:201: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:206: call set -> external
-        - src/parser/session.ts:206: call get -> external
-        - src/parser/session.ts:210: call map -> external
-        - src/parser/session.ts:210: call filter -> external
-        - src/parser/session.ts:210: call entries -> external
-    218-286: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+        - src/parser/session.ts:215: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:220: call set -> external
+        - src/parser/session.ts:220: call get -> external
+        - src/parser/session.ts:224: call map -> external
+        - src/parser/session.ts:224: call filter -> external
+        - src/parser/session.ts:224: call entries -> external
+    232-300: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
       refs out: 4 [call: 1, type: 3]
-        - src/parser/session.ts:219: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:220: type TreeNode -> src/types.ts
-        - src/parser/session.ts:221: type SessionStats -> src/types.ts
-        - src/parser/session.ts:244: call add -> external
-    333-352: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+        - src/parser/session.ts:233: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:234: type TreeNode -> src/types.ts
+        - src/parser/session.ts:235: type SessionStats -> src/types.ts
+        - src/parser/session.ts:258: call add -> external
+    347-366: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
       refs out: 6 [call: 3, type: 3]
-        - src/parser/session.ts:334: type UserMessage -> src/types.ts
-        - src/parser/session.ts:334: type AssistantMessage -> src/types.ts
-        - src/parser/session.ts:340: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:343: call isArray -> external
-        - src/parser/session.ts:346: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:346: type TextContent -> src/types.ts
-    368-390: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+        - src/parser/session.ts:348: type UserMessage -> src/types.ts
+        - src/parser/session.ts:348: type AssistantMessage -> src/types.ts
+        - src/parser/session.ts:354: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:357: call isArray -> external
+        - src/parser/session.ts:360: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:360: type TextContent -> src/types.ts
+    382-404: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
       refs out: 4 [call: 2, type: 2]
-        - src/parser/session.ts:369: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:371: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:374: call set -> external
-        - src/parser/session.ts:385: call unshift -> external
-    395-400: getEntry(entries: SessionEntry[], id: string): any [exported]
+        - src/parser/session.ts:383: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:385: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:388: call set -> external
+        - src/parser/session.ts:399: call unshift -> external
+    409-414: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/session.ts:396: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:398: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:399: call find -> external
+        - src/parser/session.ts:410: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:412: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:413: call find -> external
   imports:
     - ../types.js
     - node:fs/promises
@@ -1434,4 +1434,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,452 (codebase: ~931,916)
+Estimated tokens: 18,452 (codebase: ~932,954)

@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 32835,
-  "codebase_tokens": 931916,
+  "codebase_tokens": 932954,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -10762,7 +10762,7 @@
       "language": "typescript",
       "lines": [
         1,
-        401
+        415
       ],
       "detail_level": "full",
       "token_estimate": 435,
@@ -10811,7 +10811,7 @@
           "signature": "buildTree(entries: SessionEntry[]): any",
           "lines": [
             87,
-            166
+            180
           ],
           "exported": true,
           "is_default": false,
@@ -10829,8 +10829,8 @@
           "kind": "function",
           "signature": "findLeaf(entries: SessionEntry[]): string",
           "lines": [
-            172,
-            196
+            186,
+            210
           ],
           "exported": true,
           "is_default": false,
@@ -10848,8 +10848,8 @@
           "kind": "function",
           "signature": "findBranchPoints(entries: SessionEntry[]): {}",
           "lines": [
-            201,
-            213
+            215,
+            227
           ],
           "exported": true,
           "is_default": false,
@@ -10867,8 +10867,8 @@
           "kind": "function",
           "signature": "calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats",
           "lines": [
-            218,
-            286
+            232,
+            300
           ],
           "exported": true,
           "is_default": false,
@@ -10886,8 +10886,8 @@
           "kind": "function",
           "signature": "calculateMaxDepth(node: TreeNode): number",
           "lines": [
-            291,
-            296
+            305,
+            310
           ],
           "exported": false,
           "is_default": false,
@@ -10905,8 +10905,8 @@
           "kind": "function",
           "signature": "findSessionName(entries: SessionEntry[]): string",
           "lines": [
-            301,
-            313
+            315,
+            327
           ],
           "exported": false,
           "is_default": false,
@@ -10924,8 +10924,8 @@
           "kind": "function",
           "signature": "findFirstMessage(entries: SessionEntry[]): string",
           "lines": [
-            318,
-            328
+            332,
+            342
           ],
           "exported": false,
           "is_default": false,
@@ -10943,8 +10943,8 @@
           "kind": "function",
           "signature": "extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string",
           "lines": [
-            333,
-            352
+            347,
+            366
           ],
           "exported": true,
           "is_default": false,
@@ -10962,8 +10962,8 @@
           "kind": "function",
           "signature": "truncate(str: string, maxLength: number): string",
           "lines": [
-            357,
-            363
+            371,
+            377
           ],
           "exported": false,
           "is_default": false,
@@ -10981,8 +10981,8 @@
           "kind": "function",
           "signature": "getPathToEntry(entries: SessionEntry[], targetId: string): {}",
           "lines": [
-            368,
-            390
+            382,
+            404
           ],
           "exported": true,
           "is_default": false,
@@ -11000,8 +11000,8 @@
           "kind": "function",
           "signature": "getEntry(entries: SessionEntry[], id: string): any",
           "lines": [
-            395,
-            400
+            409,
+            414
           ],
           "exported": true,
           "is_default": false,
