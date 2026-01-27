@@ -333,3 +333,29 @@
 - Ready for Task 9.4 (Daemon watches synced directories)
 - The schedule field enables spoke-specific rsync schedules
 - rsyncOptions allows per-spoke customization of bandwidth, delete behavior, and timeout
+
+---
+
+## 2026-01-26 17:10 - Task 9.4
+
+**Status**: pending → done
+**Validation**:
+- Added syncedStabilityThreshold to WatcherConfig (30s for synced vs 5s for local)
+- Added spokePaths Set to track spoke directories in SessionWatcher
+- Implemented addSpokePath(), isFromSpoke(), getStabilityThreshold(), getSpokePaths() methods
+- Updated fromConfig() and startFromConfig() to track spoke paths from config
+- Added 5 new tests for spoke path detection:
+  - "should track enabled spoke paths"
+  - "should identify sessions from spoke directories"
+  - "should return appropriate stability thresholds"
+  - "should use custom stability thresholds if configured"
+  - "should watch both hub and spoke directories with startFromConfig" (integration test)
+- Updated default stabilityThreshold from 2s to 5s per spec
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 844 passed, 4 skipped)
+**Commit**: f6bcb93
+**Notes**:
+- The watcher now properly tracks which directories are from spokes
+- Different stability thresholds allow for network sync delays on spoke sessions
+- isFromSpoke() method enables differentiated handling downstream (e.g., in worker for computer field)
+- Also included uncommitted Task 9.3 security additions (rsync extra_args validation)
