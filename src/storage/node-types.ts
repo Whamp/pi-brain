@@ -3,6 +3,8 @@
  * Based on specs/node-model.md
  */
 
+import { createHash } from "node:crypto";
+
 import type {
   DaemonMeta,
   LessonsByLevel,
@@ -22,6 +24,27 @@ export * from "../types/index.js";
  */
 export function generateNodeId(): string {
   return crypto.randomUUID().replaceAll("-", "").slice(0, 16);
+}
+
+/**
+ * Generate a deterministic 16-character hex node ID based on session and segment.
+ * This ensures idempotent ingestion - re-running the same job produces the same ID.
+ *
+ * The ID is derived from:
+ * - Session file path
+ * - Segment start entry ID
+ * - Segment end entry ID
+ *
+ * Two jobs with the same inputs will always produce the same node ID.
+ */
+export function generateDeterministicNodeId(
+  sessionFile: string,
+  segmentStart: string,
+  segmentEnd: string
+): string {
+  const input = `${sessionFile}:${segmentStart}:${segmentEnd}`;
+  const hash = createHash("sha256").update(input).digest("hex");
+  return hash.slice(0, 16);
 }
 
 /**

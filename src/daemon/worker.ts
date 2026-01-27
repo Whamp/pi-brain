@@ -24,8 +24,8 @@ import {
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
 import {
   agentOutputToNode,
-  createNode,
   linkNodeToPredecessors,
+  upsertNode,
 } from "../storage/node-repository.js";
 import { ConnectionDiscoverer } from "./connection-discovery.js";
 import {
@@ -343,14 +343,15 @@ export class Worker {
           },
         });
 
-        // 5. Store node in SQLite and JSON
-        createNode(this.db, node, {
+        // 5. Store node in SQLite and JSON (upsert for idempotent ingestion)
+        // If this job is a retry after a crash, the node may already exist
+        const { created } = upsertNode(this.db, node, {
           nodesDir: join(this.config.hub.databaseDir, "nodes"),
         });
 
         // 6. Create structural edges based on session boundaries.
-        // Only for initial analysis - reanalysis preserves existing edges.
-        if (job.type === "initial") {
+        // Only for initial analysis of new nodes - reanalysis preserves existing edges.
+        if (job.type === "initial" && created) {
           linkNodeToPredecessors(this.db, node, {
             boundaryType: job.context?.boundaryType,
           });
@@ -360,7 +361,7 @@ export class Worker {
         this.jobsSucceeded++;
 
         this.logger.info(
-          `Job ${job.id} completed successfully, created node ${node.id}`
+          `Job ${job.id} completed successfully, ${created ? "created" : "updated"} node ${node.id}`
         );
 
         // Call callback if provided

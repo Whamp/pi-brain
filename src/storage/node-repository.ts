@@ -17,6 +17,7 @@ import {
   type NodeStorageOptions,
 } from "./node-storage.js";
 import {
+  generateDeterministicNodeId,
   generateNodeId,
   type DaemonDecision,
   type Edge,
@@ -201,6 +202,106 @@ export function createNode(
     insertNodeToDb(db, node, dataFile, options);
 
     return node;
+  })();
+}
+
+/**
+ * Upsert a node - creates if not exists, updates if exists.
+ * This provides idempotent ingestion for analysis jobs.
+ *
+ * If a job crashes after writing JSON but before DB insert, re-running
+ * will update the existing data cleanly without duplicates or errors.
+ *
+ * Returns the node and whether it was created (true) or updated (false).
+ */
+export function upsertNode(
+  db: Database.Database,
+  node: Node,
+  options: RepositoryOptions = {}
+): { node: Node; created: boolean } {
+  return db.transaction(() => {
+    const exists = nodeExistsInDb(db, node.id);
+
+    // 1. Write JSON file (overwrites if exists)
+    const dataFile = writeNode(node, options);
+
+    if (!exists) {
+      // 2a. Insert into database
+      insertNodeToDb(db, node, dataFile, options);
+      return { node, created: true };
+    }
+
+    // 2b. Update existing node in database
+    const stmt = db.prepare(`
+      UPDATE nodes SET
+        version = ?,
+        type = ?,
+        project = ?,
+        is_new_project = ?,
+        had_clear_goal = ?,
+        outcome = ?,
+        tokens_used = ?,
+        cost = ?,
+        duration_minutes = ?,
+        timestamp = ?,
+        analyzed_at = ?,
+        analyzer_version = ?,
+        data_file = ?,
+        updated_at = datetime('now')
+      WHERE id = ?
+    `);
+
+    stmt.run(
+      node.version,
+      node.classification.type,
+      node.classification.project,
+      node.classification.isNewProject ? 1 : 0,
+      node.classification.hadClearGoal ? 1 : 0,
+      node.content.outcome,
+      node.metadata.tokensUsed,
+      node.metadata.cost,
+      node.metadata.durationMinutes,
+      node.metadata.timestamp,
+      node.metadata.analyzedAt,
+      node.metadata.analyzerVersion,
+      dataFile,
+      node.id
+    );
+
+    // 3. Clear and re-insert related data
+    db.prepare("DELETE FROM tags WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM topics WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM lessons WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM model_quirks WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM tool_errors WHERE node_id = ?").run(node.id);
+    db.prepare("DELETE FROM daemon_decisions WHERE node_id = ?").run(node.id);
+
+    // 4. Re-insert related data
+    const insertTag = db.prepare(
+      "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
+    );
+    for (const tag of node.semantic.tags) {
+      insertTag.run(node.id, tag);
+    }
+
+    const insertTopic = db.prepare(
+      "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
+    );
+    for (const topic of node.semantic.topics) {
+      insertTopic.run(node.id, topic);
+    }
+
+    insertLessons(db, node.id, node.lessons);
+    insertModelQuirks(db, node.id, node.observations.modelQuirks);
+    insertToolErrors(db, node.id, node.observations.toolUseErrors);
+    insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
+
+    // 5. Update FTS index
+    if (!options.skipFts) {
+      indexNodeForSearch(db, node);
+    }
+
+    return { node, created: false };
   })();
 }
 
@@ -3003,7 +3104,20 @@ export function agentOutputToNode(
   );
 
   // Identity and versioning
-  const id = context.existingNode?.id ?? generateNodeId();
+  // For reanalysis, reuse the existing node's ID
+  // For initial analysis, use deterministic ID based on session + segment
+  // This ensures idempotent ingestion - re-running the same job produces the same ID
+  let id: string;
+  if (context.existingNode) {
+    ({ id } = context.existingNode);
+  } else {
+    // Generate deterministic ID from session file and segment boundaries
+    id = generateDeterministicNodeId(
+      context.job.sessionFile,
+      context.job.segmentStart ?? "",
+      context.job.segmentEnd ?? ""
+    );
+  }
   const version = (context.existingNode?.version ?? 0) + 1;
   const previousVersions = context.existingNode
     ? [

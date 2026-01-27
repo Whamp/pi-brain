@@ -172,17 +172,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:913: call join -> external
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 17 [call: 16, type: 1]
+      refs out: 16 [call: 15, type: 1]
         - src/daemon/cli.ts:949: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:952: call log -> external
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
         - src/daemon/cli.ts:975: call log -> external
-        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-repository.ts
         - src/daemon/cli.ts:980: call log -> external
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
         - src/daemon/cli.ts:1004: call log -> external
+        - src/daemon/cli.ts:1007: call log -> external
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -918,17 +918,19 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-535]
+src/daemon/worker.ts [1-536]
   class:
-    113-474: class Worker [exported]
+    113-475: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     55-70: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 7 [type: 7]
+      refs out: 9 [type: 9]
+        - src/daemon/worker.ts:59: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:61: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:63: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:65: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:65: type Node -> src/types/index.ts
         - src/daemon/worker.ts:65: type Promise -> external
         - src/daemon/worker.ts:67: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:67: type Error -> external
@@ -944,31 +946,32 @@ src/daemon/worker.ts [1-535]
         - src/daemon/worker.ts:95: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:99: type Error -> external
   function:
-    483-485: createWorker(config: WorkerConfig): Worker [exported]
+    484-486: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:483: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:483: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:484: instantiate Worker -> src/daemon/worker.ts
-    491-505: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:484: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:484: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:485: instantiate Worker -> src/daemon/worker.ts
+    492-506: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-      refs out: 7 [call: 2, type: 5]
-        - src/daemon/worker.ts:492: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:494: type Database -> external
-        - src/daemon/worker.ts:495: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:496: type Promise -> external
-        - src/daemon/worker.ts:496: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:503: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:504: call Worker.processJob -> src/daemon/worker.ts
-    510-534: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+      refs out: 8 [call: 2, type: 6]
+        - src/daemon/worker.ts:493: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:494: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:495: type Database -> external
+        - src/daemon/worker.ts:496: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:497: type Promise -> external
+        - src/daemon/worker.ts:497: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:504: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:505: call Worker.processJob -> src/daemon/worker.ts
+    511-535: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:511: type Error -> external
-        - src/daemon/worker.ts:512: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:513: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:518: type ReturnType -> external
-        - src/daemon/worker.ts:530: call ceil -> external
-        - src/daemon/worker.ts:531: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:512: type Error -> external
+        - src/daemon/worker.ts:513: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:514: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:519: type ReturnType -> external
+        - src/daemon/worker.ts:531: call ceil -> external
+        - src/daemon/worker.ts:532: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1405,4 +1408,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,099 (codebase: ~924,038)
+Estimated tokens: 18,147 (codebase: ~927,632)

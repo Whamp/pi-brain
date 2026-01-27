@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 75,
-    "totalSymbols": 1000,
+    "totalSymbols": 1002,
     "byLanguage": {
       "typescript": 75
     },
     "bySymbolKind": {
-      "function": 445,
+      "function": 447,
       "type": 37,
       "interface": 239,
       "variable": 97,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32110,
-  "codebase_tokens": 924038,
+  "total_tokens": 32348,
+  "codebase_tokens": 927632,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9061,7 +9061,7 @@
       "language": "typescript",
       "lines": [
         1,
-        535
+        536
       ],
       "detail_level": "full",
       "token_estimate": 789,
@@ -9129,7 +9129,7 @@
           "signature": "Worker",
           "lines": [
             113,
-            474
+            475
           ],
           "exported": true,
           "is_default": false,
@@ -9604,7 +9604,7 @@
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
             245,
-            392
+            393
           ],
           "exported": false,
           "is_default": false,
@@ -9622,8 +9622,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            397,
-            464
+            398,
+            465
           ],
           "exported": false,
           "is_default": false,
@@ -9641,8 +9641,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            469,
-            473
+            470,
+            474
           ],
           "exported": false,
           "is_default": false,
@@ -9660,8 +9660,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            483,
-            485
+            484,
+            486
           ],
           "exported": true,
           "is_default": false,
@@ -9679,8 +9679,8 @@
           "kind": "function",
           "signature": "async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            491,
-            505
+            492,
+            506
           ],
           "exported": true,
           "is_default": false,
@@ -9698,8 +9698,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            510,
-            534
+            511,
+            535
           ],
           "exported": true,
           "is_default": false,
@@ -14177,18 +14177,18 @@
       "language": "typescript",
       "lines": [
         1,
-        3181
+        3295
       ],
       "detail_level": "full",
-      "token_estimate": 4807,
+      "token_estimate": 4926,
       "symbols": [
         {
           "name": "RepositoryOptions",
           "kind": "interface",
           "signature": "RepositoryOptions extends NodeStorageOptions",
           "lines": [
-            37,
-            40
+            38,
+            41
           ],
           "exported": true,
           "is_default": false,
@@ -14206,8 +14206,8 @@
           "kind": "interface",
           "signature": "NodeRow",
           "lines": [
-            43,
-            64
+            44,
+            65
           ],
           "exported": true,
           "is_default": false,
@@ -14225,8 +14225,8 @@
           "kind": "interface",
           "signature": "EdgeRow",
           "lines": [
-            67,
-            75
+            68,
+            76
           ],
           "exported": true,
           "is_default": false,
@@ -14244,8 +14244,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            85,
-            114
+            86,
+            115
           ],
           "exported": true,
           "is_default": false,
@@ -14263,8 +14263,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            120,
-            185
+            121,
+            186
           ],
           "exported": true,
           "is_default": false,
@@ -14282,8 +14282,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            191,
-            205
+            192,
+            206
           ],
           "exported": true,
           "is_default": false,
@@ -14297,12 +14297,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "upsertNode",
+          "kind": "function",
+          "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
+          "lines": [
+            217,
+            306
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Upsert a node - creates if not exists, updates if exists.\nThis provides idempotent ingestion for analysis jobs.\n\nIf a job crashes after writing JSON but before DB insert, re-running\nwill update the existing data cleanly without duplicates or errors.\n\nReturns the node and whether it was created (true) or updated (false).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "updateNode",
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            212,
-            300
+            313,
+            401
           ],
           "exported": true,
           "is_default": false,
@@ -14320,8 +14339,8 @@
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            305,
-            336
+            406,
+            437
           ],
           "exported": false,
           "is_default": false,
@@ -14339,8 +14358,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            341,
-            361
+            442,
+            462
           ],
           "exported": false,
           "is_default": false,
@@ -14358,8 +14377,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            366,
-            386
+            467,
+            487
           ],
           "exported": false,
           "is_default": false,
@@ -14377,8 +14396,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            391,
-            410
+            492,
+            511
           ],
           "exported": false,
           "is_default": false,
@@ -14396,8 +14415,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
           "lines": [
-            415,
-            421
+            516,
+            522
           ],
           "exported": true,
           "is_default": false,
@@ -14415,8 +14434,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
           "lines": [
-            428,
-            438
+            529,
+            539
           ],
           "exported": true,
           "is_default": false,
@@ -14434,8 +14453,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            443,
-            446
+            544,
+            547
           ],
           "exported": true,
           "is_default": false,
@@ -14453,8 +14472,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            451,
-            457
+            552,
+            558
           ],
           "exported": true,
           "is_default": false,
@@ -14472,8 +14491,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            463,
-            469
+            564,
+            570
           ],
           "exported": true,
           "is_default": false,
@@ -14491,8 +14510,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
           "lines": [
-            474,
-            486
+            575,
+            587
           ],
           "exported": true,
           "is_default": false,
@@ -14510,8 +14529,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            491,
-            502
+            592,
+            603
           ],
           "exported": true,
           "is_default": false,
@@ -14529,8 +14548,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            507,
-            518
+            608,
+            619
           ],
           "exported": true,
           "is_default": false,
@@ -14548,8 +14567,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            521,
-            528
+            622,
+            629
           ],
           "exported": false,
           "is_default": false,
@@ -14567,8 +14586,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            533,
-            538
+            634,
+            639
           ],
           "exported": false,
           "is_default": false,
@@ -14586,8 +14605,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            545,
-            583
+            646,
+            684
           ],
           "exported": true,
           "is_default": false,
@@ -14605,8 +14624,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            588,
-            599
+            689,
+            700
           ],
           "exported": false,
           "is_default": false,
@@ -14624,8 +14643,8 @@
           "kind": "function",
           "signature": "createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {\n    metadata?: EdgeMetadata;\n    createdBy?: \"boundary\" | \"daemon\" | \"user\";\n  } = {}): Edge",
           "lines": [
-            608,
-            644
+            709,
+            745
           ],
           "exported": true,
           "is_default": false,
@@ -14643,8 +14662,8 @@
           "kind": "function",
           "signature": "getEdgesFrom(db: Database.Database, nodeId: string): {}",
           "lines": [
-            649,
-            656
+            750,
+            757
           ],
           "exported": true,
           "is_default": false,
@@ -14662,8 +14681,8 @@
           "kind": "function",
           "signature": "getEdgesTo(db: Database.Database, nodeId: string): {}",
           "lines": [
-            661,
-            668
+            762,
+            769
           ],
           "exported": true,
           "is_default": false,
@@ -14681,8 +14700,8 @@
           "kind": "function",
           "signature": "getNodeEdges(db: Database.Database, nodeId: string): {}",
           "lines": [
-            673,
-            680
+            774,
+            781
           ],
           "exported": true,
           "is_default": false,
@@ -14700,8 +14719,8 @@
           "kind": "function",
           "signature": "getEdge(db: Database.Database, edgeId: string): EdgeRow",
           "lines": [
-            685,
-            688
+            786,
+            789
           ],
           "exported": true,
           "is_default": false,
@@ -14719,8 +14738,8 @@
           "kind": "function",
           "signature": "deleteEdge(db: Database.Database, edgeId: string): boolean",
           "lines": [
-            693,
-            696
+            794,
+            797
           ],
           "exported": true,
           "is_default": false,
@@ -14738,8 +14757,8 @@
           "kind": "function",
           "signature": "edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean",
           "lines": [
-            701,
-            719
+            802,
+            820
           ],
           "exported": true,
           "is_default": false,
@@ -14757,8 +14776,8 @@
           "kind": "function",
           "signature": "indexNodeForSearch(db: Database.Database, node: Node): void",
           "lines": [
-            728,
-            756
+            829,
+            857
           ],
           "exported": true,
           "is_default": false,
@@ -14776,8 +14795,8 @@
           "kind": "function",
           "signature": "searchNodes(db: Database.Database, query: string, limit = 20): {}",
           "lines": [
-            762,
-            788
+            863,
+            889
           ],
           "exported": true,
           "is_default": false,
@@ -14795,8 +14814,8 @@
           "kind": "type",
           "signature": "SearchField = | \"summary\"\n  | \"decisions\"\n  | \"lessons\"\n  | \"tags\"\n  | \"topics\"",
           "lines": [
-            795,
-            800
+            896,
+            901
           ],
           "exported": true,
           "is_default": false,
@@ -14814,8 +14833,8 @@
           "kind": "variable",
           "signature": "SearchField[]",
           "lines": [
-            803,
-            809
+            904,
+            910
           ],
           "exported": false,
           "is_default": false,
@@ -14833,8 +14852,8 @@
           "kind": "interface",
           "signature": "SearchHighlight",
           "lines": [
-            812,
-            817
+            913,
+            918
           ],
           "exported": true,
           "is_default": false,
@@ -14852,8 +14871,8 @@
           "kind": "interface",
           "signature": "SearchResult",
           "lines": [
-            820,
-            827
+            921,
+            928
           ],
           "exported": true,
           "is_default": false,
@@ -14871,8 +14890,8 @@
           "kind": "interface",
           "signature": "SearchOptions",
           "lines": [
-            830,
-            839
+            931,
+            940
           ],
           "exported": true,
           "is_default": false,
@@ -14890,8 +14909,8 @@
           "kind": "interface",
           "signature": "SearchNodesResult",
           "lines": [
-            842,
-            851
+            943,
+            952
           ],
           "exported": true,
           "is_default": false,
@@ -14909,8 +14928,8 @@
           "kind": "function",
           "signature": "quoteSearchQuery(query: string): string",
           "lines": [
-            857,
-            863
+            958,
+            964
           ],
           "exported": false,
           "is_default": false,
@@ -14928,8 +14947,8 @@
           "kind": "function",
           "signature": "buildFieldQuery(query: string, fields: SearchField[]): string",
           "lines": [
-            870,
-            892
+            971,
+            993
           ],
           "exported": false,
           "is_default": false,
@@ -14947,8 +14966,8 @@
           "kind": "function",
           "signature": "extractSnippet(text: string, query: string, maxLength = 100): string",
           "lines": [
-            898,
-            951
+            999,
+            1052
           ],
           "exported": false,
           "is_default": false,
@@ -14966,8 +14985,8 @@
           "kind": "function",
           "signature": "findHighlights(db: Database.Database, nodeId: string, query: string, fields: SearchField[]): {}",
           "lines": [
-            957,
-            1009
+            1058,
+            1110
           ],
           "exported": false,
           "is_default": false,
@@ -14985,8 +15004,8 @@
           "kind": "function",
           "signature": "searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult",
           "lines": [
-            1031,
-            1154
+            1132,
+            1255
           ],
           "exported": true,
           "is_default": false,
@@ -15004,8 +15023,8 @@
           "kind": "function",
           "signature": "countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, \"fields\" | \"filters\"> = {}): number",
           "lines": [
-            1159,
-            1247
+            1260,
+            1348
           ],
           "exported": true,
           "is_default": false,
@@ -15023,8 +15042,8 @@
           "kind": "interface",
           "signature": "ListLessonsFilters",
           "lines": [
-            1254,
-            1263
+            1355,
+            1364
           ],
           "exported": true,
           "is_default": false,
@@ -15042,8 +15061,8 @@
           "kind": "interface",
           "signature": "ListLessonsOptions",
           "lines": [
-            1266,
-            1271
+            1367,
+            1372
           ],
           "exported": true,
           "is_default": false,
@@ -15061,8 +15080,8 @@
           "kind": "interface",
           "signature": "ListLessonsResult",
           "lines": [
-            1274,
-            1293
+            1375,
+            1394
           ],
           "exported": true,
           "is_default": false,
@@ -15080,8 +15099,8 @@
           "kind": "function",
           "signature": "listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult",
           "lines": [
-            1306,
-            1405
+            1407,
+            1506
           ],
           "exported": true,
           "is_default": false,
@@ -15099,8 +15118,8 @@
           "kind": "type",
           "signature": "LessonsByLevelResult = Record<\n  string,\n  {\n    count: number;\n    recent: {\n      id: string;\n      summary: string;\n      createdAt: string;\n    }[];\n  }\n>",
           "lines": [
-            1408,
-            1418
+            1509,
+            1519
           ],
           "exported": true,
           "is_default": false,
@@ -15118,8 +15137,8 @@
           "kind": "function",
           "signature": "getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }>",
           "lines": [
-            1426,
-            1466
+            1527,
+            1567
           ],
           "exported": true,
           "is_default": false,
@@ -15137,8 +15156,8 @@
           "kind": "function",
           "signature": "countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number",
           "lines": [
-            1471,
-            1477
+            1572,
+            1578
           ],
           "exported": true,
           "is_default": false,
@@ -15156,8 +15175,8 @@
           "kind": "type",
           "signature": "QuirkFrequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
           "lines": [
-            1484,
-            1484
+            1585,
+            1585
           ],
           "exported": true,
           "is_default": false,
@@ -15175,8 +15194,8 @@
           "kind": "type",
           "signature": "QuirkSeverity = \"low\" | \"medium\" | \"high\"",
           "lines": [
-            1487,
-            1487
+            1588,
+            1588
           ],
           "exported": true,
           "is_default": false,
@@ -15194,8 +15213,8 @@
           "kind": "interface",
           "signature": "ListQuirksFilters",
           "lines": [
-            1490,
-            1499
+            1591,
+            1600
           ],
           "exported": true,
           "is_default": false,
@@ -15213,8 +15232,8 @@
           "kind": "interface",
           "signature": "ListQuirksOptions",
           "lines": [
-            1502,
-            1507
+            1603,
+            1608
           ],
           "exported": true,
           "is_default": false,
@@ -15232,8 +15251,8 @@
           "kind": "interface",
           "signature": "QuirkResult",
           "lines": [
-            1510,
-            1519
+            1611,
+            1620
           ],
           "exported": true,
           "is_default": false,
@@ -15251,8 +15270,8 @@
           "kind": "interface",
           "signature": "ListQuirksResult",
           "lines": [
-            1522,
-            1531
+            1623,
+            1632
           ],
           "exported": true,
           "is_default": false,
@@ -15270,8 +15289,8 @@
           "kind": "variable",
           "signature": "Record<string, number>",
           "lines": [
-            1534,
-            1539
+            1635,
+            1640
           ],
           "exported": false,
           "is_default": false,
@@ -15289,8 +15308,8 @@
           "kind": "function",
           "signature": "listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult",
           "lines": [
-            1551,
-            1611
+            1652,
+            1712
           ],
           "exported": true,
           "is_default": false,
@@ -15308,8 +15327,8 @@
           "kind": "interface",
           "signature": "ModelQuirkStats",
           "lines": [
-            1614,
-            1624
+            1715,
+            1725
           ],
           "exported": true,
           "is_default": false,
@@ -15327,8 +15346,8 @@
           "kind": "type",
           "signature": "QuirksByModelResult = Record<string, ModelQuirkStats>",
           "lines": [
-            1627,
-            1627
+            1728,
+            1728
           ],
           "exported": true,
           "is_default": false,
@@ -15346,8 +15365,8 @@
           "kind": "function",
           "signature": "getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats>",
           "lines": [
-            1635,
-            1673
+            1736,
+            1774
           ],
           "exported": true,
           "is_default": false,
@@ -15365,8 +15384,8 @@
           "kind": "function",
           "signature": "countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number",
           "lines": [
-            1678,
-            1684
+            1779,
+            1785
           ],
           "exported": true,
           "is_default": false,
@@ -15384,8 +15403,8 @@
           "kind": "function",
           "signature": "getAllQuirkModels(db: Database.Database): {}",
           "lines": [
-            1689,
-            1696
+            1790,
+            1797
           ],
           "exported": true,
           "is_default": false,
@@ -15403,8 +15422,8 @@
           "kind": "function",
           "signature": "getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {}",
           "lines": [
-            1704,
-            1746
+            1805,
+            1847
           ],
           "exported": true,
           "is_default": false,
@@ -15422,8 +15441,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsFilters",
           "lines": [
-            1753,
-            1762
+            1854,
+            1863
           ],
           "exported": true,
           "is_default": false,
@@ -15441,8 +15460,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsOptions",
           "lines": [
-            1765,
-            1770
+            1866,
+            1871
           ],
           "exported": true,
           "is_default": false,
@@ -15460,8 +15479,8 @@
           "kind": "interface",
           "signature": "ToolErrorResult",
           "lines": [
-            1773,
-            1782
+            1874,
+            1883
           ],
           "exported": true,
           "is_default": false,
@@ -15479,8 +15498,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsResult",
           "lines": [
-            1785,
-            1794
+            1886,
+            1895
           ],
           "exported": true,
           "is_default": false,
@@ -15498,8 +15517,8 @@
           "kind": "function",
           "signature": "listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult",
           "lines": [
-            1799,
-            1857
+            1900,
+            1958
           ],
           "exported": true,
           "is_default": false,
@@ -15517,8 +15536,8 @@
           "kind": "function",
           "signature": "getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {}",
           "lines": [
-            1863,
-            1951
+            1964,
+            2052
           ],
           "exported": true,
           "is_default": false,
@@ -15536,8 +15555,8 @@
           "kind": "function",
           "signature": "getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; }",
           "lines": [
-            1957,
-            2015
+            2058,
+            2116
           ],
           "exported": true,
           "is_default": false,
@@ -15555,8 +15574,8 @@
           "kind": "function",
           "signature": "countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number",
           "lines": [
-            2020,
-            2026
+            2121,
+            2127
           ],
           "exported": true,
           "is_default": false,
@@ -15574,8 +15593,8 @@
           "kind": "function",
           "signature": "getAllToolsWithErrors(db: Database.Database): {}",
           "lines": [
-            2031,
-            2038
+            2132,
+            2139
           ],
           "exported": true,
           "is_default": false,
@@ -15593,8 +15612,8 @@
           "kind": "function",
           "signature": "getNodeSummary(db: Database.Database, nodeId: string): string",
           "lines": [
-            2047,
-            2054
+            2148,
+            2155
           ],
           "exported": true,
           "is_default": false,
@@ -15612,8 +15631,8 @@
           "kind": "function",
           "signature": "getNodeTags(db: Database.Database, nodeId: string): {}",
           "lines": [
-            2059,
-            2063
+            2160,
+            2164
           ],
           "exported": true,
           "is_default": false,
@@ -15631,8 +15650,8 @@
           "kind": "function",
           "signature": "getNodeTopics(db: Database.Database, nodeId: string): {}",
           "lines": [
-            2068,
-            2072
+            2169,
+            2173
           ],
           "exported": true,
           "is_default": false,
@@ -15650,8 +15669,8 @@
           "kind": "function",
           "signature": "getNodeLessons(db: Database.Database, nodeId: string): {}",
           "lines": [
-            2077,
-            2100
+            2178,
+            2201
           ],
           "exported": true,
           "is_default": false,
@@ -15669,8 +15688,8 @@
           "kind": "function",
           "signature": "getNodeQuirks(db: Database.Database, nodeId: string): {}",
           "lines": [
-            2105,
-            2128
+            2206,
+            2229
           ],
           "exported": true,
           "is_default": false,
@@ -15688,8 +15707,8 @@
           "kind": "function",
           "signature": "getNodeToolErrors(db: Database.Database, nodeId: string): {}",
           "lines": [
-            2133,
-            2156
+            2234,
+            2257
           ],
           "exported": true,
           "is_default": false,
@@ -15707,8 +15726,8 @@
           "kind": "function",
           "signature": "getAllTags(db: Database.Database): {}",
           "lines": [
-            2161,
-            2171
+            2262,
+            2272
           ],
           "exported": true,
           "is_default": false,
@@ -15726,8 +15745,8 @@
           "kind": "function",
           "signature": "getAllTopics(db: Database.Database): {}",
           "lines": [
-            2176,
-            2180
+            2277,
+            2281
           ],
           "exported": true,
           "is_default": false,
@@ -15745,8 +15764,8 @@
           "kind": "function",
           "signature": "getLessonTags(db: Database.Database, lessonId: string): {}",
           "lines": [
-            2185,
-            2192
+            2286,
+            2293
           ],
           "exported": true,
           "is_default": false,
@@ -15764,8 +15783,8 @@
           "kind": "function",
           "signature": "getNodesByTag(db: Database.Database, tag: string): {}",
           "lines": [
-            2197,
-            2207
+            2298,
+            2308
           ],
           "exported": true,
           "is_default": false,
@@ -15783,8 +15802,8 @@
           "kind": "function",
           "signature": "getNodesByTopic(db: Database.Database, topic: string): {}",
           "lines": [
-            2212,
-            2223
+            2313,
+            2324
           ],
           "exported": true,
           "is_default": false,
@@ -15802,8 +15821,8 @@
           "kind": "type",
           "signature": "NodeSortField = | \"timestamp\"\n  | \"analyzed_at\"\n  | \"project\"\n  | \"type\"\n  | \"outcome\"\n  | \"tokens_used\"\n  | \"cost\"\n  | \"duration_minutes\"",
           "lines": [
-            2230,
-            2238
+            2331,
+            2339
           ],
           "exported": true,
           "is_default": false,
@@ -15821,8 +15840,8 @@
           "kind": "type",
           "signature": "SortOrder = \"asc\" | \"desc\"",
           "lines": [
-            2241,
-            2241
+            2342,
+            2342
           ],
           "exported": true,
           "is_default": false,
@@ -15840,8 +15859,8 @@
           "kind": "type",
           "signature": "NodeTypeFilter = | \"coding\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"debugging\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"refactor\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"other\"",
           "lines": [
-            2244,
-            2256
+            2345,
+            2357
           ],
           "exported": true,
           "is_default": false,
@@ -15859,8 +15878,8 @@
           "kind": "type",
           "signature": "OutcomeFilter = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
           "lines": [
-            2259,
-            2259
+            2360,
+            2360
           ],
           "exported": true,
           "is_default": false,
@@ -15878,8 +15897,8 @@
           "kind": "interface",
           "signature": "ListNodesFilters",
           "lines": [
-            2262,
-            2287
+            2363,
+            2388
           ],
           "exported": true,
           "is_default": false,
@@ -15897,8 +15916,8 @@
           "kind": "interface",
           "signature": "ListNodesOptions",
           "lines": [
-            2290,
-            2299
+            2391,
+            2400
           ],
           "exported": true,
           "is_default": false,
@@ -15916,8 +15935,8 @@
           "kind": "interface",
           "signature": "ListNodesResult",
           "lines": [
-            2302,
-            2311
+            2403,
+            2412
           ],
           "exported": true,
           "is_default": false,
@@ -15935,8 +15954,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            2314,
-            2323
+            2415,
+            2424
           ],
           "exported": false,
           "is_default": false,
@@ -15954,8 +15973,8 @@
           "kind": "function",
           "signature": "listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult",
           "lines": [
-            2341,
-            2466
+            2442,
+            2567
           ],
           "exported": true,
           "is_default": false,
@@ -15973,8 +15992,8 @@
           "kind": "interface",
           "signature": "SessionSummaryRow",
           "lines": [
-            2471,
-            2483
+            2572,
+            2584
           ],
           "exported": true,
           "is_default": false,
@@ -15992,8 +16011,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            2489,
-            2518
+            2590,
+            2619
           ],
           "exported": true,
           "is_default": false,
@@ -16011,8 +16030,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            2523,
-            2531
+            2624,
+            2632
           ],
           "exported": true,
           "is_default": false,
@@ -16030,8 +16049,8 @@
           "kind": "function",
           "signature": "getAllNodeTypes(db: Database.Database): {}",
           "lines": [
-            2536,
-            2544
+            2637,
+            2645
           ],
           "exported": true,
           "is_default": false,
@@ -16049,8 +16068,8 @@
           "kind": "function",
           "signature": "getAllComputers(db: Database.Database): {}",
           "lines": [
-            2549,
-            2557
+            2650,
+            2658
           ],
           "exported": true,
           "is_default": false,
@@ -16068,8 +16087,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            2562,
-            2568
+            2663,
+            2669
           ],
           "exported": true,
           "is_default": false,
@@ -16087,8 +16106,8 @@
           "kind": "type",
           "signature": "TraversalDirection = \"incoming\" | \"outgoing\" | \"both\"",
           "lines": [
-            2575,
-            2575
+            2676,
+            2676
           ],
           "exported": true,
           "is_default": false,
@@ -16106,8 +16125,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesOptions",
           "lines": [
-            2578,
-            2594
+            2679,
+            2695
           ],
           "exported": true,
           "is_default": false,
@@ -16125,8 +16144,8 @@
           "kind": "interface",
           "signature": "TraversalEdge",
           "lines": [
-            2597,
-            2612
+            2698,
+            2713
           ],
           "exported": true,
           "is_default": false,
@@ -16144,8 +16163,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesResult",
           "lines": [
-            2615,
-            2622
+            2716,
+            2723
           ],
           "exported": true,
           "is_default": false,
@@ -16163,8 +16182,8 @@
           "kind": "function",
           "signature": "getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            2653,
-            2758
+            2754,
+            2859
           ],
           "exported": true,
           "is_default": false,
@@ -16182,8 +16201,8 @@
           "kind": "function",
           "signature": "getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            2767,
-            2814
+            2868,
+            2915
           ],
           "exported": true,
           "is_default": false,
@@ -16201,8 +16220,8 @@
           "kind": "function",
           "signature": "findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; }",
           "lines": [
-            2822,
-            2876
+            2923,
+            2977
           ],
           "exported": true,
           "is_default": false,
@@ -16220,8 +16239,8 @@
           "kind": "function",
           "signature": "getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            2882,
-            2892
+            2983,
+            2993
           ],
           "exported": true,
           "is_default": false,
@@ -16239,8 +16258,8 @@
           "kind": "function",
           "signature": "getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            2898,
-            2908
+            2999,
+            3009
           ],
           "exported": true,
           "is_default": false,
@@ -16258,8 +16277,8 @@
           "kind": "function",
           "signature": "generateLessonId(): string",
           "lines": [
-            2914,
-            2916
+            3015,
+            3017
           ],
           "exported": false,
           "is_default": false,
@@ -16277,8 +16296,8 @@
           "kind": "function",
           "signature": "generateQuirkId(): string",
           "lines": [
-            2918,
-            2920
+            3019,
+            3021
           ],
           "exported": false,
           "is_default": false,
@@ -16296,8 +16315,8 @@
           "kind": "function",
           "signature": "generateErrorId(): string",
           "lines": [
-            2922,
-            2924
+            3023,
+            3025
           ],
           "exported": false,
           "is_default": false,
@@ -16315,8 +16334,8 @@
           "kind": "function",
           "signature": "generateDecisionId(): string",
           "lines": [
-            2926,
-            2928
+            3027,
+            3029
           ],
           "exported": false,
           "is_default": false,
@@ -16334,8 +16353,8 @@
           "kind": "function",
           "signature": "generateEdgeId(): string",
           "lines": [
-            2930,
-            2932
+            3031,
+            3033
           ],
           "exported": false,
           "is_default": false,
@@ -16353,8 +16372,8 @@
           "kind": "function",
           "signature": "edgeRowToEdge(row: EdgeRow): Edge",
           "lines": [
-            2941,
-            2951
+            3042,
+            3052
           ],
           "exported": true,
           "is_default": false,
@@ -16372,8 +16391,8 @@
           "kind": "interface",
           "signature": "NodeConversionContext",
           "lines": [
-            2958,
-            2977
+            3059,
+            3078
           ],
           "exported": true,
           "is_default": false,
@@ -16391,8 +16410,8 @@
           "kind": "function",
           "signature": "agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node",
           "lines": [
-            2983,
-            3177
+            3084,
+            3291
           ],
           "exported": true,
           "is_default": false,
@@ -16709,18 +16728,18 @@
       "language": "typescript",
       "lines": [
         1,
-        85
+        108
       ],
       "detail_level": "full",
-      "token_estimate": 204,
+      "token_estimate": 323,
       "symbols": [
         {
           "name": "generateNodeId",
           "kind": "function",
           "signature": "generateNodeId(): string",
           "lines": [
-            23,
-            25
+            25,
+            27
           ],
           "exported": true,
           "is_default": false,
@@ -16734,12 +16753,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "generateDeterministicNodeId",
+          "kind": "function",
+          "signature": "generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string",
+          "lines": [
+            40,
+            48
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Generate a deterministic 16-character hex node ID based on session and segment.\nThis ensures idempotent ingestion - re-running the same job produces the same ID.\n\nThe ID is derived from:\n- Session file path\n- Segment start entry ID\n- Segment end entry ID\n\nTwo jobs with the same inputs will always produce the same node ID.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "nodeRef",
           "kind": "function",
           "signature": "nodeRef(nodeId: string, version: number): string",
           "lines": [
-            30,
-            32
+            53,
+            55
           ],
           "exported": true,
           "is_default": false,
@@ -16757,8 +16795,8 @@
           "kind": "function",
           "signature": "parseNodeRef(ref: string): { nodeId: string; version: number; }",
           "lines": [
-            37,
-            46
+            60,
+            69
           ],
           "exported": true,
           "is_default": false,
@@ -16776,8 +16814,8 @@
           "kind": "function",
           "signature": "emptyLessons(): LessonsByLevel",
           "lines": [
-            51,
-            61
+            74,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -16795,8 +16833,8 @@
           "kind": "function",
           "signature": "emptyObservations(): ModelObservations",
           "lines": [
-            66,
-            74
+            89,
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -16814,8 +16852,8 @@
           "kind": "function",
           "signature": "emptyDaemonMeta(): DaemonMeta",
           "lines": [
-            79,
-            84
+            102,
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -16833,7 +16871,8 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../types/index.js"
+        "../types/index.js",
+        "node:crypto"
       ]
     },
     {

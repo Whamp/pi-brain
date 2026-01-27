@@ -67,6 +67,7 @@ import {
   searchNodes,
   searchNodesAdvanced,
   updateNode,
+  upsertNode,
   type NodeConversionContext,
   type RepositoryOptions,
 } from "./node-repository.js";
@@ -478,6 +479,144 @@ describe("node-repository", () => {
       createNode(db, node, options);
 
       expect(nodeExistsInDb(db, node.id)).toBeTruthy();
+    });
+  });
+
+  describe("upsertNode", () => {
+    it("should create node if it does not exist", () => {
+      const node = createTestNode();
+      const { node: resultNode, created } = upsertNode(db, node, options);
+
+      expect(created).toBeTruthy();
+      expect(resultNode.id).toBe(node.id);
+      expect(nodeExistsInDb(db, node.id)).toBeTruthy();
+    });
+
+    it("should update node if it already exists", () => {
+      const node = createTestNode({
+        content: {
+          summary: "Original summary",
+          outcome: "success",
+          keyDecisions: [],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+      createNode(db, node, options);
+
+      // Create updated version with same ID
+      const updatedNode = {
+        ...node,
+        version: 2,
+        content: {
+          ...node.content,
+          summary: "Updated summary",
+        },
+      };
+
+      const { node: resultNode, created } = upsertNode(
+        db,
+        updatedNode,
+        options
+      );
+
+      expect(created).toBeFalsy();
+      expect(resultNode.version).toBe(2);
+
+      // Verify DB was updated
+      const dbNode = getNode(db, node.id);
+      expect(dbNode?.version).toBe(2);
+    });
+
+    it("should provide idempotent ingestion - same result on re-run", () => {
+      const node = createTestNode();
+
+      // First upsert - creates
+      const first = upsertNode(db, node, options);
+      expect(first.created).toBeTruthy();
+
+      // Second upsert - updates
+      const second = upsertNode(db, node, options);
+      expect(second.created).toBeFalsy();
+
+      // Node still exists with same ID
+      expect(nodeExistsInDb(db, node.id)).toBeTruthy();
+    });
+
+    it("should update related data on upsert", () => {
+      const node = createTestNode({
+        semantic: {
+          tags: ["tag1", "tag2"],
+          topics: ["topic1"],
+        },
+      });
+      createNode(db, node, options);
+
+      // Upsert with different tags
+      const updatedNode = {
+        ...node,
+        version: 2,
+        semantic: {
+          tags: ["tag3", "tag4"],
+          topics: ["topic2"],
+        },
+      };
+
+      upsertNode(db, updatedNode, options);
+
+      const tags = getNodeTags(db, node.id);
+      expect(tags).toContain("tag3");
+      expect(tags).toContain("tag4");
+      expect(tags).not.toContain("tag1");
+      expect(tags).not.toContain("tag2");
+
+      const topics = getNodeTopics(db, node.id);
+      expect(topics).toContain("topic2");
+      expect(topics).not.toContain("topic1");
+    });
+
+    it("should update lessons on upsert", () => {
+      const node = createTestNode({
+        lessons: {
+          ...emptyLessons(),
+          project: [
+            {
+              level: "project" as const,
+              summary: "Original lesson",
+              details: "Original details",
+              confidence: "high" as const,
+              tags: [],
+            },
+          ],
+        },
+      });
+      createNode(db, node, options);
+
+      // Upsert with different lesson
+      const updatedNode = {
+        ...node,
+        version: 2,
+        lessons: {
+          ...emptyLessons(),
+          model: [
+            {
+              level: "model" as const,
+              summary: "Model lesson",
+              details: "Model details",
+              confidence: "medium" as const,
+              tags: [],
+            },
+          ],
+        },
+      };
+
+      upsertNode(db, updatedNode, options);
+
+      const lessons = getNodeLessons(db, node.id);
+      expect(lessons).toHaveLength(1);
+      expect(lessons[0].level).toBe("model");
+      expect(lessons[0].summary).toBe("Model lesson");
     });
   });
 
@@ -1800,6 +1939,46 @@ describe("node-repository", () => {
 
       expect(node.signals).toBeUndefined();
     });
+
+    it("should generate deterministic node ID based on job parameters", () => {
+      const output = createTestAgentOutput();
+      const context1 = createTestConversionContext({
+        sessionFile: "/path/to/session.jsonl",
+        segmentStart: "start123",
+        segmentEnd: "end456",
+      });
+      const context2 = createTestConversionContext({
+        sessionFile: "/path/to/session.jsonl",
+        segmentStart: "start123",
+        segmentEnd: "end456",
+      });
+
+      const node1 = agentOutputToNode(output, context1);
+      const node2 = agentOutputToNode(output, context2);
+
+      // Same job parameters should produce same node ID
+      expect(node1.id).toBe(node2.id);
+    });
+
+    it("should generate different IDs for different job parameters", () => {
+      const output = createTestAgentOutput();
+      const context1 = createTestConversionContext({
+        sessionFile: "/path/to/session1.jsonl",
+        segmentStart: "start123",
+        segmentEnd: "end456",
+      });
+      const context2 = createTestConversionContext({
+        sessionFile: "/path/to/session2.jsonl",
+        segmentStart: "start123",
+        segmentEnd: "end456",
+      });
+
+      const node1 = agentOutputToNode(output, context1);
+      const node2 = agentOutputToNode(output, context2);
+
+      // Different session files should produce different IDs
+      expect(node1.id).not.toBe(node2.id);
+    });
   });
 
   // ===========================================================================
@@ -1834,8 +2013,17 @@ describe("node-repository", () => {
       const output2 = createTestAgentOutput();
       output2.content.summary = "Second segment continues first";
 
-      const context1 = createTestConversionContext({ id: "job-1" });
-      const context2 = createTestConversionContext({ id: "job-2" });
+      // Use different segment boundaries to generate different node IDs
+      const context1 = createTestConversionContext({
+        id: "job-1",
+        segmentStart: "entry1",
+        segmentEnd: "entry10",
+      });
+      const context2 = createTestConversionContext({
+        id: "job-2",
+        segmentStart: "entry11",
+        segmentEnd: "entry20",
+      });
 
       const node1 = agentOutputToNode(output1, context1);
       const node2 = agentOutputToNode(output2, context2);

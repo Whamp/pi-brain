@@ -25,6 +25,7 @@ import {
   emptyDaemonMeta,
   emptyLessons,
   emptyObservations,
+  generateDeterministicNodeId,
   generateNodeId,
   type Node,
 } from "./node-types.js";
@@ -753,6 +754,95 @@ describe("node-types", () => {
         ids.add(generateNodeId());
       }
       expect(ids.size).toBe(100);
+    });
+  });
+
+  describe("generateDeterministicNodeId", () => {
+    it("generates 16-character hex string", () => {
+      const id = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "start123",
+        "end456"
+      );
+      expect(id).toMatch(/^[a-f0-9]{16}$/);
+    });
+
+    it("generates same ID for same inputs", () => {
+      const id1 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "start123",
+        "end456"
+      );
+      const id2 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "start123",
+        "end456"
+      );
+      expect(id1).toBe(id2);
+    });
+
+    it("generates different IDs for different session files", () => {
+      const id1 = generateDeterministicNodeId(
+        "/path/to/session1.jsonl",
+        "start123",
+        "end456"
+      );
+      const id2 = generateDeterministicNodeId(
+        "/path/to/session2.jsonl",
+        "start123",
+        "end456"
+      );
+      expect(id1).not.toBe(id2);
+    });
+
+    it("generates different IDs for different segment starts", () => {
+      const id1 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "startA",
+        "end456"
+      );
+      const id2 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "startB",
+        "end456"
+      );
+      expect(id1).not.toBe(id2);
+    });
+
+    it("generates different IDs for different segment ends", () => {
+      const id1 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "start123",
+        "endA"
+      );
+      const id2 = generateDeterministicNodeId(
+        "/path/to/session.jsonl",
+        "start123",
+        "endB"
+      );
+      expect(id1).not.toBe(id2);
+    });
+
+    it("handles empty segment boundaries", () => {
+      const id = generateDeterministicNodeId("/path/to/session.jsonl", "", "");
+      expect(id).toMatch(/^[a-f0-9]{16}$/);
+    });
+
+    it("is deterministic across calls", () => {
+      // Run multiple times to ensure consistency
+      const inputs = [
+        ["/session1.jsonl", "a", "b"],
+        ["/session2.jsonl", "c", "d"],
+        ["/session3.jsonl", "", ""],
+      ] as const;
+
+      for (const [session, start, end] of inputs) {
+        const ids = [];
+        for (let i = 0; i < 5; i++) {
+          ids.push(generateDeterministicNodeId(session, start, end));
+        }
+        expect(new Set(ids).size).toBe(1);
+      }
     });
   });
 });
