@@ -6,8 +6,11 @@ import type Database from "better-sqlite3";
 
 import type {
   AggregatedFailurePattern,
+  AggregatedInsight,
   AggregatedLessonPattern,
   AggregatedModelStats,
+  InsightSeverity,
+  InsightType,
   LessonLevel,
 } from "../types/index.js";
 
@@ -42,6 +45,25 @@ interface LessonPatternRow {
   tags: string;
   example_nodes: string;
   last_seen: string;
+  updated_at: string;
+}
+
+interface InsightRow {
+  id: string;
+  type: string;
+  model: string | null;
+  tool: string | null;
+  pattern: string;
+  frequency: number;
+  confidence: number;
+  severity: string;
+  workaround: string | null;
+  examples: string;
+  first_seen: string;
+  last_seen: string;
+  prompt_text: string | null;
+  prompt_included: number;
+  prompt_version: string | null;
   updated_at: string;
 }
 
@@ -129,22 +151,23 @@ export function listLessonPatterns(
 ): AggregatedLessonPattern[] {
   const { limit = 50, offset = 0, level } = options;
 
-  let query = `
+  // Use single parameterized query with NULL coalescing pattern
+  // to avoid string concatenation for query building
+  const stmt = db.prepare(`
     SELECT *
     FROM lesson_patterns
-  `;
-  const params: unknown[] = [];
+    WHERE (? IS NULL OR level = ?)
+    ORDER BY occurrences DESC, last_seen DESC
+    LIMIT ? OFFSET ?
+  `);
 
-  if (level) {
-    query += ` WHERE level = ?`;
-    params.push(level);
-  }
-
-  query += ` ORDER BY occurrences DESC, last_seen DESC LIMIT ? OFFSET ?`;
-  params.push(limit, offset);
-
-  const stmt = db.prepare(query);
-  const rows = stmt.all(...params) as unknown as LessonPatternRow[];
+  const levelParam = level ?? null;
+  const rows = stmt.all(
+    levelParam,
+    levelParam,
+    limit,
+    offset
+  ) as unknown as LessonPatternRow[];
 
   return rows.map((row) => ({
     id: row.id,
@@ -156,4 +179,190 @@ export function listLessonPatterns(
     lastSeen: row.last_seen,
     updatedAt: row.updated_at,
   }));
+}
+
+// =============================================================================
+// Aggregated Insights (for prompt learning)
+// =============================================================================
+
+export interface ListInsightsOptions {
+  limit?: number;
+  offset?: number;
+  type?: InsightType;
+  model?: string;
+  tool?: string;
+  minFrequency?: number;
+  minConfidence?: number;
+  promptIncluded?: boolean;
+}
+
+export function listInsights(
+  db: Database.Database,
+  options: ListInsightsOptions = {}
+): AggregatedInsight[] {
+  const {
+    limit = 50,
+    offset = 0,
+    type,
+    model,
+    tool,
+    minFrequency = 1,
+    minConfidence = 0,
+    promptIncluded,
+  } = options;
+
+  const stmt = db.prepare(`
+    SELECT *
+    FROM aggregated_insights
+    WHERE frequency >= ?
+      AND confidence >= ?
+      AND (? IS NULL OR type = ?)
+      AND (? IS NULL OR model = ?)
+      AND (? IS NULL OR tool = ?)
+      AND (? IS NULL OR prompt_included = ?)
+    ORDER BY frequency DESC, confidence DESC, last_seen DESC
+    LIMIT ? OFFSET ?
+  `);
+
+  const typeParam = type ?? null;
+  const modelParam = model ?? null;
+  const toolParam = tool ?? null;
+
+  let promptIncludedParam: number | null = null;
+  if (promptIncluded !== undefined) {
+    promptIncludedParam = promptIncluded ? 1 : 0;
+  }
+
+  const rows = stmt.all(
+    minFrequency,
+    minConfidence,
+    typeParam,
+    typeParam,
+    modelParam,
+    modelParam,
+    toolParam,
+    toolParam,
+    promptIncludedParam,
+    promptIncludedParam,
+    limit,
+    offset
+  ) as unknown as InsightRow[];
+
+  return rows.map(rowToInsight);
+}
+
+export function getInsight(
+  db: Database.Database,
+  id: string
+): AggregatedInsight | null {
+  const stmt = db.prepare(`
+    SELECT * FROM aggregated_insights WHERE id = ?
+  `);
+
+  const row = stmt.get(id) as InsightRow | undefined;
+  if (!row) {
+    return null;
+  }
+
+  return rowToInsight(row);
+}
+
+export function getInsightsByModel(
+  db: Database.Database,
+  model: string,
+  options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}
+): AggregatedInsight[] {
+  const { minConfidence = 0.5, promptIncludedOnly = false } = options;
+
+  let query = `
+    SELECT *
+    FROM aggregated_insights
+    WHERE model = ?
+      AND confidence >= ?
+  `;
+
+  if (promptIncludedOnly) {
+    query += " AND prompt_included = 1";
+  }
+
+  query += " ORDER BY frequency DESC, confidence DESC";
+
+  const stmt = db.prepare(query);
+  const rows = stmt.all(model, minConfidence) as unknown as InsightRow[];
+
+  return rows.map(rowToInsight);
+}
+
+export function countInsights(
+  db: Database.Database,
+  options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}
+): number {
+  const { type, model, promptIncluded } = options;
+
+  const stmt = db.prepare(`
+    SELECT COUNT(*) as count
+    FROM aggregated_insights
+    WHERE (? IS NULL OR type = ?)
+      AND (? IS NULL OR model = ?)
+      AND (? IS NULL OR prompt_included = ?)
+  `);
+
+  const typeParam = type ?? null;
+  const modelParam = model ?? null;
+
+  let promptIncludedParam: number | null = null;
+  if (promptIncluded !== undefined) {
+    promptIncludedParam = promptIncluded ? 1 : 0;
+  }
+
+  const result = stmt.get(
+    typeParam,
+    typeParam,
+    modelParam,
+    modelParam,
+    promptIncludedParam,
+    promptIncludedParam
+  ) as { count: number };
+
+  return result.count;
+}
+
+export function updateInsightPrompt(
+  db: Database.Database,
+  id: string,
+  promptText: string,
+  promptIncluded: boolean,
+  promptVersion?: string
+): void {
+  const stmt = db.prepare(`
+    UPDATE aggregated_insights
+    SET prompt_text = ?,
+        prompt_included = ?,
+        prompt_version = ?,
+        updated_at = datetime('now')
+    WHERE id = ?
+  `);
+
+  stmt.run(promptText, promptIncluded ? 1 : 0, promptVersion ?? null, id);
+}
+
+function rowToInsight(row: InsightRow): AggregatedInsight {
+  return {
+    id: row.id,
+    type: row.type as InsightType,
+    model: row.model ?? undefined,
+    tool: row.tool ?? undefined,
+    pattern: row.pattern,
+    frequency: row.frequency,
+    confidence: row.confidence,
+    severity: row.severity as InsightSeverity,
+    workaround: row.workaround ?? undefined,
+    examples: JSON.parse(row.examples || "[]"),
+    firstSeen: row.first_seen,
+    lastSeen: row.last_seen,
+    promptText: row.prompt_text ?? undefined,
+    promptIncluded: row.prompt_included === 1,
+    promptVersion: row.prompt_version ?? undefined,
+    updatedAt: row.updated_at,
+  };
 }

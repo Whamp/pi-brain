@@ -14,6 +14,7 @@ import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
 import { getLatestVersion } from "../prompt/prompt.js";
+import { InsightAggregator } from "./insight-aggregation.js";
 import { PatternAggregator } from "./pattern-aggregation.js";
 
 /** Job types that can be scheduled */
@@ -89,6 +90,7 @@ export class Scheduler {
   private lastConnectionDiscoveryResult: ScheduledJobResult | null = null;
   private lastPatternAggregationResult: ScheduledJobResult | null = null;
   private patternAggregator: PatternAggregator;
+  private insightAggregator: InsightAggregator;
 
   constructor(
     private config: SchedulerConfig,
@@ -97,6 +99,7 @@ export class Scheduler {
     private logger: SchedulerLogger = noopLogger
   ) {
     this.patternAggregator = new PatternAggregator(db);
+    this.insightAggregator = new InsightAggregator(db);
   }
 
   /**
@@ -312,6 +315,7 @@ export class Scheduler {
 
       // Find nodes analyzed with older prompts (or null analyzer_version)
       // and exclude nodes that are already in the queue for reanalysis
+      // Uses denormalized target_node_id column for performance (indexed)
       const outdatedNodes = this.db
         .prepare<
           [string],
@@ -330,7 +334,7 @@ export class Scheduler {
           SELECT 1 FROM analysis_queue q
           WHERE q.type = 'reanalysis'
           AND q.status IN ('pending', 'running')
-          AND json_extract(q.context, '$.existingNodeId') = n.id
+          AND q.target_node_id = n.id
         )
         ORDER BY timestamp DESC
         LIMIT 100
@@ -390,6 +394,7 @@ export class Scheduler {
       // Get recently analyzed nodes (last 7 days)
       // that haven't had a connection discovery job recently (last 24h)
       // and aren't currently queued
+      // Uses denormalized target_node_id column for performance (indexed)
       const recentNodes = this.db
         .prepare<
           [],
@@ -404,7 +409,7 @@ export class Scheduler {
         AND NOT EXISTS (
           SELECT 1 FROM analysis_queue q
           WHERE q.type = 'connection_discovery'
-          AND json_extract(q.context, '$.nodeId') = n.id
+          AND q.target_node_id = n.id
           AND (
             status IN ('pending', 'running')
             OR (status = 'completed' AND completed_at > datetime('now', '-24 hours'))
@@ -454,6 +459,7 @@ export class Scheduler {
 
   /**
    * Run pattern aggregation - aggregates tool errors into failure patterns
+   * and model-specific insights for prompt learning
    */
   private async runPatternAggregation(): Promise<ScheduledJobResult> {
     const startedAt = new Date();
@@ -464,6 +470,11 @@ export class Scheduler {
       this.patternAggregator.aggregateFailurePatterns();
       this.patternAggregator.aggregateModelStats();
       this.patternAggregator.aggregateLessons();
+
+      // Run insight aggregation for prompt learning pipeline
+      this.logger.info("Running insight aggregation for prompt learning");
+      this.insightAggregator.aggregateAll();
+
       this.logger.info("Pattern aggregation completed");
     } catch (error) {
       errorMessage = error instanceof Error ? error.message : String(error);

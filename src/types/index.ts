@@ -340,3 +340,39 @@ export interface AggregatedLessonPattern {
   lastSeen: string;
   updatedAt: string;
 }
+
+// =============================================================================
+// Prompt Learning Types (specs/prompt-learning.md)
+// =============================================================================
+
+export type InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson";
+export type InsightSeverity = "low" | "medium" | "high";
+
+export interface AggregatedInsight {
+  id: string;
+  type: InsightType;
+  /** provider/model format, undefined for non-model-specific insights */
+  model?: string;
+  /** Tool name, undefined for non-tool-specific insights */
+  tool?: string;
+  /** Normalized pattern description */
+  pattern: string;
+  /** How often observed */
+  frequency: number;
+  /** 0.0-1.0 confidence score */
+  confidence: number;
+  severity: InsightSeverity;
+  /** Suggested workaround if applicable */
+  workaround?: string;
+  /** Node IDs where this was observed */
+  examples: string[];
+  firstSeen: string;
+  lastSeen: string;
+  /** Generated prompt text */
+  promptText?: string;
+  /** Whether included in prompts */
+  promptIncluded: boolean;
+  /** Which prompt version includes this */
+  promptVersion?: string;
+  updatedAt: string;
+}
