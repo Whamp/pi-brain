@@ -418,3 +418,44 @@
 - Insights are stored with frequency, confidence, severity, and examples
 - Ready for Task 10.2 (Generate model-specific prompt additions)
 - The aggregated_insights table includes prompt_text and prompt_included fields for Phase 10.2+
+
+---
+
+## 2026-01-26 18:45 - Task 10.2
+
+**Status**: pending → done
+**Validation**:
+- Created prompt-generator.ts with core functions:
+  - generatePromptAdditions(): Generate PromptAddition objects from insights
+  - formatModelSection(): Format quirks, wins, tool reminders as markdown
+  - filterActionableInsights(): Filter by confidence/frequency thresholds
+  - getModelDisplayName(): Human-readable "Google Gemini 3 Flash" from "google/gemini-3-flash"
+  - generatePromptAdditionsFromDb(): Database integration wrapper
+  - getPromptAdditionsForModel(): Get additions for specific model
+  - updateInsightPromptTexts(): Store generated prompts back to database
+  - formatPromptAdditionsDocument(): Combine all additions into markdown doc
+- Added PromptAddition type to src/types/index.ts for shared use
+- Added CLI commands:
+  - pi-brain prompt-learning preview [--model X] [--json]: Preview generated prompts
+  - pi-brain prompt-learning insights [--model X] [--type Y]: List aggregated insights
+- Added 33 new tests:
+  - 4 tests for getModelDisplayName
+  - 3 tests for groupInsightsByModel
+  - 5 tests for filterActionableInsights
+  - 6 tests for formatModelSection
+  - 6 tests for generatePromptAdditions
+  - 3 tests for formatPromptAdditionsDocument
+  - 3 tests for generatePromptAdditionsFromDb (database integration)
+  - 2 tests for getPromptAdditionsForModel (database integration)
+  - 1 test for updateInsightPromptTexts (database integration)
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 913 passed, 4 skipped)
+**Commit**: 4150c0a
+**Notes**:
+- Prompt additions are generated per-model with three sections:
+  - Known quirks to avoid (with workarounds)
+  - Effective techniques (prompting wins)
+  - Tool usage reminders (tool errors and failures)
+- Insights require minimum confidence (0.5) and frequency (3) to be included
+- Quirks additionally require a workaround to be actionable
+- Ready for Task 10.3 (Implement prompt injection mechanism)
