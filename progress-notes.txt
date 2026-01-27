@@ -51,3 +51,32 @@ Only 2 minor tasks remain pending:
 - Added 'warn' method to SchedulerLogger interface and all implementations
 - Updated config template with clearer comments about API key requirement
 - Total tests: 1181 passed, 4 skipped
+
+---
+
+## 2026-01-27 14:30 - Task 13.1
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1198 passed, 4 skipped)
+**Commit**: 49ab5f5
+
+**Summary**: Extracted types and helper functions from node-repository.ts to node-crud.ts
+
+**Files created:**
+- `src/storage/node-crud.ts` (188 lines) - types and helper insert functions
+
+**Extracted:**
+- Types: `RepositoryOptions`, `NodeRow`
+- ID generators: `generateLessonId`, `generateQuirkId`, `generateErrorId`, `generateDecisionId`
+- Helper functions: `insertLessons`, `insertModelQuirks`, `insertToolErrors`, `insertDaemonDecisions`
+
+**Changes:**
+- `node-repository.ts` reduced from 3350 to 3199 lines (-151 lines)
+- Updated imports to use node-crud.ts
+- Added re-export for backward compatibility
+- Updated storage barrel (index.ts) to include node-crud.ts
+
+**Notes:** 
+- Main CRUD functions (createNode, upsertNode, updateNode) remain in node-repository.ts due to dependency on indexNodeForSearch
+- These will be moved once search-repository.ts is extracted (Task 13.4)
+- All 1198 tests pass

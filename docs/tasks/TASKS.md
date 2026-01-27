@@ -185,16 +185,16 @@ Track implementation progress. Agents update status as they complete work.
 
 Ref: docs/plans/refactor-monolith-node-repository.md
 
-| ID    | Task                                                            | Status  | Deps      | Notes |
-| ----- | --------------------------------------------------------------- | ------- | --------- | ----- |
-| 13.1  | Extract `node-crud.ts` (~600 lines) - core CRUD operations      | active  | -         |       |
-| 13.2  | Extract `edge-repository.ts` (~150 lines) - edge operations     | pending | -         |       |
-| 13.3  | Extract `node-conversion.ts` (~200 lines) - agentOutputToNode   | pending | 13.1      |       |
-| 13.4  | Extract `search-repository.ts` (~400 lines) - FTS functions     | pending | 13.1      |       |
-| 13.5  | Extract `lesson-repository.ts` (~250 lines) - lesson queries    | pending | -         |       |
-| 13.6  | Extract `quirk-repository.ts` (~300 lines) - quirk queries      | pending | -         |       |
-| 13.7  | Extract `tool-error-repository.ts` (~250 lines) - error queries | pending | -         |       |
-| 13.8  | Extract `node-queries.ts` (~400 lines) - listing/aggregation    | pending | 13.1      |       |
-| 13.9  | Extract `graph-repository.ts` (~300 lines) - graph traversal    | pending | 13.2      |       |
-| 13.10 | Update internal imports to use new modules                      | pending | 13.1-13.9 |       |
-| 13.11 | Clean up node-repository.ts to re-export from new modules       | pending | 13.10     |       |
+| ID    | Task                                                            | Status  | Deps      | Notes      |
+| ----- | --------------------------------------------------------------- | ------- | --------- | ---------- |
+| 13.1  | Extract `node-crud.ts` (~600 lines) - core CRUD operations      | done    | -         | 2026-01-27 |
+| 13.2  | Extract `edge-repository.ts` (~150 lines) - edge operations     | pending | -         |            |
+| 13.3  | Extract `node-conversion.ts` (~200 lines) - agentOutputToNode   | pending | 13.1      |            |
+| 13.4  | Extract `search-repository.ts` (~400 lines) - FTS functions     | pending | 13.1      |            |
+| 13.5  | Extract `lesson-repository.ts` (~250 lines) - lesson queries    | pending | -         |            |
+| 13.6  | Extract `quirk-repository.ts` (~300 lines) - quirk queries      | pending | -         |            |
+| 13.7  | Extract `tool-error-repository.ts` (~250 lines) - error queries | pending | -         |            |
+| 13.8  | Extract `node-queries.ts` (~400 lines) - listing/aggregation    | pending | 13.1      |            |
+| 13.9  | Extract `graph-repository.ts` (~300 lines) - graph traversal    | pending | 13.2      |            |
+| 13.10 | Update internal imports to use new modules                      | pending | 13.1-13.9 |            |
+| 13.11 | Clean up node-repository.ts to re-export from new modules       | pending | 13.10     |            |
