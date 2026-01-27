@@ -309,16 +309,22 @@ For headless servers, configure Syncthing via its REST API or config file:
 
 ### Ignoring Old Sessions
 
-To reduce sync time for old sessions, add an ignore pattern:
+To reduce sync time for old sessions, create a `.stignore` file in the synced folder:
+
+```bash
+# On the spoke machine, create .stignore in the sessions directory
+cat > ~/.pi/agent/sessions/.stignore << 'EOF'
+// Ignore sessions older than 2024
+2023*
+2022*
+EOF
+```
+
+Alternatively, use the Syncthing web UI:
 
 1. Click on the shared folder → **Edit**
-2. Go to **Ignore Patterns**
-3. Add patterns like:
-   ```
-   // Ignore sessions older than 2024
-   2023*
-   2022*
-   ```
+2. Click the **Ignore Patterns** button
+3. Add the patterns and save
 
 ### Bandwidth Limiting
 
