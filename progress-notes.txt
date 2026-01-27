@@ -34,3 +34,28 @@ Main branch: major/pi-brain
 **Notes**:
 - All three code review issues were addressed in a single commit
 - TASKS.md status corrected to reflect completed work
+
+---
+
+## 2026-01-27 10:45 - Phase 12 Tasks Verification
+
+**Status**: Phase 12 marked as complete
+**Tasks Verified**:
+- 12.1 Shared Type Library: `src/types/index.ts` exists (661 lines)
+- 12.2 Idempotent Ingestion: Commit 6fbfa05 with deterministic node IDs
+- 12.3 SQLite Rebuild CLI: `daemon rebuild-index` command implemented
+
+**New Test Coverage Added**:
+- 6 tests for `rebuildIndex` function in `src/daemon/cli.test.ts`
+  - Empty nodes dir returns count 0
+  - Single node file rebuilds correctly
+  - Multiple node files rebuild correctly
+  - Latest version used when multiple versions exist
+  - Database cleared before rebuild
+  - Malformed JSON files handled gracefully
+
+**Validation**: All 1173 tests pass, npm run check clean
+**Commit**: 26800ce
+**Notes**:
+- Also committed directory reorganization: specs/ → docs/specs/, docs ops files → docs/ops/
+- PLAN.md updated to mark Phase 12 tasks as complete
