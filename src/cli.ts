@@ -35,6 +35,13 @@ import {
   getOverallStats,
 } from "./parser/analyzer.js";
 import {
+  generatePromptAdditionsFromDb,
+  formatPromptAdditionsDocument,
+  getPromptAdditionsForModel,
+} from "./prompt/prompt-generator.js";
+import { openDatabase, migrate } from "./storage/database.js";
+import { listInsights } from "./storage/pattern-repository.js";
+import {
   getSyncStatus,
   formatSyncStatus,
   runRsync,
@@ -468,6 +475,137 @@ syncCmd
 
         console.log("");
       }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Prompt Learning command
+// =============================================================================
+
+const promptCmd = program
+  .command("prompt-learning")
+  .description("Manage prompt learning from session insights");
+
+promptCmd
+  .command("preview")
+  .description("Preview generated prompt additions")
+  .option("-c, --config <path>", "Config file path")
+  .option("-m, --model <name>", "Show only for specific model (provider/model)")
+  .option("--min-confidence <n>", "Minimum confidence (0.0-1.0)", "0.5")
+  .option("--min-frequency <n>", "Minimum frequency", "3")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const genOptions = {
+        minConfidence: Number.parseFloat(options.minConfidence),
+        minFrequency: Number.parseInt(options.minFrequency, 10),
+      };
+
+      if (options.model) {
+        // Show for specific model
+        const addition = getPromptAdditionsForModel(
+          db,
+          options.model,
+          genOptions
+        );
+
+        if (!addition) {
+          console.log(`No insights found for model: ${options.model}`);
+          process.exit(0);
+        }
+
+        if (options.json) {
+          console.log(JSON.stringify(addition, null, 2));
+        } else {
+          console.log(addition.section);
+          console.log("");
+          console.log(addition.content);
+        }
+      } else {
+        // Show for all models
+        const additions = generatePromptAdditionsFromDb(db, genOptions);
+
+        if (additions.length === 0) {
+          console.log("No actionable insights found.");
+          console.log(
+            "\nInsights need minimum frequency and confidence to be included."
+          );
+          process.exit(0);
+        }
+
+        if (options.json) {
+          console.log(JSON.stringify(additions, null, 2));
+        } else {
+          console.log(formatPromptAdditionsDocument(additions));
+        }
+      }
+
+      db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("insights")
+  .description("List aggregated insights")
+  .option("-c, --config <path>", "Config file path")
+  .option("-m, --model <name>", "Filter by model")
+  .option(
+    "-t, --type <type>",
+    "Filter by type (quirk, win, failure, tool_error, lesson)"
+  )
+  .option("--limit <n>", "Maximum insights to show", "20")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const insights = listInsights(db, {
+        model: options.model,
+        type: options.type,
+        limit: Number.parseInt(options.limit, 10),
+      });
+
+      if (insights.length === 0) {
+        console.log("No insights found.");
+        process.exit(0);
+      }
+
+      if (options.json) {
+        console.log(JSON.stringify(insights, null, 2));
+      } else {
+        console.log(`Found ${insights.length} insights:\n`);
+
+        for (const insight of insights) {
+          const modelStr = insight.model ? ` [${insight.model}]` : "";
+          const toolStr = insight.tool ? ` (${insight.tool})` : "";
+          const included = insight.promptIncluded ? " ✓" : "";
+
+          console.log(
+            `${insight.type}${modelStr}${toolStr}: ${insight.pattern}${included}`
+          );
+          console.log(
+            `  freq=${insight.frequency} conf=${(insight.confidence * 100).toFixed(0)}% sev=${insight.severity}`
+          );
+          if (insight.workaround) {
+            console.log(`  → ${insight.workaround}`);
+          }
+          console.log("");
+        }
+      }
+
+      db.close();
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);

@@ -376,3 +376,20 @@ export interface AggregatedInsight {
   promptVersion?: string;
   updatedAt: string;
 }
+
+// =============================================================================
+// Prompt Learning Types (prompt additions)
+// =============================================================================
+
+export interface PromptAddition {
+  /** provider/model format */
+  model: string;
+  /** Section header (e.g., "## Notes for Gemini 3 Flash") */
+  section: string;
+  /** Order in prompt (lower = higher priority) */
+  priority: number;
+  /** Formatted markdown content */
+  content: string;
+  /** Insight IDs used to generate this addition */
+  sourceInsights: string[];
+}

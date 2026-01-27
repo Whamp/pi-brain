@@ -133,7 +133,7 @@ Track implementation progress. Agents update status as they complete work.
 | ID   | Task                                                           | Status  | Deps      | Notes                          |
 | ---- | -------------------------------------------------------------- | ------- | --------- | ------------------------------ |
 | 10.1 | Aggregate model-specific learnings                             | done    | 4.10      | 2026-01-26 - InsightAggregator |
-| 10.2 | Generate model-specific prompt additions                       | pending | 10.1      |                                |
+| 10.2 | Generate model-specific prompt additions                       | active  | 10.1      | 2026-01-26                     |
 | 10.3 | Implement prompt injection mechanism                           | pending | 10.2      |                                |
 | 10.4 | Create feedback loop: quirk → prompt fix → measure improvement | pending | 10.3      |                                |
 | 10.5 | Build "insights to prompts" UI                                 | pending | 10.3, 5.1 |                                |
