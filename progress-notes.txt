@@ -80,3 +80,33 @@ Only 2 minor tasks remain pending:
 - Main CRUD functions (createNode, upsertNode, updateNode) remain in node-repository.ts due to dependency on indexNodeForSearch
 - These will be moved once search-repository.ts is extracted (Task 13.4)
 - All 1198 tests pass
+
+---
+
+## 2026-01-27 15:10 - Task 13.2
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1198 passed, 4 skipped)
+**Commit**: c0696f2
+
+**Summary**: Extracted edge operations from node-repository.ts to edge-repository.ts
+
+**Files created:**
+- `src/storage/edge-repository.ts` (177 lines) - edge CRUD and conversion functions
+
+**Extracted:**
+- Types: `EdgeRow`
+- ID generator: `generateEdgeId`
+- CRUD functions: `createEdge`, `getEdge`, `getEdgesFrom`, `getEdgesTo`, `getNodeEdges`, `deleteEdge`, `edgeExists`
+- Conversion function: `edgeRowToEdge`
+
+**Changes:**
+- `node-repository.ts` reduced from 3199 to 3063 lines (-136 lines)
+- Added imports and re-exports for backward compatibility
+- Updated storage barrel (index.ts) to include edge-repository.ts
+
+**Notes:** 
+- All edge operations are now centralized in edge-repository.ts
+- Re-exports maintain backward compatibility with existing imports
+- graph-repository.ts (Task 13.9) depends on this module
+

@@ -2763,4 +2763,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 41
-Estimated tokens: 36,761 (codebase: ~955,085)
+Estimated tokens: 36,761 (codebase: ~955,789)

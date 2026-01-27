@@ -188,7 +188,7 @@ Ref: docs/plans/refactor-monolith-node-repository.md
 | ID    | Task                                                            | Status  | Deps      | Notes      |
 | ----- | --------------------------------------------------------------- | ------- | --------- | ---------- |
 | 13.1  | Extract `node-crud.ts` (~600 lines) - core CRUD operations      | done    | -         | 2026-01-27 |
-| 13.2  | Extract `edge-repository.ts` (~150 lines) - edge operations     | active  | -         | 2026-01-27 |
+| 13.2  | Extract `edge-repository.ts` (~150 lines) - edge operations     | done    | -         | 2026-01-27 |
 | 13.3  | Extract `node-conversion.ts` (~200 lines) - agentOutputToNode   | pending | 13.1      |            |
 | 13.4  | Extract `search-repository.ts` (~400 lines) - FTS functions     | pending | 13.1      |            |
 | 13.5  | Extract `lesson-repository.ts` (~250 lines) - lesson queries    | pending | -         |            |
