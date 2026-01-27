@@ -930,3 +930,33 @@
 **Notes**:
 - TypeScript now compiles cleanly for signals files
 - Frontend types updated to match API change
+
+---
+
+## 2026-01-27 09:00 - Task 12.2
+
+**Status**: pending → done
+**Validation**:
+- Added `generateDeterministicNodeId()` in node-types.ts:
+  - Uses SHA-256 hash of session file + segment start + segment end
+  - Always produces same 16-char hex ID for same inputs
+  - 7 tests covering determinism and uniqueness
+- Added `upsertNode()` in node-repository.ts:
+  - Creates node if not exists in DB
+  - Updates node if already exists (clears and re-inserts related data)
+  - Returns `{ node, created: boolean }` for tracking
+  - 5 tests covering create, update, idempotent re-run, related data updates
+- Updated `agentOutputToNode()` to use deterministic IDs for initial analysis
+  - 2 tests verifying deterministic ID generation
+- Updated Worker to use `upsertNode` instead of `createNode`
+  - Only creates structural edges on new node creation (not retries)
+  - Logs whether node was created or updated
+- All 1167 tests pass (14 new tests)
+- npm run check passes
+**Commit**: 6fbfa05
+**Notes**:
+- If job crashes after JSON write but before DB insert, re-running will:
+  - Generate same node ID (deterministic from job params)
+  - Overwrite JSON file
+  - Insert or update DB cleanly
+- Edge creation is skipped on retry to prevent duplicates

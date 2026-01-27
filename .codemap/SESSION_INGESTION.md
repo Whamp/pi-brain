@@ -89,17 +89,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:226: call now -> external
     251-361: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs out: 18 [call: 13, type: 5]
+      refs out: 20 [call: 15, type: 5]
         - src/daemon/cli.ts:251: type StartOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:251: type Promise -> external
+        - src/daemon/cli.ts:270: call loadConfig -> src/config/config.ts
         - src/daemon/cli.ts:274: type Error -> external
+        - src/daemon/cli.ts:280: call ensureDirectories -> src/config/config.ts
         - src/daemon/cli.ts:284: type Error -> external
         - src/daemon/cli.ts:290: call writePidFile -> src/daemon/cli.ts
         - src/daemon/cli.ts:303: call existsSync -> external
         - src/daemon/cli.ts:304: call mkdirSync -> external
         - src/daemon/cli.ts:311: call push -> external
-        - src/daemon/cli.ts:316: call spawn -> external
-        - src/daemon/cli.ts:325: call closeSync -> external
     366-428: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 9 [call: 7, type: 2]
@@ -172,17 +172,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:913: call join -> external
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 16 [call: 15, type: 1]
+      refs out: 17 [call: 16, type: 1]
         - src/daemon/cli.ts:949: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:952: call log -> external
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
         - src/daemon/cli.ts:975: call log -> external
+        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-repository.ts
         - src/daemon/cli.ts:980: call log -> external
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
         - src/daemon/cli.ts:1004: call log -> external
-        - src/daemon/cli.ts:1007: call log -> external
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -216,6 +216,8 @@ src/daemon/connection-discovery.ts [1-549]
     146-548: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
+      refs out: 1 [type: 1]
+        - src/daemon/connection-discovery.ts:143: type Edge -> src/types/index.ts
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
@@ -614,8 +616,9 @@ src/daemon/query-processor.ts [1-720]
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
     91-100: interface QueryProcessorConfig [exported]
-      refs out: 2 [type: 2]
+      refs out: 3 [type: 3]
         - src/daemon/query-processor.ts:93: type Database -> external
+        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
         - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
   function:
     105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
@@ -1408,4 +1411,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,147 (codebase: ~927,632)
+Estimated tokens: 18,212 (codebase: ~928,156)
