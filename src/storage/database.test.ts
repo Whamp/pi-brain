@@ -297,6 +297,7 @@ describe("database", () => {
         expect(indexNames).toContain("idx_effectiveness_measured_at");
         expect(indexNames).toContain("idx_effectiveness_significant");
         expect(indexNames).toContain("idx_effectiveness_improvement");
+        expect(indexNames).toContain("idx_effectiveness_unique");
 
         cleanupTestDb(testDbPath, db);
       } finally {
@@ -526,6 +527,43 @@ describe("database", () => {
           .prepare("SELECT * FROM prompt_effectiveness WHERE insight_id = ?")
           .all("insight-1");
         expect(effectiveness).toHaveLength(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("enforces unique constraint on (insight_id, prompt_version)", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert an insight
+        db.prepare(`
+          INSERT INTO aggregated_insights (id, type, pattern)
+          VALUES (?, ?, ?)
+        `).run("insight-1", "quirk", "Test pattern");
+
+        // Insert first effectiveness record
+        db.prepare(`
+          INSERT INTO prompt_effectiveness (id, insight_id, prompt_version)
+          VALUES (?, ?, ?)
+        `).run("eff-1", "insight-1", "v1");
+
+        // Try to insert duplicate (same insight_id + prompt_version)
+        expect(() => {
+          db.prepare(`
+            INSERT INTO prompt_effectiveness (id, insight_id, prompt_version)
+            VALUES (?, ?, ?)
+          `).run("eff-2", "insight-1", "v1");
+        }).toThrow(/UNIQUE constraint failed/);
+
+        // Different prompt_version should succeed
+        db.prepare(`
+          INSERT INTO prompt_effectiveness (id, insight_id, prompt_version)
+          VALUES (?, ?, ?)
+        `).run("eff-3", "insight-1", "v2");
+
         cleanupTestDb(testDbPath, db);
       } finally {
         cleanupTestDb(testDbPath);
