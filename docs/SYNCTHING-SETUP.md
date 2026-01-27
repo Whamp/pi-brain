@@ -309,7 +309,7 @@ For headless servers, configure Syncthing via its REST API or config file:
 
 ### Ignoring Old Sessions
 
-To reduce sync time for old sessions, create a `.stignore` file in the synced folder:
+To reduce sync time for old sessions, create a `.stignore` file in the sessions directory on the spoke:
 
 ```bash
 # On the spoke machine, create .stignore in the sessions directory
