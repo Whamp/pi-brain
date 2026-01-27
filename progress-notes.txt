@@ -284,3 +284,25 @@
 - Documentation complements specs/sync-protocol.md technical spec
 - Focused on practical setup rather than implementation details
 - Ready for users to set up multi-computer sync with Syncthing
+
+---
+
+## 2026-01-26 16:17 - Task 9.2
+
+**Status**: pending → done
+**Validation**:
+- Created src/sync/ module with rsync.ts, status.ts, and index.ts
+- Implemented rsync execution using node:child_process execFile with promisify
+- Added CLI commands: `pi-brain sync status`, `sync run`, and `sync list`
+- CLI options include --spoke, --dry-run, --delete, --bwlimit, --json
+- Added 26 unit tests in src/sync/sync.test.ts
+- Tests cover: formatBytes, countSpokeSessionFiles, listSpokeSessions, getLastSyncTime, formatTimeAgo, getSpokeStatus, getSyncStatus, formatSyncStatus
+- Created comprehensive docs/RSYNC-SETUP.md user guide
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 821 passed, 4 skipped)
+**Commit**: 4daf0bb
+**Notes**:
+- rsync module parses and displays helpful error messages for common failures
+- Supports bandwidth limiting, dry-run mode, and delete option
+- Documentation includes automated sync setup via cron or systemd
+- Comparison table between rsync and Syncthing included

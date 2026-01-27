@@ -120,13 +120,13 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 9: Multi-Computer Sync
 
-| ID  | Task                                         | Status  | Deps     | Notes                           |
-| --- | -------------------------------------------- | ------- | -------- | ------------------------------- |
-| 9.1 | Document Syncthing setup for spokes          | done    | -        | 2026-01-26 - SYNCTHING-SETUP.md |
-| 9.2 | Implement rsync-based sync option            | active  | 3.1      | 2026-01-26                      |
-| 9.3 | Implement spoke configuration in config.yaml | pending | 1.4      |                                 |
-| 9.4 | Daemon watches synced directories            | pending | 3.1, 9.3 |                                 |
-| 9.5 | Computer field populated correctly           | pending | 3.7      |                                 |
+| ID  | Task                                         | Status  | Deps     | Notes                               |
+| --- | -------------------------------------------- | ------- | -------- | ----------------------------------- |
+| 9.1 | Document Syncthing setup for spokes          | done    | -        | 2026-01-26 - SYNCTHING-SETUP.md     |
+| 9.2 | Implement rsync-based sync option            | done    | 3.1      | 2026-01-26 - sync module, CLI, docs |
+| 9.3 | Implement spoke configuration in config.yaml | pending | 1.4      |                                     |
+| 9.4 | Daemon watches synced directories            | pending | 3.1, 9.3 |                                     |
+| 9.5 | Computer field populated correctly           | pending | 3.7      |                                     |
 
 ## Phase 10: Prompt Learning Pipeline
 
