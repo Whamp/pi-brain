@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 75,
-    "totalSymbols": 1002,
+    "totalFiles": 76,
+    "totalSymbols": 1005,
     "byLanguage": {
-      "typescript": 75
+      "typescript": 76
     },
     "bySymbolKind": {
-      "function": 447,
+      "function": 448,
       "type": 37,
       "interface": 239,
-      "variable": 97,
+      "variable": 99,
       "class": 11,
       "constructor": 10,
       "method": 114,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32478,
-  "codebase_tokens": 926742,
+  "total_tokens": 32570,
+  "codebase_tokens": 929297,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -3003,7 +3003,7 @@
       "language": "typescript",
       "lines": [
         1,
-        559
+        562
       ],
       "detail_level": "full",
       "token_estimate": 482,
@@ -3071,7 +3071,7 @@
           "signature": "ConnectionDiscoverer",
           "lines": [
             146,
-            558
+            561
           ],
           "exported": true,
           "is_default": false,
@@ -3223,7 +3223,7 @@
           "signature": "detectLessonReinforcement(nodeId: string, sourceTimestamp: string, threshold: number, limit: number): {}",
           "lines": [
             373,
-            463
+            466
           ],
           "exported": false,
           "is_default": false,
@@ -3241,8 +3241,8 @@
           "kind": "method",
           "signature": "getLessons(nodeId: string): {}",
           "lines": [
-            465,
-            469
+            468,
+            472
           ],
           "exported": false,
           "is_default": false,
@@ -3260,8 +3260,8 @@
           "kind": "method",
           "signature": "findBestLessonMatch(targetLesson: LessonRow, candidateLessons: LessonRow[]): { lesson: LessonRow; score: number; }",
           "lines": [
-            471,
-            505
+            474,
+            508
           ],
           "exported": false,
           "is_default": false,
@@ -3279,8 +3279,8 @@
           "kind": "method",
           "signature": "calculateSimilarity(a: { tags: Set<string>; topics: Set<string>; summary: string }, b: { tags: Set<string>; topics: Set<string>; summary: string }): number",
           "lines": [
-            514,
-            527
+            517,
+            530
           ],
           "exported": false,
           "is_default": false,
@@ -3298,8 +3298,8 @@
           "kind": "method",
           "signature": "jaccardIndex(setA: Set<string>, setB: Set<string>): number",
           "lines": [
-            529,
-            543
+            532,
+            546
           ],
           "exported": false,
           "is_default": false,
@@ -3317,8 +3317,8 @@
           "kind": "method",
           "signature": "tokenize(text: string): Set<string>",
           "lines": [
-            545,
-            557
+            548,
+            560
           ],
           "exported": false,
           "is_default": false,
@@ -3339,6 +3339,90 @@
         "../storage/node-repository.js",
         "../types/index.js",
         "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/daemon/daemon-process.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        193
+      ],
+      "detail_level": "full",
+      "token_estimate": 92,
+      "symbols": [
+        {
+          "name": "args",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            30,
+            30
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "configPath",
+          "kind": "variable",
+          "signature": "string | undefined",
+          "lines": [
+            31,
+            31
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "signature": "async main(): Promise<void>",
+          "lines": [
+            44,
+            181
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../api/server.js",
+        "../config/config.js",
+        "../storage/database.js",
+        "./cli.js",
+        "./queue.js",
+        "./scheduler.js",
+        "./watcher-events.js",
+        "./watcher.js",
+        "./worker.js",
+        "node:path"
       ]
     },
     {
