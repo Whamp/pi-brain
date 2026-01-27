@@ -215,6 +215,95 @@ describe("database", () => {
       }
     });
 
+    it("creates prompt learning tables", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const tables = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+          )
+          .all() as { name: string }[];
+        const tableNames = tables.map((t) => t.name);
+
+        expect(tableNames).toContain("aggregated_insights");
+        expect(tableNames).toContain("prompt_effectiveness");
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates prompt_effectiveness table with correct columns", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const columns = db
+          .prepare("PRAGMA table_info(prompt_effectiveness)")
+          .all() as { name: string; type: string }[];
+        const columnNames = columns.map((c) => c.name);
+
+        // Core columns
+        expect(columnNames).toContain("id");
+        expect(columnNames).toContain("insight_id");
+        expect(columnNames).toContain("prompt_version");
+
+        // Before/after metrics
+        expect(columnNames).toContain("before_occurrences");
+        expect(columnNames).toContain("before_severity");
+        expect(columnNames).toContain("after_occurrences");
+        expect(columnNames).toContain("after_severity");
+
+        // Period columns
+        expect(columnNames).toContain("before_start");
+        expect(columnNames).toContain("before_end");
+        expect(columnNames).toContain("after_start");
+        expect(columnNames).toContain("after_end");
+
+        // Improvement metrics
+        expect(columnNames).toContain("improvement_pct");
+        expect(columnNames).toContain("statistically_significant");
+
+        // Session counts
+        expect(columnNames).toContain("sessions_before");
+        expect(columnNames).toContain("sessions_after");
+
+        // Timestamps
+        expect(columnNames).toContain("measured_at");
+        expect(columnNames).toContain("created_at");
+        expect(columnNames).toContain("updated_at");
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates prompt_effectiveness indexes", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const indexes = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'idx_effectiveness%'"
+          )
+          .all() as { name: string }[];
+        const indexNames = indexes.map((i) => i.name);
+
+        expect(indexNames).toContain("idx_effectiveness_insight");
+        expect(indexNames).toContain("idx_effectiveness_measured_at");
+        expect(indexNames).toContain("idx_effectiveness_significant");
+        expect(indexNames).toContain("idx_effectiveness_improvement");
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
     it("creates FTS virtual table", () => {
       const testDbPath = createTestDbPath();
       try {
@@ -386,6 +475,57 @@ describe("database", () => {
           .prepare("SELECT * FROM lessons WHERE node_id = ?")
           .all("test-node");
         expect(lessons).toHaveLength(0);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("enforces foreign key on prompt_effectiveness to aggregated_insights", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Try to insert effectiveness record referencing non-existent insight
+        expect(() => {
+          db.prepare(`
+            INSERT INTO prompt_effectiveness (id, insight_id, prompt_version)
+            VALUES (?, ?, ?)
+          `).run("eff-1", "nonexistent-insight", "v1");
+        }).toThrow(/FOREIGN KEY constraint failed/);
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("cascades deletes from aggregated_insights to prompt_effectiveness", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert an insight
+        db.prepare(`
+          INSERT INTO aggregated_insights (id, type, pattern)
+          VALUES (?, ?, ?)
+        `).run("insight-1", "quirk", "Test pattern");
+
+        // Insert related effectiveness record
+        db.prepare(`
+          INSERT INTO prompt_effectiveness (id, insight_id, prompt_version)
+          VALUES (?, ?, ?)
+        `).run("eff-1", "insight-1", "v1");
+
+        // Delete the insight
+        db.prepare("DELETE FROM aggregated_insights WHERE id = ?").run(
+          "insight-1"
+        );
+
+        // Verify cascaded delete
+        const effectiveness = db
+          .prepare("SELECT * FROM prompt_effectiveness WHERE insight_id = ?")
+          .all("insight-1");
+        expect(effectiveness).toHaveLength(0);
         cleanupTestDb(testDbPath, db);
       } finally {
         cleanupTestDb(testDbPath);

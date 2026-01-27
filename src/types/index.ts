@@ -393,3 +393,73 @@ export interface PromptAddition {
   /** Insight IDs used to generate this addition */
   sourceInsights: string[];
 }
+
+// =============================================================================
+// Prompt Effectiveness Types (specs/prompt-learning.md)
+// =============================================================================
+
+/**
+ * Date range for measuring effectiveness before/after prompt addition
+ */
+export interface DateRange {
+  /** ISO 8601 timestamp */
+  start: string;
+  /** ISO 8601 timestamp */
+  end: string;
+}
+
+/**
+ * Result of measuring prompt effectiveness for a single insight
+ */
+export interface EffectivenessResult {
+  insightId: string;
+  /** Occurrences per session before prompt was added */
+  beforeRate: number;
+  /** Occurrences per session after prompt was added */
+  afterRate: number;
+  /** Percentage improvement (positive = fewer occurrences = better) */
+  improvement: number;
+  /** Whether we have enough data to be confident */
+  significant: boolean;
+}
+
+/**
+ * Full effectiveness measurement record stored in database
+ */
+export interface PromptEffectiveness {
+  id: string;
+  insightId: string;
+  promptVersion: string;
+
+  /** Occurrences before prompt was added */
+  beforeOccurrences: number;
+  /** Average severity before (0.0-1.0) */
+  beforeSeverity: number;
+
+  /** Occurrences after prompt was added */
+  afterOccurrences: number;
+  /** Average severity after (0.0-1.0) */
+  afterSeverity: number;
+
+  /** Analysis period - before */
+  beforeStart: string;
+  beforeEnd: string;
+
+  /** Analysis period - after */
+  afterStart: string;
+  afterEnd: string;
+
+  /** Improvement percentage (positive = better) */
+  improvementPct: number;
+  /** Whether statistically significant */
+  statisticallySignificant: boolean;
+
+  /** Session counts for rate calculations */
+  sessionsBefore: number;
+  sessionsAfter: number;
+
+  /** When this measurement was taken */
+  measuredAt: string;
+  createdAt: string;
+  updatedAt: string;
+}

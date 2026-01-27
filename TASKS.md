@@ -130,18 +130,27 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 10: Prompt Learning Pipeline
 
-| ID   | Task                                                           | Status  | Deps      | Notes                          |
-| ---- | -------------------------------------------------------------- | ------- | --------- | ------------------------------ |
-| 10.1 | Aggregate model-specific learnings                             | done    | 4.10      | 2026-01-26 - InsightAggregator |
-| 10.2 | Generate model-specific prompt additions                       | done    | 10.1      | 2026-01-26                     |
-| 10.3 | Implement prompt injection mechanism                           | done    | 10.2      | 2026-01-26                     |
-| 10.4 | Create feedback loop: quirk → prompt fix → measure improvement | pending | 10.3      |                                |
-| 10.5 | Build "insights to prompts" UI                                 | pending | 10.3, 5.1 |                                |
+| ID    | Task                                                                                   | Status  | Deps      | Notes                          |
+| ----- | -------------------------------------------------------------------------------------- | ------- | --------- | ------------------------------ |
+| 10.1  | Aggregate model-specific learnings                                                     | done    | 4.10      | 2026-01-26 - InsightAggregator |
+| 10.2  | Generate model-specific prompt additions                                               | done    | 10.1      | 2026-01-26                     |
+| 10.3  | Implement skill-based prompt injection (brain-insights skill)                          | done    | 10.2      | 2026-01-26                     |
+| 10.4  | Create `prompt_effectiveness` table migration                                          | active  | 10.3      | 2026-01-26                     |
+| 10.5  | Implement `measureEffectiveness()` function                                            | pending | 10.4      |                                |
+| 10.6  | Implement auto-disable for ineffective insights                                        | pending | 10.5      |                                |
+| 10.7  | Add effectiveness tracking to nightly pipeline                                         | pending | 10.6      |                                |
+| 10.8  | Build prompt learning dashboard UI (`/prompt-learning` route)                          | pending | 10.7, 5.1 |                                |
+| 10.9  | Build insight editor component                                                         | pending | 10.8      |                                |
+| 10.10 | Add CLI commands for prompt-learning (run, insights, preview, enable/disable, measure) | pending | 10.3      |                                |
 
 ## Phase 11: Architecture Hardening
 
 | ID   | Task                                                                        | Status  | Deps | Notes                                        |
 | ---- | --------------------------------------------------------------------------- | ------- | ---- | -------------------------------------------- |
 | 11.1 | Refactor: Shared Type Library (extract to `src/types` or configure imports) | done    | 5.1  | 2026-01-26 - extracted to src/types/index.ts |
-| 11.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | pending | 3.7  |                                              |
+| 11.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | pending | 3.7  | TODO-36554ff9                                |
 | 11.3 | Architecture: SQLite Rebuild CLI (restore DB from JSON)                     | done    | 4.1  | 2026-01-26 - added rebuild-index command     |
+| 11.4 | Fix target deduplication in detectLessonReinforcement                       | pending | 8.5  | TODO-6347f019                                |
+| 11.5 | Return counts from PatternAggregator methods for status reporting           | pending | 8.6  | TODO-10af064f                                |
+| 11.6 | Make hardcoded limits configurable in nightly processing                    | pending | 8.1  | TODO-a2c7972a                                |
+| 11.7 | Add JSDoc to connection-discovery.ts public methods                         | pending | 8.3  | TODO-42ac82b8                                |
