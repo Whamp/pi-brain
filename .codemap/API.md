@@ -1798,4 +1798,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,038 (codebase: ~916,274)
+Estimated tokens: 22,038 (codebase: ~921,948)

@@ -887,3 +887,31 @@
 - Clustering uses mock embedding provider in scheduler (production would use configured provider)
 - Integrates with FacetDiscovery from Task 11.5 and LLM cluster analysis from Task 11.6
 - Follows spec from specs/signals.md Section 3 (Facet Discovery) and specs/daemon.md
+
+---
+
+## 2026-01-27 08:00 - Task 11.10
+
+**Status**: pending → done
+**Validation**:
+- Created `src/api/routes/signals.ts` with:
+  - GET `/api/v1/signals/abandoned-restarts` - Returns nodes with abandonedRestart friction signal
+  - GET `/api/v1/signals/friction-summary` - Returns aggregate friction stats (high friction count, abandoned restarts, tool loops, rephrasing cascades, context churn, model friction breakdown)
+- Created `abandoned-restarts.svelte` dashboard component showing:
+  - Friction stats grid (4 key metrics)
+  - List of recent abandoned restart patterns with project, model, timestamp, friction score
+  - Models with highest friction
+  - Positive empty state ("No abandoned restart patterns detected - this is good!")
+- Added frontend types: `AbandonedRestartPattern`, `AbandonedRestartsResponse`, `FrictionSummary`
+- Added API client methods: `getAbandonedRestarts()`, `getFrictionSummary()`
+- Integrated component into dashboard (after NewsFeed)
+- Tests:
+  - 7 tests for signals API (abandoned restarts, friction summary)
+- All 1153 tests pass (7 new)
+- npm run check passes
+**Commit**: 2e03bd0
+**Notes**:
+- Signals are stored in node JSON files, not indexed in SQLite
+- Queries scan JSON files at request time (limited to recent nodes for performance)
+- Dashboard shows both detailed patterns and aggregate summary
+- Follows spec from specs/signals.md Section 1 (Friction Signals) and specs/web-ui.md
