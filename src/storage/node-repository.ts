@@ -634,6 +634,40 @@ export function findFirstNodeInSession(
   return (stmt.get(sessionFile) as NodeRow) ?? null;
 }
 
+/**
+ * Find the most recent node for a project before a given timestamp.
+ * Used for abandoned restart detection.
+ *
+ * Returns the full Node from JSON storage (not just the row) to access
+ * filesTouched and other content fields.
+ */
+export function findPreviousProjectNode(
+  db: Database.Database,
+  project: string,
+  beforeTimestamp: string
+): Node | null {
+  const stmt = db.prepare(`
+    SELECT data_file FROM nodes
+    WHERE project = ? AND timestamp < ?
+    ORDER BY timestamp DESC, version DESC
+    LIMIT 1
+  `);
+  const row = stmt.get(project, beforeTimestamp) as
+    | { data_file: string }
+    | undefined;
+
+  if (!row) {
+    return null;
+  }
+
+  try {
+    return readNodeFromPath(row.data_file);
+  } catch {
+    // JSON file may have been deleted or corrupted
+    return null;
+  }
+}
+
 /** Valid structural edge types for boundary detection */
 const STRUCTURAL_EDGE_TYPES = new Set<EdgeType>([
   "continuation",

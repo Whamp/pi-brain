@@ -55,6 +55,7 @@ import {
   getNodeVersion,
   getQuirksByModel,
   getSubgraph,
+  findPreviousProjectNode,
   indexNodeForSearch,
   linkNodeToPredecessors,
   listLessons,
@@ -479,6 +480,140 @@ describe("node-repository", () => {
       createNode(db, node, options);
 
       expect(nodeExistsInDb(db, node.id)).toBeTruthy();
+    });
+  });
+
+  describe("findPreviousProjectNode", () => {
+    it("should return null if no previous node exists", () => {
+      const result = findPreviousProjectNode(
+        db,
+        "test-project",
+        "2026-01-26T12:00:00.000Z"
+      );
+      expect(result).toBeNull();
+    });
+
+    it("should return the most recent node for the project before timestamp", () => {
+      // Create two nodes for same project at different times
+      const node1 = createTestNode({
+        id: "aaaa111111111111",
+        classification: {
+          ...createTestNode().classification,
+          project: "my-project",
+        },
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-26T10:00:00.000Z",
+        },
+      });
+      const node2 = createTestNode({
+        id: "bbbb222222222222",
+        classification: {
+          ...createTestNode().classification,
+          project: "my-project",
+        },
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-26T11:00:00.000Z",
+        },
+      });
+
+      createNode(db, node1, options);
+      createNode(db, node2, options);
+
+      // Search for nodes before noon - should get node2 (most recent before noon)
+      const result = findPreviousProjectNode(
+        db,
+        "my-project",
+        "2026-01-26T12:00:00.000Z"
+      );
+
+      expect(result).not.toBeNull();
+      expect(result?.id).toBe("bbbb222222222222");
+    });
+
+    it("should return null if all nodes are after the timestamp", () => {
+      const node = createTestNode({
+        id: "cccc333333333333",
+        classification: {
+          ...createTestNode().classification,
+          project: "my-project",
+        },
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-26T14:00:00.000Z",
+        },
+      });
+
+      createNode(db, node, options);
+
+      // Search for nodes before noon - but node is at 2pm
+      const result = findPreviousProjectNode(
+        db,
+        "my-project",
+        "2026-01-26T12:00:00.000Z"
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it("should not return nodes from different projects", () => {
+      const node = createTestNode({
+        id: "dddd444444444444",
+        classification: {
+          ...createTestNode().classification,
+          project: "other-project",
+        },
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-26T10:00:00.000Z",
+        },
+      });
+
+      createNode(db, node, options);
+
+      // Search for my-project - should not find other-project's node
+      const result = findPreviousProjectNode(
+        db,
+        "my-project",
+        "2026-01-26T12:00:00.000Z"
+      );
+
+      expect(result).toBeNull();
+    });
+
+    it("should return full node data with filesTouched and outcome", () => {
+      const node = createTestNode({
+        id: "eeee555555555555",
+        classification: {
+          ...createTestNode().classification,
+          project: "my-project",
+        },
+        metadata: {
+          ...createTestNode().metadata,
+          timestamp: "2026-01-26T10:00:00.000Z",
+        },
+        content: {
+          ...createTestNode().content,
+          outcome: "abandoned",
+          filesTouched: ["src/auth.ts", "src/utils.ts"],
+        },
+      });
+
+      createNode(db, node, options);
+
+      const result = findPreviousProjectNode(
+        db,
+        "my-project",
+        "2026-01-26T12:00:00.000Z"
+      );
+
+      expect(result).not.toBeNull();
+      expect(result?.content.outcome).toBe("abandoned");
+      expect(result?.content.filesTouched).toStrictEqual([
+        "src/auth.ts",
+        "src/utils.ts",
+      ]);
     });
   });
 

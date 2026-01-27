@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 38
-- Total symbols: 191
-  - function: 114
+- Total symbols: 192
+  - function: 115
   - interface: 45
   - variable: 14
   - class: 10
@@ -176,17 +176,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:913: call join -> external
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 17 [call: 16, type: 1]
+      refs out: 16 [call: 15, type: 1]
         - src/daemon/cli.ts:949: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:952: call log -> external
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
         - src/daemon/cli.ts:975: call log -> external
-        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-repository.ts
         - src/daemon/cli.ts:980: call log -> external
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
         - src/daemon/cli.ts:1004: call log -> external
+        - src/daemon/cli.ts:1007: call log -> external
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -940,60 +940,60 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-536]
+src/daemon/worker.ts [1-571]
   class:
-    113-475: class Worker [exported]
+    116-510: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    55-70: interface WorkerConfig [exported]
+    58-73: interface WorkerConfig [exported]
       /** Worker configuration */
       refs out: 9 [type: 9]
-        - src/daemon/worker.ts:59: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:61: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:63: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:65: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:65: type Node -> src/types/index.ts
-        - src/daemon/worker.ts:65: type Promise -> external
-        - src/daemon/worker.ts:67: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:67: type Error -> external
-        - src/daemon/worker.ts:67: type Promise -> external
-    73-88: interface WorkerStatus [exported]
+        - src/daemon/worker.ts:62: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:64: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:66: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:68: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:68: type Node -> src/types/index.ts
+        - src/daemon/worker.ts:68: type Promise -> external
+        - src/daemon/worker.ts:70: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:70: type Error -> external
+        - src/daemon/worker.ts:70: type Promise -> external
+    76-91: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:79: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:87: type Date -> external
-    91-104: interface JobProcessingResult [exported]
+        - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:90: type Date -> external
+    94-107: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:95: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:99: type Error -> external
+        - src/daemon/worker.ts:98: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:102: type Error -> external
   function:
-    484-486: createWorker(config: WorkerConfig): Worker [exported]
+    519-521: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:484: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:484: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:485: instantiate Worker -> src/daemon/worker.ts
-    492-506: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:519: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:519: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:520: instantiate Worker -> src/daemon/worker.ts
+    527-541: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:493: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:494: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:495: type Database -> external
-        - src/daemon/worker.ts:496: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:497: type Promise -> external
-        - src/daemon/worker.ts:497: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:504: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:505: call Worker.processJob -> src/daemon/worker.ts
-    511-535: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:528: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:529: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:530: type Database -> external
+        - src/daemon/worker.ts:531: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:532: type Promise -> external
+        - src/daemon/worker.ts:532: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:539: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:540: call Worker.processJob -> src/daemon/worker.ts
+    546-570: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:512: type Error -> external
-        - src/daemon/worker.ts:513: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:514: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:519: type ReturnType -> external
-        - src/daemon/worker.ts:531: call ceil -> external
-        - src/daemon/worker.ts:532: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:547: type Error -> external
+        - src/daemon/worker.ts:548: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:549: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:554: type ReturnType -> external
+        - src/daemon/worker.ts:566: call ceil -> external
+        - src/daemon/worker.ts:567: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1332,17 +1332,17 @@ src/parser/session.ts [1-415]
     - ../types.js
     - node:fs/promises
 
-src/parser/signals.test.ts [1-1117]
+src/parser/signals.test.ts [1-1260]
   imports:
     - ../types.js
     - ./signals.js
     - vitest
 
-src/parser/signals.ts [1-1043]
+src/parser/signals.ts [1-1095]
   interface:
     555-564: interface FrictionDetectionOptions [exported]
       /** Options for friction detection */
-    1015-1018: interface DelightDetectionOptions [exported]
+    1067-1070: interface DelightDetectionOptions [exported]
       /** Options for delight detection */
   function:
     126-163: countRephrasingCascades(entries: SessionEntry[]): number [exported]
@@ -1375,21 +1375,25 @@ src/parser/signals.ts [1-1043]
         - src/parser/signals.ts:428: call hasGenuineSuccessIndicator -> src/parser/signals.ts
     479-507: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 2 [call: 1, type: 1]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:479: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:479: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:497: call push -> external
+        - src/parser/signals.ts:498: type ManualFlag -> src/types/index.ts
     518-546: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 4 [call: 4]
+      refs out: 5 [call: 4, type: 1]
+        - src/parser/signals.ts:518: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:522: call min -> external
         - src/parser/signals.ts:525: call min -> external
         - src/parser/signals.ts:528: call min -> external
         - src/parser/signals.ts:545: call min -> external
     569-601: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:570: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:571: type FrictionDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:572: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:598: call calculateFrictionScore -> src/parser/signals.ts
     611-642: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1422,35 +1426,47 @@ src/parser/signals.ts [1-1043]
         - src/parser/signals.ts:743: call isNaN -> external
         - src/parser/signals.ts:743: call isNaN -> external
         - src/parser/signals.ts:757: call hasFileOverlap -> src/parser/signals.ts
-    770-812: detectResilientRecovery(entries: SessionEntry[]): boolean [exported]
+    771-810: isAbandonedRestartFromNode(previousNode: {
+    outcome: string;
+    timestamp: string;
+    filesTouched: string[];
+  }, currentStartTime: string, currentFilesTouched: string[]): boolean [exported]
+      /** Check if a current segment is an abandoned restart of a previous node. This is similar to `isAbandonedRestart` but works with already-computed node data (with filesTouched arrays) instead of raw session entries. Criteria: - Previous node has outcome 'abandoned' - Current segment starts within 30 minutes of previous node's timestamp - Both touch similar files (30% overlap threshold) */
+      refs out: 3 [call: 3]
+        - src/parser/signals.ts:795: call isNaN -> external
+        - src/parser/signals.ts:795: call isNaN -> external
+        - src/parser/signals.ts:809: call hasFileOverlap -> src/parser/signals.ts
+    822-864: detectResilientRecovery(entries: SessionEntry[]): boolean [exported]
       /** Detect resilient recovery Tool error occurs, but the model fixes it WITHOUT user intervention, and the task ultimately succeeds. */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:770: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:803: call isMinimalAcknowledgment -> src/parser/signals.ts
-    842-889: detectOneShotSuccess(entries: SessionEntry[]): boolean [exported]
+        - src/parser/signals.ts:822: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:855: call isMinimalAcknowledgment -> src/parser/signals.ts
+    894-941: detectOneShotSuccess(entries: SessionEntry[]): boolean [exported]
       /** Detect one-shot success Complex task (multiple tool calls) completed with zero user corrections/rephrasings. */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:842: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:875: call isUserCorrection -> src/parser/signals.ts
-    930-953: detectExplicitPraise(entries: SessionEntry[]): boolean [exported]
+        - src/parser/signals.ts:894: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:927: call isUserCorrection -> src/parser/signals.ts
+    982-1005: detectExplicitPraise(entries: SessionEntry[]): boolean [exported]
       /** Detect explicit praise from user User says "great job", "perfect", "thanks", etc. */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:930: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:946: call hasGenuinePraise -> src/parser/signals.ts
-    987-1006: calculateDelightScore(delight: DelightSignals): number [exported]
+        - src/parser/signals.ts:982: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:998: call hasGenuinePraise -> src/parser/signals.ts
+    1039-1058: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 1 [call: 1]
-        - src/parser/signals.ts:1005: call min -> external
-    1023-1042: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
+      refs out: 2 [call: 1, type: 1]
+        - src/parser/signals.ts:1039: type DelightSignals -> src/types/index.ts
+        - src/parser/signals.ts:1057: call min -> external
+    1075-1094: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
-        - src/parser/signals.ts:1024: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:1025: type DelightDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:1039: call calculateDelightScore -> src/parser/signals.ts
+      refs out: 4 [call: 1, type: 3]
+        - src/parser/signals.ts:1076: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:1077: type DelightDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:1078: type DelightSignals -> src/types/index.ts
+        - src/parser/signals.ts:1091: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types.js
     - ../types/index.js
 
 ---
 Files: 38
-Estimated tokens: 18,979 (codebase: ~943,405)
+Estimated tokens: 19,305 (codebase: ~949,520)

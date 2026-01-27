@@ -19,11 +19,14 @@ import {
   detectDelightSignals,
   detectFrictionSignals,
   extractManualFlags,
+  getFilesTouched,
+  isAbandonedRestartFromNode,
   parseSession,
 } from "../parser/index.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
 import {
   agentOutputToNode,
+  findPreviousProjectNode,
   linkNodeToPredecessors,
   upsertNode,
 } from "../storage/node-repository.js";
@@ -308,17 +311,49 @@ export class Worker {
           }
         }
 
-        // 3. Detect friction and delight signals from segment entries
+        // 3. Detect abandoned restart by checking previous project node
+        // Get the segment's start time and files touched
+        const segmentStartTime =
+          segmentEntries[0]?.timestamp ?? session.header.timestamp;
+        const currentFilesTouched = [
+          ...getFilesTouched(segmentEntries),
+          ...result.nodeData.content.filesTouched,
+        ];
+        const { project } = result.nodeData.classification;
+
+        // Look up previous node for the same project
+        let abandonedRestart = false;
+        if (project) {
+          const previousNode = findPreviousProjectNode(
+            this.db,
+            project,
+            segmentStartTime
+          );
+          if (previousNode) {
+            abandonedRestart = isAbandonedRestartFromNode(
+              {
+                outcome: previousNode.content.outcome,
+                timestamp: previousNode.metadata.timestamp,
+                filesTouched: previousNode.content.filesTouched,
+              },
+              segmentStartTime,
+              currentFilesTouched
+            );
+          }
+        }
+
+        // 4. Detect friction and delight signals from segment entries
         const frictionSignals = detectFrictionSignals(segmentEntries, {
           isLastSegment: !job.segmentEnd, // If no end specified, assume it's the latest segment
           wasResumed: job.context?.boundaryType === "resume",
+          abandonedRestart,
         });
         const delightSignals = detectDelightSignals(segmentEntries, {
           outcome: result.nodeData.content.outcome,
         });
         const manualFlags = extractManualFlags(segmentEntries);
 
-        // 4. Convert AgentNodeOutput to Node
+        // 5. Convert AgentNodeOutput to Node
         const promptVersion = getOrCreatePromptVersion(
           this.db,
           this.config.daemon.promptFile
@@ -343,13 +378,13 @@ export class Worker {
           },
         });
 
-        // 5. Store node in SQLite and JSON (upsert for idempotent ingestion)
+        // 6. Store node in SQLite and JSON (upsert for idempotent ingestion)
         // If this job is a retry after a crash, the node may already exist
         const { created } = upsertNode(this.db, node, {
           nodesDir: join(this.config.hub.databaseDir, "nodes"),
         });
 
-        // 6. Create structural edges based on session boundaries.
+        // 7. Create structural edges based on session boundaries.
         // Only for initial analysis of new nodes - reanalysis preserves existing edges.
         if (job.type === "initial" && created) {
           linkNodeToPredecessors(this.db, node, {

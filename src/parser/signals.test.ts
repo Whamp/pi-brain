@@ -31,6 +31,7 @@ import {
   getSegmentTimestamp,
   hasFileOverlap,
   isAbandonedRestart,
+  isAbandonedRestartFromNode,
 } from "./signals.js";
 
 // =============================================================================
@@ -748,6 +749,148 @@ describe("isAbandonedRestart", () => {
       startTime: "invalid-date",
     };
     expect(isAbandonedRestart(segmentA, segmentB)).toBeFalsy();
+  });
+});
+
+describe("isAbandonedRestartFromNode", () => {
+  const baseTime = new Date("2026-01-26T10:00:00.000Z");
+
+  it("should return false if previous node not abandoned", () => {
+    const previousNode = {
+      outcome: "success",
+      timestamp: baseTime.toISOString(),
+      filesTouched: ["src/auth.ts"],
+    };
+    const currentStartTime = new Date(
+      baseTime.getTime() + 5 * 60 * 1000
+    ).toISOString();
+    const currentFilesTouched = ["src/auth.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeFalsy();
+  });
+
+  it("should return false if too much time passed", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: baseTime.toISOString(),
+      filesTouched: ["src/auth.ts"],
+    };
+    const currentStartTime = new Date(
+      baseTime.getTime() + 60 * 60 * 1000
+    ).toISOString(); // 1 hour
+    const currentFilesTouched = ["src/auth.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeFalsy();
+  });
+
+  it("should return true for abandoned restart within window with file overlap", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: baseTime.toISOString(),
+      filesTouched: ["src/auth.ts", "src/utils.ts"],
+    };
+    const currentStartTime = new Date(
+      baseTime.getTime() + 10 * 60 * 1000
+    ).toISOString(); // 10 min
+    const currentFilesTouched = ["src/auth.ts", "src/new.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeTruthy();
+  });
+
+  it("should return false if no file overlap", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: baseTime.toISOString(),
+      filesTouched: ["src/a.ts", "src/b.ts"],
+    };
+    const currentStartTime = new Date(
+      baseTime.getTime() + 10 * 60 * 1000
+    ).toISOString();
+    const currentFilesTouched = ["src/c.ts", "src/d.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeFalsy();
+  });
+
+  it("should return false for empty filesTouched arrays", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: baseTime.toISOString(),
+      filesTouched: [],
+    };
+    const currentStartTime = new Date(
+      baseTime.getTime() + 10 * 60 * 1000
+    ).toISOString();
+    const currentFilesTouched: string[] = [];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeFalsy();
+  });
+
+  it("should return false for invalid timestamps", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: "",
+      filesTouched: ["src/auth.ts"],
+    };
+    const currentFilesTouched = ["src/auth.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        "invalid-date",
+        currentFilesTouched
+      )
+    ).toBeFalsy();
+  });
+
+  it("should return false if current starts before previous ended", () => {
+    const previousNode = {
+      outcome: "abandoned",
+      timestamp: baseTime.toISOString(),
+      filesTouched: ["src/auth.ts"],
+    };
+    // Current starts 5 minutes BEFORE previous ended
+    const currentStartTime = new Date(
+      baseTime.getTime() - 5 * 60 * 1000
+    ).toISOString();
+    const currentFilesTouched = ["src/auth.ts"];
+
+    expect(
+      isAbandonedRestartFromNode(
+        previousNode,
+        currentStartTime,
+        currentFilesTouched
+      )
+    ).toBeFalsy();
   });
 });
 

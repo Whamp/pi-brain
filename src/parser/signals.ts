@@ -757,6 +757,58 @@ export function isAbandonedRestart(
   return hasFileOverlap(filesA, filesB);
 }
 
+/**
+ * Check if a current segment is an abandoned restart of a previous node.
+ *
+ * This is similar to `isAbandonedRestart` but works with already-computed
+ * node data (with filesTouched arrays) instead of raw session entries.
+ *
+ * Criteria:
+ * - Previous node has outcome 'abandoned'
+ * - Current segment starts within 30 minutes of previous node's timestamp
+ * - Both touch similar files (30% overlap threshold)
+ */
+export function isAbandonedRestartFromNode(
+  previousNode: {
+    outcome: string;
+    timestamp: string;
+    filesTouched: string[];
+  },
+  currentStartTime: string,
+  currentFilesTouched: string[]
+): boolean {
+  // Check if previous node was abandoned
+  if (previousNode.outcome !== "abandoned") {
+    return false;
+  }
+
+  // Validate timestamps
+  if (!previousNode.timestamp || !currentStartTime) {
+    return false;
+  }
+
+  // Check time gap
+  const prevEnd = new Date(previousNode.timestamp).getTime();
+  const currStart = new Date(currentStartTime).getTime();
+
+  // Handle invalid dates
+  if (Number.isNaN(prevEnd) || Number.isNaN(currStart)) {
+    return false;
+  }
+
+  const gapMinutes = (currStart - prevEnd) / (1000 * 60);
+
+  if (gapMinutes < 0 || gapMinutes > ABANDONED_RESTART_WINDOW_MINUTES) {
+    return false;
+  }
+
+  // Check file overlap
+  const filesA = new Set(previousNode.filesTouched);
+  const filesB = new Set(currentFilesTouched);
+
+  return hasFileOverlap(filesA, filesB);
+}
+
 // =============================================================================
 // Delight Detection Functions
 // =============================================================================

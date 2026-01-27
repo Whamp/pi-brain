@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 7
-- Total symbols: 147
-  - function: 97
+- Total symbols: 148
+  - function: 98
   - interface: 37
   - type: 10
   - variable: 3
@@ -67,7 +67,7 @@ src/storage/index.ts [1-9]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-repository.ts [1-3311]
+src/storage/node-repository.ts [1-3345]
   interface:
     38-41: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
@@ -75,62 +75,62 @@ src/storage/node-repository.ts [1-3311]
       /** Node row from the database */
     68-76: interface EdgeRow [exported]
       /** Edge row from the database */
-    929-934: interface SearchHighlight [exported]
+    963-968: interface SearchHighlight [exported]
       /** Highlight match for search results */
-    937-944: interface SearchResult [exported]
+    971-978: interface SearchResult [exported]
       /** Enhanced search result with score and highlights */
-    947-956: interface SearchOptions [exported]
+    981-990: interface SearchOptions [exported]
       /** Options for enhanced search */
-    959-968: interface SearchNodesResult [exported]
+    993-1002: interface SearchNodesResult [exported]
       /** Result from enhanced search with pagination metadata */
-    1371-1380: interface ListLessonsFilters [exported]
+    1405-1414: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
-    1383-1388: interface ListLessonsOptions [exported]
+    1417-1422: interface ListLessonsOptions [exported]
       /** Pagination options for lessons */
-    1391-1410: interface ListLessonsResult [exported]
+    1425-1444: interface ListLessonsResult [exported]
       /** Result from listLessons query */
-    1607-1616: interface ListQuirksFilters [exported]
+    1641-1650: interface ListQuirksFilters [exported]
       /** Filters for querying model quirks */
-    1619-1624: interface ListQuirksOptions [exported]
+    1653-1658: interface ListQuirksOptions [exported]
       /** Pagination options for quirks */
-    1627-1636: interface QuirkResult [exported]
+    1661-1670: interface QuirkResult [exported]
       /** A quirk result with metadata */
-    1639-1648: interface ListQuirksResult [exported]
+    1673-1682: interface ListQuirksResult [exported]
       /** Result from listQuirks query */
-    1731-1741: interface ModelQuirkStats [exported]
+    1765-1775: interface ModelQuirkStats [exported]
       /** Stats for a single model */
-    1870-1879: interface ListToolErrorsFilters [exported]
+    1904-1913: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
-    1882-1887: interface ListToolErrorsOptions [exported]
+    1916-1921: interface ListToolErrorsOptions [exported]
       /** Pagination options for tool errors */
-    1890-1899: interface ToolErrorResult [exported]
+    1924-1933: interface ToolErrorResult [exported]
       /** A tool error result with metadata */
-    1902-1911: interface ListToolErrorsResult [exported]
+    1936-1945: interface ListToolErrorsResult [exported]
       /** Result from listToolErrors query */
-    2379-2404: interface ListNodesFilters [exported]
+    2413-2438: interface ListNodesFilters [exported]
       /** Filters for querying nodes */
-    2407-2416: interface ListNodesOptions [exported]
+    2441-2450: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-    2419-2428: interface ListNodesResult [exported]
+    2453-2462: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    2588-2600: interface SessionSummaryRow [exported]
+    2622-2634: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
-    2695-2711: interface ConnectedNodesOptions [exported]
+    2729-2745: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
-    2714-2729: interface TraversalEdge [exported]
+    2748-2763: interface TraversalEdge [exported]
       /** An edge with direction information for traversal results */
-    2732-2739: interface ConnectedNodesResult [exported]
+    2766-2773: interface ConnectedNodesResult [exported]
       /** Result from getConnectedNodes */
-    3075-3094: interface NodeConversionContext [exported]
+    3109-3128: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   type:
-    912-917: SearchField = | "summary"
+    946-951: SearchField = | "summary"
   | "decisions"
   | "lessons"
   | "tags"
   | "topics" [exported]
       /** Fields that can be searched in the FTS index */
-    1525-1535: LessonsByLevelResult = Record<
+    1559-1569: LessonsByLevelResult = Record<
   string,
   {
     count: number;
@@ -142,13 +142,13 @@ src/storage/node-repository.ts [1-3311]
   }
 > [exported]
       /** Result from getLessonsByLevel */
-    1601-1601: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
+    1635-1635: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
       /** Frequency values for model quirks */
-    1604-1604: QuirkSeverity = "low" | "medium" | "high" [exported]
+    1638-1638: QuirkSeverity = "low" | "medium" | "high" [exported]
       /** Severity values for model quirks (matches spec) */
-    1744-1744: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
+    1778-1778: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
       /** Result from getQuirksByModel */
-    2347-2355: NodeSortField = | "timestamp"
+    2381-2389: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -157,9 +157,9 @@ src/storage/node-repository.ts [1-3311]
   | "cost"
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
-    2358-2358: SortOrder = "asc" | "desc" [exported]
+    2392-2392: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
-    2361-2373: NodeTypeFilter = | "coding"
+    2395-2407: NodeTypeFilter = | "coding"
   | "sysadmin"
   | "research"
   | "planning"
@@ -172,9 +172,9 @@ src/storage/node-repository.ts [1-3311]
   | "configuration"
   | "other" [exported]
       /** Node type filter values */
-    2376-2376: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
+    2410-2410: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
       /** Outcome filter values */
-    2692-2692: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
+    2726-2726: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
       /** Direction for graph traversal */
   function:
     86-115: clearAllData(db: Database.Database): void [exported]
@@ -203,108 +203,110 @@ src/storage/node-repository.ts [1-3311]
       /** Find the latest node for a given session file */
     624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    662-700: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+      /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
+    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
-    725-761: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
+    759-795: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
     metadata?: EdgeMetadata;
     createdBy?: "boundary" | "daemon" | "user";
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-    766-773: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
+    800-807: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-    778-785: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
+    812-819: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
-    790-797: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
+    824-831: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
-    802-805: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    836-839: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-    810-813: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    844-847: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-    818-836: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    852-870: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
-    845-873: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
+    879-907: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
       /** Index a node for full-text search */
-    879-905: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
+    913-939: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    1148-1271: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    1182-1305: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    1276-1364: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    1310-1398: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
-    1423-1522: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
+    1457-1556: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
-    1543-1583: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
+    1577-1617: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    1588-1594: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
+    1622-1628: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
       /** Count lessons matching filters (without fetching data) */
-    1668-1728: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
+    1702-1762: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
       /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
-    1752-1790: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
+    1786-1824: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
       /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    1795-1801: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
+    1829-1835: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
       /** Count quirks matching filters (without fetching data) */
-    1806-1813: getAllQuirkModels(db: Database.Database): {} [exported]
+    1840-1847: getAllQuirkModels(db: Database.Database): {} [exported]
       /** Get all unique models that have quirks recorded */
-    1821-1863: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+    1855-1897: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
       /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
-    1916-1974: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    1950-2008: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    1980-2068: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+    2014-2102: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
-    2074-2132: getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; } [exported]
+    2108-2166: getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; } [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
-    2137-2143: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
+    2171-2177: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
       /** Count tool errors matching filters. */
-    2148-2155: getAllToolsWithErrors(db: Database.Database): {} [exported]
+    2182-2189: getAllToolsWithErrors(db: Database.Database): {} [exported]
       /** Get all unique tools that have errors recorded */
-    2164-2171: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+    2198-2205: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
-    2176-2180: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+    2210-2214: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
-    2185-2189: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+    2219-2223: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-    2194-2217: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+    2228-2251: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
-    2222-2245: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+    2256-2279: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
-    2250-2273: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
+    2284-2307: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
-    2278-2288: getAllTags(db: Database.Database): {} [exported]
+    2312-2322: getAllTags(db: Database.Database): {} [exported]
       /** Get all unique tags in the system */
-    2293-2297: getAllTopics(db: Database.Database): {} [exported]
+    2327-2331: getAllTopics(db: Database.Database): {} [exported]
       /** Get all unique topics in the system */
-    2302-2309: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
+    2336-2343: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
       /** Get tags for a specific lesson */
-    2314-2324: getNodesByTag(db: Database.Database, tag: string): {} [exported]
+    2348-2358: getNodesByTag(db: Database.Database, tag: string): {} [exported]
       /** Find nodes by tag (matches both node tags and lesson tags) */
-    2329-2340: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
+    2363-2374: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
       /** Find nodes by topic */
-    2458-2583: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+    2492-2617: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    2606-2635: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    2640-2669: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    2640-2648: getAllProjects(db: Database.Database): {} [exported]
+    2674-2682: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    2653-2661: getAllNodeTypes(db: Database.Database): {} [exported]
+    2687-2695: getAllNodeTypes(db: Database.Database): {} [exported]
       /** Get all unique node types that have been used */
-    2666-2674: getAllComputers(db: Database.Database): {} [exported]
+    2700-2708: getAllComputers(db: Database.Database): {} [exported]
       /** Get all unique computers (source machines) */
-    2679-2685: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    2713-2719: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
-    2770-2875: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    2804-2909: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    2884-2931: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    2918-2965: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    2939-2993: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    2973-3027: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    2999-3009: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    3033-3043: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    3015-3025: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    3049-3059: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
-    3058-3068: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    3092-3102: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
-    3100-3307: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
+    3134-3341: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
   imports:
     - ../daemon/processor.js
@@ -390,4 +392,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 7
-Estimated tokens: 6,181 (codebase: ~943,169)
+Estimated tokens: 6,267 (codebase: ~944,260)
