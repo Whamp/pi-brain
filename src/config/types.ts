@@ -98,6 +98,18 @@ export interface DaemonConfig {
   /** Cron schedule for facet discovery/clustering (optional) */
   clusteringSchedule: string;
 
+  /** Max nodes to queue for reanalysis per nightly run */
+  reanalysisLimit: number;
+
+  /** Max nodes to queue for connection discovery per nightly run */
+  connectionDiscoveryLimit: number;
+
+  /** Days to look back for recent nodes in connection discovery */
+  connectionDiscoveryLookbackDays: number;
+
+  /** Hours before re-running connection discovery on a node */
+  connectionDiscoveryCooldownHours: number;
+
   /** Embedding provider for clustering ('openrouter', 'ollama', 'openai') */
   embeddingProvider: "ollama" | "openai" | "openrouter";
 
@@ -211,6 +223,10 @@ export interface RawConfig {
     connection_discovery_schedule?: string;
     pattern_aggregation_schedule?: string;
     clustering_schedule?: string;
+    reanalysis_limit?: number;
+    connection_discovery_limit?: number;
+    connection_discovery_lookback_days?: number;
+    connection_discovery_cooldown_hours?: number;
     embedding_provider?: "ollama" | "openai" | "openrouter";
     embedding_model?: string;
     embedding_api_key?: string;

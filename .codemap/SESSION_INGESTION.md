@@ -93,17 +93,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:226: call now -> external
     251-361: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs out: 20 [call: 15, type: 5]
+      refs out: 18 [call: 13, type: 5]
         - src/daemon/cli.ts:251: type StartOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:251: type Promise -> external
-        - src/daemon/cli.ts:270: call loadConfig -> src/config/config.ts
         - src/daemon/cli.ts:274: type Error -> external
-        - src/daemon/cli.ts:280: call ensureDirectories -> src/config/config.ts
         - src/daemon/cli.ts:284: type Error -> external
         - src/daemon/cli.ts:290: call writePidFile -> src/daemon/cli.ts
         - src/daemon/cli.ts:303: call existsSync -> external
         - src/daemon/cli.ts:304: call mkdirSync -> external
         - src/daemon/cli.ts:311: call push -> external
+        - src/daemon/cli.ts:316: call spawn -> external
+        - src/daemon/cli.ts:325: call closeSync -> external
     366-428: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 9 [call: 7, type: 2]
@@ -215,13 +215,14 @@ src/daemon/connection-discovery.test.ts [1-440]
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-562]
+src/daemon/connection-discovery.ts [1-623]
   class:
-    146-561: class ConnectionDiscoverer [exported]
+    162-622: class ConnectionDiscoverer [exported]
+      /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    141-144: interface ConnectionResult [exported]
+    141-146: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:143: type Edge -> src/types/index.ts
+        - src/daemon/connection-discovery.ts:145: type Edge -> src/types/index.ts
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
@@ -633,9 +634,8 @@ src/daemon/query-processor.ts [1-720]
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
     91-100: interface QueryProcessorConfig [exported]
-      refs out: 3 [type: 3]
+      refs out: 2 [type: 2]
         - src/daemon/query-processor.ts:93: type Database -> external
-        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
         - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
   function:
     105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
@@ -738,9 +738,9 @@ src/daemon/scheduler.test.ts [1-723]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-797]
+src/daemon/scheduler.ts [1-817]
   class:
-    130-731: class Scheduler [exported]
+    142-747: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     49-56: interface ScheduledJobResult [exported]
@@ -751,15 +751,15 @@ src/daemon/scheduler.ts [1-797]
         - src/daemon/scheduler.ts:52: type Date -> external
     59-63: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    80-113: interface SchedulerConfig [exported]
+    80-125: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    116-125: interface SchedulerStatus [exported]
+    128-137: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs out: 4 [type: 4]
-        - src/daemon/scheduler.ts:119: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:121: type Date -> external
-        - src/daemon/scheduler.ts:122: type Date -> external
-        - src/daemon/scheduler.ts:123: type ScheduledJobResult -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:131: type ScheduledJobType -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:133: type Date -> external
+        - src/daemon/scheduler.ts:134: type Date -> external
+        - src/daemon/scheduler.ts:135: type ScheduledJobResult -> src/daemon/scheduler.ts
   type:
     42-46: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -767,26 +767,26 @@ src/daemon/scheduler.ts [1-797]
   | "clustering" [exported]
       /** Job types that can be scheduled */
   function:
-    736-760: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    752-780: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:737: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:738: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:739: type Database -> external
-        - src/daemon/scheduler.ts:740: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:741: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:742: instantiate Scheduler -> src/daemon/scheduler.ts
-    766-775: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:753: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:754: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:755: type Database -> external
+        - src/daemon/scheduler.ts:756: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:757: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:758: instantiate Scheduler -> src/daemon/scheduler.ts
+    786-795: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:770: call Cron.stop -> external
-    780-796: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:790: call Cron.stop -> external
+    800-816: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:780: type Date -> external
-        - src/daemon/scheduler.ts:787: call push -> external
-        - src/daemon/scheduler.ts:788: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:791: call Cron.stop -> external
+        - src/daemon/scheduler.ts:800: type Date -> external
+        - src/daemon/scheduler.ts:807: call push -> external
+        - src/daemon/scheduler.ts:808: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:811: call Cron.stop -> external
   variable:
     66-70: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -1451,4 +1451,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,908 (codebase: ~935,789)
+Estimated tokens: 18,943 (codebase: ~937,056)
