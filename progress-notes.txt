@@ -110,3 +110,31 @@ Only 2 minor tasks remain pending:
 - Re-exports maintain backward compatibility with existing imports
 - graph-repository.ts (Task 13.9) depends on this module
 
+
+---
+
+## 2026-01-27 15:30 - Task 13.3
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1198 passed, 4 skipped)
+**Commit**: 26be244
+
+**Summary**: Extracted agentOutputToNode function and NodeConversionContext interface from node-repository.ts to node-conversion.ts
+
+**Files created:**
+- `src/storage/node-conversion.ts` (259 lines) - conversion function and types
+
+**Extracted:**
+- Interface: `NodeConversionContext`
+- Function: `agentOutputToNode`
+
+**Changes:**
+- `node-repository.ts` reduced from 3063 to 2829 lines (-234 lines)
+- Added imports and re-exports for backward compatibility
+- Removed unused imports (generateDeterministicNodeId, NodeSignals)
+- Updated storage barrel (index.ts) to include node-conversion.ts
+
+**Notes:** 
+- All consumers (worker.ts, tests) continue to import from node-repository.ts via re-exports
+- Re-exports maintain backward compatibility
+- All 1198 tests pass
