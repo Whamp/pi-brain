@@ -196,6 +196,29 @@ describe("/brain --flag command", () => {
     });
   });
 
+  it("should handle colon syntax flag type case-insensitively", async () => {
+    await commandHandler("--flag:QUIRK Uppercase colon type test", ctx);
+
+    expect(pi.appendEntry).toHaveBeenCalledWith("brain_flag", {
+      type: "quirk",
+      message: "Uppercase colon type test",
+    });
+  });
+
+  it("should not match -flag as a flag command", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockRejectedValue(new Error("Network error"));
+
+    await commandHandler("-flag quirk test", ctx);
+
+    expect(pi.appendEntry).not.toHaveBeenCalled();
+    // Treated as query, not flag
+    expect(fetchSpy).toHaveBeenCalled();
+
+    fetchSpy.mockRestore();
+  });
+
   it("should handle messages with multiple words", async () => {
     await commandHandler("--flag note Message with multiple words here", ctx);
 

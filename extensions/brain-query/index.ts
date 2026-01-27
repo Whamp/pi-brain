@@ -40,7 +40,9 @@ function parseFlagCommand(input: string): {
   error?: string;
 } {
   // Check for --flag or -f prefix
-  const flagPrefixMatch = input.match(/^(?:--flag|-f)(?::(\w+))?\s*(.*)/);
+  const flagPrefixMatch = input.match(
+    /^(?:--flag|-f(?!lag))(?::(\w+))?\s*(.*)/
+  );
   if (!flagPrefixMatch) {
     return { isFlag: false };
   }
@@ -53,13 +55,14 @@ function parseFlagCommand(input: string): {
 
   if (inlineType) {
     // Format: --flag:type message
-    if (!VALID_FLAG_TYPES.includes(inlineType as FlagType)) {
+    const normalizedInlineType = inlineType.toLowerCase();
+    if (!VALID_FLAG_TYPES.includes(normalizedInlineType as FlagType)) {
       return {
         isFlag: true,
         error: `Invalid flag type "${inlineType}". Valid types: ${VALID_FLAG_TYPES.join(", ")}`,
       };
     }
-    flagType = inlineType as FlagType;
+    flagType = normalizedInlineType as FlagType;
     message = remaining;
   } else {
     // Format: --flag type message

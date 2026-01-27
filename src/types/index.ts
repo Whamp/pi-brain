@@ -532,3 +532,129 @@ export interface NodeSignals {
   delight: DelightSignals;
   manualFlags: ManualFlag[];
 }
+
+// =============================================================================
+// Facet Discovery Types (specs/signals.md)
+// =============================================================================
+
+/**
+ * Cluster status for user feedback
+ */
+export type ClusterStatus = "pending" | "confirmed" | "dismissed";
+
+/**
+ * Signal type a cluster relates to
+ */
+export type ClusterSignalType = "friction" | "delight" | null;
+
+/**
+ * A discovered cluster from facet discovery
+ */
+export interface Cluster {
+  id: string;
+  /** LLM-generated name (null until analyzed) */
+  name: string | null;
+  /** LLM-generated description */
+  description: string | null;
+  /** Number of nodes in this cluster */
+  nodeCount: number;
+  /** Algorithm used to create the cluster */
+  algorithm: string;
+  /** HDBSCAN min_cluster_size parameter if applicable */
+  minClusterSize?: number;
+  /** User feedback status */
+  status: ClusterStatus;
+  /** If this cluster relates to a specific model */
+  relatedModel?: string;
+  /** If this cluster focuses on friction or delight signals */
+  signalType: ClusterSignalType;
+  /** ISO 8601 timestamp */
+  createdAt: string;
+  /** ISO 8601 timestamp */
+  updatedAt: string;
+}
+
+/**
+ * Node membership in a cluster
+ */
+export interface ClusterNode {
+  clusterId: string;
+  nodeId: string;
+  /** Distance from cluster center (lower = closer) */
+  distance?: number;
+  /** Whether this node is a representative example */
+  isRepresentative: boolean;
+}
+
+/**
+ * Cached embedding for a node
+ */
+export interface NodeEmbedding {
+  nodeId: string;
+  /** Float32 array as number[] */
+  embedding: number[];
+  /** Model used to create embedding */
+  embeddingModel: string;
+  /** Source text that was embedded */
+  inputText: string;
+  /** ISO 8601 timestamp */
+  createdAt: string;
+}
+
+/**
+ * Record of a clustering run
+ */
+export interface ClusteringRun {
+  id: string;
+  startedAt: string;
+  completedAt?: string;
+  nodesEmbedded: number;
+  nodesClustered: number;
+  clustersCreated: number;
+  clustersAnalyzed: number;
+  embeddingModel: string;
+  algorithm: string;
+  parameters: Record<string, unknown>;
+  status: "running" | "completed" | "failed";
+  error?: string;
+}
+
+/**
+ * Configuration for the embedding provider
+ */
+export interface EmbeddingConfig {
+  /** Provider type: 'ollama', 'openai', or 'mock' for testing */
+  provider: "ollama" | "openai" | "mock";
+  /** Model name (e.g., 'nomic-embed-text', 'text-embedding-3-small') */
+  model: string;
+  /** Base URL for the API (default: http://localhost:11434 for Ollama) */
+  baseUrl?: string;
+  /** API key (required for OpenAI) */
+  apiKey?: string;
+  /** Dimension of embeddings (default: depends on model) */
+  dimensions?: number;
+}
+
+/**
+ * Configuration for clustering algorithm
+ */
+export interface ClusteringConfig {
+  /** Algorithm to use */
+  algorithm: "hdbscan" | "kmeans";
+  /** HDBSCAN: minimum cluster size */
+  minClusterSize?: number;
+  /** HDBSCAN: minimum samples */
+  minSamples?: number;
+  /** K-means: number of clusters */
+  numClusters?: number;
+  /** Maximum nodes to cluster in one run */
+  maxNodes?: number;
+}
+
+/**
+ * Result of facet discovery pipeline
+ */
+export interface FacetDiscoveryResult {
+  run: ClusteringRun;
+  clusters: Cluster[];
+}
