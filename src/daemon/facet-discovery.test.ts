@@ -656,3 +656,177 @@ describe("facetDiscovery with HDBSCAN", () => {
     expect(result.clusters).toHaveLength(0);
   });
 });
+
+// =============================================================================
+// Cluster Analysis Tests
+// =============================================================================
+
+describe("analyzeClusters", () => {
+  let db: Database.Database;
+  let discovery: FacetDiscovery;
+  let cleanup: () => void;
+
+  beforeEach(() => {
+    const testSetup = createTestDb();
+    ({ db } = testSetup);
+    ({ cleanup } = testSetup);
+    discovery = new FacetDiscovery(
+      db,
+      { provider: "mock", model: "mock", dimensions: 64 },
+      { algorithm: "kmeans", numClusters: 2 }
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("should return empty results when no pending clusters", async () => {
+    const result = await discovery.analyzeClusters({
+      provider: "zai",
+      model: "glm-4.7",
+    });
+
+    expect(result.analyzed).toBe(0);
+    expect(result.succeeded).toBe(0);
+    expect(result.failed).toBe(0);
+    expect(result.results).toHaveLength(0);
+  });
+
+  it("should skip clusters that already have names", async () => {
+    // Create clusters
+    insertTestNodes(db, [
+      { id: "node1", summary: "Auth implementation" },
+      { id: "node2", summary: "Auth tokens" },
+      { id: "node3", summary: "Database queries" },
+      { id: "node4", summary: "Database indexes" },
+    ]);
+
+    await discovery.run();
+
+    const clusters = discovery.getClusters();
+    expect(clusters.length).toBeGreaterThan(0);
+
+    // Name ALL clusters so none need analysis
+    for (const cluster of clusters) {
+      discovery.updateClusterDetails(
+        cluster.id,
+        `Pattern ${cluster.id}`,
+        "Test description"
+      );
+    }
+
+    // Now analyze - all clusters have names, so none should be analyzed
+    const result = await discovery.analyzeClusters({
+      provider: "zai",
+      model: "glm-4.7",
+    });
+
+    // All clusters are named, so nothing to analyze
+    expect(result.analyzed).toBe(0);
+    expect(result.succeeded).toBe(0);
+    expect(result.failed).toBe(0);
+  });
+
+  it("should return failure for clusters when pi is unavailable", async () => {
+    insertTestNodes(db, [
+      { id: "node1", summary: "Test 1" },
+      { id: "node2", summary: "Test 2" },
+    ]);
+
+    await discovery.run();
+
+    const clusters = discovery.getClusters();
+    expect(clusters.length).toBeGreaterThan(0);
+
+    // Provide a non-existent prompt file path with no fallback possible
+    // Using a subdirectory that definitely doesn't exist
+    const uniquePath = `/tmp/nonexistent-${Date.now()}/cluster-analyzer.md`;
+    const result = await discovery.analyzeClusters({
+      provider: "zai",
+      model: "glm-4.7",
+      promptFile: uniquePath,
+    });
+
+    // Should have attempted to analyze but failed due to missing prompt file
+    expect(result.analyzed).toBeGreaterThan(0);
+    expect(result.failed).toBe(result.analyzed);
+
+    const [failedResult] = result.results;
+    expect(failedResult.success).toBeFalsy();
+    expect(failedResult.error).toContain("prompt file not found");
+  });
+
+  it("should respect limit option", async () => {
+    // Create multiple clusters
+    insertTestNodes(db, [
+      { id: "node1", summary: "Pattern A type 1" },
+      { id: "node2", summary: "Pattern A type 2" },
+      { id: "node3", summary: "Pattern B type 1" },
+      { id: "node4", summary: "Pattern B type 2" },
+      { id: "node5", summary: "Pattern C type 1" },
+      { id: "node6", summary: "Pattern C type 2" },
+    ]);
+
+    // Use kmeans with 3 clusters
+    const discoveryWithMore = new FacetDiscovery(
+      db,
+      { provider: "mock", model: "mock", dimensions: 64 },
+      { algorithm: "kmeans", numClusters: 3 }
+    );
+
+    await discoveryWithMore.run();
+
+    const clusters = discoveryWithMore.getClusters();
+    expect(clusters).toHaveLength(3);
+
+    // Name 2 of 3 clusters, so only 1 unnamed
+    discovery.updateClusterDetails(
+      clusters[0].id,
+      "Named Cluster 1",
+      "Description 1"
+    );
+    discovery.updateClusterDetails(
+      clusters[1].id,
+      "Named Cluster 2",
+      "Description 2"
+    );
+
+    // Analyze with limit of 1 - should only pick up 1 unnamed cluster
+    const result = await discoveryWithMore.analyzeClusters(
+      {
+        provider: "zai",
+        model: "glm-4.7",
+        promptFile: `/tmp/nonexistent-${Date.now()}/prompt.md`,
+      },
+      { limit: 10 }
+    );
+
+    // Only 1 unnamed cluster, so should analyze 1
+    expect(result.analyzed).toBe(1);
+  });
+
+  it("should get node summaries for representative nodes", async () => {
+    insertTestNodes(db, [
+      { id: "node1", summary: "Summary for node 1", type: "coding" },
+      { id: "node2", summary: "Summary for node 2", type: "debugging" },
+    ]);
+
+    await discovery.run();
+
+    const clusters = discovery.getClusters();
+    expect(clusters.length).toBeGreaterThan(0);
+
+    const [firstCluster] = clusters;
+    const repNodes = discovery.getClusterNodes(firstCluster.id, {
+      representativeOnly: true,
+    });
+
+    expect(repNodes.length).toBeGreaterThan(0);
+
+    // The representative nodes should have isRepresentative = true
+    for (const node of repNodes) {
+      expect(node.isRepresentative).toBeTruthy();
+    }
+  });
+});

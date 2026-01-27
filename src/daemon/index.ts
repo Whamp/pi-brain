@@ -163,5 +163,18 @@ export {
 // Export pattern aggregation functionality
 export { PatternAggregator } from "./pattern-aggregation.js";
 
+// Export facet discovery functionality
+export {
+  FacetDiscovery,
+  createEmbeddingProvider,
+  kMeansClustering,
+  hdbscanClustering,
+  type EmbeddingProvider,
+  type FacetDiscoveryLogger,
+  type ClusterAnalysisConfig,
+  type ClusterAnalysisResult,
+  type ClusterAnalysisBatchResult,
+} from "./facet-discovery.js";
+
 /** Daemon module version */
 export const DAEMON_MODULE_VERSION = "0.1.0";

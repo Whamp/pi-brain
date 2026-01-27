@@ -8,12 +8,16 @@
  * 1. Embed node summaries using a local or API-based embedding model
  * 2. Cluster embeddings using HDBSCAN or K-means
  * 3. Store clusters and representative nodes
- * 4. (Task 11.6) LLM analyzes clusters to generate names/descriptions
+ * 4. LLM analyzes clusters to generate names/descriptions (analyzeClusters)
  */
 
 import type Database from "better-sqlite3";
 
+import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 
 import type {
   Cluster,
@@ -74,6 +78,47 @@ interface ClusterRow {
   signal_type: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// =============================================================================
+// Cluster Analysis Types
+// =============================================================================
+
+/**
+ * Configuration for LLM cluster analysis
+ */
+export interface ClusterAnalysisConfig {
+  /** LLM provider (e.g., 'zai', 'anthropic') */
+  provider: string;
+  /** Model name (e.g., 'glm-4.7') */
+  model: string;
+  /** Path to the cluster analyzer prompt file */
+  promptFile?: string;
+  /** Timeout in minutes (default: 5) */
+  timeoutMinutes?: number;
+}
+
+/**
+ * Result from analyzing a single cluster
+ */
+export interface ClusterAnalysisResult {
+  clusterId: string;
+  success: boolean;
+  name?: string;
+  description?: string;
+  confidence?: "high" | "medium" | "low";
+  reasoning?: string;
+  error?: string;
+}
+
+/**
+ * Result from analyzing multiple clusters
+ */
+export interface ClusterAnalysisBatchResult {
+  analyzed: number;
+  succeeded: number;
+  failed: number;
+  results: ClusterAnalysisResult[];
 }
 
 // =============================================================================
@@ -1087,6 +1132,478 @@ export class FacetDiscovery {
         "UPDATE clusters SET name = ?, description = ?, updated_at = ? WHERE id = ?"
       )
       .run(name, description, now, clusterId);
+  }
+
+  // ===========================================================================
+  // Cluster Analysis (LLM)
+  // ===========================================================================
+
+  /**
+   * Analyze pending clusters using an LLM to generate names and descriptions.
+   *
+   * This method:
+   * 1. Gets clusters with status 'pending' that haven't been named
+   * 2. For each cluster, gets the representative nodes
+   * 3. Builds a prompt with node summaries
+   * 4. Invokes a pi agent to analyze and name the cluster
+   * 5. Updates the cluster with the generated name and description
+   */
+  async analyzeClusters(
+    config: ClusterAnalysisConfig,
+    options?: { limit?: number }
+  ): Promise<ClusterAnalysisBatchResult> {
+    const limit = options?.limit ?? 10;
+
+    // Get pending clusters that need analysis
+    const pendingClusters = this.getClusters({ status: "pending", limit });
+    const unnamedClusters = pendingClusters.filter((c) => c.name === null);
+
+    this.logger.info(
+      `Found ${unnamedClusters.length} unnamed clusters to analyze`
+    );
+
+    const results: ClusterAnalysisResult[] = [];
+    let succeeded = 0;
+    let failed = 0;
+
+    for (const cluster of unnamedClusters) {
+      const result = await this.analyzeCluster(cluster, config);
+      results.push(result);
+
+      if (result.success) {
+        succeeded++;
+        // Update the cluster with name and description
+        if (result.name && result.description) {
+          this.updateClusterDetails(
+            cluster.id,
+            result.name,
+            result.description
+          );
+        }
+      } else {
+        failed++;
+      }
+    }
+
+    this.logger.info(
+      `Cluster analysis complete: ${succeeded} succeeded, ${failed} failed`
+    );
+
+    return {
+      analyzed: unnamedClusters.length,
+      succeeded,
+      failed,
+      results,
+    };
+  }
+
+  /**
+   * Analyze a single cluster
+   */
+  private async analyzeCluster(
+    cluster: Cluster,
+    config: ClusterAnalysisConfig
+  ): Promise<ClusterAnalysisResult> {
+    this.logger.info(
+      `Analyzing cluster ${cluster.id} (${cluster.nodeCount} nodes)`
+    );
+
+    // Get representative nodes for this cluster
+    const repNodes = this.getClusterNodes(cluster.id, {
+      representativeOnly: true,
+    });
+
+    if (repNodes.length === 0) {
+      return {
+        clusterId: cluster.id,
+        success: false,
+        error: "No representative nodes found",
+      };
+    }
+
+    // Get node summaries for the representative nodes
+    const nodeSummaries = this.getNodeSummaries(repNodes.map((n) => n.nodeId));
+
+    if (nodeSummaries.length === 0) {
+      return {
+        clusterId: cluster.id,
+        success: false,
+        error: "Could not retrieve node summaries",
+      };
+    }
+
+    // Build the prompt
+    const prompt = this.buildClusterAnalysisPrompt(nodeSummaries, cluster);
+
+    // Invoke the LLM
+    try {
+      const llmResult = await this.invokeClusterAnalysisAgent(prompt, config);
+
+      if (!llmResult.success) {
+        return {
+          clusterId: cluster.id,
+          success: false,
+          error: llmResult.error,
+        };
+      }
+
+      return {
+        clusterId: cluster.id,
+        success: true,
+        name: llmResult.name,
+        description: llmResult.description,
+        confidence: llmResult.confidence,
+        reasoning: llmResult.reasoning,
+      };
+    } catch (error) {
+      return {
+        clusterId: cluster.id,
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+
+  /**
+   * Get node summaries for a list of node IDs
+   */
+  private getNodeSummaries(nodeIds: string[]): NodeSummaryRow[] {
+    if (nodeIds.length === 0) {
+      return [];
+    }
+
+    const placeholders = nodeIds.map(() => "?").join(",");
+    const rows = this.db
+      .prepare(
+        `SELECT 
+          n.id,
+          fts.summary,
+          n.type,
+          n.project,
+          n.outcome
+        FROM nodes n
+        LEFT JOIN nodes_fts fts ON fts.node_id = n.id
+        WHERE n.id IN (${placeholders})`
+      )
+      .all(...nodeIds) as NodeSummaryRow[];
+
+    return rows;
+  }
+
+  /**
+   * Build the prompt for cluster analysis
+   */
+  private buildClusterAnalysisPrompt(
+    nodes: NodeSummaryRow[],
+    cluster: Cluster
+  ): string {
+    const parts: string[] = [
+      "Analyze the following cluster of related sessions and identify the pattern.",
+      "",
+      `## Cluster Metadata`,
+      `- **Node count**: ${cluster.nodeCount}`,
+    ];
+
+    if (cluster.relatedModel) {
+      parts.push(`- **Related model**: ${cluster.relatedModel}`);
+    }
+
+    if (cluster.signalType) {
+      parts.push(`- **Signal type**: ${cluster.signalType}`);
+    }
+
+    parts.push("", "## Representative Sessions", "");
+
+    for (const node of nodes) {
+      parts.push(`### Session ${node.id}`);
+      parts.push(`- **Type**: ${node.type ?? "unknown"}`);
+      parts.push(`- **Project**: ${node.project ?? "unknown"}`);
+      parts.push(`- **Outcome**: ${node.outcome ?? "unknown"}`);
+      parts.push(`- **Summary**: ${node.summary ?? "No summary available"}`);
+      parts.push("");
+    }
+
+    parts.push("## Instructions");
+    parts.push(
+      "Identify what these sessions have in common and name the pattern."
+    );
+    parts.push("Return your response as a JSON object:");
+    parts.push("```json");
+    parts.push("{");
+    parts.push('  "name": "Short Pattern Name",');
+    parts.push(
+      '  "description": "One to two sentences explaining the pattern.",'
+    );
+    parts.push('  "confidence": "high" | "medium" | "low",');
+    parts.push(
+      '  "reasoning": "Brief explanation of how you identified this pattern"'
+    );
+    parts.push("}");
+    parts.push("```");
+
+    return parts.join("\n");
+  }
+
+  /**
+   * Invoke the pi agent to analyze a cluster
+   */
+  private async invokeClusterAnalysisAgent(
+    prompt: string,
+    config: ClusterAnalysisConfig
+  ): Promise<{
+    success: boolean;
+    name?: string;
+    description?: string;
+    confidence?: "high" | "medium" | "low";
+    reasoning?: string;
+    error?: string;
+  }> {
+    // Determine prompt file path
+    const defaultPromptFile = path.join(
+      os.homedir(),
+      ".pi-brain",
+      "prompts",
+      "cluster-analyzer.md"
+    );
+    const promptFile = config.promptFile ?? defaultPromptFile;
+
+    // Check if prompt file exists
+    // Only fall back to project prompts dir if using default path (not explicit config)
+    let actualPromptFile = promptFile;
+    try {
+      await fs.access(promptFile);
+    } catch {
+      // If explicit path was provided, don't fall back
+      if (config.promptFile) {
+        return {
+          success: false,
+          error: `Cluster analyzer prompt file not found: ${promptFile}`,
+        };
+      }
+
+      // Try project prompts dir as fallback
+      const projectPromptFile = path.join(
+        process.cwd(),
+        "prompts",
+        "cluster-analyzer.md"
+      );
+      try {
+        await fs.access(projectPromptFile);
+        actualPromptFile = projectPromptFile;
+      } catch {
+        return {
+          success: false,
+          error: `Cluster analyzer prompt file not found: ${promptFile}`,
+        };
+      }
+    }
+
+    const timeoutMinutes = config.timeoutMinutes ?? 5;
+
+    // Build pi arguments
+    const args = [
+      "--provider",
+      config.provider,
+      "--model",
+      config.model,
+      "--system-prompt",
+      actualPromptFile,
+      "--no-session",
+      "--mode",
+      "json",
+      "-p",
+      prompt,
+    ];
+
+    this.logger.debug?.(`Invoking cluster analysis agent`);
+
+    // Spawn the process
+    const spawnResult = await this.spawnPiProcess(args, timeoutMinutes);
+
+    if (spawnResult.spawnError) {
+      return {
+        success: false,
+        error: `Failed to spawn pi: ${spawnResult.spawnError}`,
+      };
+    }
+
+    if (spawnResult.timedOut) {
+      return {
+        success: false,
+        error: "Cluster analysis timed out",
+      };
+    }
+
+    if (spawnResult.exitCode !== 0) {
+      return {
+        success: false,
+        error: `Pi exited with code ${spawnResult.exitCode}`,
+      };
+    }
+
+    // Parse the output
+    return this.parseClusterAnalysisOutput(spawnResult.stdout);
+  }
+
+  /**
+   * Spawn a pi process and wait for completion
+   */
+  private async spawnPiProcess(
+    args: string[],
+    timeoutMinutes: number
+  ): Promise<{
+    stdout: string;
+    stderr: string;
+    exitCode: number | null;
+    timedOut: boolean;
+    spawnError?: string;
+  }> {
+    return new Promise((resolve) => {
+      const timeoutMs = timeoutMinutes * 60 * 1000;
+      let stdout = "";
+      let stderr = "";
+      let resolved = false;
+
+      const complete = (result: {
+        stdout: string;
+        stderr: string;
+        exitCode: number | null;
+        timedOut: boolean;
+        spawnError?: string;
+      }) => {
+        if (!resolved) {
+          resolved = true;
+          resolve(result);
+        }
+      };
+
+      const proc = spawn("pi", args, {
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+
+      const timeout = setTimeout(() => {
+        proc.kill("SIGTERM");
+        this.logger.error(
+          `Cluster analysis timed out after ${timeoutMinutes}m`
+        );
+        complete({
+          stdout,
+          stderr,
+          exitCode: null,
+          timedOut: true,
+        });
+      }, timeoutMs);
+
+      proc.stdout.on("data", (data: Buffer) => {
+        stdout += data.toString();
+      });
+
+      proc.stderr.on("data", (data: Buffer) => {
+        stderr += data.toString();
+      });
+
+      proc.on("close", (code) => {
+        clearTimeout(timeout);
+        complete({
+          stdout,
+          stderr,
+          exitCode: code,
+          timedOut: false,
+        });
+      });
+
+      proc.on("error", (err) => {
+        clearTimeout(timeout);
+        complete({
+          stdout,
+          stderr,
+          exitCode: null,
+          timedOut: false,
+          spawnError: err.message,
+        });
+      });
+    });
+  }
+
+  /**
+   * Parse the LLM output for cluster analysis
+   */
+  private parseClusterAnalysisOutput(stdout: string): {
+    success: boolean;
+    name?: string;
+    description?: string;
+    confidence?: "high" | "medium" | "low";
+    reasoning?: string;
+    error?: string;
+  } {
+    // Pi JSON mode outputs newline-delimited JSON events
+    const lines = stdout.trim().split("\n");
+    const events: {
+      type: string;
+      messages?: { role: string; content: { type: string; text?: string }[] }[];
+    }[] = [];
+
+    for (const line of lines) {
+      if (!line.trim()) {
+        continue;
+      }
+      try {
+        events.push(JSON.parse(line));
+      } catch {
+        // Skip non-JSON lines
+      }
+    }
+
+    // Find the agent_end event
+    const endEvent = events.find((e) => e.type === "agent_end");
+    if (!endEvent?.messages) {
+      return { success: false, error: "No agent_end event found" };
+    }
+
+    // Find the assistant message
+    const assistantMsg = endEvent.messages.find((m) => m.role === "assistant");
+    if (!assistantMsg) {
+      return { success: false, error: "No assistant message found" };
+    }
+
+    // Extract text content
+    const textContent = assistantMsg.content
+      .filter((b) => b.type === "text" && b.text)
+      .map((b) => b.text)
+      .join("\n");
+
+    // Try to extract JSON from the response
+    const jsonMatch =
+      textContent.match(/```json\n([\s\S]*?)\n```/) ||
+      textContent.match(/\{[\s\S]*"name"[\s\S]*"description"[\s\S]*\}/);
+
+    if (!jsonMatch) {
+      return { success: false, error: "No JSON found in response" };
+    }
+
+    try {
+      const json = JSON.parse(jsonMatch[1] || jsonMatch[0]);
+
+      if (!json.name || !json.description) {
+        return {
+          success: false,
+          error: "Missing name or description in response",
+        };
+      }
+
+      return {
+        success: true,
+        name: json.name,
+        description: json.description,
+        confidence: json.confidence,
+        reasoning: json.reasoning,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
   }
 }
 
