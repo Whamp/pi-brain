@@ -12,7 +12,7 @@
 import { Command } from "commander";
 import { watch } from "node:fs";
 import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import open from "open";
 
 import { loadConfig } from "./config/index.js";
@@ -460,8 +460,8 @@ syncCmd
               console.log(`  ${session}`);
             } else {
               // Show relative path from spoke directory
-              const relative = session.slice(spoke.path.length + 1);
-              console.log(`  ${relative}`);
+              const relativePath = relative(spoke.path, session);
+              console.log(`  ${relativePath}`);
             }
           }
         }
