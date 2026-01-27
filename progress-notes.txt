@@ -646,3 +646,36 @@
 - This task integrates them into the actual node creation pipeline
 - JSON node files now include signals field when created by worker
 - Ready for Task 11.4 (/brain --flag manual notation command)
+
+---
+
+## 2026-01-26 21:53 - Task 11.4
+
+**Status**: pending → done
+**Validation**:
+- Added `/brain --flag` command to brain-query extension for manual notation
+- Supported syntax formats:
+  - `/brain --flag <type> <message>` - standard form
+  - `/brain -f <type> <message>` - short form
+  - `/brain --flag:<type> <message>` - colon syntax
+  - `/brain -f:<type> <message>` - short colon syntax
+- Valid flag types: quirk, failure, win, note
+- Flags written as `custom` entries with `customType: "brain_flag"` via `pi.appendEntry()`
+- Entries are extracted by `extractManualFlags()` during daemon analysis (from Task 11.1)
+- Added 13 new tests covering:
+  - Flag recording with --flag and -f syntax
+  - Colon syntax variants
+  - All four flag types
+  - Error handling for invalid types
+  - Error handling for missing type/message
+  - Distinction from query commands
+  - Case-insensitive type matching
+- Updated brain skill SKILL.md with flag usage documentation
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1074 passed, 4 skipped)
+**Commit**: 6c1f169
+**Notes**:
+- The flag command integrates with existing signals infrastructure
+- Flags are stored in Node.signals.manualFlags after daemon analysis
+- Multiple spaces in messages are normalized to single spaces (by design)
+- Ready for Task 11.5 (Facet discovery pipeline)
