@@ -20,7 +20,10 @@ import type {
 } from "../types/index.js";
 
 import { readNodeFromPath } from "../storage/node-storage.js";
-import { getInsight } from "../storage/pattern-repository.js";
+import {
+  getInsight,
+  updateInsightPrompt,
+} from "../storage/pattern-repository.js";
 
 // =============================================================================
 // Types
@@ -48,6 +51,13 @@ const DEFAULT_MIN_SESSIONS = 10;
 // Chi-square critical value for p < 0.05 with 1 degree of freedom
 const CHI_SQUARE_CRITICAL = 3.841;
 
+// SQL LIKE escape character
+const LIKE_ESCAPE_CHAR = "\\";
+
+// Maximum nodes to read from disk for prompting pattern counting
+// This bounds file I/O to prevent performance issues with large date ranges
+const MAX_PROMPTING_PATTERN_NODES = 1000;
+
 // =============================================================================
 // Helper Functions
 // =============================================================================
@@ -64,6 +74,16 @@ function generateId(): string {
  */
 function normalizePattern(text: string): string {
   return text.toLowerCase().replaceAll(/\s+/g, " ").trim();
+}
+
+/**
+ * Escape SQL LIKE special characters (%, _) to prevent pattern interpretation
+ */
+function escapeLikePattern(pattern: string): string {
+  return pattern
+    .replaceAll(LIKE_ESCAPE_CHAR, LIKE_ESCAPE_CHAR + LIKE_ESCAPE_CHAR) // Escape the escape character itself
+    .replaceAll("%", LIKE_ESCAPE_CHAR + "%")
+    .replaceAll("_", LIKE_ESCAPE_CHAR + "_");
 }
 
 /**
@@ -109,6 +129,7 @@ function countQuirkOccurrences(
   dateRange: DateRange
 ): number {
   const normalizedPattern = normalizePattern(insight.pattern);
+  const escapedPattern = escapeLikePattern(normalizedPattern);
 
   // Join with nodes to filter by timestamp
   const stmt = db.prepare(`
@@ -117,12 +138,12 @@ function countQuirkOccurrences(
     JOIN nodes n ON q.node_id = n.id
     WHERE n.timestamp >= ? AND n.timestamp <= ?
       AND (? IS NULL OR q.model = ?)
-      AND LOWER(REPLACE(REPLACE(q.observation, '  ', ' '), char(10), ' ')) LIKE ?
+      AND LOWER(REPLACE(REPLACE(q.observation, '  ', ' '), char(10), ' ')) LIKE ? ESCAPE '${LIKE_ESCAPE_CHAR}'
   `);
 
   const modelParam = insight.model ?? null;
-  // Use LIKE for fuzzy matching of normalized patterns
-  const patternParam = `%${normalizedPattern}%`;
+  // Use LIKE for fuzzy matching of normalized patterns (escaped for special chars)
+  const patternParam = `%${escapedPattern}%`;
 
   const result = stmt.get(
     dateRange.start,
@@ -177,6 +198,7 @@ function countLessonOccurrences(
   dateRange: DateRange
 ): number {
   const normalizedPattern = normalizePattern(insight.pattern);
+  const escapedPattern = escapeLikePattern(normalizedPattern);
 
   const stmt = db.prepare(`
     SELECT COUNT(*) as count
@@ -184,10 +206,10 @@ function countLessonOccurrences(
     JOIN nodes n ON l.node_id = n.id
     WHERE n.timestamp >= ? AND n.timestamp <= ?
       AND l.level IN ('model', 'tool', 'user')
-      AND LOWER(REPLACE(REPLACE(l.summary, '  ', ' '), char(10), ' ')) LIKE ?
+      AND LOWER(REPLACE(REPLACE(l.summary, '  ', ' '), char(10), ' ')) LIKE ? ESCAPE '${LIKE_ESCAPE_CHAR}'
   `);
 
-  const patternParam = `%${normalizedPattern}%`;
+  const patternParam = `%${escapedPattern}%`;
 
   const result = stmt.get(dateRange.start, dateRange.end, patternParam) as {
     count: number;
@@ -199,6 +221,9 @@ function countLessonOccurrences(
 /**
  * Count occurrences of win/failure patterns within a date range.
  * These are stored in node JSON files, not in the database directly.
+ *
+ * Note: This function limits the number of files read to MAX_PROMPTING_PATTERN_NODES
+ * to prevent unbounded I/O. For very large date ranges, results may be approximate.
  */
 function countPromptingPatternOccurrences(
   db: Database.Database,
@@ -208,18 +233,20 @@ function countPromptingPatternOccurrences(
   const normalizedPattern = normalizePattern(insight.pattern);
   const isWin = insight.type === "win";
 
-  // Get all nodes in the date range
+  // Get nodes in the date range, limited to prevent unbounded file I/O
   const stmt = db.prepare(`
     SELECT id, data_file
     FROM nodes
     WHERE timestamp >= ? AND timestamp <= ?
       AND data_file IS NOT NULL
-    ORDER BY timestamp
+    ORDER BY timestamp DESC
+    LIMIT ?
   `);
 
   const rows = stmt.all(
     dateRange.start,
-    dateRange.end
+    dateRange.end,
+    MAX_PROMPTING_PATTERN_NODES
   ) as unknown as NodeDataFileRow[];
 
   let count = 0;
@@ -289,10 +316,7 @@ export function countOccurrences(
  * Calculate average severity for occurrences within a date range.
  * Returns a value between 0.0 and 1.0.
  */
-export function calculateAverageSeverity(
-  insight: AggregatedInsight,
-  _occurrences: number
-): number {
+export function calculateAverageSeverity(insight: AggregatedInsight): number {
   // Convert severity to numeric value
   switch (insight.severity) {
     case "high": {
@@ -391,8 +415,11 @@ export function measureEffectiveness(
   const afterRate = afterSessions > 0 ? afterCount / afterSessions : 0;
 
   // Calculate improvement (positive = fewer occurrences = better)
+  // Only calculate improvement if we have data in both periods
   const improvement =
-    beforeRate > 0 ? ((beforeRate - afterRate) / beforeRate) * 100 : 0;
+    beforeRate > 0 && afterSessions > 0
+      ? ((beforeRate - afterRate) / beforeRate) * 100
+      : 0;
 
   // Statistical significance test
   const significant = isStatisticallySignificant(
@@ -407,8 +434,12 @@ export function measureEffectiveness(
     insightId,
     beforeRate,
     afterRate,
+    beforeCount,
+    afterCount,
     improvement,
     significant,
+    beforeSessions,
+    afterSessions,
   };
 }
 
@@ -436,31 +467,23 @@ export function measureAndStoreEffectiveness(
     options
   );
 
-  // Calculate average severities
-  const beforeSeverity = calculateAverageSeverity(
-    insight,
-    Math.round(result.beforeRate * countSessions(db, beforePeriod))
-  );
-  const afterSeverity = calculateAverageSeverity(
-    insight,
-    Math.round(result.afterRate * countSessions(db, afterPeriod))
-  );
+  // Use counts directly from measureEffectiveness (avoids floating-point precision loss)
+  const { beforeSessions, afterSessions, beforeCount, afterCount } = result;
 
-  const beforeSessions = countSessions(db, beforePeriod);
-  const afterSessions = countSessions(db, afterPeriod);
-  const beforeCount = Math.round(result.beforeRate * beforeSessions);
-  const afterCount = Math.round(result.afterRate * afterSessions);
+  // Calculate average severities
+  const beforeSeverity = calculateAverageSeverity(insight);
+  const afterSeverity = calculateAverageSeverity(insight);
 
   const id = generateId();
   const now = new Date().toISOString();
 
   // Check for existing record
   const existingStmt = db.prepare(`
-    SELECT id FROM prompt_effectiveness 
+    SELECT id, created_at FROM prompt_effectiveness 
     WHERE insight_id = ? AND prompt_version = ?
   `);
   const existing = existingStmt.get(insightId, promptVersion) as
-    | { id: string }
+    | { id: string; created_at: string }
     | undefined;
 
   if (existing) {
@@ -519,7 +542,7 @@ export function measureAndStoreEffectiveness(
       sessionsBefore: beforeSessions,
       sessionsAfter: afterSessions,
       measuredAt: now,
-      createdAt: now, // Will be stale but we don't have the original
+      createdAt: existing.created_at, // Preserve original creation timestamp
       updatedAt: now,
     };
   }
@@ -633,6 +656,42 @@ export function getLatestEffectiveness(
 }
 
 /**
+ * Get the latest effectiveness measurements for multiple insights in a single query.
+ * Returns a map of insightId -> PromptEffectiveness.
+ */
+export function getLatestEffectivenessBatch(
+  db: Database.Database,
+  insightIds: string[]
+): Map<string, PromptEffectiveness> {
+  if (insightIds.length === 0) {
+    return new Map();
+  }
+
+  // Use a subquery to get only the latest measurement per insight
+  const placeholders = insightIds.map(() => "?").join(", ");
+  const stmt = db.prepare(`
+    SELECT pe.*
+    FROM prompt_effectiveness pe
+    INNER JOIN (
+      SELECT insight_id, MAX(measured_at) as max_measured_at
+      FROM prompt_effectiveness
+      WHERE insight_id IN (${placeholders})
+      GROUP BY insight_id
+    ) latest ON pe.insight_id = latest.insight_id 
+             AND pe.measured_at = latest.max_measured_at
+  `);
+
+  const rows = stmt.all(...insightIds) as unknown as EffectivenessRow[];
+
+  const result = new Map<string, PromptEffectiveness>();
+  for (const row of rows) {
+    result.set(row.insight_id, rowToEffectiveness(row));
+  }
+
+  return result;
+}
+
+/**
  * Get all insights that need effectiveness measurement.
  * Returns insights that are included in prompts but haven't been measured recently.
  */
@@ -644,18 +703,85 @@ export function getInsightsNeedingMeasurement(
   cutoff.setDate(cutoff.getDate() - measureAfterDays);
   const cutoffStr = cutoff.toISOString();
 
+  // Use subquery to get most recent measurement per insight to avoid duplicates
   const stmt = db.prepare(`
     SELECT ai.*
     FROM aggregated_insights ai
-    LEFT JOIN prompt_effectiveness pe ON ai.id = pe.insight_id
+    LEFT JOIN (
+      SELECT insight_id, MAX(measured_at) as latest_measured_at
+      FROM prompt_effectiveness
+      GROUP BY insight_id
+    ) pe ON ai.id = pe.insight_id
     WHERE ai.prompt_included = 1
-      AND (pe.measured_at IS NULL OR pe.measured_at < ?)
+      AND (pe.latest_measured_at IS NULL OR pe.latest_measured_at < ?)
     ORDER BY ai.frequency DESC
+    LIMIT 50
   `);
 
   const rows = stmt.all(cutoffStr) as unknown as InsightRow[];
 
   return rows.map(insightRowToAggregatedInsight);
+}
+
+/**
+ * Auto-disable insights that have been measured as ineffective.
+ * Returns the IDs of disabled insights.
+ */
+export function autoDisableIneffectiveInsights(
+  db: Database.Database,
+  options: {
+    threshold?: number; // Improvement % threshold (e.g. -10)
+    minSessions?: number;
+  } = {}
+): string[] {
+  const { threshold = -10, minSessions = 10 } = options;
+
+  // Find insights that are currently included but have poor effectiveness.
+  // We join with aggregated_insights to ensure they are still included.
+  // We use a subquery to only consider the LATEST measurement for each insight.
+  const stmt = db.prepare(`
+    SELECT pe.*, ai.prompt_text, ai.prompt_version as ai_version
+    FROM prompt_effectiveness pe
+    JOIN aggregated_insights ai ON pe.insight_id = ai.id
+    WHERE ai.prompt_included = 1
+      AND pe.statistically_significant = 1
+      AND pe.improvement_pct < ?
+      AND pe.sessions_after >= ?
+      AND pe.measured_at = (
+        SELECT MAX(measured_at)
+        FROM prompt_effectiveness
+        WHERE insight_id = pe.insight_id
+      )
+  `);
+
+  const ineffective = stmt.all(
+    threshold,
+    minSessions
+  ) as unknown as (EffectivenessRow & {
+    prompt_text: string;
+    ai_version: string;
+  })[];
+
+  const disabledIds: string[] = [];
+
+  db.transaction(() => {
+    for (const row of ineffective) {
+      // Only auto-disable if the measurement is for the CURRENTLY active prompt version.
+      // If the prompt was updated since the measurement, we should wait for new measurements.
+      if (row.prompt_version === row.ai_version) {
+        updateInsightPrompt(
+          db,
+          row.insight_id,
+          row.prompt_text,
+          false, // promptIncluded = false
+          row.ai_version
+        );
+        disabledIds.push(row.insight_id);
+      }
+    }
+  })();
+
+  return disabledIds;
 }
 
 // =============================================================================

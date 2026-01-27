@@ -1198,6 +1198,43 @@ When prompt changes:
 - Injection mechanism
 - Feedback tracking
 
+### Phase 11: Signals & Insights
+
+**Goal**: Friction detection, manual flagging, and clustering for deep discovery.
+
+**Tasks:**
+
+- [ ] Implement friction signal detection (rephrasing, abandonment, churn)
+- [ ] Implement delight signal detection (resilience, one-shot success)
+- [ ] Add `/brain --flag` command for manual notation
+- [ ] Implement facet discovery (clustering pipeline)
+- [ ] Build "News Feed" UI for clusters and signals
+- [ ] Implement model-specific AGENTS.md generator
+
+**Deliverables:**
+
+- Enhanced Node model with signals
+- Manual notation command
+- Clustering analysis job
+- News Feed dashboard panel
+- Model-specific AGENTS.md generator
+
+### Phase 12: Architecture Hardening
+
+**Goal**: Refactoring, robustness, and performance.
+
+**Tasks:**
+
+- [ ] Refactor: Shared Type Library (extract to `src/types` or configure imports)
+- [ ] Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)
+- [ ] Architecture: SQLite Rebuild CLI (restore DB from JSON)
+
+**Deliverables:**
+
+- Cleaner codebase
+- Robust data ingestion
+- Maintenance tools
+
 ---
 
 ## Long-Term Goals

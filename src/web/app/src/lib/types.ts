@@ -30,6 +30,8 @@ import type {
   AggregatedFailurePattern,
   AggregatedModelStats,
   AggregatedLessonPattern,
+  AggregatedInsight,
+  PromptEffectiveness,
 } from "../../../../types/index.js";
 
 // Re-export shared types
@@ -60,6 +62,8 @@ export type {
   AggregatedFailurePattern,
   AggregatedModelStats,
   AggregatedLessonPattern,
+  AggregatedInsight,
+  PromptEffectiveness,
 };
 
 // Extended types with IDs for API responses (Entities)

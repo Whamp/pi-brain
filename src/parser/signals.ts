@@ -16,7 +16,11 @@ import type {
   ToolResultMessage,
   UserMessage,
 } from "../types.js";
-import type { FrictionSignals, ManualFlag } from "../types/index.js";
+import type {
+  DelightSignals,
+  FrictionSignals,
+  ManualFlag,
+} from "../types/index.js";
 
 // =============================================================================
 // Constants
@@ -33,6 +37,9 @@ const CONTEXT_CHURN_THRESHOLD = 10;
 
 /** Maximum minutes between abandoned node and restart to count as abandoned restart */
 const ABANDONED_RESTART_WINDOW_MINUTES = 30;
+
+/** Minimum tool calls to consider a task "complex" for one-shot success */
+const COMPLEX_TASK_TOOL_CALL_THRESHOLD = 3;
 
 // =============================================================================
 // Types
@@ -178,6 +185,28 @@ function normalizeErrorMessage(msg: string): string {
 }
 
 /**
+ * Extract directory path from an ls command
+ */
+function extractLsDirectory(cmd: string): string {
+  // Handle "ls" with no args
+  if (cmd === "ls") {
+    return ".";
+  }
+
+  // Extract path from "ls [options] path"
+  // Split and find first non-option argument
+  const parts = cmd.split(/\s+/);
+  for (let i = 1; i < parts.length; i++) {
+    const part = parts[i];
+    if (part && !part.startsWith("-")) {
+      return part;
+    }
+  }
+
+  return ".";
+}
+
+/**
  * Count context churn events
  *
  * Context churn is high frequency of read/ls operations on different files,
@@ -185,6 +214,7 @@ function normalizeErrorMessage(msg: string): string {
  */
 export function countContextChurn(entries: SessionEntry[]): number {
   const filesAccessed = new Set<string>();
+  const dirsAccessed = new Set<string>();
   let readLsCount = 0;
 
   for (const entry of entries) {
@@ -214,9 +244,13 @@ export function countContextChurn(entries: SessionEntry[]): number {
             typeof args.command === "string"
           ) {
             const cmd = args.command;
-            // Check for ls commands
+            // Check for ls commands - extract directory and track uniqueness
             if (cmd.startsWith("ls ") || cmd === "ls") {
-              readLsCount++;
+              const dir = extractLsDirectory(cmd);
+              if (!dirsAccessed.has(dir)) {
+                dirsAccessed.add(dir);
+                readLsCount++;
+              }
             }
           }
         }
@@ -285,7 +319,7 @@ export function detectSilentTermination(
   }
 
   // Look at the last few entries to determine if work was incomplete
-  const lastEntries = entries.slice(-5);
+  const lastEntries = entries.slice(-10);
 
   // Check if there's an incomplete tool result or error
   let hasUnresolvedError = false;
@@ -313,13 +347,8 @@ export function detectSilentTermination(
           ? userMsg.content
           : extractTextFromContent(userMsg.content);
 
-      // Check for success indicators
-      if (
-        text.toLowerCase().includes("thanks") ||
-        text.toLowerCase().includes("great") ||
-        text.toLowerCase().includes("perfect") ||
-        text.toLowerCase().includes("done")
-      ) {
+      // Check for genuine success indicators (not negated)
+      if (hasGenuineSuccessIndicator(text)) {
         hasSuccessIndicator = true;
       }
     }
@@ -340,6 +369,51 @@ function extractTextFromContent(content: ContentBlock[]): string {
     }
   }
   return texts.join(" ");
+}
+
+/**
+ * Check if text contains genuine success indicators (not negated or sarcastic)
+ */
+function hasGenuineSuccessIndicator(text: string): boolean {
+  const lower = text.toLowerCase();
+
+  // Negation patterns that indicate frustration, not success
+  const negationPatterns = [
+    /i'?m done trying/i,
+    /done with this/i,
+    /great[,.]?\s*(another|more|yet)/i,
+    /thanks for nothing/i,
+    /perfect[,.]?\s*(now|another|more)/i,
+    /not working/i,
+    /still (not|broken|failing)/i,
+  ];
+
+  for (const pattern of negationPatterns) {
+    if (pattern.test(text)) {
+      return false;
+    }
+  }
+
+  // Positive patterns - success indicators
+  const successPatterns = [
+    /\bthanks\b/i,
+    /\bthank you\b/i,
+    /\bperfect\b/i,
+    /\bgreat\b/i,
+    /\bawesome\b/i,
+    /\bexcellent\b/i,
+    /\blooks good\b/i,
+    /\bthat works\b/i,
+    /\ball (done|set|good)\b/i,
+  ];
+
+  for (const pattern of successPatterns) {
+    if (pattern.test(lower)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -573,13 +647,15 @@ export function getPrimaryModel(entries: SessionEntry[]): string | undefined {
 /**
  * Get segment timestamp for abandoned restart detection
  */
-export function getSegmentTimestamp(entries: SessionEntry[]): string {
+export function getSegmentTimestamp(
+  entries: SessionEntry[]
+): string | undefined {
   for (const entry of entries) {
     if (entry.type === "message") {
       return entry.timestamp;
     }
   }
-  return entries[0]?.timestamp ?? "";
+  return entries[0]?.timestamp;
 }
 
 /**
@@ -599,9 +675,20 @@ export function isAbandonedRestart(
     return false;
   }
 
+  // Validate timestamps
+  if (!segmentA.endTime || !segmentB.startTime) {
+    return false;
+  }
+
   // Check time gap
   const aEnd = new Date(segmentA.endTime).getTime();
   const bStart = new Date(segmentB.startTime).getTime();
+
+  // Handle invalid dates (NaN)
+  if (Number.isNaN(aEnd) || Number.isNaN(bStart)) {
+    return false;
+  }
+
   const gapMinutes = (bStart - aEnd) / (1000 * 60);
 
   if (gapMinutes < 0 || gapMinutes > ABANDONED_RESTART_WINDOW_MINUTES) {
@@ -613,4 +700,353 @@ export function isAbandonedRestart(
   const filesB = getFilesTouched(segmentB.entries);
 
   return hasFileOverlap(filesA, filesB);
+}
+
+// =============================================================================
+// Delight Detection Functions
+// =============================================================================
+
+/**
+ * Detect resilient recovery
+ *
+ * Tool error occurs, but the model fixes it WITHOUT user intervention,
+ * and the task ultimately succeeds.
+ */
+export function detectResilientRecovery(entries: SessionEntry[]): boolean {
+  let sawToolError = false;
+  let userInterventionBeforeRecovery = false;
+  let successAfterError = false;
+
+  for (const entry of entries) {
+    if (entry.type !== "message") {
+      continue;
+    }
+
+    const msgEntry = entry as SessionMessageEntry;
+    const msg = msgEntry.message;
+
+    if (msg.role === "toolResult") {
+      const toolResult = msg as ToolResultMessage;
+      if (toolResult.isError) {
+        sawToolError = true;
+        userInterventionBeforeRecovery = false;
+        successAfterError = false;
+      } else if (sawToolError && !userInterventionBeforeRecovery) {
+        // Successful tool result after error, before user intervened
+        successAfterError = true;
+      }
+    } else if (msg.role === "user" && sawToolError && !successAfterError) {
+      // User sent a message after we saw an error but BEFORE recovery
+      // This means they had to intervene to help fix it
+      const userMsg = msg as UserMessage;
+      const text =
+        typeof userMsg.content === "string"
+          ? userMsg.content
+          : extractTextFromContent(userMsg.content);
+
+      // If it's correction/guidance, not just acknowledgment
+      if (!isMinimalAcknowledgment(text)) {
+        userInterventionBeforeRecovery = true;
+      }
+    }
+    // User messages AFTER successful recovery are fine (praise, etc.)
+  }
+
+  // Resilient recovery if we had an error, recovered successfully, without user intervention
+  return sawToolError && successAfterError && !userInterventionBeforeRecovery;
+}
+
+/**
+ * Check if text is a minimal acknowledgment (not a correction)
+ */
+function isMinimalAcknowledgment(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+
+  // Very short responses are usually acknowledgments
+  if (lower.length < 10) {
+    return true;
+  }
+
+  // Patterns that indicate minimal acknowledgment
+  const acknowledgmentPatterns = [/^ok$/, /^okay$/, /^k$/, /^yes$/, /^go$/];
+
+  for (const pattern of acknowledgmentPatterns) {
+    if (pattern.test(lower)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Detect one-shot success
+ *
+ * Complex task (multiple tool calls) completed with zero user corrections/rephrasings.
+ */
+export function detectOneShotSuccess(entries: SessionEntry[]): boolean {
+  let toolCallCount = 0;
+  let userCorrectionCount = 0;
+  let isFirstUserMessage = true;
+
+  for (const entry of entries) {
+    if (entry.type !== "message") {
+      continue;
+    }
+
+    const msgEntry = entry as SessionMessageEntry;
+    const msg = msgEntry.message;
+
+    if (msg.role === "assistant") {
+      const assistantMsg = msg as AssistantMessage;
+      for (const block of assistantMsg.content ?? []) {
+        if (block.type === "toolCall") {
+          toolCallCount++;
+        }
+      }
+    } else if (msg.role === "user") {
+      if (isFirstUserMessage) {
+        // First user message is the task, not a correction
+        isFirstUserMessage = false;
+      } else {
+        // Subsequent user messages are potential corrections
+        const userMsg = msg as UserMessage;
+        const text =
+          typeof userMsg.content === "string"
+            ? userMsg.content
+            : extractTextFromContent(userMsg.content);
+
+        // Check if this looks like a correction vs. just praise/acknowledgment
+        if (isUserCorrection(text)) {
+          userCorrectionCount++;
+        }
+      }
+    }
+  }
+
+  // One-shot success if:
+  // - Complex task (3+ tool calls)
+  // - Zero user corrections
+  return (
+    toolCallCount >= COMPLEX_TASK_TOOL_CALL_THRESHOLD &&
+    userCorrectionCount === 0
+  );
+}
+
+/**
+ * Check if user message looks like a correction
+ */
+function isUserCorrection(text: string): boolean {
+  const lower = text.toLowerCase().trim();
+
+  // Very short messages are usually not corrections
+  if (lower.length < 5) {
+    return false;
+  }
+
+  // Praise patterns - not corrections
+  const praisePatterns = [
+    /\bthanks?\b/,
+    /\bthank you\b/,
+    /\bperfect\b/,
+    /\bgreat\b/,
+    /\bawesome\b/,
+    /\bexcellent\b/,
+    /\blooks good\b/,
+    /\bthat works\b/,
+    /\bnice\b/,
+    /\bgood job\b/,
+    /\bwell done\b/,
+    /^ok$/,
+    /^okay$/,
+    /^yes$/,
+    /^👍/,
+    /^lgtm\b/,
+  ];
+
+  for (const pattern of praisePatterns) {
+    if (pattern.test(lower)) {
+      return false;
+    }
+  }
+
+  // Correction indicators
+  const correctionPatterns = [
+    /\bno\b/,
+    /\bwrong\b/,
+    /\bincorrect\b/,
+    /\bnot what\b/,
+    /\binstead\b/,
+    /\bactually\b/,
+    /\bshould be\b/,
+    /\bchange\b/,
+    /\bfix\b/,
+    /\btry again\b/,
+    /\bretry\b/,
+    /\bplease\b.*\binstead\b/,
+    /\?$/, // Questions often indicate confusion/need for clarification
+  ];
+
+  for (const pattern of correctionPatterns) {
+    if (pattern.test(lower)) {
+      return true;
+    }
+  }
+
+  // If message is substantial (>50 chars) and not praise, treat as potential correction/guidance
+  return lower.length > 50;
+}
+
+/**
+ * Detect explicit praise from user
+ *
+ * User says "great job", "perfect", "thanks", etc.
+ */
+export function detectExplicitPraise(entries: SessionEntry[]): boolean {
+  for (const entry of entries) {
+    if (entry.type !== "message") {
+      continue;
+    }
+
+    const msgEntry = entry as SessionMessageEntry;
+    const msg = msgEntry.message;
+
+    if (msg.role === "user") {
+      const userMsg = msg as UserMessage;
+      const text =
+        typeof userMsg.content === "string"
+          ? userMsg.content
+          : extractTextFromContent(userMsg.content);
+
+      if (hasGenuinePraise(text)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Check if text contains genuine praise
+ */
+function hasGenuinePraise(text: string): boolean {
+  const lower = text.toLowerCase();
+
+  // Negation patterns that indicate frustration, not praise
+  const negationPatterns = [
+    /i'?m done trying/i,
+    /done with this/i,
+    /great[,.]?\s*(another|more|yet)/i,
+    /thanks for nothing/i,
+    /perfect[,.]?\s*(now|another|more)/i,
+    /not working/i,
+    /still (not|broken|failing)/i,
+    /sarcasti/i,
+  ];
+
+  for (const pattern of negationPatterns) {
+    if (pattern.test(text)) {
+      return false;
+    }
+  }
+
+  // Genuine praise patterns
+  const praisePatterns = [
+    /\bthanks?\b/,
+    /\bthank you\b/,
+    /\bperfect\b/,
+    /\bgreat\b/,
+    /\bawesome\b/,
+    /\bexcellent\b/,
+    /\blooks good\b/,
+    /\bthat works\b/,
+    /\ball (done|set|good)\b/,
+    /\bnice work\b/,
+    /\bgood job\b/,
+    /\bwell done\b/,
+    /\bbrilliant\b/,
+    /\bamazing\b/,
+    /\bfantastic\b/,
+    /\bwonderful\b/,
+    /\blgtm\b/,
+    /\bship it\b/,
+    /👍/,
+    /🎉/,
+    /✅/,
+  ];
+
+  for (const pattern of praisePatterns) {
+    if (pattern.test(lower)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// =============================================================================
+// Delight Score Calculation
+// =============================================================================
+
+/**
+ * Calculate overall delight score (0.0-1.0)
+ *
+ * Weights different delight signals based on significance.
+ */
+export function calculateDelightScore(delight: DelightSignals): number {
+  let score = 0;
+
+  // Resilient recovery (high value - shows robustness)
+  if (delight.resilientRecovery) {
+    score += 0.4;
+  }
+
+  // One-shot success (high value - efficiency)
+  if (delight.oneShotSuccess) {
+    score += 0.4;
+  }
+
+  // Explicit praise (moderate value - user satisfaction)
+  if (delight.explicitPraise) {
+    score += 0.3;
+  }
+
+  return Math.min(score, 1);
+}
+
+// =============================================================================
+// Main Delight Detection Function
+// =============================================================================
+
+/**
+ * Options for delight detection
+ */
+export interface DelightDetectionOptions {
+  /** Outcome of the segment (for context) */
+  outcome?: string;
+}
+
+/**
+ * Detect all delight signals in a session segment
+ */
+export function detectDelightSignals(
+  entries: SessionEntry[],
+  _options: DelightDetectionOptions = {}
+): DelightSignals {
+  const resilientRecovery = detectResilientRecovery(entries);
+  const oneShotSuccess = detectOneShotSuccess(entries);
+  const explicitPraise = detectExplicitPraise(entries);
+
+  const delight: DelightSignals = {
+    score: 0, // Will be calculated below
+    resilientRecovery,
+    oneShotSuccess,
+    explicitPraise,
+  };
+
+  // Calculate overall score
+  delight.score = calculateDelightScore(delight);
+
+  return delight;
 }

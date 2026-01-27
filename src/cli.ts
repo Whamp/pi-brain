@@ -35,6 +35,10 @@ import {
   getOverallStats,
 } from "./parser/analyzer.js";
 import {
+  autoDisableIneffectiveInsights,
+  measureAndStoreEffectiveness,
+} from "./prompt/effectiveness.js";
+import {
   generatePromptAdditionsFromDb,
   formatPromptAdditionsDocument,
   getPromptAdditionsForModel,
@@ -45,7 +49,11 @@ import {
   getInjectionStatus,
 } from "./prompt/prompt-injector.js";
 import { openDatabase, migrate } from "./storage/database.js";
-import { listInsights } from "./storage/pattern-repository.js";
+import {
+  getInsight,
+  listInsights,
+  updateInsightPrompt,
+} from "./storage/pattern-repository.js";
 import {
   getSyncStatus,
   formatSyncStatus,
@@ -608,6 +616,152 @@ promptCmd
           }
           console.log("");
         }
+      }
+
+      db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("enable <id>")
+  .description("Enable an insight in system prompts")
+  .option("-c, --config <path>", "Config file path")
+  .action(async (id, options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const insight = getInsight(db, id);
+      if (!insight) {
+        console.error(`Error: Insight not found: ${id}`);
+        process.exit(1);
+      }
+
+      updateInsightPrompt(
+        db,
+        id,
+        insight.promptText || "",
+        true,
+        insight.promptVersion
+      );
+      console.log(`✓ Insight enabled: ${insight.pattern}`);
+
+      db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("disable <id>")
+  .description("Disable an insight in system prompts")
+  .option("-c, --config <path>", "Config file path")
+  .action(async (id, options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const insight = getInsight(db, id);
+      if (!insight) {
+        console.error(`Error: Insight not found: ${id}`);
+        process.exit(1);
+      }
+
+      updateInsightPrompt(
+        db,
+        id,
+        insight.promptText || "",
+        false,
+        insight.promptVersion
+      );
+      console.log(`✓ Insight disabled: ${insight.pattern}`);
+
+      db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("measure")
+  .description("Manually measure effectiveness of insights")
+  .option("-c, --config <path>", "Config file path")
+  .option("-i, --id <id>", "Measure specific insight only")
+  .option("--days <n>", "Number of days for before/after periods", "7")
+  .action(async (options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const days = Number.parseInt(options.days, 10);
+      const now = new Date();
+      const splitDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+      const beforeStart = new Date(
+        splitDate.getTime() - days * 24 * 60 * 60 * 1000
+      );
+
+      const beforePeriod = {
+        start: beforeStart.toISOString(),
+        end: splitDate.toISOString(),
+      };
+      const afterPeriod = {
+        start: splitDate.toISOString(),
+        end: now.toISOString(),
+      };
+
+      let insightsToMeasure = [];
+      if (options.id) {
+        const insight = getInsight(db, options.id);
+        if (insight) {
+          insightsToMeasure = [insight];
+        } else {
+          console.error(`Error: Insight not found: ${options.id}`);
+          process.exit(1);
+        }
+      } else {
+        insightsToMeasure = listInsights(db, { promptIncluded: true });
+      }
+
+      console.log(
+        `Measuring effectiveness for ${insightsToMeasure.length} insights...`
+      );
+      console.log(`Before: ${beforePeriod.start} to ${beforePeriod.end}`);
+      console.log(`After:  ${afterPeriod.start} to ${afterPeriod.end}\n`);
+
+      for (const insight of insightsToMeasure) {
+        process.stdout.write(`  ${insight.pattern.slice(0, 40)}... `);
+        const result = measureAndStoreEffectiveness(
+          db,
+          insight.id,
+          beforePeriod,
+          afterPeriod,
+          insight.promptVersion || "manual"
+        );
+
+        const impStr =
+          result.improvementPct > 0
+            ? `+${result.improvementPct.toFixed(1)}%`
+            : `${result.improvementPct.toFixed(1)}%`;
+        const sigStr = result.statisticallySignificant ? " [SIG]" : "";
+
+        console.log(`${impStr}${sigStr}`);
+      }
+
+      // Also run auto-disable
+      console.log("\nChecking for ineffective insights to auto-disable...");
+      const disabled = autoDisableIneffectiveInsights(db);
+      if (disabled.length > 0) {
+        console.log(`✓ Auto-disabled ${disabled.length} insights.`);
+      } else {
+        console.log("  No insights met the disable threshold.");
       }
 
       db.close();

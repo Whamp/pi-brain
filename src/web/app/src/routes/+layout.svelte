@@ -9,6 +9,7 @@
     FolderTree,
     Settings,
     Brain,
+    Lightbulb,
   } from "lucide-svelte";
   import { wsStore } from "$lib/stores/websocket";
   import { daemonStore } from "$lib/stores/daemon";
@@ -24,6 +25,7 @@
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/graph", label: "Graph", icon: Network },
     { href: "/search", label: "Search", icon: Search },
+    { href: "/prompt-learning", label: "Learning", icon: Lightbulb },
     { href: "/sessions", label: "Sessions", icon: FolderTree },
     { href: "/settings", label: "Settings", icon: Settings },
   ];

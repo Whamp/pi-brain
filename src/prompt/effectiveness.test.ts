@@ -3,12 +3,15 @@
  */
 
 import Database from "better-sqlite3";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { DateRange } from "../types/index.js";
+import type * as NodeStorage from "../storage/node-storage.js";
+import type { DateRange, Node } from "../types/index.js";
 
 import { migrate } from "../storage/database.js";
+import { readNodeFromPath } from "../storage/node-storage.js";
 import {
+  autoDisableIneffectiveInsights,
   calculateAverageSeverity,
   countNodes,
   countOccurrences,
@@ -20,6 +23,12 @@ import {
   measureAndStoreEffectiveness,
   measureEffectiveness,
 } from "./effectiveness.js";
+
+// Mock node storage
+vi.mock<typeof NodeStorage>("../storage/node-storage.js", (importActual) => ({
+  ...importActual(),
+  readNodeFromPath: vi.fn() as unknown as typeof readNodeFromPath,
+}));
 
 // =============================================================================
 // Test Setup
@@ -244,6 +253,40 @@ describe("effectiveness", () => {
         const count = countOccurrences(db, insight, range);
         expect(count).toBe(2);
       });
+
+      it("should escape SQL special characters in quirk patterns", () => {
+        insertNode("n1", "2026-01-15T10:00:00Z");
+
+        // Quirk with actual % sign
+        insertModelQuirk("n1", "google/gemini-3-flash", "uses 100% CPU");
+        // Quirk that would match if % was a wildcard
+        insertModelQuirk("n1", "google/gemini-3-flash", "uses 1000 CPU");
+
+        const range: DateRange = {
+          start: "2026-01-14T00:00:00Z",
+          end: "2026-01-17T00:00:00Z",
+        };
+
+        const insight = {
+          id: "test-quirk-special",
+          type: "quirk" as const,
+          model: "google/gemini-3-flash",
+          pattern: "100%",
+          frequency: 1,
+          confidence: 0.75,
+          severity: "medium" as const,
+          examples: [],
+          firstSeen: "2026-01-15T00:00:00Z",
+          lastSeen: "2026-01-16T00:00:00Z",
+          promptIncluded: false,
+          updatedAt: "2026-01-16T00:00:00Z",
+        };
+
+        const count = countOccurrences(db, insight, range);
+        // If it wasn't escaped, "100%" would match "1000 CPU" because % would be a wildcard.
+        // With escaping, it should only match "100% CPU".
+        expect(count).toBe(1);
+      });
     });
 
     describe("tool_error type", () => {
@@ -341,6 +384,90 @@ describe("effectiveness", () => {
         expect(count).toBe(2);
       });
     });
+
+    describe("win/failure types", () => {
+      it("should count matching win patterns from node files", () => {
+        insertNode("n1", "2026-01-15T10:00:00Z");
+
+        const mockNode = {
+          observations: {
+            modelsUsed: [{ model: "google/gemini-3-flash" }],
+            promptingWins: [
+              "Uses read tool before editing",
+              "Specific instructions",
+            ],
+            promptingFailures: [],
+          },
+        };
+
+        vi.mocked(readNodeFromPath).mockReturnValue(
+          mockNode as unknown as Node
+        );
+
+        const range: DateRange = {
+          start: "2026-01-14T00:00:00Z",
+          end: "2026-01-17T00:00:00Z",
+        };
+
+        const insight = {
+          id: "test-win",
+          type: "win" as const,
+          model: "google/gemini-3-flash",
+          pattern: "read tool before editing",
+          frequency: 1,
+          confidence: 0.9,
+          severity: "medium" as const,
+          examples: [],
+          firstSeen: "2026-01-15T00:00:00Z",
+          lastSeen: "2026-01-15T00:00:00Z",
+          promptIncluded: true,
+          updatedAt: "2026-01-15T00:00:00Z",
+        };
+
+        const count = countOccurrences(db, insight, range);
+        expect(count).toBe(1);
+        expect(readNodeFromPath).toHaveBeenCalled();
+      });
+
+      it("should count matching failure patterns from node files", () => {
+        insertNode("n1", "2026-01-15T10:00:00Z");
+
+        const mockNode = {
+          observations: {
+            modelsUsed: [{ model: "google/gemini-3-flash" }],
+            promptingWins: [],
+            promptingFailures: ["forgot to use read tool"],
+          },
+        };
+
+        vi.mocked(readNodeFromPath).mockReturnValue(
+          mockNode as unknown as Node
+        );
+
+        const range: DateRange = {
+          start: "2026-01-14T00:00:00Z",
+          end: "2026-01-17T00:00:00Z",
+        };
+
+        const insight = {
+          id: "test-failure",
+          type: "failure" as const,
+          model: "google/gemini-3-flash",
+          pattern: "forgot to use read tool",
+          frequency: 1,
+          confidence: 0.9,
+          severity: "high" as const,
+          examples: [],
+          firstSeen: "2026-01-15T00:00:00Z",
+          lastSeen: "2026-01-15T00:00:00Z",
+          promptIncluded: true,
+          updatedAt: "2026-01-15T00:00:00Z",
+        };
+
+        const count = countOccurrences(db, insight, range);
+        expect(count).toBe(1);
+      });
+    });
   });
 
   // =============================================================================
@@ -363,7 +490,7 @@ describe("effectiveness", () => {
         updatedAt: "2026-01-16T00:00:00Z",
       };
 
-      expect(calculateAverageSeverity(insight, 5)).toBe(0.9);
+      expect(calculateAverageSeverity(insight)).toBe(0.9);
     });
 
     it("should return 0.5 for medium severity", () => {
@@ -381,7 +508,7 @@ describe("effectiveness", () => {
         updatedAt: "2026-01-16T00:00:00Z",
       };
 
-      expect(calculateAverageSeverity(insight, 5)).toBe(0.5);
+      expect(calculateAverageSeverity(insight)).toBe(0.5);
     });
 
     it("should return 0.2 for low severity", () => {
@@ -399,7 +526,7 @@ describe("effectiveness", () => {
         updatedAt: "2026-01-16T00:00:00Z",
       };
 
-      expect(calculateAverageSeverity(insight, 5)).toBe(0.2);
+      expect(calculateAverageSeverity(insight)).toBe(0.2);
     });
   });
 
@@ -492,6 +619,41 @@ describe("effectiveness", () => {
       expect(result.beforeRate).toBe(1); // 2 quirks / 2 sessions
       expect(result.afterRate).toBe(0.5); // 1 quirk / 2 sessions
       expect(result.improvement).toBe(50); // 50% improvement
+      expect(result.beforeSessions).toBe(2);
+      expect(result.afterSessions).toBe(2);
+    });
+
+    it("should return 0 improvement when after sessions is 0", () => {
+      // Before period: 2 quirks in 2 sessions
+      insertNode("n1", "2026-01-05T10:00:00Z", "/test/session1.jsonl");
+      insertNode("n2", "2026-01-10T10:00:00Z", "/test/session2.jsonl");
+      insertModelQuirk("n1", "google/gemini-3-flash", "test pattern");
+      insertModelQuirk("n2", "google/gemini-3-flash", "test pattern");
+
+      // No nodes in after period
+
+      insertInsight("test-insight", "quirk", "test pattern", 2, {
+        model: "google/gemini-3-flash",
+      });
+
+      const beforePeriod: DateRange = {
+        start: "2026-01-01T00:00:00Z",
+        end: "2026-01-15T00:00:00Z",
+      };
+      const afterPeriod: DateRange = {
+        start: "2026-01-16T00:00:00Z",
+        end: "2026-01-31T00:00:00Z",
+      };
+
+      const result = measureEffectiveness(
+        db,
+        "test-insight",
+        beforePeriod,
+        afterPeriod
+      );
+
+      expect(result.afterSessions).toBe(0);
+      expect(result.improvement).toBe(0);
     });
 
     it("should return 0 improvement when before rate is 0", () => {
@@ -607,6 +769,8 @@ describe("effectiveness", () => {
 
       // Should have same ID (updated, not inserted)
       expect(result2.id).toBe(result1.id);
+      // Should preserve created_at
+      expect(result2.createdAt).toBe(result1.createdAt);
 
       // Should only have one record
       const count = db
@@ -794,6 +958,179 @@ describe("effectiveness", () => {
       const needing = getInsightsNeedingMeasurement(db, 7);
 
       expect(needing).toHaveLength(0);
+    });
+
+    it("should avoid duplicates when an insight has multiple measurements", () => {
+      insertInsight("insight-1", "quirk", "pattern 1", 5, {
+        model: "google/gemini-3-flash",
+        promptIncluded: true,
+      });
+
+      // Insert two OLD measurements for the SAME insight manually with old timestamps
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version, measured_at, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        "eff-1",
+        "insight-1",
+        "v0.1.0",
+        "2025-01-01T00:00:00Z",
+        "2025-01-01T00:00:00Z",
+        "2025-01-01T00:00:00Z"
+      );
+
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version, measured_at, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        "eff-2",
+        "insight-1",
+        "v0.2.0",
+        "2025-01-02T00:00:00Z",
+        "2025-01-02T00:00:00Z",
+        "2025-01-02T00:00:00Z"
+      );
+
+      // Now it needs measurement because measurements are old
+      const needing = getInsightsNeedingMeasurement(db, 7);
+
+      // Should only be returned ONCE
+      expect(needing).toHaveLength(1);
+      expect(needing[0].id).toBe("insight-1");
+    });
+  });
+
+  // =============================================================================
+  // autoDisableIneffectiveInsights Tests
+  // =============================================================================
+
+  describe("autoDisableIneffectiveInsights", () => {
+    it("should disable ineffective insights with significant negative improvement", () => {
+      // 1. Setup an insight that is included in prompt
+      insertInsight("bad-insight", "quirk", "bad pattern", 10, {
+        promptIncluded: true,
+      });
+      db.prepare(
+        "UPDATE aggregated_insights SET prompt_text = 'Avoid bad pattern', prompt_version = 'v1.0.0' WHERE id = 'bad-insight'"
+      ).run();
+
+      // 2. Add an ineffective measurement for it
+      // High occurrences AFTER (10 in 20 sessions) vs BEFORE (2 in 20 sessions)
+      // improvement = ((2/20 - 10/20) / (2/20)) * 100 = (0.1 - 0.5) / 0.1 * 100 = -400%
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version,
+          before_occurrences, after_occurrences,
+          sessions_before, sessions_after,
+          improvement_pct, statistically_significant,
+          measured_at
+        ) VALUES (
+          'eff-1', 'bad-insight', 'v1.0.0',
+          2, 10, 20, 20, -400.0, 1, datetime('now')
+        )
+      `).run();
+
+      // 3. Run auto-disable
+      const disabled = autoDisableIneffectiveInsights(db, { threshold: -10 });
+
+      expect(disabled).toContain("bad-insight");
+
+      // 4. Verify in DB
+      const updated = db
+        .prepare("SELECT prompt_included FROM aggregated_insights WHERE id = ?")
+        .get("bad-insight") as { prompt_included: number };
+      expect(updated.prompt_included).toBe(0);
+    });
+
+    it("should not disable if improvement is above threshold", () => {
+      insertInsight("ok-insight", "quirk", "ok pattern", 10, {
+        promptIncluded: true,
+      });
+      db.prepare(
+        "UPDATE aggregated_insights SET prompt_text = 'Avoid ok pattern', prompt_version = 'v1.0.0' WHERE id = 'ok-insight'"
+      ).run();
+
+      // Slight improvement (+5%)
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version,
+          before_occurrences, after_occurrences,
+          sessions_before, sessions_after,
+          improvement_pct, statistically_significant,
+          measured_at
+        ) VALUES (
+          'eff-2', 'ok-insight', 'v1.0.0',
+          10, 9, 20, 20, 5.0, 1, datetime('now')
+        )
+      `).run();
+
+      const disabled = autoDisableIneffectiveInsights(db, { threshold: -10 });
+      expect(disabled).not.toContain("ok-insight");
+
+      const updated = db
+        .prepare("SELECT prompt_included FROM aggregated_insights WHERE id = ?")
+        .get("ok-insight") as { prompt_included: number };
+      expect(updated.prompt_included).toBe(1);
+    });
+
+    it("should not disable if not statistically significant", () => {
+      insertInsight("unsure-insight", "quirk", "unsure pattern", 10, {
+        promptIncluded: true,
+      });
+      db.prepare(
+        "UPDATE aggregated_insights SET prompt_text = 'Avoid unsure pattern', prompt_version = 'v1.0.0' WHERE id = 'unsure-insight'"
+      ).run();
+
+      // Negative improvement but not significant
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version,
+          before_occurrences, after_occurrences,
+          sessions_before, sessions_after,
+          improvement_pct, statistically_significant,
+          measured_at
+        ) VALUES (
+          'eff-3', 'unsure-insight', 'v1.0.0',
+          1, 2, 5, 5, -100.0, 0, datetime('now')
+        )
+      `).run();
+
+      const disabled = autoDisableIneffectiveInsights(db, { threshold: -10 });
+      expect(disabled).not.toContain("unsure-insight");
+    });
+
+    it("should not disable if prompt version has changed since measurement", () => {
+      insertInsight("outdated-insight", "quirk", "outdated pattern", 10, {
+        promptIncluded: true,
+      });
+      // Insight is now at v2.0.0
+      db.prepare(
+        "UPDATE aggregated_insights SET prompt_text = 'Avoid pattern v2', prompt_version = 'v2.0.0' WHERE id = 'outdated-insight'"
+      ).run();
+
+      // But we have an ineffective measurement for OLD v1.0.0
+      db.prepare(`
+        INSERT INTO prompt_effectiveness (
+          id, insight_id, prompt_version,
+          before_occurrences, after_occurrences,
+          sessions_before, sessions_after,
+          improvement_pct, statistically_significant,
+          measured_at
+        ) VALUES (
+          'eff-4', 'outdated-insight', 'v1.0.0',
+          2, 10, 20, 20, -400.0, 1, datetime('now')
+        )
+      `).run();
+
+      const disabled = autoDisableIneffectiveInsights(db, { threshold: -10 });
+      expect(disabled).not.toContain("outdated-insight");
+
+      const updated = db
+        .prepare("SELECT prompt_included FROM aggregated_insights WHERE id = ?")
+        .get("outdated-insight") as { prompt_included: number };
+      expect(updated.prompt_included).toBe(1);
     });
   });
 }); // Close the main describe block

@@ -13,9 +13,27 @@ import { Cron } from "croner";
 import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
+import {
+  autoDisableIneffectiveInsights,
+  getInsightsNeedingMeasurement,
+  measureAndStoreEffectiveness,
+} from "../prompt/effectiveness.js";
 import { getLatestVersion } from "../prompt/prompt.js";
 import { InsightAggregator } from "./insight-aggregation.js";
 import { PatternAggregator } from "./pattern-aggregation.js";
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+/** Days to look back for "before" period when measuring effectiveness */
+const EFFECTIVENESS_BEFORE_PERIOD_DAYS = 14;
+
+/** Default days to look back when no prompt version timestamp is available */
+const DEFAULT_SPLIT_DAYS = 7;
+
+/** Milliseconds per day */
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 /** Job types that can be scheduled */
 export type ScheduledJobType =
@@ -474,6 +492,59 @@ export class Scheduler {
       // Run insight aggregation for prompt learning pipeline
       this.logger.info("Running insight aggregation for prompt learning");
       this.insightAggregator.aggregateAll();
+
+      // Run effectiveness measurements for prompt learning pipeline
+      this.logger.info("Measuring effectiveness of prompt additions");
+      const needingMeasurement = getInsightsNeedingMeasurement(this.db);
+      this.logger.info(
+        `Found ${needingMeasurement.length} insights needing measurement`
+      );
+
+      for (const insight of needingMeasurement) {
+        try {
+          // If we have a prompt version for this insight, use its creation date as the split point
+          let splitDate = new Date(
+            Date.now() - DEFAULT_SPLIT_DAYS * MS_PER_DAY
+          );
+
+          if (insight.promptVersion) {
+            const versionRow = this.db
+              .prepare(
+                "SELECT created_at FROM prompt_versions WHERE version = ?"
+              )
+              .get(insight.promptVersion) as { created_at: string } | undefined;
+            if (versionRow) {
+              splitDate = new Date(versionRow.created_at);
+            }
+          }
+
+          const now = new Date();
+          const beforeStart = new Date(
+            splitDate.getTime() - EFFECTIVENESS_BEFORE_PERIOD_DAYS * MS_PER_DAY
+          );
+
+          measureAndStoreEffectiveness(
+            this.db,
+            insight.id,
+            { start: beforeStart.toISOString(), end: splitDate.toISOString() },
+            { start: splitDate.toISOString(), end: now.toISOString() },
+            insight.promptVersion || "unknown"
+          );
+        } catch (error) {
+          this.logger.error(
+            `Failed to measure effectiveness for ${insight.id}: ${error}`
+          );
+        }
+      }
+
+      // Auto-disable ineffective insights
+      this.logger.info("Auto-disabling ineffective insights");
+      const disabled = autoDisableIneffectiveInsights(this.db);
+      if (disabled.length > 0) {
+        this.logger.info(
+          `Auto-disabled ${disabled.length} ineffective insights: ${disabled.join(", ")}`
+        );
+      }
 
       this.logger.info("Pattern aggregation completed");
     } catch (error) {

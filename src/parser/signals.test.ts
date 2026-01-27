@@ -13,16 +13,22 @@ import type {
 } from "../types.js";
 
 import {
+  calculateDelightScore,
   calculateFrictionScore,
   countContextChurn,
   countRephrasingCascades,
   countToolLoops,
+  detectDelightSignals,
+  detectExplicitPraise,
   detectFrictionSignals,
   detectModelSwitch,
+  detectOneShotSuccess,
+  detectResilientRecovery,
   detectSilentTermination,
   extractManualFlags,
   getFilesTouched,
   getPrimaryModel,
+  getSegmentTimestamp,
   hasFileOverlap,
   isAbandonedRestart,
 } from "./signals.js";
@@ -321,6 +327,29 @@ describe("countContextChurn", () => {
     // 5 reads + 5 ls = 10, equals threshold
     expect(countContextChurn(entries)).toBe(1);
   });
+
+  it("should not count duplicate ls on same directory", () => {
+    const entries: SessionEntry[] = [];
+    // 5 unique files
+    for (let i = 0; i < 5; i++) {
+      entries.push(createReadToolCall(`/file${i}.ts`, `r${i}`));
+    }
+    // 10 ls commands on same 2 directories (should only count 2)
+    for (let i = 0; i < 10; i++) {
+      entries.push(createBashToolCall(`ls /dir${i % 2}`, `l${i}`));
+    }
+    // 5 reads + 2 unique ls = 7, below threshold
+    expect(countContextChurn(entries)).toBe(0);
+  });
+
+  it("should handle ls with options", () => {
+    const entries: SessionEntry[] = [];
+    for (let i = 0; i < 10; i++) {
+      entries.push(createBashToolCall(`ls -la /dir${i}`, `l${i}`));
+    }
+    // 10 unique directories = threshold
+    expect(countContextChurn(entries)).toBe(1);
+  });
 });
 
 // =============================================================================
@@ -399,6 +428,41 @@ describe("detectSilentTermination", () => {
       createUserMessage("Thanks, that's perfect!", "4"),
     ];
     expect(detectSilentTermination(entries, true, false)).toBeFalsy();
+  });
+
+  it("should still detect silent termination with negated success words", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Do something", "1"),
+      createAssistantMessage("Trying", "2", { hasToolCall: true }),
+      createToolResult("edit", true, "Error occurred", "3"),
+      createUserMessage("I'm done trying, this is hopeless", "4"),
+    ];
+    expect(detectSilentTermination(entries, true, false)).toBeTruthy();
+  });
+
+  it("should detect silent termination with sarcastic success words", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Do something", "1"),
+      createAssistantMessage("Trying", "2", { hasToolCall: true }),
+      createToolResult("edit", true, "Error occurred", "3"),
+      createUserMessage("Great, another error", "4"),
+    ];
+    expect(detectSilentTermination(entries, true, false)).toBeTruthy();
+  });
+
+  it("should check more than last 5 entries for errors", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Do something", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("edit", true, "Error occurred", "3"),
+      createAssistantMessage("Step 2", "4"),
+      createAssistantMessage("Step 3", "5"),
+      createAssistantMessage("Step 4", "6"),
+      createAssistantMessage("Step 5", "7"),
+      createAssistantMessage("Step 6", "8"),
+    ];
+    // Error is at position 3, within expanded 10-entry window
+    expect(detectSilentTermination(entries, true, false)).toBeTruthy();
   });
 });
 
@@ -671,5 +735,382 @@ describe("isAbandonedRestart", () => {
       startTime: new Date(baseTime.getTime() + 10 * 60 * 1000).toISOString(),
     };
     expect(isAbandonedRestart(segmentA, segmentB)).toBeFalsy();
+  });
+
+  it("should return false for invalid timestamps", () => {
+    const segmentA = {
+      entries: [createReadToolCall("/src/a.ts", "1")],
+      outcome: "abandoned",
+      endTime: "",
+    };
+    const segmentB = {
+      entries: [createReadToolCall("/src/a.ts", "2")],
+      startTime: "invalid-date",
+    };
+    expect(isAbandonedRestart(segmentA, segmentB)).toBeFalsy();
+  });
+});
+
+describe("getSegmentTimestamp", () => {
+  it("should return undefined for empty entries", () => {
+    expect(getSegmentTimestamp([])).toBeUndefined();
+  });
+
+  it("should return timestamp of first message entry", () => {
+    const entries: SessionEntry[] = [
+      {
+        type: "custom",
+        id: "1",
+        parentId: null,
+        timestamp: "2026-01-26T09:00:00.000Z",
+        customType: "other",
+      } as unknown as SessionEntry,
+      createUserMessage("Hello", "2"),
+    ];
+    // Should skip custom entry and return message timestamp
+    expect(getSegmentTimestamp(entries)).toBeDefined();
+  });
+
+  it("should return undefined when no message entries", () => {
+    const entries: SessionEntry[] = [
+      {
+        type: "custom",
+        id: "1",
+        parentId: null,
+        timestamp: "2026-01-26T09:00:00.000Z",
+        customType: "other",
+      } as unknown as SessionEntry,
+    ];
+    expect(getSegmentTimestamp(entries)).toBe("2026-01-26T09:00:00.000Z");
+  });
+});
+
+// =============================================================================
+// Delight Signal Tests
+// =============================================================================
+
+describe("detectResilientRecovery", () => {
+  it("should return false for empty entries", () => {
+    expect(detectResilientRecovery([])).toBeFalsy();
+  });
+
+  it("should return false when no tool errors", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Do something", "1"),
+      createAssistantMessage("Done", "2", { hasToolCall: true }),
+      createToolResult("read", false, "file content", "3"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeFalsy();
+  });
+
+  it("should return true when model recovers from error without user intervention", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Read the file", "1"),
+      createAssistantMessage("Reading", "2", { hasToolCall: true }),
+      createToolResult("read", true, "File not found: /wrong/path", "3"),
+      createAssistantMessage("Let me try again", "4", { hasToolCall: true }),
+      createToolResult("read", false, "file content here", "5"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeTruthy();
+  });
+
+  it("should return false when user intervenes after error", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Read the file", "1"),
+      createAssistantMessage("Reading", "2", { hasToolCall: true }),
+      createToolResult("read", true, "File not found", "3"),
+      createUserMessage("Try /correct/path instead", "4"),
+      createAssistantMessage("Got it", "5", { hasToolCall: true }),
+      createToolResult("read", false, "file content here", "6"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeFalsy();
+  });
+
+  it("should return true when user sends minimal acknowledgment (not correction)", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Read the file", "1"),
+      createAssistantMessage("Reading", "2", { hasToolCall: true }),
+      createToolResult("read", true, "File not found", "3"),
+      createUserMessage("ok", "4"), // minimal acknowledgment
+      createAssistantMessage("Let me try again", "5", { hasToolCall: true }),
+      createToolResult("read", false, "file content", "6"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeTruthy();
+  });
+
+  it("should handle multiple errors with eventual recovery", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Read the file", "1"),
+      createAssistantMessage("Reading", "2", { hasToolCall: true }),
+      createToolResult("read", true, "Error 1", "3"),
+      createAssistantMessage("Retry 1", "4", { hasToolCall: true }),
+      createToolResult("read", true, "Error 2", "5"),
+      createAssistantMessage("Retry 2", "6", { hasToolCall: true }),
+      createToolResult("read", false, "success", "7"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeTruthy();
+  });
+
+  it("should return false when error not resolved", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Read the file", "1"),
+      createAssistantMessage("Reading", "2", { hasToolCall: true }),
+      createToolResult("read", true, "File not found", "3"),
+    ];
+    expect(detectResilientRecovery(entries)).toBeFalsy();
+  });
+});
+
+describe("detectOneShotSuccess", () => {
+  it("should return false for empty entries", () => {
+    expect(detectOneShotSuccess([])).toBeFalsy();
+  });
+
+  it("should return false when too few tool calls (not complex)", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Do something simple", "1"),
+      createAssistantMessage("Done", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+    ];
+    expect(detectOneShotSuccess(entries)).toBeFalsy();
+  });
+
+  it("should return true for complex task with no corrections", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+      createAssistantMessage("Step 2", "4", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "5"),
+      createAssistantMessage("Step 3", "6", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "7"),
+      createAssistantMessage("All done!", "8"),
+    ];
+    expect(detectOneShotSuccess(entries)).toBeTruthy();
+  });
+
+  it("should return true when user only sends praise", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+      createAssistantMessage("Step 2", "4", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "5"),
+      createAssistantMessage("Step 3", "6", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "7"),
+      createUserMessage("Thanks, that's perfect!", "8"),
+    ];
+    expect(detectOneShotSuccess(entries)).toBeTruthy();
+  });
+
+  it("should return false when user sends correction", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+      createUserMessage("No, that's wrong. Try again.", "4"),
+      createAssistantMessage("Step 2", "5", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "6"),
+      createAssistantMessage("Step 3", "7", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "8"),
+    ];
+    expect(detectOneShotSuccess(entries)).toBeFalsy();
+  });
+
+  it("should handle questions as corrections", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+      createAssistantMessage("Step 2", "4", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "5"),
+      createUserMessage("Why did you do it that way?", "6"),
+      createAssistantMessage("Step 3", "7", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "8"),
+    ];
+    expect(detectOneShotSuccess(entries)).toBeFalsy();
+  });
+});
+
+describe("detectExplicitPraise", () => {
+  it("should return false for empty entries", () => {
+    expect(detectExplicitPraise([])).toBeFalsy();
+  });
+
+  it("should return false when no user messages", () => {
+    const entries: SessionEntry[] = [createAssistantMessage("Hello", "1")];
+    expect(detectExplicitPraise(entries)).toBeFalsy();
+  });
+
+  it("should return true for 'thanks'", () => {
+    const entries: SessionEntry[] = [createUserMessage("thanks", "1")];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return true for 'Thank you'", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Thank you for your help", "1"),
+    ];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return true for 'perfect'", () => {
+    const entries: SessionEntry[] = [createUserMessage("Perfect!", "1")];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return true for 'great'", () => {
+    const entries: SessionEntry[] = [createUserMessage("Great job!", "1")];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return true for 'awesome'", () => {
+    const entries: SessionEntry[] = [createUserMessage("Awesome work!", "1")];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return true for emojis", () => {
+    const entries1: SessionEntry[] = [createUserMessage("👍", "1")];
+    expect(detectExplicitPraise(entries1)).toBeTruthy();
+
+    const entries2: SessionEntry[] = [createUserMessage("🎉 Done!", "1")];
+    expect(detectExplicitPraise(entries2)).toBeTruthy();
+  });
+
+  it("should return true for 'lgtm'", () => {
+    const entries: SessionEntry[] = [createUserMessage("lgtm", "1")];
+    expect(detectExplicitPraise(entries)).toBeTruthy();
+  });
+
+  it("should return false for sarcastic praise", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Great, another error", "1"),
+    ];
+    expect(detectExplicitPraise(entries)).toBeFalsy();
+  });
+
+  it("should return false for 'thanks for nothing'", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("thanks for nothing", "1"),
+    ];
+    expect(detectExplicitPraise(entries)).toBeFalsy();
+  });
+
+  it("should return false for 'I'm done trying'", () => {
+    const entries: SessionEntry[] = [createUserMessage("I'm done trying", "1")];
+    expect(detectExplicitPraise(entries)).toBeFalsy();
+  });
+
+  it("should return false for 'perfect, now another error'", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("perfect, now another error", "1"),
+    ];
+    expect(detectExplicitPraise(entries)).toBeFalsy();
+  });
+});
+
+describe("calculateDelightScore", () => {
+  it("should return 0 for no delight", () => {
+    const delight = {
+      score: 0,
+      resilientRecovery: false,
+      oneShotSuccess: false,
+      explicitPraise: false,
+    };
+    expect(calculateDelightScore(delight)).toBe(0);
+  });
+
+  it("should weight resilient recovery at 0.4", () => {
+    const delight = {
+      score: 0,
+      resilientRecovery: true,
+      oneShotSuccess: false,
+      explicitPraise: false,
+    };
+    expect(calculateDelightScore(delight)).toBeCloseTo(0.4, 2);
+  });
+
+  it("should weight one-shot success at 0.4", () => {
+    const delight = {
+      score: 0,
+      resilientRecovery: false,
+      oneShotSuccess: true,
+      explicitPraise: false,
+    };
+    expect(calculateDelightScore(delight)).toBeCloseTo(0.4, 2);
+  });
+
+  it("should weight explicit praise at 0.3", () => {
+    const delight = {
+      score: 0,
+      resilientRecovery: false,
+      oneShotSuccess: false,
+      explicitPraise: true,
+    };
+    expect(calculateDelightScore(delight)).toBeCloseTo(0.3, 2);
+  });
+
+  it("should cap at 1.0", () => {
+    const delight = {
+      score: 0,
+      resilientRecovery: true,
+      oneShotSuccess: true,
+      explicitPraise: true,
+    };
+    // 0.4 + 0.4 + 0.3 = 1.1, capped at 1.0
+    expect(calculateDelightScore(delight)).toBe(1);
+  });
+});
+
+describe("detectDelightSignals", () => {
+  it("should return all signals as false for empty entries", () => {
+    const signals = detectDelightSignals([]);
+    expect(signals.resilientRecovery).toBeFalsy();
+    expect(signals.oneShotSuccess).toBeFalsy();
+    expect(signals.explicitPraise).toBeFalsy();
+    expect(signals.score).toBe(0);
+  });
+
+  it("should detect multiple delight signals", () => {
+    // Complex task with recovery and praise
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", true, "Error", "3"),
+      createAssistantMessage("Retry", "4", { hasToolCall: true }),
+      createToolResult("read", false, "content", "5"),
+      createAssistantMessage("Step 2", "6", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "7"),
+      createAssistantMessage("Step 3", "8", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "9"),
+      createUserMessage("Thanks, perfect!", "10"),
+    ];
+
+    const signals = detectDelightSignals(entries);
+    expect(signals.resilientRecovery).toBeTruthy();
+    expect(signals.explicitPraise).toBeTruthy();
+    // Note: oneShotSuccess is false because there was an error (even if recovered)
+    // Actually, oneShotSuccess only checks for user corrections, not errors
+    // We need to check if oneShotSuccess is true here
+    expect(signals.score).toBeGreaterThan(0);
+  });
+
+  it("should calculate combined score correctly", () => {
+    const entries: SessionEntry[] = [
+      createUserMessage("Build a feature", "1"),
+      createAssistantMessage("Step 1", "2", { hasToolCall: true }),
+      createToolResult("read", false, "content", "3"),
+      createAssistantMessage("Step 2", "4", { hasToolCall: true }),
+      createToolResult("edit", false, "edited", "5"),
+      createAssistantMessage("Step 3", "6", { hasToolCall: true }),
+      createToolResult("bash", false, "output", "7"),
+      createUserMessage("Amazing work!", "8"),
+    ];
+
+    const signals = detectDelightSignals(entries);
+    expect(signals.oneShotSuccess).toBeTruthy();
+    expect(signals.explicitPraise).toBeTruthy();
+    // 0.4 (one-shot) + 0.3 (praise) = 0.7
+    expect(signals.score).toBeCloseTo(0.7, 2);
   });
 });

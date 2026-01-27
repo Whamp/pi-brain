@@ -25,6 +25,7 @@ import { edgesRoutes } from "./routes/edges.js";
 import { lessonsRoutes } from "./routes/lessons.js";
 import { nodesRoutes } from "./routes/nodes.js";
 import { patternsRoutes } from "./routes/patterns.js";
+import { promptLearningRoutes } from "./routes/prompt-learning.js";
 import { queryRoutes } from "./routes/query.js";
 import { quirksRoutes } from "./routes/quirks.js";
 import { searchRoutes } from "./routes/search.js";
@@ -104,6 +105,7 @@ export async function createServer(
       await api.register(statsRoutes, { prefix: "/stats" });
       await api.register(daemonRoutes, { prefix: "/daemon" });
       await api.register(decisionsRoutes, { prefix: "/decisions" });
+      await api.register(promptLearningRoutes, { prefix: "/prompt-learning" });
       await api.register(sessionsRoutes, { prefix: "/sessions" });
       await api.register(configRoutes, { prefix: "/config" });
     },

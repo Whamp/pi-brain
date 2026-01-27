@@ -15,6 +15,8 @@ import type {
   AggregatedFailurePattern,
   AggregatedModelStats,
   AggregatedLessonPattern,
+  AggregatedInsight,
+  PromptEffectiveness,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -385,6 +387,28 @@ export const api = {
         models: string[];
       }[];
     }>("/config/providers"),
+
+  // Prompt Learning
+  getPromptInsights: (options?: {
+    limit?: number;
+    offset?: number;
+    model?: string;
+    promptIncluded?: boolean;
+  }) =>
+    request<
+      (AggregatedInsight & {
+        latestEffectiveness: PromptEffectiveness | null;
+      })[]
+    >(`/prompt-learning/insights${toQueryString(options ?? {})}`),
+
+  getInsightHistory: (insightId: string) =>
+    request<PromptEffectiveness[]>(`/prompt-learning/history/${insightId}`),
+
+  toggleInsight: (insightId: string, enabled: boolean) =>
+    request<{ success: boolean }>(`/prompt-learning/toggle/${insightId}`, {
+      method: "POST",
+      body: JSON.stringify({ enabled }),
+    }),
 };
 
 export { createApiError, createTimeoutError, isApiError, isTimeoutError };
