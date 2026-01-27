@@ -59,3 +59,20 @@ Main branch: major/pi-brain
 **Notes**:
 - Also committed directory reorganization: specs/ → docs/specs/, docs ops files → docs/ops/
 - PLAN.md updated to mark Phase 12 tasks as complete
+
+---
+
+## 2026-01-27 10:50 - Task 12.4
+
+**Status**: pending → done
+**Validation**:
+- Added `seenTargets` Set to track targets already connected in detectLessonReinforcement
+- Skip candidates already in seenTargets before database edge check
+- Add candidate.id to seenTargets after creating edge
+- New test: "should deduplicate edges when multiple lessons match same candidate"
+- All 1174 tests pass (1 new test)
+- npm run check passes
+**Commit**: 46a119c
+**Notes**:
+- Fix prevents duplicate edges when multiple lessons on source node match same candidate
+- Related TODO-6347f019 marked as done
