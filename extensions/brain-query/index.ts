@@ -15,16 +15,127 @@ interface BrainQueryResponse {
   };
 }
 
+/** Valid flag types for manual notation */
+type FlagType = "quirk" | "failure" | "win" | "note";
+
+const VALID_FLAG_TYPES: readonly FlagType[] = [
+  "quirk",
+  "failure",
+  "win",
+  "note",
+] as const;
+
+/**
+ * Parse --flag or -f arguments from input
+ * Formats:
+ *   /brain --flag <type> <message>
+ *   /brain -f <type> <message>
+ *   /brain --flag:<type> <message>
+ *   /brain -f:<type> <message>
+ */
+function parseFlagCommand(input: string): {
+  isFlag: boolean;
+  type?: FlagType;
+  message?: string;
+  error?: string;
+} {
+  // Check for --flag or -f prefix
+  const flagPrefixMatch = input.match(/^(?:--flag|-f)(?::(\w+))?\s*(.*)/);
+  if (!flagPrefixMatch) {
+    return { isFlag: false };
+  }
+
+  const [, inlineType, rawRemaining] = flagPrefixMatch;
+  let remaining = rawRemaining?.trim() ?? "";
+
+  let flagType: FlagType;
+  let message: string;
+
+  if (inlineType) {
+    // Format: --flag:type message
+    if (!VALID_FLAG_TYPES.includes(inlineType as FlagType)) {
+      return {
+        isFlag: true,
+        error: `Invalid flag type "${inlineType}". Valid types: ${VALID_FLAG_TYPES.join(", ")}`,
+      };
+    }
+    flagType = inlineType as FlagType;
+    message = remaining;
+  } else {
+    // Format: --flag type message
+    const parts = remaining.split(/\s+/);
+    const typeArg = parts[0]?.toLowerCase();
+
+    if (!typeArg) {
+      return {
+        isFlag: true,
+        error: `Missing flag type. Usage: /brain --flag <${VALID_FLAG_TYPES.join("|")}> <message>`,
+      };
+    }
+
+    if (!VALID_FLAG_TYPES.includes(typeArg as FlagType)) {
+      return {
+        isFlag: true,
+        error: `Invalid flag type "${typeArg}". Valid types: ${VALID_FLAG_TYPES.join(", ")}`,
+      };
+    }
+
+    flagType = typeArg as FlagType;
+    message = parts.slice(1).join(" ");
+  }
+
+  if (!message) {
+    return {
+      isFlag: true,
+      error: `Missing message. Usage: /brain --flag ${flagType} <message>`,
+    };
+  }
+
+  return { isFlag: true, type: flagType, message };
+}
+
 export default function brainExtension(pi: ExtensionAPI) {
-  // Register /brain command for USER queries
-  // Usage: /brain why did auth fail last month?
+  // Register /brain command for USER queries and manual flags
+  // Usage:
+  //   /brain <question>           - Query the knowledge graph
+  //   /brain --flag <type> <msg>  - Record a manual flag
+  //   /brain -f <type> <msg>      - Record a manual flag (short form)
   pi.registerCommand("brain", {
     description: "Query the pi-brain knowledge graph",
-    handler: async (query, ctx) => {
-      if (!query) {
-        ctx.ui.notify("Usage: /brain <your question>", "error");
+    handler: async (input, ctx) => {
+      if (!input) {
+        ctx.ui.notify(
+          "Usage: /brain <question> OR /brain --flag <type> <message>",
+          "error"
+        );
         return;
       }
+
+      // Check if this is a --flag command
+      const flagResult = parseFlagCommand(input);
+
+      if (flagResult.isFlag) {
+        // Handle --flag command
+        if (flagResult.error) {
+          ctx.ui.notify(flagResult.error, "error");
+          return;
+        }
+
+        // Write the flag as a custom entry to the session
+        pi.appendEntry("brain_flag", {
+          type: flagResult.type,
+          message: flagResult.message,
+        });
+
+        ctx.ui.notify(
+          `Recorded ${flagResult.type}: ${flagResult.message}`,
+          "success"
+        );
+        return;
+      }
+
+      // Otherwise, treat as a query
+      const query = input;
 
       try {
         // Query the brain API

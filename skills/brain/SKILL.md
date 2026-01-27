@@ -14,6 +14,7 @@ Query the pi-brain knowledge graph for insights from analyzed coding sessions.
 - **Starting work on a project**: Get context from previous sessions
 - **Debugging**: Find similar issues and their solutions
 - **Model quirks**: Check known behaviors of the current model
+- **Recording insights**: Flag model quirks, failures, or wins during sessions
 
 ## Using the Tool
 
@@ -26,6 +27,35 @@ brain_query "What are known quirks of Claude when using the edit tool?"
 brain_query "What lessons were learned about async debugging?"
 brain_query "How did we implement caching in project-x?"
 ```
+
+## Manual Flags
+
+Record observations directly into the session for later analysis using `/brain --flag`:
+
+```
+/brain --flag quirk Claude keeps using sed instead of read tool
+/brain --flag failure This caching approach caused race conditions
+/brain --flag win One-shot implementation with clear spec worked perfectly
+/brain --flag note Remember to check edge cases for empty arrays
+```
+
+Short form:
+
+```
+/brain -f quirk Model hallucinated a non-existent API
+/brain -f:win Perfect first try
+```
+
+### Flag Types
+
+| Type      | Use For                                    |
+| --------- | ------------------------------------------ |
+| `quirk`   | Model-specific behaviors worth remembering |
+| `failure` | Approaches that didn't work (and why)      |
+| `win`     | Techniques that worked exceptionally well  |
+| `note`    | General observations for future reference  |
+
+Flags are extracted during session analysis and become part of the node's `signals.manualFlags` field.
 
 ## Query Types
 
