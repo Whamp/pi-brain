@@ -135,7 +135,7 @@ Track implementation progress. Agents update status as they complete work.
 | 10.1  | Aggregate model-specific learnings                                                     | done    | 4.10      | 2026-01-26 - InsightAggregator |
 | 10.2  | Generate model-specific prompt additions                                               | done    | 10.1      | 2026-01-26                     |
 | 10.3  | Implement skill-based prompt injection (brain-insights skill)                          | done    | 10.2      | 2026-01-26                     |
-| 10.4  | Create `prompt_effectiveness` table migration                                          | active  | 10.3      | 2026-01-26                     |
+| 10.4  | Create `prompt_effectiveness` table migration                                          | done    | 10.3      | 2026-01-26                     |
 | 10.5  | Implement `measureEffectiveness()` function                                            | pending | 10.4      |                                |
 | 10.6  | Implement auto-disable for ineffective insights                                        | pending | 10.5      |                                |
 | 10.7  | Add effectiveness tracking to nightly pipeline                                         | pending | 10.6      |                                |

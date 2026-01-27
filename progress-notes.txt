@@ -493,3 +493,35 @@
 - Empty skill generated when no actionable insights meet thresholds (freq >= 5, conf >= 0.7)
 - AGENTS.md injection uses markers for easy update/removal
 - Ready for Task 10.4 (Feedback loop: quirk → prompt fix → measure improvement)
+
+---
+
+## 2026-01-26 19:06 - Task 10.4
+
+**Status**: pending → done
+**Validation**:
+- Created migration 008_prompt_effectiveness.sql with schema for tracking
+  prompt effectiveness (before/after occurrences, severity, improvement_pct)
+- Added columns: id, insight_id, prompt_version, before/after_occurrences,
+  before/after_severity, before/after_start/end, improvement_pct,
+  statistically_significant, sessions_before/after, measured_at, timestamps
+- Added foreign key constraint to aggregated_insights with cascading deletes
+- Added 4 indexes: idx_effectiveness_insight, idx_effectiveness_measured_at,
+  idx_effectiveness_significant, idx_effectiveness_improvement
+- Added TypeScript types to src/types/index.ts:
+  - DateRange: For before/after period specification
+  - EffectivenessResult: For measureEffectiveness() function return value
+  - PromptEffectiveness: Full database record type
+- Added 5 new tests in database.test.ts:
+  - creates prompt learning tables (aggregated_insights, prompt_effectiveness)
+  - creates prompt_effectiveness table with correct columns (17 columns verified)
+  - creates prompt_effectiveness indexes (4 indexes verified)
+  - enforces foreign key on prompt_effectiveness to aggregated_insights
+  - cascades deletes from aggregated_insights to prompt_effectiveness
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 940 passed, 4 skipped)
+**Commit**: b30b56d
+**Notes**:
+- Table design follows specs/prompt-learning.md schema
+- Sessions counts added for rate calculations (not in original spec but needed)
+- Ready for Task 10.5 (Implement measureEffectiveness() function)
