@@ -379,6 +379,11 @@ describe("scheduler", () => {
 
       // Verify DB was called (implicitly verifying aggregator was run)
       expect(mockDb.prepare).toHaveBeenCalled();
+
+      // Verify itemsProcessed is now a number (count from aggregator methods)
+      expect(typeof result.itemsProcessed).toBe("number");
+      // With empty iterators, all counts should be 0
+      expect(result.itemsProcessed).toBe(0);
     });
 
     it("should handle database errors", async () => {

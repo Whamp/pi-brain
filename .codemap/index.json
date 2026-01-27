@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32477,
-  "codebase_tokens": 926963,
+  "total_tokens": 32478,
+  "codebase_tokens": 926740,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -5414,10 +5414,10 @@
       "language": "typescript",
       "lines": [
         1,
-        326
+        332
       ],
       "detail_level": "full",
-      "token_estimate": 200,
+      "token_estimate": 201,
       "symbols": [
         {
           "name": "FailurePatternGroup",
@@ -5463,7 +5463,7 @@
           "signature": "PatternAggregator",
           "lines": [
             22,
-            325
+            331
           ],
           "exported": true,
           "is_default": false,
@@ -5517,10 +5517,10 @@
         {
           "name": "aggregateFailurePatterns",
           "kind": "method",
-          "signature": "aggregateFailurePatterns(): void",
+          "signature": "aggregateFailurePatterns(): number",
           "lines": [
-            32,
-            125
+            33,
+            127
           ],
           "exported": false,
           "is_default": false,
@@ -5536,10 +5536,10 @@
         {
           "name": "aggregateLessons",
           "kind": "method",
-          "signature": "aggregateLessons(): void",
+          "signature": "aggregateLessons(): number",
           "lines": [
-            131,
-            241
+            134,
+            245
           ],
           "exported": false,
           "is_default": false,
@@ -5555,10 +5555,10 @@
         {
           "name": "aggregateModelStats",
           "kind": "method",
-          "signature": "aggregateModelStats(): void",
+          "signature": "aggregateModelStats(): number",
           "lines": [
-            246,
-            324
+            251,
+            330
           ],
           "exported": false,
           "is_default": false,

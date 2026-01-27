@@ -667,9 +667,9 @@ src/daemon/pattern-aggregation.test.ts [1-384]
     - better-sqlite3
     - vitest
 
-src/daemon/pattern-aggregation.ts [1-326]
+src/daemon/pattern-aggregation.ts [1-332]
   class:
-    22-325: class PatternAggregator [exported]
+    22-331: class PatternAggregator [exported]
       refs in: 7 [import: 2, instantiate: 2, reexport: 1, type: 2]
         - src/daemon/index.ts:164: reexport (module)
         - src/daemon/pattern-aggregation.test.ts:4: import (module)
@@ -1056,7 +1056,7 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-718]
+src/daemon/scheduler.test.ts [1-723]
   imports:
     - ./queue.js
     - ./scheduler.js
@@ -1108,13 +1108,13 @@ src/daemon/scheduler.ts [1-797]
         - src/daemon/index.ts:153: reexport (module)
         - src/daemon/scheduler.test.ts:18: import (module)
         - src/daemon/scheduler.test.ts:144: type defaultConfig
-        - src/daemon/scheduler.test.ts:401: type badConfig
-        - src/daemon/scheduler.test.ts:418: type badConfig
-        - src/daemon/scheduler.test.ts:438: type config
-        - src/daemon/scheduler.test.ts:451: type config
-        - src/daemon/scheduler.test.ts:563: type config
-        - src/daemon/scheduler.test.ts:584: type config
-        - src/daemon/scheduler.test.ts:600: type config
+        - src/daemon/scheduler.test.ts:406: type badConfig
+        - src/daemon/scheduler.test.ts:423: type badConfig
+        - src/daemon/scheduler.test.ts:443: type config
+        - src/daemon/scheduler.test.ts:456: type config
+        - src/daemon/scheduler.test.ts:568: type config
+        - src/daemon/scheduler.test.ts:589: type config
+        - src/daemon/scheduler.test.ts:605: type config
     116-125: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs in: 3 [reexport: 1, type: 2]
@@ -1137,28 +1137,28 @@ src/daemon/scheduler.ts [1-797]
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
-        - src/daemon/scheduler.test.ts:478: call scheduler
+        - src/daemon/scheduler.test.ts:483: call scheduler
     766-775: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:146: reexport (module)
         - src/daemon/scheduler.test.ts:14: import (module)
-        - src/daemon/scheduler.test.ts:489: call (module)
-        - src/daemon/scheduler.test.ts:490: call (module)
-        - src/daemon/scheduler.test.ts:491: call (module)
-        - src/daemon/scheduler.test.ts:492: call (module)
-        - src/daemon/scheduler.test.ts:493: call (module)
+        - src/daemon/scheduler.test.ts:494: call (module)
+        - src/daemon/scheduler.test.ts:495: call (module)
+        - src/daemon/scheduler.test.ts:496: call (module)
         - src/daemon/scheduler.test.ts:497: call (module)
         - src/daemon/scheduler.test.ts:498: call (module)
-        - src/daemon/scheduler.test.ts:499: call (module)
+        - src/daemon/scheduler.test.ts:502: call (module)
+        - src/daemon/scheduler.test.ts:503: call (module)
+        - src/daemon/scheduler.test.ts:504: call (module)
     780-796: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
         - src/daemon/scheduler.test.ts:15: import (module)
-        - src/daemon/scheduler.test.ts:507: call times
-        - src/daemon/scheduler.test.ts:529: call (module)
-        - src/daemon/scheduler.test.ts:533: call times
+        - src/daemon/scheduler.test.ts:512: call times
+        - src/daemon/scheduler.test.ts:534: call (module)
+        - src/daemon/scheduler.test.ts:538: call times
   variable:
     66-70: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -2651,4 +2651,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 38
-Estimated tokens: 35,295 (codebase: ~926,963)
+Estimated tokens: 35,295 (codebase: ~926,740)

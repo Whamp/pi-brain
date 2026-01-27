@@ -28,8 +28,9 @@ export class PatternAggregator {
   /**
    * Aggregates tool errors into failure patterns.
    * This is intended to be run nightly or periodically.
+   * @returns {number} The number of patterns aggregated
    */
-  public aggregateFailurePatterns(): void {
+  public aggregateFailurePatterns(): number {
     const stmt = this.db.prepare(`
       SELECT tool, error_type, model, node_id, created_at 
       FROM tool_errors 
@@ -122,13 +123,15 @@ export class PatternAggregator {
     });
 
     transaction();
+    return groups.size;
   }
 
   /**
    * Aggregates lessons into lesson patterns.
    * Groups by level and exact summary text.
+   * @returns {number} The number of patterns aggregated
    */
-  public aggregateLessons(): void {
+  public aggregateLessons(): number {
     const stmt = this.db.prepare(`
       SELECT l.level, l.summary, l.node_id, l.created_at,
              GROUP_CONCAT(lt.tag, '|') as tag_list
@@ -238,12 +241,14 @@ export class PatternAggregator {
     });
 
     transaction();
+    return groups.size;
   }
 
   /**
    * Aggregates model statistics from quirks and tool errors.
+   * @returns {number} The number of models aggregated
    */
-  public aggregateModelStats(): void {
+  public aggregateModelStats(): number {
     const quirksStmt = this.db.prepare(`
       SELECT model, COUNT(*) as count, MAX(created_at) as last_seen
       FROM model_quirks
@@ -321,5 +326,6 @@ export class PatternAggregator {
     });
 
     transaction();
+    return statsMap.size;
   }
 }

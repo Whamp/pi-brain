@@ -452,9 +452,9 @@ src/daemon/pattern-aggregation.test.ts [1-384]
     - better-sqlite3
     - vitest
 
-src/daemon/pattern-aggregation.ts [1-326]
+src/daemon/pattern-aggregation.ts [1-332]
   class:
-    22-325: class PatternAggregator [exported]
+    22-331: class PatternAggregator [exported]
   imports:
     - better-sqlite3
     - node:crypto
@@ -718,7 +718,7 @@ src/daemon/queue.ts [1-733]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-718]
+src/daemon/scheduler.test.ts [1-723]
   imports:
     - ./queue.js
     - ./scheduler.js
@@ -1416,4 +1416,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,354 (codebase: ~926,963)
+Estimated tokens: 18,354 (codebase: ~926,740)

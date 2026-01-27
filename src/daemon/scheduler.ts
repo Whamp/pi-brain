@@ -558,12 +558,14 @@ export class Scheduler {
   private async runPatternAggregation(): Promise<ScheduledJobResult> {
     const startedAt = new Date();
     let errorMessage: string | undefined;
+    let itemsProcessed = 0;
 
     try {
       this.logger.info("Starting pattern aggregation job");
-      this.patternAggregator.aggregateFailurePatterns();
-      this.patternAggregator.aggregateModelStats();
-      this.patternAggregator.aggregateLessons();
+      const failurePatterns = this.patternAggregator.aggregateFailurePatterns();
+      const modelStats = this.patternAggregator.aggregateModelStats();
+      const lessonPatterns = this.patternAggregator.aggregateLessons();
+      itemsProcessed = failurePatterns + modelStats + lessonPatterns;
 
       // Run insight aggregation for prompt learning pipeline
       this.logger.info("Running insight aggregation for prompt learning");
@@ -635,9 +637,7 @@ export class Scheduler {
       type: "pattern_aggregation",
       startedAt,
       completedAt: new Date(),
-      // Pattern aggregation processes all records, so count isn't easily available
-      // without changing the aggregator interface
-      itemsProcessed: undefined,
+      itemsProcessed,
       error: errorMessage,
     };
 

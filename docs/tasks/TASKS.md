@@ -169,6 +169,6 @@ Track implementation progress. Agents update status as they complete work.
 | 12.2 | Architecture: Idempotent Ingestion (deterministic IDs or upsert logic)      | done    | 3.7  | 2026-01-27                                   |
 | 12.3 | Architecture: SQLite Rebuild CLI (restore DB from JSON)                     | done    | 4.1  | 2026-01-26 - added rebuild-index command     |
 | 12.4 | Fix target deduplication in detectLessonReinforcement                       | done    | 8.5  | 2026-01-27 TODO-6347f019                     |
-| 12.5 | Return counts from PatternAggregator methods for status reporting           | pending | 8.6  | TODO-10af064f                                |
+| 12.5 | Return counts from PatternAggregator methods for status reporting           | active  | 8.6  | TODO-10af064f 2026-01-27                     |
 | 12.6 | Make hardcoded limits configurable in nightly processing                    | pending | 8.1  | TODO-a2c7972a                                |
 | 12.7 | Add JSDoc to connection-discovery.ts public methods                         | pending | 8.3  | TODO-42ac82b8                                |

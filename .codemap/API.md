@@ -506,9 +506,9 @@ src/daemon/insight-aggregation.ts [1-553]
     - better-sqlite3
     - node:crypto
 
-src/daemon/pattern-aggregation.ts [1-326]
+src/daemon/pattern-aggregation.ts [1-332]
   class:
-    22-325: class PatternAggregator [exported]
+    22-331: class PatternAggregator [exported]
   imports:
     - better-sqlite3
     - node:crypto
@@ -1803,4 +1803,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,406 (codebase: ~925,983)
+Estimated tokens: 22,406 (codebase: ~926,050)
