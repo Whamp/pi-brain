@@ -481,9 +481,9 @@ src/daemon/processor.test.ts [1-668]
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-770]
+src/daemon/processor.ts [1-773]
   class:
-    709-762: class JobProcessor [exported]
+    711-765: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
@@ -504,13 +504,13 @@ src/daemon/processor.ts [1-770]
       /** Skill availability information */
     135-140: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    202-207: interface EnvironmentValidationResult [exported]
+    202-209: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    699-704: interface ProcessorConfig [exported]
+    701-706: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:701: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:703: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:703: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:705: type ProcessorLogger -> src/daemon/processor.ts
   function:
     170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
@@ -524,77 +524,77 @@ src/daemon/processor.ts [1-770]
         - src/daemon/processor.ts:183: type Map -> external
         - src/daemon/processor.ts:183: type SkillInfo -> src/daemon/processor.ts
         - src/daemon/processor.ts:191: call set -> external
-    213-225: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:213: type Promise -> external
-        - src/daemon/processor.ts:213: type EnvironmentValidationResult -> src/daemon/processor.ts
-    231-237: async buildSkillsArg(): Promise<string> [exported]
+        - src/daemon/processor.ts:215: type Promise -> external
+        - src/daemon/processor.ts:215: type EnvironmentValidationResult -> src/daemon/processor.ts
+    233-239: async buildSkillsArg(): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/processor.ts:231: type Promise -> external
-        - src/daemon/processor.ts:234: call join -> external
-        - src/daemon/processor.ts:234: call filter -> external
-        - src/daemon/processor.ts:235: call get -> external
-    246-278: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.ts:233: type Promise -> external
+        - src/daemon/processor.ts:236: call join -> external
+        - src/daemon/processor.ts:236: call filter -> external
+        - src/daemon/processor.ts:237: call get -> external
+    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs out: 10 [call: 9, type: 1]
-        - src/daemon/processor.ts:246: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/processor.ts:254: call push -> external
-        - src/daemon/processor.ts:258: call push -> external
+        - src/daemon/processor.ts:248: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/processor.ts:256: call push -> external
         - src/daemon/processor.ts:260: call push -> external
-        - src/daemon/processor.ts:266: call push -> external
-        - src/daemon/processor.ts:267: call push -> external
+        - src/daemon/processor.ts:262: call push -> external
         - src/daemon/processor.ts:268: call push -> external
-        - src/daemon/processor.ts:272: call push -> external
-        - src/daemon/processor.ts:273: call push -> external
-        - src/daemon/processor.ts:277: call join -> external
-    311-427: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.ts:269: call push -> external
+        - src/daemon/processor.ts:270: call push -> external
+        - src/daemon/processor.ts:274: call push -> external
+        - src/daemon/processor.ts:275: call push -> external
+        - src/daemon/processor.ts:279: call join -> external
+    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs out: 14 [call: 9, type: 5]
-        - src/daemon/processor.ts:312: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/processor.ts:313: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:314: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:315: type Promise -> external
-        - src/daemon/processor.ts:315: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:320: call access -> external
-        - src/daemon/processor.ts:327: call now -> external
-        - src/daemon/processor.ts:333: call access -> external
-        - src/daemon/processor.ts:340: call now -> external
-        - src/daemon/processor.ts:352: call now -> external
-    533-602: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:314: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/processor.ts:315: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:316: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:317: type Promise -> external
+        - src/daemon/processor.ts:317: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:322: call access -> external
+        - src/daemon/processor.ts:329: call now -> external
+        - src/daemon/processor.ts:335: call access -> external
+        - src/daemon/processor.ts:342: call now -> external
+        - src/daemon/processor.ts:354: call now -> external
+    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
-        - src/daemon/processor.ts:535: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:536: type Omit -> external
-        - src/daemon/processor.ts:536: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:542: call trim -> external
-        - src/daemon/processor.ts:546: call push -> external
-        - src/daemon/processor.ts:546: call parse -> external
-        - src/daemon/processor.ts:546: type PiJsonEvent -> src/daemon/processor.ts
-        - src/daemon/processor.ts:549: call debug -> src/daemon/processor.ts
-        - src/daemon/processor.ts:549: call slice -> external
-    608-641: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+        - src/daemon/processor.ts:537: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:538: type Omit -> external
+        - src/daemon/processor.ts:538: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:544: call trim -> external
+        - src/daemon/processor.ts:548: call push -> external
+        - src/daemon/processor.ts:548: call parse -> external
+        - src/daemon/processor.ts:548: type PiJsonEvent -> src/daemon/processor.ts
+        - src/daemon/processor.ts:551: call debug -> src/daemon/processor.ts
+        - src/daemon/processor.ts:551: call slice -> external
+    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs out: 8 [call: 6, type: 2]
-        - src/daemon/processor.ts:610: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:611: type AgentNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:617: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:620: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:612: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:613: type AgentNodeOutput -> src/daemon/processor.ts
+        - src/daemon/processor.ts:619: call isValidNodeOutput -> src/daemon/processor.ts
         - src/daemon/processor.ts:622: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:631: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:634: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:624: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:633: call isValidNodeOutput -> src/daemon/processor.ts
         - src/daemon/processor.ts:636: call warn -> src/daemon/processor.ts
-    646-692: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.ts:638: call warn -> src/daemon/processor.ts
+    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:646: type AgentNodeOutput -> src/daemon/processor.ts
-    767-769: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+        - src/daemon/processor.ts:648: type AgentNodeOutput -> src/daemon/processor.ts
+    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/processor.ts:767: type ProcessorConfig -> src/daemon/processor.ts
-        - src/daemon/processor.ts:767: type JobProcessor -> src/daemon/processor.ts
-        - src/daemon/processor.ts:768: instantiate JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:770: type ProcessorConfig -> src/daemon/processor.ts
+        - src/daemon/processor.ts:770: type JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:771: instantiate JobProcessor -> src/daemon/processor.ts
   variable:
     143-148: ProcessorLogger [exported]
       /** Default console logger */
@@ -942,9 +942,9 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-586]
+src/daemon/worker.ts [1-594]
   class:
-    116-525: class Worker [exported]
+    116-533: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     58-73: interface WorkerConfig [exported]
@@ -970,32 +970,32 @@ src/daemon/worker.ts [1-586]
         - src/daemon/worker.ts:98: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:102: type Error -> external
   function:
-    534-536: createWorker(config: WorkerConfig): Worker [exported]
+    542-544: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:534: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:534: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:535: instantiate Worker -> src/daemon/worker.ts
-    542-556: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:542: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:542: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:543: instantiate Worker -> src/daemon/worker.ts
+    550-564: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:543: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:544: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:545: type Database -> external
-        - src/daemon/worker.ts:546: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:547: type Promise -> external
-        - src/daemon/worker.ts:547: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:554: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:555: call Worker.processJob -> src/daemon/worker.ts
-    561-585: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:551: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:552: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:553: type Database -> external
+        - src/daemon/worker.ts:554: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:555: type Promise -> external
+        - src/daemon/worker.ts:555: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:562: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:563: call Worker.processJob -> src/daemon/worker.ts
+    569-593: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:562: type Error -> external
-        - src/daemon/worker.ts:563: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:564: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:569: type ReturnType -> external
-        - src/daemon/worker.ts:581: call ceil -> external
-        - src/daemon/worker.ts:582: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:570: type Error -> external
+        - src/daemon/worker.ts:571: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:572: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:577: type ReturnType -> external
+        - src/daemon/worker.ts:589: call ceil -> external
+        - src/daemon/worker.ts:590: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1471,4 +1471,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 38
-Estimated tokens: 19,363 (codebase: ~963,096)
+Estimated tokens: 19,363 (codebase: ~961,648)

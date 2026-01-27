@@ -607,7 +607,7 @@ src/prompt/prompt.ts [1-388]
       /** Get or create a prompt version If the current prompt has the same hash as an existing version, returns that version. Otherwise, creates a new version, archives the prompt, and records it in the database. */
       refs in: 11 [call: 9, import: 2]
         - src/daemon/worker.ts:26: import (module)
-        - src/daemon/worker.ts:372: call Worker.promptVersion
+        - src/daemon/worker.ts:380: call Worker.promptVersion
         - src/prompt/prompt.test.ts:32: import (module)
         - src/prompt/prompt.test.ts:403: call (module)
         - src/prompt/prompt.test.ts:421: call version
@@ -783,4 +783,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 14
-Estimated tokens: 10,774 (codebase: ~963,096)
+Estimated tokens: 10,774 (codebase: ~961,648)

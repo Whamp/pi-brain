@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 33909,
-  "codebase_tokens": 963096,
+  "codebase_tokens": 961648,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -5668,7 +5668,7 @@
       "language": "typescript",
       "lines": [
         1,
-        770
+        773
       ],
       "detail_level": "full",
       "token_estimate": 974,
@@ -5888,7 +5888,7 @@
           "signature": "EnvironmentValidationResult",
           "lines": [
             202,
-            207
+            209
           ],
           "exported": true,
           "is_default": false,
@@ -5906,8 +5906,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            213,
-            225
+            215,
+            227
           ],
           "exported": true,
           "is_default": false,
@@ -5925,8 +5925,8 @@
           "kind": "function",
           "signature": "async buildSkillsArg(): Promise<string>",
           "lines": [
-            231,
-            237
+            233,
+            239
           ],
           "exported": true,
           "is_default": false,
@@ -5944,8 +5944,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            246,
-            278
+            248,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -5963,8 +5963,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            283,
-            302
+            285,
+            304
           ],
           "exported": false,
           "is_default": false,
@@ -5982,8 +5982,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            311,
-            427
+            313,
+            429
           ],
           "exported": true,
           "is_default": false,
@@ -6001,8 +6001,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            430,
-            436
+            432,
+            438
           ],
           "exported": false,
           "is_default": false,
@@ -6020,8 +6020,8 @@
           "kind": "function",
           "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            441,
-            505
+            443,
+            507
           ],
           "exported": false,
           "is_default": false,
@@ -6039,8 +6039,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            512,
-            517
+            514,
+            519
           ],
           "exported": false,
           "is_default": false,
@@ -6058,8 +6058,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            519,
-            522
+            521,
+            524
           ],
           "exported": false,
           "is_default": false,
@@ -6077,8 +6077,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            524,
-            528
+            526,
+            530
           ],
           "exported": false,
           "is_default": false,
@@ -6096,8 +6096,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            533,
-            602
+            535,
+            604
           ],
           "exported": true,
           "is_default": false,
@@ -6115,8 +6115,8 @@
           "kind": "function",
           "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput",
           "lines": [
-            608,
-            641
+            610,
+            643
           ],
           "exported": true,
           "is_default": false,
@@ -6134,8 +6134,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            646,
-            692
+            648,
+            694
           ],
           "exported": true,
           "is_default": false,
@@ -6153,8 +6153,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            699,
-            704
+            701,
+            706
           ],
           "exported": true,
           "is_default": false,
@@ -6172,8 +6172,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            709,
-            762
+            711,
+            765
           ],
           "exported": true,
           "is_default": false,
@@ -6191,8 +6191,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            710,
-            710
+            712,
+            712
           ],
           "exported": false,
           "is_default": false,
@@ -6210,8 +6210,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            711,
-            711
+            713,
+            713
           ],
           "exported": false,
           "is_default": false,
@@ -6229,8 +6229,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            713,
-            716
+            715,
+            718
           ],
           "exported": false,
           "is_default": false,
@@ -6248,8 +6248,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            721,
-            737
+            723,
+            739
           ],
           "exported": false,
           "is_default": false,
@@ -6267,8 +6267,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            743,
-            761
+            745,
+            764
           ],
           "exported": false,
           "is_default": false,
@@ -6286,8 +6286,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            767,
-            769
+            770,
+            772
           ],
           "exported": true,
           "is_default": false,
@@ -9163,7 +9163,7 @@
       "language": "typescript",
       "lines": [
         1,
-        586
+        594
       ],
       "detail_level": "full",
       "token_estimate": 789,
@@ -9231,7 +9231,7 @@
           "signature": "Worker",
           "lines": [
             116,
-            525
+            533
           ],
           "exported": true,
           "is_default": false,
@@ -9611,7 +9611,7 @@
           "signature": "async start(): Promise<void>",
           "lines": [
             170,
-            221
+            229
           ],
           "exported": false,
           "is_default": false,
@@ -9629,8 +9629,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            226,
-            229
+            234,
+            237
           ],
           "exported": false,
           "is_default": false,
@@ -9648,8 +9648,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            234,
-            236
+            242,
+            244
           ],
           "exported": false,
           "is_default": false,
@@ -9667,8 +9667,8 @@
           "kind": "method",
           "signature": "getCurrentJob(): any",
           "lines": [
-            241,
-            243
+            249,
+            251
           ],
           "exported": false,
           "is_default": false,
@@ -9686,8 +9686,8 @@
           "kind": "method",
           "signature": "getStatus(): WorkerStatus",
           "lines": [
-            248,
-            258
+            256,
+            266
           ],
           "exported": false,
           "is_default": false,
@@ -9705,8 +9705,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            263,
-            443
+            271,
+            451
           ],
           "exported": false,
           "is_default": false,
@@ -9724,8 +9724,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            448,
-            515
+            456,
+            523
           ],
           "exported": false,
           "is_default": false,
@@ -9743,8 +9743,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            520,
-            524
+            528,
+            532
           ],
           "exported": false,
           "is_default": false,
@@ -9762,8 +9762,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            534,
-            536
+            542,
+            544
           ],
           "exported": true,
           "is_default": false,
@@ -9781,8 +9781,8 @@
           "kind": "function",
           "signature": "async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            542,
-            556
+            550,
+            564
           ],
           "exported": true,
           "is_default": false,
@@ -9800,8 +9800,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            561,
-            585
+            569,
+            593
           ],
           "exported": true,
           "is_default": false,
