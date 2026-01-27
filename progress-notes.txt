@@ -459,3 +459,37 @@
 - Insights require minimum confidence (0.5) and frequency (3) to be included
 - Quirks additionally require a workaround to be actionable
 - Ready for Task 10.3 (Implement prompt injection mechanism)
+
+---
+
+## 2026-01-26 18:55 - Task 10.3
+
+**Status**: pending → done
+**Validation**:
+- Created prompt-injector.ts with two injection methods:
+  - skill (recommended): Generate brain-insights skill in ~/skills/brain-insights/
+  - agents_file: Modify AGENTS.md directly (not recommended, affects all sessions)
+- Functions implemented:
+  - generateBrainInsightsSkill(): Generate skill markdown from PromptAddition[]
+  - writeBrainInsightsSkill(): Write skill to disk from database insights
+  - generateModelSkill(): Generate skill for a specific model
+  - updateAgentsFile(): Add/update pi-brain section in AGENTS.md
+  - removeFromAgentsFile(): Remove pi-brain section from AGENTS.md
+  - injectInsights(): Main injection function using configured method
+  - removeInjectedInsights(): Remove injected insights
+  - getInjectionStatus(): Check current injection status
+- Added CLI commands:
+  - pi-brain prompt-learning inject [--method skill|agents_file] [--min-confidence n] [--min-frequency n]
+  - pi-brain prompt-learning remove [--method skill|agents_file]
+  - pi-brain prompt-learning status
+- Made agentsFilePath configurable for testing (avoid mocking os.homedir)
+- 22 new tests covering all injection functions
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 935 passed, 4 skipped)
+**Commit**: cfc0476
+**Notes**:
+- Default injection method is "skill" (recommended per spec)
+- Skill is generated at ~/skills/brain-insights/SKILL.md
+- Empty skill generated when no actionable insights meet thresholds (freq >= 5, conf >= 0.7)
+- AGENTS.md injection uses markers for easy update/removal
+- Ready for Task 10.4 (Feedback loop: quirk → prompt fix → measure improvement)
