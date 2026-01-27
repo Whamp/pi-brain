@@ -8,7 +8,7 @@
 import type Database from "better-sqlite3";
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
-import type { NodeRow } from "../../types/index.js";
+import type { NodeRow } from "../../storage/node-repository.js";
 
 import { readNodeFromPath } from "../../storage/node-storage.js";
 import { successResponse } from "../responses.js";
@@ -77,14 +77,14 @@ export async function signalsRoutes(app: FastifyInstance): Promise<void> {
       const offset = Number.parseInt(request.query.offset ?? "0", 10);
 
       const patterns = getAbandonedRestartPatterns(db, limit, offset);
-      const total = countAbandonedRestartPatterns(db);
+      const approximateTotal = countAbandonedRestartPatterns(db);
 
       const durationMs = Date.now() - startTime;
       return reply.send(
         successResponse(
           {
             patterns,
-            total,
+            approximateTotal,
             limit,
             offset,
           },
@@ -231,9 +231,9 @@ function getFrictionSummary(db: Database.Database): FrictionSummary {
         abandonedRestartCount++;
       }
 
-      rephrasingCascadeCount += friction.rephrasingCount;
-      toolLoopCount += friction.toolLoopCount;
-      contextChurnCount += friction.contextChurnCount;
+      rephrasingCascadeCount += friction.rephrasingCount ?? 0;
+      toolLoopCount += friction.toolLoopCount ?? 0;
+      contextChurnCount += friction.contextChurnCount ?? 0;
 
       // Track model friction
       if (friction.score > 0.3) {

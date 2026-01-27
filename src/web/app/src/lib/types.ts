@@ -263,7 +263,8 @@ export interface AbandonedRestartPattern {
 
 export interface AbandonedRestartsResponse {
   patterns: AbandonedRestartPattern[];
-  total: number;
+  /** Approximate count - based on 'abandoned' outcome, not all have abandonedRestart signal */
+  approximateTotal: number;
   limit: number;
   offset: number;
 }

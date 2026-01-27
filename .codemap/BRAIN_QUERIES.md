@@ -1622,7 +1622,10 @@ src/storage/node-repository.ts [1-3181]
         - src/storage/node-repository.ts:453: type getAllNodeVersions
     43-64: interface NodeRow [exported]
       /** Node row from the database */
-      refs in: 31 [import: 2, type: 29]
+      refs in: 34 [import: 3, type: 31]
+        - src/api/routes/signals.ts:11: import (module)
+        - src/api/routes/signals.ts:137: type abandonedRows
+        - src/api/routes/signals.ts:208: type rows
         - src/daemon/connection-discovery.ts:17: import (module)
         - src/daemon/connection-discovery.ts:273: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:294: type ConnectionDiscoverer.findCandidates
@@ -1630,9 +1633,6 @@ src/storage/node-repository.ts [1-3181]
         - src/daemon/query-processor.ts:236: type nodeRowToRelevant
         - src/storage/node-repository.ts:415: type getNode
         - src/storage/node-repository.ts:420: type getNode
-        - src/storage/node-repository.ts:432: type getNodeVersion
-        - src/storage/node-repository.ts:437: type getNodeVersion
-        - src/storage/node-repository.ts:478: type findNodeByEndEntryId
     67-75: interface EdgeRow [exported]
       /** Edge row from the database */
       refs in: 12 [type: 12]
@@ -2680,4 +2680,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 38
-Estimated tokens: 35,440 (codebase: ~923,652)
+Estimated tokens: 35,430 (codebase: ~924,038)

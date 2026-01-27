@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 32107,
-  "codebase_tokens": 923652,
+  "total_tokens": 32110,
+  "codebase_tokens": 924038,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1095,7 +1095,7 @@
         263
       ],
       "detail_level": "full",
-      "token_estimate": 192,
+      "token_estimate": 195,
       "symbols": [
         {
           "name": "AbandonedRestartPattern",
@@ -1216,8 +1216,8 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "../../storage/node-repository.js",
         "../../storage/node-storage.js",
-        "../../types/index.js",
         "../responses.js",
         "better-sqlite3",
         "fastify"
@@ -19784,7 +19784,7 @@
       "language": "typescript",
       "lines": [
         1,
-        285
+        286
       ],
       "detail_level": "full",
       "token_estimate": 279,
@@ -20099,7 +20099,7 @@
           "signature": "AbandonedRestartsResponse",
           "lines": [
             264,
-            269
+            270
           ],
           "exported": true,
           "is_default": false,
@@ -20117,8 +20117,8 @@
           "kind": "interface",
           "signature": "FrictionSummary",
           "lines": [
-            271,
-            284
+            272,
+            285
           ],
           "exported": true,
           "is_default": false,

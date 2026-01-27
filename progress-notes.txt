@@ -915,3 +915,18 @@
 - Queries scan JSON files at request time (limited to recent nodes for performance)
 - Dashboard shows both detailed patterns and aggregate summary
 - Follows spec from specs/signals.md Section 1 (Friction Signals) and specs/web-ui.md
+
+---
+
+## 2026-01-27 08:55 - Task 11.11
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1153 tests)
+**Fixes applied**:
+- [P0] Fixed NodeRow import - changed from `../../types/index.js` to `../../storage/node-repository.js`
+- [P2] Renamed `total` to `approximateTotal` in abandoned-restarts response to clarify it's an estimate
+- [P2] Fixed test config - now provides valid ApiConfig with required port, host, corsOrigins
+- [P3] Added defensive defaults (`?? 0`) for friction counts that could be undefined from malformed JSON
+**Notes**:
+- TypeScript now compiles cleanly for signals files
+- Frontend types updated to match API change

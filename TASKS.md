@@ -145,20 +145,21 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 11: Signals & Insights
 
-| ID    | Task                                                                    | Status | Deps | Notes                               |
-| ----- | ----------------------------------------------------------------------- | ------ | ---- | ----------------------------------- |
-| 11.1  | Implement friction signal detection (rephrasing, abandonment, churn)    | done   | 2.1  | 2026-01-26                          |
-| 11.2  | Implement delight signal detection (resilience, one-shot success)       | done   | 2.1  | 2026-01-26                          |
-| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | done   | 1.2  | 2026-01-26 - integrated into worker |
-| 11.4  | Implement `/brain --flag` manual notation command                       | done   | 7.2  | 2026-01-26 - 13 tests               |
-| 11.5  | Implement facet discovery pipeline (embedding + clustering)             | done   | 8.1  | 2026-01-26 - see 11.5a for lint fix |
-| 11.5a | Fix conditional expects in facet-discovery tests                        | done   | 11.5 | 2026-01-26                          |
-| 11.6  | Implement LLM cluster analysis and naming                               | done   | 11.5 | 2026-01-26                          |
-| 11.7  | Build "News Feed" UI component for clusters and signals                 | done   | 5.1  | 2026-01-27                          |
-| 11.8  | Implement Model-Specific AGENTS.md generator                            | done   | 10.1 | 2026-01-27                          |
-| 11.9  | Add clustering job to nightly scheduler                                 | done   | 8.1  | 2026-01-27 - 7 tests                |
-| 11.9a | Add OpenRouter embedding provider with configurable embedding settings  | done   | 11.9 | 2026-01-27 - qwen3-embedding-8b     |
-| 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | done   | 11.1 | 2026-01-27 - 7 tests                |
+| ID    | Task                                                                    | Status | Deps  | Notes                               |
+| ----- | ----------------------------------------------------------------------- | ------ | ----- | ----------------------------------- |
+| 11.1  | Implement friction signal detection (rephrasing, abandonment, churn)    | done   | 2.1   | 2026-01-26                          |
+| 11.2  | Implement delight signal detection (resilience, one-shot success)       | done   | 2.1   | 2026-01-26                          |
+| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | done   | 1.2   | 2026-01-26 - integrated into worker |
+| 11.4  | Implement `/brain --flag` manual notation command                       | done   | 7.2   | 2026-01-26 - 13 tests               |
+| 11.5  | Implement facet discovery pipeline (embedding + clustering)             | done   | 8.1   | 2026-01-26 - see 11.5a for lint fix |
+| 11.5a | Fix conditional expects in facet-discovery tests                        | done   | 11.5  | 2026-01-26                          |
+| 11.6  | Implement LLM cluster analysis and naming                               | done   | 11.5  | 2026-01-26                          |
+| 11.7  | Build "News Feed" UI component for clusters and signals                 | done   | 5.1   | 2026-01-27                          |
+| 11.8  | Implement Model-Specific AGENTS.md generator                            | done   | 10.1  | 2026-01-27                          |
+| 11.9  | Add clustering job to nightly scheduler                                 | done   | 8.1   | 2026-01-27 - 7 tests                |
+| 11.9a | Add OpenRouter embedding provider with configurable embedding settings  | done   | 11.9  | 2026-01-27 - qwen3-embedding-8b     |
+| 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | done   | 11.1  | 2026-01-27 - 7 tests                |
+| 11.11 | Fix signals API code review issues (NodeRow import, test config, etc)   | done   | 11.10 | 2026-01-27 - P0/P2/P3 fixes         |
 
 ## Phase 12: Architecture Hardening
 

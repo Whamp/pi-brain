@@ -14,10 +14,20 @@ import {
   type MockInstance,
 } from "vitest";
 
+import type { ApiConfig } from "../../config/types.js";
 import type { Node } from "../../types/index.js";
 
 import * as nodeStorage from "../../storage/node-storage.js";
 import { signalsRoutes } from "./signals.js";
+
+/** Create a minimal valid API config for tests */
+function createTestApiConfig(): ApiConfig {
+  return {
+    port: 0,
+    host: "127.0.0.1",
+    corsOrigins: ["http://localhost:5173"],
+  };
+}
 
 describe("signalsRoutes", () => {
   let app: FastifyInstance;
@@ -56,7 +66,7 @@ describe("signalsRoutes", () => {
 
     // Set up Fastify
     app = Fastify();
-    app.decorate("ctx", { db, config: {} });
+    app.decorate("ctx", { db, config: createTestApiConfig() });
 
     // Register routes
     await app.register(signalsRoutes, { prefix: "/signals" });
@@ -82,7 +92,7 @@ describe("signalsRoutes", () => {
       const body = response.json();
       expect(body.status).toBe("success");
       expect(body.data.patterns).toStrictEqual([]);
-      expect(body.data.total).toBe(0);
+      expect(body.data.approximateTotal).toBe(0);
     });
 
     it("should return abandoned restart patterns when they exist", async () => {

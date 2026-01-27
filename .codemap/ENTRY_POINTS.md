@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 25
-- Total symbols: 61
-  - function: 45
+- Total symbols: 62
+  - function: 46
   - interface: 9
   - variable: 6
   - type: 1
@@ -365,8 +365,14 @@ src/api/routes/sessions.ts [1-272]
     - ../responses.js
     - fastify
 
-src/api/routes/signals.test.ts [1-307]
+src/api/routes/signals.test.ts [1-317]
+  function:
+    24-30: createTestApiConfig(): ApiConfig
+      /** Create a minimal valid API config for tests */
+      refs out: 1 [type: 1]
+        - src/api/routes/signals.test.ts:24: type ApiConfig -> src/config/types.ts
   imports:
+    - ../../config/types.js
     - ../../storage/node-storage.js
     - ../../types/index.js
     - ./signals.js
@@ -405,8 +411,8 @@ src/api/routes/signals.ts [1-263]
         - src/api/routes/signals.ts:198: call getDate -> external
         - src/api/routes/signals.ts:241: call set -> external
   imports:
+    - ../../storage/node-repository.js
     - ../../storage/node-storage.js
-    - ../../types/index.js
     - ../responses.js
     - better-sqlite3
     - fastify
@@ -569,4 +575,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 5,920 (codebase: ~921,948)
+Estimated tokens: 5,986 (codebase: ~922,057)

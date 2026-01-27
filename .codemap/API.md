@@ -163,8 +163,8 @@ src/api/routes/signals.ts [1-263]
   function:
     57-114: async signalsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
+    - ../../storage/node-repository.js
     - ../../storage/node-storage.js
-    - ../../types/index.js
     - ../responses.js
     - better-sqlite3
     - fastify
@@ -1743,7 +1743,7 @@ src/web/app/src/lib/stores/websocket.ts [1-175]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-285]
+src/web/app/src/lib/types.ts [1-286]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
@@ -1761,8 +1761,8 @@ src/web/app/src/lib/types.ts [1-285]
     233-236: interface ClusterFeedResponse [exported]
     238-243: interface ClusterListResponse [exported]
     246-262: interface AbandonedRestartPattern [exported]
-    264-269: interface AbandonedRestartsResponse [exported]
-    271-284: interface FrictionSummary [exported]
+    264-270: interface AbandonedRestartsResponse [exported]
+    272-285: interface FrictionSummary [exported]
   imports:
     - ../../../../types/index.js
 
@@ -1798,4 +1798,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,038 (codebase: ~921,948)
+Estimated tokens: 22,041 (codebase: ~921,987)
