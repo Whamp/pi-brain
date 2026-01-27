@@ -25,6 +25,7 @@ import {
   type LessonsByLevel,
   type ModelQuirk,
   type Node,
+  type NodeSignals,
   type ToolError,
 } from "./node-types.js";
 
@@ -2971,6 +2972,8 @@ export interface NodeConversionContext {
   analyzerVersion: string;
   /** Existing node (if reanalyzing) */
   existingNode?: Node;
+  /** Friction/delight signals detected in the segment */
+  signals?: NodeSignals;
 }
 
 /**
@@ -3167,6 +3170,9 @@ export function agentOutputToNode(
       analysisLog: output.daemonMeta.analysisLog,
       segmentTokenCount: output.daemonMeta.segmentTokenCount,
     },
+
+    // Include signals if provided in context
+    ...(context.signals ? { signals: context.signals } : {}),
   };
 }
 

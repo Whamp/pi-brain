@@ -15,7 +15,12 @@ import type { PiBrainConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
 
 import { getComputerFromPath } from "../config/config.js";
-import { parseSession } from "../parser/session.js";
+import {
+  detectDelightSignals,
+  detectFrictionSignals,
+  extractManualFlags,
+  parseSession,
+} from "../parser/index.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
 import {
   agentOutputToNode,
@@ -286,7 +291,8 @@ export class Worker {
         // 1. Parse session for source metadata
         const session = await parseSession(job.sessionFile);
 
-        // 2. Count entries in segment
+        // 2. Extract segment entries and count
+        let segmentEntries = session.entries;
         let entryCount = session.entries.length;
         if (job.segmentStart || job.segmentEnd) {
           const startIndex = job.segmentStart
@@ -297,11 +303,22 @@ export class Worker {
             : session.entries.length - 1;
 
           if (startIndex !== -1 && endIndex !== -1) {
+            segmentEntries = session.entries.slice(startIndex, endIndex + 1);
             entryCount = endIndex - startIndex + 1;
           }
         }
 
-        // 3. Convert AgentNodeOutput to Node
+        // 3. Detect friction and delight signals from segment entries
+        const frictionSignals = detectFrictionSignals(segmentEntries, {
+          isLastSegment: !job.segmentEnd, // If no end specified, assume it's the latest segment
+          wasResumed: job.context?.boundaryType === "resume",
+        });
+        const delightSignals = detectDelightSignals(segmentEntries, {
+          outcome: result.nodeData.content.outcome,
+        });
+        const manualFlags = extractManualFlags(segmentEntries);
+
+        // 4. Convert AgentNodeOutput to Node
         const promptVersion = getOrCreatePromptVersion(
           this.db,
           this.config.daemon.promptFile
@@ -319,14 +336,19 @@ export class Worker {
           entryCount,
           analysisDurationMs: result.durationMs,
           analyzerVersion: promptVersion.version,
+          signals: {
+            friction: frictionSignals,
+            delight: delightSignals,
+            manualFlags,
+          },
         });
 
-        // 4. Store node in SQLite and JSON
+        // 5. Store node in SQLite and JSON
         createNode(this.db, node, {
           nodesDir: join(this.config.hub.databaseDir, "nodes"),
         });
 
-        // 5. Create structural edges based on session boundaries.
+        // 6. Create structural edges based on session boundaries.
         // Only for initial analysis - reanalysis preserves existing edges.
         if (job.type === "initial") {
           linkNodeToPredecessors(this.db, node, {

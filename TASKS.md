@@ -149,7 +149,7 @@ Track implementation progress. Agents update status as they complete work.
 | ----- | ----------------------------------------------------------------------- | ------- | ---- | ---------- |
 | 11.1  | Implement friction signal detection (rephrasing, abandonment, churn)    | done    | 2.1  | 2026-01-26 |
 | 11.2  | Implement delight signal detection (resilience, one-shot success)       | done    | 2.1  | 2026-01-26 |
-| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | pending | 1.2  |            |
+| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | active  | 1.2  | 2026-01-26 |
 | 11.4  | Implement `/brain --flag` manual notation command                       | pending | 7.2  |            |
 | 11.5  | Implement facet discovery pipeline (embedding + clustering)             | pending | 8.1  |            |
 | 11.6  | Implement LLM cluster analysis and naming                               | pending | 11.5 |            |

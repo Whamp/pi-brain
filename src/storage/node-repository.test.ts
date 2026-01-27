@@ -1751,6 +1751,55 @@ describe("node-repository", () => {
       expect(node.semantic.relatedProjects).toBeUndefined();
       expect(node.source.parentSession).toBeUndefined();
     });
+
+    it("should include signals when provided in context", () => {
+      const output = createTestAgentOutput();
+      const context = createTestConversionContext();
+      context.signals = {
+        friction: {
+          score: 0.35,
+          rephrasingCount: 2,
+          contextChurnCount: 1,
+          abandonedRestart: false,
+          toolLoopCount: 0,
+          modelSwitchFrom: undefined,
+          silentTermination: false,
+        },
+        delight: {
+          score: 0.4,
+          resilientRecovery: true,
+          oneShotSuccess: false,
+          explicitPraise: false,
+        },
+        manualFlags: [
+          {
+            type: "note",
+            message: "Test flag",
+            timestamp: "2026-01-26T12:00:00Z",
+          },
+        ],
+      };
+
+      const node = agentOutputToNode(output, context);
+
+      expect(node.signals).toBeDefined();
+      expect(node.signals?.friction.score).toBe(0.35);
+      expect(node.signals?.friction.rephrasingCount).toBe(2);
+      expect(node.signals?.delight.resilientRecovery).toBeTruthy();
+      expect(node.signals?.manualFlags).toHaveLength(1);
+      expect(node.signals?.manualFlags[0].message).toBe("Test flag");
+    });
+
+    it("should not include signals when not provided in context", () => {
+      const output = createTestAgentOutput();
+      const context = createTestConversionContext();
+      // Ensure signals is not set
+      delete (context as { signals?: unknown }).signals;
+
+      const node = agentOutputToNode(output, context);
+
+      expect(node.signals).toBeUndefined();
+    });
   });
 
   // ===========================================================================
