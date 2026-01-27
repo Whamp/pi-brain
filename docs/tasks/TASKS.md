@@ -191,7 +191,7 @@ Ref: docs/plans/refactor-monolith-node-repository.md
 | 13.2  | Extract `edge-repository.ts` (~150 lines) - edge operations     | done    | -         | 2026-01-27 |
 | 13.3  | Extract `node-conversion.ts` (~200 lines) - agentOutputToNode   | done    | 13.1      | 2026-01-27 |
 | 13.4  | Extract `search-repository.ts` (~400 lines) - FTS functions     | done    | 13.1      | 2026-01-27 |
-| 13.5  | Extract `lesson-repository.ts` (~250 lines) - lesson queries    | pending | -         |            |
+| 13.5  | Extract `lesson-repository.ts` (~250 lines) - lesson queries    | done    | -         | 2026-01-27 |
 | 13.6  | Extract `quirk-repository.ts` (~300 lines) - quirk queries      | pending | -         |            |
 | 13.7  | Extract `tool-error-repository.ts` (~250 lines) - error queries | pending | -         |            |
 | 13.8  | Extract `node-queries.ts` (~400 lines) - listing/aggregation    | pending | 13.1      |            |

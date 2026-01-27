@@ -167,3 +167,29 @@ Only 2 minor tasks remain pending:
 - All consumers continue to import from node-repository.ts via re-exports
 - The `buildFilterClause` helper was refactored to reduce code duplication between `searchNodesAdvanced` and `countSearchResults`
 - All 1198 tests pass
+
+---
+
+## 2026-01-27 15:45 - Task 13.5
+
+**Status**: pending → done
+**Validation**: npm run check passes, npm test -- --run passes (1198 passed, 4 skipped)
+**Commit**: 3732dfa
+
+**Summary**: Extracted lesson query operations from node-repository.ts to lesson-repository.ts
+
+**Files created:**
+- `src/storage/lesson-repository.ts` (283 lines) - lesson query operations
+
+**Extracted:**
+- Types: `ListLessonsFilters`, `ListLessonsOptions`, `ListLessonsResult`, `LessonsByLevelResult`
+- Functions: `listLessons`, `getLessonsByLevel`, `countLessons`, `getNodeLessons`, `getLessonTags`
+
+**Changes:**
+- `node-repository.ts` reduced from 2332 to 2093 lines (-239 lines)
+- Added imports and re-exports for backward compatibility
+- Updated storage barrel (index.ts) to include lesson-repository.ts
+
+**Notes:** 
+- All consumers continue to import from node-repository.ts via re-exports
+- All 1198 tests pass
