@@ -818,3 +818,43 @@
 3. **[P2] N+1 queries**: Replaced N+1 query pattern with batched query using window function (ROW_NUMBER)
 4. **[P3] Code cleanup**: Extracted ClusterRow and ClusterNodeRow interfaces to file scope, added mapClusterRow and mapNodeRow helpers
 
+
+---
+
+## 2026-01-27 05:57 - Task 11.8
+
+**Status**: pending → done
+**Validation**:
+- Created `agents-generator.ts` module with:
+  - `gatherModelData()` - Collects insights from aggregated_insights table for a model
+  - `getFrictionClustersForModel()` - Fetches friction clusters for the model
+  - `formatDataForPrompt()` - Structures data for LLM synthesis
+  - `generateFallbackAgents()` - LLM-free fallback generation
+  - `synthesizeWithLLM()` - Uses pi agent for content synthesis
+  - `generateAgentsForModel()` - Main entry with file saving
+  - `listModelsWithInsights()` - Discovers available models
+  - `previewAgentsForModel()` - Preview without saving
+- Added CLI commands:
+  - `pi-brain agents list` - Lists models with insights
+  - `pi-brain agents generate <model>` - Generates and saves AGENTS.md
+  - `pi-brain agents preview <model>` - Preview without saving
+- Added API routes under /api/v1/agents:
+  - GET /models - List models
+  - GET /data/:model - Raw insight data
+  - GET /preview/:model - Preview generated content
+  - POST /generate/:model - Generate and save
+  - GET /prompt-data/:model - Debug prompt data for LLM
+- Extended brain-query extension:
+  - Added `generate agents.md for <model>` command parsing
+  - Updated usage message
+- Tests:
+  - 7 tests for agents-generator (formatDataForPrompt, generateFallbackAgents, getModelDisplayName)
+  - 5 tests for extension generate command
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1138 passed, 4 skipped)
+**Commit**: e98d820
+**Notes**:
+- Output files saved to ~/.pi/agent/contexts/<provider>_<model>.md
+- Supports LLM synthesis via pi agent or fallback template generation
+- Follows spec from signals.md Section 4 (Model-Specific AGENTS.md)
+- Integrates with InsightAggregator from Task 10.1 and clusters from Task 11.5/11.6
