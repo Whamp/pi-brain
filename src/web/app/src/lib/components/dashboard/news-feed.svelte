@@ -19,6 +19,15 @@
   let loading = true;
   let errorMessage: string | null = null;
   let processingIds = new Set<string>();
+  let actionErrors = new Map<string, string>();
+
+  /** Clear action error after a delay */
+  function clearActionError(clusterId: string, delayMs = 3000) {
+    setTimeout(() => {
+      actionErrors.delete(clusterId);
+      actionErrors = new Map(actionErrors);
+    }, delayMs);
+  }
 
   onMount(async () => {
     await loadClusters();
@@ -40,12 +49,17 @@
 
   async function handleConfirm(clusterId: string) {
     processingIds = new Set([...processingIds, clusterId]);
+    actionErrors.delete(clusterId);
+    actionErrors = new Map(actionErrors);
     try {
       await api.updateClusterStatus(clusterId, "confirmed");
       // Remove from list after successful confirmation
       clusters = clusters.filter((c) => c.id !== clusterId);
     } catch (error) {
       console.error("Failed to confirm cluster:", error);
+      actionErrors.set(clusterId, "Failed to confirm");
+      actionErrors = new Map(actionErrors);
+      clearActionError(clusterId);
     } finally {
       processingIds.delete(clusterId);
       processingIds = new Set(processingIds);
@@ -54,12 +68,17 @@
 
   async function handleDismiss(clusterId: string) {
     processingIds = new Set([...processingIds, clusterId]);
+    actionErrors.delete(clusterId);
+    actionErrors = new Map(actionErrors);
     try {
       await api.updateClusterStatus(clusterId, "dismissed");
       // Remove from list after successful dismissal
       clusters = clusters.filter((c) => c.id !== clusterId);
     } catch (error) {
       console.error("Failed to dismiss cluster:", error);
+      actionErrors.set(clusterId, "Failed to dismiss");
+      actionErrors = new Map(actionErrors);
+      clearActionError(clusterId);
     } finally {
       processingIds.delete(clusterId);
       processingIds = new Set(processingIds);
@@ -134,6 +153,7 @@
     <div class="clusters-list">
       {#each clusters as cluster (cluster.id)}
         {@const isProcessing = processingIds.has(cluster.id)}
+        {@const actionError = actionErrors.get(cluster.id)}
         {@const SignalIcon = getSignalIcon(cluster.signalType)}
         <article class="cluster-card" data-signal={cluster.signalType ?? "neutral"}>
           <header class="cluster-header">
@@ -178,9 +198,16 @@
           {/if}
 
           <footer class="cluster-footer">
-            <span class="cluster-time">
-              Discovered {formatDistanceToNow(parseDate(cluster.createdAt))}
-            </span>
+            {#if actionError}
+              <span class="action-error">
+                <AlertTriangle size={12} />
+                {actionError}
+              </span>
+            {:else}
+              <span class="cluster-time">
+                Discovered {formatDistanceToNow(parseDate(cluster.createdAt))}
+              </span>
+            {/if}
             <div class="cluster-actions">
               <button
                 class="action-btn confirm"
@@ -400,6 +427,24 @@
   .cluster-time {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
+  }
+
+  .action-error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--color-error);
+    animation: fade-in 0.2s ease-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .cluster-actions {
