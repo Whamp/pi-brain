@@ -24,21 +24,25 @@ src/daemon/index.ts
       - [builtin] path
       - [builtin] url
     - src/storage/node-repository.ts
-      - src/daemon/processor.ts
-        - src/config/types.ts
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
-        - [builtin] child_process
-        - [builtin] fs/promises
-        - [builtin] os
-        - [builtin] path
-      - src/daemon/queue.ts
-        - [external] better-sqlite3
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
+      - src/storage/node-conversion.ts
+        - src/daemon/processor.ts
+          - src/config/types.ts
+          - src/daemon/queue.ts
+            - [external] better-sqlite3
+          - [builtin] child_process
+          - [builtin] fs/promises
+          - [builtin] os
+          - [builtin] path
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
       - src/storage/node-crud.ts
         - src/storage/node-storage.ts
           - src/storage/node-types.ts
@@ -74,21 +78,25 @@ src/daemon/index.ts
     - [builtin] path
   - src/daemon/connection-discovery.ts
     - src/storage/node-repository.ts
-      - src/daemon/processor.ts
-        - src/config/types.ts
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
-        - [builtin] child_process
-        - [builtin] fs/promises
-        - [builtin] os
-        - [builtin] path
-      - src/daemon/queue.ts
-        - [external] better-sqlite3
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
+      - src/storage/node-conversion.ts
+        - src/daemon/processor.ts
+          - src/config/types.ts
+          - src/daemon/queue.ts
+            - [external] better-sqlite3
+          - [builtin] child_process
+          - [builtin] fs/promises
+          - [builtin] os
+          - [builtin] path
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
       - src/storage/node-crud.ts
         - src/storage/node-storage.ts
           - src/storage/node-types.ts
@@ -214,21 +222,25 @@ src/daemon/index.ts
     - src/config/types.ts
     - src/daemon/connection-discovery.ts
       - src/storage/node-repository.ts
-        - src/daemon/processor.ts
-          - src/config/types.ts
-          - src/daemon/queue.ts
-            - [external] better-sqlite3
-          - [builtin] child_process
-          - [builtin] fs/promises
-          - [builtin] os
-          - [builtin] path
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
         - src/storage/edge-repository.ts
           - src/storage/node-types.ts
             - src/types/index.ts
             - [builtin] crypto
           - [external] better-sqlite3
+        - src/storage/node-conversion.ts
+          - src/daemon/processor.ts
+            - src/config/types.ts
+            - src/daemon/queue.ts
+              - [external] better-sqlite3
+            - [builtin] child_process
+            - [builtin] fs/promises
+            - [builtin] os
+            - [builtin] path
+          - src/daemon/queue.ts
+            - [external] better-sqlite3
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
         - src/storage/node-crud.ts
           - src/storage/node-storage.ts
             - src/storage/node-types.ts
@@ -293,21 +305,25 @@ src/daemon/index.ts
       - [builtin] path
       - [builtin] url
     - src/storage/node-repository.ts
-      - src/daemon/processor.ts
-        - src/config/types.ts
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
-        - [builtin] child_process
-        - [builtin] fs/promises
-        - [builtin] os
-        - [builtin] path
-      - src/daemon/queue.ts
-        - [external] better-sqlite3
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
+      - src/storage/node-conversion.ts
+        - src/daemon/processor.ts
+          - src/config/types.ts
+          - src/daemon/queue.ts
+            - [external] better-sqlite3
+          - [builtin] child_process
+          - [builtin] fs/promises
+          - [builtin] os
+          - [builtin] path
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
       - src/storage/node-crud.ts
         - src/storage/node-storage.ts
           - src/storage/node-types.ts

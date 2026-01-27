@@ -7,4 +7,5 @@ export * from "./node-types.js";
 export * from "./node-storage.js";
 export * from "./node-crud.js";
 export * from "./edge-repository.js";
+export * from "./node-conversion.js";
 export * from "./node-repository.js";
