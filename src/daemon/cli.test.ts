@@ -7,7 +7,17 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
+import type { Node } from "../types/index.js";
+
 import { openDatabase, migrate } from "../storage/database.js";
+import { getNode, listNodes } from "../storage/node-repository.js";
+import { writeNode, readNodeFromPath } from "../storage/node-storage.js";
+import {
+  generateNodeId,
+  emptyLessons,
+  emptyObservations,
+  emptyDaemonMeta,
+} from "../storage/node-types.js";
 import {
   PID_FILE,
   readPidFile,
@@ -22,6 +32,7 @@ import {
   formatDaemonStatus,
   formatQueueStatus,
   formatHealthStatus,
+  rebuildIndex,
   type DaemonStatus,
   type QueueStatus,
   type HealthStatus,
@@ -466,5 +477,281 @@ describe("formatHealthStatus", () => {
 
     expect(output).toContain("Ready");
     expect(output).toContain("2 warnings");
+  });
+});
+
+// =============================================================================
+// rebuildIndex tests
+// =============================================================================
+
+/**
+ * Create a minimal test node for rebuild tests
+ */
+function createTestNode(overrides: Partial<Node> = {}): Node {
+  const id = generateNodeId();
+  const now = new Date().toISOString();
+
+  return {
+    id,
+    version: 1,
+    previousVersions: [],
+    source: {
+      sessionFile: "/tmp/test-session.jsonl",
+      segment: {
+        startEntryId: "entry1",
+        endEntryId: "entry10",
+        entryCount: 10,
+      },
+      computer: "test-host",
+      sessionId: "test-session-id",
+    },
+    classification: {
+      type: "coding",
+      project: "/home/test/project",
+      isNewProject: false,
+      hadClearGoal: true,
+    },
+    content: {
+      summary: "Test node summary",
+      outcome: "success",
+      keyDecisions: [],
+      filesTouched: ["src/index.ts"],
+      toolsUsed: ["read"],
+      errorsSeen: [],
+    },
+    lessons: emptyLessons(),
+    observations: emptyObservations(),
+    metadata: {
+      tokensUsed: 1500,
+      cost: 0,
+      durationMinutes: 10,
+      timestamp: now,
+      analyzedAt: now,
+      analyzerVersion: "v1-test",
+    },
+    semantic: {
+      tags: ["test"],
+      topics: ["testing"],
+    },
+    daemonMeta: emptyDaemonMeta(),
+    ...overrides,
+  };
+}
+
+describe("rebuildIndex", () => {
+  let tempDir: string;
+  let configPath: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "pi-brain-rebuild-test-"));
+    configPath = path.join(tempDir, "config.yaml");
+
+    // Create a minimal config file
+    const config = `
+hub:
+  sessions_dir: ${path.join(tempDir, "sessions")}
+  database_dir: ${tempDir}
+  web_ui_port: 8765
+daemon:
+  prompt_file: ${path.join(tempDir, "prompts", "session-analyzer.md")}
+`;
+    fs.writeFileSync(configPath, config);
+    fs.mkdirSync(path.join(tempDir, "sessions"));
+    fs.mkdirSync(path.join(tempDir, "prompts"));
+    fs.mkdirSync(path.join(tempDir, "nodes"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempDir, "prompts", "session-analyzer.md"),
+      "# Test prompt"
+    );
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("should return success with count 0 when no node files exist", () => {
+    const result = rebuildIndex(configPath);
+
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(0);
+    expect(result.message).toContain("0 nodes");
+  });
+
+  it("should rebuild index from single node file", () => {
+    // Create a test node and write it to JSON
+    const node = createTestNode();
+    writeNode(node, { nodesDir: path.join(tempDir, "nodes") });
+
+    // Rebuild the index
+    const result = rebuildIndex(configPath);
+
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(1);
+    expect(result.message).toContain("1 nodes");
+
+    // Verify node is in database
+    const dbPath = path.join(tempDir, "brain.db");
+    const db = openDatabase({ path: dbPath });
+    migrate(db);
+
+    const retrieved = getNode(db, node.id);
+    expect(retrieved).not.toBeNull();
+    const nodeRow = retrieved as NonNullable<typeof retrieved>;
+    expect(nodeRow.id).toBe(node.id);
+    expect(nodeRow.version).toBe(1);
+
+    // Content is stored in JSON file, verify via data_file
+    expect(nodeRow.data_file).toBeDefined();
+    const fullNode = readNodeFromPath(nodeRow.data_file);
+    expect(fullNode.content.summary).toBe("Test node summary");
+
+    db.close();
+  });
+
+  it("should rebuild index from multiple node files", () => {
+    const nodesDir = path.join(tempDir, "nodes");
+    const node1 = createTestNode({
+      content: { ...createTestNode().content, summary: "Node 1" },
+    });
+    const node2 = createTestNode({
+      content: { ...createTestNode().content, summary: "Node 2" },
+    });
+    const node3 = createTestNode({
+      content: { ...createTestNode().content, summary: "Node 3" },
+    });
+
+    writeNode(node1, { nodesDir });
+    writeNode(node2, { nodesDir });
+    writeNode(node3, { nodesDir });
+
+    const result = rebuildIndex(configPath);
+
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(3);
+
+    // Verify all nodes are in database
+    const dbPath = path.join(tempDir, "brain.db");
+    const db = openDatabase({ path: dbPath });
+    migrate(db);
+
+    const listResult = listNodes(db, { limit: 10 });
+    expect(listResult.nodes).toHaveLength(3);
+
+    db.close();
+  });
+
+  it("should use latest version when multiple versions exist", () => {
+    const nodesDir = path.join(tempDir, "nodes");
+    const nodeId = generateNodeId();
+    const now = new Date().toISOString();
+
+    // Create version 1
+    const nodeV1 = createTestNode({
+      id: nodeId,
+      version: 1,
+      content: { ...createTestNode().content, summary: "Version 1 summary" },
+      metadata: { ...createTestNode().metadata, timestamp: now },
+    });
+
+    // Create version 2 with same ID
+    const nodeV2 = createTestNode({
+      id: nodeId,
+      version: 2,
+      previousVersions: [nodeId],
+      content: { ...createTestNode().content, summary: "Version 2 summary" },
+      metadata: { ...createTestNode().metadata, timestamp: now },
+    });
+
+    writeNode(nodeV1, { nodesDir });
+    writeNode(nodeV2, { nodesDir });
+
+    const result = rebuildIndex(configPath);
+
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(1); // Should only count 1 unique node
+
+    // Verify the latest version is in database
+    const dbPath = path.join(tempDir, "brain.db");
+    const db = openDatabase({ path: dbPath });
+    migrate(db);
+
+    const retrieved = getNode(db, nodeId);
+    expect(retrieved).not.toBeNull();
+    const nodeRow = retrieved as NonNullable<typeof retrieved>;
+    expect(nodeRow.version).toBe(2);
+
+    // Verify content via JSON file
+    const fullNode = readNodeFromPath(nodeRow.data_file);
+    expect(fullNode.content.summary).toBe("Version 2 summary");
+
+    db.close();
+  });
+
+  it("should clear existing data before rebuilding", () => {
+    const nodesDir = path.join(tempDir, "nodes");
+    const dbPath = path.join(tempDir, "brain.db");
+
+    // Create initial node and insert directly to database
+    const node1 = createTestNode({
+      content: { ...createTestNode().content, summary: "Original node" },
+    });
+    writeNode(node1, { nodesDir });
+
+    // First rebuild
+    rebuildIndex(configPath);
+
+    // Verify node1 is there
+    let db = openDatabase({ path: dbPath });
+    migrate(db);
+    let listResult = listNodes(db, { limit: 10 });
+    expect(listResult.nodes).toHaveLength(1);
+    db.close();
+
+    // Delete the JSON file and create a different one
+    fs.rmSync(path.join(tempDir, "nodes"), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, "nodes"), { recursive: true });
+
+    const node2 = createTestNode({
+      content: { ...createTestNode().content, summary: "New node" },
+    });
+    writeNode(node2, { nodesDir });
+
+    // Second rebuild should clear old data
+    const result = rebuildIndex(configPath);
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(1);
+
+    // Verify only node2 exists now
+    db = openDatabase({ path: dbPath });
+    migrate(db);
+    listResult = listNodes(db, { limit: 10 });
+    expect(listResult.nodes).toHaveLength(1);
+    expect(listResult.nodes[0].id).toBe(node2.id);
+
+    // Verify content via JSON file
+    const fullNode = readNodeFromPath(listResult.nodes[0].data_file);
+    expect(fullNode.content.summary).toBe("New node");
+    db.close();
+  });
+
+  it("should handle malformed JSON files gracefully", () => {
+    const nodesDir = path.join(tempDir, "nodes");
+    const yearMonth = new Date().toISOString().slice(0, 7).replace("-", "/");
+    const badDir = path.join(nodesDir, yearMonth);
+    fs.mkdirSync(badDir, { recursive: true });
+
+    // Create a valid node
+    const validNode = createTestNode();
+    writeNode(validNode, { nodesDir });
+
+    // Create a malformed JSON file with valid naming pattern
+    const badFilePath = path.join(badDir, "abcd1234abcd1234-v1.json");
+    fs.writeFileSync(badFilePath, "{ invalid json }");
+
+    // Rebuild should succeed with the valid node, skipping the bad one
+    const result = rebuildIndex(configPath);
+
+    expect(result.success).toBeTruthy();
+    expect(result.count).toBe(1); // Only the valid node
   });
 });

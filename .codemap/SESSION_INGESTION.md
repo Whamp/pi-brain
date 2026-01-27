@@ -14,9 +14,13 @@
 
 ---
 
-src/daemon/cli.test.ts [1-471]
+src/daemon/cli.test.ts [1-758]
   imports:
     - ../storage/database.js
+    - ../storage/node-repository.js
+    - ../storage/node-storage.js
+    - ../storage/node-types.js
+    - ../types/index.js
     - ./cli.js
     - ./queue.js
     - node:fs
@@ -1411,4 +1415,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 37
-Estimated tokens: 18,212 (codebase: ~914,945)
+Estimated tokens: 18,243 (codebase: ~924,935)
