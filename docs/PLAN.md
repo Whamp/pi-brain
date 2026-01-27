@@ -118,6 +118,11 @@ daemon:
   idle_timeout_minutes: 10
   parallel_workers: 1 # Increase for more powerful hardware
   reanalysis_schedule: "0 2 * * *" # 2am nightly
+  clustering_schedule: "0 4 * * *" # 4am nightly
+  embedding_provider: openrouter # or: ollama, openai
+  embedding_model: qwen/qwen3-embedding-8b
+  embedding_api_key: sk-or-v1-... # required for openrouter/openai
+  # embedding_base_url: https://... # optional, for custom endpoints
   model: zai/glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md
 ```
@@ -1287,7 +1292,12 @@ This would complement D3.js (used for interactive web visualization) with static
 
 ## Open Questions
 
-1. **Embedding model**: For semantic similarity, should we use local embeddings (slower, free) or API (faster, cost)? use this model Qwen/Qwen3-Embedding-8B https://huggingface.co/Qwen/Qwen3-Embedding-8B can be locally or through a third party api. default to third party api, we need to find a free one. use can override this in config.yaml with their local model via local api. personally i need to set this model up locally on my win48 machine. config on this machine for win48 experiments will be here: ~/models/qwen/Qwen3-Embedding-8B
+1. **Embedding model**: ✅ RESOLVED - Using OpenRouter with `qwen/qwen3-embedding-8b` as the default provider. Configuration options:
+   - `embedding_provider`: `openrouter` (default), `ollama`, or `openai`
+   - `embedding_model`: Model name (default: `qwen/qwen3-embedding-8b`)
+   - `embedding_api_key`: Required for `openrouter` and `openai`
+   - `embedding_base_url`: Optional, for custom endpoints
+   - For local embeddings, use `ollama` with a model like `nomic-embed-text`
 
 2. **Session segment size**: How much context to include when analyzing a segment? Just the segment, or also surrounding context?
 

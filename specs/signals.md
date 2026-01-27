@@ -133,7 +133,16 @@ Discover new patterns by clustering node content.
 ### Steps
 
 1.  **Embedding**:
-    - Use a local embedding model (e.g., `nomic-embed-text` via Ollama or similar lightweight model).
+    - Default: OpenRouter API with `qwen/qwen3-embedding-8b` model.
+    - Alternative: Local embeddings via Ollama (e.g., `nomic-embed-text`).
+    - Configuration in `~/.pi-brain/config.yaml`:
+      ```yaml
+      daemon:
+        embedding_provider: openrouter # or: ollama, openai
+        embedding_model: qwen/qwen3-embedding-8b
+        embedding_api_key: sk-or-v1-... # required for openrouter/openai
+        # embedding_base_url: https://...  # optional
+      ```
     - Embed `node.content.summary` + `node.classification.type`.
 2.  **Clustering**:
     - Run a clustering algorithm (Hybrid: Hierarchical + Density-based like HDBSCAN).

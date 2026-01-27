@@ -27,6 +27,10 @@ Technical specifications for implementing pi-brain.
 - [API Specification](api.md) - HTTP/WebSocket APIs for web UI and queries
 - [Web UI](web-ui.md) - Frontend architecture, components, visualization, dashboard panels
 
+## Signals & Insights
+
+- [Signals](signals.md) - Friction/delight detection, manual flags, facet discovery, embedding configuration
+
 ## Future
 
 - [Prompt Learning](prompt-learning.md) - Systematic prompt improvement pipeline
@@ -58,6 +62,7 @@ Technical specifications for implementing pi-brain.
 | api.md              | REST API, WebSocket, endpoints             | ✅ Complete |
 | web-ui.md           | SvelteKit, components, D3 graph, dashboard | ✅ Complete |
 | prompt-learning.md  | Insight aggregation, prompt injection      | ✅ Complete |
+| signals.md          | Friction/delight, clustering, embeddings   | ✅ Complete |
 
 ## Implementation Order
 

@@ -157,6 +157,7 @@ Track implementation progress. Agents update status as they complete work.
 | 11.7  | Build "News Feed" UI component for clusters and signals                 | done    | 5.1  | 2026-01-27                          |
 | 11.8  | Implement Model-Specific AGENTS.md generator                            | done    | 10.1 | 2026-01-27                          |
 | 11.9  | Add clustering job to nightly scheduler                                 | done    | 8.1  | 2026-01-27 - 7 tests                |
+| 11.9a | Add OpenRouter embedding provider with configurable embedding settings  | done    | 11.9 | 2026-01-27 - qwen3-embedding-8b     |
 | 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | pending | 11.1 |                                     |
 
 ## Phase 12: Architecture Hardening
