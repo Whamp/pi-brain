@@ -580,7 +580,7 @@ src/daemon/processor.ts [1-747]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-720]
+src/daemon/query-processor.ts [1-727]
   interface:
     32-45: interface QueryRequest [exported]
       /** Query request from the API */
@@ -1830,4 +1830,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,871 (codebase: ~936,750)
+Estimated tokens: 22,871 (codebase: ~936,797)

@@ -900,32 +900,25 @@ src/daemon/query-processor.test.ts [1-79]
   imports:
     - vitest
 
-src/daemon/query-processor.ts [1-720]
+src/daemon/query-processor.ts [1-727]
   interface:
     32-45: interface QueryRequest [exported]
       /** Query request from the API */
-      refs in: 3 [import: 1, type: 2]
-        - src/api/routes/query.ts:14: import (module)
-        - src/api/routes/query.ts:93: type queryRequest
+      refs in: 1 [type: 1]
         - src/daemon/query-processor.ts:106: type processQuery
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
-      refs in: 5 [import: 1, type: 4]
-        - src/api/routes/query.ts:15: import (module)
-        - src/api/routes/query.ts:102: type response
+      refs in: 3 [type: 3]
         - src/daemon/query-processor.ts:71: type AgentQueryResult
         - src/daemon/query-processor.ts:108: type processQuery
-        - src/daemon/query-processor.ts:581: type ParseResult
+        - src/daemon/query-processor.ts:588: type ParseResult
     91-100: interface QueryProcessorConfig [exported]
       refs in: 2 [type: 2]
         - src/daemon/query-processor.ts:107: type processQuery
-        - src/daemon/query-processor.ts:322: type invokeQueryAgent
+        - src/daemon/query-processor.ts:324: type invokeQueryAgent
   function:
     105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/query.ts:13: import (module)
-        - src/api/routes/query.ts:102: call response
   imports:
     - ../config/types.js
     - ../storage/node-repository.js
@@ -1661,7 +1654,7 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/connection-discovery.ts:314: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:335: type ConnectionDiscoverer.findCandidates
         - src/daemon/query-processor.ts:23: import (module)
-        - src/daemon/query-processor.ts:236: type nodeRowToRelevant
+        - src/daemon/query-processor.ts:237: type nodeRowToRelevant
         - src/storage/node-repository.ts:532: type getNode
         - src/storage/node-repository.ts:537: type getNode
         - src/storage/node-repository.ts:549: type getNodeVersion
@@ -1758,8 +1751,8 @@ src/storage/node-repository.ts [1-3311]
       /** Filters for querying nodes */
       refs in: 6 [import: 1, type: 5]
         - src/daemon/query-processor.ts:22: import (module)
-        - src/daemon/query-processor.ts:206: type filters
-        - src/daemon/query-processor.ts:219: type listFilters
+        - src/daemon/query-processor.ts:207: type filters
+        - src/daemon/query-processor.ts:220: type listFilters
         - src/storage/node-repository.ts:955: type SearchOptions
         - src/storage/node-repository.ts:2460: type listNodes
         - src/storage/node-repository.ts:2681: type countNodes
@@ -2085,7 +2078,7 @@ src/storage/node-repository.ts [1-3311]
       /** Enhanced search with scores, highlights, and filter support */
       refs in: 15 [call: 13, import: 2]
         - src/daemon/query-processor.ts:18: import (module)
-        - src/daemon/query-processor.ts:209: call searchResults
+        - src/daemon/query-processor.ts:210: call searchResults
         - src/storage/node-repository.test.ts:68: import (module)
         - src/storage/node-repository.test.ts:1396: call { results, total }
         - src/storage/node-repository.test.ts:1447: call summaryResults
@@ -2158,7 +2151,7 @@ src/storage/node-repository.ts [1-3311]
       /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
       refs in: 5 [call: 3, import: 2]
         - src/daemon/query-processor.ts:20: import (module)
-        - src/daemon/query-processor.ts:276: call quirks
+        - src/daemon/query-processor.ts:278: call quirks
         - src/storage/node-repository.test.ts:34: import (module)
         - src/storage/node-repository.test.ts:3690: call aggregated
         - src/storage/node-repository.test.ts:3700: call all
@@ -2175,7 +2168,7 @@ src/storage/node-repository.ts [1-3311]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
       refs in: 4 [call: 2, import: 2]
         - src/daemon/query-processor.ts:21: import (module)
-        - src/daemon/query-processor.ts:297: call errors
+        - src/daemon/query-processor.ts:299: call errors
         - src/storage/node-repository.test.ts:35: import (module)
         - src/storage/node-repository.test.ts:3837: call aggregated
     2074-2132: getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; } [exported]
@@ -2268,7 +2261,7 @@ src/storage/node-repository.ts [1-3311]
         - src/daemon/cli.test.ts:706: call listResult
         - src/daemon/cli.test.ts:727: call (module)
         - src/daemon/query-processor.ts:19: import (module)
-        - src/daemon/query-processor.ts:224: call nodes
+        - src/daemon/query-processor.ts:225: call nodes
         - src/storage/node-repository.test.ts:61: import (module)
         - src/storage/node-repository.test.ts:2065: call result
         - src/storage/node-repository.test.ts:2089: call result
@@ -2673,4 +2666,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 39
-Estimated tokens: 35,512 (codebase: ~937,056)
+Estimated tokens: 35,416 (codebase: ~941,122)

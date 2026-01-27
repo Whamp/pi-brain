@@ -191,6 +191,7 @@ interface RelevantNode {
   project: string;
   outcome: string;
   timestamp: string;
+  sessionFile: string;
 }
 
 /**
@@ -241,6 +242,7 @@ function nodeRowToRelevant(row: NodeRow): RelevantNode {
     project: row.project ?? "unknown",
     outcome: row.outcome ?? "unknown",
     timestamp: row.timestamp,
+    sessionFile: row.session_file,
   };
 }
 
@@ -363,6 +365,8 @@ async function invokeQueryAgent(
     config.daemonConfig.model,
     "--system-prompt",
     actualPromptFile,
+    "--skills",
+    "rlm",
     "--no-session",
     "--mode",
     "json",
@@ -441,6 +445,9 @@ function buildQueryPrompt(
     parts.push(`- **Outcome**: ${node.outcome}`);
     parts.push(`- **Date**: ${node.timestamp}`);
     parts.push(`- **Summary**: ${node.summary}`);
+    parts.push(
+      `- **Raw File**: ${node.sessionFile} (Use RLM to read details if needed)`
+    );
     parts.push("");
   }
 

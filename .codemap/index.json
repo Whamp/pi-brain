@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 33273,
-  "codebase_tokens": 937056,
+  "codebase_tokens": 941122,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -6300,7 +6300,7 @@
       "language": "typescript",
       "lines": [
         1,
-        720
+        727
       ],
       "detail_level": "full",
       "token_estimate": 578,
@@ -6425,7 +6425,7 @@
           "signature": "RelevantNode",
           "lines": [
             187,
-            194
+            195
           ],
           "exported": false,
           "is_default": false,
@@ -6443,8 +6443,8 @@
           "kind": "function",
           "signature": "findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number): {}",
           "lines": [
-            199,
-            231
+            200,
+            232
           ],
           "exported": false,
           "is_default": false,
@@ -6462,8 +6462,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            236,
-            245
+            237,
+            247
           ],
           "exported": false,
           "is_default": false,
@@ -6481,8 +6481,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            251,
-            254
+            253,
+            256
           ],
           "exported": false,
           "is_default": false,
@@ -6500,8 +6500,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            259,
-            309
+            261,
+            311
           ],
           "exported": false,
           "is_default": false,
@@ -6519,8 +6519,8 @@
           "kind": "function",
           "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            318,
-            417
+            320,
+            421
           ],
           "exported": false,
           "is_default": false,
@@ -6538,8 +6538,8 @@
           "kind": "function",
           "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
           "lines": [
-            422,
-            481
+            426,
+            488
           ],
           "exported": false,
           "is_default": false,
@@ -6557,8 +6557,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            487,
-            493
+            494,
+            500
           ],
           "exported": false,
           "is_default": false,
@@ -6576,8 +6576,8 @@
           "kind": "function",
           "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            495,
-            557
+            502,
+            564
           ],
           "exported": false,
           "is_default": false,
@@ -6595,8 +6595,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            563,
-            567
+            570,
+            574
           ],
           "exported": false,
           "is_default": false,
@@ -6614,8 +6614,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            569,
-            572
+            576,
+            579
           ],
           "exported": false,
           "is_default": false,
@@ -6633,8 +6633,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            574,
-            577
+            581,
+            584
           ],
           "exported": false,
           "is_default": false,
@@ -6652,8 +6652,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            579,
-            583
+            586,
+            590
           ],
           "exported": false,
           "is_default": false,
@@ -6671,8 +6671,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            585,
-            661
+            592,
+            668
           ],
           "exported": false,
           "is_default": false,
@@ -6690,8 +6690,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            663,
-            696
+            670,
+            703
           ],
           "exported": false,
           "is_default": false,
@@ -6709,8 +6709,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            698,
-            719
+            705,
+            726
           ],
           "exported": false,
           "is_default": false,

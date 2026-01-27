@@ -627,15 +627,16 @@ src/daemon/query-processor.test.ts [1-79]
   imports:
     - vitest
 
-src/daemon/query-processor.ts [1-720]
+src/daemon/query-processor.ts [1-727]
   interface:
     32-45: interface QueryRequest [exported]
       /** Query request from the API */
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
     91-100: interface QueryProcessorConfig [exported]
-      refs out: 2 [type: 2]
+      refs out: 3 [type: 3]
         - src/daemon/query-processor.ts:93: type Database -> external
+        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
         - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
   function:
     105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
@@ -1451,4 +1452,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,943 (codebase: ~937,056)
+Estimated tokens: 18,964 (codebase: ~941,122)
