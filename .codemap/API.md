@@ -812,28 +812,32 @@ src/parser/analyzer.ts [1-279]
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-408]
+src/parser/boundary.ts [1-543]
   class:
-    99-176: class LeafTracker [exported]
+    200-277: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
   interface:
-    29-40: interface Boundary [exported]
+    39-50: interface Boundary [exported]
       /** A detected boundary in the session */
-    45-58: interface BoundaryMetadata [exported]
+    55-70: interface BoundaryMetadata [exported]
       /** Metadata for different boundary types */
-    63-76: interface Segment [exported]
+    75-88: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
-    375-379: interface BoundaryStats [exported]
+    509-513: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
-    24-24: BoundaryType = "branch" | "tree_jump" | "compaction" | "resume" [exported]
+    29-34: BoundaryType = | "branch"
+  | "tree_jump"
+  | "compaction"
+  | "resume"
+  | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    188-289: detectBoundaries(entries: SessionEntry[]): {} [exported]
+    289-423: detectBoundaries(entries: SessionEntry[]): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    299-370: extractSegments(entries: SessionEntry[]): {} [exported]
+    433-504: extractSegments(entries: SessionEntry[]): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    387-407: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+    521-542: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
   imports:
     - ../types.js
@@ -1816,4 +1820,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 76
-Estimated tokens: 22,485 (codebase: ~929,400)
+Estimated tokens: 22,491 (codebase: ~930,378)

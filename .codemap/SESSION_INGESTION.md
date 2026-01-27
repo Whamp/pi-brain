@@ -1102,59 +1102,64 @@ src/parser/boundary.test.ts [1-776]
     - ./boundary.js
     - vitest
 
-src/parser/boundary.ts [1-408]
+src/parser/boundary.ts [1-543]
   class:
-    99-176: class LeafTracker [exported]
+    200-277: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
   interface:
-    29-40: interface Boundary [exported]
+    39-50: interface Boundary [exported]
       /** A detected boundary in the session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:31: type BoundaryType -> src/parser/boundary.ts
-        - src/parser/boundary.ts:39: type BoundaryMetadata -> src/parser/boundary.ts
-    45-58: interface BoundaryMetadata [exported]
+        - src/parser/boundary.ts:41: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:49: type BoundaryMetadata -> src/parser/boundary.ts
+    55-70: interface BoundaryMetadata [exported]
       /** Metadata for different boundary types */
-    63-76: interface Segment [exported]
+    75-88: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
       refs out: 1 [type: 1]
-        - src/parser/boundary.ts:69: type Boundary -> src/parser/boundary.ts
-    375-379: interface BoundaryStats [exported]
+        - src/parser/boundary.ts:81: type Boundary -> src/parser/boundary.ts
+    509-513: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:377: type Record -> external
-        - src/parser/boundary.ts:377: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:511: type Record -> external
+        - src/parser/boundary.ts:511: type BoundaryType -> src/parser/boundary.ts
   type:
-    24-24: BoundaryType = "branch" | "tree_jump" | "compaction" | "resume" [exported]
+    29-34: BoundaryType = | "branch"
+  | "tree_jump"
+  | "compaction"
+  | "resume"
+  | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    188-289: detectBoundaries(entries: SessionEntry[]): {} [exported]
+    289-423: detectBoundaries(entries: SessionEntry[]): {} [exported]
       /** Detect all boundaries in a list of session entries */
-      refs out: 9 [call: 7, type: 2]
-        - src/parser/boundary.ts:188: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:188: type Boundary -> src/parser/boundary.ts
-        - src/parser/boundary.ts:197: call has -> external
-        - src/parser/boundary.ts:204: call push -> external
-        - src/parser/boundary.ts:218: call push -> external
-        - src/parser/boundary.ts:248: call push -> external
-        - src/parser/boundary.ts:270: call push -> external
-        - src/parser/boundary.ts:276: call round -> external
-        - src/parser/boundary.ts:283: call LeafTracker.update -> src/parser/boundary.ts
-    299-370: extractSegments(entries: SessionEntry[]): {} [exported]
+      refs out: 13 [call: 11, type: 2]
+        - src/parser/boundary.ts:289: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:289: type Boundary -> src/parser/boundary.ts
+        - src/parser/boundary.ts:298: call has -> external
+        - src/parser/boundary.ts:305: call push -> external
+        - src/parser/boundary.ts:319: call push -> external
+        - src/parser/boundary.ts:334: call push -> external
+        - src/parser/boundary.ts:338: call LeafTracker.getCurrentLeaf -> src/parser/boundary.ts
+        - src/parser/boundary.ts:359: call push -> external
+        - src/parser/boundary.ts:363: call LeafTracker.getPreviousEntryId -> src/parser/boundary.ts
+        - src/parser/boundary.ts:382: call push -> external
+    433-504: extractSegments(entries: SessionEntry[]): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
       refs out: 8 [call: 6, type: 2]
-        - src/parser/boundary.ts:299: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:299: type Segment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:317: call push -> external
-        - src/parser/boundary.ts:318: call set -> external
-        - src/parser/boundary.ts:355: call push -> external
-        - src/parser/boundary.ts:355: call createSegment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:366: call push -> external
-        - src/parser/boundary.ts:366: call createSegment -> src/parser/boundary.ts
-    387-407: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+        - src/parser/boundary.ts:433: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:433: type Segment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:451: call push -> external
+        - src/parser/boundary.ts:452: call set -> external
+        - src/parser/boundary.ts:489: call push -> external
+        - src/parser/boundary.ts:489: call createSegment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:500: call push -> external
+        - src/parser/boundary.ts:500: call createSegment -> src/parser/boundary.ts
+    521-542: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:387: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:387: type BoundaryStats -> src/parser/boundary.ts
+        - src/parser/boundary.ts:521: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:521: type BoundaryStats -> src/parser/boundary.ts
   imports:
     - ../types.js
 
@@ -1429,4 +1434,4 @@ src/parser/signals.ts [1-1043]
 
 ---
 Files: 38
-Estimated tokens: 18,419 (codebase: ~930,223)
+Estimated tokens: 18,452 (codebase: ~931,916)
