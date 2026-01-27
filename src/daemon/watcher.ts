@@ -48,8 +48,11 @@ export interface WatcherConfig {
   /** Idle timeout in minutes before triggering analysis */
   idleTimeoutMinutes: number;
 
-  /** Stability threshold in milliseconds (wait for writes to settle) */
+  /** Stability threshold in milliseconds for local sessions */
   stabilityThreshold: number;
+
+  /** Stability threshold in milliseconds for synced sessions (longer to account for network sync) */
+  syncedStabilityThreshold: number;
 
   /** Poll interval in milliseconds for awaitWriteFinish */
   pollInterval: number;
@@ -63,7 +66,8 @@ export interface WatcherConfig {
  */
 export const DEFAULT_WATCHER_CONFIG: WatcherConfig = {
   idleTimeoutMinutes: 10,
-  stabilityThreshold: 2000,
+  stabilityThreshold: 5000, // 5 seconds for local sessions
+  syncedStabilityThreshold: 30_000, // 30 seconds for synced sessions
   pollInterval: 100,
   depth: 2,
 };
@@ -81,6 +85,7 @@ export class SessionWatcher extends EventTarget {
   private sessionStates = new Map<string, SessionState>();
   private watchConfig: WatcherConfig;
   private watchPaths: string[] = [];
+  private spokePaths = new Set<string>();
   private isRunning = false;
 
   constructor(config?: Partial<WatcherConfig>) {
@@ -92,9 +97,54 @@ export class SessionWatcher extends EventTarget {
    * Create a SessionWatcher from pi-brain config
    */
   static fromConfig(config: PiBrainConfig): SessionWatcher {
-    return new SessionWatcher({
+    const watcher = new SessionWatcher({
       idleTimeoutMinutes: config.daemon.idleTimeoutMinutes,
     });
+
+    // Track spoke paths for differentiated stability thresholds
+    for (const spoke of config.spokes) {
+      if (spoke.enabled) {
+        watcher.addSpokePath(spoke.path);
+      }
+    }
+
+    return watcher;
+  }
+
+  /**
+   * Add a path as a spoke (synced) directory
+   * Synced directories use longer stability thresholds
+   */
+  addSpokePath(spokePath: string): void {
+    this.spokePaths.add(spokePath);
+  }
+
+  /**
+   * Check if a session file is from a spoke (synced) directory
+   */
+  isFromSpoke(sessionPath: string): boolean {
+    for (const spokePath of this.spokePaths) {
+      if (sessionPath.startsWith(spokePath)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Get the stability threshold for a given session path
+   */
+  getStabilityThreshold(sessionPath: string): number {
+    return this.isFromSpoke(sessionPath)
+      ? this.watchConfig.syncedStabilityThreshold
+      : this.watchConfig.stabilityThreshold;
+  }
+
+  /**
+   * Get the set of spoke paths being watched
+   */
+  getSpokePaths(): Set<string> {
+    return new Set(this.spokePaths);
   }
 
   /**
@@ -171,8 +221,18 @@ export class SessionWatcher extends EventTarget {
 
   /**
    * Start watching directories from pi-brain config
+   *
+   * This automatically includes both local sessions (hub) and synced sessions (enabled spokes).
+   * Spoke paths are tracked separately to allow differentiated handling.
    */
   async startFromConfig(config: PiBrainConfig): Promise<void> {
+    // Track spoke paths before starting (fromConfig already does this, but be explicit)
+    for (const spoke of config.spokes) {
+      if (spoke.enabled) {
+        this.addSpokePath(spoke.path);
+      }
+    }
+
     const paths = getSessionDirs(config);
     return this.start(paths);
   }

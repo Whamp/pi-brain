@@ -514,6 +514,193 @@ describe("sessionWatcher", () => {
       const configWatcher = SessionWatcher.fromConfig(config);
       expect(configWatcher).toBeInstanceOf(SessionWatcher);
     });
+
+    it("should track enabled spoke paths", () => {
+      const config = {
+        hub: {
+          sessionsDir: "/test/sessions",
+          databaseDir: "/test/data",
+          webUiPort: 8765,
+        },
+        spokes: [
+          {
+            name: "laptop",
+            syncMethod: "syncthing" as const,
+            path: "/synced/laptop",
+            enabled: true,
+          },
+          {
+            name: "server",
+            syncMethod: "rsync" as const,
+            path: "/synced/server",
+            source: "user@server:~/.pi/agent/sessions",
+            enabled: true,
+          },
+          {
+            name: "disabled-spoke",
+            syncMethod: "syncthing" as const,
+            path: "/synced/disabled",
+            enabled: false,
+          },
+        ],
+        daemon: {
+          idleTimeoutMinutes: 15,
+          parallelWorkers: 1,
+          maxRetries: 3,
+          retryDelaySeconds: 60,
+          reanalysisSchedule: "0 2 * * *",
+          connectionDiscoverySchedule: "0 3 * * *",
+          provider: "zai",
+          model: "glm-4.7",
+          promptFile: "/test/prompt.md",
+          maxConcurrentAnalysis: 1,
+          analysisTimeoutMinutes: 30,
+          maxQueueSize: 1000,
+        },
+        query: {
+          provider: "zai",
+          model: "glm-4.7",
+        },
+        api: {
+          port: 8765,
+          host: "127.0.0.1",
+          corsOrigins: [],
+        },
+      };
+
+      const configWatcher = SessionWatcher.fromConfig(config);
+      const spokePaths = configWatcher.getSpokePaths();
+
+      // Should track enabled spokes
+      expect(spokePaths.has("/synced/laptop")).toBeTruthy();
+      expect(spokePaths.has("/synced/server")).toBeTruthy();
+
+      // Should not track disabled spokes
+      expect(spokePaths.has("/synced/disabled")).toBeFalsy();
+    });
+  });
+
+  describe("spoke path detection", () => {
+    it("should identify sessions from spoke directories", () => {
+      const watcher = new SessionWatcher();
+      watcher.addSpokePath("/synced/laptop");
+      watcher.addSpokePath("/synced/server");
+
+      // Sessions from spoke directories
+      expect(
+        watcher.isFromSpoke("/synced/laptop/project/session.jsonl")
+      ).toBeTruthy();
+      expect(
+        watcher.isFromSpoke("/synced/server/another/session.jsonl")
+      ).toBeTruthy();
+
+      // Sessions from local directory
+      expect(
+        watcher.isFromSpoke(
+          "/home/user/.pi/agent/sessions/project/session.jsonl"
+        )
+      ).toBeFalsy();
+      expect(watcher.isFromSpoke("/test/sessions/session.jsonl")).toBeFalsy();
+    });
+
+    it("should return appropriate stability thresholds", () => {
+      const watcher = new SessionWatcher();
+      watcher.addSpokePath("/synced/laptop");
+
+      // Local sessions should use local threshold
+      expect(
+        watcher.getStabilityThreshold("/home/user/sessions/session.jsonl")
+      ).toBe(5000);
+
+      // Synced sessions should use synced threshold
+      expect(
+        watcher.getStabilityThreshold("/synced/laptop/project/session.jsonl")
+      ).toBe(30_000);
+    });
+
+    it("should use custom stability thresholds if configured", () => {
+      const watcher = new SessionWatcher({
+        stabilityThreshold: 3000,
+        syncedStabilityThreshold: 15_000,
+      });
+      watcher.addSpokePath("/synced/laptop");
+
+      expect(watcher.getStabilityThreshold("/local/session.jsonl")).toBe(3000);
+      expect(
+        watcher.getStabilityThreshold("/synced/laptop/session.jsonl")
+      ).toBe(15_000);
+    });
+
+    it("should watch both hub and spoke directories with startFromConfig", async () => {
+      // Create temp directories for hub and spoke
+      const hubDir = await createTempDir();
+      const spokeDir = await createTempDir();
+
+      try {
+        // Use short stability threshold for faster test
+        const watcher = new SessionWatcher({
+          idleTimeoutMinutes: 10,
+          stabilityThreshold: 100,
+          syncedStabilityThreshold: 200,
+        });
+        watcher.addSpokePath(spokeDir);
+
+        // Set up ready promise BEFORE starting
+        const readyPromise = waitForEvent(watcher, SESSION_EVENTS.READY);
+
+        // Start watching both directories
+        await watcher.start([hubDir, spokeDir]);
+
+        // Wait for ready event
+        await readyPromise;
+
+        // Verify spoke paths are tracked
+        expect(watcher.getSpokePaths().has(spokeDir)).toBeTruthy();
+
+        // Verify both directories are watched
+        const watchPaths = watcher.getWatchPaths();
+        expect(watchPaths).toContain(hubDir);
+        expect(watchPaths).toContain(spokeDir);
+
+        // Test events for sessions in both directories
+        const hubEvents: string[] = [];
+        const spokeEvents: string[] = [];
+
+        watcher.addEventListener(SESSION_EVENTS.NEW, (event) => {
+          const sessionPath = getSessionPath(event);
+          if (sessionPath?.startsWith(hubDir)) {
+            hubEvents.push(sessionPath);
+          } else if (sessionPath?.startsWith(spokeDir)) {
+            spokeEvents.push(sessionPath);
+          }
+        });
+
+        // Create sessions in both directories
+        const hubSession = await writeSessionFile(hubDir, "hub-session.jsonl");
+        const spokeSession = await writeSessionFile(
+          spokeDir,
+          "spoke-session.jsonl"
+        );
+
+        // Wait for file system events (stability threshold + buffer)
+        await new Promise((resolve) => {
+          setTimeout(resolve, 400);
+        });
+
+        // Verify events from both directories
+        expect(hubEvents).toContain(hubSession);
+        expect(spokeEvents).toContain(spokeSession);
+
+        // Verify spoke session is identified correctly
+        expect(watcher.isFromSpoke(hubSession)).toBeFalsy();
+        expect(watcher.isFromSpoke(spokeSession)).toBeTruthy();
+
+        await watcher.stop();
+      } finally {
+        await cleanupTempDir(hubDir);
+        await cleanupTempDir(spokeDir);
+      }
+    });
   });
 });
 
@@ -580,7 +767,8 @@ describe("getProjectFromSessionPath", () => {
 describe("default watcher config", () => {
   it("should have expected default values", () => {
     expect(DEFAULT_WATCHER_CONFIG.idleTimeoutMinutes).toBe(10);
-    expect(DEFAULT_WATCHER_CONFIG.stabilityThreshold).toBe(2000);
+    expect(DEFAULT_WATCHER_CONFIG.stabilityThreshold).toBe(5000); // 5 seconds for local
+    expect(DEFAULT_WATCHER_CONFIG.syncedStabilityThreshold).toBe(30_000); // 30 seconds for synced
     expect(DEFAULT_WATCHER_CONFIG.pollInterval).toBe(100);
     expect(DEFAULT_WATCHER_CONFIG.depth).toBe(2);
   });

@@ -129,23 +129,13 @@ export async function runRsync(
 
   // Merge spoke's rsyncOptions with passed options (passed options take precedence)
   const spokeOpts = spoke.rsyncOptions ?? {};
-  const mergedOptions: RsyncOptions = {
-    bwLimit: options.bwLimit ?? spokeOpts.bwLimit ?? 0,
-    dryRun: options.dryRun ?? false,
-    delete: options.delete ?? spokeOpts.delete ?? false,
-    extraArgs: options.extraArgs ?? spokeOpts.extraArgs ?? [],
-    timeoutMs:
-      options.timeoutMs ??
-      (spokeOpts.timeoutSeconds ? spokeOpts.timeoutSeconds * 1000 : 300_000),
-  };
-
-  const {
-    bwLimit,
-    dryRun,
-    delete: doDelete,
-    extraArgs,
-    timeoutMs,
-  } = mergedOptions;
+  const bwLimit = options.bwLimit ?? spokeOpts.bwLimit ?? 0;
+  const dryRun = options.dryRun ?? false;
+  const doDelete = options.delete ?? spokeOpts.delete ?? false;
+  const extraArgs = options.extraArgs ?? spokeOpts.extraArgs ?? [];
+  const timeoutMs =
+    options.timeoutMs ??
+    (spokeOpts.timeoutSeconds ? spokeOpts.timeoutSeconds * 1000 : 300_000);
 
   // Validate spoke has rsync method and source
   if (spoke.syncMethod !== "rsync") {
@@ -187,7 +177,7 @@ export async function runRsync(
     args.push("--delete");
   }
 
-  // Add extra args
+  // Add extra args (validated in config to reject dangerous options like --rsh)
   args.push(...extraArgs);
 
   // Ensure source ends with / to sync contents, not the directory itself

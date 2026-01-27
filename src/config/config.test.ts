@@ -525,6 +525,55 @@ describe("transformConfig", () => {
       );
     });
 
+    it("rejects non-string elements in extra_args", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            rsync_options: {
+              extra_args: [123, "--verbose"] as unknown as string[],
+            },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow(
+        "all elements must be strings"
+      );
+    });
+
+    it("rejects dangerous --rsh option in extra_args", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            rsync_options: { extra_args: ["--rsh=evil command"] },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow("disallowed rsync option");
+    });
+
+    it("rejects dangerous -e option in extra_args", () => {
+      const raw: RawConfig = {
+        spokes: [
+          {
+            name: "test",
+            sync_method: "rsync",
+            path: "/test",
+            source: "user@host:/path",
+            rsync_options: { extra_args: ["-e", "evil command"] },
+          },
+        ],
+      };
+      expect(() => transformConfig(raw)).toThrow("disallowed rsync option");
+    });
+
     it("rejects duplicate spoke names", () => {
       const raw: RawConfig = {
         spokes: [

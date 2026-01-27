@@ -203,6 +203,24 @@ function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
           `Spoke "${spoke.name}" has invalid rsync_options.extra_args: must be an array`
         );
       }
+      if (
+        !spoke.rsync_options.extra_args.every((arg) => typeof arg === "string")
+      ) {
+        throw new TypeError(
+          `Spoke "${spoke.name}" has invalid rsync_options.extra_args: all elements must be strings`
+        );
+      }
+      // Reject dangerous rsync options that could execute arbitrary commands
+      const dangerousOptions = ["--rsh", "-e"];
+      for (const arg of spoke.rsync_options.extra_args) {
+        for (const dangerous of dangerousOptions) {
+          if (arg === dangerous || arg.startsWith(`${dangerous}=`)) {
+            throw new Error(
+              `Spoke "${spoke.name}" has disallowed rsync option "${arg}" in extra_args (security risk)`
+            );
+          }
+        }
+      }
       rsyncOptions.extraArgs = spoke.rsync_options.extra_args;
     }
 
