@@ -306,3 +306,30 @@
 - Supports bandwidth limiting, dry-run mode, and delete option
 - Documentation includes automated sync setup via cron or systemd
 - Comparison table between rsync and Syncthing included
+
+---
+
+## 2026-01-26 16:52 - Task 9.3
+
+**Status**: pending → done
+**Validation**:
+- Added `enabled` field to SpokeConfig (boolean, default: true)
+- Added `schedule` field for rsync cron scheduling
+- Added `RsyncOptions` interface with bwLimit, delete, extraArgs, timeoutSeconds
+- Added `rsyncOptions` field to SpokeConfig
+- Updated getSessionDirs to only include enabled spokes
+- Added getEnabledSpokes, getRsyncSpokes, getScheduledRsyncSpokes helper functions
+- Updated runRsync to merge spoke.rsyncOptions with CLI options (CLI takes precedence)
+- Updated formatSyncStatus to show disabled spokes with (disabled) marker
+- Added validation: schedule and rsync_options rejected on non-rsync spokes
+- Added validation: invalid bw_limit and timeout_seconds values
+- Added 15 new unit tests covering all new configuration options
+- Updated existing tests to include enabled field
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 836 passed, 4 skipped)
+**Commit**: b9b2da7
+**Notes**:
+- Configuration now matches specs/sync-protocol.md spoke config spec
+- Ready for Task 9.4 (Daemon watches synced directories)
+- The schedule field enables spoke-specific rsync schedules
+- rsyncOptions allows per-spoke customization of bandwidth, delete behavior, and timeout
