@@ -558,3 +558,36 @@
   - win/failure: Reads node JSON files and counts prompting wins/failures
 - Statistical significance requires minimum 10 sessions in each period
 - Ready for Task 10.6 (Implement auto-disable for ineffective insights)
+
+---
+
+## 2026-01-26 21:14 - Task 11.1
+
+**Status**: pending → done
+**Validation**:
+- Created signals.ts with friction signal detection functions:
+  - countRephrasingCascades(): Detects 3+ consecutive user messages without tool call
+  - countToolLoops(): Detects same tool error 3+ times (normalized comparison)
+  - countContextChurn(): Detects high-frequency read/ls on different files
+  - detectModelSwitch(): Detects when segment uses different model than previous
+  - detectSilentTermination(): Detects session ending with unresolved error
+  - extractManualFlags(): Extracts brain_flag custom entries
+  - isAbandonedRestart(): Detects abandoned node followed by restart within 30 mins
+  - calculateFrictionScore(): Computes weighted 0.0-1.0 friction score
+- Added utility functions: getFilesTouched(), hasFileOverlap(), getPrimaryModel(), getSegmentTimestamp()
+- Added types to src/types/index.ts:
+  - FrictionSignals: rephrasingCount, contextChurnCount, abandonedRestart, toolLoopCount, modelSwitchFrom, silentTermination, score
+  - DelightSignals: resilientRecovery, oneShotSuccess, explicitPraise, score
+  - ManualFlag: type, message, timestamp
+  - NodeSignals: friction, delight, manualFlags
+  - Updated Node interface to include optional signals field
+- 41 new tests covering all friction signal detection functions
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1016 passed, 4 skipped)
+**Commit**: 967c85f
+**Notes**:
+- Friction score weights: rephrasing=0.15 (cap 0.3), churn=0.1 (cap 0.2), toolLoop=0.2 (cap 0.4), abandonedRestart=0.3, modelSwitch=0.15, silentTermination=0.25
+- Error messages are normalized (numbers→N, paths→PATH, strings→STR) for tool loop comparison
+- Context churn threshold is 10 unique file reads/ls before counting as churn event
+- Abandoned restart requires: outcome=abandoned, restart within 30 mins, file overlap >= 30%
+- Ready for Task 11.2 (Delight signal detection)
