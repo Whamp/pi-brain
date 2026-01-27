@@ -622,3 +622,27 @@
   - Questions treated as corrections (indicate confusion)
 - Ready for Task 11.3 (Update Node model to include signals)
 
+
+---
+
+## 2026-01-26 21:45 - Task 11.3
+
+**Status**: pending → done
+**Validation**:
+- Added `signals?: NodeSignals` field to `NodeConversionContext` interface
+- Updated `agentOutputToNode()` to spread signals into returned Node when provided
+- Updated Worker to detect friction/delight signals from segment entries:
+  - Uses `detectFrictionSignals()` with isLastSegment and wasResumed options
+  - Uses `detectDelightSignals()` with outcome from agent analysis
+  - Uses `extractManualFlags()` to capture user-flagged entries
+- Added 2 new tests for signal inclusion in agentOutputToNode
+- All lint checks pass (npm run check)
+- All tests pass (npm test -- --run: 1061 passed, 4 skipped)
+**Commit**: 12fc8d9
+**Notes**:
+- Node.signals is optional - only included when signals are detected
+- Signals are computed from raw session entries, not from LLM analysis
+- The friction/delight detection functions were already implemented in Task 11.1/11.2
+- This task integrates them into the actual node creation pipeline
+- JSON node files now include signals field when created by worker
+- Ready for Task 11.4 (/brain --flag manual notation command)

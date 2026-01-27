@@ -145,18 +145,18 @@ Track implementation progress. Agents update status as they complete work.
 
 ## Phase 11: Signals & Insights
 
-| ID    | Task                                                                    | Status  | Deps | Notes      |
-| ----- | ----------------------------------------------------------------------- | ------- | ---- | ---------- |
-| 11.1  | Implement friction signal detection (rephrasing, abandonment, churn)    | done    | 2.1  | 2026-01-26 |
-| 11.2  | Implement delight signal detection (resilience, one-shot success)       | done    | 2.1  | 2026-01-26 |
-| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | active  | 1.2  | 2026-01-26 |
-| 11.4  | Implement `/brain --flag` manual notation command                       | pending | 7.2  |            |
-| 11.5  | Implement facet discovery pipeline (embedding + clustering)             | pending | 8.1  |            |
-| 11.6  | Implement LLM cluster analysis and naming                               | pending | 11.5 |            |
-| 11.7  | Build "News Feed" UI component for clusters and signals                 | pending | 5.1  |            |
-| 11.8  | Implement Model-Specific AGENTS.md generator                            | pending | 10.1 |            |
-| 11.9  | Add clustering job to nightly scheduler                                 | pending | 8.1  |            |
-| 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | pending | 11.1 |            |
+| ID    | Task                                                                    | Status  | Deps | Notes                               |
+| ----- | ----------------------------------------------------------------------- | ------- | ---- | ----------------------------------- |
+| 11.1  | Implement friction signal detection (rephrasing, abandonment, churn)    | done    | 2.1  | 2026-01-26                          |
+| 11.2  | Implement delight signal detection (resilience, one-shot success)       | done    | 2.1  | 2026-01-26                          |
+| 11.3  | Update Node model to include `signals` (friction/delight scores, flags) | done    | 1.2  | 2026-01-26 - integrated into worker |
+| 11.4  | Implement `/brain --flag` manual notation command                       | pending | 7.2  |                                     |
+| 11.5  | Implement facet discovery pipeline (embedding + clustering)             | pending | 8.1  |                                     |
+| 11.6  | Implement LLM cluster analysis and naming                               | pending | 11.5 |                                     |
+| 11.7  | Build "News Feed" UI component for clusters and signals                 | pending | 5.1  |                                     |
+| 11.8  | Implement Model-Specific AGENTS.md generator                            | pending | 10.1 |                                     |
+| 11.9  | Add clustering job to nightly scheduler                                 | pending | 8.1  |                                     |
+| 11.10 | Surface "Abandoned Restart" patterns in dashboard                       | pending | 11.1 |                                     |
 
 ## Phase 12: Architecture Hardening
 
