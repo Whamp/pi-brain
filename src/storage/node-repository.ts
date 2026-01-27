@@ -11,6 +11,18 @@ import type { AgentNodeOutput } from "../daemon/processor.js";
 import type { AnalysisJob } from "../daemon/queue.js";
 
 import {
+  createEdge,
+  deleteEdge,
+  edgeExists,
+  edgeRowToEdge,
+  generateEdgeId,
+  getEdge,
+  getEdgesFrom,
+  getEdgesTo,
+  getNodeEdges,
+  type EdgeRow,
+} from "./edge-repository.js";
+import {
   insertDaemonDecisions,
   insertLessons,
   insertModelQuirks,
@@ -36,20 +48,19 @@ import {
 // Re-export types from node-crud.ts for backward compatibility
 export type { NodeRow, RepositoryOptions } from "./node-crud.js";
 
-// =============================================================================
-// Types (EdgeRow stays here until edge-repository.ts is extracted)
-// =============================================================================
-
-/** Edge row from the database */
-export interface EdgeRow {
-  id: string;
-  source_node_id: string;
-  target_node_id: string;
-  type: string;
-  metadata: string | null;
-  created_at: string;
-  created_by: string | null;
-}
+// Re-export edge functions and types from edge-repository.ts for backward compatibility
+export {
+  createEdge,
+  deleteEdge,
+  edgeExists,
+  edgeRowToEdge,
+  generateEdgeId,
+  getEdge,
+  getEdgesFrom,
+  getEdgesTo,
+  getNodeEdges,
+  type EdgeRow,
+} from "./edge-repository.js";
 
 // =============================================================================
 // Node CRUD Operations
@@ -618,126 +629,6 @@ function edgeExistsInSameSession(
     WHERE t.id = ? AND s.session_file = t.session_file
   `);
   return stmt.get(nodeId) !== undefined;
-}
-
-// =============================================================================
-// Edge CRUD Operations
-// =============================================================================
-
-/**
- * Create an edge between two nodes
- */
-export function createEdge(
-  db: Database.Database,
-  sourceNodeId: string,
-  targetNodeId: string,
-  type: EdgeType,
-  options: {
-    metadata?: EdgeMetadata;
-    createdBy?: "boundary" | "daemon" | "user";
-  } = {}
-): Edge {
-  const edge: Edge = {
-    id: generateEdgeId(),
-    sourceNodeId,
-    targetNodeId,
-    type,
-    metadata: options.metadata ?? {},
-    createdAt: new Date().toISOString(),
-    createdBy: options.createdBy ?? "daemon",
-  };
-
-  const stmt = db.prepare(`
-    INSERT INTO edges (id, source_node_id, target_node_id, type, metadata, created_at, created_by)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  stmt.run(
-    edge.id,
-    edge.sourceNodeId,
-    edge.targetNodeId,
-    edge.type,
-    JSON.stringify(edge.metadata),
-    edge.createdAt,
-    edge.createdBy
-  );
-
-  return edge;
-}
-
-/**
- * Get edges from a node (outgoing)
- */
-export function getEdgesFrom(db: Database.Database, nodeId: string): EdgeRow[] {
-  const stmt = db.prepare(`
-    SELECT * FROM edges
-    WHERE source_node_id = ?
-    ORDER BY created_at DESC
-  `);
-  return stmt.all(nodeId) as EdgeRow[];
-}
-
-/**
- * Get edges to a node (incoming)
- */
-export function getEdgesTo(db: Database.Database, nodeId: string): EdgeRow[] {
-  const stmt = db.prepare(`
-    SELECT * FROM edges
-    WHERE target_node_id = ?
-    ORDER BY created_at DESC
-  `);
-  return stmt.all(nodeId) as EdgeRow[];
-}
-
-/**
- * Get all edges for a node (both directions)
- */
-export function getNodeEdges(db: Database.Database, nodeId: string): EdgeRow[] {
-  const stmt = db.prepare(`
-    SELECT * FROM edges
-    WHERE source_node_id = ? OR target_node_id = ?
-    ORDER BY created_at DESC
-  `);
-  return stmt.all(nodeId, nodeId) as EdgeRow[];
-}
-
-/**
- * Get edge by ID
- */
-export function getEdge(db: Database.Database, edgeId: string): EdgeRow | null {
-  const stmt = db.prepare("SELECT * FROM edges WHERE id = ?");
-  return (stmt.get(edgeId) as EdgeRow) ?? null;
-}
-
-/**
- * Delete an edge
- */
-export function deleteEdge(db: Database.Database, edgeId: string): boolean {
-  const result = db.prepare("DELETE FROM edges WHERE id = ?").run(edgeId);
-  return result.changes > 0;
-}
-
-/**
- * Check if an edge exists between two nodes
- */
-export function edgeExists(
-  db: Database.Database,
-  sourceNodeId: string,
-  targetNodeId: string,
-  type?: EdgeType
-): boolean {
-  if (type) {
-    const stmt = db.prepare(`
-      SELECT 1 FROM edges
-      WHERE source_node_id = ? AND target_node_id = ? AND type = ?
-    `);
-    return stmt.get(sourceNodeId, targetNodeId, type) !== undefined;
-  }
-  const stmt = db.prepare(`
-    SELECT 1 FROM edges
-    WHERE source_node_id = ? AND target_node_id = ?
-  `);
-  return stmt.get(sourceNodeId, targetNodeId) !== undefined;
 }
 
 // =============================================================================
@@ -2927,33 +2818,6 @@ export function getDescendants(
     direction: "outgoing",
     edgeTypes: options.edgeTypes,
   });
-}
-
-// =============================================================================
-// ID Generation (edge ID generator stays here until edge-repository.ts is extracted)
-// =============================================================================
-
-function generateEdgeId(): string {
-  return `edg_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-// =============================================================================
-// Conversion Functions
-// =============================================================================
-
-/**
- * Convert an Edge row from the database to an Edge object
- */
-export function edgeRowToEdge(row: EdgeRow): Edge {
-  return {
-    id: row.id,
-    sourceNodeId: row.source_node_id,
-    targetNodeId: row.target_node_id,
-    type: row.type as EdgeType,
-    metadata: row.metadata ? JSON.parse(row.metadata) : {},
-    createdAt: row.created_at,
-    createdBy: row.created_by as "boundary" | "daemon" | "user",
-  };
 }
 
 // =============================================================================
