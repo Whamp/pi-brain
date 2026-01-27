@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 75 files
+- typescript: 76 files
 
 ## Statistics
-- Total files: 75
+- Total files: 76
 - Total symbols: 582
   - function: 320
   - interface: 188
@@ -124,9 +124,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-202]
+src/api/routes/query.ts [1-204]
   function:
-    44-201: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    44-203: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/query-processor.js
     - ../responses.js
@@ -186,14 +186,14 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-179]
+src/api/server.ts [1-183]
   interface:
-    46-49: interface ServerContext [exported]
+    46-51: interface ServerContext [exported]
       /** Server context passed to route handlers */
   function:
-    63-152: async createServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    65-155: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    157-171: async startServer(db: Database, config: ApiConfig): Promise<FastifyInstance> [exported]
+    160-175: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -384,15 +384,28 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.ts [1-559]
+src/daemon/connection-discovery.ts [1-562]
   class:
-    146-558: class ConnectionDiscoverer [exported]
+    146-561: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
   imports:
     - ../storage/node-repository.js
     - ../types/index.js
     - better-sqlite3
+
+src/daemon/daemon-process.ts [1-193]
+  imports:
+    - ../api/server.js
+    - ../config/config.js
+    - ../storage/database.js
+    - ./cli.js
+    - ./queue.js
+    - ./scheduler.js
+    - ./watcher-events.js
+    - ./watcher.js
+    - ./worker.js
+    - node:path
 
 src/daemon/errors.ts [1-457]
   interface:
@@ -1802,5 +1815,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 75
-Estimated tokens: 22,406 (codebase: ~926,740)
+Files: 76
+Estimated tokens: 22,485 (codebase: ~929,400)

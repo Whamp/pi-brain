@@ -36,7 +36,7 @@ const DEFAULT_QUERY_CONFIG = {
   patternAggregationSchedule: "0 3 * * *",
   clusteringSchedule: "0 4 * * *",
   embeddingProvider: "openrouter" as const,
-  embeddingModel: "mock",
+  embeddingModel: "qwen/qwen3-embedding-8b",
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,
 };
@@ -71,7 +71,7 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
       reply: FastifyReply
     ) => {
       const startTime = request.startTime ?? Date.now();
-      const { db } = app.ctx;
+      const { db, daemonConfig } = app.ctx;
       const { body } = request;
 
       // Validate query
@@ -97,9 +97,11 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
       };
 
       try {
+        // Use daemonConfig from context if available, otherwise fall back to defaults
+        const effectiveConfig = daemonConfig ?? DEFAULT_QUERY_CONFIG;
         const response: QueryResponse = await processQuery(queryRequest, {
           db,
-          daemonConfig: DEFAULT_QUERY_CONFIG,
+          daemonConfig: effectiveConfig,
           queryPromptFile: path.join(
             process.cwd(),
             "prompts",

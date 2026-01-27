@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 37 files
+- typescript: 38 files
 
 ## Statistics
-- Total files: 37
+- Total files: 38
 - Total symbols: 187
   - function: 112
   - interface: 44
@@ -208,16 +208,16 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-386]
+src/daemon/connection-discovery.test.ts [1-440]
   imports:
     - ../storage/node-repository.js
     - ./connection-discovery.js
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-559]
+src/daemon/connection-discovery.ts [1-562]
   class:
-    146-558: class ConnectionDiscoverer [exported]
+    146-561: class ConnectionDiscoverer [exported]
   interface:
     141-144: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
@@ -226,6 +226,19 @@ src/daemon/connection-discovery.ts [1-559]
     - ../storage/node-repository.js
     - ../types/index.js
     - better-sqlite3
+
+src/daemon/daemon-process.ts [1-193]
+  imports:
+    - ../api/server.js
+    - ../config/config.js
+    - ../storage/database.js
+    - ./cli.js
+    - ./queue.js
+    - ./scheduler.js
+    - ./watcher-events.js
+    - ./watcher.js
+    - ./worker.js
+    - node:path
 
 src/daemon/errors.test.ts [1-493]
   imports:
@@ -1415,5 +1428,5 @@ src/parser/signals.ts [1-1043]
     - ../types/index.js
 
 ---
-Files: 37
-Estimated tokens: 18,354 (codebase: ~926,742)
+Files: 38
+Estimated tokens: 18,419 (codebase: ~930,223)
