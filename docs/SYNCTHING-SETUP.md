@@ -268,7 +268,7 @@ Only add devices you control. Each device must be explicitly authorized on both 
 
 1. **Check network**: Large session files may take time over slow connections
 2. **Check for conflicts**: Resolve any conflict files (see below)
-3. **Reduce rescan interval**: In folder settings, set "Rescan Interval" to 60 seconds
+3. **Increase rescan interval**: In folder settings, increase "Rescan Interval" to reduce CPU usage (Syncthing also uses filesystem events for real-time sync)
 
 ### Conflict Files
 
