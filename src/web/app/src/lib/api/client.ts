@@ -17,6 +17,10 @@ import type {
   AggregatedLessonPattern,
   AggregatedInsight,
   PromptEffectiveness,
+  ClusterFeedResponse,
+  ClusterListResponse,
+  ClusterWithNodes,
+  ClusterStatus,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -409,6 +413,33 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ enabled }),
     }),
+
+  // Clusters
+  getClusterFeed: (limit?: number) =>
+    request<ClusterFeedResponse>(
+      `/clusters/feed${toQueryString({ limit: limit ?? 10 })}`
+    ),
+
+  getClusters: (options?: {
+    status?: ClusterStatus;
+    signalType?: "friction" | "delight" | null;
+    limit?: number;
+    offset?: number;
+    includeNodes?: boolean;
+  }) =>
+    request<ClusterListResponse>(`/clusters${toQueryString(options ?? {})}`),
+
+  getCluster: (id: string) =>
+    request<{ cluster: ClusterWithNodes }>(`/clusters/${id}`),
+
+  updateClusterStatus: (id: string, status: "confirmed" | "dismissed") =>
+    request<{ id: string; status: string; updatedAt: string }>(
+      `/clusters/${id}/status`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status }),
+      }
+    ),
 };
 
 export { createApiError, createTimeoutError, isApiError, isTimeoutError };

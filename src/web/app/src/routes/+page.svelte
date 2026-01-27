@@ -22,6 +22,7 @@
     AggregatedModelStats
   } from "$lib/types";
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
+  import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import Spinner from "$lib/components/spinner.svelte";
 
   // State
@@ -435,6 +436,9 @@
         </section>
       {/if}
     </div>
+
+    <!-- News Feed (Discovered Clusters) -->
+    <NewsFeed />
 
     <!-- Model Stats -->
     {#if modelStats.length > 0}

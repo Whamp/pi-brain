@@ -32,6 +32,10 @@ import type {
   AggregatedLessonPattern,
   AggregatedInsight,
   PromptEffectiveness,
+  Cluster,
+  ClusterNode,
+  ClusterStatus,
+  ClusterSignalType,
 } from "../../../../types/index.js";
 
 // Re-export shared types
@@ -64,6 +68,10 @@ export type {
   AggregatedLessonPattern,
   AggregatedInsight,
   PromptEffectiveness,
+  Cluster,
+  ClusterNode,
+  ClusterStatus,
+  ClusterSignalType,
 };
 
 // Extended types with IDs for API responses (Entities)
@@ -208,4 +216,28 @@ export interface SessionSummary {
   types: string[];
   totalTokens: number;
   totalCost: number;
+}
+
+// Cluster types for News Feed
+export interface ClusterNodeWithDetails extends ClusterNode {
+  summary?: string;
+  type?: string;
+  project?: string;
+  outcome?: string;
+}
+
+export interface ClusterWithNodes extends Cluster {
+  nodes?: ClusterNodeWithDetails[];
+}
+
+export interface ClusterFeedResponse {
+  clusters: ClusterWithNodes[];
+  count: number;
+}
+
+export interface ClusterListResponse {
+  clusters: ClusterWithNodes[];
+  total: number;
+  limit: number;
+  offset: number;
 }
