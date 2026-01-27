@@ -5,9 +5,9 @@
 
 ## Statistics
 - Total files: 44
-- Total symbols: 290
+- Total symbols: 291
   - function: 173
-  - interface: 75
+  - interface: 76
   - type: 17
   - variable: 16
   - class: 9
@@ -427,8 +427,8 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.test.ts:366: call stored
         - src/daemon/index.ts:84: reexport (module)
         - src/daemon/worker.ts:37: import (module)
-        - src/daemon/worker.ts:453: call Worker.storedError
-        - src/daemon/worker.ts:567: call handleJobError
+        - src/daemon/worker.ts:468: call Worker.storedError
+        - src/daemon/worker.ts:582: call handleJobError
     375-393: parseStoredError(stored: string): { timestamp: string; type: ErrorCategoryType; reason: string; message: string; stack?: string; } [exported]
       /** Parse stored error back to object */
       refs in: 5 [call: 3, import: 1, reexport: 1]
@@ -708,14 +708,14 @@ src/daemon/processor.test.ts [1-668]
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-747]
+src/daemon/processor.ts [1-770]
   class:
-    702-739: class JobProcessor [exported]
+    709-762: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
       refs in: 5 [import: 1, instantiate: 1, reexport: 1, type: 2]
         - src/daemon/index.ts:56: reexport (module)
-        - src/daemon/processor.ts:744: type createProcessor
-        - src/daemon/processor.ts:745: instantiate createProcessor
+        - src/daemon/processor.ts:767: type createProcessor
+        - src/daemon/processor.ts:768: instantiate createProcessor
         - src/daemon/worker.ts:44: import (module)
         - src/daemon/worker.ts:132: type Worker.processor
   interface:
@@ -723,22 +723,20 @@ src/daemon/processor.ts [1-747]
       /** Result from invoking the pi agent */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:71: reexport (module)
-        - src/daemon/processor.ts:308: type invokeAgent
-        - src/daemon/processor.ts:529: type parseAgentOutput
-        - src/daemon/processor.ts:714: type JobProcessor.process
+        - src/daemon/processor.ts:315: type invokeAgent
+        - src/daemon/processor.ts:536: type parseAgentOutput
+        - src/daemon/processor.ts:721: type JobProcessor.process
     37-116: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs in: 12 [import: 3, reexport: 1, type: 8]
+      refs in: 8 [import: 1, reexport: 1, type: 6]
         - src/daemon/index.ts:72: reexport (module)
         - src/daemon/processor.test.ts:24: import (module)
         - src/daemon/processor.test.ts:47: type createValidNodeOutput
         - src/daemon/processor.ts:27: type AgentResult
-        - src/daemon/processor.ts:604: type extractNodeFromText
-        - src/daemon/processor.ts:609: type parsed
-        - src/daemon/processor.ts:623: type parsed
-        - src/daemon/processor.ts:639: type isValidNodeOutput
-        - src/storage/node-conversion.ts:8: import (module)
-        - src/storage/node-conversion.ts:53: type agentOutputToNode
+        - src/daemon/processor.ts:611: type extractNodeFromText
+        - src/daemon/processor.ts:616: type parsed
+        - src/daemon/processor.ts:630: type parsed
+        - src/daemon/processor.ts:646: type isValidNodeOutput
     128-132: interface SkillInfo [exported]
       /** Skill availability information */
       refs in: 3 [reexport: 1, type: 2]
@@ -752,18 +750,23 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:25: import (module)
         - src/daemon/processor.test.ts:105: type silentLogger
         - src/daemon/processor.ts:143: type consoleLogger
-        - src/daemon/processor.ts:307: type invokeAgent
-        - src/daemon/processor.ts:437: type spawnPiProcess
-        - src/daemon/processor.ts:528: type parseAgentOutput
-        - src/daemon/processor.ts:603: type extractNodeFromText
-        - src/daemon/processor.ts:696: type ProcessorConfig
-        - src/daemon/processor.ts:704: type JobProcessor.logger
-    692-697: interface ProcessorConfig [exported]
+        - src/daemon/processor.ts:314: type invokeAgent
+        - src/daemon/processor.ts:444: type spawnPiProcess
+        - src/daemon/processor.ts:535: type parseAgentOutput
+        - src/daemon/processor.ts:610: type extractNodeFromText
+        - src/daemon/processor.ts:703: type ProcessorConfig
+        - src/daemon/processor.ts:711: type JobProcessor.logger
+    202-207: interface EnvironmentValidationResult [exported]
+      /** Result of environment validation */
+      refs in: 2 [type: 2]
+        - src/daemon/processor.ts:213: type validateRequiredSkills
+        - src/daemon/processor.ts:743: type JobProcessor.validateEnvironment
+    699-704: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:75: reexport (module)
-        - src/daemon/processor.ts:706: type JobProcessor.constructor
-        - src/daemon/processor.ts:744: type createProcessor
+        - src/daemon/processor.ts:713: type JobProcessor.constructor
+        - src/daemon/processor.ts:767: type createProcessor
   function:
     170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
@@ -783,22 +786,22 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:18: import (module)
         - src/daemon/processor.test.ts:564: call availability
         - src/daemon/processor.test.ts:580: call availability
-        - src/daemon/processor.ts:206: call skills
-        - src/daemon/processor.ts:225: call skills
-    205-218: async validateRequiredSkills(): Promise<void> [exported]
-      /** Validate that all required skills are available Throws if any required skill is missing */
+        - src/daemon/processor.ts:214: call skills
+        - src/daemon/processor.ts:232: call skills
+    213-225: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+      /** Validate that all required skills are available Returns validation result instead of throwing */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:66: reexport (module)
-        - src/daemon/processor.ts:736: call JobProcessor.validateEnvironment
-    224-230: async buildSkillsArg(): Promise<string> [exported]
+        - src/daemon/processor.ts:745: call JobProcessor.skillsResult
+    231-237: async buildSkillsArg(): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:63: reexport (module)
         - src/daemon/processor.test.ts:13: import (module)
         - src/daemon/processor.test.ts:594: call skills
         - src/daemon/processor.test.ts:599: call skills
-        - src/daemon/processor.ts:338: call skills
-    239-271: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.ts:345: call skills
+    246-278: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:62: reexport (module)
@@ -810,13 +813,13 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:162: call prompt
         - src/daemon/processor.test.ts:175: call prompt
         - src/daemon/processor.test.ts:187: call prompt
-        - src/daemon/processor.ts:350: call prompt
-    304-420: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.ts:357: call prompt
+    311-427: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:58: reexport (module)
-        - src/daemon/processor.ts:719: call JobProcessor.result
-    526-595: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:726: call JobProcessor.result
+    533-602: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:59: reexport (module)
@@ -829,7 +832,7 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:462: call result
         - src/daemon/processor.test.ts:486: call result
         - src/daemon/processor.test.ts:514: call result
-    601-634: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    608-641: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:60: reexport (module)
@@ -841,8 +844,8 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:341: call result
         - src/daemon/processor.test.ts:346: call result
         - src/daemon/processor.test.ts:363: call result
-        - src/daemon/processor.ts:580: call nodeData
-    639-685: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.ts:587: call nodeData
+    646-692: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs in: 19 [call: 17, import: 1, reexport: 1]
         - src/daemon/index.ts:61: reexport (module)
@@ -855,7 +858,7 @@ src/daemon/processor.ts [1-747]
         - src/daemon/processor.test.ts:224: call (module)
         - src/daemon/processor.test.ts:231: call (module)
         - src/daemon/processor.test.ts:238: call (module)
-    744-746: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    767-769: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/index.ts:57: reexport (module)
@@ -982,7 +985,7 @@ src/daemon/queue.ts [1-733]
         - src/daemon/processor.test.ts:32: type createTestJob
         - src/daemon/processor.test.ts:32: type createTestJob
         - src/daemon/processor.ts:14: import (module)
-        - src/daemon/processor.ts:239: type buildAnalysisPrompt
+        - src/daemon/processor.ts:246: type buildAnalysisPrompt
     102-115: interface QueueStats [exported]
       /** Queue statistics */
       refs in: 5 [import: 1, reexport: 1, type: 3]
@@ -1399,16 +1402,16 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-571]
+src/daemon/worker.ts [1-586]
   class:
-    116-510: class Worker [exported]
+    116-525: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
       refs in: 5 [import: 1, instantiate: 2, reexport: 1, type: 1]
         - src/daemon/index.ts:103: reexport (module)
         - src/daemon/worker.test.ts:19: import (module)
-        - src/daemon/worker.ts:519: type createWorker
-        - src/daemon/worker.ts:520: instantiate createWorker
-        - src/daemon/worker.ts:533: instantiate worker
+        - src/daemon/worker.ts:534: type createWorker
+        - src/daemon/worker.ts:535: instantiate createWorker
+        - src/daemon/worker.ts:548: instantiate worker
   interface:
     58-73: interface WorkerConfig [exported]
       /** Worker configuration */
@@ -1418,21 +1421,21 @@ src/daemon/worker.ts [1-571]
         - src/daemon/worker.test.ts:67: type createTestWorkerConfig
         - src/daemon/worker.test.ts:68: type createTestWorkerConfig
         - src/daemon/worker.ts:144: type Worker.constructor
-        - src/daemon/worker.ts:519: type createWorker
+        - src/daemon/worker.ts:534: type createWorker
     76-91: interface WorkerStatus [exported]
       /** Worker status */
       refs in: 2 [reexport: 1, type: 1]
         - src/daemon/index.ts:108: reexport (module)
-        - src/daemon/worker.ts:233: type Worker.getStatus
+        - src/daemon/worker.ts:248: type Worker.getStatus
     94-107: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:109: reexport (module)
-        - src/daemon/worker.ts:248: type Worker.processJob
-        - src/daemon/worker.ts:437: type Worker.handleJobFailure
-        - src/daemon/worker.ts:532: type processSingleJob
+        - src/daemon/worker.ts:263: type Worker.processJob
+        - src/daemon/worker.ts:452: type Worker.handleJobFailure
+        - src/daemon/worker.ts:547: type processSingleJob
   function:
-    519-521: createWorker(config: WorkerConfig): Worker [exported]
+    534-536: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs in: 16 [call: 13, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
@@ -1445,11 +1448,11 @@ src/daemon/worker.ts [1-571]
         - src/daemon/worker.test.ts:142: call worker
         - src/daemon/worker.test.ts:158: call worker
         - src/daemon/worker.test.ts:172: call worker
-    527-541: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    542-556: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
         - src/daemon/index.ts:105: reexport (module)
-    546-570: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    561-585: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
@@ -1847,7 +1850,7 @@ src/storage/node-conversion.ts [1-260]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
       refs in: 26 [call: 22, import: 3, reexport: 1]
         - src/daemon/worker.ts:28: import (module)
-        - src/daemon/worker.ts:366: call Worker.node
+        - src/daemon/worker.ts:381: call Worker.node
         - src/storage/node-repository.test.ts:16: import (module)
         - src/storage/node-repository.test.ts:822: call newNode
         - src/storage/node-repository.test.ts:847: call (module)
@@ -2114,7 +2117,7 @@ src/storage/node-repository.ts [1-2094]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:31: import (module)
-        - src/daemon/worker.ts:383: call Worker.{ created }
+        - src/daemon/worker.ts:398: call Worker.{ created }
         - src/storage/node-repository.test.ts:71: import (module)
         - src/storage/node-repository.test.ts:623: call { node: resultNode, created }
         - src/storage/node-repository.test.ts:653: call { node: resultNode, created }
@@ -2185,7 +2188,7 @@ src/storage/node-repository.ts [1-2094]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:29: import (module)
-        - src/daemon/worker.ts:327: call Worker.previousNode
+        - src/daemon/worker.ts:342: call Worker.previousNode
         - src/storage/node-repository.test.ts:58: import (module)
         - src/storage/node-repository.test.ts:488: call result
         - src/storage/node-repository.test.ts:525: call result
@@ -2200,7 +2203,7 @@ src/storage/node-repository.ts [1-2094]
         - src/daemon/cli.ts:31: import (module)
         - src/daemon/cli.ts:1014: call processLinkBatch
         - src/daemon/worker.ts:30: import (module)
-        - src/daemon/worker.ts:390: call Worker.processJob
+        - src/daemon/worker.ts:405: call Worker.processJob
         - src/storage/node-repository.test.ts:60: import (module)
         - src/storage/node-repository.test.ts:1106: call edges
         - src/storage/node-repository.test.ts:1131: call edges
@@ -2831,4 +2834,4 @@ src/storage/search-repository.ts [1-532]
 
 ---
 Files: 44
-Estimated tokens: 37,585 (codebase: ~962,127)
+Estimated tokens: 37,628 (codebase: ~962,521)

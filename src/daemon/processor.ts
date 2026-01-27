@@ -198,23 +198,30 @@ export async function getSkillAvailability(): Promise<Map<string, SkillInfo>> {
   return availability;
 }
 
+/** Result of environment validation */
+export interface EnvironmentValidationResult {
+  /** Whether environment is valid for job processing */
+  valid: boolean;
+  /** Missing skill names */
+  missingSkills: string[];
+}
+
 /**
  * Validate that all required skills are available
- * Throws if any required skill is missing
+ * Returns validation result instead of throwing
  */
-export async function validateRequiredSkills(): Promise<void> {
+export async function validateRequiredSkills(): Promise<EnvironmentValidationResult> {
   const skills = await getSkillAvailability();
 
-  const missingRequired = REQUIRED_SKILLS.filter(
+  const missingSkills = REQUIRED_SKILLS.filter(
     (s) => !skills.get(s)?.available
   );
 
-  if (missingRequired.length > 0) {
-    throw new Error(
-      `Missing required skills: ${missingRequired.join(", ")}. ` +
-        `Ensure these skills are installed in ${SKILLS_DIR}/`
-    );
+  if (missingSkills.length > 0) {
+    return { valid: false, missingSkills };
   }
+
+  return { valid: true, missingSkills: [] };
 }
 
 /**
@@ -731,10 +738,26 @@ export class JobProcessor {
 
   /**
    * Validate environment before processing
+   * Returns validation result - does not throw
    */
-  async validateEnvironment(): Promise<void> {
-    await validateRequiredSkills();
-    await fs.access(this.config.promptFile);
+  async validateEnvironment(): Promise<EnvironmentValidationResult> {
+    // Check skills
+    const skillsResult = await validateRequiredSkills();
+    if (!skillsResult.valid) {
+      return skillsResult;
+    }
+
+    // Check prompt file
+    try {
+      await fs.access(this.config.promptFile);
+    } catch {
+      return {
+        valid: false,
+        missingSkills: [],
+      };
+    }
+
+    return { valid: true, missingSkills: [] };
   }
 }
 

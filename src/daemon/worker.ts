@@ -182,12 +182,27 @@ export class Worker {
     this.logger.info(`Worker ${this.id} started`);
 
     // Validate environment
-    try {
-      await this.processor.validateEnvironment();
-    } catch (error) {
-      this.logger.error(`Environment validation failed: ${error}`);
-      this.running = false;
-      throw error;
+    const envStatus = await this.processor.validateEnvironment();
+    if (!envStatus.valid) {
+      if (envStatus.missingSkills.length > 0) {
+        this.logger.warn(
+          `Missing skills: ${envStatus.missingSkills.join(", ")}. Worker will idle until skills are installed.`
+        );
+      } else {
+        this.logger.warn(
+          "Environment validation failed (prompt file missing?). Worker will idle."
+        );
+      }
+      // Worker stays running but doesn't process jobs - allows API to still work
+      // Re-check environment periodically
+      while (this.running) {
+        await this.sleep(30_000); // Check every 30 seconds
+        const recheck = await this.processor.validateEnvironment();
+        if (recheck.valid) {
+          this.logger.info("Environment now valid. Resuming job processing.");
+          break;
+        }
+      }
     }
 
     // Main loop
