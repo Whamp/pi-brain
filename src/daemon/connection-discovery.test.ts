@@ -372,10 +372,64 @@ describe("connectionDiscoverer", () => {
       "task"
     );
 
-    // 3. Run discovery
+    // 3. Verify both source lessons would match the candidate via FTS
+    // (confirms deduplication actually happens, not that only one lesson matched)
+    const sourceLessons = discoverer.getLessons(sourceId);
+    expect(sourceLessons).toHaveLength(2);
+
+    // Helper function to check if a lesson matches via FTS
+    const verifyLessonMatchesCandidate = (
+      lesson: { summary: string },
+      expectedCandidateId: string
+    ): boolean => {
+      const tokens = (
+        discoverer as unknown as {
+          tokenize: (text: string) => Set<string>;
+          escapeFtsToken: (token: string) => string;
+        }
+      ).tokenize(lesson.summary);
+      expect(tokens.size).toBeGreaterThan(0);
+
+      const queryTerms = [...tokens]
+        .map(
+          (t) =>
+            `"${(discoverer as unknown as { escapeFtsToken: (t: string) => string }).escapeFtsToken(t)}"`
+        )
+        .join(" OR ");
+      const ftsQuery = `lessons:(${queryTerms})`;
+
+      const ftsResults = db
+        .prepare(
+          `
+          SELECT n.id
+          FROM nodes n
+          JOIN nodes_fts ON n.id = nodes_fts.node_id
+          WHERE n.id = ?
+          AND n.timestamp < ?
+          AND nodes_fts MATCH ?
+        `
+        )
+        .all(
+          expectedCandidateId,
+          new Date("2026-01-02T10:00:00Z").toISOString(),
+          ftsQuery
+        );
+
+      expect(ftsResults).toHaveLength(1);
+      expect(ftsResults[0].id).toBe(expectedCandidateId);
+      return true;
+    };
+
+    // Verify both lessons match the candidate
+    for (const lesson of sourceLessons) {
+      verifyLessonMatchesCandidate(lesson, candidateId);
+    }
+
+    // 4. Run discovery
     const result = await discoverer.discover(sourceId, { threshold: 0.1 });
 
-    // 4. Verify only ONE edge is created to the candidate, not two
+    // 5. Verify only ONE edge is created to the candidate, not two
+    // (deduplication: both lessons match candidate, but only one edge created)
     const lessonEdges = result.edges.filter(
       (e) => e.type === "lesson_application"
     );

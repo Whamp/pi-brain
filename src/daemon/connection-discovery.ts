@@ -429,6 +429,10 @@ export class ConnectionDiscoverer {
           continue;
         }
 
+        // Mark this candidate as seen to avoid redundant processing
+        // (even if similarity is below threshold, skip it in subsequent lessons)
+        seenTargets.add(candidate.id);
+
         // Skip if edge already exists in database
         if (edgeExists(this.db, nodeId, candidate.id)) {
           continue;
@@ -454,7 +458,6 @@ export class ConnectionDiscoverer {
             }
           );
           edges.push(edge);
-          seenTargets.add(candidate.id);
         }
       }
     }
