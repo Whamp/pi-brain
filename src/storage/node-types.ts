@@ -35,6 +35,9 @@ export function generateNodeId(): string {
  * - Segment start entry ID
  * - Segment end entry ID
  *
+ * Uses length-prefix encoding to prevent collisions from inputs containing
+ * delimiter characters (e.g., "a:b" + "c" vs "a" + "b:c").
+ *
  * Two jobs with the same inputs will always produce the same node ID.
  */
 export function generateDeterministicNodeId(
@@ -42,7 +45,9 @@ export function generateDeterministicNodeId(
   segmentStart: string,
   segmentEnd: string
 ): string {
-  const input = `${sessionFile}:${segmentStart}:${segmentEnd}`;
+  // Length-prefix encoding: "len:value" for each component
+  // This prevents collisions from inputs containing delimiter characters
+  const input = `${sessionFile.length}:${sessionFile}|${segmentStart.length}:${segmentStart}|${segmentEnd.length}:${segmentEnd}`;
   const hash = createHash("sha256").update(input).digest("hex");
   return hash.slice(0, 16);
 }

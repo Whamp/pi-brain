@@ -232,6 +232,9 @@ export function upsertNode(
     }
 
     // 2b. Update existing node in database
+    // Note: source fields (session_file, segment_start, segment_end, computer) are
+    // intentionally omitted. The node ID is deterministic from these values, so they
+    // are guaranteed to be identical on retry. Only analysis-derived fields are updated.
     const stmt = db.prepare(`
       UPDATE nodes SET
         version = ?,
@@ -269,12 +272,25 @@ export function upsertNode(
     );
 
     // 3. Clear and re-insert related data
-    db.prepare("DELETE FROM tags WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM topics WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM lessons WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM model_quirks WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM tool_errors WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM daemon_decisions WHERE node_id = ?").run(node.id);
+    const deleteTags = db.prepare("DELETE FROM tags WHERE node_id = ?");
+    const deleteTopics = db.prepare("DELETE FROM topics WHERE node_id = ?");
+    const deleteLessons = db.prepare("DELETE FROM lessons WHERE node_id = ?");
+    const deleteModelQuirks = db.prepare(
+      "DELETE FROM model_quirks WHERE node_id = ?"
+    );
+    const deleteToolErrors = db.prepare(
+      "DELETE FROM tool_errors WHERE node_id = ?"
+    );
+    const deleteDaemonDecisions = db.prepare(
+      "DELETE FROM daemon_decisions WHERE node_id = ?"
+    );
+
+    deleteTags.run(node.id);
+    deleteTopics.run(node.id);
+    deleteLessons.run(node.id);
+    deleteModelQuirks.run(node.id);
+    deleteToolErrors.run(node.id);
+    deleteDaemonDecisions.run(node.id);
 
     // 4. Re-insert related data
     const insertTag = db.prepare(
