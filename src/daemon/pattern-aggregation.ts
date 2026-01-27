@@ -20,6 +20,9 @@ interface ToolErrorRow {
 }
 
 export class PatternAggregator {
+  /** Maximum unique patterns to track before logging warning */
+  private static readonly MAX_PATTERNS = 10_000;
+
   constructor(private db: Database.Database) {}
 
   /**
@@ -34,6 +37,7 @@ export class PatternAggregator {
     `);
 
     const groups = new Map<string, FailurePatternGroup>();
+    let hitLimit = false;
 
     // Use iterator to handle large datasets without loading everything into memory
     for (const error of stmt.iterate() as IterableIterator<ToolErrorRow>) {
@@ -41,6 +45,16 @@ export class PatternAggregator {
 
       let group = groups.get(key);
       if (!group) {
+        // Check if we've hit the pattern limit
+        if (groups.size >= PatternAggregator.MAX_PATTERNS) {
+          if (!hitLimit) {
+            console.warn(
+              `[pattern-aggregation] Hit ${PatternAggregator.MAX_PATTERNS} failure pattern limit, skipping new patterns`
+            );
+            hitLimit = true;
+          }
+          continue; // Skip new patterns, only update existing ones
+        }
         group = {
           tool: error.tool,
           errorType: error.error_type,
@@ -136,6 +150,8 @@ export class PatternAggregator {
       }
     >();
 
+    let hitLimit = false;
+
     for (const row of stmt.iterate() as IterableIterator<{
       level: string;
       summary: string;
@@ -148,6 +164,16 @@ export class PatternAggregator {
 
       let group = groups.get(key);
       if (!group) {
+        // Check if we've hit the pattern limit
+        if (groups.size >= PatternAggregator.MAX_PATTERNS) {
+          if (!hitLimit) {
+            console.warn(
+              `[pattern-aggregation] Hit ${PatternAggregator.MAX_PATTERNS} lesson pattern limit, skipping new patterns`
+            );
+            hitLimit = true;
+          }
+          continue; // Skip new patterns, only update existing ones
+        }
         group = {
           level: row.level,
           pattern: summary,

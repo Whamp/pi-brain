@@ -87,6 +87,11 @@ export class SessionWatcher extends EventTarget {
   private watchPaths: string[] = [];
   private spokePaths = new Set<string>();
   private isRunning = false;
+  /** Pending stability timers for spoke files (extra delay beyond chokidar's threshold) */
+  private spokeStabilityTimers = new Map<
+    string,
+    ReturnType<typeof setTimeout>
+  >();
 
   constructor(config?: Partial<WatcherConfig>) {
     super();
@@ -152,6 +157,46 @@ export class SessionWatcher extends EventTarget {
     return this.isFromSpoke(sessionPath)
       ? this.watchConfig.syncedStabilityThreshold
       : this.watchConfig.stabilityThreshold;
+  }
+
+  /**
+   * Emit an event, applying extra delay for spoke (synced) files.
+   *
+   * Chokidar's awaitWriteFinish uses a single global threshold (5s for local).
+   * For spoke files, we add the difference between synced threshold (30s) and
+   * local threshold (5s) as an extra delay before emitting the event.
+   * This accounts for network sync latency and partial file transfers.
+   *
+   * If the file changes again during the delay, the previous pending event is
+   * canceled and a new delay starts (debounce behavior).
+   */
+  private emitWithSpokeDelay(filePath: string, emitFn: () => void): void {
+    // Cancel any pending timer for this file
+    const existingTimer = this.spokeStabilityTimers.get(filePath);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      this.spokeStabilityTimers.delete(filePath);
+    }
+
+    // Calculate extra delay needed for spoke files
+    const extraDelay = this.isFromSpoke(filePath)
+      ? this.watchConfig.syncedStabilityThreshold -
+        this.watchConfig.stabilityThreshold
+      : 0;
+
+    if (extraDelay > 0) {
+      // Schedule delayed emission
+      const timer = setTimeout(() => {
+        this.spokeStabilityTimers.delete(filePath);
+        if (this.isRunning) {
+          emitFn();
+        }
+      }, extraDelay);
+      this.spokeStabilityTimers.set(filePath, timer);
+    } else {
+      // Emit immediately for local files
+      emitFn();
+    }
   }
 
   /**
@@ -270,6 +315,12 @@ export class SessionWatcher extends EventTarget {
       }
     }
 
+    // Clear all spoke stability timers
+    for (const timer of this.spokeStabilityTimers.values()) {
+      clearTimeout(timer);
+    }
+    this.spokeStabilityTimers.clear();
+
     if (this.watcher) {
       await this.watcher.close();
       this.watcher = null;
@@ -361,8 +412,10 @@ export class SessionWatcher extends EventTarget {
 
     this.sessionStates.set(filePath, state);
 
-    // Emit new session event
-    this.dispatchEvent(createSessionEvent(SESSION_EVENTS.NEW, filePath));
+    // Emit new session event (with extra delay for spoke files)
+    this.emitWithSpokeDelay(filePath, () =>
+      this.dispatchEvent(createSessionEvent(SESSION_EVENTS.NEW, filePath))
+    );
 
     // Schedule idle check
     this.scheduleIdleCheck(filePath);
@@ -391,8 +444,10 @@ export class SessionWatcher extends EventTarget {
     // Update last modified time
     state.lastModified = Date.now();
 
-    // Emit change event
-    this.dispatchEvent(createSessionEvent(SESSION_EVENTS.CHANGE, filePath));
+    // Emit change event (with extra delay for spoke files)
+    this.emitWithSpokeDelay(filePath, () =>
+      this.dispatchEvent(createSessionEvent(SESSION_EVENTS.CHANGE, filePath))
+    );
 
     // Reschedule idle check
     this.scheduleIdleCheck(filePath);

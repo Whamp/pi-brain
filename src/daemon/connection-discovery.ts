@@ -319,9 +319,19 @@ export class ConnectionDiscoverer {
     }
   }
 
+  /**
+   * Escape a token for use in FTS5 quoted strings.
+   * Double quotes are escaped by doubling them (FTS5 convention).
+   */
+  private escapeFtsToken(token: string): string {
+    return token.replaceAll('"', '""');
+  }
+
   private detectReferences(sourceNodeId: string, sourceText: string): Edge[] {
-    // Regex for 16-char hex strings (node IDs)
-    // Matches exactly 16 hex chars, surrounded by word boundaries
+    // Regex for 16-char hex strings (node IDs).
+    // Matches exactly 16 hex chars, surrounded by word boundaries.
+    // May over-match git SHAs, hashes, etc. - false positives are filtered
+    // by the DB lookup below, so over-matching is acceptable.
     const hexRegex = /\b[a-f0-9]{16}\b/g;
     const matches = sourceText.match(hexRegex);
 
@@ -382,7 +392,10 @@ export class ConnectionDiscoverer {
 
       // Create OR query for FTS
       // We search specifically in the 'lessons' column
-      const queryTerms = [...tokens].map((t) => `"${t}"`).join(" OR ");
+      // Escape quotes in tokens to prevent FTS5 syntax errors
+      const queryTerms = [...tokens]
+        .map((t) => `"${this.escapeFtsToken(t)}"`)
+        .join(" OR ");
       const ftsQuery = `lessons:(${queryTerms})`;
 
       // 2. Find candidates

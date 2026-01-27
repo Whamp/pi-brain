@@ -160,13 +160,17 @@ export class QueueManager {
   enqueue(job: JobInput): string {
     const id = generateJobId();
 
+    // Extract target_node_id from context for denormalized index
+    const targetNodeId =
+      job.context?.existingNodeId ?? job.context?.nodeId ?? null;
+
     this.db
       .prepare(
         `
       INSERT INTO analysis_queue (
         id, type, priority, session_file, segment_start, segment_end,
-        context, status, queued_at, max_retries
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'), ?)
+        context, status, queued_at, max_retries, target_node_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'), ?, ?)
     `
       )
       .run(
@@ -177,7 +181,8 @@ export class QueueManager {
         job.segmentStart ?? null,
         job.segmentEnd ?? null,
         job.context ? JSON.stringify(job.context) : null,
-        job.maxRetries ?? DEFAULT_MAX_RETRIES
+        job.maxRetries ?? DEFAULT_MAX_RETRIES,
+        targetNodeId
       );
 
     return id;
@@ -192,13 +197,16 @@ export class QueueManager {
     const insert = this.db.prepare(`
       INSERT INTO analysis_queue (
         id, type, priority, session_file, segment_start, segment_end,
-        context, status, queued_at, max_retries
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'), ?)
+        context, status, queued_at, max_retries, target_node_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'), ?, ?)
     `);
 
     const transaction = this.db.transaction(() => {
       for (const job of jobs) {
         const id = generateJobId();
+        // Extract target_node_id from context for denormalized index
+        const targetNodeId =
+          job.context?.existingNodeId ?? job.context?.nodeId ?? null;
         insert.run(
           id,
           job.type,
@@ -207,7 +215,8 @@ export class QueueManager {
           job.segmentStart ?? null,
           job.segmentEnd ?? null,
           job.context ? JSON.stringify(job.context) : null,
-          job.maxRetries ?? DEFAULT_MAX_RETRIES
+          job.maxRetries ?? DEFAULT_MAX_RETRIES,
+          targetNodeId
         );
         ids.push(id);
       }

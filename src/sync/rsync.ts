@@ -44,7 +44,10 @@ export interface RsyncOptions {
 }
 
 /**
- * Parse rsync stats output to get transfer details
+ * Parse rsync stats output to get transfer details.
+ *
+ * Logs a warning if stats cannot be parsed from non-empty output,
+ * which may indicate an older rsync version with different output format.
  */
 function parseRsyncStats(output: string): {
   filesTransferred: number;
@@ -66,6 +69,17 @@ function parseRsyncStats(output: string): {
   const bytesMatch = output.match(/Total transferred file size:\s*([\d,]+)/i);
   if (bytesMatch) {
     bytesTransferred = Number.parseInt(bytesMatch[1].replaceAll(",", ""), 10);
+  }
+
+  // Warn if we have substantial output but couldn't parse stats
+  // (indicates older rsync version or unexpected output format)
+  const trimmedOutput = output.trim();
+  if (trimmedOutput.length > 100 && !filesMatch && !bytesMatch) {
+    console.warn(
+      "[pi-brain] Warning: Could not parse rsync stats from output. " +
+        "This may indicate an older rsync version with a different output format. " +
+        "File transfer counts will show as 0."
+    );
   }
 
   return { filesTransferred, bytesTransferred };
@@ -273,12 +287,16 @@ export function formatBytes(bytes: number): string {
 
 /**
  * Check if rsync is available on the system
+ *
+ * Uses `rsync --version` instead of `which` for cross-platform compatibility
+ * (works on Windows, Linux, macOS). Gracefully handles ENOENT.
  */
 export async function isRsyncAvailable(): Promise<boolean> {
   try {
-    await execFileAsync("which", ["rsync"]);
+    await execFileAsync("rsync", ["--version"]);
     return true;
   } catch {
+    // ENOENT means command not found, any other error also means unavailable
     return false;
   }
 }

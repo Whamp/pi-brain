@@ -270,4 +270,49 @@ describe("connectionDiscoverer", () => {
     expect(lessonEdge?.targetNodeId).toBe(candidateId);
     expect(lessonEdge?.metadata.reason).toContain("Reinforces lesson");
   });
+
+  it("should handle lesson summaries with quotes in FTS query", async () => {
+    // 1. Create candidate node with a lesson containing quotes
+    const candidateId = "q1q1q1q1q1q1q1q1";
+    manualInsertNode(
+      db,
+      candidateId,
+      "TypeScript config session",
+      ["typescript"],
+      ["config"],
+      new Date("2026-01-01T10:00:00Z").toISOString()
+    );
+    manualInsertLesson(
+      db,
+      candidateId,
+      'Use "strict" mode for TypeScript',
+      'Always enable "strict": true in tsconfig.json for better type safety.',
+      "tool"
+    );
+
+    // 2. Create source node with similar lesson (also with quotes)
+    const sourceId = "q2q2q2q2q2q2q2q2";
+    manualInsertNode(
+      db,
+      sourceId,
+      "Another TypeScript session",
+      ["typescript"],
+      ["config"],
+      new Date("2026-01-02T10:00:00Z").toISOString()
+    );
+    manualInsertLesson(
+      db,
+      sourceId,
+      'Enable "strict" in TypeScript config',
+      'TypeScript "strict" mode catches more errors at compile time.',
+      "tool"
+    );
+
+    // 3. Run discovery - should not throw despite quotes in lesson text
+    const result = await discoverer.discover(sourceId, { threshold: 0.1 });
+
+    // 4. Should complete without error (FTS query should be properly escaped)
+    // May or may not find a match depending on tokenization, but shouldn't crash
+    expect(result.sourceNodeId).toBe(sourceId);
+  });
 });

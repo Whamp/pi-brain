@@ -274,21 +274,21 @@ export function getInsightsByModel(
 ): AggregatedInsight[] {
   const { minConfidence = 0.5, promptIncludedOnly = false } = options;
 
-  let query = `
+  // Use parameterized query to avoid string concatenation
+  const stmt = db.prepare(`
     SELECT *
     FROM aggregated_insights
     WHERE model = ?
       AND confidence >= ?
-  `;
+      AND (? = 0 OR prompt_included = 1)
+    ORDER BY frequency DESC, confidence DESC
+  `);
 
-  if (promptIncludedOnly) {
-    query += " AND prompt_included = 1";
-  }
-
-  query += " ORDER BY frequency DESC, confidence DESC";
-
-  const stmt = db.prepare(query);
-  const rows = stmt.all(model, minConfidence) as unknown as InsightRow[];
+  const rows = stmt.all(
+    model,
+    minConfidence,
+    promptIncludedOnly ? 1 : 0
+  ) as unknown as InsightRow[];
 
   return rows.map(rowToInsight);
 }

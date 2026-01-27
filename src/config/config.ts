@@ -120,13 +120,22 @@ export function getDefaultConfig(): PiBrainConfig {
 /**
  * Validate sync method
  */
-function validateSyncMethod(method: string): SyncMethod {
+function validateSyncMethod(method: string, spokeName: string): SyncMethod {
   const validMethods: SyncMethod[] = ["syncthing", "rsync", "api"];
   if (!validMethods.includes(method as SyncMethod)) {
     throw new Error(
       `Invalid sync_method: ${method}. Must be one of: ${validMethods.join(", ")}`
     );
   }
+
+  // Warn about unimplemented api method
+  if (method === "api") {
+    throw new Error(
+      `Spoke "${spokeName}" uses sync_method "api" which is not yet implemented. ` +
+        `Use "syncthing" or "rsync" instead.`
+    );
+  }
+
   return method as SyncMethod;
 }
 
@@ -151,7 +160,7 @@ function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
     throw new Error(`Spoke "${spoke.name}" missing required field: path`);
   }
 
-  const syncMethod = validateSyncMethod(spoke.sync_method);
+  const syncMethod = validateSyncMethod(spoke.sync_method, spoke.name);
 
   // rsync requires source
   if (syncMethod === "rsync" && !spoke.source) {
@@ -632,19 +641,24 @@ export function getComputerFromPath(
   sessionPath: string,
   config: PiBrainConfig
 ): string {
+  // Normalize session path separators to current platform
+  const normalizedSessionPath = sessionPath.replaceAll(/[/\\]+/g, path.sep);
+
   // Check if the session is in any spoke directory
   for (const spoke of config.spokes) {
     if (!spoke.enabled) {
       continue;
     }
 
-    // Normalize both paths: remove trailing slashes
-    const normalizedSpokePath = spoke.path.replace(/[/\\]+$/, "");
+    // Normalize spoke path: convert separators and remove trailing slashes
+    const normalizedSpokePath = spoke.path
+      .replaceAll(/[/\\]+/g, path.sep)
+      .replace(/[/\\]+$/, "");
 
     // Check for exact match or match with path separator
     if (
-      sessionPath === normalizedSpokePath ||
-      sessionPath.startsWith(normalizedSpokePath + path.sep)
+      normalizedSessionPath === normalizedSpokePath ||
+      normalizedSessionPath.startsWith(normalizedSpokePath + path.sep)
     ) {
       return spoke.name;
     }

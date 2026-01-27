@@ -76,6 +76,7 @@ interface NodeRow {
 
 const MAX_PATTERNS = 10_000;
 const MAX_EXAMPLES = 10;
+const NODE_BATCH_SIZE = 1000; // Process nodes in batches to limit memory pressure
 
 // =============================================================================
 // Helper Functions
@@ -214,7 +215,11 @@ export class InsightAggregator {
       group.lastSeen = maxDate(group.lastSeen, row.created_at);
       group.firstSeen = minDate(group.firstSeen, row.created_at);
 
-      // Update confidence based on frequency
+      // Use maximum confidence from all row frequency values
+      const rowConfidence = frequencyToConfidence(row.frequency);
+      group.confidence = Math.max(group.confidence, rowConfidence);
+
+      // Update confidence based on occurrence count
       if (group.frequency >= 5) {
         group.confidence = Math.max(group.confidence, 0.75);
       }
@@ -350,8 +355,8 @@ export class InsightAggregator {
       group.lastSeen = maxDate(group.lastSeen, row.created_at);
       group.firstSeen = minDate(group.firstSeen, row.created_at);
 
-      // Increase confidence with repetition
-      if (group.frequency >= 3) {
+      // Boost confidence once when we reach 3 occurrences
+      if (group.frequency === 3) {
         group.confidence = Math.min(group.confidence + 0.1, 0.95);
       }
 
@@ -362,119 +367,133 @@ export class InsightAggregator {
   }
 
   /**
-   * Aggregate prompting wins and failures from node JSON files
+   * Aggregate prompting wins and failures from node JSON files.
+   * Processes nodes in batches to limit memory pressure.
    */
   private aggregatePromptingPatterns(
     insights: Map<string, InsightGroup>
   ): void {
+    let hitLimit = false;
+    let nodesProcessed = 0;
+    let errorsEncountered = 0;
+    let offset = 0;
+
     const stmt = this.db.prepare(`
       SELECT id, data_file
       FROM nodes
       WHERE data_file IS NOT NULL
       ORDER BY timestamp DESC
+      LIMIT ? OFFSET ?
     `);
 
-    let hitLimit = false;
-    let nodesProcessed = 0;
-    let errorsEncountered = 0;
+    // Process in batches
+    while (true) {
+      const rows = stmt.all(NODE_BATCH_SIZE, offset) as unknown as NodeRow[];
 
-    for (const row of stmt.iterate() as IterableIterator<NodeRow>) {
-      let node: Node;
-      try {
-        node = readNodeFromPath(row.data_file);
-      } catch {
-        // Skip nodes with missing/invalid JSON files
-        errorsEncountered++;
-        continue;
+      if (rows.length === 0) {
+        break;
       }
 
-      nodesProcessed++;
-
-      // Extract model from the node's observations
-      const primaryModel = node.observations.modelsUsed[0]?.model;
-      const nodeTimestamp = node.metadata.timestamp;
-
-      // Process prompting wins
-      for (const win of node.observations.promptingWins) {
-        if (insights.size >= MAX_PATTERNS && !hitLimit) {
-          console.warn(
-            `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
-          );
-          hitLimit = true;
+      for (const row of rows) {
+        let node: Node;
+        try {
+          node = readNodeFromPath(row.data_file);
+        } catch {
+          // Skip nodes with missing/invalid JSON files
+          errorsEncountered++;
+          continue;
         }
 
-        const id = generateInsightId("win", win, primaryModel);
-        let group = insights.get(id);
+        nodesProcessed++;
 
-        if (!group && !hitLimit) {
-          group = {
-            type: "win",
-            model: primaryModel,
-            pattern: win,
-            frequency: 0,
-            confidence: 0.6,
-            severity: "low",
-            examples: [],
-            firstSeen: nodeTimestamp,
-            lastSeen: nodeTimestamp,
-          };
-          insights.set(id, group);
+        // Extract model from the node's observations
+        const primaryModel = node.observations.modelsUsed[0]?.model;
+        const nodeTimestamp = node.metadata.timestamp;
+
+        // Process prompting wins
+        for (const win of node.observations.promptingWins) {
+          if (insights.size >= MAX_PATTERNS && !hitLimit) {
+            console.warn(
+              `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
+            );
+            hitLimit = true;
+          }
+
+          const id = generateInsightId("win", win, primaryModel);
+          let group = insights.get(id);
+
+          if (!group && !hitLimit) {
+            group = {
+              type: "win",
+              model: primaryModel,
+              pattern: win,
+              frequency: 0,
+              confidence: 0.6,
+              severity: "low",
+              examples: [],
+              firstSeen: nodeTimestamp,
+              lastSeen: nodeTimestamp,
+            };
+            insights.set(id, group);
+          }
+
+          if (group) {
+            group.frequency++;
+            group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
+            group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
+
+            if (group.examples.length < MAX_EXAMPLES) {
+              group.examples.push(row.id);
+            }
+          }
         }
 
-        if (group) {
-          group.frequency++;
-          group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
-          group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
+        // Process prompting failures
+        for (const failure of node.observations.promptingFailures) {
+          if (insights.size >= MAX_PATTERNS && !hitLimit) {
+            console.warn(
+              `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
+            );
+            hitLimit = true;
+          }
 
-          if (group.examples.length < MAX_EXAMPLES) {
-            group.examples.push(row.id);
+          const id = generateInsightId("failure", failure, primaryModel);
+          let group = insights.get(id);
+
+          if (!group && !hitLimit) {
+            group = {
+              type: "failure",
+              model: primaryModel,
+              pattern: failure,
+              frequency: 0,
+              confidence: 0.6,
+              severity: "medium",
+              examples: [],
+              firstSeen: nodeTimestamp,
+              lastSeen: nodeTimestamp,
+            };
+            insights.set(id, group);
+          }
+
+          if (group) {
+            group.frequency++;
+            group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
+            group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
+
+            // Failures that repeat are more severe - boost once at threshold
+            if (group.frequency === 3) {
+              group.severity = "high";
+              group.confidence = Math.min(group.confidence + 0.15, 0.95);
+            }
+
+            if (group.examples.length < MAX_EXAMPLES) {
+              group.examples.push(row.id);
+            }
           }
         }
       }
 
-      // Process prompting failures
-      for (const failure of node.observations.promptingFailures) {
-        if (insights.size >= MAX_PATTERNS && !hitLimit) {
-          console.warn(
-            `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
-          );
-          hitLimit = true;
-        }
-
-        const id = generateInsightId("failure", failure, primaryModel);
-        let group = insights.get(id);
-
-        if (!group && !hitLimit) {
-          group = {
-            type: "failure",
-            model: primaryModel,
-            pattern: failure,
-            frequency: 0,
-            confidence: 0.6,
-            severity: "medium",
-            examples: [],
-            firstSeen: nodeTimestamp,
-            lastSeen: nodeTimestamp,
-          };
-          insights.set(id, group);
-        }
-
-        if (group) {
-          group.frequency++;
-          group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
-          group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
-
-          // Failures that repeat are more severe
-          if (group.frequency >= 3) {
-            group.severity = "high";
-            group.confidence = Math.min(group.confidence + 0.15, 0.95);
-          }
-
-          if (group.examples.length < MAX_EXAMPLES) {
-            group.examples.push(row.id);
-          }
-        }
-      }
+      offset += NODE_BATCH_SIZE;
     }
 
     if (errorsEncountered > 0) {

@@ -2,7 +2,12 @@
  * Patterns API routes
  */
 
-import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type {
+  FastifyBaseLogger,
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply,
+} from "fastify";
 
 import {
   listFailurePatterns,
@@ -12,14 +17,25 @@ import {
 import { successResponse } from "../responses.js";
 
 /**
- * Parse integer query param
+ * Parse integer query param with optional debug logging for invalid values
  */
-function parseIntParam(value: string | undefined): number | undefined {
+function parseIntParam(
+  value: string | undefined,
+  paramName?: string,
+  logger?: FastifyBaseLogger
+): number | undefined {
   if (value === undefined) {
     return undefined;
   }
   const num = Number.parseInt(value, 10);
-  return Number.isNaN(num) ? undefined : num;
+  if (Number.isNaN(num)) {
+    logger?.debug(
+      { param: paramName, value },
+      "Invalid integer param, using default"
+    );
+    return undefined;
+  }
+  return num;
 }
 
 export async function patternsRoutes(app: FastifyInstance): Promise<void> {
@@ -43,9 +59,13 @@ export async function patternsRoutes(app: FastifyInstance): Promise<void> {
       const { query } = request;
 
       const result = listFailurePatterns(db, {
-        limit: parseIntParam(query.limit),
-        offset: parseIntParam(query.offset),
-        minOccurrences: parseIntParam(query.minOccurrences),
+        limit: parseIntParam(query.limit, "limit", request.log),
+        offset: parseIntParam(query.offset, "offset", request.log),
+        minOccurrences: parseIntParam(
+          query.minOccurrences,
+          "minOccurrences",
+          request.log
+        ),
       });
 
       const durationMs = Date.now() - startTime;
@@ -86,8 +106,8 @@ export async function patternsRoutes(app: FastifyInstance): Promise<void> {
       const { query } = request;
 
       const result = listLessonPatterns(db, {
-        limit: parseIntParam(query.limit),
-        offset: parseIntParam(query.offset),
+        limit: parseIntParam(query.limit, "limit", request.log),
+        offset: parseIntParam(query.offset, "offset", request.log),
         level: query.level,
       });
 

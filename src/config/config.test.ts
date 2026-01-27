@@ -411,6 +411,13 @@ describe("transformConfig", () => {
       expect(() => transformConfig(raw)).toThrow("Invalid sync_method");
     });
 
+    it("rejects unimplemented api sync_method", () => {
+      const raw: RawConfig = {
+        spokes: [{ name: "test", sync_method: "api", path: "/test" }],
+      };
+      expect(() => transformConfig(raw)).toThrow("not yet implemented");
+    });
+
     it("rejects spoke without name", () => {
       const raw: RawConfig = {
         spokes: [{ sync_method: "syncthing", path: "/test" }],

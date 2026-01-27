@@ -88,22 +88,6 @@ export function getSpokeStatus(spoke: SpokeConfig): SpokeStatus {
 }
 
 /**
- * Count sessions in a directory
- */
-function countSessions(dir: string): number {
-  if (!fs.existsSync(dir)) {
-    return 0;
-  }
-
-  try {
-    const files = fs.readdirSync(dir, { recursive: true });
-    return files.filter((f) => String(f).endsWith(".jsonl")).length;
-  } catch {
-    return 0;
-  }
-}
-
-/**
  * Get overall sync status
  */
 export async function getSyncStatus(
@@ -119,7 +103,7 @@ export async function getSyncStatus(
   return {
     hubName: os.hostname(),
     hubSessionsDir: config.hub.sessionsDir,
-    hubSessionCount: countSessions(config.hub.sessionsDir),
+    hubSessionCount: countSpokeSessionFiles(config.hub.sessionsDir),
     rsyncAvailable,
     spokes,
     totalSpokeSessionCount,

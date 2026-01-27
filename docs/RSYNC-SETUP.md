@@ -224,9 +224,10 @@ command="rrsync -ro ~/.pi/agent/sessions" ssh-ed25519 AAAA... pi-brain-sync
 
 This requires the `rrsync` script (usually in `/usr/share/rsync/scripts/rrsync`).
 
-### 3. Use Specific SSH Config
+### 3. Configure SSH for Custom Keys (Required)
 
-Create an SSH config entry for cleaner commands:
+pi-brain runs rsync without the `-e` option, so it uses your default SSH configuration.
+**You must configure `~/.ssh/config`** to use your dedicated sync key:
 
 ```
 # ~/.ssh/config
@@ -237,7 +238,18 @@ Host laptop-sync
     IdentitiesOnly yes
 ```
 
-Then use `laptop-sync:~/.pi/agent/sessions` as the source.
+Then use `laptop-sync:~/.pi/agent/sessions` as the source in your config:
+
+```yaml
+spokes:
+  - name: laptop
+    sync_method: rsync
+    source: laptop-sync:~/.pi/agent/sessions
+    path: ~/.pi-brain/synced/laptop
+```
+
+> **Note**: If you use the default SSH key (`~/.ssh/id_ed25519` or `~/.ssh/id_rsa`),
+> no SSH config entry is needed—rsync will find it automatically.
 
 ## Troubleshooting
 
