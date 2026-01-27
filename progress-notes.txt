@@ -679,3 +679,39 @@
 - Flags are stored in Node.signals.manualFlags after daemon analysis
 - Multiple spaces in messages are normalized to single spaces (by design)
 - Ready for Task 11.5 (Facet discovery pipeline)
+
+---
+
+## 2026-01-26 22:10 - Task 11.5
+
+**Status**: pending → done
+**Validation**:
+- Created database migration 010_clusters.sql with tables:
+  - node_embeddings: Cached embeddings for nodes
+  - clusters: Discovered clusters with name/description/status
+  - cluster_nodes: Cluster membership with distance and representative flag
+  - clustering_runs: Track clustering job executions
+- Implemented facet discovery pipeline in src/daemon/facet-discovery.ts:
+  - EmbeddingProvider interface with Ollama, OpenAI, and Mock implementations
+  - K-means++ clustering algorithm
+  - HDBSCAN-like density-based clustering (simplified)
+  - FacetDiscovery class for running the pipeline
+  - Embedding caching for efficiency
+  - Cluster CRUD operations (getClusters, getClusterNodes, updateClusterStatus, etc.)
+- Added cluster-related types to src/types/index.ts:
+  - Cluster, ClusterNode, NodeEmbedding, ClusteringRun
+  - EmbeddingConfig, ClusteringConfig, FacetDiscoveryResult
+  - ClusterStatus, ClusterSignalType
+- Added 34 tests in facet-discovery.test.ts covering:
+  - Embedding provider creation and embedding generation
+  - K-means clustering correctness
+  - HDBSCAN clustering correctness
+  - FacetDiscovery run, getClusters, getClusterNodes, updateClusterStatus
+- All tests pass (1110 passed, 4 skipped)
+- 9 lint violations for conditional expects in tests (deferred to Task 11.5a)
+**Commit**: a9b949e
+**Notes**:
+- Signal-based filtering (friction/delight) deferred - requires adding signal columns to nodes table
+- Task 11.5a created for lint fix (TODO-f8b10687)
+- Task 11.6 will add LLM cluster analysis and naming
+- Task 11.9 will add clustering to nightly scheduler
