@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 32477,
-  "codebase_tokens": 925872,
+  "codebase_tokens": 926963,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9976,7 +9976,7 @@
       "language": "typescript",
       "lines": [
         1,
-        400
+        408
       ],
       "detail_level": "full",
       "token_estimate": 693,
@@ -10348,7 +10348,7 @@
           "signature": "extractSegments(entries: SessionEntry[]): {}",
           "lines": [
             299,
-            362
+            370
           ],
           "exported": true,
           "is_default": false,
@@ -10366,8 +10366,8 @@
           "kind": "interface",
           "signature": "BoundaryStats",
           "lines": [
-            367,
-            371
+            375,
+            379
           ],
           "exported": true,
           "is_default": false,
@@ -10385,8 +10385,8 @@
           "kind": "function",
           "signature": "getBoundaryStats(entries: SessionEntry[]): BoundaryStats",
           "lines": [
-            379,
-            399
+            387,
+            407
           ],
           "exported": true,
           "is_default": false,

@@ -799,7 +799,7 @@ src/parser/analyzer.ts [1-279]
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-400]
+src/parser/boundary.ts [1-408]
   class:
     99-176: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
@@ -810,7 +810,7 @@ src/parser/boundary.ts [1-400]
       /** Metadata for different boundary types */
     63-76: interface Segment [exported]
       /** A segment is a contiguous span of entries between boundaries */
-    367-371: interface BoundaryStats [exported]
+    375-379: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
     24-24: BoundaryType = "branch" | "tree_jump" | "compaction" | "resume" [exported]
@@ -818,9 +818,9 @@ src/parser/boundary.ts [1-400]
   function:
     188-289: detectBoundaries(entries: SessionEntry[]): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    299-362: extractSegments(entries: SessionEntry[]): {} [exported]
+    299-370: extractSegments(entries: SessionEntry[]): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    379-399: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
+    387-407: getBoundaryStats(entries: SessionEntry[]): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
   imports:
     - ../types.js
@@ -1803,4 +1803,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 75
-Estimated tokens: 22,406 (codebase: ~926,054)
+Estimated tokens: 22,406 (codebase: ~925,983)

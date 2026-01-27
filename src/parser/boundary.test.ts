@@ -613,6 +613,85 @@ describe("extractSegments", () => {
     expect(segments[0].startEntryId).toBe("a");
     expect(segments[0].endEntryId).toBe("b");
   });
+
+  describe("boundaries field population", () => {
+    it("populates boundaries array on segments that end due to a boundary", () => {
+      const entries: SessionEntry[] = [
+        createMessageEntry("a", null, "2024-01-01T00:00:00.000Z"),
+        createMessageEntry("b", "a", "2024-01-01T00:01:00.000Z"),
+        // 15 minute gap creates resume boundary
+        createMessageEntry("c", "b", "2024-01-01T00:16:00.000Z"),
+        createMessageEntry("d", "c", "2024-01-01T00:17:00.000Z"),
+      ];
+
+      const segments = extractSegments(entries);
+
+      expect(segments).toHaveLength(2);
+      // First segment should have the resume boundary
+      expect(segments[0].boundaries).toHaveLength(1);
+      expect(segments[0].boundaries[0].type).toBe("resume");
+      expect(segments[0].boundaries[0].entryId).toBe("c");
+      // Last segment has no boundaries (session ends normally)
+      expect(segments[1].boundaries).toHaveLength(0);
+    });
+
+    it("returns empty boundaries array for segment without boundaries", () => {
+      const entries: SessionEntry[] = [
+        createMessageEntry("a", null, timestamp(0)),
+        createMessageEntry("b", "a", timestamp(1)),
+        createMessageEntry("c", "b", timestamp(2)),
+      ];
+
+      const segments = extractSegments(entries);
+
+      expect(segments).toHaveLength(1);
+      expect(segments[0].boundaries).toStrictEqual([]);
+    });
+
+    it("handles multiple boundaries at same entry", () => {
+      // This can happen when a branch_summary and resume occur together
+      // (but in practice our detection logic mostly prevents this)
+      const entries: SessionEntry[] = [
+        createMessageEntry("a", null, "2024-01-01T00:00:00.000Z"),
+        createMessageEntry("b", "a", "2024-01-01T00:01:00.000Z"),
+        // Compaction after 15 min gap - both compaction AND resume detected
+        createCompactionEntry(
+          "comp1",
+          "b",
+          40_000,
+          "Compacted",
+          "2024-01-01T00:16:00.000Z"
+        ),
+        createMessageEntry("c", "comp1", "2024-01-01T00:17:00.000Z"),
+      ];
+
+      const segments = extractSegments(entries);
+
+      expect(segments).toHaveLength(2);
+      // First segment should have both compaction and resume boundaries
+      expect(segments[0].boundaries.length).toBeGreaterThanOrEqual(1);
+      const types = segments[0].boundaries.map((b) => b.type);
+      expect(types).toContain("compaction");
+      // Resume is also detected since there's a 15 min gap
+      expect(types).toContain("resume");
+    });
+
+    it("attaches correct boundary type to each segment", () => {
+      const entries: SessionEntry[] = [
+        createMessageEntry("a", null, timestamp(0)),
+        createMessageEntry("b", "a", timestamp(1)),
+        createBranchSummaryEntry("bs1", "a", "b", "Summary", timestamp(2)),
+        createMessageEntry("c", "a", timestamp(3)),
+      ];
+
+      const segments = extractSegments(entries);
+
+      expect(segments).toHaveLength(2);
+      expect(segments[0].boundaries).toHaveLength(1);
+      expect(segments[0].boundaries[0].type).toBe("branch");
+      expect(segments[0].boundaries[0].metadata?.summary).toBe("Summary");
+    });
+  });
 });
 
 // =============================================================================
