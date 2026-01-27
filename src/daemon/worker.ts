@@ -9,12 +9,12 @@
 
 import type Database from "better-sqlite3";
 
-import * as os from "node:os";
 import { join } from "node:path";
 
 import type { PiBrainConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
 
+import { getComputerFromPath } from "../config/config.js";
 import { parseSession } from "../parser/session.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
 import {
@@ -307,9 +307,13 @@ export class Worker {
           this.config.daemon.promptFile
         );
 
+        // Determine computer name from session path
+        // For spoke sessions, use the spoke name; for local sessions, use hostname
+        const computer = getComputerFromPath(job.sessionFile, this.config);
+
         const node = agentOutputToNode(result.nodeData, {
           job,
-          computer: os.hostname(),
+          computer,
           sessionId: session.header.id,
           parentSession: session.header.parentSession,
           entryCount,

@@ -28,6 +28,7 @@ export {
   getEnabledSpokes,
   getRsyncSpokes,
   getScheduledRsyncSpokes,
+  getComputerFromPath,
   ConfigError,
   DEFAULT_CONFIG_DIR,
   DEFAULT_CONFIG_PATH,

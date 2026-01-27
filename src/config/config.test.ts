@@ -24,6 +24,7 @@ import {
   getEnabledSpokes,
   getRsyncSpokes,
   getScheduledRsyncSpokes,
+  getComputerFromPath,
   ConfigError,
 } from "./config.js";
 
@@ -1051,5 +1052,122 @@ describe("getScheduledRsyncSpokes", () => {
     ];
     const scheduled = getScheduledRsyncSpokes(config);
     expect(scheduled).toHaveLength(0);
+  });
+});
+
+describe("getComputerFromPath", () => {
+  it("returns hostname for local sessions (not in any spoke)", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+    ];
+    const sessionPath = "/home/user/.pi/agent/sessions/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    expect(computer).toBe(os.hostname());
+  });
+
+  it("returns spoke name for sessions in spoke directory", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+        source: "u@h:/p",
+      },
+    ];
+    const sessionPath = "/synced/laptop/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    expect(computer).toBe("laptop");
+  });
+
+  it("returns correct spoke name when multiple spokes exist", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+      {
+        name: "server",
+        syncMethod: "rsync",
+        path: "/synced/server",
+        enabled: true,
+        source: "u@h:/p",
+      },
+    ];
+    const sessionPath = "/synced/server/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    expect(computer).toBe("server");
+  });
+
+  it("ignores disabled spokes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "disabled-laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: false,
+      },
+    ];
+    const sessionPath = "/synced/laptop/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    // Falls back to hostname since spoke is disabled
+    expect(computer).toBe(os.hostname());
+  });
+
+  it("handles spoke paths with trailing slashes", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop/", // Trailing slash
+        enabled: true,
+      },
+    ];
+    const sessionPath = "/synced/laptop/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    expect(computer).toBe("laptop");
+  });
+
+  it("uses proper path boundary checking (no false prefix matches)", () => {
+    const config = getDefaultConfig();
+    config.spokes = [
+      {
+        name: "laptop",
+        syncMethod: "syncthing",
+        path: "/synced/laptop",
+        enabled: true,
+      },
+    ];
+    // This path starts with /synced/laptop but is NOT a child of it
+    const sessionPath = "/synced/laptop-backup/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    // Should NOT match "laptop" - falls back to hostname
+    expect(computer).toBe(os.hostname());
+  });
+
+  it("returns hostname when no spokes configured", () => {
+    const config = getDefaultConfig();
+    config.spokes = [];
+    const sessionPath = "/home/user/.pi/agent/sessions/project/session.jsonl";
+    const computer = getComputerFromPath(sessionPath, config);
+    expect(computer).toBe(os.hostname());
   });
 });

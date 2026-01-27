@@ -603,6 +603,46 @@ describe("sessionWatcher", () => {
       expect(watcher.isFromSpoke("/test/sessions/session.jsonl")).toBeFalsy();
     });
 
+    it("should not match paths with similar prefixes (path boundary check)", () => {
+      const watcher = new SessionWatcher();
+      watcher.addSpokePath("/synced/laptop");
+
+      // Should NOT match - laptop-backup starts with laptop but is different dir
+      expect(
+        watcher.isFromSpoke("/synced/laptop-backup/session.jsonl")
+      ).toBeFalsy();
+      expect(watcher.isFromSpoke("/synced/laptops/session.jsonl")).toBeFalsy();
+      expect(watcher.isFromSpoke("/synced/laptop2/session.jsonl")).toBeFalsy();
+
+      // Should match - actually under /synced/laptop/
+      expect(
+        watcher.isFromSpoke("/synced/laptop/project/session.jsonl")
+      ).toBeTruthy();
+      expect(watcher.isFromSpoke("/synced/laptop/session.jsonl")).toBeTruthy();
+    });
+
+    it("should normalize trailing slashes in spoke paths", () => {
+      const watcher = new SessionWatcher();
+      // Add with trailing slash
+      watcher.addSpokePath("/synced/laptop/");
+
+      // Should still match correctly
+      expect(
+        watcher.isFromSpoke("/synced/laptop/project/session.jsonl")
+      ).toBeTruthy();
+      expect(watcher.isFromSpoke("/synced/laptop/session.jsonl")).toBeTruthy();
+
+      // Should NOT match similar prefixes
+      expect(
+        watcher.isFromSpoke("/synced/laptop-backup/session.jsonl")
+      ).toBeFalsy();
+
+      // Verify normalization in stored paths
+      const spokePaths = watcher.getSpokePaths();
+      expect(spokePaths.has("/synced/laptop")).toBeTruthy();
+      expect(spokePaths.has("/synced/laptop/")).toBeFalsy();
+    });
+
     it("should return appropriate stability thresholds", () => {
       const watcher = new SessionWatcher();
       watcher.addSpokePath("/synced/laptop");

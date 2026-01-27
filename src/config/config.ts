@@ -618,3 +618,38 @@ export function getScheduledRsyncSpokes(config: PiBrainConfig): SpokeConfig[] {
       spoke.schedule !== undefined
   );
 }
+
+/**
+ * Get the computer name for a session based on its path.
+ *
+ * For sessions from spoke directories, returns the spoke name.
+ * For local sessions (hub), returns the local hostname.
+ *
+ * Uses proper path boundary checking to avoid false matches
+ * (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`)
+ */
+export function getComputerFromPath(
+  sessionPath: string,
+  config: PiBrainConfig
+): string {
+  // Check if the session is in any spoke directory
+  for (const spoke of config.spokes) {
+    if (!spoke.enabled) {
+      continue;
+    }
+
+    // Normalize both paths: remove trailing slashes
+    const normalizedSpokePath = spoke.path.replace(/[/\\]+$/, "");
+
+    // Check for exact match or match with path separator
+    if (
+      sessionPath === normalizedSpokePath ||
+      sessionPath.startsWith(normalizedSpokePath + path.sep)
+    ) {
+      return spoke.name;
+    }
+  }
+
+  // Not in any spoke directory - it's a local session
+  return os.hostname();
+}

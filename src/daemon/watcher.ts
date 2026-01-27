@@ -116,15 +116,24 @@ export class SessionWatcher extends EventTarget {
    * Synced directories use longer stability thresholds
    */
   addSpokePath(spokePath: string): void {
-    this.spokePaths.add(spokePath);
+    // Normalize: remove trailing slashes to ensure consistent matching
+    const normalized = spokePath.replace(/[/\\]+$/, "");
+    this.spokePaths.add(normalized);
   }
 
   /**
    * Check if a session file is from a spoke (synced) directory
+   *
+   * Uses proper path boundary checking to avoid false matches
+   * (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`)
    */
   isFromSpoke(sessionPath: string): boolean {
     for (const spokePath of this.spokePaths) {
-      if (sessionPath.startsWith(spokePath)) {
+      // Check for exact match or match with path separator
+      if (
+        sessionPath === spokePath ||
+        sessionPath.startsWith(spokePath + path.sep)
+      ) {
         return true;
       }
     }
@@ -133,6 +142,11 @@ export class SessionWatcher extends EventTarget {
 
   /**
    * Get the stability threshold for a given session path
+   *
+   * NOTE: This method is for caller reference only. Chokidar uses a single
+   * global `stabilityThreshold` for all paths (awaitWriteFinish doesn't support
+   * per-path thresholds). Callers can use this to implement additional delays
+   * for synced paths after receiving events, if needed.
    */
   getStabilityThreshold(sessionPath: string): number {
     return this.isFromSpoke(sessionPath)
@@ -223,10 +237,10 @@ export class SessionWatcher extends EventTarget {
    * Start watching directories from pi-brain config
    *
    * This automatically includes both local sessions (hub) and synced sessions (enabled spokes).
-   * Spoke paths are tracked separately to allow differentiated handling.
+   * Spoke paths are registered here to support standalone usage without fromConfig().
    */
   async startFromConfig(config: PiBrainConfig): Promise<void> {
-    // Track spoke paths before starting (fromConfig already does this, but be explicit)
+    // Register spoke paths (idempotent - safe if already registered via fromConfig)
     for (const spoke of config.spokes) {
       if (spoke.enabled) {
         this.addSpokePath(spoke.path);
