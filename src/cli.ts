@@ -39,6 +39,11 @@ import {
   formatPromptAdditionsDocument,
   getPromptAdditionsForModel,
 } from "./prompt/prompt-generator.js";
+import {
+  injectInsights,
+  removeInjectedInsights,
+  getInjectionStatus,
+} from "./prompt/prompt-injector.js";
 import { openDatabase, migrate } from "./storage/database.js";
 import { listInsights } from "./storage/pattern-repository.js";
 import {
@@ -606,6 +611,116 @@ promptCmd
       }
 
       db.close();
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("inject")
+  .description("Inject insights into prompts")
+  .option("-c, --config <path>", "Config file path")
+  .option(
+    "-m, --method <method>",
+    "Injection method: skill (recommended) or agents_file",
+    "skill"
+  )
+  .option("--min-confidence <n>", "Minimum confidence (0.0-1.0)", "0.7")
+  .option("--min-frequency <n>", "Minimum frequency", "5")
+  .option("--skill-dir <path>", "Custom skill directory")
+  .action((options) => {
+    try {
+      const config = loadConfig(options.config);
+      const db = openDatabase(config.hub.databaseDir);
+      migrate(db);
+
+      const result = injectInsights(db, {
+        method: options.method,
+        minConfidence: Number.parseFloat(options.minConfidence),
+        minFrequency: Number.parseInt(options.minFrequency, 10),
+        skillDir: options.skillDir,
+      });
+
+      db.close();
+
+      if (result.success) {
+        console.log(`✓ ${result.message}`);
+        if (result.path) {
+          console.log(`  Path: ${result.path}`);
+        }
+        if (result.models && result.models.length > 0) {
+          console.log(`  Models: ${result.models.join(", ")}`);
+        }
+      } else {
+        console.error(`✗ ${result.message}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("remove")
+  .description("Remove injected insights")
+  .option(
+    "-m, --method <method>",
+    "Injection method: skill or agents_file",
+    "skill"
+  )
+  .option("--skill-dir <path>", "Custom skill directory")
+  .action((options) => {
+    try {
+      const result = removeInjectedInsights({
+        method: options.method,
+        skillDir: options.skillDir,
+      });
+
+      if (result.success) {
+        console.log(`✓ ${result.message}`);
+      } else {
+        console.error(`✗ ${result.message}`);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+promptCmd
+  .command("status")
+  .description("Show prompt injection status")
+  .option("--skill-dir <path>", "Custom skill directory")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    try {
+      const status = getInjectionStatus({
+        skillDir: options.skillDir,
+      });
+
+      if (options.json) {
+        console.log(JSON.stringify(status, null, 2));
+      } else {
+        console.log("Prompt Injection Status:\n");
+        console.log(
+          `  Skill (brain-insights): ${status.skillExists ? "✓ installed" : "not installed"}`
+        );
+        console.log(`    Path: ${status.skillPath}`);
+        console.log(
+          `\n  AGENTS.md section: ${status.agentsHasSection ? "✓ present" : "not present"}`
+        );
+        console.log(`    Path: ${status.agentsPath}`);
+
+        if (!status.skillExists && !status.agentsHasSection) {
+          console.log("\n  No insights currently injected.");
+          console.log(
+            "  Run 'pi-brain prompt-learning inject' to inject insights."
+          );
+        }
+      }
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);
