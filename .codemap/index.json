@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 86,
-    "totalSymbols": 1040,
+    "totalSymbols": 1041,
     "byLanguage": {
       "typescript": 86
     },
@@ -12,13 +12,13 @@
       "variable": 102,
       "class": 11,
       "constructor": 10,
-      "method": 114,
+      "method": 115,
       "property": 45,
       "getter": 2
     }
   },
-  "total_tokens": 34765,
-  "codebase_tokens": 977679,
+  "total_tokens": 34803,
+  "codebase_tokens": 979858,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -3376,7 +3376,7 @@
       "language": "typescript",
       "lines": [
         1,
-        197
+        203
       ],
       "detail_level": "full",
       "token_estimate": 92,
@@ -3425,7 +3425,7 @@
           "signature": "async main(): Promise<void>",
           "lines": [
             44,
-            185
+            191
           ],
           "exported": false,
           "is_default": false,
@@ -6995,10 +6995,10 @@
       "language": "typescript",
       "lines": [
         1,
-        733
+        754
       ],
       "detail_level": "full",
-      "token_estimate": 1134,
+      "token_estimate": 1172,
       "symbols": [
         {
           "name": "JobType",
@@ -7196,7 +7196,7 @@
           "signature": "QueueManager",
           "lines": [
             151,
-            688
+            709
           ],
           "exported": true,
           "is_default": false,
@@ -7533,12 +7533,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "releaseAllRunning",
+          "kind": "method",
+          "signature": "releaseAllRunning(): number",
+          "lines": [
+            572,
+            586
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "QueueManager",
+          "annotation": null,
+          "comment": "Release ALL running jobs back to pending\n\nUse this on daemon startup to recover from a crash.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "getStats",
           "kind": "method",
           "signature": "getStats(): QueueStats",
           "lines": [
-            570,
-            605
+            591,
+            626
           ],
           "exported": false,
           "is_default": false,
@@ -7556,8 +7575,8 @@
           "kind": "method",
           "signature": "getJobCounts(): Record<JobStatus, number>",
           "lines": [
-            610,
-            635
+            631,
+            656
           ],
           "exported": false,
           "is_default": false,
@@ -7575,8 +7594,8 @@
           "kind": "method",
           "signature": "clearOldCompleted(daysOld: number): number",
           "lines": [
-            640,
-            652
+            661,
+            673
           ],
           "exported": false,
           "is_default": false,
@@ -7594,8 +7613,8 @@
           "kind": "method",
           "signature": "clearAll(): number",
           "lines": [
-            657,
-            660
+            678,
+            681
           ],
           "exported": false,
           "is_default": false,
@@ -7613,8 +7632,8 @@
           "kind": "method",
           "signature": "parseRow(row: QueueRow): AnalysisJob",
           "lines": [
-            665,
-            687
+            686,
+            708
           ],
           "exported": false,
           "is_default": false,
@@ -7632,8 +7651,8 @@
           "kind": "function",
           "signature": "generateJobId(): string",
           "lines": [
-            699,
-            701
+            720,
+            722
           ],
           "exported": true,
           "is_default": false,
@@ -7651,8 +7670,8 @@
           "kind": "function",
           "signature": "createQueueManager(db: Database.Database): QueueManager",
           "lines": [
-            706,
-            708
+            727,
+            729
           ],
           "exported": true,
           "is_default": false,
@@ -7670,8 +7689,8 @@
           "kind": "function",
           "signature": "getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; }",
           "lines": [
-            714,
-            732
+            735,
+            753
           ],
           "exported": true,
           "is_default": false,

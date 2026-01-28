@@ -557,6 +557,48 @@ describe("queueManager", () => {
     });
   });
 
+  describe("releaseAllRunning", () => {
+    it("should release all running jobs regardless of lock expiration", () => {
+      // Add a job and make it running (locked in future)
+      queue.enqueue({
+        type: "initial",
+        sessionFile: "/path/running.jsonl",
+      });
+      queue.dequeue("worker-1");
+
+      // Add another stale job (locked in past)
+      db.prepare(
+        `
+        INSERT INTO analysis_queue (
+          id, type, priority, session_file, status, queued_at,
+          started_at, worker_id, locked_until, max_retries
+        ) VALUES (
+          'stale-job-id34',
+          'initial',
+          100,
+          '/path/stale.jsonl',
+          'running',
+          datetime('now', '-1 hour'),
+          datetime('now', '-1 hour'),
+          'worker-dead',
+          datetime('now', '-30 minutes'),
+          3
+        )
+      `
+      ).run();
+
+      const count = queue.releaseAllRunning();
+
+      expect(count).toBe(2);
+
+      const job1 = queue.getJob("stale-job-id34");
+      expect(job1?.status).toBe("pending");
+
+      const runningJobs = queue.getRunningJobs();
+      expect(runningJobs).toHaveLength(0);
+    });
+  });
+
   describe("getStats", () => {
     it("should return queue statistics", () => {
       // First add the completed and failed jobs (they get dequeued immediately)

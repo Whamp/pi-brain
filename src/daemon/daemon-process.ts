@@ -63,6 +63,12 @@ async function main(): Promise<void> {
   const queue = createQueueManager(db);
   console.log("[daemon] Queue manager initialized");
 
+  // Release any stale jobs from previous run
+  const releasedCount = queue.releaseAllRunning();
+  if (releasedCount > 0) {
+    console.log(`[daemon] Released ${releasedCount} stale running jobs`);
+  }
+
   // Create worker
   const worker = createWorker({
     id: "worker-1",

@@ -406,7 +406,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-197]
+src/daemon/daemon-process.ts [1-203]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -646,9 +646,9 @@ src/daemon/query-processor.ts [1-724]
     - node:os
     - node:path
 
-src/daemon/queue.ts [1-733]
+src/daemon/queue.ts [1-754]
   class:
-    151-688: class QueueManager [exported]
+    151-709: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -671,11 +671,11 @@ src/daemon/queue.ts [1-733]
   /** Override default max re... [exported]
       /** Job creation input (id, status, queuedAt are auto-generated) */
   function:
-    699-701: generateJobId(): string [exported]
+    720-722: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
-    706-708: createQueueManager(db: Database.Database): QueueManager [exported]
+    727-729: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-    714-732: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    735-753: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
   variable:
     23-34: PRIORITY [exported]
@@ -1992,4 +1992,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 86
-Estimated tokens: 24,386 (codebase: ~975,977)
+Estimated tokens: 24,386 (codebase: ~977,833)

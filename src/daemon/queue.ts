@@ -565,6 +565,27 @@ export class QueueManager {
   }
 
   /**
+   * Release ALL running jobs back to pending
+   *
+   * Use this on daemon startup to recover from a crash.
+   */
+  releaseAllRunning(): number {
+    const result = this.db
+      .prepare(
+        `
+      UPDATE analysis_queue
+      SET status = 'pending',
+          worker_id = NULL,
+          locked_until = NULL
+      WHERE status = 'running'
+    `
+      )
+      .run();
+
+    return result.changes;
+  }
+
+  /**
    * Get queue statistics
    */
   getStats(): QueueStats {

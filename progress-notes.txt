@@ -325,3 +325,18 @@ Functions still in node-repository.ts (CRUD operations: clearAllData, insertNode
 **Commit**: [pending]
 
 **Notes**: Can now visualize the knowledge graph using external tools like Graphviz or Gephi via the exported DOT file.
+
+---
+
+## 2026-01-27 18:53 - Task 16.1 (Stale Job Recovery)
+
+**Status**: pending → done
+**Validation**: 
+- Added `releaseAllRunning()` to `QueueManager` in `src/daemon/queue.ts`.
+- Integrated `queue.releaseAllRunning()` into `src/daemon/daemon-process.ts` startup.
+- Added unit tests in `src/daemon/queue.test.ts` verifying that all running jobs are released regardless of lock expiration.
+- All 42 tests in `src/daemon/queue.test.ts` passed.
+
+**Commit**: [pending]
+
+**Notes**: This ensures that if the daemon crashes, any jobs that were in "running" state are immediately made available for retry upon daemon restart, rather than waiting for the 30-minute lock timeout.

@@ -231,7 +231,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-197]
+src/daemon/daemon-process.ts [1-203]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -720,7 +720,7 @@ src/daemon/query-processor.ts [1-724]
     - node:os
     - node:path
 
-src/daemon/queue.test.ts [1-698]
+src/daemon/queue.test.ts [1-740]
   imports:
     - ../storage/database.js
     - ./queue.js
@@ -730,9 +730,9 @@ src/daemon/queue.test.ts [1-698]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-733]
+src/daemon/queue.ts [1-754]
   class:
-    151-688: class QueueManager [exported]
+    151-709: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -762,26 +762,26 @@ src/daemon/queue.ts [1-733]
         - src/daemon/queue.ts:91: type Omit -> external
         - src/daemon/queue.ts:92: type AnalysisJob -> src/daemon/queue.ts
   function:
-    699-701: generateJobId(): string [exported]
+    720-722: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs out: 3 [call: 3]
-        - src/daemon/queue.ts:700: call slice -> external
-        - src/daemon/queue.ts:700: call replaceAll -> external
-        - src/daemon/queue.ts:700: call randomUUID -> external
-    706-708: createQueueManager(db: Database.Database): QueueManager [exported]
+        - src/daemon/queue.ts:721: call slice -> external
+        - src/daemon/queue.ts:721: call replaceAll -> external
+        - src/daemon/queue.ts:721: call randomUUID -> external
+    727-729: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/queue.ts:706: type Database -> external
-        - src/daemon/queue.ts:706: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/queue.ts:707: instantiate QueueManager -> src/daemon/queue.ts
-    714-732: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+        - src/daemon/queue.ts:727: type Database -> external
+        - src/daemon/queue.ts:727: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/queue.ts:728: instantiate QueueManager -> src/daemon/queue.ts
+    735-753: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs out: 5 [type: 5]
-        - src/daemon/queue.ts:714: type Database -> external
-        - src/daemon/queue.ts:715: type QueueStats -> src/daemon/queue.ts
-        - src/daemon/queue.ts:716: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:717: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:718: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:735: type Database -> external
+        - src/daemon/queue.ts:736: type QueueStats -> src/daemon/queue.ts
+        - src/daemon/queue.ts:737: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:738: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:739: type AnalysisJob -> src/daemon/queue.ts
   variable:
     23-34: PRIORITY [exported]
       /** Priority levels (lower = higher priority) */
@@ -1528,4 +1528,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,025 (codebase: ~977,679)
+Estimated tokens: 20,025 (codebase: ~979,858)

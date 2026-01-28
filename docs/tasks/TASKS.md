@@ -218,3 +218,14 @@ Ref: docs/plans/integration-repair-plan.md
 | ---- | ----------------------------------------------- | ------ | ---- | ---------- |
 | 15.1 | Implement fine-tuning data export (CLI command) | done   | -    | 2026-01-27 |
 | 15.2 | Implement Graphviz/DOT export (CLI command)     | done   | -    | 2026-01-27 |
+
+## Phase 16: Web UI Repair & Reliability
+
+Ref: docs/plans/web-ui-feature-report-repair-plan.md
+
+| ID   | Task                                     | Status  | Deps | Notes      |
+| ---- | ---------------------------------------- | ------- | ---- | ---------- |
+| 16.1 | Implement Stale Job Recovery             | done    | -    | 2026-01-27 |
+| 16.2 | Implement WebSocket Route Implementation | pending | -    |            |
+| 16.3 | Implement Status Polling Fallback        | pending | 16.2 |            |
+| 16.4 | News Feed UX Refinement                  | pending | -    |            |

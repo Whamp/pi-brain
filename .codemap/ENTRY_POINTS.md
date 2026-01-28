@@ -127,7 +127,7 @@ src/api/routes/config.ts [1-218]
 src/api/routes/daemon.ts [1-157]
   function:
     22-156: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 33 [call: 25, type: 8]
+      refs out: 32 [call: 24, type: 8]
         - src/api/routes/daemon.ts:22: type FastifyInstance -> external
         - src/api/routes/daemon.ts:22: type Promise -> external
         - src/api/routes/daemon.ts:26: call get -> external
@@ -585,4 +585,4 @@ src/cli.ts [1-1102]
 
 ---
 Files: 25
-Estimated tokens: 6,164 (codebase: ~975,977)
+Estimated tokens: 6,164 (codebase: ~977,833)
