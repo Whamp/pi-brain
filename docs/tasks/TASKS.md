@@ -198,3 +198,16 @@ Ref: docs/plans/refactor-monolith-node-repository.md
 | 13.9  | Extract `graph-repository.ts` (~300 lines) - graph traversal    | pending | 13.2      |            |
 | 13.10 | Update internal imports to use new modules                      | pending | 13.1-13.9 |            |
 | 13.11 | Clean up node-repository.ts to re-export from new modules       | pending | 13.10     |            |
+
+## Phase 14: Integration Repair
+
+Ref: docs/plans/integration-repair-plan.md
+
+| ID   | Task                                        | Status  | Deps | Notes      |
+| ---- | ------------------------------------------- | ------- | ---- | ---------- |
+| 14.1 | Fix Build Pipeline for Migrations           | done    | -    | 2026-01-27 |
+| 14.2 | Fix Worker Initialization                   | done    | -    | 2026-01-27 |
+| 14.3 | Non-Fatal Environment Validation            | done    | -    | 2026-01-27 |
+| 14.4 | Configure Vite Proxy                        | done    | -    | 2026-01-27 |
+| 14.5 | Frontend Graceful API Failure Handling      | active  | -    | 2026-01-27 |
+| 14.6 | RLM Skill Installation (optional, see 14.3) | pending | -    |            |

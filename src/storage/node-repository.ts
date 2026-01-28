@@ -19,18 +19,6 @@ import {
   getNodeEdges,
   type EdgeRow,
 } from "./edge-repository.js";
-// Import lesson functions for internal use
-import {
-  countLessons,
-  getLessonTags,
-  getLessonsByLevel,
-  getNodeLessons,
-  listLessons,
-  type LessonsByLevelResult,
-  type ListLessonsFilters,
-  type ListLessonsOptions,
-  type ListLessonsResult,
-} from "./lesson-repository.js";
 import {
   agentOutputToNode,
   type NodeConversionContext,
