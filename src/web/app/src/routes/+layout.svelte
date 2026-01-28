@@ -14,6 +14,7 @@
   import { wsStore } from "$lib/stores/websocket";
   import { daemonStore } from "$lib/stores/daemon";
   import ErrorFallback from "$lib/components/error-fallback.svelte";
+  import Toast from "$lib/components/toast.svelte";
 
   interface NavItem {
     href: string;
@@ -130,6 +131,8 @@
       {/snippet}
     </svelte:boundary>
   </main>
+
+  <Toast />
 </div>
 
 <style>

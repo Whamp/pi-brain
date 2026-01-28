@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Settings, Save, RotateCcw, AlertCircle, CheckCircle } from "lucide-svelte";
+  import { Settings, Save, RotateCcw } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
+  import { toastStore } from "$lib/stores/toast";
 
   interface Provider {
     id: string;
@@ -12,8 +13,6 @@
   // State
   let loading = $state(true);
   let saving = $state(false);
-  let errorMessage: string | null = $state(null);
-  let successMessage: string | null = $state(null);
 
   // Config values
   let provider = $state("");
@@ -63,9 +62,11 @@
       originalParallelWorkers = config.parallelWorkers;
     } catch (error) {
       console.error("Failed to load config:", error);
-      errorMessage = isBackendOffline(error)
-        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
-        : getErrorMessage(error);
+      toastStore.error(
+        isBackendOffline(error)
+          ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+          : getErrorMessage(error)
+      );
     }
   }
 
@@ -86,8 +87,6 @@
 
   async function saveConfig() {
     saving = true;
-    errorMessage = null;
-    successMessage = null;
 
     try {
       const result = await api.updateDaemonConfig({
@@ -103,17 +102,14 @@
       originalIdleTimeoutMinutes = result.idleTimeoutMinutes;
       originalParallelWorkers = result.parallelWorkers;
 
-      successMessage = result.message;
-
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        successMessage = null;
-      }, 5000);
+      toastStore.success(result.message);
     } catch (error) {
       console.error("Failed to save config:", error);
-      errorMessage = isBackendOffline(error)
-        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
-        : getErrorMessage(error);
+      toastStore.error(
+        isBackendOffline(error)
+          ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+          : getErrorMessage(error)
+      );
     } finally {
       saving = false;
     }
@@ -124,8 +120,7 @@
     model = originalModel;
     idleTimeoutMinutes = originalIdleTimeoutMinutes;
     parallelWorkers = originalParallelWorkers;
-    errorMessage = null;
-    successMessage = null;
+    toastStore.info("Settings reset to last saved values");
   }
 
   function handleProviderChange() {
@@ -157,20 +152,6 @@
       <p>Loading configuration...</p>
     </div>
   {:else}
-    {#if successMessage}
-      <div class="message success">
-        <CheckCircle size={18} />
-        {successMessage}
-      </div>
-    {/if}
-
-    {#if errorMessage}
-      <div class="message error">
-        <AlertCircle size={18} />
-        {errorMessage}
-      </div>
-    {/if}
-
     <section class="settings-section">
       <h2>Daemon Agent Model</h2>
       <p class="section-description">
@@ -302,28 +283,6 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  .message {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-4);
-    font-size: var(--text-sm);
-  }
-
-  .message.success {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid var(--color-success);
-    color: var(--color-success);
-  }
-
-  .message.error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--color-error);
-    color: var(--color-error);
   }
 
   .settings-section {

@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 89,
-    "totalSymbols": 1109,
+    "totalFiles": 90,
+    "totalSymbols": 1117,
     "byLanguage": {
-      "typescript": 89
+      "typescript": 90
     },
     "bySymbolKind": {
-      "function": 494,
-      "type": 40,
-      "interface": 260,
-      "variable": 107,
+      "function": 495,
+      "type": 41,
+      "interface": 262,
+      "variable": 111,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38108,
-  "codebase_tokens": 1045885,
+  "total_tokens": 38281,
+  "codebase_tokens": 1047195,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -21797,10 +21797,10 @@
       "language": "typescript",
       "lines": [
         1,
-        17
+        18
       ],
       "detail_level": "full",
-      "token_estimate": 37,
+      "token_estimate": 42,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -21809,6 +21809,7 @@
         "./api/client",
         "./stores/daemon",
         "./stores/nodes",
+        "./stores/toast",
         "./stores/websocket",
         "./types"
       ]
@@ -22040,6 +22041,176 @@
       "imports": [
         "$lib/api/client",
         "$lib/types",
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/toast.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        114
+      ],
+      "detail_level": "full",
+      "token_estimate": 168,
+      "symbols": [
+        {
+          "name": "ToastType",
+          "kind": "type",
+          "signature": "ToastType = \"success\" | \"error\" | \"warning\" | \"info\"",
+          "lines": [
+            7,
+            7
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "Toast",
+          "kind": "interface",
+          "signature": "Toast",
+          "lines": [
+            9,
+            15
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToastState",
+          "kind": "interface",
+          "signature": "ToastState",
+          "lines": [
+            17,
+            19
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "initialState",
+          "kind": "variable",
+          "signature": "ToastState",
+          "lines": [
+            21,
+            23
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toastIdCounter",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            25,
+            25
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createToastStore",
+          "kind": "function",
+          "signature": "createToastStore(): { subscribe: any; success(message: string, duration?: number): string; error(message: string, duration?: number): string; warning(message: string, duration?: number): string; info(message: string, duration?: number): string; dismiss(id: string): void; dismissAll(): void; }",
+          "lines": [
+            27,
+            108
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toastStore",
+          "kind": "variable",
+          "signature": "toastStore",
+          "lines": [
+            110,
+            110
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toasts",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            113,
+            113
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "svelte/store"
       ]
     },

@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 89 files
+- typescript: 90 files
 
 ## Statistics
-- Total files: 89
-- Total symbols: 653
+- Total files: 90
+- Total symbols: 657
   - function: 368
-  - interface: 206
-  - type: 39
-  - variable: 28
+  - interface: 207
+  - type: 40
+  - variable: 30
   - class: 12
 
 ---
@@ -2026,11 +2026,12 @@ src/web/app/src/lib/api/client.ts [1-537]
   imports:
     - $lib/types
 
-src/web/app/src/lib/index.ts [1-17]
+src/web/app/src/lib/index.ts [1-18]
   imports:
     - ./api/client
     - ./stores/daemon
     - ./stores/nodes
+    - ./stores/toast
     - ./stores/websocket
     - ./types
 
@@ -2049,6 +2050,17 @@ src/web/app/src/lib/stores/nodes.ts [1-112]
   imports:
     - $lib/api/client
     - $lib/types
+    - svelte/store
+
+src/web/app/src/lib/stores/toast.ts [1-114]
+  interface:
+    9-15: interface Toast [exported]
+  type:
+    7-7: ToastType = "success" | "error" | "warning" | "info" [exported]
+  variable:
+    110-110: toastStore [exported]
+    113-113: any [exported]
+  imports:
     - svelte/store
 
 src/web/app/src/lib/stores/websocket.ts [1-175]
@@ -2113,5 +2125,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 89
-Estimated tokens: 26,659 (codebase: ~1,045,667)
+Files: 90
+Estimated tokens: 26,734 (codebase: ~1,046,473)
