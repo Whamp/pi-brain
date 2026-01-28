@@ -62,3 +62,21 @@ Main branch: major/pi-brain
 **Result**: When backend is offline, users now see actionable messages like:
   "Backend is offline. Start the daemon with 'pi-brain daemon start'."
   instead of cryptic JSON parsing errors.
+
+---
+
+## 2026-01-27 16:11 - Code Review Fixes (Task 14.5)
+
+**Status**: done
+**Validation**: 
+- `npm test -- --run` passes (1198 tests)
+- `svelte-check` passes
+- Verified removal of brittle browser checks
+
+**Commit**: b27afa6
+
+**Changes**:
+- `src/web/app/src/lib/api/client.ts`: Removed `error.message.includes("fetch")` check, now catches all TypeErrors as network errors in that block.
+- `src/web/app/src/routes/+page.svelte`: Simplified catch block since API errors are handled by `Promise.allSettled`.
+
+**Notes**: Addressed P2 and P3 issues from code review.
