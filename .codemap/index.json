@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 96,
-    "totalSymbols": 1225,
+    "totalFiles": 97,
+    "totalSymbols": 1230,
     "byLanguage": {
-      "typescript": 96
+      "typescript": 97
     },
     "bySymbolKind": {
-      "function": 518,
+      "function": 521,
       "type": 42,
-      "interface": 280,
+      "interface": 282,
       "variable": 132,
       "class": 15,
       "property": 62,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 42105,
-  "codebase_tokens": 1151490,
+  "total_tokens": 42315,
+  "codebase_tokens": 1156830,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -16583,6 +16583,122 @@
       "imports": []
     },
     {
+      "path": "src/storage/bridge-discovery.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        260
+      ],
+      "detail_level": "full",
+      "token_estimate": 203,
+      "symbols": [
+        {
+          "name": "BridgePath",
+          "kind": "interface",
+          "signature": "BridgePath",
+          "lines": [
+            23,
+            32
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "A discovered path in the graph",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BridgeDiscoveryOptions",
+          "kind": "interface",
+          "signature": "BridgeDiscoveryOptions",
+          "lines": [
+            34,
+            41
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findBridgePaths",
+          "kind": "function",
+          "signature": "findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {}",
+          "lines": [
+            57,
+            218
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find interesting multi-hop paths originating from seed nodes.\n\nUses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence\nand node relevance.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generatePathDescription",
+          "kind": "function",
+          "signature": "generatePathDescription(nodes: NodeRow[], edges: EdgeRow[]): string",
+          "lines": [
+            223,
+            252
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Generate a human-readable description of the path",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "truncate",
+          "kind": "function",
+          "signature": "truncate(str: string, len = 30): string",
+          "lines": [
+            254,
+            259
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./edge-repository.js",
+        "./node-crud.js",
+        "./node-storage.js",
+        "better-sqlite3"
+      ]
+    },
+    {
       "path": "src/storage/database.ts",
       "language": "typescript",
       "lines": [
@@ -18249,15 +18365,16 @@
       "language": "typescript",
       "lines": [
         1,
-        21
+        22
       ],
       "detail_level": "full",
-      "token_estimate": 115,
+      "token_estimate": 122,
       "symbols": [],
       "annotation": null,
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./bridge-discovery.js",
         "./database.js",
         "./edge-repository.js",
         "./embedding-utils.js",

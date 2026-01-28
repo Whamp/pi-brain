@@ -1,17 +1,31 @@
 # Project Overview
 
 ## Languages
-- typescript: 19 files
+- typescript: 20 files
 
 ## Statistics
-- Total files: 19
-- Total symbols: 210
-  - function: 139
-  - interface: 56
+- Total files: 20
+- Total symbols: 213
+  - function: 140
+  - interface: 58
   - type: 10
   - variable: 5
 
 ---
+
+src/storage/bridge-discovery.ts [1-260]
+  interface:
+    23-32: interface BridgePath [exported]
+      /** A discovered path in the graph */
+    34-41: interface BridgeDiscoveryOptions [exported]
+  function:
+    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+      /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-storage.js
+    - better-sqlite3
 
 src/storage/database.ts [1-298]
   interface:
@@ -201,8 +215,9 @@ src/storage/hybrid-search.ts [1-609]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/index.ts [1-21]
+src/storage/index.ts [1-22]
   imports:
+    - ./bridge-discovery.js
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
@@ -626,5 +641,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 19
-Estimated tokens: 9,787 (codebase: ~1,146,922)
+Files: 20
+Estimated tokens: 9,947 (codebase: ~1,153,399)

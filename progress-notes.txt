@@ -329,3 +329,25 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: 6525ed34
 **Notes**: Hybrid search enables multi-signal ranking for brain queries. Next task 20.4.2 will implement bridge discovery for multi-hop graph traversal to explain context between nodes.
+
+---
+
+## 2026-01-28 12:40 - Task 20.4.2
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/storage/bridge-discovery.ts with findBridgePaths()
+  - Implemented multi-hop traversal to explain context between nodes
+  - Implemented path scoring based on edge confidence and hop penalty
+  - Implemented human-readable path description generation with node summaries
+  - Added 6 unit tests covering:
+    - Direct connections (1 hop)
+    - Multi-hop paths (2 hops)
+    - Score thresholding
+    - Cycle detection
+    - Path prioritization
+    - Description generation
+  - All 1380 tests pass (6 new tests added)
+  - Lint/format checks pass
+**Commit**: [hash]
+**Notes**: Bridge discovery enables the system to explain "why" two nodes are related by finding causal or semantic paths between them. Next task 20.4.3 will expose these new query capabilities via the API.

@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 96 files
+- typescript: 97 files
 
 ## Statistics
-- Total files: 96
-- Total symbols: 689
-  - function: 381
-  - interface: 220
+- Total files: 97
+- Total symbols: 692
+  - function: 382
+  - interface: 222
   - type: 41
   - variable: 32
   - class: 15
@@ -1316,6 +1316,20 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
+src/storage/bridge-discovery.ts [1-260]
+  interface:
+    23-32: interface BridgePath [exported]
+      /** A discovered path in the graph */
+    34-41: interface BridgeDiscoveryOptions [exported]
+  function:
+    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+      /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-storage.js
+    - better-sqlite3
+
 src/storage/database.ts [1-298]
   interface:
     20-34: interface DatabaseOptions [exported]
@@ -1504,8 +1518,9 @@ src/storage/hybrid-search.ts [1-609]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/index.ts [1-21]
+src/storage/index.ts [1-22]
   imports:
+    - ./bridge-discovery.js
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
@@ -2256,5 +2271,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 96
-Estimated tokens: 28,459 (codebase: ~1,146,922)
+Files: 97
+Estimated tokens: 28,619 (codebase: ~1,153,399)

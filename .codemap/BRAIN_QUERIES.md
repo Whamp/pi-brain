@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 61 files
+- typescript: 63 files
 
 ## Statistics
-- Total files: 61
-- Total symbols: 351
-  - function: 211
-  - interface: 96
+- Total files: 63
+- Total symbols: 354
+  - function: 212
+  - interface: 98
   - variable: 18
   - type: 17
   - class: 9
@@ -1526,6 +1526,46 @@ src/daemon/worker.ts [1-741]
     - better-sqlite3
     - node:path
 
+src/storage/bridge-discovery.test.ts [1-207]
+  imports:
+    - ./bridge-discovery.js
+    - ./database.js
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-types.js
+    - better-sqlite3
+    - node:fs
+    - node:os
+    - node:path
+    - vitest
+
+src/storage/bridge-discovery.ts [1-260]
+  interface:
+    23-32: interface BridgePath [exported]
+      /** A discovered path in the graph */
+      refs in: 2 [type: 2]
+        - src/storage/bridge-discovery.ts:61: type findBridgePaths
+        - src/storage/bridge-discovery.ts:104: type discoveredPaths
+    34-41: interface BridgeDiscoveryOptions [exported]
+      refs in: 1 [type: 1]
+        - src/storage/bridge-discovery.ts:60: type findBridgePaths
+  function:
+    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+      /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
+      refs in: 7 [call: 6, import: 1]
+        - src/storage/bridge-discovery.test.ts:8: import (module)
+        - src/storage/bridge-discovery.test.ts:107: call paths
+        - src/storage/bridge-discovery.test.ts:130: call paths
+        - src/storage/bridge-discovery.test.ts:150: call paths
+        - src/storage/bridge-discovery.test.ts:164: call paths
+        - src/storage/bridge-discovery.test.ts:188: call paths
+        - src/storage/bridge-discovery.test.ts:203: call paths
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-storage.js
+    - better-sqlite3
+
 src/storage/database-vec.test.ts [1-72]
   imports:
     - ./database
@@ -1556,7 +1596,7 @@ src/storage/database.ts [1-298]
   function:
     46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 118 [call: 102, import: 16]
+      refs in: 120 [call: 103, import: 17]
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:131: call db
         - src/api/server.test.ts:145: call db
@@ -1614,7 +1654,7 @@ src/storage/database.ts [1-298]
         - src/api/server.test.ts:211: call (module)
     254-256: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-      refs in: 20 [call: 14, import: 6]
+      refs in: 22 [call: 15, import: 7]
         - src/daemon/queue.test.ts:12: import (module)
         - src/daemon/queue.test.ts:34: call (module)
         - src/daemon/worker.test.ts:14: import (module)
@@ -1622,9 +1662,9 @@ src/storage/database.ts [1-298]
         - src/daemon/worker.test.ts:279: call (module)
         - src/daemon/worker.test.ts:373: call (module)
         - src/daemon/worker.test.ts:461: call (module)
+        - src/storage/bridge-discovery.test.ts:9: import (module)
+        - src/storage/bridge-discovery.test.ts:34: call (module)
         - src/storage/database-vec.test.ts:8: import (module)
-        - src/storage/database-vec.test.ts:17: call (module)
-        - src/storage/database.test.ts:13: import (module)
     261-268: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
       refs in: 4 [call: 3, import: 1]
@@ -1719,17 +1759,17 @@ src/storage/edge-repository.ts [1-197]
   interface:
     19-30: interface EdgeRow [exported]
       /** Edge row from the database */
-      refs in: 15 [import: 1, type: 14]
+      refs in: 19 [import: 2, type: 17]
+        - src/storage/bridge-discovery.ts:12: import (module)
+        - src/storage/bridge-discovery.ts:27: type BridgePath
+        - src/storage/bridge-discovery.ts:87: type queue
+        - src/storage/bridge-discovery.ts:223: type generatePathDescription
         - src/storage/edge-repository.ts:97: type getEdgesFrom
         - src/storage/edge-repository.ts:103: type getEdgesFrom
         - src/storage/edge-repository.ts:109: type getEdgesTo
         - src/storage/edge-repository.ts:115: type getEdgesTo
         - src/storage/edge-repository.ts:121: type getNodeEdges
         - src/storage/edge-repository.ts:127: type getNodeEdges
-        - src/storage/edge-repository.ts:133: type getAllEdges
-        - src/storage/edge-repository.ts:135: type getAllEdges
-        - src/storage/edge-repository.ts:141: type getEdge
-        - src/storage/edge-repository.ts:143: type getEdge
   function:
     39-41: generateEdgeId(): string [exported]
       /** Generate a unique edge ID with 'edg_' prefix */
@@ -1742,20 +1782,22 @@ src/storage/edge-repository.ts [1-197]
     similarity?: number;
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-      refs in: 62 [call: 57, import: 5]
+      refs in: 72 [call: 66, import: 6]
         - src/daemon/connection-discovery.test.ts:4: import (module)
         - src/daemon/connection-discovery.test.ts:192: call (module)
         - src/daemon/connection-discovery.ts:13: import (module)
         - src/daemon/connection-discovery.ts:272: call ConnectionDiscoverer.edge
         - src/daemon/connection-discovery.ts:399: call ConnectionDiscoverer.edge
         - src/daemon/connection-discovery.ts:484: call ConnectionDiscoverer.edge
-        - src/storage/index.test.ts:20: import (module)
-        - src/storage/index.test.ts:1237: call edge
-        - src/storage/index.test.ts:1254: call edge
-        - src/storage/index.test.ts:1275: call (module)
+        - src/storage/bridge-discovery.test.ts:10: import (module)
+        - src/storage/bridge-discovery.test.ts:105: call (module)
+        - src/storage/bridge-discovery.test.ts:127: call (module)
+        - src/storage/bridge-discovery.test.ts:128: call (module)
     97-104: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-      refs in: 10 [call: 7, import: 3]
+      refs in: 12 [call: 8, import: 4]
+        - src/storage/bridge-discovery.ts:12: import (module)
+        - src/storage/bridge-discovery.ts:183: call outgoingEdges
         - src/storage/graph-repository.ts:17: import (module)
         - src/storage/graph-repository.ts:144: call outgoing
         - src/storage/index.test.ts:39: import (module)
@@ -1764,8 +1806,6 @@ src/storage/edge-repository.ts [1-197]
         - src/storage/index.test.ts:2176: call (module)
         - src/storage/relationship-edges.test.ts:15: import (module)
         - src/storage/relationship-edges.test.ts:196: call edges
-        - src/storage/relationship-edges.test.ts:221: call edges
-        - src/storage/relationship-edges.test.ts:384: call edges
     109-116: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
       refs in: 6 [call: 4, import: 2]
@@ -2145,8 +2185,9 @@ src/storage/index.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/index.ts [1-21]
+src/storage/index.ts [1-22]
   imports:
+    - ./bridge-discovery.js
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
@@ -2295,7 +2336,7 @@ src/storage/node-crud.ts [1-763]
         - src/storage/node-crud.ts:582: type getAllNodeVersions
     45-72: interface NodeRow [exported]
       /** Node row from the database */
-      refs in: 47 [import: 9, type: 38]
+      refs in: 54 [import: 10, type: 44]
         - src/daemon/connection-discovery.ts:10: import (module)
         - src/daemon/connection-discovery.ts:311: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:332: type ConnectionDiscoverer.findCandidates
@@ -2303,9 +2344,9 @@ src/storage/node-crud.ts [1-763]
         - src/daemon/graph-export.ts:97: type formatNodeLabel
         - src/daemon/query-processor.ts:16: import (module)
         - src/daemon/query-processor.ts:296: type nodeRowToRelevant
-        - src/storage/graph-repository.ts:13: import (module)
-        - src/storage/graph-repository.ts:72: type ConnectedNodesResult
-        - src/storage/graph-repository.ts:199: type nodes
+        - src/storage/bridge-discovery.ts:13: import (module)
+        - src/storage/bridge-discovery.ts:25: type BridgePath
+        - src/storage/bridge-discovery.ts:71: type nodesMap
   function:
     81-112: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node */
@@ -2345,7 +2386,7 @@ src/storage/node-crud.ts [1-763]
         - src/storage/node-crud.ts:348: call upsertNode
     310-324: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-      refs in: 247 [call: 244, import: 3]
+      refs in: 249 [call: 245, import: 4]
         - src/daemon/semantic-search.integration.test.ts:12: import (module)
         - src/daemon/semantic-search.integration.test.ts:156: call (module)
         - src/daemon/semantic-search.integration.test.ts:157: call (module)
@@ -2353,9 +2394,9 @@ src/storage/node-crud.ts [1-763]
         - src/daemon/semantic-search.integration.test.ts:249: call (module)
         - src/daemon/semantic-search.integration.test.ts:250: call (module)
         - src/daemon/semantic-search.integration.test.ts:290: call (module)
+        - src/storage/bridge-discovery.test.ts:11: import (module)
+        - src/storage/bridge-discovery.test.ts:40: call createTestNode
         - src/storage/decision-repository.test.ts:13: import (module)
-        - src/storage/decision-repository.test.ts:96: call (module)
-        - src/storage/decision-repository.test.ts:107: call (module)
     335-442: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
@@ -2379,17 +2420,17 @@ src/storage/node-crud.ts [1-763]
         - src/storage/index.test.ts:908: call (module)
     544-550: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-      refs in: 11 [call: 9, import: 2]
+      refs in: 14 [call: 11, import: 3]
         - src/daemon/connection-discovery.ts:14: import (module)
         - src/daemon/connection-discovery.ts:205: call ConnectionDiscoverer.sourceNode
         - src/daemon/connection-discovery.ts:390: call ConnectionDiscoverer.targetNode
+        - src/storage/bridge-discovery.ts:13: import (module)
+        - src/storage/bridge-discovery.ts:75: call node
+        - src/storage/bridge-discovery.ts:142: call findBridgePaths
         - src/storage/index.test.ts:43: import (module)
         - src/storage/index.test.ts:304: call row
         - src/storage/index.test.ts:442: call result
         - src/storage/index.test.ts:450: call result
-        - src/storage/index.test.ts:665: call dbNode
-        - src/storage/index.test.ts:833: call row
-        - src/storage/index.test.ts:852: call row
     557-567: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
       refs in: 3 [call: 2, import: 1]
@@ -2697,7 +2738,7 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:219: call (module)
     107-114: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 24 [call: 13, import: 11]
+      refs in: 26 [call: 14, import: 12]
         - src/api/routes/nodes.ts:20: import (module)
         - src/api/routes/nodes.ts:152: call node
         - src/daemon/cli.ts:38: import (module)
@@ -2784,16 +2825,17 @@ src/storage/node-types.ts [1-129]
   function:
     25-27: generateNodeId(): string [exported]
       /** Generate a unique 16-character hex node ID Uses first 16 chars of UUID (64 bits of entropy) */
-      refs in: 9 [call: 7, import: 2]
-        - src/storage/index.test.ts:73: import (module)
-        - src/storage/index.test.ts:90: call id
-        - src/storage/node-storage.test.ts:29: import (module)
-        - src/storage/node-storage.test.ts:37: call id
-        - src/storage/node-storage.test.ts:368: call nodeId
-        - src/storage/node-storage.test.ts:448: call nodeId
-        - src/storage/node-storage.test.ts:519: call nodeId
-        - src/storage/node-storage.test.ts:747: call id
-        - src/storage/node-storage.test.ts:754: call (module)
+      refs in: 24 [call: 21, import: 3]
+        - src/storage/bridge-discovery.test.ts:12: import (module)
+        - src/storage/bridge-discovery.test.ts:99: call idA
+        - src/storage/bridge-discovery.test.ts:100: call idB
+        - src/storage/bridge-discovery.test.ts:119: call idA
+        - src/storage/bridge-discovery.test.ts:120: call idB
+        - src/storage/bridge-discovery.test.ts:121: call idC
+        - src/storage/bridge-discovery.test.ts:142: call idA
+        - src/storage/bridge-discovery.test.ts:143: call idB
+        - src/storage/bridge-discovery.test.ts:155: call idA
+        - src/storage/bridge-discovery.test.ts:156: call idB
     29-31: generateLessonId(): string [exported]
       refs in: 2 [call: 1, import: 1]
         - src/storage/node-crud.ts:22: import (module)
@@ -3420,5 +3462,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 61
-Estimated tokens: 45,158 (codebase: ~1,151,490)
+Files: 63
+Estimated tokens: 45,615 (codebase: ~1,156,830)

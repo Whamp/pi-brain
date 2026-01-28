@@ -18,3 +18,4 @@ export * from "./embedding-utils.js";
 export * from "./relationship-edges.js";
 export * from "./semantic-search.js";
 export * from "./hybrid-search.js";
+export * from "./bridge-discovery.js";
