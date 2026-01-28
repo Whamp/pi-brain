@@ -1,9 +1,9 @@
 {
   "stats": {
-    "totalFiles": 84,
+    "totalFiles": 85,
     "totalSymbols": 1030,
     "byLanguage": {
-      "typescript": 84
+      "typescript": 85
     },
     "bySymbolKind": {
       "function": 462,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34315,
-  "codebase_tokens": 970049,
+  "total_tokens": 34364,
+  "codebase_tokens": 971255,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14638,14 +14638,206 @@
       ]
     },
     {
+      "path": "src/storage/graph-repository.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        366
+      ],
+      "detail_level": "full",
+      "token_estimate": 566,
+      "symbols": [
+        {
+          "name": "TraversalDirection",
+          "kind": "type",
+          "signature": "TraversalDirection = \"incoming\" | \"outgoing\" | \"both\"",
+          "lines": [
+            28,
+            28
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Direction for graph traversal",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConnectedNodesOptions",
+          "kind": "interface",
+          "signature": "ConnectedNodesOptions",
+          "lines": [
+            31,
+            47
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for getConnectedNodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "TraversalEdge",
+          "kind": "interface",
+          "signature": "TraversalEdge",
+          "lines": [
+            50,
+            65
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "An edge with direction information for traversal results",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConnectedNodesResult",
+          "kind": "interface",
+          "signature": "ConnectedNodesResult",
+          "lines": [
+            68,
+            75
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from getConnectedNodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getConnectedNodes",
+          "kind": "function",
+          "signature": "getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult",
+          "lines": [
+            110,
+            215
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all nodes connected to a specific node with graph traversal.\n\nSupports:\n- Multi-hop traversal (depth 1-5)\n- Direction filtering (incoming, outgoing, both)\n- Edge type filtering\n\nBased on specs/storage.md graph traversal query and specs/api.md\nGET /api/v1/nodes/:id/connected endpoint.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getSubgraph",
+          "kind": "function",
+          "signature": "getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult",
+          "lines": [
+            224,
+            271
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get the subgraph for visualization - returns nodes and edges\nwithin a given depth from multiple root nodes.\n\nUnlike getConnectedNodes, this INCLUDES the root nodes in the result,\nwhich is useful for rendering a graph view starting from selected nodes.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findPath",
+          "kind": "function",
+          "signature": "findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; }",
+          "lines": [
+            279,
+            333
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get the path between two nodes if one exists.\nUses BFS to find the shortest path.\n\nReturns null if no path exists.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAncestors",
+          "kind": "function",
+          "signature": "getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
+          "lines": [
+            339,
+            349
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all ancestors of a node (nodes that lead TO this node).\nFollows incoming edges only.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getDescendants",
+          "kind": "function",
+          "signature": "getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
+          "lines": [
+            355,
+            365
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all descendants of a node (nodes that this node leads TO).\nFollows outgoing edges only.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./edge-repository.js",
+        "./node-crud.js",
+        "./node-types.js",
+        "better-sqlite3"
+      ]
+    },
+    {
       "path": "src/storage/index.ts",
       "language": "typescript",
       "lines": [
         1,
-        17
+        18
       ],
       "detail_level": "full",
-      "token_estimate": 88,
+      "token_estimate": 95,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -14653,6 +14845,7 @@
       "imports": [
         "./database.js",
         "./edge-repository.js",
+        "./graph-repository.js",
         "./lesson-repository.js",
         "./node-conversion.js",
         "./node-crud.js",
@@ -15564,18 +15757,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1092
+        769
       ],
       "detail_level": "full",
-      "token_estimate": 1594,
+      "token_estimate": 1070,
       "symbols": [
         {
           "name": "clearAllData",
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            160,
-            189
+            159,
+            188
           ],
           "exported": true,
           "is_default": false,
@@ -15593,8 +15786,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            195,
-            261
+            194,
+            260
           ],
           "exported": true,
           "is_default": false,
@@ -15612,8 +15805,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            267,
-            281
+            266,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -15631,8 +15824,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            292,
-            399
+            291,
+            398
           ],
           "exported": true,
           "is_default": false,
@@ -15650,8 +15843,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            406,
-            496
+            405,
+            495
           ],
           "exported": true,
           "is_default": false,
@@ -15669,8 +15862,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): any",
           "lines": [
-            501,
-            507
+            500,
+            506
           ],
           "exported": true,
           "is_default": false,
@@ -15688,8 +15881,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): any",
           "lines": [
-            514,
-            524
+            513,
+            523
           ],
           "exported": true,
           "is_default": false,
@@ -15707,8 +15900,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            529,
-            532
+            528,
+            531
           ],
           "exported": true,
           "is_default": false,
@@ -15726,8 +15919,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            537,
-            543
+            536,
+            542
           ],
           "exported": true,
           "is_default": false,
@@ -15745,8 +15938,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            549,
-            555
+            548,
+            554
           ],
           "exported": true,
           "is_default": false,
@@ -15764,8 +15957,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any",
           "lines": [
-            560,
-            572
+            559,
+            571
           ],
           "exported": true,
           "is_default": false,
@@ -15783,8 +15976,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            577,
-            588
+            576,
+            587
           ],
           "exported": true,
           "is_default": false,
@@ -15802,8 +15995,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            593,
-            604
+            592,
+            603
           ],
           "exported": true,
           "is_default": false,
@@ -15821,8 +16014,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            613,
-            638
+            612,
+            637
           ],
           "exported": true,
           "is_default": false,
@@ -15840,8 +16033,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            641,
-            648
+            640,
+            647
           ],
           "exported": false,
           "is_default": false,
@@ -15859,8 +16052,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            653,
-            658
+            652,
+            657
           ],
           "exported": false,
           "is_default": false,
@@ -15878,8 +16071,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            665,
-            703
+            664,
+            702
           ],
           "exported": true,
           "is_default": false,
@@ -15897,8 +16090,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            708,
-            719
+            707,
+            718
           ],
           "exported": false,
           "is_default": false,
@@ -15910,177 +16103,6 @@
           "comment": "Check if a node has any incoming edges from the same session",
           "incoming_refs": null,
           "outgoing_refs": null
-        },
-        {
-          "name": "TraversalDirection",
-          "kind": "type",
-          "signature": "TraversalDirection = \"incoming\" | \"outgoing\" | \"both\"",
-          "lines": [
-            755,
-            755
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Direction for graph traversal",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ConnectedNodesOptions",
-          "kind": "interface",
-          "signature": "ConnectedNodesOptions",
-          "lines": [
-            758,
-            774
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Options for getConnectedNodes",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "TraversalEdge",
-          "kind": "interface",
-          "signature": "TraversalEdge",
-          "lines": [
-            777,
-            792
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "An edge with direction information for traversal results",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ConnectedNodesResult",
-          "kind": "interface",
-          "signature": "ConnectedNodesResult",
-          "lines": [
-            795,
-            802
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Result from getConnectedNodes",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getConnectedNodes",
-          "kind": "function",
-          "signature": "getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult",
-          "lines": [
-            833,
-            938
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all nodes connected to a specific node with graph traversal.\n\nSupports:\n- Multi-hop traversal (depth 1-5)\n- Direction filtering (incoming, outgoing, both)\n- Edge type filtering\n\nBased on specs/storage.md graph traversal query and specs/api.md\nGET /api/v1/nodes/:id/connected endpoint.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getSubgraph",
-          "kind": "function",
-          "signature": "getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult",
-          "lines": [
-            947,
-            994
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get the subgraph for visualization - returns nodes and edges\nwithin a given depth from multiple root nodes.\n\nUnlike getConnectedNodes, this INCLUDES the root nodes in the result,\nwhich is useful for rendering a graph view starting from selected nodes.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "findPath",
-          "kind": "function",
-          "signature": "findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; }",
-          "lines": [
-            1002,
-            1056
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get the path between two nodes if one exists.\nUses BFS to find the shortest path.\n\nReturns null if no path exists.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAncestors",
-          "kind": "function",
-          "signature": "getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
-          "lines": [
-            1062,
-            1072
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all ancestors of a node (nodes that lead TO this node).\nFollows incoming edges only.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getDescendants",
-          "kind": "function",
-          "signature": "getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
-          "lines": [
-            1078,
-            1088
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all descendants of a node (nodes that this node leads TO).\nFollows outgoing edges only.",
-          "incoming_refs": null,
-          "outgoing_refs": null
         }
       ],
       "annotation": null,
@@ -16088,6 +16110,7 @@
       "code_blocks": null,
       "imports": [
         "./edge-repository.js",
+        "./graph-repository.js",
         "./lesson-repository.js",
         "./node-conversion.js",
         "./node-crud.js",

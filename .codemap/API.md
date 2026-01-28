@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 84 files
+- typescript: 85 files
 
 ## Statistics
-- Total files: 84
+- Total files: 85
 - Total symbols: 611
   - function: 339
   - interface: 197
@@ -1237,10 +1237,39 @@ src/storage/edge-repository.ts [1-178]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-17]
+src/storage/graph-repository.ts [1-366]
+  interface:
+    31-47: interface ConnectedNodesOptions [exported]
+      /** Options for getConnectedNodes */
+    50-65: interface TraversalEdge [exported]
+      /** An edge with direction information for traversal results */
+    68-75: interface ConnectedNodesResult [exported]
+      /** Result from getConnectedNodes */
+  type:
+    28-28: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
+      /** Direction for graph traversal */
+  function:
+    110-215: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+      /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
+    224-271: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+      /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
+    279-333: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+      /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
+    339-349: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+      /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
+    355-365: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+      /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-types.js
+    - better-sqlite3
+
+src/storage/index.ts [1-18]
   imports:
     - ./database.js
     - ./edge-repository.js
+    - ./graph-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -1391,62 +1420,43 @@ src/storage/node-queries.ts [1-455]
     - ./node-crud.js
     - better-sqlite3
 
-src/storage/node-repository.ts [1-1092]
-  interface:
-    758-774: interface ConnectedNodesOptions [exported]
-      /** Options for getConnectedNodes */
-    777-792: interface TraversalEdge [exported]
-      /** An edge with direction information for traversal results */
-    795-802: interface ConnectedNodesResult [exported]
-      /** Result from getConnectedNodes */
-  type:
-    755-755: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
-      /** Direction for graph traversal */
+src/storage/node-repository.ts [1-769]
   function:
-    160-189: clearAllData(db: Database.Database): void [exported]
+    159-188: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    195-261: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    194-260: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    267-281: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    266-280: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    292-399: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    291-398: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    406-496: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    405-495: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    501-507: getNode(db: Database.Database, nodeId: string): any [exported]
+    500-506: getNode(db: Database.Database, nodeId: string): any [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    514-524: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
+    513-523: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    529-532: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    528-531: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    537-543: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    536-542: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    549-555: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    548-554: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    560-572: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
+    559-571: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    577-588: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+    576-587: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the latest node for a given session file */
-    593-604: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+    592-603: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the first node for a given session file */
-    613-638: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    612-637: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    665-703: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    664-702: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
-    833-938: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
-      /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    947-994: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
-      /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    1002-1056: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
-      /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    1062-1072: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
-      /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    1078-1088: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
-      /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
   imports:
     - ./edge-repository.js
+    - ./graph-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -1950,5 +1960,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 84
-Estimated tokens: 23,988 (codebase: ~969,474)
+Files: 85
+Estimated tokens: 24,038 (codebase: ~970,380)

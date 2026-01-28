@@ -29,6 +29,28 @@ src/daemon/index.ts
           - src/types/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
+      - src/storage/graph-repository.ts
+        - src/storage/edge-repository.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
+        - src/storage/node-crud.ts
+          - src/storage/node-storage.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [builtin] fs
+            - [builtin] os
+            - [builtin] path
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
       - src/storage/lesson-repository.ts
         - [external] better-sqlite3
       - src/storage/node-conversion.ts
@@ -114,6 +136,28 @@ src/daemon/index.ts
   - src/daemon/connection-discovery.ts
     - src/storage/node-repository.ts
       - src/storage/edge-repository.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/graph-repository.ts
+        - src/storage/edge-repository.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
+        - src/storage/node-crud.ts
+          - src/storage/node-storage.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [builtin] fs
+            - [builtin] os
+            - [builtin] path
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto
@@ -297,6 +341,28 @@ src/daemon/index.ts
             - src/types/index.ts
             - [builtin] crypto
           - [external] better-sqlite3
+        - src/storage/graph-repository.ts
+          - src/storage/edge-repository.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [external] better-sqlite3
+          - src/storage/node-crud.ts
+            - src/storage/node-storage.ts
+              - src/storage/node-types.ts
+                - src/types/index.ts
+                - [builtin] crypto
+              - [builtin] fs
+              - [builtin] os
+              - [builtin] path
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [external] better-sqlite3
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
         - src/storage/lesson-repository.ts
           - [external] better-sqlite3
         - src/storage/node-conversion.ts
@@ -411,6 +477,28 @@ src/daemon/index.ts
       - [builtin] url
     - src/storage/node-repository.ts
       - src/storage/edge-repository.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/graph-repository.ts
+        - src/storage/edge-repository.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
+        - src/storage/node-crud.ts
+          - src/storage/node-storage.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [builtin] fs
+            - [builtin] os
+            - [builtin] path
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
         - src/storage/node-types.ts
           - src/types/index.ts
           - [builtin] crypto

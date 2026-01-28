@@ -195,7 +195,7 @@ Ref: docs/plans/refactor-monolith-node-repository.md
 | 13.6  | Extract `quirk-repository.ts` (~300 lines) - quirk queries      | done    | -         | 2026-01-27 |
 | 13.7  | Extract `tool-error-repository.ts` (~250 lines) - error queries | done    | -         | 2026-01-27 |
 | 13.8  | Extract `node-queries.ts` (~400 lines) - listing/aggregation    | done    | 13.1      | 2026-01-27 |
-| 13.9  | Extract `graph-repository.ts` (~300 lines) - graph traversal    | pending | 13.2      |            |
+| 13.9  | Extract `graph-repository.ts` (~300 lines) - graph traversal    | active  | 13.2      | 2026-01-27 |
 | 13.10 | Update internal imports to use new modules                      | pending | 13.1-13.9 |            |
 | 13.11 | Clean up node-repository.ts to re-export from new modules       | pending | 13.10     |            |
 
