@@ -111,3 +111,21 @@ Main branch: major/pi-brain
   - All 1272 tests pass overall
 **Commit**: 523f677b
 **Notes**: Task 17.5.1 was already implemented; completed 17.5.2 by adding missing unit tests per spec requirements.
+
+## 2026-01-28 05:57 - Task 18.1
+
+**Status**: pending → done
+**Validation**: 
+  - Browser-tested using agent-browser headless automation
+  - Verified initial state: both buttons disabled when no changes
+  - Made change (parallelWorkers 3→2): buttons became enabled
+  - Clicked Save Changes: buttons returned to disabled state
+  - Svelte type-check passes: `npm run check` in src/web/app
+  - All 1272 backend tests pass
+**Commit**: 04731fcf
+**Notes**: Fixed Svelte 5 reactivity bug. The `originalProvider`, `originalModel`, 
+`originalIdleTimeoutMinutes`, and `originalParallelWorkers` variables were plain 
+`let` declarations, not `$state()` runes. In Svelte 5 runes mode, `$derived()` 
+only tracks reactive `$state()` dependencies, so updating plain variables after 
+save didn't trigger `hasChanges` recomputation. Converting to `$state()` fixed 
+the reactivity chain.
