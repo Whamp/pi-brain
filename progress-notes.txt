@@ -14,3 +14,21 @@ Main branch: major/pi-brain
 
 ## Progress Log
 
+
+---
+
+## 2026-01-27 21:30 - Task 17.3.1
+
+**Status**: pending → done
+**Validation**: 
+  - 11 new unit tests for storage functions (storeEmbeddingWithVec, deleteEmbedding, getEmbedding, hasEmbedding, serializeEmbedding, deserializeEmbedding)
+  - Tests cover: basic storage, upsert semantics, vec table updates with correct dimensions, dimension mismatch handling
+  - All 1255 tests pass
+**Commit**: 64435dcc
+**Notes**: Added storeEmbeddingWithVec helper function to embedding-utils.ts:
+  - Stores embeddings in both node_embeddings (binary blob) and node_embeddings_vec (vec0 virtual table)
+  - Handles upsert semantics (INSERT OR REPLACE)
+  - Gracefully handles dimension mismatch (stores in node_embeddings, skips vec table)
+  - Uses BigInt for vec table rowid as required by sqlite-vec
+  - Also added getEmbedding, hasEmbedding, deleteEmbedding helper functions
+  - Added serializeEmbedding/deserializeEmbedding for binary blob conversion

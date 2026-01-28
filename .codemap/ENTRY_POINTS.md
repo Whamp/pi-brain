@@ -801,4 +801,4 @@ src/cli.ts [1-1102]
 
 ---
 Files: 27
-Estimated tokens: 8,933 (codebase: ~1,017,390)
+Estimated tokens: 8,933 (codebase: ~1,020,775)
