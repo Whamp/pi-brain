@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 35904,
-  "codebase_tokens": 1004483,
+  "total_tokens": 35905,
+  "codebase_tokens": 1004931,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14895,10 +14895,10 @@
       "language": "typescript",
       "lines": [
         1,
-        186
+        205
       ],
       "detail_level": "full",
-      "token_estimate": 333,
+      "token_estimate": 334,
       "symbols": [
         {
           "name": "__dirname",
@@ -14963,7 +14963,7 @@
           "signature": "DatabaseOptions",
           "lines": [
             20,
-            27
+            34
           ],
           "exported": true,
           "is_default": false,
@@ -14981,8 +14981,8 @@
           "kind": "interface",
           "signature": "MigrationInfo",
           "lines": [
-            29,
-            34
+            36,
+            41
           ],
           "exported": true,
           "is_default": false,
@@ -15000,8 +15000,8 @@
           "kind": "function",
           "signature": "openDatabase(options: DatabaseOptions = {}): Database.Database",
           "lines": [
-            39,
-            67
+            46,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -15019,8 +15019,8 @@
           "kind": "function",
           "signature": "loadMigrations(): {}",
           "lines": [
-            72,
-            95
+            89,
+            112
           ],
           "exported": true,
           "is_default": false,
@@ -15038,8 +15038,8 @@
           "kind": "function",
           "signature": "getSchemaVersion(db: Database.Database): number",
           "lines": [
-            100,
-            110
+            117,
+            127
           ],
           "exported": true,
           "is_default": false,
@@ -15057,8 +15057,8 @@
           "kind": "function",
           "signature": "migrate(db: Database.Database): number",
           "lines": [
-            115,
-            139
+            132,
+            156
           ],
           "exported": true,
           "is_default": false,
@@ -15076,8 +15076,8 @@
           "kind": "function",
           "signature": "closeDatabase(db: Database.Database): void",
           "lines": [
-            144,
-            146
+            161,
+            163
           ],
           "exported": true,
           "is_default": false,
@@ -15095,8 +15095,8 @@
           "kind": "function",
           "signature": "isDatabaseHealthy(db: Database.Database): boolean",
           "lines": [
-            151,
-            158
+            168,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -15114,8 +15114,8 @@
           "kind": "function",
           "signature": "loadVecExtension(db: Database.Database): boolean",
           "lines": [
-            163,
-            171
+            180,
+            188
           ],
           "exported": true,
           "is_default": false,
@@ -15133,8 +15133,8 @@
           "kind": "function",
           "signature": "isVecLoaded(db: Database.Database): boolean",
           "lines": [
-            176,
-            185
+            193,
+            204
           ],
           "exported": true,
           "is_default": false,

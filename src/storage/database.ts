@@ -24,6 +24,13 @@ export interface DatabaseOptions {
   verbose?: boolean;
   /** Run migrations on open */
   migrate?: boolean;
+  /**
+   * Load sqlite-vec extension for vector operations.
+   * - true (default): Load extension, throw if it fails
+   * - false: Skip loading the extension
+   * - 'optional': Load extension but don't throw on failure
+   */
+  loadVec?: boolean | "optional";
 }
 
 export interface MigrationInfo {
@@ -56,7 +63,17 @@ export function openDatabase(options: DatabaseOptions = {}): Database.Database {
   db.pragma("foreign_keys = ON");
 
   // Load sqlite-vec extension
-  loadVecExtension(db);
+  const loadVecOption = options.loadVec ?? true;
+  if (loadVecOption !== false) {
+    const loaded = loadVecExtension(db);
+    if (!loaded && loadVecOption === true) {
+      db.close();
+      throw new Error(
+        "Failed to load sqlite-vec extension. Semantic search will not work. " +
+          "Set loadVec: false to disable, or loadVec: 'optional' to continue without it."
+      );
+    }
+  }
 
   // Run migrations if requested (default: true)
   if (options.migrate !== false) {
@@ -175,10 +192,12 @@ export function loadVecExtension(db: Database.Database): boolean {
  */
 export function isVecLoaded(db: Database.Database): boolean {
   try {
-    const result = db.prepare("SELECT vec_version() as version").get() as {
-      version: string;
-    };
-    return !!result.version;
+    const result = db.prepare("SELECT vec_version() as version").get() as
+      | {
+          version: string | null;
+        }
+      | undefined;
+    return typeof result?.version === "string" && result.version.length > 0;
   } catch {
     return false;
   }
