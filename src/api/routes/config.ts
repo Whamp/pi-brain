@@ -13,6 +13,7 @@ import {
   DEFAULT_CONFIG_PATH,
   loadConfig,
   getDefaultDaemonConfig,
+  getDefaultQueryConfig,
 } from "../../config/config.js";
 import { successResponse, errorResponse } from "../responses.js";
 
@@ -76,6 +77,14 @@ interface DaemonConfigUpdateBody {
   connectionDiscoveryLookbackDays?: number;
   connectionDiscoveryCooldownHours?: number;
   semanticSearchThreshold?: number;
+}
+
+/**
+ * Query configuration update request body
+ */
+interface QueryConfigUpdateBody {
+  provider?: string;
+  model?: string;
 }
 
 /**
@@ -220,6 +229,48 @@ function applyDaemonUpdates(
   }
   if (semanticSearchThreshold !== undefined) {
     rawConfig.daemon.semantic_search_threshold = semanticSearchThreshold;
+  }
+}
+
+/**
+ * Validate query configuration update fields
+ */
+function validateQueryUpdate(body: QueryConfigUpdateBody): ValidationResult {
+  const { provider, model } = body;
+
+  // Validate provider is a non-empty string
+  if (provider !== undefined && (!provider || typeof provider !== "string")) {
+    return "provider must be a non-empty string";
+  }
+
+  // Validate model is a non-empty string
+  if (model !== undefined && (!model || typeof model !== "string")) {
+    return "model must be a non-empty string";
+  }
+
+  return null;
+}
+
+/**
+ * Apply query config updates to raw config object
+ */
+function applyQueryUpdates(
+  rawConfig: RawConfig,
+  body: QueryConfigUpdateBody
+): void {
+  const { provider, model } = body;
+
+  // Initialize query section if needed
+  if (!rawConfig.query) {
+    rawConfig.query = {};
+  }
+
+  // Update provided fields
+  if (provider !== undefined) {
+    rawConfig.query.provider = provider;
+  }
+  if (model !== undefined) {
+    rawConfig.query.model = model;
   }
 }
 
@@ -376,6 +427,103 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
               updatedConfig.daemon.connectionDiscoveryCooldownHours,
             semanticSearchThreshold:
               updatedConfig.daemon.semanticSearchThreshold,
+            message: "Configuration updated. Restart daemon to apply changes.",
+          },
+          durationMs
+        )
+      );
+    }
+  );
+
+  /**
+   * GET /config/query - Get query configuration
+   */
+  app.get("/query", async (request: FastifyRequest, reply: FastifyReply) => {
+    const startTime = request.startTime ?? Date.now();
+
+    const config = loadConfig();
+    const defaults = getDefaultQueryConfig();
+
+    const durationMs = Date.now() - startTime;
+    return reply.send(
+      successResponse(
+        {
+          provider: config.query.provider,
+          model: config.query.model,
+          // Include defaults for UI reference
+          defaults: {
+            provider: defaults.provider,
+            model: defaults.model,
+          },
+        },
+        durationMs
+      )
+    );
+  });
+
+  /**
+   * PUT /config/query - Update query configuration
+   */
+  app.put(
+    "/query",
+    async (
+      request: FastifyRequest<{ Body: QueryConfigUpdateBody }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const body = request.body ?? {};
+      const { provider, model } = body;
+
+      // Validate at least one field is provided
+      const hasAnyField = provider !== undefined || model !== undefined;
+
+      if (!hasAnyField) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse(
+              "BAD_REQUEST",
+              "At least one configuration field is required"
+            )
+          );
+      }
+
+      // Validate fields
+      const validationError = validateQueryUpdate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
+      }
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Apply updates
+      applyQueryUpdates(rawConfig, body);
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      // Reload and return updated config
+      const updatedConfig = loadConfig();
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            provider: updatedConfig.query.provider,
+            model: updatedConfig.query.model,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

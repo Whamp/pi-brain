@@ -873,4 +873,113 @@ describe("config api routes", () => {
       expect(provider.models).toBeInstanceOf(Array);
     });
   });
+
+  describe("get /config/query", () => {
+    it("returns query configuration", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/query",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data).toBeDefined();
+      expect(body.data.provider).toBeDefined();
+      expect(body.data.model).toBeDefined();
+      expect(body.data.defaults).toBeDefined();
+    });
+
+    it("includes defaults for UI reference", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/query",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.defaults.provider).toBeDefined();
+      expect(body.data.defaults.model).toBeDefined();
+    });
+  });
+
+  describe("put /config/query", () => {
+    it("rejects request with no fields", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("error");
+      expect(body.error.code).toBe("BAD_REQUEST");
+    });
+
+    it("rejects empty provider", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: { provider: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("provider");
+    });
+
+    it("rejects empty model", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: { model: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("model");
+    });
+
+    it("accepts valid provider update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: { provider: "anthropic" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.provider).toBe("anthropic");
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts valid model update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: { model: "gpt-4o" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.model).toBe("gpt-4o");
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts both provider and model update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/query",
+        payload: { provider: "openai", model: "gpt-4o-mini" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.provider).toBe("openai");
+      expect(body.data.model).toBe("gpt-4o-mini");
+      expect(body.data.message).toContain("Configuration updated");
+    });
+  });
 });

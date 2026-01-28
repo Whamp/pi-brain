@@ -5,9 +5,9 @@
 
 ## Statistics
 - Total files: 28
-- Total symbols: 103
-  - function: 56
-  - interface: 15
+- Total symbols: 106
+  - function: 58
+  - interface: 16
   - method: 12
   - variable: 11
   - type: 5
@@ -112,47 +112,59 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.test.ts [1-877]
+src/api/routes/config.test.ts [1-986]
   imports:
     - ../../storage/database.js
     - ../server.js
     - better-sqlite3
     - vitest
 
-src/api/routes/config.ts [1-430]
+src/api/routes/config.ts [1-578]
   interface:
-    63-79: interface DaemonConfigUpdateBody
+    64-80: interface DaemonConfigUpdateBody
       /** Daemon configuration update request body */
+    85-88: interface QueryConfigUpdateBody
+      /** Query configuration update request body */
   type:
-    22-22: ValidationResult = string | null
+    23-23: ValidationResult = string | null
       /** Validation result - either success (null) or error message */
   function:
-    27-40: validateIntRange(value: number | undefined, field: string, min: number, max: number): string
+    28-41: validateIntRange(value: number | undefined, field: string, min: number, max: number): string
       /** Validate an integer field is within a range */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:32: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:36: call isInteger -> external
-    45-58: validateFloatRange(value: number | undefined, field: string, min: number, max: number): string
+        - src/api/routes/config.ts:33: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:37: call isInteger -> external
+    46-59: validateFloatRange(value: number | undefined, field: string, min: number, max: number): string
       /** Validate a float field is within a range */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:50: type ValidationResult -> src/api/routes/config.ts
-    84-144: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
+        - src/api/routes/config.ts:51: type ValidationResult -> src/api/routes/config.ts
+    93-153: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
       /** Validate daemon configuration update fields */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:84: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:84: type ValidationResult -> src/api/routes/config.ts
-    149-224: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
+        - src/api/routes/config.ts:93: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:93: type ValidationResult -> src/api/routes/config.ts
+    158-233: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
       /** Apply daemon config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:150: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:151: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-    226-429: async configRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 30 [call: 20, type: 10]
-        - src/api/routes/config.ts:226: type FastifyInstance -> external
-        - src/api/routes/config.ts:226: type Promise -> external
-        - src/api/routes/config.ts:230: call get -> external
-        - src/api/routes/config.ts:230: type FastifyRequest -> external
-        - src/api/routes/config.ts:230: type FastifyReply -> external
+        - src/api/routes/config.ts:159: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:160: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+    238-252: validateQueryUpdate(body: QueryConfigUpdateBody): string
+      /** Validate query configuration update fields */
+      refs out: 2 [type: 2]
+        - src/api/routes/config.ts:238: type QueryConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:238: type ValidationResult -> src/api/routes/config.ts
+    257-275: applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void
+      /** Apply query config updates to raw config object */
+      refs out: 2 [type: 2]
+        - src/api/routes/config.ts:258: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:259: type QueryConfigUpdateBody -> src/api/routes/config.ts
+    277-577: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 53 [call: 37, type: 16]
+        - src/api/routes/config.ts:277: type FastifyInstance -> external
+        - src/api/routes/config.ts:277: type Promise -> external
+        - src/api/routes/config.ts:281: call get -> external
+        - src/api/routes/config.ts:281: type FastifyRequest -> external
+        - src/api/routes/config.ts:281: type FastifyReply -> external
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -861,4 +873,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 28
-Estimated tokens: 9,564 (codebase: ~1,105,810)
+Estimated tokens: 9,760 (codebase: ~1,110,665)

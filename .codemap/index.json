@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1138,
+    "totalSymbols": 1141,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 505,
+      "function": 507,
       "type": 42,
-      "interface": 263,
+      "interface": 264,
       "variable": 119,
       "class": 12,
       "property": 51,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39187,
-  "codebase_tokens": 1108865,
+  "total_tokens": 39279,
+  "codebase_tokens": 1110870,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,18 @@
       "language": "typescript",
       "lines": [
         1,
-        430
+        578
       ],
       "detail_level": "full",
-      "token_estimate": 273,
+      "token_estimate": 365,
       "symbols": [
         {
           "name": "ValidationResult",
           "kind": "type",
           "signature": "ValidationResult = string | null",
           "lines": [
-            22,
-            22
+            23,
+            23
           ],
           "exported": false,
           "is_default": false,
@@ -356,8 +356,8 @@
           "kind": "function",
           "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            27,
-            40
+            28,
+            41
           ],
           "exported": false,
           "is_default": false,
@@ -375,8 +375,8 @@
           "kind": "function",
           "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            45,
-            58
+            46,
+            59
           ],
           "exported": false,
           "is_default": false,
@@ -394,8 +394,8 @@
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            63,
-            79
+            64,
+            80
           ],
           "exported": false,
           "is_default": false,
@@ -409,12 +409,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "QueryConfigUpdateBody",
+          "kind": "interface",
+          "signature": "QueryConfigUpdateBody",
+          "lines": [
+            85,
+            88
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Query configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "validateDaemonUpdate",
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            84,
-            144
+            93,
+            153
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +451,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            149,
-            224
+            158,
+            233
           ],
           "exported": false,
           "is_default": false,
@@ -447,12 +466,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateQueryUpdate",
+          "kind": "function",
+          "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
+          "lines": [
+            238,
+            252
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate query configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyQueryUpdates",
+          "kind": "function",
+          "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
+          "lines": [
+            257,
+            275
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply query config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "configRoutes",
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            226,
-            429
+            277,
+            577
           ],
           "exported": true,
           "is_default": false,
