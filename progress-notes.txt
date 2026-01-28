@@ -1,51 +1,16 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-210928
-Created: 2026-01-27 21:09
+Branch: fix/code-review-20260127-211938
+Created: 2026-01-27 21:19
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-1. [P2] isRichEmbeddingFormat false positive - check `\nDecisions:` could match user text
-2. [P3] Lesson ordering depends on spread order - add documentation  
-3. [P3] buildSimpleEmbeddingText returns "[type]" when summary is null
-4. [P3] createTestNode helper allows partial nested objects that miss required fields
+1. [P2] Nodes with empty decisions/lessons perpetually re-embedded
+2. [P3] Test doesn't verify embedding regeneration  
+3. [P3] Tests rely on implicit test.json absence
 
 ---
 
 ## Progress Log
 
-### 2026-01-27 21:10 - All issues fixed
-
-Commit: 4fe5fe4e - fix(storage): improve isRichEmbeddingFormat robustness
-
-Changes made:
-1. [P2] isRichEmbeddingFormat: Now requires text to start with `[`, and section headers 
-   to have proper structure `\n\nDecisions:\n-` or `\n\nLessons:\n-`. Added 2 new tests 
-   for edge cases.
-2. [P3] Added documentation for lesson ordering (deterministic: project, task, user, 
-   model, tool, skill, subagent)
-3. [P3] Added documentation for buildSimpleEmbeddingText explaining all return cases
-4. [P3] Fixed createTestNode type safety - now requires complete sub-objects when 
-   overriding (no partial nested objects allowed)
-
-All 1239 tests pass. Ready for merge.
-
----
-
-## 2026-01-27 21:16 - Task 17.2.2
-
-**Status**: pending → done
-**Validation**: 
-  - 2 new unit tests in facet-discovery.test.ts:
-    - "should re-embed nodes with old simple format (not rich format)"
-    - "should use cached embedding when already in rich format"
-  - All 1241 tests pass
-**Commit**: 5409dbac
-**Notes**: Updated facet-discovery.ts to use the rich embedding format from embedding-utils.ts:
-  - Import buildEmbeddingText, buildSimpleEmbeddingText, isRichEmbeddingFormat
-  - Import readNodeFromPath for loading full node data from JSON
-  - Added data_file to NodeSummaryRow interface and SQL query
-  - Updated embedNodes to check isRichEmbeddingFormat on cached embeddings
-  - New buildNodeEmbeddingText method loads full node from JSON for rich format
-  - Graceful fallback to simple format if JSON loading fails

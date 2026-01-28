@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 88,
-    "totalSymbols": 1079,
+    "totalSymbols": 1080,
     "byLanguage": {
       "typescript": 88
     },
@@ -9,7 +9,7 @@
       "function": 481,
       "type": 40,
       "interface": 253,
-      "variable": 105,
+      "variable": 106,
       "class": 12,
       "property": 48,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 36544,
-  "codebase_tokens": 1015513,
+  "total_tokens": 36610,
+  "codebase_tokens": 1016095,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15584,18 +15584,37 @@
       "language": "typescript",
       "lines": [
         1,
-        119
+        137
       ],
       "detail_level": "full",
-      "token_estimate": 377,
+      "token_estimate": 443,
       "symbols": [
+        {
+          "name": "EMBEDDING_FORMAT_VERSION",
+          "kind": "variable",
+          "signature": "\"[emb:v2]\"",
+          "lines": [
+            15,
+            15
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Format version marker appended to rich embedding text.\nUsed to distinguish new-format embeddings (even with empty decisions/lessons)\nfrom old simple-format embeddings.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "buildEmbeddingText",
           "kind": "function",
           "signature": "buildEmbeddingText(node: Node): string",
           "lines": [
-            32,
-            67
+            39,
+            79
           ],
           "exported": true,
           "is_default": false,
@@ -15613,8 +15632,8 @@
           "kind": "function",
           "signature": "buildSimpleEmbeddingText(type: string | null, summary: string | null): string",
           "lines": [
-            81,
-            93
+            93,
+            105
           ],
           "exported": true,
           "is_default": false,
@@ -15632,8 +15651,8 @@
           "kind": "function",
           "signature": "isRichEmbeddingFormat(inputText: string): boolean",
           "lines": [
-            106,
-            118
+            119,
+            136
           ],
           "exported": true,
           "is_default": false,
@@ -15642,7 +15661,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection criteria:\n1. Text must start with `[type]` format (e.g., `[coding]`)\n2. Text must contain section headers on their own line: `\\n\\nDecisions:\\n` or `\\n\\nLessons:\\n`\n\nThis is more robust than just checking for `\\nDecisions:` which could match user content.",
+          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection criteria (any of these indicate rich format):\n1. Contains the version marker [emb:v2]\n2. Contains section headers: `\\n\\nDecisions:\\n-` or `\\n\\nLessons:\\n-`\n\nThe version marker is the primary check - it handles nodes with empty\ndecisions/lessons that would otherwise be perpetually re-embedded.",
           "incoming_refs": null,
           "outgoing_refs": null
         }

@@ -5,11 +5,11 @@
 
 ## Statistics
 - Total files: 53
-- Total symbols: 310
+- Total symbols: 311
   - function: 185
   - interface: 83
+  - variable: 17
   - type: 17
-  - variable: 16
   - class: 9
 
 ---
@@ -1791,48 +1791,53 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.test.ts [1-362]
+src/storage/embedding-utils.test.ts [1-378]
   imports:
     - ../types/index.js
     - ./embedding-utils.js
     - vitest
 
-src/storage/embedding-utils.ts [1-119]
+src/storage/embedding-utils.ts [1-137]
   function:
-    32-67: buildEmbeddingText(node: Node): string [exported]
+    39-79: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/facet-discovery.ts:35: import (module)
         - src/daemon/facet-discovery.ts:873: call FacetDiscovery.buildNodeEmbeddingText
         - src/storage/embedding-utils.test.ts:10: import (module)
-        - src/storage/embedding-utils.test.ts:123: call text
-        - src/storage/embedding-utils.test.ts:151: call text
-        - src/storage/embedding-utils.test.ts:208: call text
-        - src/storage/embedding-utils.test.ts:259: call text
-        - src/storage/embedding-utils.test.ts:294: call text
-    81-93: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+        - src/storage/embedding-utils.test.ts:124: call text
+        - src/storage/embedding-utils.test.ts:154: call text
+        - src/storage/embedding-utils.test.ts:211: call text
+        - src/storage/embedding-utils.test.ts:262: call text
+        - src/storage/embedding-utils.test.ts:297: call text
+    93-105: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
       refs in: 7 [call: 5, import: 2]
         - src/daemon/facet-discovery.ts:36: import (module)
         - src/daemon/facet-discovery.ts:879: call FacetDiscovery.buildNodeEmbeddingText
         - src/storage/embedding-utils.test.ts:11: import (module)
-        - src/storage/embedding-utils.test.ts:304: call text
         - src/storage/embedding-utils.test.ts:309: call text
         - src/storage/embedding-utils.test.ts:314: call text
         - src/storage/embedding-utils.test.ts:319: call text
-    106-118: isRichEmbeddingFormat(inputText: string): boolean [exported]
-      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria: 1. Text must start with `[type]` format (e.g., `[coding]`) 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n` This is more robust than just checking for `\nDecisions:` which could match user content. */
-      refs in: 10 [call: 8, import: 2]
+        - src/storage/embedding-utils.test.ts:324: call text
+    119-136: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria (any of these indicate rich format): 1. Contains the version marker [emb:v2] 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-` The version marker is the primary check - it handles nodes with empty decisions/lessons that would otherwise be perpetually re-embedded. */
+      refs in: 12 [call: 10, import: 2]
         - src/daemon/facet-discovery.ts:37: import (module)
         - src/daemon/facet-discovery.ts:817: call FacetDiscovery.embedNodes
-        - src/storage/embedding-utils.test.ts:12: import (module)
-        - src/storage/embedding-utils.test.ts:327: call (module)
+        - src/storage/embedding-utils.test.ts:13: import (module)
         - src/storage/embedding-utils.test.ts:332: call (module)
-        - src/storage/embedding-utils.test.ts:338: call (module)
+        - src/storage/embedding-utils.test.ts:337: call (module)
         - src/storage/embedding-utils.test.ts:343: call (module)
         - src/storage/embedding-utils.test.ts:348: call (module)
         - src/storage/embedding-utils.test.ts:353: call (module)
-        - src/storage/embedding-utils.test.ts:359: call (module)
+        - src/storage/embedding-utils.test.ts:358: call (module)
+        - src/storage/embedding-utils.test.ts:364: call (module)
+  variable:
+    15-15: "[emb:v2]" [exported]
+      /** Format version marker appended to rich embedding text. Used to distinguish new-format embeddings (even with empty decisions/lessons) from old simple-format embeddings. */
+      refs in: 1 [import: 1]
+        - src/storage/embedding-utils.test.ts:12: import (module)
   imports:
     - ../types/index.js
 
@@ -3025,4 +3030,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 38,990 (codebase: ~1,015,513)
+Estimated tokens: 39,081 (codebase: ~1,016,095)

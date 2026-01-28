@@ -9,6 +9,7 @@ import type { Node } from "../types/index.js";
 import {
   buildEmbeddingText,
   buildSimpleEmbeddingText,
+  EMBEDDING_FORMAT_VERSION,
   isRichEmbeddingFormat,
 } from "./embedding-utils.js";
 
@@ -102,7 +103,7 @@ function createTestNode(
 }
 
 describe("buildEmbeddingText", () => {
-  it("should include type and summary", () => {
+  it("should include type, summary, and version marker", () => {
     const node = createTestNode({
       classification: {
         type: "debugging",
@@ -122,7 +123,9 @@ describe("buildEmbeddingText", () => {
 
     const text = buildEmbeddingText(node);
 
-    expect(text).toBe("[debugging] Fixed a bug in the parser");
+    expect(text).toBe(
+      `[debugging] Fixed a bug in the parser\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
   });
 
   it("should include decisions when present", () => {
@@ -293,7 +296,9 @@ describe("buildEmbeddingText", () => {
 
     const text = buildEmbeddingText(node);
 
-    expect(text).toBe("[coding] Quick fix for typo");
+    expect(text).toBe(
+      `[coding] Quick fix for typo\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
     expect(text).not.toContain("Decisions:");
     expect(text).not.toContain("Lessons:");
   });
@@ -357,5 +362,16 @@ describe("isRichEmbeddingFormat", () => {
     // Edge case: user summary that happens to contain "\nDecisions:" text
     const text = "[coding] User wrote about\nDecisions: what to do next";
     expect(isRichEmbeddingFormat(text)).toBeFalsy();
+  });
+
+  it("should return true for text with version marker", () => {
+    // Node with no decisions/lessons but marked as new format
+    const text = `[coding] Summary only\n\n${EMBEDDING_FORMAT_VERSION}`;
+    expect(isRichEmbeddingFormat(text)).toBeTruthy();
+  });
+
+  it("should return true for text with version marker and sections", () => {
+    const text = `[coding] Summary\n\nDecisions:\n- Decision 1\n\n${EMBEDDING_FORMAT_VERSION}`;
+    expect(isRichEmbeddingFormat(text)).toBeTruthy();
   });
 });
