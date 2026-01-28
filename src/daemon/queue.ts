@@ -552,9 +552,13 @@ export class QueueManager {
       .prepare(
         `
       UPDATE analysis_queue
-      SET status = 'pending',
+      SET status = CASE WHEN retry_count + 1 >= max_retries THEN 'failed' ELSE 'pending' END,
+          retry_count = retry_count + 1,
           worker_id = NULL,
-          locked_until = NULL
+          locked_until = NULL,
+          started_at = NULL,
+          error = CASE WHEN retry_count + 1 >= max_retries THEN 'Stale lock released (max retries exceeded)' ELSE NULL END,
+          completed_at = CASE WHEN retry_count + 1 >= max_retries THEN datetime('now') ELSE NULL END
       WHERE status = 'running'
         AND locked_until < datetime('now')
     `
@@ -574,9 +578,13 @@ export class QueueManager {
       .prepare(
         `
       UPDATE analysis_queue
-      SET status = 'pending',
+      SET status = CASE WHEN retry_count + 1 >= max_retries THEN 'failed' ELSE 'pending' END,
+          retry_count = retry_count + 1,
           worker_id = NULL,
-          locked_until = NULL
+          locked_until = NULL,
+          started_at = NULL,
+          error = CASE WHEN retry_count + 1 >= max_retries THEN 'Daemon restart recovery (max retries exceeded)' ELSE NULL END,
+          completed_at = CASE WHEN retry_count + 1 >= max_retries THEN datetime('now') ELSE NULL END
       WHERE status = 'running'
     `
       )
