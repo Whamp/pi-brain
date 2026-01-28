@@ -156,6 +156,19 @@ describe("webSocketManager", () => {
       expect(sentMessage.data.channels).not.toContain("invalid-channel");
     });
 
+    it("should reject non-array channels", () => {
+      const socket = createMockSocket();
+      manager.handleConnection(socket as unknown as WebSocket);
+
+      // Send channels as a string instead of array
+      const message = JSON.stringify({ type: "subscribe", channels: "daemon" });
+      emitEvent(socket, "message", message);
+
+      const sentMessage = JSON.parse(socket.send.mock.calls[0][0] as string);
+      expect(sentMessage.type).toBe("error");
+      expect(sentMessage.data.message).toBe("channels must be an array");
+    });
+
     it("should handle malformed JSON", () => {
       const socket = createMockSocket();
       manager.handleConnection(socket as unknown as WebSocket);
@@ -295,16 +308,20 @@ describe("webSocketManager", () => {
         maxRetries: 3,
       };
 
-      const mockNode: Node = {
+      // Minimal mock with only fields needed by broadcastAnalysisCompleted
+      const mockNode = {
         id: "node-456",
         version: 1,
         previousVersions: [],
         source: {
           sessionFile: "/test/session.jsonl",
           sessionId: "sess-1",
-          segment: {},
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-10",
+            entryCount: 10,
+          },
           computer: "test-machine",
-          entryCount: 10,
         },
         classification: {
           type: "coding",
@@ -317,6 +334,8 @@ describe("webSocketManager", () => {
           outcome: "success",
           keyDecisions: [],
           filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
         },
         lessons: {
           project: [],
@@ -335,33 +354,47 @@ describe("webSocketManager", () => {
           toolUseErrors: [],
         },
         metadata: {
+          tokensUsed: 1000,
+          cost: 0.01,
+          durationMinutes: 5,
           timestamp: new Date().toISOString(),
           analyzedAt: new Date().toISOString(),
           analyzerVersion: "1.0.0",
-          analysisDurationMs: 1000,
         },
         semantic: {
           tags: [],
           topics: [],
         },
         signals: {
-          friction: { score: 0, signals: [] },
-          delight: { score: 0, signals: [] },
+          friction: {
+            score: 0,
+            rephrasingCount: 0,
+            contextChurnCount: 0,
+            abandonedRestart: false,
+            toolLoopCount: 0,
+          },
+          delight: {
+            score: 0,
+            resilientRecovery: false,
+            oneShotSuccess: false,
+            explicitPraise: false,
+          },
           manualFlags: [],
         },
         daemonMeta: {
-          daemonDecisions: [],
+          decisions: [],
+          rlmUsed: false,
         },
-      };
+      } as unknown as Node;
 
       manager.broadcastAnalysisCompleted(mockJob, mockNode);
 
       // Should send both analysis.completed and node.created
       expect(socket.send).toHaveBeenCalledTimes(2);
 
-      const messages = socket.send.mock.calls.map(
-        (call: [string]) => JSON.parse(call[0]) as { type: string }
-      );
+      const messages = socket.send.mock.calls.map((call: unknown[]) =>
+        JSON.parse(call[0] as string)
+      ) as { type: string }[];
       const analysisMsg = messages.find((m) => m.type === "analysis.completed");
       const nodeMsg = messages.find((m) => m.type === "node.created");
 

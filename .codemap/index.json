@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 87,
-    "totalSymbols": 1068,
+    "totalSymbols": 1070,
     "byLanguage": {
       "typescript": 87
     },
@@ -9,16 +9,16 @@
       "function": 473,
       "type": 40,
       "interface": 253,
-      "variable": 103,
+      "variable": 104,
       "class": 12,
-      "property": 47,
+      "property": 48,
       "constructor": 11,
       "method": 127,
       "getter": 2
     }
   },
-  "total_tokens": 35761,
-  "codebase_tokens": 994722,
+  "total_tokens": 35828,
+  "codebase_tokens": 992158,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1469,18 +1469,37 @@
       "language": "typescript",
       "lines": [
         1,
-        367
+        388
       ],
       "detail_level": "full",
-      "token_estimate": 832,
+      "token_estimate": 875,
       "symbols": [
+        {
+          "name": "WS_READY_STATE",
+          "kind": "variable",
+          "signature": "{ readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }",
+          "lines": [
+            19,
+            24
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "WebSocket ready state values (mirrors WebSocket.OPEN, etc.)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "WSChannel",
           "kind": "type",
           "signature": "WSChannel = \"daemon\" | \"analysis\" | \"node\" | \"queue\"",
           "lines": [
-            19,
-            19
+            31,
+            31
           ],
           "exported": true,
           "is_default": false,
@@ -1498,8 +1517,8 @@
           "kind": "type",
           "signature": "WSEventType = | \"daemon.status\"\n  | \"analysis.started\"\n  | \"analysis.completed\"\n  | \"analysis.failed\"\n  | \"node.created\"\n  | \"queue.updated\"\n  | \"subscribed\"\n  | \"error\"",
           "lines": [
-            22,
-            30
+            34,
+            42
           ],
           "exported": true,
           "is_default": false,
@@ -1517,8 +1536,8 @@
           "kind": "interface",
           "signature": "WSMessage",
           "lines": [
-            33,
-            37
+            45,
+            49
           ],
           "exported": true,
           "is_default": false,
@@ -1536,8 +1555,8 @@
           "kind": "interface",
           "signature": "SubscribeMessage",
           "lines": [
-            40,
-            43
+            52,
+            55
           ],
           "exported": false,
           "is_default": false,
@@ -1555,8 +1574,8 @@
           "kind": "type",
           "signature": "ClientMessage = SubscribeMessage",
           "lines": [
-            46,
-            46
+            58,
+            58
           ],
           "exported": false,
           "is_default": false,
@@ -1574,8 +1593,8 @@
           "kind": "interface",
           "signature": "WSClient",
           "lines": [
-            49,
-            53
+            61,
+            65
           ],
           "exported": false,
           "is_default": false,
@@ -1593,8 +1612,8 @@
           "kind": "class",
           "signature": "WebSocketManager",
           "lines": [
-            62,
-            322
+            74,
+            343
           ],
           "exported": true,
           "is_default": false,
@@ -1612,8 +1631,8 @@
           "kind": "property",
           "signature": "clients",
           "lines": [
-            63,
-            63
+            75,
+            75
           ],
           "exported": false,
           "is_default": false,
@@ -1631,8 +1650,8 @@
           "kind": "property",
           "signature": "logger: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  }",
           "lines": [
-            64,
-            68
+            76,
+            80
           ],
           "exported": false,
           "is_default": false,
@@ -1650,8 +1669,8 @@
           "kind": "constructor",
           "signature": "constructor(logger?: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  })",
           "lines": [
-            70,
-            80
+            82,
+            92
           ],
           "exported": false,
           "is_default": false,
@@ -1669,8 +1688,8 @@
           "kind": "method",
           "signature": "handleConnection(socket: WebSocket): void",
           "lines": [
-            85,
-            112
+            97,
+            124
           ],
           "exported": false,
           "is_default": false,
@@ -1688,8 +1707,8 @@
           "kind": "method",
           "signature": "handleMessage(client: WSClient, data: Buffer | string): void",
           "lines": [
-            117,
-            146
+            129,
+            158
           ],
           "exported": false,
           "is_default": false,
@@ -1707,8 +1726,8 @@
           "kind": "method",
           "signature": "handleSubscribe(client: WSClient, message: SubscribeMessage): void",
           "lines": [
-            151,
-            174
+            163,
+            196
           ],
           "exported": false,
           "is_default": false,
@@ -1726,8 +1745,8 @@
           "kind": "method",
           "signature": "sendToClient(client: WSClient, message: WSMessage): void",
           "lines": [
-            179,
-            190
+            201,
+            211
           ],
           "exported": false,
           "is_default": false,
@@ -1745,8 +1764,8 @@
           "kind": "method",
           "signature": "broadcast(channel: WSChannel, message: WSMessage): void",
           "lines": [
-            195,
-            208
+            216,
+            229
           ],
           "exported": false,
           "is_default": false,
@@ -1764,8 +1783,8 @@
           "kind": "method",
           "signature": "getClientCount(): number",
           "lines": [
-            213,
-            215
+            234,
+            236
           ],
           "exported": false,
           "is_default": false,
@@ -1783,8 +1802,8 @@
           "kind": "method",
           "signature": "closeAll(): void",
           "lines": [
-            220,
-            225
+            241,
+            246
           ],
           "exported": false,
           "is_default": false,
@@ -1802,8 +1821,8 @@
           "kind": "method",
           "signature": "broadcastDaemonStatus(status: {\n    running: boolean;\n    workers?: { active: number; idle: number };\n    queue?: { pending: number; running: number };\n  }): void",
           "lines": [
-            234,
-            244
+            255,
+            265
           ],
           "exported": false,
           "is_default": false,
@@ -1821,8 +1840,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void",
           "lines": [
-            249,
-            259
+            270,
+            280
           ],
           "exported": false,
           "is_default": false,
@@ -1840,8 +1859,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void",
           "lines": [
-            264,
-            286
+            285,
+            307
           ],
           "exported": false,
           "is_default": false,
@@ -1859,8 +1878,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void",
           "lines": [
-            291,
-            305
+            312,
+            326
           ],
           "exported": false,
           "is_default": false,
@@ -1878,8 +1897,8 @@
           "kind": "method",
           "signature": "broadcastQueueUpdate(stats: {\n    pending: number;\n    running: number;\n    completed: number;\n    failed: number;\n  }): void",
           "lines": [
-            310,
-            321
+            331,
+            342
           ],
           "exported": false,
           "is_default": false,
@@ -1897,8 +1916,8 @@
           "kind": "function",
           "signature": "registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void",
           "lines": [
-            331,
-            343
+            352,
+            364
           ],
           "exported": true,
           "is_default": false,
@@ -1916,8 +1935,8 @@
           "kind": "variable",
           "signature": "WebSocketManager | null",
           "lines": [
-            349,
-            349
+            370,
+            370
           ],
           "exported": false,
           "is_default": false,
@@ -1935,8 +1954,8 @@
           "kind": "function",
           "signature": "getWebSocketManager(): WebSocketManager",
           "lines": [
-            354,
-            359
+            375,
+            380
           ],
           "exported": true,
           "is_default": false,
@@ -1954,8 +1973,8 @@
           "kind": "function",
           "signature": "setWebSocketManager(manager: WebSocketManager): void",
           "lines": [
-            364,
-            366
+            385,
+            387
           ],
           "exported": true,
           "is_default": false,
@@ -3912,7 +3931,7 @@
       "language": "typescript",
       "lines": [
         1,
-        244
+        248
       ],
       "detail_level": "full",
       "token_estimate": 92,
@@ -3961,7 +3980,7 @@
           "signature": "async main(): Promise<void>",
           "lines": [
             44,
-            232
+            236
           ],
           "exported": false,
           "is_default": false,
@@ -9952,10 +9971,10 @@
       "language": "typescript",
       "lines": [
         1,
-        594
+        610
       ],
       "detail_level": "full",
-      "token_estimate": 795,
+      "token_estimate": 819,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -9963,7 +9982,7 @@
           "signature": "WorkerConfig",
           "lines": [
             58,
-            73
+            75
           ],
           "exported": true,
           "is_default": false,
@@ -9981,8 +10000,8 @@
           "kind": "interface",
           "signature": "WorkerStatus",
           "lines": [
-            76,
-            91
+            78,
+            93
           ],
           "exported": true,
           "is_default": false,
@@ -10000,8 +10019,8 @@
           "kind": "interface",
           "signature": "JobProcessingResult",
           "lines": [
-            94,
-            107
+            96,
+            109
           ],
           "exported": true,
           "is_default": false,
@@ -10019,8 +10038,8 @@
           "kind": "class",
           "signature": "Worker",
           "lines": [
-            116,
-            533
+            118,
+            549
           ],
           "exported": true,
           "is_default": false,
@@ -10038,8 +10057,8 @@
           "kind": "property",
           "signature": "id: string",
           "lines": [
-            117,
-            117
+            119,
+            119
           ],
           "exported": false,
           "is_default": false,
@@ -10057,8 +10076,8 @@
           "kind": "property",
           "signature": "config: PiBrainConfig",
           "lines": [
-            118,
-            118
+            120,
+            120
           ],
           "exported": false,
           "is_default": false,
@@ -10076,8 +10095,8 @@
           "kind": "property",
           "signature": "retryPolicy: RetryPolicy",
           "lines": [
-            119,
-            119
+            121,
+            121
           ],
           "exported": false,
           "is_default": false,
@@ -10095,8 +10114,27 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            120,
-            120
+            122,
+            122
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "onJobStarted",
+          "kind": "property",
+          "signature": "onJobStarted?: (\n    job: AnalysisJob,\n    workerId: string\n  ) => Promise<void>",
+          "lines": [
+            123,
+            126
           ],
           "exported": false,
           "is_default": false,
@@ -10114,8 +10152,8 @@
           "kind": "property",
           "signature": "onNodeCreated?: (\n    job: AnalysisJob,\n    node: Node\n  ) => Promise<void>",
           "lines": [
-            121,
-            124
+            127,
+            130
           ],
           "exported": false,
           "is_default": false,
@@ -10133,8 +10171,8 @@
           "kind": "property",
           "signature": "onJobFailed?: (\n    job: AnalysisJob,\n    error: Error\n  ) => Promise<void>",
           "lines": [
-            125,
-            128
+            131,
+            134
           ],
           "exported": false,
           "is_default": false,
@@ -10152,8 +10190,8 @@
           "kind": "property",
           "signature": "pollIntervalMs: number",
           "lines": [
-            129,
-            129
+            135,
+            135
           ],
           "exported": false,
           "is_default": false,
@@ -10171,8 +10209,8 @@
           "kind": "property",
           "signature": "queue: QueueManager | null",
           "lines": [
-            131,
-            131
+            137,
+            137
           ],
           "exported": false,
           "is_default": false,
@@ -10190,8 +10228,8 @@
           "kind": "property",
           "signature": "processor: JobProcessor | null",
           "lines": [
-            132,
-            132
+            138,
+            138
           ],
           "exported": false,
           "is_default": false,
@@ -10209,8 +10247,8 @@
           "kind": "property",
           "signature": "connectionDiscoverer: ConnectionDiscoverer | null",
           "lines": [
-            133,
-            133
+            139,
+            139
           ],
           "exported": false,
           "is_default": false,
@@ -10228,8 +10266,8 @@
           "kind": "property",
           "signature": "db: Database.Database | null",
           "lines": [
-            134,
-            134
+            140,
+            140
           ],
           "exported": false,
           "is_default": false,
@@ -10247,8 +10285,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            135,
-            135
+            141,
+            141
           ],
           "exported": false,
           "is_default": false,
@@ -10266,8 +10304,8 @@
           "kind": "property",
           "signature": "currentJob: AnalysisJob | null",
           "lines": [
-            136,
-            136
+            142,
+            142
           ],
           "exported": false,
           "is_default": false,
@@ -10285,8 +10323,8 @@
           "kind": "property",
           "signature": "startedAt: Date | null",
           "lines": [
-            137,
-            137
+            143,
+            143
           ],
           "exported": false,
           "is_default": false,
@@ -10304,8 +10342,8 @@
           "kind": "property",
           "signature": "jobsProcessed",
           "lines": [
-            140,
-            140
+            146,
+            146
           ],
           "exported": false,
           "is_default": false,
@@ -10323,8 +10361,8 @@
           "kind": "property",
           "signature": "jobsSucceeded",
           "lines": [
-            141,
-            141
+            147,
+            147
           ],
           "exported": false,
           "is_default": false,
@@ -10342,8 +10380,8 @@
           "kind": "property",
           "signature": "jobsFailed",
           "lines": [
-            142,
-            142
+            148,
+            148
           ],
           "exported": false,
           "is_default": false,
@@ -10361,8 +10399,8 @@
           "kind": "constructor",
           "signature": "constructor(config: WorkerConfig)",
           "lines": [
-            144,
-            152
+            150,
+            159
           ],
           "exported": false,
           "is_default": false,
@@ -10380,8 +10418,8 @@
           "kind": "method",
           "signature": "initialize(db: Database.Database): void",
           "lines": [
-            157,
-            165
+            164,
+            172
           ],
           "exported": false,
           "is_default": false,
@@ -10399,8 +10437,8 @@
           "kind": "method",
           "signature": "async start(): Promise<void>",
           "lines": [
-            170,
-            229
+            177,
+            236
           ],
           "exported": false,
           "is_default": false,
@@ -10418,8 +10456,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            234,
-            237
+            241,
+            244
           ],
           "exported": false,
           "is_default": false,
@@ -10437,8 +10475,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            242,
-            244
+            249,
+            251
           ],
           "exported": false,
           "is_default": false,
@@ -10456,8 +10494,8 @@
           "kind": "method",
           "signature": "getCurrentJob(): any",
           "lines": [
-            249,
-            251
+            256,
+            258
           ],
           "exported": false,
           "is_default": false,
@@ -10475,8 +10513,8 @@
           "kind": "method",
           "signature": "getStatus(): WorkerStatus",
           "lines": [
-            256,
-            266
+            263,
+            273
           ],
           "exported": false,
           "is_default": false,
@@ -10494,8 +10532,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            271,
-            451
+            278,
+            467
           ],
           "exported": false,
           "is_default": false,
@@ -10513,8 +10551,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            456,
-            523
+            472,
+            539
           ],
           "exported": false,
           "is_default": false,
@@ -10532,8 +10570,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            528,
-            532
+            544,
+            548
           ],
           "exported": false,
           "is_default": false,
@@ -10551,8 +10589,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            542,
-            544
+            558,
+            560
           ],
           "exported": true,
           "is_default": false,
@@ -10570,8 +10608,8 @@
           "kind": "function",
           "signature": "async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            550,
-            564
+            566,
+            580
           ],
           "exported": true,
           "is_default": false,
@@ -10589,8 +10627,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            569,
-            593
+            585,
+            609
           ],
           "exported": true,
           "is_default": false,

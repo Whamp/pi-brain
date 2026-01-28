@@ -230,17 +230,17 @@ src/api/server.ts [1-201]
     - better-sqlite3
     - fastify
 
-src/api/websocket.ts [1-367]
+src/api/websocket.ts [1-388]
   class:
-    62-322: class WebSocketManager [exported]
+    74-343: class WebSocketManager [exported]
       /** Manages WebSocket connections and broadcasts events */
   interface:
-    33-37: interface WSMessage [exported]
+    45-49: interface WSMessage [exported]
       /** Message format for WebSocket events */
   type:
-    19-19: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
+    31-31: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
       /** Available subscription channels */
-    22-30: WSEventType = | "daemon.status"
+    34-42: WSEventType = | "daemon.status"
   | "analysis.started"
   | "analysis.completed"
   | "analysis.failed"
@@ -250,11 +250,11 @@ src/api/websocket.ts [1-367]
   | "error" [exported]
       /** WebSocket message types from server to client */
   function:
-    331-343: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+    352-364: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
       /** Register the WebSocket route on a Fastify instance */
-    354-359: getWebSocketManager(): WebSocketManager [exported]
+    375-380: getWebSocketManager(): WebSocketManager [exported]
       /** Get or create the global WebSocket manager */
-    364-366: setWebSocketManager(manager: WebSocketManager): void [exported]
+    385-387: setWebSocketManager(manager: WebSocketManager): void [exported]
       /** Set the global WebSocket manager (for testing or custom config) */
   imports:
     - ../daemon/queue.js
@@ -442,7 +442,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-244]
+src/daemon/daemon-process.ts [1-248]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -819,23 +819,23 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-594]
+src/daemon/worker.ts [1-610]
   class:
-    116-533: class Worker [exported]
+    118-549: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    58-73: interface WorkerConfig [exported]
+    58-75: interface WorkerConfig [exported]
       /** Worker configuration */
-    76-91: interface WorkerStatus [exported]
+    78-93: interface WorkerStatus [exported]
       /** Worker status */
-    94-107: interface JobProcessingResult [exported]
+    96-109: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    542-544: createWorker(config: WorkerConfig): Worker [exported]
+    558-560: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    550-564: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    566-580: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    569-593: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    585-609: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -2028,4 +2028,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,737 (codebase: ~990,245)
+Estimated tokens: 24,737 (codebase: ~990,564)

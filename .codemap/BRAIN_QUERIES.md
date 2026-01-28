@@ -120,8 +120,8 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:399: call stopDaemon
         - src/daemon/cli.ts:417: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:217: call shutdown
-        - src/daemon/daemon-process.ts:240: call (module)
+        - src/daemon/daemon-process.ts:221: call shutdown
+        - src/daemon/daemon-process.ts:244: call (module)
     159-167: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
       refs in: 7 [call: 5, import: 1, reexport: 1]
@@ -286,8 +286,8 @@ src/daemon/connection-discovery.ts [1-620]
         - src/daemon/connection-discovery.test.ts:76: instantiate (module)
         - src/daemon/index.ts:159: reexport (module)
         - src/daemon/worker.ts:33: import (module)
-        - src/daemon/worker.ts:133: type Worker.connectionDiscoverer
-        - src/daemon/worker.ts:164: instantiate Worker.initialize
+        - src/daemon/worker.ts:139: type Worker.connectionDiscoverer
+        - src/daemon/worker.ts:171: instantiate Worker.initialize
   interface:
     138-143: interface ConnectionResult [exported]
       refs in: 2 [reexport: 1, type: 1]
@@ -301,7 +301,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-244]
+src/daemon/daemon-process.ts [1-248]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -424,8 +424,8 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.test.ts:366: call stored
         - src/daemon/index.ts:84: reexport (module)
         - src/daemon/worker.ts:37: import (module)
-        - src/daemon/worker.ts:476: call Worker.storedError
-        - src/daemon/worker.ts:590: call handleJobError
+        - src/daemon/worker.ts:492: call Worker.storedError
+        - src/daemon/worker.ts:606: call handleJobError
     375-393: parseStoredError(stored: string): { timestamp: string; type: ErrorCategoryType; reason: string; message: string; stack?: string; } [exported]
       /** Parse stored error back to object */
       refs in: 5 [call: 3, import: 1, reexport: 1]
@@ -747,7 +747,7 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:770: type createProcessor
         - src/daemon/processor.ts:771: instantiate createProcessor
         - src/daemon/worker.ts:44: import (module)
-        - src/daemon/worker.ts:132: type Worker.processor
+        - src/daemon/worker.ts:138: type Worker.processor
   interface:
     21-34: interface AgentResult [exported]
       /** Result from invoking the pi agent */
@@ -897,7 +897,7 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:16: import (module)
         - src/daemon/processor.test.ts:622: call processor
         - src/daemon/worker.ts:43: import (module)
-        - src/daemon/worker.ts:160: call Worker.initialize
+        - src/daemon/worker.ts:167: call Worker.initialize
   variable:
     143-148: ProcessorLogger [exported]
       /** Default console logger */
@@ -1004,14 +1004,14 @@ src/daemon/queue.ts [1-766]
         - src/daemon/queue.ts:707: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 49 [import: 7, reexport: 1, type: 41]
+      refs in: 51 [import: 7, reexport: 1, type: 43]
         - src/api/websocket.test.ts:9: import (module)
-        - src/api/websocket.test.ts:287: type mockJob
-        - src/api/websocket.test.ts:382: type mockJob
+        - src/api/websocket.test.ts:300: type mockJob
+        - src/api/websocket.test.ts:415: type mockJob
         - src/api/websocket.ts:11: import (module)
-        - src/api/websocket.ts:249: type WebSocketManager.broadcastAnalysisStarted
-        - src/api/websocket.ts:264: type WebSocketManager.broadcastAnalysisCompleted
-        - src/api/websocket.ts:292: type WebSocketManager.broadcastAnalysisFailed
+        - src/api/websocket.ts:270: type WebSocketManager.broadcastAnalysisStarted
+        - src/api/websocket.ts:285: type WebSocketManager.broadcastAnalysisCompleted
+        - src/api/websocket.ts:313: type WebSocketManager.broadcastAnalysisFailed
         - src/daemon/cli.ts:48: import (module)
         - src/daemon/cli.ts:86: type QueueStatus
         - src/daemon/cli.ts:87: type QueueStatus
@@ -1183,7 +1183,7 @@ src/daemon/scheduler.ts [1-831]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
-        - src/daemon/daemon-process.ts:120: call scheduler
+        - src/daemon/daemon-process.ts:124: call scheduler
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:562: call scheduler
@@ -1297,8 +1297,8 @@ src/daemon/watcher-events.ts [1-117]
       /** Helper to get session path from a session event */
       refs in: 13 [call: 9, import: 2, reexport: 2]
         - src/daemon/daemon-process.ts:22: import (module)
-        - src/daemon/daemon-process.ts:135: call sessionPath
-        - src/daemon/daemon-process.ts:153: call sessionPath
+        - src/daemon/daemon-process.ts:139: call sessionPath
+        - src/daemon/daemon-process.ts:157: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
         - src/daemon/watcher.test.ts:228: call (module)
@@ -1337,7 +1337,7 @@ src/daemon/watcher.ts [1-582]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
       refs in: 22 [import: 2, instantiate: 14, reexport: 2, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
-        - src/daemon/daemon-process.ts:129: instantiate watcher
+        - src/daemon/daemon-process.ts:133: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
         - src/daemon/watcher.test.ts:53: type waitForEvent
@@ -1427,40 +1427,40 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-594]
+src/daemon/worker.ts [1-610]
   class:
-    116-533: class Worker [exported]
+    118-549: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
       refs in: 5 [import: 1, instantiate: 2, reexport: 1, type: 1]
         - src/daemon/index.ts:103: reexport (module)
         - src/daemon/worker.test.ts:19: import (module)
-        - src/daemon/worker.ts:542: type createWorker
-        - src/daemon/worker.ts:543: instantiate createWorker
-        - src/daemon/worker.ts:556: instantiate worker
+        - src/daemon/worker.ts:558: type createWorker
+        - src/daemon/worker.ts:559: instantiate createWorker
+        - src/daemon/worker.ts:572: instantiate worker
   interface:
-    58-73: interface WorkerConfig [exported]
+    58-75: interface WorkerConfig [exported]
       /** Worker configuration */
       refs in: 6 [import: 1, reexport: 1, type: 4]
         - src/daemon/index.ts:107: reexport (module)
         - src/daemon/worker.test.ts:20: import (module)
         - src/daemon/worker.test.ts:67: type createTestWorkerConfig
         - src/daemon/worker.test.ts:68: type createTestWorkerConfig
-        - src/daemon/worker.ts:144: type Worker.constructor
-        - src/daemon/worker.ts:542: type createWorker
-    76-91: interface WorkerStatus [exported]
+        - src/daemon/worker.ts:150: type Worker.constructor
+        - src/daemon/worker.ts:558: type createWorker
+    78-93: interface WorkerStatus [exported]
       /** Worker status */
       refs in: 2 [reexport: 1, type: 1]
         - src/daemon/index.ts:108: reexport (module)
-        - src/daemon/worker.ts:256: type Worker.getStatus
-    94-107: interface JobProcessingResult [exported]
+        - src/daemon/worker.ts:263: type Worker.getStatus
+    96-109: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:109: reexport (module)
-        - src/daemon/worker.ts:271: type Worker.processJob
-        - src/daemon/worker.ts:460: type Worker.handleJobFailure
-        - src/daemon/worker.ts:555: type processSingleJob
+        - src/daemon/worker.ts:278: type Worker.processJob
+        - src/daemon/worker.ts:476: type Worker.handleJobFailure
+        - src/daemon/worker.ts:571: type processSingleJob
   function:
-    542-544: createWorker(config: WorkerConfig): Worker [exported]
+    558-560: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs in: 16 [call: 13, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
@@ -1473,11 +1473,11 @@ src/daemon/worker.ts [1-594]
         - src/daemon/worker.test.ts:142: call worker
         - src/daemon/worker.test.ts:158: call worker
         - src/daemon/worker.test.ts:172: call worker
-    550-564: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    566-580: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
         - src/daemon/index.ts:105: reexport (module)
-    569-593: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    585-609: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
@@ -1953,7 +1953,7 @@ src/storage/node-conversion.ts [1-260]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
       refs in: 24 [call: 22, import: 2]
         - src/daemon/worker.ts:32: import (module)
-        - src/daemon/worker.ts:389: call Worker.node
+        - src/daemon/worker.ts:405: call Worker.node
         - src/storage/index.test.ts:16: import (module)
         - src/storage/index.test.ts:824: call newNode
         - src/storage/index.test.ts:849: call (module)
@@ -2045,7 +2045,7 @@ src/storage/node-crud.ts [1-751]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:30: import (module)
-        - src/daemon/worker.ts:406: call Worker.{ created }
+        - src/daemon/worker.ts:422: call Worker.{ created }
         - src/storage/index.test.ts:65: import (module)
         - src/storage/index.test.ts:625: call { node: resultNode, created }
         - src/storage/index.test.ts:655: call { node: resultNode, created }
@@ -2116,7 +2116,7 @@ src/storage/node-crud.ts [1-751]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:28: import (module)
-        - src/daemon/worker.ts:350: call Worker.previousNode
+        - src/daemon/worker.ts:366: call Worker.previousNode
         - src/storage/index.test.ts:54: import (module)
         - src/storage/index.test.ts:490: call result
         - src/storage/index.test.ts:527: call result
@@ -2131,7 +2131,7 @@ src/storage/node-crud.ts [1-751]
         - src/daemon/cli.ts:31: import (module)
         - src/daemon/cli.ts:1014: call processLinkBatch
         - src/daemon/worker.ts:29: import (module)
-        - src/daemon/worker.ts:413: call Worker.processJob
+        - src/daemon/worker.ts:429: call Worker.processJob
         - src/storage/index.test.ts:56: import (module)
         - src/storage/index.test.ts:1108: call edges
         - src/storage/index.test.ts:1133: call edges
@@ -2937,4 +2937,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 49
-Estimated tokens: 37,660 (codebase: ~994,722)
+Estimated tokens: 37,660 (codebase: ~992,158)

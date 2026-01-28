@@ -231,7 +231,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-244]
+src/daemon/daemon-process.ts [1-248]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -998,60 +998,61 @@ src/daemon/worker.test.ts [1-445]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-594]
+src/daemon/worker.ts [1-610]
   class:
-    116-533: class Worker [exported]
+    118-549: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    58-73: interface WorkerConfig [exported]
+    58-75: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 9 [type: 9]
+      refs out: 11 [type: 11]
         - src/daemon/worker.ts:62: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:64: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:66: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:68: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:68: type Node -> src/types/index.ts
         - src/daemon/worker.ts:68: type Promise -> external
         - src/daemon/worker.ts:70: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:70: type Error -> external
+        - src/daemon/worker.ts:70: type Node -> src/types/index.ts
         - src/daemon/worker.ts:70: type Promise -> external
-    76-91: interface WorkerStatus [exported]
+        - src/daemon/worker.ts:72: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:72: type Error -> external
+    78-93: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:90: type Date -> external
-    94-107: interface JobProcessingResult [exported]
+        - src/daemon/worker.ts:84: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:92: type Date -> external
+    96-109: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:98: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:102: type Error -> external
+        - src/daemon/worker.ts:100: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:104: type Error -> external
   function:
-    542-544: createWorker(config: WorkerConfig): Worker [exported]
+    558-560: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:542: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:542: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:543: instantiate Worker -> src/daemon/worker.ts
-    550-564: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:558: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:558: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:559: instantiate Worker -> src/daemon/worker.ts
+    566-580: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:551: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:552: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:553: type Database -> external
-        - src/daemon/worker.ts:554: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:555: type Promise -> external
-        - src/daemon/worker.ts:555: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:562: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:563: call Worker.processJob -> src/daemon/worker.ts
-    569-593: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:567: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:568: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:569: type Database -> external
+        - src/daemon/worker.ts:570: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:571: type Promise -> external
+        - src/daemon/worker.ts:571: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:578: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:579: call Worker.processJob -> src/daemon/worker.ts
+    585-609: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:570: type Error -> external
-        - src/daemon/worker.ts:571: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:572: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:577: type ReturnType -> external
-        - src/daemon/worker.ts:589: call ceil -> external
-        - src/daemon/worker.ts:590: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:586: type Error -> external
+        - src/daemon/worker.ts:587: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:588: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:593: type ReturnType -> external
+        - src/daemon/worker.ts:605: call ceil -> external
+        - src/daemon/worker.ts:606: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1528,4 +1529,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,025 (codebase: ~994,722)
+Estimated tokens: 20,045 (codebase: ~992,158)

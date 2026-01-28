@@ -12,6 +12,18 @@ import type { AnalysisJob } from "../daemon/queue.js";
 import type { Node } from "../storage/node-types.js";
 
 // =============================================================================
+// Constants
+// =============================================================================
+
+/** WebSocket ready state values (mirrors WebSocket.OPEN, etc.) */
+const WS_READY_STATE = {
+  CONNECTING: 0,
+  OPEN: 1,
+  CLOSING: 2,
+  CLOSED: 3,
+} as const;
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -149,12 +161,22 @@ export class WebSocketManager {
    * Handle subscription request
    */
   private handleSubscribe(client: WSClient, message: SubscribeMessage): void {
-    const validChannels: WSChannel[] = new Set([
+    const validChannels = new Set<WSChannel>([
       "daemon",
       "analysis",
       "node",
       "queue",
     ]);
+
+    // Validate that channels is actually an array
+    if (!Array.isArray(message.channels)) {
+      this.sendToClient(client, {
+        type: "error",
+        data: { message: "channels must be an array" },
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
 
     for (const channel of message.channels) {
       if (validChannels.has(channel)) {
@@ -177,8 +199,7 @@ export class WebSocketManager {
    * Send message to a specific client
    */
   private sendToClient(client: WSClient, message: WSMessage): void {
-    if (client.socket.readyState === 1) {
-      // WebSocket.OPEN
+    if (client.socket.readyState === WS_READY_STATE.OPEN) {
       try {
         client.socket.send(JSON.stringify(message));
       } catch (error) {
