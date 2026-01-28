@@ -199,7 +199,6 @@
       <button
         class="breadcrumb active"
         aria-current="page"
-        disabled
       >
         <FileText size={14} />
         <span>{getSessionName(currentSession)}</span>
