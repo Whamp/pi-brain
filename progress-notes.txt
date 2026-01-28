@@ -129,3 +129,29 @@ The daemon gracefully degrades when skills are missing.
 - Reduced `node-repository.ts` from 2099 to 1811 lines (288 lines removed)
 
 **Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
+
+---
+
+## 2026-01-27 17:17 - Task 13.7 (Extract tool-error-repository.ts)
+
+**Status**: pending → done
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+- Verified exports work correctly via index.ts
+- All consumers import through storage/index.ts - backward compatible
+
+**Commit**: aea0d27
+
+**Changes**:
+- Created `src/storage/tool-error-repository.ts` (~349 lines)
+- Extracted tool error query functions: `listToolErrors`, `getAggregatedToolErrors`, 
+  `getToolErrorStats`, `countToolErrors`, `getAllToolsWithErrors`, `getNodeToolErrors`
+- Extracted tool error types: `ListToolErrorsFilters`, `ListToolErrorsOptions`, 
+  `ToolErrorResult`, `ListToolErrorsResult`, `AggregatedToolError`, `NodeToolError`,
+  `ToolStats`, `ModelErrorStats`, `ToolErrorTrends`, `ToolErrorStatsResult`
+- Added re-exports in `node-repository.ts` for backward compatibility
+- Added export in `src/storage/index.ts`
+- Reduced `node-repository.ts` from 1811 to 1520 lines (291 lines removed)
+
+**Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
