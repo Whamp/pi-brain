@@ -193,16 +193,16 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-201]
+src/api/server.ts [1-203]
   interface:
-    47-52: interface ServerContext [exported]
+    49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
-    167-170: interface ServerResult [exported]
+    169-172: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
   function:
-    66-162: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
+    68-164: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    175-193: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
+    177-195: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -2028,4 +2028,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,718 (codebase: ~994,547)
+Estimated tokens: 24,718 (codebase: ~994,707)

@@ -493,36 +493,36 @@ src/api/server.test.ts [1-703]
     - node:path
     - vitest
 
-src/api/server.ts [1-201]
+src/api/server.ts [1-203]
   interface:
-    47-52: interface ServerContext [exported]
+    49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
       refs out: 3 [type: 3]
-        - src/api/server.ts:48: type Database -> external
-        - src/api/server.ts:49: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:51: type DaemonConfig -> src/config/types.ts
-    167-170: interface ServerResult [exported]
+        - src/api/server.ts:50: type Database -> external
+        - src/api/server.ts:51: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:53: type DaemonConfig -> src/config/types.ts
+    169-172: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
       refs out: 2 [type: 2]
-        - src/api/server.ts:168: type FastifyInstance -> external
-        - src/api/server.ts:169: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:170: type FastifyInstance -> external
+        - src/api/server.ts:171: type WebSocketManager -> src/api/websocket.ts
   function:
-    66-162: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
+    68-164: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
       refs out: 34 [call: 27, instantiate: 1, type: 6]
-        - src/api/server.ts:67: type Database -> external
-        - src/api/server.ts:68: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:69: type DaemonConfig -> src/config/types.ts
-        - src/api/server.ts:70: type WebSocketManager -> src/api/websocket.ts
-        - src/api/server.ts:71: type Promise -> external
-    175-193: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
+        - src/api/server.ts:69: type Database -> external
+        - src/api/server.ts:70: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:71: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:72: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:73: type Promise -> external
+    177-195: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
       refs out: 8 [call: 2, type: 6]
-        - src/api/server.ts:176: type Database -> external
-        - src/api/server.ts:177: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:178: type DaemonConfig -> src/config/types.ts
-        - src/api/server.ts:179: type WebSocketManager -> src/api/websocket.ts
-        - src/api/server.ts:180: type Promise -> external
+        - src/api/server.ts:178: type Database -> external
+        - src/api/server.ts:179: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:180: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:181: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:182: type Promise -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -801,4 +801,4 @@ src/cli.ts [1-1102]
 
 ---
 Files: 27
-Estimated tokens: 8,933 (codebase: ~994,547)
+Estimated tokens: 8,933 (codebase: ~994,707)

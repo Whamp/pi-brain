@@ -30,6 +30,7 @@ Technical specifications for implementing pi-brain.
 ## Signals & Insights
 
 - [Signals](signals.md) - Friction/delight detection, manual flags, facet discovery, embedding configuration
+- [Semantic Search](semantic-search.md) - Vector similarity search for brain queries using sqlite-vec
 
 ## Future
 
@@ -63,6 +64,7 @@ Technical specifications for implementing pi-brain.
 | web-ui.md           | SvelteKit, components, D3 graph, dashboard | ✅ Complete |
 | prompt-learning.md  | Insight aggregation, prompt injection      | ✅ Complete |
 | signals.md          | Friction/delight, clustering, embeddings   | ✅ Complete |
+| semantic-search.md  | Vector similarity search, sqlite-vec       | 📋 Planned  |
 
 ## Implementation Order
 

@@ -37,6 +37,8 @@ import { statsRoutes } from "./routes/stats.js";
 import { toolErrorsRoutes } from "./routes/tool-errors.js";
 import { WebSocketManager, registerWebSocketRoute } from "./websocket.js";
 
+export { WebSocketManager, registerWebSocketRoute };
+
 // Re-export response helpers for convenience
 export { successResponse, errorResponse } from "./responses.js";
 export type { ApiErrorCode } from "./responses.js";
