@@ -193,3 +193,23 @@ the reactivity chain.
   - All 1291 tests pass, including new integration tests.
 **Commit**: 60c88128
 **Notes**: Completed Phase 17 Semantic Search implementation and verification. The system now has robust error handling and graceful degradation for vector search.
+
+---
+
+## 2026-01-28 12:39 - Task 19.1.1
+
+**Status**: pending → done
+**Validation**:
+  - Added maxRetries (0-10) and retryDelaySeconds (1-3600) to PUT /config/daemon API
+  - Added both fields to GET /config/daemon response
+  - Refactored config.ts: extracted validation helpers (validateIntRange, validateDaemonUpdate, applyDaemonUpdates) to reduce complexity from 34 to 18
+  - Created comprehensive API test suite with 13 tests covering:
+    - GET returns all fields including new ones
+    - PUT validates all numeric ranges
+    - PUT validates non-negative integers
+    - PUT validates maximum values
+    - PUT accepts valid values
+  - All 1307 tests pass (1307 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: 2be29217
+**Notes**: Extended daemon configuration API with retry settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.

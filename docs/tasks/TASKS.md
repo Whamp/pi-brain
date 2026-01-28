@@ -315,8 +315,8 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 | ID     | Task                                              | Status  | Deps          | Notes      |
 | ------ | ------------------------------------------------- | ------- | ------------- | ---------- |
-| 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | active  | -             | 2026-01-28 |
-| 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | pending | -             |            |
+| 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | done    | -             | 2026-01-28 |
+| 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | active  | -             | 2026-01-28 |
 | 19.1.3 | Add maxQueueSize, backfillLimit, reanalysisLimit  | pending | -             |            |
 | 19.1.4 | Add connectionDiscovery limits (3 fields)         | pending | -             |            |
 | 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | pending | -             |            |

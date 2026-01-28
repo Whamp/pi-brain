@@ -49,20 +49,30 @@ interface DaemonConfigUpdateBody {
   parallelWorkers?: number;
   maxRetries?: number;
   retryDelaySeconds?: number;
+  analysisTimeoutMinutes?: number;
+  maxConcurrentAnalysis?: number;
 }
 
 /**
  * Validate daemon configuration update fields
  */
 function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
-  const { idleTimeoutMinutes, parallelWorkers, maxRetries, retryDelaySeconds } =
-    body;
+  const {
+    idleTimeoutMinutes,
+    parallelWorkers,
+    maxRetries,
+    retryDelaySeconds,
+    analysisTimeoutMinutes,
+    maxConcurrentAnalysis,
+  } = body;
 
   const validations: ValidationResult[] = [
     validateIntRange(idleTimeoutMinutes, "idleTimeoutMinutes", 1, 1440),
     validateIntRange(parallelWorkers, "parallelWorkers", 1, 10),
     validateIntRange(maxRetries, "maxRetries", 0, 10),
     validateIntRange(retryDelaySeconds, "retryDelaySeconds", 1, 3600),
+    validateIntRange(analysisTimeoutMinutes, "analysisTimeoutMinutes", 1, 120),
+    validateIntRange(maxConcurrentAnalysis, "maxConcurrentAnalysis", 1, 10),
   ];
 
   for (const error of validations) {
@@ -88,6 +98,8 @@ function applyDaemonUpdates(
     parallelWorkers,
     maxRetries,
     retryDelaySeconds,
+    analysisTimeoutMinutes,
+    maxConcurrentAnalysis,
   } = body;
 
   // Initialize daemon section if needed
@@ -114,6 +126,12 @@ function applyDaemonUpdates(
   if (retryDelaySeconds !== undefined) {
     rawConfig.daemon.retry_delay_seconds = retryDelaySeconds;
   }
+  if (analysisTimeoutMinutes !== undefined) {
+    rawConfig.daemon.analysis_timeout_minutes = analysisTimeoutMinutes;
+  }
+  if (maxConcurrentAnalysis !== undefined) {
+    rawConfig.daemon.max_concurrent_analysis = maxConcurrentAnalysis;
+  }
 }
 
 export async function configRoutes(app: FastifyInstance): Promise<void> {
@@ -136,6 +154,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           parallelWorkers: config.daemon.parallelWorkers,
           maxRetries: config.daemon.maxRetries,
           retryDelaySeconds: config.daemon.retryDelaySeconds,
+          analysisTimeoutMinutes: config.daemon.analysisTimeoutMinutes,
+          maxConcurrentAnalysis: config.daemon.maxConcurrentAnalysis,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
@@ -165,6 +185,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         parallelWorkers,
         maxRetries,
         retryDelaySeconds,
+        analysisTimeoutMinutes,
+        maxConcurrentAnalysis,
       } = body;
 
       // Validate at least one field is provided
@@ -174,7 +196,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         idleTimeoutMinutes !== undefined ||
         parallelWorkers !== undefined ||
         maxRetries !== undefined ||
-        retryDelaySeconds !== undefined;
+        retryDelaySeconds !== undefined ||
+        analysisTimeoutMinutes !== undefined ||
+        maxConcurrentAnalysis !== undefined;
 
       if (!hasAnyField) {
         return reply
@@ -227,6 +251,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             parallelWorkers: updatedConfig.daemon.parallelWorkers,
             maxRetries: updatedConfig.daemon.maxRetries,
             retryDelaySeconds: updatedConfig.daemon.retryDelaySeconds,
+            analysisTimeoutMinutes: updatedConfig.daemon.analysisTimeoutMinutes,
+            maxConcurrentAnalysis: updatedConfig.daemon.maxConcurrentAnalysis,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

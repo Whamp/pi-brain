@@ -49,6 +49,8 @@ describe("config api routes", () => {
       expect(body.data.parallelWorkers).toBeDefined();
       expect(body.data.maxRetries).toBeDefined();
       expect(body.data.retryDelaySeconds).toBeDefined();
+      expect(body.data.analysisTimeoutMinutes).toBeDefined();
+      expect(body.data.maxConcurrentAnalysis).toBeDefined();
       expect(body.data.defaults).toBeDefined();
     });
 
@@ -195,6 +197,137 @@ describe("config api routes", () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.data.message).toContain("Restart daemon");
+    });
+
+    it("validates analysisTimeoutMinutes minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { analysisTimeoutMinutes: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("analysisTimeoutMinutes");
+      expect(body.error.message).toContain("between 1 and 120");
+    });
+
+    it("validates analysisTimeoutMinutes maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { analysisTimeoutMinutes: 121 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("analysisTimeoutMinutes");
+    });
+
+    it("accepts valid analysisTimeoutMinutes", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { analysisTimeoutMinutes: 60 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.analysisTimeoutMinutes).toBe(60);
+    });
+
+    it("validates analysisTimeoutMinutes must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { analysisTimeoutMinutes: 30.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("analysisTimeoutMinutes");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("validates maxConcurrentAnalysis minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxConcurrentAnalysis: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxConcurrentAnalysis");
+      expect(body.error.message).toContain("between 1 and 10");
+    });
+
+    it("validates maxConcurrentAnalysis maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxConcurrentAnalysis: 11 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxConcurrentAnalysis");
+    });
+
+    it("accepts valid maxConcurrentAnalysis", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxConcurrentAnalysis: 3 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.maxConcurrentAnalysis).toBe(3);
+    });
+
+    it("validates maxConcurrentAnalysis must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxConcurrentAnalysis: 2.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxConcurrentAnalysis");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("updates both analysisTimeoutMinutes and maxConcurrentAnalysis together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          analysisTimeoutMinutes: 45,
+          maxConcurrentAnalysis: 2,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.analysisTimeoutMinutes).toBe(45);
+      expect(body.data.maxConcurrentAnalysis).toBe(2);
+    });
+
+    it("returns configured values for new fields on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.analysisTimeoutMinutes).toBe(45); // Updated by previous test
+      expect(body.data.maxConcurrentAnalysis).toBe(2); // Updated by previous test
     });
   });
 
