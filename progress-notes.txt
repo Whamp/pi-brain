@@ -271,3 +271,30 @@ the reactivity chain.
   - Linting: 0 errors, 0 warnings
 **Commit**: ba9c02b6
 **Notes**: Extended daemon configuration API with timeout and concurrency settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
+
+## 2026-01-28 13:25 - Task 19.1.5
+
+**Status**: pending → done
+**Validation**:
+  - Added semanticSearchThreshold field (0-1) to PUT /config/daemon API
+  - Added validateFloatRange helper for float validation
+  - Added semanticSearchThreshold validation in validateDaemonUpdate
+  - Updated applyDaemonUpdates to persist semantic_search_threshold to config (snake_case)
+  - Added semanticSearchThreshold to GET /config/daemon response
+  - Added semanticSearchThreshold to PUT /config/daemon response
+  - Added 8 new tests covering validation (min/max) and update behavior
+  - Added test for GET returning all daemon fields including semanticSearchThreshold
+  - All 1354 tests pass (1354 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: d9aab260
+**Notes**: Extended daemon configuration API with semantic search threshold setting. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
+
+## 2026-01-28 13:35 - Task 19.1.6
+
+**Status**: pending → done
+**Validation**: 
+  - Verified type safety with `npm run web:check` (0 errors)
+  - Verified formatting with `npm run check` (0 errors)
+  - Manual inspection of code confirms fields match API spec
+**Commit**: (will be committed shortly)
+**Notes**: Updated Settings UI to include Analysis Execution, Queue & Limits, Connection Discovery, and Semantic Search sections. Updated API client to support new configuration fields.

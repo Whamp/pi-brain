@@ -2030,7 +2030,7 @@ src/types/index.ts [1-661]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-537]
+src/web/app/src/lib/api/client.ts [1-570]
   function:
     65-74: createApiError(options: ApiErrorOptions): Error [exported]
     76-80: createTimeoutError(timeoutMs: number): Error [exported]
@@ -2045,7 +2045,7 @@ src/web/app/src/lib/api/client.ts [1-537]
     132-149: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    220-523: api [exported]
+    220-556: api [exported]
   imports:
     - $lib/types
 
@@ -2149,4 +2149,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 27,087 (codebase: ~1,104,359)
+Estimated tokens: 27,087 (codebase: ~1,105,810)

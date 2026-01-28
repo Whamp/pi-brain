@@ -434,6 +434,17 @@ export const api = {
       model: string;
       idleTimeoutMinutes: number;
       parallelWorkers: number;
+      maxRetries: number;
+      retryDelaySeconds: number;
+      analysisTimeoutMinutes: number;
+      maxConcurrentAnalysis: number;
+      maxQueueSize: number;
+      backfillLimit: number;
+      reanalysisLimit: number;
+      connectionDiscoveryLimit: number;
+      connectionDiscoveryLookbackDays: number;
+      connectionDiscoveryCooldownHours: number;
+      semanticSearchThreshold: number;
       defaults: { provider: string; model: string };
     }>("/config/daemon"),
 
@@ -442,12 +453,34 @@ export const api = {
     model?: string;
     idleTimeoutMinutes?: number;
     parallelWorkers?: number;
+    maxRetries?: number;
+    retryDelaySeconds?: number;
+    analysisTimeoutMinutes?: number;
+    maxConcurrentAnalysis?: number;
+    maxQueueSize?: number;
+    backfillLimit?: number;
+    reanalysisLimit?: number;
+    connectionDiscoveryLimit?: number;
+    connectionDiscoveryLookbackDays?: number;
+    connectionDiscoveryCooldownHours?: number;
+    semanticSearchThreshold?: number;
   }) =>
     request<{
       provider: string;
       model: string;
       idleTimeoutMinutes: number;
       parallelWorkers: number;
+      maxRetries: number;
+      retryDelaySeconds: number;
+      analysisTimeoutMinutes: number;
+      maxConcurrentAnalysis: number;
+      maxQueueSize: number;
+      backfillLimit: number;
+      reanalysisLimit: number;
+      connectionDiscoveryLimit: number;
+      connectionDiscoveryLookbackDays: number;
+      connectionDiscoveryCooldownHours: number;
+      semanticSearchThreshold: number;
       message: string;
     }>("/config/daemon", {
       method: "PUT",

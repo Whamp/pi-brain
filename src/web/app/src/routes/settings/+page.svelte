@@ -19,12 +19,34 @@
   let model = $state("");
   let idleTimeoutMinutes = $state(10);
   let parallelWorkers = $state(1);
+  let maxRetries = $state(3);
+  let retryDelaySeconds = $state(60);
+  let analysisTimeoutMinutes = $state(10);
+  let maxConcurrentAnalysis = $state(1);
+  let maxQueueSize = $state(100);
+  let backfillLimit = $state(50);
+  let reanalysisLimit = $state(20);
+  let connectionDiscoveryLimit = $state(20);
+  let connectionDiscoveryLookbackDays = $state(7);
+  let connectionDiscoveryCooldownHours = $state(24);
+  let semanticSearchThreshold = $state(0.6);
 
-  // Original values (for reset) - must be $state for $derived reactivity
+  // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
   let originalIdleTimeoutMinutes = $state(10);
   let originalParallelWorkers = $state(1);
+  let originalMaxRetries = $state(3);
+  let originalRetryDelaySeconds = $state(60);
+  let originalAnalysisTimeoutMinutes = $state(10);
+  let originalMaxConcurrentAnalysis = $state(1);
+  let originalMaxQueueSize = $state(100);
+  let originalBackfillLimit = $state(50);
+  let originalReanalysisLimit = $state(20);
+  let originalConnectionDiscoveryLimit = $state(20);
+  let originalConnectionDiscoveryLookbackDays = $state(7);
+  let originalConnectionDiscoveryCooldownHours = $state(24);
+  let originalSemanticSearchThreshold = $state(0.6);
 
   // Available providers
   let providers: Provider[] = $state([]);
@@ -39,7 +61,18 @@
     provider !== originalProvider ||
     model !== originalModel ||
     idleTimeoutMinutes !== originalIdleTimeoutMinutes ||
-    parallelWorkers !== originalParallelWorkers
+    parallelWorkers !== originalParallelWorkers ||
+    maxRetries !== originalMaxRetries ||
+    retryDelaySeconds !== originalRetryDelaySeconds ||
+    analysisTimeoutMinutes !== originalAnalysisTimeoutMinutes ||
+    maxConcurrentAnalysis !== originalMaxConcurrentAnalysis ||
+    maxQueueSize !== originalMaxQueueSize ||
+    backfillLimit !== originalBackfillLimit ||
+    reanalysisLimit !== originalReanalysisLimit ||
+    connectionDiscoveryLimit !== originalConnectionDiscoveryLimit ||
+    connectionDiscoveryLookbackDays !== originalConnectionDiscoveryLookbackDays ||
+    connectionDiscoveryCooldownHours !== originalConnectionDiscoveryCooldownHours ||
+    semanticSearchThreshold !== originalSemanticSearchThreshold
   );
 
   onMount(async () => {
@@ -54,12 +87,34 @@
       ({ model } = config);
       ({ idleTimeoutMinutes } = config);
       ({ parallelWorkers } = config);
+      maxRetries = config.maxRetries ?? 3;
+      retryDelaySeconds = config.retryDelaySeconds ?? 60;
+      analysisTimeoutMinutes = config.analysisTimeoutMinutes ?? 10;
+      maxConcurrentAnalysis = config.maxConcurrentAnalysis ?? 1;
+      maxQueueSize = config.maxQueueSize ?? 100;
+      backfillLimit = config.backfillLimit ?? 50;
+      reanalysisLimit = config.reanalysisLimit ?? 20;
+      connectionDiscoveryLimit = config.connectionDiscoveryLimit ?? 20;
+      connectionDiscoveryLookbackDays = config.connectionDiscoveryLookbackDays ?? 7;
+      connectionDiscoveryCooldownHours = config.connectionDiscoveryCooldownHours ?? 24;
+      semanticSearchThreshold = config.semanticSearchThreshold ?? 0.6;
 
       // Store originals
-      originalProvider = config.provider;
-      originalModel = config.model;
-      originalIdleTimeoutMinutes = config.idleTimeoutMinutes;
-      originalParallelWorkers = config.parallelWorkers;
+      originalProvider = provider;
+      originalModel = model;
+      originalIdleTimeoutMinutes = idleTimeoutMinutes;
+      originalParallelWorkers = parallelWorkers;
+      originalMaxRetries = maxRetries;
+      originalRetryDelaySeconds = retryDelaySeconds;
+      originalAnalysisTimeoutMinutes = analysisTimeoutMinutes;
+      originalMaxConcurrentAnalysis = maxConcurrentAnalysis;
+      originalMaxQueueSize = maxQueueSize;
+      originalBackfillLimit = backfillLimit;
+      originalReanalysisLimit = reanalysisLimit;
+      originalConnectionDiscoveryLimit = connectionDiscoveryLimit;
+      originalConnectionDiscoveryLookbackDays = connectionDiscoveryLookbackDays;
+      originalConnectionDiscoveryCooldownHours = connectionDiscoveryCooldownHours;
+      originalSemanticSearchThreshold = semanticSearchThreshold;
     } catch (error) {
       console.error("Failed to load config:", error);
       toastStore.error(
@@ -94,6 +149,17 @@
         model,
         idleTimeoutMinutes,
         parallelWorkers,
+        maxRetries,
+        retryDelaySeconds,
+        analysisTimeoutMinutes,
+        maxConcurrentAnalysis,
+        maxQueueSize,
+        backfillLimit,
+        reanalysisLimit,
+        connectionDiscoveryLimit,
+        connectionDiscoveryLookbackDays,
+        connectionDiscoveryCooldownHours,
+        semanticSearchThreshold,
       });
 
       // Update originals
@@ -101,6 +167,17 @@
       originalModel = result.model;
       originalIdleTimeoutMinutes = result.idleTimeoutMinutes;
       originalParallelWorkers = result.parallelWorkers;
+      originalMaxRetries = result.maxRetries;
+      originalRetryDelaySeconds = result.retryDelaySeconds;
+      originalAnalysisTimeoutMinutes = result.analysisTimeoutMinutes;
+      originalMaxConcurrentAnalysis = result.maxConcurrentAnalysis;
+      originalMaxQueueSize = result.maxQueueSize;
+      originalBackfillLimit = result.backfillLimit;
+      originalReanalysisLimit = result.reanalysisLimit;
+      originalConnectionDiscoveryLimit = result.connectionDiscoveryLimit;
+      originalConnectionDiscoveryLookbackDays = result.connectionDiscoveryLookbackDays;
+      originalConnectionDiscoveryCooldownHours = result.connectionDiscoveryCooldownHours;
+      originalSemanticSearchThreshold = result.semanticSearchThreshold;
 
       toastStore.success(result.message);
     } catch (error) {
@@ -120,6 +197,17 @@
     model = originalModel;
     idleTimeoutMinutes = originalIdleTimeoutMinutes;
     parallelWorkers = originalParallelWorkers;
+    maxRetries = originalMaxRetries;
+    retryDelaySeconds = originalRetryDelaySeconds;
+    analysisTimeoutMinutes = originalAnalysisTimeoutMinutes;
+    maxConcurrentAnalysis = originalMaxConcurrentAnalysis;
+    maxQueueSize = originalMaxQueueSize;
+    backfillLimit = originalBackfillLimit;
+    reanalysisLimit = originalReanalysisLimit;
+    connectionDiscoveryLimit = originalConnectionDiscoveryLimit;
+    connectionDiscoveryLookbackDays = originalConnectionDiscoveryLookbackDays;
+    connectionDiscoveryCooldownHours = originalConnectionDiscoveryCooldownHours;
+    semanticSearchThreshold = originalSemanticSearchThreshold;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -219,6 +307,178 @@
       </div>
     </section>
 
+    <section class="settings-section">
+      <h2>Analysis Execution</h2>
+      <p class="section-description">
+        Fine-tune timeouts and retry logic for analysis jobs
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="analysisTimeout">Analysis Timeout (minutes)</label>
+          <input
+            type="number"
+            id="analysisTimeout"
+            bind:value={analysisTimeoutMinutes}
+            min="1"
+            max="120"
+          />
+          <span class="hint">Max time allowed for a single analysis job</span>
+        </div>
+
+        <div class="form-group">
+          <label for="maxConcurrent">Max Concurrent Jobs</label>
+          <input
+            type="number"
+            id="maxConcurrent"
+            bind:value={maxConcurrentAnalysis}
+            min="1"
+            max="10"
+          />
+          <span class="hint">Limit concurrent API calls to providers</span>
+        </div>
+
+        <div class="form-group">
+          <label for="maxRetries">Max Retries</label>
+          <input
+            type="number"
+            id="maxRetries"
+            bind:value={maxRetries}
+            min="0"
+            max="10"
+          />
+          <span class="hint">Number of times to retry failed jobs</span>
+        </div>
+
+        <div class="form-group">
+          <label for="retryDelay">Retry Delay (seconds)</label>
+          <input
+            type="number"
+            id="retryDelay"
+            bind:value={retryDelaySeconds}
+            min="1"
+            max="3600"
+          />
+          <span class="hint">Wait time before retrying a failed job</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Queue & Limits</h2>
+      <p class="section-description">
+        Manage queue capacity and processing limits
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="maxQueueSize">Max Queue Size</label>
+          <input
+            type="number"
+            id="maxQueueSize"
+            bind:value={maxQueueSize}
+            min="10"
+            max="10000"
+          />
+          <span class="hint">Maximum number of pending jobs in queue</span>
+        </div>
+
+        <div class="form-group">
+          <label for="backfillLimit">Backfill Limit</label>
+          <input
+            type="number"
+            id="backfillLimit"
+            bind:value={backfillLimit}
+            min="1"
+            max="1000"
+          />
+          <span class="hint">Max jobs to process during backfill</span>
+        </div>
+
+        <div class="form-group">
+          <label for="reanalysisLimit">Reanalysis Limit</label>
+          <input
+            type="number"
+            id="reanalysisLimit"
+            bind:value={reanalysisLimit}
+            min="1"
+            max="1000"
+          />
+          <span class="hint">Max jobs for nightly reanalysis</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Connection Discovery</h2>
+      <p class="section-description">
+        Configure how the daemon discovers connections between sessions
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="connLimit">Discovery Limit</label>
+          <input
+            type="number"
+            id="connLimit"
+            bind:value={connectionDiscoveryLimit}
+            min="1"
+            max="1000"
+          />
+          <span class="hint">Max nodes to check for connections per run</span>
+        </div>
+
+        <div class="form-group">
+          <label for="connLookback">Lookback Days</label>
+          <input
+            type="number"
+            id="connLookback"
+            bind:value={connectionDiscoveryLookbackDays}
+            min="1"
+            max="365"
+          />
+          <span class="hint">How far back to check for related sessions</span>
+        </div>
+
+        <div class="form-group">
+          <label for="connCooldown">Cooldown (hours)</label>
+          <input
+            type="number"
+            id="connCooldown"
+            bind:value={connectionDiscoveryCooldownHours}
+            min="1"
+            max="168"
+          />
+          <span class="hint">Min time between discovery runs for a node</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Semantic Search</h2>
+      <p class="section-description">
+        Configure parameters for vector-based semantic search
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="semanticThreshold">Similarity Threshold</label>
+          <div class="range-group">
+            <input
+              type="range"
+              id="semanticThreshold"
+              bind:value={semanticSearchThreshold}
+              min="0"
+              max="1"
+              step="0.05"
+            />
+            <span class="range-value">{semanticSearchThreshold.toFixed(2)}</span>
+          </div>
+          <span class="hint">Minimum similarity score (0.0 - 1.0) for matches</span>
+        </div>
+      </div>
+    </section>
+
     <div class="actions">
       <button
         class="btn-secondary"
@@ -243,6 +503,7 @@
 <style>
   .settings-page {
     max-width: 800px;
+    padding-bottom: var(--space-12);
   }
 
   .page-header {
@@ -324,7 +585,8 @@
   }
 
   .form-group select,
-  .form-group input[type="number"] {
+  .form-group input[type="number"],
+  .form-group input[type="range"] {
     padding: var(--space-2) var(--space-3);
     background: var(--color-bg);
     border: 1px solid var(--color-border);
@@ -332,6 +594,10 @@
     font-size: var(--text-sm);
     color: var(--color-text);
     transition: border-color 0.15s ease;
+  }
+
+  .form-group input[type="range"] {
+    padding: 0;
   }
 
   .form-group select:focus,
@@ -343,6 +609,23 @@
   .form-group .hint {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
+  }
+  
+  .range-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  
+  .range-group input {
+    flex: 1;
+  }
+  
+  .range-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    width: 3em;
+    text-align: right;
   }
 
   .actions {
