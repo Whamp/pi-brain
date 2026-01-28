@@ -111,3 +111,24 @@ Main branch: major/pi-brain
   - All 1272 tests pass overall
 **Commit**: d807f469
 **Notes**: Task 17.5.1 was already implemented; completed 17.5.2 by adding missing unit tests per spec requirements.
+
+---
+
+## 2026-01-28 06:36 - Task 17.6.1
+
+**Status**: active → done
+**Validation**: 
+  - 5 new unit tests for semantic search integration in query-processor.test.ts:
+    - Should use semantic search when embedding provider configured
+    - Should fall back to FTS when semantic search returns no results
+    - Should fall back to FTS when semantic search throws an error
+    - Should skip semantic search when no embedding provider configured
+    - Should pass project filter to semantic search
+  - All 1277 tests pass
+**Commit**: 005d8ca9
+**Notes**: Updated findRelevantNodes to be async and accept embedding provider:
+  - Phase 1: Try semantic search when embedding provider configured
+  - Phase 2: Fall back to FTS if semantic returns no results or throws
+  - Phase 3: Fall back to listing recent nodes as last resort
+  - Updated API route to create embedding provider from config
+  - Logs strategy transitions for debugging (semantic → FTS fallback)
