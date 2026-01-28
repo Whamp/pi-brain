@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import {
     Sparkles,
     ThumbsUp,
@@ -8,11 +8,23 @@
     AlertTriangle,
     ChevronRight,
     Layers,
+    Undo2,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { ClusterWithNodes } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
+
+  // Undo delay in milliseconds
+  const UNDO_DELAY_MS = 5000;
+
+  // Pending action type
+  interface PendingAction {
+    clusterId: string;
+    action: "confirmed" | "dismissed";
+    timeoutId: ReturnType<typeof setTimeout>;
+    startTime: number;
+  }
 
   // State
   let clusters: ClusterWithNodes[] = [];
@@ -20,6 +32,7 @@
   let errorMessage: string | null = null;
   let processingIds = new Set<string>();
   let actionErrors = new Map<string, string>();
+  let pendingActions = new Map<string, PendingAction>();
 
   /** Clear action error after a delay */
   function clearActionError(clusterId: string, delayMs = 3000) {
@@ -28,6 +41,13 @@
       actionErrors = new Map(actionErrors);
     }, delayMs);
   }
+
+  /** Clean up all pending timeouts on destroy */
+  onDestroy(() => {
+    for (const pending of pendingActions.values()) {
+      clearTimeout(pending.timeoutId);
+    }
+  });
 
   onMount(async () => {
     await loadClusters();
@@ -49,42 +69,67 @@
     }
   }
 
-  async function handleConfirm(clusterId: string) {
+  /** Commit the pending action to the API */
+  async function commitAction(clusterId: string, action: "confirmed" | "dismissed") {
     processingIds = new Set([...processingIds, clusterId]);
-    actionErrors.delete(clusterId);
-    actionErrors = new Map(actionErrors);
     try {
-      await api.updateClusterStatus(clusterId, "confirmed");
-      // Remove from list after successful confirmation
+      await api.updateClusterStatus(clusterId, action);
+      // Remove from list after successful action
       clusters = clusters.filter((c) => c.id !== clusterId);
+      pendingActions.delete(clusterId);
+      pendingActions = new Map(pendingActions);
     } catch (error) {
-      console.error("Failed to confirm cluster:", error);
-      actionErrors.set(clusterId, "Failed to confirm");
+      console.error(`Failed to ${action} cluster:`, error);
+      actionErrors.set(clusterId, `Failed to ${action}`);
       actionErrors = new Map(actionErrors);
       clearActionError(clusterId);
+      // Clear pending state so user can retry
+      pendingActions.delete(clusterId);
+      pendingActions = new Map(pendingActions);
     } finally {
       processingIds.delete(clusterId);
       processingIds = new Set(processingIds);
     }
   }
 
-  async function handleDismiss(clusterId: string) {
-    processingIds = new Set([...processingIds, clusterId]);
-    actionErrors.delete(clusterId);
-    actionErrors = new Map(actionErrors);
-    try {
-      await api.updateClusterStatus(clusterId, "dismissed");
-      // Remove from list after successful dismissal
-      clusters = clusters.filter((c) => c.id !== clusterId);
-    } catch (error) {
-      console.error("Failed to dismiss cluster:", error);
-      actionErrors.set(clusterId, "Failed to dismiss");
-      actionErrors = new Map(actionErrors);
-      clearActionError(clusterId);
-    } finally {
-      processingIds.delete(clusterId);
-      processingIds = new Set(processingIds);
+  /** Start a pending action with undo window */
+  function startPendingAction(clusterId: string, action: "confirmed" | "dismissed") {
+    // Clear any existing pending action
+    const existing = pendingActions.get(clusterId);
+    if (existing) {
+      clearTimeout(existing.timeoutId);
     }
+
+    // Set up new pending action
+    const timeoutId = setTimeout(() => {
+      commitAction(clusterId, action);
+    }, UNDO_DELAY_MS);
+
+    pendingActions.set(clusterId, {
+      clusterId,
+      action,
+      timeoutId,
+      startTime: Date.now(),
+    });
+    pendingActions = new Map(pendingActions);
+  }
+
+  /** Undo a pending action */
+  function handleUndo(clusterId: string) {
+    const pending = pendingActions.get(clusterId);
+    if (pending) {
+      clearTimeout(pending.timeoutId);
+      pendingActions.delete(clusterId);
+      pendingActions = new Map(pendingActions);
+    }
+  }
+
+  function handleConfirm(clusterId: string) {
+    startPendingAction(clusterId, "confirmed");
+  }
+
+  function handleDismiss(clusterId: string) {
+    startPendingAction(clusterId, "dismissed");
   }
 
   function getSignalIcon(signalType: "friction" | "delight" | null) {
@@ -123,6 +168,10 @@
     }
     return summary.slice(0, maxLen).trim() + "...";
   }
+
+  function getActionLabel(action: "confirmed" | "dismissed"): string {
+    return action === "confirmed" ? "Confirmed" : "Dismissed";
+  }
 </script>
 
 <section class="card news-feed-panel">
@@ -156,85 +205,110 @@
       {#each clusters as cluster (cluster.id)}
         {@const isProcessing = processingIds.has(cluster.id)}
         {@const actionError = actionErrors.get(cluster.id)}
+        {@const pending = pendingActions.get(cluster.id)}
         {@const SignalIcon = getSignalIcon(cluster.signalType)}
-        <article class="cluster-card" data-signal={cluster.signalType ?? "neutral"}>
-          <header class="cluster-header">
-            <div class="cluster-signal" style="color: {getSignalColor(cluster.signalType)}">
-              <SignalIcon size={16} />
-              <span class="signal-label">{getSignalLabel(cluster.signalType)}</span>
+        <article
+          class="cluster-card"
+          class:pending-action={pending}
+          data-signal={cluster.signalType ?? "neutral"}
+        >
+          {#if pending}
+            <!-- Pending action overlay -->
+            <div class="pending-overlay">
+              <div class="pending-content">
+                <span class="pending-label">{getActionLabel(pending.action)}</span>
+                <button
+                  class="undo-btn"
+                  onclick={() => handleUndo(cluster.id)}
+                  disabled={isProcessing}
+                >
+                  <Undo2 size={16} />
+                  <span>Undo</span>
+                </button>
+              </div>
+              <div class="pending-timer">
+                <div class="timer-bar"></div>
+              </div>
             </div>
-            {#if cluster.relatedModel}
-              <span class="cluster-model">
-                <code>{cluster.relatedModel}</code>
-              </span>
+          {:else}
+            <header class="cluster-header">
+              <div class="cluster-signal" style="color: {getSignalColor(cluster.signalType)}">
+                <SignalIcon size={16} />
+                <span class="signal-label">{getSignalLabel(cluster.signalType)}</span>
+              </div>
+              {#if cluster.relatedModel}
+                <span class="cluster-model">
+                  <code>{cluster.relatedModel}</code>
+                </span>
+              {/if}
+            </header>
+
+            <h3 class="cluster-name">{cluster.name}</h3>
+
+            {#if cluster.description}
+              <p class="cluster-description">{cluster.description}</p>
             {/if}
-          </header>
 
-          <h3 class="cluster-name">{cluster.name}</h3>
-
-          {#if cluster.description}
-            <p class="cluster-description">{cluster.description}</p>
-          {/if}
-
-          {#if cluster.nodes && cluster.nodes.length > 0}
-            <div class="cluster-examples">
-              <span class="examples-label">Examples ({cluster.nodeCount} nodes):</span>
-              <ul class="example-list">
-                {#each cluster.nodes.slice(0, 3) as node}
-                  <li class="example-item">
-                    <a href="/nodes/{node.nodeId}" class="example-link">
-                      <ChevronRight size={14} />
-                      <span class="example-summary">
-                        {truncateSummary(node.summary ?? "No summary")}
-                      </span>
-                      {#if node.project}
-                        <span class="example-project">
-                          {node.project.split("/").pop()}
+            {#if cluster.nodes && cluster.nodes.length > 0}
+              <div class="cluster-examples">
+                <span class="examples-label">Examples ({cluster.nodeCount} nodes):</span>
+                <ul class="example-list">
+                  {#each cluster.nodes.slice(0, 3) as node}
+                    <li class="example-item">
+                      <a href="/nodes/{node.nodeId}" class="example-link">
+                        <ChevronRight size={14} />
+                        <span class="example-summary">
+                          {truncateSummary(node.summary ?? "No summary")}
                         </span>
-                      {/if}
-                    </a>
-                  </li>
-                {/each}
-              </ul>
-            </div>
-          {/if}
-
-          <footer class="cluster-footer">
-            {#if actionError}
-              <span class="action-error">
-                <AlertTriangle size={12} />
-                {actionError}
-              </span>
-            {:else}
-              <span class="cluster-time">
-                Discovered {formatDistanceToNow(parseDate(cluster.createdAt))}
-              </span>
+                        {#if node.project}
+                          <span class="example-project">
+                            {node.project.split("/").pop()}
+                          </span>
+                        {/if}
+                      </a>
+                    </li>
+                  {/each}
+                </ul>
+              </div>
             {/if}
-            <div class="cluster-actions">
-              <button
-                class="action-btn confirm"
-                onclick={() => handleConfirm(cluster.id)}
-                disabled={isProcessing}
-                title="Confirm this pattern"
-              >
-                <ThumbsUp size={16} />
-                {#if isProcessing}
-                  <span>...</span>
-                {:else}
-                  <span>Confirm</span>
-                {/if}
-              </button>
-              <button
-                class="action-btn dismiss"
-                onclick={() => handleDismiss(cluster.id)}
-                disabled={isProcessing}
-                title="Dismiss this pattern"
-              >
-                <ThumbsDown size={16} />
-                <span>Dismiss</span>
-              </button>
-            </div>
-          </footer>
+
+            <footer class="cluster-footer">
+              {#if actionError}
+                <span class="action-error">
+                  <AlertTriangle size={12} />
+                  {actionError}
+                </span>
+              {:else}
+                <span class="cluster-time">
+                  Discovered {formatDistanceToNow(parseDate(cluster.createdAt))}
+                </span>
+              {/if}
+              <div class="cluster-actions">
+                <button
+                  class="action-btn confirm"
+                  onclick={() => handleConfirm(cluster.id)}
+                  disabled={isProcessing}
+                  title="Confirm this pattern"
+                >
+                  <ThumbsUp size={16} />
+                  {#if isProcessing}
+                    <span>...</span>
+                  {:else}
+                    <span>Confirm</span>
+                  {/if}
+                </button>
+                <button
+                  class="action-btn dismiss"
+                  onclick={() => handleDismiss(cluster.id)}
+                  disabled={isProcessing}
+                  title="Dismiss this pattern"
+                >
+                  <ThumbsDown size={16} />
+                  <span>Dismiss</span>
+                </button>
+              </div>
+            </footer>
+          {/if}
         </article>
       {/each}
     </div>
@@ -299,11 +373,13 @@
   }
 
   .cluster-card {
+    position: relative;
     padding: var(--space-4);
     background: var(--color-bg);
     border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-lg);
     transition: border-color var(--transition-fast);
+    overflow: hidden;
   }
 
   .cluster-card:hover {
@@ -320,6 +396,81 @@
 
   .cluster-card[data-signal="neutral"] {
     border-left: 3px solid var(--color-accent);
+  }
+
+  /* Pending action state */
+  .cluster-card.pending-action {
+    opacity: 0.8;
+    background: var(--color-bg-elevated);
+  }
+
+  .pending-overlay {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
+  }
+
+  .pending-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pending-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+
+  .undo-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--color-accent-muted);
+    color: var(--color-accent);
+    cursor: pointer;
+    transition:
+      background var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  .undo-btn:hover:not(:disabled) {
+    background: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .undo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pending-timer {
+    height: 3px;
+    background: var(--color-border-subtle);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: var(--color-accent);
+    width: 100%;
+    animation: timer-shrink 5s linear forwards;
+  }
+
+  @keyframes timer-shrink {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
   }
 
   .cluster-header {
@@ -510,6 +661,17 @@
 
     .action-btn {
       flex: 1;
+      justify-content: center;
+    }
+
+    .pending-content {
+      flex-direction: column;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+
+    .undo-btn {
+      width: 100%;
       justify-content: center;
     }
   }
