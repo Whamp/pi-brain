@@ -314,12 +314,12 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 ### 19.1 Extend Daemon Settings (Trivial)
 
 | ID     | Task                                              | Status  | Deps          | Notes      |
-| ------ | ------------------------------------------------- | ------- | ------------- | ---------- |
+| ------ | ------------------------------------------------- | ------- | ------------- | ---------- | --- |
 | 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | done    | -             | 2026-01-28 |
 | 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | done    | -             | 2026-01-28 |
 | 19.1.3 | Add maxQueueSize, backfillLimit, reanalysisLimit  | done    | -             | 2026-01-28 |
 | 19.1.4 | Add connectionDiscovery limits (3 fields)         | done    | -             | 2026-01-28 |
-| 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | pending | -             |            |
+| 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | active  | -             | 2026-01-28 |     |
 | 19.1.6 | Update settings UI with new daemon form sections  | pending | 19.1.1-19.1.5 |            |
 
 ### 19.2 Query & API Config (Trivial)

@@ -734,6 +734,123 @@ describe("config api routes", () => {
       expect(body.data.connectionDiscoveryCooldownHours).toBeDefined();
       expect(body.data.defaults).toBeDefined();
     });
+
+    // semanticSearchThreshold tests
+    it("validates semanticSearchThreshold minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: -0.1 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("semanticSearchThreshold");
+      expect(body.error.message).toContain("between 0 and 1");
+    });
+
+    it("validates semanticSearchThreshold maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: 1.1 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("semanticSearchThreshold");
+      expect(body.error.message).toContain("between 0 and 1");
+    });
+
+    it("accepts valid semanticSearchThreshold minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: 0 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.semanticSearchThreshold).toBe(0);
+    });
+
+    it("accepts valid semanticSearchThreshold maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: 1 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.semanticSearchThreshold).toBe(1);
+    });
+
+    it("accepts valid semanticSearchThreshold midpoint", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: 0.5 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.semanticSearchThreshold).toBe(0.5);
+    });
+
+    it("accepts semanticSearchThreshold with decimal precision", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { semanticSearchThreshold: 0.75 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.semanticSearchThreshold).toBe(0.75);
+    });
+
+    it("returns semanticSearchThreshold on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.semanticSearchThreshold).toBe(0.75); // Updated by previous test
+    });
+
+    it("returns all daemon fields including semanticSearchThreshold", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data).toBeDefined();
+      expect(body.data.provider).toBeDefined();
+      expect(body.data.model).toBeDefined();
+      expect(body.data.idleTimeoutMinutes).toBeDefined();
+      expect(body.data.parallelWorkers).toBeDefined();
+      expect(body.data.maxRetries).toBeDefined();
+      expect(body.data.retryDelaySeconds).toBeDefined();
+      expect(body.data.analysisTimeoutMinutes).toBeDefined();
+      expect(body.data.maxConcurrentAnalysis).toBeDefined();
+      expect(body.data.maxQueueSize).toBeDefined();
+      expect(body.data.backfillLimit).toBeDefined();
+      expect(body.data.reanalysisLimit).toBeDefined();
+      expect(body.data.connectionDiscoveryLimit).toBeDefined();
+      expect(body.data.connectionDiscoveryLookbackDays).toBeDefined();
+      expect(body.data.connectionDiscoveryCooldownHours).toBeDefined();
+      expect(body.data.semanticSearchThreshold).toBeDefined();
+      expect(body.data.defaults).toBeDefined();
+    });
   });
 
   describe("gET /config/providers", () => {

@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1137,
+    "totalSymbols": 1138,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 504,
+      "function": 505,
       "type": 42,
       "interface": 263,
       "variable": 119,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39147,
-  "codebase_tokens": 1104117,
+  "total_tokens": 39187,
+  "codebase_tokens": 1105515,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,10 +327,10 @@
       "language": "typescript",
       "lines": [
         1,
-        395
+        430
       ],
       "detail_level": "full",
-      "token_estimate": 233,
+      "token_estimate": 273,
       "symbols": [
         {
           "name": "ValidationResult",
@@ -371,12 +371,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateFloatRange",
+          "kind": "function",
+          "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
+          "lines": [
+            45,
+            58
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a float field is within a range",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "DaemonConfigUpdateBody",
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            45,
-            60
+            63,
+            79
           ],
           "exported": false,
           "is_default": false,
@@ -394,8 +413,8 @@
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            65,
-            118
+            84,
+            144
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +432,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            123,
-            194
+            149,
+            224
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +451,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            196,
-            394
+            226,
+            429
           ],
           "exported": true,
           "is_default": false,

@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 28
-- Total symbols: 102
-  - function: 55
+- Total symbols: 103
+  - function: 56
   - interface: 15
   - method: 12
   - variable: 11
@@ -112,16 +112,16 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.test.ts [1-760]
+src/api/routes/config.test.ts [1-877]
   imports:
     - ../../storage/database.js
     - ../server.js
     - better-sqlite3
     - vitest
 
-src/api/routes/config.ts [1-395]
+src/api/routes/config.ts [1-430]
   interface:
-    45-60: interface DaemonConfigUpdateBody
+    63-79: interface DaemonConfigUpdateBody
       /** Daemon configuration update request body */
   type:
     22-22: ValidationResult = string | null
@@ -132,23 +132,27 @@ src/api/routes/config.ts [1-395]
       refs out: 2 [call: 1, type: 1]
         - src/api/routes/config.ts:32: type ValidationResult -> src/api/routes/config.ts
         - src/api/routes/config.ts:36: call isInteger -> external
-    65-118: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
+    45-58: validateFloatRange(value: number | undefined, field: string, min: number, max: number): string
+      /** Validate a float field is within a range */
+      refs out: 1 [type: 1]
+        - src/api/routes/config.ts:50: type ValidationResult -> src/api/routes/config.ts
+    84-144: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
       /** Validate daemon configuration update fields */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:65: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:65: type ValidationResult -> src/api/routes/config.ts
-    123-194: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
+        - src/api/routes/config.ts:84: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:84: type ValidationResult -> src/api/routes/config.ts
+    149-224: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
       /** Apply daemon config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:124: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:125: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-    196-394: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/config.ts:150: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:151: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+    226-429: async configRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 30 [call: 20, type: 10]
-        - src/api/routes/config.ts:196: type FastifyInstance -> external
-        - src/api/routes/config.ts:196: type Promise -> external
-        - src/api/routes/config.ts:200: call get -> external
-        - src/api/routes/config.ts:200: type FastifyRequest -> external
-        - src/api/routes/config.ts:200: type FastifyReply -> external
+        - src/api/routes/config.ts:226: type FastifyInstance -> external
+        - src/api/routes/config.ts:226: type Promise -> external
+        - src/api/routes/config.ts:230: call get -> external
+        - src/api/routes/config.ts:230: type FastifyRequest -> external
+        - src/api/routes/config.ts:230: type FastifyReply -> external
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -857,4 +861,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 28
-Estimated tokens: 9,494 (codebase: ~1,103,793)
+Estimated tokens: 9,564 (codebase: ~1,105,443)

@@ -40,6 +40,24 @@ function validateIntRange(
 }
 
 /**
+ * Validate a float field is within a range
+ */
+function validateFloatRange(
+  value: number | undefined,
+  field: string,
+  min: number,
+  max: number
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  if (typeof value !== "number" || value < min || value > max) {
+    return `${field} must be a number between ${min} and ${max}`;
+  }
+  return null;
+}
+
+/**
  * Daemon configuration update request body
  */
 interface DaemonConfigUpdateBody {
@@ -57,6 +75,7 @@ interface DaemonConfigUpdateBody {
   connectionDiscoveryLimit?: number;
   connectionDiscoveryLookbackDays?: number;
   connectionDiscoveryCooldownHours?: number;
+  semanticSearchThreshold?: number;
 }
 
 /**
@@ -76,6 +95,7 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     connectionDiscoveryLimit,
     connectionDiscoveryLookbackDays,
     connectionDiscoveryCooldownHours,
+    semanticSearchThreshold,
   } = body;
 
   const validations: ValidationResult[] = [
@@ -105,6 +125,12 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
       "connectionDiscoveryCooldownHours",
       1,
       168
+    ),
+    validateFloatRange(
+      semanticSearchThreshold,
+      "semanticSearchThreshold",
+      0,
+      1
     ),
   ];
 
@@ -139,6 +165,7 @@ function applyDaemonUpdates(
     connectionDiscoveryLimit,
     connectionDiscoveryLookbackDays,
     connectionDiscoveryCooldownHours,
+    semanticSearchThreshold,
   } = body;
 
   // Initialize daemon section if needed
@@ -191,6 +218,9 @@ function applyDaemonUpdates(
     rawConfig.daemon.connection_discovery_cooldown_hours =
       connectionDiscoveryCooldownHours;
   }
+  if (semanticSearchThreshold !== undefined) {
+    rawConfig.daemon.semantic_search_threshold = semanticSearchThreshold;
+  }
 }
 
 export async function configRoutes(app: FastifyInstance): Promise<void> {
@@ -223,6 +253,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             config.daemon.connectionDiscoveryLookbackDays,
           connectionDiscoveryCooldownHours:
             config.daemon.connectionDiscoveryCooldownHours,
+          semanticSearchThreshold: config.daemon.semanticSearchThreshold,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
@@ -260,6 +291,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         connectionDiscoveryLimit,
         connectionDiscoveryLookbackDays,
         connectionDiscoveryCooldownHours,
+        semanticSearchThreshold,
       } = body;
 
       // Validate at least one field is provided
@@ -277,7 +309,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         reanalysisLimit !== undefined ||
         connectionDiscoveryLimit !== undefined ||
         connectionDiscoveryLookbackDays !== undefined ||
-        connectionDiscoveryCooldownHours !== undefined;
+        connectionDiscoveryCooldownHours !== undefined ||
+        semanticSearchThreshold !== undefined;
 
       if (!hasAnyField) {
         return reply
@@ -341,6 +374,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
               updatedConfig.daemon.connectionDiscoveryLookbackDays,
             connectionDiscoveryCooldownHours:
               updatedConfig.daemon.connectionDiscoveryCooldownHours,
+            semanticSearchThreshold:
+              updatedConfig.daemon.semanticSearchThreshold,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs
