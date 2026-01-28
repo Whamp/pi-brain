@@ -95,7 +95,7 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:365: call startDaemon
         - src/daemon/cli.ts:415: call startDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:68: call main
+        - src/daemon/daemon-process.ts:102: call main
         - src/daemon/index.ts:117: reexport (module)
     185-193: removePidFile(): void [exported]
       /** Remove the PID file */
@@ -107,8 +107,8 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:474: call stopDaemon
         - src/daemon/cli.ts:492: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:251: call shutdown
-        - src/daemon/daemon-process.ts:274: call (module)
+        - src/daemon/daemon-process.ts:285: call shutdown
+        - src/daemon/daemon-process.ts:308: call (module)
         - src/daemon/index.ts:118: reexport (module)
     198-206: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
@@ -265,7 +265,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-278]
+src/daemon/daemon-process.ts [1-312]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -1080,7 +1080,7 @@ src/daemon/queue.ts [1-787]
         - src/daemon/cli.ts:48: import (module)
         - src/daemon/cli.ts:589: call queue
         - src/daemon/daemon-process.ts:20: import (module)
-        - src/daemon/daemon-process.ts:72: call queue
+        - src/daemon/daemon-process.ts:106: call queue
         - src/daemon/index.ts:43: reexport (module)
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
@@ -1185,7 +1185,7 @@ src/daemon/scheduler.ts [1-978]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
-        - src/daemon/daemon-process.ts:136: call scheduler
+        - src/daemon/daemon-process.ts:170: call scheduler
         - src/daemon/index.ts:146: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:562: call scheduler
@@ -1293,8 +1293,8 @@ src/daemon/watcher-events.ts [1-117]
       /** Helper to get session path from a session event */
       refs in: 12 [call: 9, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:22: import (module)
-        - src/daemon/daemon-process.ts:151: call sessionPath
-        - src/daemon/daemon-process.ts:169: call sessionPath
+        - src/daemon/daemon-process.ts:185: call sessionPath
+        - src/daemon/daemon-process.ts:203: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
         - src/daemon/watcher.test.ts:228: call (module)
@@ -1331,7 +1331,7 @@ src/daemon/watcher.ts [1-582]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
       refs in: 21 [import: 2, instantiate: 14, reexport: 1, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
-        - src/daemon/daemon-process.ts:145: instantiate watcher
+        - src/daemon/daemon-process.ts:179: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
         - src/daemon/watcher.test.ts:53: type waitForEvent
@@ -1452,7 +1452,7 @@ src/daemon/worker.ts [1-717]
       /** Create a worker instance */
       refs in: 19 [call: 16, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
-        - src/daemon/daemon-process.ts:105: call worker
+        - src/daemon/daemon-process.ts:139: call worker
         - src/daemon/index.ts:104: reexport (module)
         - src/daemon/worker.test.ts:18: import (module)
         - src/daemon/worker.test.ts:119: call worker
@@ -3232,4 +3232,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 56
-Estimated tokens: 42,444 (codebase: ~1,069,049)
+Estimated tokens: 42,444 (codebase: ~1,070,993)

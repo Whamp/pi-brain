@@ -236,7 +236,7 @@
       .attr("dx", LABEL_OFFSET)
       .attr("dy", 4)
       .attr("class", "node-label")
-      .text((d) => truncateLabel(d.content.summary, MAX_LABEL_LENGTH));
+      .text((d) => truncateLabel(d.content?.summary ?? `Node ${d.id}`, MAX_LABEL_LENGTH));
 
     // Update existing nodes - merge enter and update selections
     const allNodes = nodeEnter.merge(nodeSelection);
@@ -244,12 +244,12 @@
     // Update circle fills (for when data changes)
     allNodes
       .select("circle")
-      .attr("fill", (d) => getNodeColor(d.classification.type));
+      .attr("fill", (d) => getNodeColor(d.classification?.type ?? "other"));
 
     // Update labels
     allNodes
       .select("text")
-      .text((d) => truncateLabel(d.content.summary, MAX_LABEL_LENGTH));
+      .text((d) => truncateLabel(d.content?.summary ?? `Node ${d.id}`, MAX_LABEL_LENGTH));
 
     // Update selection state
     allNodes.classed("selected", (d) => d.id === selectedNodeId);

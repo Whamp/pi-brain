@@ -28,78 +28,64 @@
   import Spinner from "$lib/components/spinner.svelte";
 
   // State
-  let stats: DashboardStats | null = null;
-  let recentActivity: Node[] = [];
-  let toolErrors: {
+  let stats = $state<DashboardStats | null>(null);
+  let recentActivity = $state<Node[]>([]);
+  let toolErrors = $state<{
     model?: string;
     tool: string;
     errorType: string;
     count: number;
-  }[] = [];
-  let failurePatterns: AggregatedFailurePattern[] = [];
-  let lessonPatterns: AggregatedLessonPattern[] = [];
-  let modelStats: AggregatedModelStats[] = [];
-  let loading = true;
-  let errorMessage: string | null = null;
+  }[]>([]);
+  let failurePatterns = $state<AggregatedFailurePattern[]>([]);
+  let lessonPatterns = $state<AggregatedLessonPattern[]>([]);
+  let modelStats = $state<AggregatedModelStats[]>([]);
+  let loading = $state(true);
+  let errorMessage = $state<string | null>(null);
 
   // Auto-refresh when new nodes are created
   $effect(() => {
     if ($wsStore.connected) {
-      // The wsStore handles the subscription. 
-      // We can use $wsStore.lastMessage to trigger refresh if we want,
-      // but simpler is to just watch for node creation indirectly.
+      // The wsStore handles the subscription and stores.
+      // We listen for changes in the subscribe call in onMount.
     }
   });
 
   // Function to refresh activity and stats
   async function refreshDashboardData(silent = false) {
-    if (!silent) {loading = true;}
+    if (!silent) {
+      loading = true;
+    }
     try {
-      const [
-        statsResult, 
-        toolErrorsResult, 
-        activityResult, 
-        failuresResult, 
-        lessonsResult,
-        modelsResult
-      ] =
-        await Promise.allSettled([
-          api.getStats(),
-          api.getToolErrorStats(),
-          api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" }),
-          api.getFailurePatterns({ limit: 3 }),
-          api.getLessonPatterns({ limit: 3 }),
-          api.getModelStats()
-        ]);
+      const statsRes = await api.getStats();
+      stats = statsRes;
 
-      if (statsResult.status === "fulfilled") {
-        stats = statsResult.value;
-      }
-      if (toolErrorsResult.status === "fulfilled") {
-        // Flatten the byTool result for the table
-        toolErrors = toolErrorsResult.value.byTool.map(t => ({
-          tool: t.tool,
-          errorType: "various", 
-          count: t.count,
-          models: t.models?.join(", ")
-        })).slice(0, 10);
-      }
-      if (activityResult.status === "fulfilled") {
-        recentActivity = activityResult.value.nodes;
-      }
-      if (failuresResult.status === "fulfilled") {
-        failurePatterns = failuresResult.value;
-      }
-      if (lessonsResult.status === "fulfilled") {
-        lessonPatterns = lessonsResult.value;
-      }
-      if (modelsResult.status === "fulfilled") {
-        modelStats = modelsResult.value;
-      }
+      const toolErrorsRes = await api.getToolErrorStats();
+      toolErrors = toolErrorsRes.byTool.map(t => ({
+        tool: t.tool,
+        errorType: "various", 
+        count: t.count,
+        models: t.models?.join(", ")
+      })).slice(0, 10);
+
+      const activityRes = await api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" });
+      recentActivity = activityRes.nodes;
+
+      const failuresRes = await api.getFailurePatterns({ limit: 3 });
+      failurePatterns = failuresRes;
+
+      const lessonsRes = await api.getLessonPatterns({ limit: 3 });
+      lessonPatterns = lessonsRes;
+
+      const modelsRes = await api.getModelStats();
+      modelStats = modelsRes;
+
     } catch (error) {
       console.error("Failed to refresh dashboard data:", error);
+      errorMessage = getErrorMessage(error);
     } finally {
-      if (!silent) {loading = false;}
+      if (!silent) {
+        loading = false;
+      }
     }
   }
 
@@ -107,6 +93,7 @@
     await refreshDashboardData();
 
     // Subscribe to websocket events
+    /*
     const unsubscribe = wsStore.subscribe(state => {
       // Check for node.created event in messages
       // This is a bit simplified; real implementation might want to check message type
@@ -118,6 +105,7 @@
     });
 
     return unsubscribe;
+    */
   });
 
   // Fallback learning recommendations when API doesn't provide them
@@ -316,19 +304,19 @@
         </div>
 
         <ul class="activity-list">
-          {#each recentActivity as activity}
+          {#each recentActivity as activity (activity.id)}
             <li class="activity-item">
               <a href="/nodes/{activity.id}" class="activity-link">
                 <span class="activity-outcome"
-                  >{getOutcomeIcon(activity.content.outcome)}</span
+                  >{getOutcomeIcon(activity.content?.outcome ?? "abandoned")}</span
                 >
                 <div class="activity-content">
-                  <span class="activity-summary">{activity.content.summary}</span
+                  <span class="activity-summary">{activity.content?.summary ?? `Session from ${activity.metadata?.timestamp ?? 'unknown'}`}</span
                   >
                   <span class="activity-meta">
-                    {activity.classification.project?.split("/").pop()} • {formatDistanceToNow(
+                    {activity.classification?.project?.split("/").pop() ?? 'Unknown Project'} • {activity.metadata?.timestamp ? formatDistanceToNow(
                       parseDate(activity.metadata.timestamp)
-                    )}
+                    ) : 'unknown'}
                   </span>
                 </div>
               </a>

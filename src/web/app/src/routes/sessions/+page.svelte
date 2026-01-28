@@ -342,7 +342,7 @@
         </div>
       {:else}
         {#each nodes as node, index}
-          {@const OutcomeIcon = getOutcomeIcon(node.content.outcome)}
+          {@const OutcomeIcon = getOutcomeIcon(node.content?.outcome ?? "abandoned")}
           <a
             href="/nodes/{node.id}"
             class="node-item"
@@ -350,28 +350,28 @@
             <div class="node-index">{index + 1}</div>
             <div class="node-content">
               <div class="node-header">
-                <span class="node-type type-{node.classification.type}">
-                  {node.classification.type}
+                <span class="node-type type-{node.classification?.type ?? 'other'}">
+                  {node.classification?.type ?? 'other'}
                 </span>
-                <span class="node-outcome {getOutcomeColor(node.content.outcome)}">
+                <span class="node-outcome {getOutcomeColor(node.content?.outcome ?? 'abandoned')}">
                   <OutcomeIcon size={14} />
-                  {node.content.outcome}
+                  {node.content?.outcome ?? 'abandoned'}
                 </span>
               </div>
-              <div class="node-summary">{node.content.summary}</div>
+              <div class="node-summary">{node.content?.summary ?? `Node ${node.id}`}</div>
               <div class="node-meta">
                 <span title="Timestamp">
                   <Clock size={12} />
-                  {formatDistanceToNow(parseDate(node.metadata.timestamp))}
+                  {node.metadata?.timestamp ? formatDistanceToNow(parseDate(node.metadata.timestamp)) : 'unknown'}
                 </span>
                 <span title="Duration">
-                  {node.metadata.durationMinutes} min
+                  {node.metadata?.durationMinutes ?? 0} min
                 </span>
                 <span title="Tokens">
-                  {formatTokens(node.metadata.tokensUsed)} tokens
+                  {formatTokens(node.metadata?.tokensUsed ?? 0)} tokens
                 </span>
               </div>
-              {#if node.semantic.tags.length > 0}
+              {#if node.semantic?.tags && node.semantic.tags.length > 0}
                 <div class="node-tags">
                   {#each node.semantic.tags.slice(0, 5) as tag}
                     <span class="tag">{tag}</span>

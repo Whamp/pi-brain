@@ -29,11 +29,14 @@ import { createWorker } from "./worker.js";
 
 const args = process.argv.slice(2);
 let configPath: string | undefined;
+let force = false;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--config" && args[i + 1]) {
     configPath = args[i + 1];
     i++;
+  } else if (args[i] === "--force") {
+    force = true;
   }
 }
 
@@ -46,6 +49,11 @@ const handleWatcherError = (event: Event) => {
   console.error("[daemon] Watcher error:", customEvent.detail?.error);
 };
 
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 // =============================================================================
 // Main Daemon Process
 // =============================================================================
@@ -56,6 +64,32 @@ async function main(): Promise<void> {
   // Load configuration
   const config = loadConfig(configPath);
   ensureDirectories(config);
+
+  // Check port availability if force is enabled
+  const { isPortAvailable, findProcessOnPort } = await import("./cli.js");
+  const portAvailable = await isPortAvailable(config.api.port);
+  if (!portAvailable) {
+    const existingPid = findProcessOnPort(config.api.port);
+    if (force && existingPid) {
+      console.log(
+        `[daemon] Killing process ${existingPid} on port ${config.api.port}...`
+      );
+      try {
+        process.kill(existingPid, "SIGKILL");
+        await sleep(500); // Wait for cleanup
+      } catch (error) {
+        console.error(
+          `[daemon] Failed to kill process on port ${config.api.port}: ${(error as Error).message}`
+        );
+        process.exit(1);
+      }
+    } else {
+      console.error(
+        `[daemon] Port ${config.api.port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`
+      );
+      process.exit(1);
+    }
+  }
 
   // Open database
   const dbPath = path.join(config.hub.databaseDir, "brain.db");

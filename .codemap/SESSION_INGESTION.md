@@ -260,7 +260,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-278]
+src/daemon/daemon-process.ts [1-312]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -1582,4 +1582,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,700 (codebase: ~1,069,049)
+Estimated tokens: 20,700 (codebase: ~1,070,993)

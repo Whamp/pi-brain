@@ -292,13 +292,13 @@
     <div class="header-card">
       <div class="header-top">
         <div class="summary-row">
-          {#if node.content.outcome}
+          {#if node.content?.outcome}
             {@const OutcomeIcon = getOutcomeIcon(node.content.outcome)}
             <span class={`outcome-icon ${getOutcomeClass(node.content.outcome)}`}>
               <OutcomeIcon size={20} />
             </span>
           {/if}
-          <h1 class="node-summary">{node.content.summary}</h1>
+          <h1 class="node-summary">{node.content?.summary ?? `Node ${nodeId}`}</h1>
         </div>
       </div>
 
@@ -306,18 +306,20 @@
         <div class="meta-row">
           <span class="meta-item">
             <Folder size={14} />
-            <a href={`/graph?project=${encodeURIComponent(node.classification.project)}`}>
-              {getProjectName(node.classification.project)}
+            <a href={`/graph?project=${encodeURIComponent(node.classification?.project ?? "")}`}>
+              {getProjectName(node.classification?.project ?? "Unknown")}
             </a>
           </span>
           <span class="meta-separator">•</span>
-          <span class="meta-item type-badge" data-type={node.classification.type}>
-            {node.classification.type}
+          <span class="meta-item type-badge" data-type={node.classification?.type ?? "other"}>
+            {node.classification?.type ?? "other"}
           </span>
-          <span class="meta-separator">•</span>
-          <span class={`meta-item outcome-text ${getOutcomeClass(node.content.outcome)}`}>
-            {node.content.outcome}
-          </span>
+          {#if node.content?.outcome}
+            <span class="meta-separator">•</span>
+            <span class={`meta-item outcome-text ${getOutcomeClass(node.content.outcome)}`}>
+              {node.content.outcome}
+            </span>
+          {/if}
           {#if node.version > 1}
             <span class="meta-separator">•</span>
             <span class="meta-item version-badge">
@@ -330,25 +332,25 @@
         <div class="meta-row secondary">
           <span class="meta-item">
             <Clock size={14} />
-            {formatDate(node.metadata.timestamp)}
+            {node.metadata?.timestamp ? formatDate(node.metadata.timestamp) : "Unknown date"}
           </span>
           <span class="meta-separator">•</span>
           <span class="meta-item">
-            {formatDuration(node.metadata.durationMinutes)}
+            {formatDuration(node.metadata?.durationMinutes ?? 0)}
           </span>
           <span class="meta-separator">•</span>
           <span class="meta-item">
             <Zap size={14} />
-            {formatTokens(node.metadata.tokensUsed)} tokens
+            {formatTokens(node.metadata?.tokensUsed ?? 0)} tokens
           </span>
           <span class="meta-separator">•</span>
           <span class="meta-item">
             <Coins size={14} />
-            {formatCost(node.metadata.cost)}
+            {formatCost(node.metadata?.cost ?? 0)}
           </span>
         </div>
 
-        {#if node.semantic.tags.length > 0}
+        {#if node.semantic?.tags && node.semantic.tags.length > 0}
           <div class="tags-row">
             {#each node.semantic.tags as tag}
               <a href={`/search?tags=${encodeURIComponent(tag)}`} class="tag">
@@ -364,7 +366,7 @@
       <!-- Left Column -->
       <div class="main-column">
         <!-- Key Decisions -->
-        {#if node.content.keyDecisions.length > 0}
+        {#if node.content?.keyDecisions && node.content.keyDecisions.length > 0}
           <section class="card">
             <h2 class="section-title">
               <GitBranch size={18} />
@@ -393,7 +395,24 @@
                         <strong>Why:</strong>
                         {decision.why}
                       </div>
-                      {#if decision.alternativesConsidered.length > 0}
+                      {#if decision.alternativesConsidered?.length > 0}
+                        <div class="decision-alternatives">
+                          <strong>Alternatives considered:</strong>
+                          <ul>
+                            {#each decision.alternativesConsidered as alt}
+                              <li>{alt}</li>
+                            {/each}
+                          </ul>
+                        </div>
+                      {/if}
+                    </div>
+                  {#if expandedDecisions[index]}
+                    <div class="decision-details">
+                      <div class="decision-why">
+                        <strong>Why:</strong>
+                        {decision.why}
+                      </div>
+                      {#if decision.alternativesConsidered?.length > 0}
                         <div class="decision-alternatives">
                           <strong>Alternatives considered:</strong>
                           <ul>
@@ -412,7 +431,7 @@
         {/if}
 
         <!-- Lessons -->
-        {#if getLessonCount(node.lessons) > 0}
+        {#if node.lessons && getLessonCount(node.lessons) > 0}
           <section class="card">
             <div class="section-header">
               <h2 class="section-title">
@@ -433,7 +452,7 @@
             <div class="lessons-list">
               {#if lessonGroupBy === "level"}
                 {#each ["project", "task", "user", "model", "tool", "skill", "subagent"] as level}
-                  {#if node.lessons[level as LessonLevel].length > 0}
+                  {#if node.lessons[level as LessonLevel]?.length > 0}
                     <div class="lesson-group">
                       <h3 class="group-header">
                         <span class="level-icon">{levelIcons[level as LessonLevel]}</span>
@@ -500,11 +519,11 @@
         {/if}
 
         <!-- Model Observations -->
-        {#if node.observations.modelQuirks.length > 0 || node.observations.promptingWins.length > 0 || node.observations.promptingFailures.length > 0}
+        {#if node.observations?.modelQuirks?.length > 0 || node.observations?.promptingWins?.length > 0 || node.observations?.promptingFailures?.length > 0}
           <section class="card">
             <h2 class="section-title">Model Observations</h2>
 
-            {#if node.observations.promptingWins.length > 0}
+            {#if node.observations.promptingWins?.length > 0}
               <div class="observation-group">
                 <h3 class="sub-title success">✓ Prompting Wins</h3>
                 <ul class="observation-list">
@@ -515,7 +534,7 @@
               </div>
             {/if}
 
-            {#if node.observations.promptingFailures.length > 0}
+            {#if node.observations.promptingFailures?.length > 0}
               <div class="observation-group">
                 <h3 class="sub-title error">✗ Prompting Failures</h3>
                 <ul class="observation-list">
@@ -526,7 +545,7 @@
               </div>
             {/if}
 
-            {#if node.observations.modelQuirks.length > 0}
+            {#if node.observations.modelQuirks?.length > 0}
               <div class="observation-group">
                 <h3 class="sub-title">Model Quirks</h3>
                 {#each node.observations.modelQuirks as quirk}
@@ -591,7 +610,7 @@
         {/if}
 
         <!-- Files Touched -->
-        {#if node.content.filesTouched.length > 0}
+        {#if node.content?.filesTouched?.length > 0}
           <section class="card">
             <h2 class="section-title">
               <FileText size={18} />

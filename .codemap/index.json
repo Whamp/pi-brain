@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1128,
+    "totalSymbols": 1130,
     "byLanguage": {
       "typescript": 90
     },
@@ -9,7 +9,7 @@
       "function": 501,
       "type": 41,
       "interface": 262,
-      "variable": 115,
+      "variable": 117,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38870,
-  "codebase_tokens": 1069049,
+  "total_tokens": 38882,
+  "codebase_tokens": 1070993,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -4051,10 +4051,10 @@
       "language": "typescript",
       "lines": [
         1,
-        278
+        312
       ],
       "detail_level": "full",
-      "token_estimate": 100,
+      "token_estimate": 112,
       "symbols": [
         {
           "name": "args",
@@ -4095,12 +4095,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "force",
+          "kind": "variable",
+          "signature": "boolean",
+          "lines": [
+            32,
+            32
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "handleWatcherError",
           "kind": "variable",
           "signature": "(event: Event): void",
           "lines": [
-            44,
-            47
+            47,
+            50
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sleep",
+          "kind": "variable",
+          "signature": "(ms: number): any",
+          "lines": [
+            52,
+            55
           ],
           "exported": false,
           "is_default": false,
@@ -4118,8 +4156,8 @@
           "kind": "function",
           "signature": "async main(): Promise<void>",
           "lines": [
-            53,
-            266
+            61,
+            300
           ],
           "exported": false,
           "is_default": false,
