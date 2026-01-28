@@ -10,11 +10,14 @@ import type { Node } from "../types/index.js";
 
 import { closeDatabase, openDatabase } from "./database.js";
 import {
+  backfillEmbeddings,
   buildEmbeddingText,
   buildSimpleEmbeddingText,
+  countNodesNeedingEmbedding,
   deleteEmbedding,
   deserializeEmbedding,
   EMBEDDING_FORMAT_VERSION,
+  findNodesNeedingEmbedding,
   getEmbedding,
   hasEmbedding,
   isRichEmbeddingFormat,
@@ -613,5 +616,408 @@ describe("serializeEmbedding and deserializeEmbedding", () => {
     for (let i = 0; i < original.length; i++) {
       expect(restored[i]).toBeCloseTo(original[i], 5);
     }
+  });
+});
+
+// =============================================================================
+// Backfill Tests
+// =============================================================================
+
+describe("findNodesNeedingEmbedding", () => {
+  let db: Database.Database;
+  const mockProvider = {
+    embed: async (texts: string[]) =>
+      texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+    dimensions: 64,
+    modelName: "test-model",
+  };
+
+  /** Helper to insert a test node */
+  function insertTestNode(
+    nodeId: string,
+    opts: { dataFile?: string; timestamp?: string } = {}
+  ): void {
+    const dataFile = opts.dataFile ?? `/data/${nodeId}.json`;
+    const timestamp = opts.timestamp ?? "2026-01-27T12:00:00Z";
+    db.prepare(
+      `INSERT INTO nodes (id, version, session_file, type, project, outcome, data_file, timestamp, analyzed_at, analyzer_version)
+       VALUES (?, 1, '/session.jsonl', 'coding', '/test/project', 'success', ?, ?, datetime('now'), 'v1')`
+    ).run(nodeId, dataFile, timestamp);
+  }
+
+  afterEach(() => {
+    if (db) {
+      closeDatabase(db);
+    }
+  });
+
+  it("should find nodes without embeddings", () => {
+    db = openDatabase({ path: ":memory:" });
+    insertTestNode("node-1");
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider);
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0].id).toBe("node-1");
+  });
+
+  it("should skip nodes with valid embeddings", () => {
+    db = openDatabase({ path: ":memory:" });
+    insertTestNode("node-1");
+
+    const richText = `[coding] Test summary\n\nDecisions:\n- Use X (why: because Y)\n\n${EMBEDDING_FORMAT_VERSION}`;
+    storeEmbeddingWithVec(db, "node-1", [0.1, 0.2], "test-model", richText);
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider);
+    expect(nodes).toHaveLength(0);
+  });
+
+  it("should find nodes with old format embeddings", () => {
+    db = openDatabase({ path: ":memory:" });
+    insertTestNode("node-1");
+
+    const oldText = "[coding] Test summary";
+    storeEmbeddingWithVec(db, "node-1", [0.1, 0.2], "test-model", oldText);
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider);
+    expect(nodes).toHaveLength(1);
+  });
+
+  it("should find nodes with different model", () => {
+    db = openDatabase({ path: ":memory:" });
+    insertTestNode("node-1");
+
+    storeEmbeddingWithVec(
+      db,
+      "node-1",
+      [0.1, 0.2],
+      "different-model",
+      `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider);
+    expect(nodes).toHaveLength(1);
+  });
+
+  it("should respect limit option", () => {
+    db = openDatabase({ path: ":memory:" });
+
+    for (let i = 0; i < 5; i++) {
+      insertTestNode(`node-${i}`, { timestamp: `2026-01-27T12:0${i}:00Z` });
+    }
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider, { limit: 3 });
+    expect(nodes).toHaveLength(3);
+  });
+
+  it("should return all nodes when force is true", () => {
+    db = openDatabase({ path: ":memory:" });
+    insertTestNode("node-1");
+    storeEmbeddingWithVec(
+      db,
+      "node-1",
+      [0.1, 0.2],
+      "test-model",
+      `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
+
+    expect(findNodesNeedingEmbedding(db, mockProvider)).toHaveLength(0);
+
+    const nodes = findNodesNeedingEmbedding(db, mockProvider, { force: true });
+    expect(nodes).toHaveLength(1);
+  });
+});
+
+describe("countNodesNeedingEmbedding", () => {
+  let db: Database.Database;
+  const mockProvider = {
+    embed: async (texts: string[]) =>
+      texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+    dimensions: 64,
+    modelName: "test-model",
+  };
+
+  function insertTestNode(nodeId: string): void {
+    db.prepare(
+      `INSERT INTO nodes (id, version, session_file, type, project, outcome, data_file, timestamp, analyzed_at, analyzer_version)
+       VALUES (?, 1, '/session.jsonl', 'coding', '/test/project', 'success', ?, datetime('now'), datetime('now'), 'v1')`
+    ).run(nodeId, `/data/${nodeId}.json`);
+  }
+
+  afterEach(() => {
+    if (db) {
+      closeDatabase(db);
+    }
+  });
+
+  it("should count nodes needing embedding", () => {
+    db = openDatabase({ path: ":memory:" });
+
+    for (let i = 0; i < 3; i++) {
+      insertTestNode(`node-${i}`);
+    }
+
+    storeEmbeddingWithVec(
+      db,
+      "node-0",
+      [0.1, 0.2],
+      "test-model",
+      `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
+
+    const result = countNodesNeedingEmbedding(db, mockProvider);
+    expect(result.total).toBe(3);
+    expect(result.needsEmbedding).toBe(2);
+  });
+
+  it("should return total for force mode", () => {
+    db = openDatabase({ path: ":memory:" });
+
+    for (let i = 0; i < 3; i++) {
+      insertTestNode(`node-${i}`);
+      storeEmbeddingWithVec(
+        db,
+        `node-${i}`,
+        [0.1, 0.2],
+        "test-model",
+        `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+      );
+    }
+
+    const result = countNodesNeedingEmbedding(db, mockProvider, {
+      force: true,
+    });
+    expect(result.total).toBe(3);
+    expect(result.needsEmbedding).toBe(3);
+  });
+});
+
+describe("backfillEmbeddings", () => {
+  let db: Database.Database;
+  let mockProvider: {
+    embed: (texts: string[]) => Promise<number[][]>;
+    dimensions: number;
+    modelName: string;
+  };
+  let mockReadNode: (dataFile: string) => Node;
+
+  function insertTestNode(
+    nodeId: string,
+    opts: { dataFile?: string; timestamp?: string } = {}
+  ): void {
+    const dataFile = opts.dataFile ?? `/data/${nodeId}.json`;
+    const timestamp = opts.timestamp ?? "2026-01-27T12:00:00Z";
+    db.prepare(
+      `INSERT INTO nodes (id, version, session_file, type, project, outcome, data_file, timestamp, analyzed_at, analyzer_version)
+       VALUES (?, 1, '/session.jsonl', 'coding', '/test/project', 'success', ?, ?, datetime('now'), 'v1')`
+    ).run(nodeId, dataFile, timestamp);
+  }
+
+  afterEach(() => {
+    if (db) {
+      closeDatabase(db);
+    }
+  });
+
+  it("should backfill missing embeddings", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async (texts) =>
+        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = (dataFile: string) =>
+      createTestNode({
+        id: dataFile.replace("/data/", "").replace(".json", ""),
+        content: {
+          summary: "Test summary from JSON",
+          outcome: "success",
+          keyDecisions: [{ what: "Use TypeScript", why: "Type safety" }],
+          filesTouched: [],
+          toolsUsed: [],
+          errorsSeen: [],
+        },
+      });
+
+    insertTestNode("node-1");
+
+    const result = await backfillEmbeddings(db, mockProvider, mockReadNode);
+
+    expect(result.totalNodes).toBe(1);
+    expect(result.successCount).toBe(1);
+    expect(result.failureCount).toBe(0);
+    expect(result.failedNodeIds).toHaveLength(0);
+
+    expect(hasEmbedding(db, "node-1")).toBeTruthy();
+    const stored = getEmbedding(db, "node-1");
+    expect(stored?.embedding).toHaveLength(64);
+    expect(isRichEmbeddingFormat(stored?.inputText ?? "")).toBeTruthy();
+  });
+
+  it("should handle empty database", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async (texts) =>
+        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = () => createTestNode();
+
+    const result = await backfillEmbeddings(db, mockProvider, mockReadNode);
+
+    expect(result.totalNodes).toBe(0);
+    expect(result.successCount).toBe(0);
+    expect(result.failureCount).toBe(0);
+  });
+
+  it("should handle node loading failure gracefully", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async (texts) =>
+        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = () => {
+      throw new Error("Failed to load node");
+    };
+
+    insertTestNode("node-1");
+
+    const result = await backfillEmbeddings(db, mockProvider, mockReadNode);
+
+    expect(result.totalNodes).toBe(1);
+    expect(result.successCount).toBe(0);
+    expect(result.failureCount).toBe(1);
+    expect(result.failedNodeIds).toContain("node-1");
+  });
+
+  it("should handle embedding API failure gracefully", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async () => {
+        throw new Error("API error");
+      },
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = () => createTestNode();
+
+    insertTestNode("node-1");
+
+    const result = await backfillEmbeddings(db, mockProvider, mockReadNode);
+
+    expect(result.totalNodes).toBe(1);
+    expect(result.successCount).toBe(0);
+    expect(result.failureCount).toBe(1);
+    expect(result.failedNodeIds).toContain("node-1");
+  });
+
+  it("should process multiple nodes in batches", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    let embedCallCount = 0;
+    mockProvider = {
+      embed: async (texts) => {
+        embedCallCount++;
+        return texts.map(() => Array.from({ length: 64 }, () => Math.random()));
+      },
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = (dataFile: string) =>
+      createTestNode({
+        id: dataFile.replace("/data/", "").replace(".json", ""),
+      });
+
+    for (let i = 0; i < 5; i++) {
+      insertTestNode(`node-${i}`, { timestamp: `2026-01-27T12:0${i}:00Z` });
+    }
+
+    const result = await backfillEmbeddings(db, mockProvider, mockReadNode, {
+      batchSize: 2,
+    });
+
+    expect(result.totalNodes).toBe(5);
+    expect(result.successCount).toBe(5);
+    expect(embedCallCount).toBe(3);
+  });
+
+  it("should call progress callback", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async (texts) =>
+        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = (dataFile: string) =>
+      createTestNode({
+        id: dataFile.replace("/data/", "").replace(".json", ""),
+      });
+
+    for (let i = 0; i < 5; i++) {
+      insertTestNode(`node-${i}`, { timestamp: `2026-01-27T12:0${i}:00Z` });
+    }
+
+    const progressCalls: { processed: number; total: number }[] = [];
+
+    await backfillEmbeddings(db, mockProvider, mockReadNode, {
+      batchSize: 2,
+      onProgress: (processed, total) => {
+        progressCalls.push({ processed, total });
+      },
+    });
+
+    expect(progressCalls).toHaveLength(3);
+    expect(progressCalls[0]).toStrictEqual({ processed: 2, total: 5 });
+    expect(progressCalls[1]).toStrictEqual({ processed: 4, total: 5 });
+    expect(progressCalls[2]).toStrictEqual({ processed: 5, total: 5 });
+  });
+
+  it("should skip already embedded nodes unless force is true", async () => {
+    db = openDatabase({ path: ":memory:" });
+
+    mockProvider = {
+      embed: async (texts) =>
+        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
+      dimensions: 64,
+      modelName: "test-model",
+    };
+
+    mockReadNode = (dataFile: string) =>
+      createTestNode({
+        id: dataFile.replace("/data/", "").replace(".json", ""),
+      });
+
+    insertTestNode("node-1");
+    storeEmbeddingWithVec(
+      db,
+      "node-1",
+      [0.1, 0.2],
+      "test-model",
+      `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+    );
+
+    const result1 = await backfillEmbeddings(db, mockProvider, mockReadNode);
+    expect(result1.totalNodes).toBe(0);
+
+    const result2 = await backfillEmbeddings(db, mockProvider, mockReadNode, {
+      force: true,
+    });
+    expect(result2.totalNodes).toBe(1);
+    expect(result2.successCount).toBe(1);
   });
 });

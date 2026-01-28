@@ -339,3 +339,343 @@ export function deserializeEmbedding(buffer: Buffer): number[] {
   }
   return embedding;
 }
+
+// =============================================================================
+// Backfill Types
+// =============================================================================
+
+/**
+ * Embedding provider interface for backfill operations.
+ * Matches the EmbeddingProvider interface from facet-discovery.ts.
+ */
+export interface BackfillEmbeddingProvider {
+  embed(texts: string[]): Promise<number[][]>;
+  dimensions: number;
+  modelName: string;
+}
+
+/**
+ * Logger interface for backfill operations.
+ */
+export interface BackfillLogger {
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
+  debug?: (message: string) => void;
+}
+
+/**
+ * Options for backfillEmbeddings function.
+ */
+export interface BackfillEmbeddingsOptions {
+  /** Maximum number of nodes to process in one run (default: 100) */
+  limit?: number;
+  /** Batch size for embedding API calls (default: 10) */
+  batchSize?: number;
+  /** Force re-embed all nodes, not just outdated ones */
+  force?: boolean;
+  /** Logger for progress reporting */
+  logger?: BackfillLogger;
+  /** Progress callback called after each batch */
+  onProgress?: (processed: number, total: number) => void;
+}
+
+/**
+ * Result of a backfill operation.
+ */
+export interface BackfillResult {
+  /** Total nodes that needed embedding */
+  totalNodes: number;
+  /** Nodes successfully embedded */
+  successCount: number;
+  /** Nodes that failed to embed */
+  failureCount: number;
+  /** Node IDs that failed */
+  failedNodeIds: string[];
+  /** Duration in milliseconds */
+  durationMs: number;
+}
+
+// =============================================================================
+// Backfill Implementation
+// =============================================================================
+
+/** Default no-op logger for backfill */
+const noopLogger: BackfillLogger = {
+  info: () => {},
+  warn: () => {},
+  error: () => {},
+  debug: () => {},
+};
+
+/**
+ * Row type for nodes query
+ */
+interface NodeNeedingEmbeddingRow {
+  id: string;
+  data_file: string;
+}
+
+/**
+ * Row type for embedding check
+ */
+interface EmbeddingCheckRow {
+  node_id: string;
+  embedding_model: string;
+  input_text: string;
+}
+
+/**
+ * Find nodes that need embedding generation or update.
+ *
+ * A node needs embedding if:
+ * 1. No embedding exists for it
+ * 2. Embedding uses a different model than the current provider
+ * 3. Embedding uses old format (not rich format with decisions/lessons)
+ */
+export function findNodesNeedingEmbedding(
+  db: Database.Database,
+  provider: BackfillEmbeddingProvider,
+  options: { limit?: number; force?: boolean } = {}
+): NodeNeedingEmbeddingRow[] {
+  const { limit = 100, force = false } = options;
+
+  if (force) {
+    // Force mode: return all nodes up to limit
+    return db
+      .prepare(
+        `SELECT n.id, n.data_file
+         FROM nodes n
+         ORDER BY n.timestamp DESC
+         LIMIT ?`
+      )
+      .all(limit) as NodeNeedingEmbeddingRow[];
+  }
+
+  // Normal mode: find nodes missing embeddings or with outdated format
+  // Step 1: Get all nodes up to limit
+  const allNodes = db
+    .prepare(
+      `SELECT n.id, n.data_file
+       FROM nodes n
+       ORDER BY n.timestamp DESC
+       LIMIT ?`
+    )
+    .all(limit) as NodeNeedingEmbeddingRow[];
+
+  if (allNodes.length === 0) {
+    return [];
+  }
+
+  // Step 2: Get existing embeddings for these nodes
+  const nodeIds = allNodes.map((n) => n.id);
+  const placeholders = nodeIds.map(() => "?").join(",");
+  const existingEmbeddings = db
+    .prepare(
+      `SELECT node_id, embedding_model, input_text
+       FROM node_embeddings
+       WHERE node_id IN (${placeholders})`
+    )
+    .all(...nodeIds) as EmbeddingCheckRow[];
+
+  const embeddingMap = new Map(existingEmbeddings.map((e) => [e.node_id, e]));
+
+  // Step 3: Filter to nodes that need embedding
+  const needsEmbedding: NodeNeedingEmbeddingRow[] = [];
+  for (const node of allNodes) {
+    const existing = embeddingMap.get(node.id);
+    if (!existing) {
+      // No embedding exists
+      needsEmbedding.push(node);
+    } else if (existing.embedding_model !== provider.modelName) {
+      // Different model
+      needsEmbedding.push(node);
+    } else if (!isRichEmbeddingFormat(existing.input_text)) {
+      // Old format (doesn't include decisions/lessons)
+      needsEmbedding.push(node);
+    }
+  }
+
+  return needsEmbedding;
+}
+
+/**
+ * Backfill embeddings for nodes that are missing or have outdated embeddings.
+ *
+ * This function:
+ * 1. Finds nodes needing embedding (missing, wrong model, or old format)
+ * 2. Loads full node data from JSON files
+ * 3. Builds rich embedding text (summary + decisions + lessons)
+ * 4. Generates embeddings in batches via the provider
+ * 5. Stores in both node_embeddings table and node_embeddings_vec (if available)
+ *
+ * Errors are handled gracefully:
+ * - Individual node failures don't stop the batch
+ * - Returns statistics including failed node IDs for retry
+ */
+export async function backfillEmbeddings(
+  db: Database.Database,
+  provider: BackfillEmbeddingProvider,
+  readNodeFromPath: (dataFile: string) => Node,
+  options: BackfillEmbeddingsOptions = {}
+): Promise<BackfillResult> {
+  const {
+    limit = 100,
+    batchSize = 10,
+    force = false,
+    logger = noopLogger,
+    onProgress,
+  } = options;
+
+  const startTime = Date.now();
+
+  // Find nodes that need embedding
+  const nodes = findNodesNeedingEmbedding(db, provider, { limit, force });
+  const totalNodes = nodes.length;
+
+  if (totalNodes === 0) {
+    logger.info("No nodes need embedding backfill");
+    return {
+      totalNodes: 0,
+      successCount: 0,
+      failureCount: 0,
+      failedNodeIds: [],
+      durationMs: Date.now() - startTime,
+    };
+  }
+
+  logger.info(
+    `Found ${totalNodes} nodes needing embedding (limit: ${limit}, force: ${force})`
+  );
+
+  let successCount = 0;
+  let failureCount = 0;
+  const failedNodeIds: string[] = [];
+
+  // Process in batches
+  for (let i = 0; i < nodes.length; i += batchSize) {
+    const batch = nodes.slice(i, i + batchSize);
+    const batchTexts: { nodeId: string; text: string }[] = [];
+
+    // Build embedding text for each node in the batch
+    for (const node of batch) {
+      try {
+        const fullNode = readNodeFromPath(node.data_file);
+        const text = buildEmbeddingText(fullNode);
+        batchTexts.push({ nodeId: node.id, text });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        logger.warn(`Failed to load node ${node.id}: ${message}`);
+        failedNodeIds.push(node.id);
+        failureCount++;
+      }
+    }
+
+    if (batchTexts.length === 0) {
+      continue;
+    }
+
+    // Generate embeddings for the batch
+    try {
+      const texts = batchTexts.map((bt) => bt.text);
+      const embeddings = await provider.embed(texts);
+
+      // Store each embedding
+      for (let j = 0; j < batchTexts.length; j++) {
+        const { nodeId, text } = batchTexts[j];
+        const embedding = embeddings[j];
+
+        if (!embedding || embedding.length === 0) {
+          logger.warn(`Empty embedding returned for node ${nodeId}`);
+          failedNodeIds.push(nodeId);
+          failureCount++;
+          continue;
+        }
+
+        try {
+          storeEmbeddingWithVec(
+            db,
+            nodeId,
+            embedding,
+            provider.modelName,
+            text
+          );
+          successCount++;
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : String(error);
+          logger.warn(`Failed to store embedding for ${nodeId}: ${message}`);
+          failedNodeIds.push(nodeId);
+          failureCount++;
+        }
+      }
+    } catch (error) {
+      // Batch embedding failed - mark all nodes in batch as failed
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error(`Batch embedding failed: ${message}`);
+      for (const { nodeId } of batchTexts) {
+        failedNodeIds.push(nodeId);
+        failureCount++;
+      }
+    }
+
+    // Progress callback
+    const processed = Math.min(i + batchSize, nodes.length);
+    onProgress?.(processed, totalNodes);
+    logger.debug?.(
+      `Processed ${processed}/${totalNodes} nodes (${successCount} success, ${failureCount} failed)`
+    );
+  }
+
+  const durationMs = Date.now() - startTime;
+  logger.info(
+    `Backfill complete: ${successCount}/${totalNodes} successful in ${durationMs}ms`
+  );
+
+  return {
+    totalNodes,
+    successCount,
+    failureCount,
+    failedNodeIds,
+    durationMs,
+  };
+}
+
+/**
+ * Count nodes that need embedding backfill.
+ *
+ * Useful for showing progress or estimating work before running backfill.
+ */
+export function countNodesNeedingEmbedding(
+  db: Database.Database,
+  provider: BackfillEmbeddingProvider,
+  options: { force?: boolean } = {}
+): { total: number; needsEmbedding: number } {
+  const { force = false } = options;
+
+  // Count total nodes
+  const totalRow = db.prepare("SELECT COUNT(*) as count FROM nodes").get() as {
+    count: number;
+  };
+  const total = totalRow.count;
+
+  if (force) {
+    return { total, needsEmbedding: total };
+  }
+
+  // Count nodes with valid embeddings (right model and rich format)
+  // This is more efficient than loading all nodes for a count
+  const validEmbeddingsRow = db
+    .prepare(
+      `SELECT COUNT(*) as count
+       FROM node_embeddings
+       WHERE embedding_model = ?
+         AND (input_text LIKE '%[emb:v2]%'
+              OR input_text LIKE '%\n\nDecisions:\n-%'
+              OR input_text LIKE '%\n\nLessons:\n-%')`
+    )
+    .get(provider.modelName) as { count: number };
+
+  const needsEmbedding = total - validEmbeddingsRow.count;
+  return { total, needsEmbedding };
+}

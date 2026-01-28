@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 88,
-    "totalSymbols": 1089,
+    "totalSymbols": 1099,
     "byLanguage": {
       "typescript": 88
     },
     "bySymbolKind": {
-      "function": 487,
+      "function": 490,
       "type": 40,
-      "interface": 253,
-      "variable": 106,
+      "interface": 259,
+      "variable": 107,
       "class": 12,
       "property": 49,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 37115,
-  "codebase_tokens": 1026420,
+  "total_tokens": 37681,
+  "codebase_tokens": 1032831,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15643,10 +15643,10 @@
       "language": "typescript",
       "lines": [
         1,
-        342
+        682
       ],
       "detail_level": "full",
-      "token_estimate": 805,
+      "token_estimate": 1371,
       "symbols": [
         {
           "name": "EMBEDDING_FORMAT_VERSION",
@@ -15835,6 +15835,196 @@
           "parent_name": null,
           "annotation": null,
           "comment": "Deserialize a binary Buffer to an embedding array.\n\nInverse of serializeEmbedding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BackfillEmbeddingProvider",
+          "kind": "interface",
+          "signature": "BackfillEmbeddingProvider",
+          "lines": [
+            351,
+            355
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Embedding provider interface for backfill operations.\nMatches the EmbeddingProvider interface from facet-discovery.ts.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BackfillLogger",
+          "kind": "interface",
+          "signature": "BackfillLogger",
+          "lines": [
+            360,
+            365
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Logger interface for backfill operations.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BackfillEmbeddingsOptions",
+          "kind": "interface",
+          "signature": "BackfillEmbeddingsOptions",
+          "lines": [
+            370,
+            381
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for backfillEmbeddings function.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BackfillResult",
+          "kind": "interface",
+          "signature": "BackfillResult",
+          "lines": [
+            386,
+            397
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of a backfill operation.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "noopLogger",
+          "kind": "variable",
+          "signature": "BackfillLogger",
+          "lines": [
+            404,
+            409
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default no-op logger for backfill",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeNeedingEmbeddingRow",
+          "kind": "interface",
+          "signature": "NodeNeedingEmbeddingRow",
+          "lines": [
+            414,
+            417
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Row type for nodes query",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "EmbeddingCheckRow",
+          "kind": "interface",
+          "signature": "EmbeddingCheckRow",
+          "lines": [
+            422,
+            426
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Row type for embedding check",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findNodesNeedingEmbedding",
+          "kind": "function",
+          "signature": "findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {}",
+          "lines": [
+            436,
+            500
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find nodes that need embedding generation or update.\n\nA node needs embedding if:\n1. No embedding exists for it\n2. Embedding uses a different model than the current provider\n3. Embedding uses old format (not rich format with decisions/lessons)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "backfillEmbeddings",
+          "kind": "function",
+          "signature": "async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult>",
+          "lines": [
+            516,
+            642
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Backfill embeddings for nodes that are missing or have outdated embeddings.\n\nThis function:\n1. Finds nodes needing embedding (missing, wrong model, or old format)\n2. Loads full node data from JSON files\n3. Builds rich embedding text (summary + decisions + lessons)\n4. Generates embeddings in batches via the provider\n5. Stores in both node_embeddings table and node_embeddings_vec (if available)\n\nErrors are handled gracefully:\n- Individual node failures don't stop the batch\n- Returns statistics including failed node IDs for retry",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "countNodesNeedingEmbedding",
+          "kind": "function",
+          "signature": "countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; }",
+          "lines": [
+            649,
+            681
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Count nodes that need embedding backfill.\n\nUseful for showing progress or estimating work before running backfill.",
           "incoming_refs": null,
           "outgoing_refs": null
         }
