@@ -35,7 +35,6 @@ export async function quirksRoutes(app: FastifyInstance): Promise<void> {
         Querystring: {
           model?: string;
           frequency?: string;
-          severity?: string;
           project?: string;
           limit?: string;
           offset?: string;
@@ -50,7 +49,6 @@ export async function quirksRoutes(app: FastifyInstance): Promise<void> {
       const filters: ListQuirksFilters = {
         model: query.model,
         frequency: query.frequency as ListQuirksFilters["frequency"],
-        severity: query.severity as ListQuirksFilters["severity"],
         project: query.project,
       };
 

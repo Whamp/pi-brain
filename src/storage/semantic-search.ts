@@ -8,15 +8,15 @@
 import type Database from "better-sqlite3";
 
 import type { NodeRow } from "./node-crud.js";
+import type {
+  SearchFilters,
+  SearchHighlight,
+  SearchResult,
+} from "./search-repository.js";
 
 import { isVecLoaded } from "./database.js";
 import { deserializeEmbedding } from "./embedding-utils.js";
-import {
-  type SearchHighlight,
-  type SearchResult,
-  buildFilterClause,
-  type SearchFilters,
-} from "./search-repository.js";
+import { buildWhereClause } from "./filter-utils.js";
 
 // =============================================================================
 // Types
@@ -70,8 +70,10 @@ export function semanticSearch(
   } = options;
 
   // Build WHERE clause from filters
-  const { clause: filterClause, params: filterParams } =
-    buildFilterClause(filters);
+  const { clause: filterClause, params: filterParams } = buildWhereClause(
+    filters,
+    "n"
+  );
 
   // We need to construct a dynamic query because sqlite-vec uses virtual tables
   // and we need to join with the nodes table for metadata and filtering.

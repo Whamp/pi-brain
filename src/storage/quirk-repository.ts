@@ -15,17 +15,12 @@ import type Database from "better-sqlite3";
 /** Frequency values for model quirks */
 export type QuirkFrequency = "once" | "sometimes" | "often" | "always";
 
-/** Severity values for model quirks (matches spec) */
-export type QuirkSeverity = "low" | "medium" | "high";
-
 /** Filters for querying model quirks */
 export interface ListQuirksFilters {
   /** Filter by exact model (e.g., "zai/glm-4.7") */
   model?: string;
   /** Filter by minimum frequency (inclusive ranking: once < sometimes < often < always) */
   frequency?: QuirkFrequency;
-  /** Filter by severity (if present in observations) */
-  severity?: QuirkSeverity;
   /** Filter by source project (partial match via nodes table) */
   project?: string;
 }

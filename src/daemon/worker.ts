@@ -331,9 +331,7 @@ export class Worker {
 
   /**
    * Process a single job (can be called directly for testing)
-  
    */
-  // oxlint-disable-next-line complexity
   async processJob(job: AnalysisJob): Promise<JobProcessingResult> {
     if (
       !this.queue ||
@@ -362,161 +360,11 @@ export class Worker {
     try {
       // Handle connection discovery jobs specifically
       if (job.type === "connection_discovery") {
-        const nodeId = job.context?.nodeId as string | undefined;
-        if (!nodeId) {
-          throw new Error("Missing nodeId in connection_discovery job context");
-        }
-
-        const result = await this.connectionDiscoverer.discover(nodeId);
-
-        await this.queue.complete(job.id, nodeId);
-        this.jobsSucceeded++;
-
-        this.logger.info(
-          `Job ${job.id} completed successfully, found ${result.edges.length} connections for node ${nodeId}`
-        );
-
-        return {
-          success: true,
-          job,
-          nodeId,
-          willRetry: false,
-          durationMs: Date.now() - startTime,
-        };
+        return await this.handleConnectionDiscoveryJob(job, startTime);
       }
 
-      // Invoke the agent for other job types
-      const result = await this.processor.process(job);
-
-      if (result.success && result.nodeData) {
-        // 1. Parse session for source metadata
-        const session = await parseSession(job.sessionFile);
-
-        // 2. Extract segment entries and count
-        let segmentEntries = session.entries;
-        let entryCount = session.entries.length;
-        if (job.segmentStart || job.segmentEnd) {
-          const startIndex = job.segmentStart
-            ? session.entries.findIndex((e) => e.id === job.segmentStart)
-            : 0;
-          const endIndex = job.segmentEnd
-            ? session.entries.findIndex((e) => e.id === job.segmentEnd)
-            : session.entries.length - 1;
-
-          if (startIndex !== -1 && endIndex !== -1) {
-            segmentEntries = session.entries.slice(startIndex, endIndex + 1);
-            entryCount = endIndex - startIndex + 1;
-          }
-        }
-
-        // 3. Detect abandoned restart by checking previous project node
-        // Get the segment's start time and files touched
-        const segmentStartTime =
-          segmentEntries[0]?.timestamp ?? session.header.timestamp;
-        const currentFilesTouched = [
-          ...getFilesTouched(segmentEntries),
-          ...result.nodeData.content.filesTouched,
-        ];
-        const { project } = result.nodeData.classification;
-
-        // Look up previous node for the same project
-        let abandonedRestart = false;
-        if (project) {
-          const previousNode = findPreviousProjectNode(
-            this.db,
-            project,
-            segmentStartTime
-          );
-          if (previousNode) {
-            abandonedRestart = isAbandonedRestartFromNode(
-              {
-                outcome: previousNode.content.outcome,
-                timestamp: previousNode.metadata.timestamp,
-                filesTouched: previousNode.content.filesTouched,
-              },
-              segmentStartTime,
-              currentFilesTouched
-            );
-          }
-        }
-
-        // 4. Detect friction and delight signals from segment entries
-        const frictionSignals = detectFrictionSignals(segmentEntries, {
-          isLastSegment: !job.segmentEnd, // If no end specified, assume it's the latest segment
-          wasResumed: job.context?.boundaryType === "resume",
-          abandonedRestart,
-        });
-        const delightSignals = detectDelightSignals(segmentEntries, {
-          outcome: result.nodeData.content.outcome,
-        });
-        const manualFlags = extractManualFlags(segmentEntries);
-
-        // 5. Convert AgentNodeOutput to Node
-        const promptVersion = getOrCreatePromptVersion(
-          this.db,
-          this.config.daemon.promptFile
-        );
-
-        // Determine computer name from session path
-        // For spoke sessions, use the spoke name; for local sessions, use hostname
-        const computer = getComputerFromPath(job.sessionFile, this.config);
-
-        const node = agentOutputToNode(result.nodeData, {
-          job,
-          computer,
-          sessionId: session.header.id,
-          parentSession: session.header.parentSession,
-          entryCount,
-          analysisDurationMs: result.durationMs,
-          analyzerVersion: promptVersion.version,
-          signals: {
-            friction: frictionSignals,
-            delight: delightSignals,
-            manualFlags,
-          },
-        });
-
-        // 6. Store node in SQLite and JSON (upsert for idempotent ingestion)
-        // If this job is a retry after a crash, the node may already exist
-        const { created } = upsertNode(this.db, node, {
-          nodesDir: join(this.config.hub.databaseDir, "nodes"),
-        });
-
-        // 7. Create structural edges based on session boundaries.
-        // Only for initial analysis of new nodes - reanalysis preserves existing edges.
-        if (job.type === "initial" && created) {
-          linkNodeToPredecessors(this.db, node, {
-            boundaryType: job.context?.boundaryType,
-          });
-        }
-
-        // 8. Generate and store embedding for semantic search
-        await this.generateNodeEmbedding(node);
-
-        this.queue.complete(job.id, node.id);
-        this.jobsSucceeded++;
-
-        this.logger.info(
-          `Job ${job.id} completed successfully, ${created ? "created" : "updated"} node ${node.id}`
-        );
-
-        // Call callback if provided
-        if (this.onNodeCreated) {
-          await this.onNodeCreated(job, node);
-        }
-
-        return {
-          success: true,
-          job,
-          nodeId: node.id,
-          willRetry: false,
-          durationMs: Date.now() - startTime,
-        };
-      }
-
-      // Processing failed
-      const error = new Error(result.error ?? "Unknown error");
-      return await this.handleJobFailure(job, error, startTime);
+      // Handle analysis jobs (initial, reanalysis, etc.)
+      return await this.handleAnalysisJob(job, startTime);
     } catch (error) {
       return await this.handleJobFailure(
         job,
@@ -526,6 +374,232 @@ export class Worker {
     } finally {
       this.currentJob = null;
     }
+  }
+
+  /**
+   * Handle connection discovery job
+   */
+  private async handleConnectionDiscoveryJob(
+    job: AnalysisJob,
+    startTime: number
+  ): Promise<JobProcessingResult> {
+    if (!this.connectionDiscoverer || !this.queue) {
+      throw new Error("Worker not initialized");
+    }
+
+    const nodeId = job.context?.nodeId as string | undefined;
+    if (!nodeId) {
+      throw new Error("Missing nodeId in connection_discovery job context");
+    }
+
+    const result = await this.connectionDiscoverer.discover(nodeId);
+
+    await this.queue.complete(job.id, nodeId);
+    this.jobsSucceeded++;
+
+    this.logger.info(
+      `Job ${job.id} completed successfully, found ${result.edges.length} connections for node ${nodeId}`
+    );
+
+    return {
+      success: true,
+      job,
+      nodeId,
+      willRetry: false,
+      durationMs: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Handle analysis job (initial, reanalysis, etc.)
+   */
+  private async handleAnalysisJob(
+    job: AnalysisJob,
+    startTime: number
+  ): Promise<JobProcessingResult> {
+    if (!this.processor || !this.queue) {
+      throw new Error("Worker not initialized");
+    }
+
+    // Invoke the agent
+    const result = await this.processor.process(job);
+
+    if (result.success && result.nodeData) {
+      return await this.processAnalysisResult(job, result, startTime);
+    }
+
+    // Processing failed
+    const error = new Error(result.error ?? "Unknown error");
+    return await this.handleJobFailure(job, error, startTime);
+  }
+
+  /**
+   * Process successful analysis result and create/update node
+   */
+  private async processAnalysisResult(
+    job: AnalysisJob,
+    result: Awaited<ReturnType<JobProcessor["process"]>>,
+    startTime: number
+  ): Promise<JobProcessingResult> {
+    if (!result.nodeData || !this.db || !this.queue) {
+      throw new Error("Invalid state or worker not initialized");
+    }
+
+    // 1. Parse session for source metadata
+    const session = await parseSession(job.sessionFile);
+
+    // 2. Extract segment entries and count
+    const { segmentEntries, entryCount } = this.extractSegment(
+      session.entries,
+      job.segmentStart,
+      job.segmentEnd
+    );
+
+    // 3. Detect abandoned restart by checking previous project node
+    const segmentStartTime =
+      segmentEntries[0]?.timestamp ?? session.header.timestamp;
+    const currentFilesTouched = [
+      ...getFilesTouched(segmentEntries),
+      ...result.nodeData.content.filesTouched,
+    ];
+    const { project } = result.nodeData.classification;
+
+    const abandonedRestart = this.detectAbandonedRestart(
+      project,
+      segmentStartTime,
+      currentFilesTouched
+    );
+
+    // 4. Detect friction and delight signals from segment entries
+    const frictionSignals = detectFrictionSignals(segmentEntries, {
+      isLastSegment: !job.segmentEnd,
+      wasResumed: job.context?.boundaryType === "resume",
+      abandonedRestart,
+    });
+    const delightSignals = detectDelightSignals(segmentEntries, {
+      outcome: result.nodeData.content.outcome,
+    });
+    const manualFlags = extractManualFlags(segmentEntries);
+
+    // 5. Convert AgentNodeOutput to Node
+    const promptVersion = getOrCreatePromptVersion(
+      this.db,
+      this.config.daemon.promptFile
+    );
+
+    // Determine computer name from session path
+    const computer = getComputerFromPath(job.sessionFile, this.config);
+
+    const node = agentOutputToNode(result.nodeData, {
+      job,
+      computer,
+      sessionId: session.header.id,
+      parentSession: session.header.parentSession,
+      entryCount,
+      analysisDurationMs: result.durationMs,
+      analyzerVersion: promptVersion.version,
+      signals: {
+        friction: frictionSignals,
+        delight: delightSignals,
+        manualFlags,
+      },
+    });
+
+    // 6. Store node in SQLite and JSON (upsert for idempotent ingestion)
+    const { created } = upsertNode(this.db, node, {
+      nodesDir: join(this.config.hub.databaseDir, "nodes"),
+    });
+
+    // 7. Create structural edges based on session boundaries
+    if (job.type === "initial" && created) {
+      linkNodeToPredecessors(this.db, node, {
+        boundaryType: job.context?.boundaryType,
+      });
+    }
+
+    // 8. Generate and store embedding for semantic search
+    await this.generateNodeEmbedding(node);
+
+    this.queue.complete(job.id, node.id);
+    this.jobsSucceeded++;
+
+    this.logger.info(
+      `Job ${job.id} completed successfully, ${created ? "created" : "updated"} node ${node.id}`
+    );
+
+    // Call callback if provided
+    if (this.onNodeCreated) {
+      await this.onNodeCreated(job, node);
+    }
+
+    return {
+      success: true,
+      job,
+      nodeId: node.id,
+      willRetry: false,
+      durationMs: Date.now() - startTime,
+    };
+  }
+
+  /**
+   * Extract segment entries and count from session entries
+   */
+  private extractSegment(
+    entries: { id: string; timestamp?: string }[],
+    segmentStart?: string,
+    segmentEnd?: string
+  ): { segmentEntries: typeof entries; entryCount: number } {
+    let segmentEntries = entries;
+    let entryCount = entries.length;
+
+    if (segmentStart || segmentEnd) {
+      const startIndex = segmentStart
+        ? entries.findIndex((e) => e.id === segmentStart)
+        : 0;
+      const endIndex = segmentEnd
+        ? entries.findIndex((e) => e.id === segmentEnd)
+        : entries.length - 1;
+
+      if (startIndex !== -1 && endIndex !== -1) {
+        segmentEntries = entries.slice(startIndex, endIndex + 1);
+        entryCount = endIndex - startIndex + 1;
+      }
+    }
+
+    return { segmentEntries, entryCount };
+  }
+
+  /**
+   * Detect if current segment is an abandoned restart
+   */
+  private detectAbandonedRestart(
+    project: string | undefined,
+    segmentStartTime: string,
+    currentFilesTouched: string[]
+  ): boolean {
+    if (!project || !this.db) {
+      return false;
+    }
+
+    const previousNode = findPreviousProjectNode(
+      this.db,
+      project,
+      segmentStartTime
+    );
+
+    if (!previousNode) {
+      return false;
+    }
+
+    return isAbandonedRestartFromNode(
+      {
+        outcome: previousNode.content.outcome,
+        timestamp: previousNode.metadata.timestamp,
+        filesTouched: previousNode.content.filesTouched,
+      },
+      segmentStartTime,
+      currentFilesTouched
+    );
   }
 
   /**
@@ -619,9 +693,9 @@ export class Worker {
       // Generate embedding
       const embeddings = await this.embeddingProvider.embed([text]);
 
-      if (!embeddings[0] || embeddings[0].length === 0) {
+      if (!embeddings[0]) {
         this.logger.warn(
-          `Empty embedding returned for node ${node.id}, skipping storage`
+          `No embedding generated for node ${node.id}, skipping storage`
         );
         return;
       }

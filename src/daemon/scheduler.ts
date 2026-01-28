@@ -366,61 +366,55 @@ export class Scheduler {
 
   /**
    * Get scheduler status including next run times
-  
    */
-  // oxlint-disable-next-line complexity
   getStatus(): SchedulerStatus {
-    const jobs: SchedulerStatus["jobs"] = [];
-
-    if (this.config.reanalysisSchedule) {
-      jobs.push({
-        type: "reanalysis",
+    const jobConfigs = [
+      {
+        type: "reanalysis" as const,
         schedule: this.config.reanalysisSchedule,
-        nextRun: this.reanalysisJob?.nextRun() ?? null,
-        lastRun: this.lastReanalysisResult?.completedAt ?? null,
-        lastResult: this.lastReanalysisResult ?? undefined,
-      });
-    }
-
-    if (this.config.connectionDiscoverySchedule) {
-      jobs.push({
-        type: "connection_discovery",
+        job: this.reanalysisJob,
+        lastResult: this.lastReanalysisResult,
+      },
+      {
+        type: "connection_discovery" as const,
         schedule: this.config.connectionDiscoverySchedule,
-        nextRun: this.connectionDiscoveryJob?.nextRun() ?? null,
-        lastRun: this.lastConnectionDiscoveryResult?.completedAt ?? null,
-        lastResult: this.lastConnectionDiscoveryResult ?? undefined,
-      });
-    }
-
-    if (this.config.patternAggregationSchedule) {
-      jobs.push({
-        type: "pattern_aggregation",
+        job: this.connectionDiscoveryJob,
+        lastResult: this.lastConnectionDiscoveryResult,
+      },
+      {
+        type: "pattern_aggregation" as const,
         schedule: this.config.patternAggregationSchedule,
-        nextRun: this.patternAggregationJob?.nextRun() ?? null,
-        lastRun: this.lastPatternAggregationResult?.completedAt ?? null,
-        lastResult: this.lastPatternAggregationResult ?? undefined,
-      });
-    }
-
-    if (this.config.clusteringSchedule) {
-      jobs.push({
-        type: "clustering",
+        job: this.patternAggregationJob,
+        lastResult: this.lastPatternAggregationResult,
+      },
+      {
+        type: "clustering" as const,
         schedule: this.config.clusteringSchedule,
-        nextRun: this.clusteringJob?.nextRun() ?? null,
-        lastRun: this.lastClusteringResult?.completedAt ?? null,
-        lastResult: this.lastClusteringResult ?? undefined,
-      });
-    }
-
-    if (this.config.backfillEmbeddingsSchedule) {
-      jobs.push({
-        type: "backfill_embeddings",
+        job: this.clusteringJob,
+        lastResult: this.lastClusteringResult,
+      },
+      {
+        type: "backfill_embeddings" as const,
         schedule: this.config.backfillEmbeddingsSchedule,
-        nextRun: this.backfillEmbeddingsJob?.nextRun() ?? null,
-        lastRun: this.lastBackfillEmbeddingsResult?.completedAt ?? null,
-        lastResult: this.lastBackfillEmbeddingsResult ?? undefined,
-      });
-    }
+        job: this.backfillEmbeddingsJob,
+        lastResult: this.lastBackfillEmbeddingsResult,
+      },
+    ];
+
+    const jobs: SchedulerStatus["jobs"] = jobConfigs
+      .filter(
+        (config) =>
+          config.schedule !== null &&
+          config.schedule !== undefined &&
+          config.schedule !== ""
+      )
+      .map((config) => ({
+        type: config.type,
+        schedule: config.schedule,
+        nextRun: config.job?.nextRun() ?? null,
+        lastRun: config.lastResult?.completedAt ?? null,
+        lastResult: config.lastResult ?? undefined,
+      }));
 
     return {
       running: this.running,

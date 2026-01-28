@@ -19,7 +19,10 @@ import {
   hasEmbedding,
 } from "../storage/embedding-utils.js";
 import { upsertNode } from "../storage/index.js";
-import { createMockEmbeddingProvider } from "./facet-discovery.js";
+import {
+  createMockEmbeddingProvider,
+  type EmbeddingProvider,
+} from "./facet-discovery.js";
 import { createQueueManager, PRIORITY, type AnalysisJob } from "./queue.js";
 import {
   createWorker,
@@ -824,7 +827,7 @@ describe("embedding generation full flow", () => {
       // Access private embeddingProvider for testing
       // eslint-disable-next-line @typescript-eslint/consistent-type-imports
       const { embeddingProvider } = worker as unknown as {
-        embeddingProvider: typeof import("./facet-discovery.js").EmbeddingProvider;
+        embeddingProvider: EmbeddingProvider;
       };
 
       // Verify the provider was initialized
@@ -1133,6 +1136,7 @@ describe("embedding generation full flow", () => {
         await failingProvider.embed([text]);
         expect.fail("Should have thrown an error");
       } catch (error) {
+        // Valid testing pattern for caught errors
         // eslint-disable-next-line jest/no-conditional-expect
         expect(error).toBeInstanceOf(Error);
         // eslint-disable-next-line jest/no-conditional-expect

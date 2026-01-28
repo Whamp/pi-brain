@@ -106,10 +106,9 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:265: call now -> external
     291-436: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs out: 26 [call: 20, type: 6]
+      refs out: 24 [call: 18, type: 6]
         - src/daemon/cli.ts:291: type StartOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:291: type Promise -> external
-        - src/daemon/cli.ts:310: call loadConfig -> src/config/config.ts
         - src/daemon/cli.ts:314: type Error -> external
         - src/daemon/cli.ts:323: call log -> external
         - src/daemon/cli.ts:327: call kill -> external
@@ -117,6 +116,7 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:332: type Error -> external
         - src/daemon/cli.ts:346: call kill -> external
         - src/daemon/cli.ts:347: call removePidFile -> src/daemon/cli.ts
+        - src/daemon/cli.ts:359: type Error -> external
     441-503: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 9 [call: 7, type: 2]
@@ -856,9 +856,9 @@ src/daemon/scheduler.test.ts [1-961]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-978]
+src/daemon/scheduler.ts [1-972]
   class:
-    163-904: class Scheduler [exported]
+    163-898: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     59-66: interface ScheduledJobResult [exported]
@@ -886,26 +886,26 @@ src/daemon/scheduler.ts [1-978]
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    909-939: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    903-933: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:910: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:911: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:912: type Database -> external
-        - src/daemon/scheduler.ts:913: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:914: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:915: instantiate Scheduler -> src/daemon/scheduler.ts
-    945-955: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:904: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:905: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:906: type Database -> external
+        - src/daemon/scheduler.ts:907: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:908: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:909: instantiate Scheduler -> src/daemon/scheduler.ts
+    939-949: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:950: call Cron.stop -> external
-    960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:944: call Cron.stop -> external
+    954-971: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:960: type Date -> external
-        - src/daemon/scheduler.ts:968: call push -> external
-        - src/daemon/scheduler.ts:969: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:972: call Cron.stop -> external
+        - src/daemon/scheduler.ts:954: type Date -> external
+        - src/daemon/scheduler.ts:962: call push -> external
+        - src/daemon/scheduler.ts:963: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:966: call Cron.stop -> external
   variable:
     78-83: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -1067,11 +1067,14 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-546]
+src/daemon/worker.test.ts [1-1180]
   imports:
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
+    - ../storage/index.js
+    - ../storage/node-types.js
+    - ./facet-discovery.js
     - ./queue.js
     - ./worker.js
     - better-sqlite3
@@ -1080,9 +1083,9 @@ src/daemon/worker.test.ts [1-546]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-717]
+src/daemon/worker.ts [1-791]
   class:
-    126-656: class Worker [exported]
+    126-730: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     66-83: interface WorkerConfig [exported]
@@ -1109,32 +1112,32 @@ src/daemon/worker.ts [1-717]
         - src/daemon/worker.ts:108: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:112: type Error -> external
   function:
-    665-667: createWorker(config: WorkerConfig): Worker [exported]
+    739-741: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:665: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:665: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:666: instantiate Worker -> src/daemon/worker.ts
-    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:739: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:739: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:740: instantiate Worker -> src/daemon/worker.ts
+    747-761: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:674: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:675: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:676: type Database -> external
-        - src/daemon/worker.ts:677: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:678: type Promise -> external
-        - src/daemon/worker.ts:678: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:685: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:686: call Worker.processJob -> src/daemon/worker.ts
-    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:748: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:749: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:750: type Database -> external
+        - src/daemon/worker.ts:751: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:752: type Promise -> external
+        - src/daemon/worker.ts:752: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:759: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:760: call Worker.processJob -> src/daemon/worker.ts
+    766-790: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:693: type Error -> external
-        - src/daemon/worker.ts:694: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:695: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:700: type ReturnType -> external
-        - src/daemon/worker.ts:712: call ceil -> external
-        - src/daemon/worker.ts:713: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:767: type Error -> external
+        - src/daemon/worker.ts:768: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:769: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:774: type ReturnType -> external
+        - src/daemon/worker.ts:786: call ceil -> external
+        - src/daemon/worker.ts:787: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1613,4 +1616,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 21,001 (codebase: ~1,091,955)
+Estimated tokens: 21,018 (codebase: ~1,103,251)

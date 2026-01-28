@@ -205,7 +205,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/cli.ts:47: import (module)
         - src/cli.ts:794: call result
         - src/daemon/scheduler.ts:21: import (module)
-        - src/daemon/scheduler.ts:695: call Scheduler.runPatternAggregation
+        - src/daemon/scheduler.ts:689: call Scheduler.runPatternAggregation
         - src/prompt/effectiveness.test.ts:22: import (module)
         - src/prompt/effectiveness.test.ts:711: call result
         - src/prompt/effectiveness.test.ts:752: call result1
@@ -229,7 +229,7 @@ src/prompt/effectiveness.ts [1-881]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
       refs in: 6 [call: 4, import: 2]
         - src/daemon/scheduler.ts:20: import (module)
-        - src/daemon/scheduler.ts:664: call Scheduler.needingMeasurement
+        - src/daemon/scheduler.ts:658: call Scheduler.needingMeasurement
         - src/prompt/effectiveness.test.ts:19: import (module)
         - src/prompt/effectiveness.test.ts:933: call needing
         - src/prompt/effectiveness.test.ts:957: call needing
@@ -243,7 +243,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/cli.ts:46: import (module)
         - src/cli.ts:813: call disabled
         - src/daemon/scheduler.ts:19: import (module)
-        - src/daemon/scheduler.ts:711: call Scheduler.disabled
+        - src/daemon/scheduler.ts:705: call Scheduler.disabled
         - src/prompt/effectiveness.test.ts:13: import (module)
         - src/prompt/effectiveness.test.ts:1035: call disabled
         - src/prompt/effectiveness.test.ts:1068: call disabled
@@ -572,7 +572,7 @@ src/prompt/prompt.ts [1-388]
       /** Get the latest prompt version from database */
       refs in: 5 [call: 3, import: 2]
         - src/daemon/scheduler.ts:23: import (module)
-        - src/daemon/scheduler.ts:478: call Scheduler.latestVersion
+        - src/daemon/scheduler.ts:472: call Scheduler.latestVersion
         - src/prompt/prompt.test.ts:28: import (module)
         - src/prompt/prompt.test.ts:235: call (module)
         - src/prompt/prompt.test.ts:251: call result
@@ -602,7 +602,7 @@ src/prompt/prompt.ts [1-388]
       /** Get or create a prompt version If the current prompt has the same hash as an existing version, returns that version. Otherwise, creates a new version, archives the prompt, and records it in the database. */
       refs in: 11 [call: 9, import: 2]
         - src/daemon/worker.ts:26: import (module)
-        - src/daemon/worker.ts:455: call Worker.promptVersion
+        - src/daemon/worker.ts:485: call Worker.promptVersion
         - src/prompt/prompt.test.ts:32: import (module)
         - src/prompt/prompt.test.ts:403: call (module)
         - src/prompt/prompt.test.ts:421: call version
@@ -778,4 +778,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 14
-Estimated tokens: 10,701 (codebase: ~1,091,955)
+Estimated tokens: 10,701 (codebase: ~1,103,251)

@@ -1,24 +1,24 @@
 {
   "stats": {
-    "totalFiles": 90,
-    "totalSymbols": 1134,
+    "totalFiles": 91,
+    "totalSymbols": 1155,
     "byLanguage": {
-      "typescript": 90
+      "typescript": 91
     },
     "bySymbolKind": {
-      "function": 503,
-      "type": 41,
-      "interface": 262,
+      "function": 517,
+      "type": 42,
+      "interface": 263,
       "variable": 119,
       "class": 12,
       "property": 51,
       "constructor": 11,
-      "method": 133,
+      "method": 138,
       "getter": 2
     }
   },
-  "total_tokens": 39038,
-  "codebase_tokens": 1091955,
+  "total_tokens": 40152,
+  "codebase_tokens": 1103251,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -369,18 +369,18 @@
       "language": "typescript",
       "lines": [
         1,
-        157
+        214
       ],
       "detail_level": "full",
-      "token_estimate": 64,
+      "token_estimate": 71,
       "symbols": [
         {
           "name": "daemonRoutes",
           "kind": "function",
           "signature": "async daemonRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            22,
-            156
+            24,
+            213
           ],
           "exported": true,
           "is_default": false,
@@ -399,6 +399,7 @@
       "code_blocks": null,
       "imports": [
         "../../daemon/cli.js",
+        "../../daemon/errors.js",
         "../../daemon/queue.js",
         "../responses.js",
         "fastify",
@@ -926,7 +927,7 @@
       "language": "typescript",
       "lines": [
         1,
-        110
+        108
       ],
       "detail_level": "full",
       "token_estimate": 78,
@@ -956,7 +957,7 @@
           "signature": "async quirksRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             27,
-            109
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -2213,10 +2214,10 @@
       "language": "typescript",
       "lines": [
         1,
-        773
+        901
       ],
       "detail_level": "full",
-      "token_estimate": 836,
+      "token_estimate": 1325,
       "symbols": [
         {
           "name": "DEFAULT_CONFIG_DIR",
@@ -2390,12 +2391,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateSpokeSchedule",
+          "kind": "function",
+          "signature": "validateSpokeSchedule(spokeName: string, syncMethod: SyncMethod, schedule: string, index: number): void",
+          "lines": [
+            158,
+            170
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke schedule configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateRsyncOptions",
+          "kind": "function",
+          "signature": "validateRsyncOptions(spokeName: string, syncMethod: SyncMethod, rawOptions: RawConfig[\"spokes\"][number][\"rsync_options\"]): any",
+          "lines": [
+            175,
+            243
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate rsync options configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "validateSpoke",
           "kind": "function",
           "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
           "lines": [
-            160,
-            273
+            248,
+            296
           ],
           "exported": false,
           "is_default": false,
@@ -2413,8 +2452,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            278,
-            286
+            301,
+            309
           ],
           "exported": false,
           "is_default": false,
@@ -2432,8 +2471,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            291,
-            297
+            314,
+            320
           ],
           "exported": false,
           "is_default": false,
@@ -2451,8 +2490,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            302,
-            308
+            325,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -2470,8 +2509,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            313,
-            319
+            336,
+            342
           ],
           "exported": false,
           "is_default": false,
@@ -2485,12 +2524,164 @@
           "outgoing_refs": null
         },
         {
+          "name": "transformHubConfig",
+          "kind": "function",
+          "signature": "transformHubConfig(raw: RawConfig, defaults: PiBrainConfig): HubConfig",
+          "lines": [
+            347,
+            364
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform hub configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformDaemonSchedules",
+          "kind": "function",
+          "signature": "transformDaemonSchedules(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"reanalysisSchedule\" | \"connectionDiscoverySchedule\" | \"patternAggregationSchedule\" | \"clusteringSchedule\" | \"backfillEmbeddingsSchedule\">",
+          "lines": [
+            369,
+            395
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform daemon scheduling configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformDaemonLimits",
+          "kind": "function",
+          "signature": "transformDaemonLimits(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"backfillLimit\" | \"reanalysisLimit\" | \"connectionDiscoveryLimit\" | \"connectionDiscoveryLookbackDays\" | \"connectionDiscoveryCooldownHours\" | \"semanticSearchThreshold\">",
+          "lines": [
+            400,
+            429
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform daemon limits and thresholds from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformDaemonEmbeddings",
+          "kind": "function",
+          "signature": "transformDaemonEmbeddings(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"embeddingProvider\" | \"embeddingModel\" | \"embeddingApiKey\" | \"embeddingBaseUrl\" | \"embeddingDimensions\">",
+          "lines": [
+            434,
+            454
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform daemon embedding configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformDaemonConfig",
+          "kind": "function",
+          "signature": "transformDaemonConfig(raw: RawConfig, defaults: PiBrainConfig): DaemonConfig",
+          "lines": [
+            459,
+            493
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform daemon configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateDaemonConfig",
+          "kind": "function",
+          "signature": "validateDaemonConfig(daemon: DaemonConfig): void",
+          "lines": [
+            498,
+            562
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate daemon configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformQueryConfig",
+          "kind": "function",
+          "signature": "transformQueryConfig(raw: RawConfig, defaults: PiBrainConfig): QueryConfig",
+          "lines": [
+            567,
+            575
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform query configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "transformApiConfig",
+          "kind": "function",
+          "signature": "transformApiConfig(raw: RawConfig, defaults: PiBrainConfig): ApiConfig",
+          "lines": [
+            580,
+            593
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Transform API configuration from raw config",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "transformConfig",
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            326,
-            504
+            598,
+            632
           ],
           "exported": true,
           "is_default": false,
@@ -2508,8 +2699,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            509,
-            517
+            637,
+            645
           ],
           "exported": true,
           "is_default": false,
@@ -2527,8 +2718,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            510,
-            516
+            638,
+            644
           ],
           "exported": false,
           "is_default": false,
@@ -2546,8 +2737,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            522,
-            577
+            650,
+            705
           ],
           "exported": true,
           "is_default": false,
@@ -2565,8 +2756,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            582,
-            587
+            710,
+            715
           ],
           "exported": true,
           "is_default": false,
@@ -2584,8 +2775,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            592,
-            627
+            720,
+            755
           ],
           "exported": true,
           "is_default": false,
@@ -2603,8 +2794,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            632,
-            691
+            760,
+            819
           ],
           "exported": true,
           "is_default": false,
@@ -2622,8 +2813,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            696,
-            704
+            824,
+            832
           ],
           "exported": true,
           "is_default": false,
@@ -2641,8 +2832,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            709,
-            711
+            837,
+            839
           ],
           "exported": true,
           "is_default": false,
@@ -2660,8 +2851,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            716,
-            720
+            844,
+            848
           ],
           "exported": true,
           "is_default": false,
@@ -2679,8 +2870,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            725,
-            732
+            853,
+            860
           ],
           "exported": true,
           "is_default": false,
@@ -2698,8 +2889,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            743,
-            772
+            871,
+            900
           ],
           "exported": true,
           "is_default": false,
@@ -8510,7 +8701,7 @@
       "language": "typescript",
       "lines": [
         1,
-        978
+        972
       ],
       "detail_level": "full",
       "token_estimate": 1210,
@@ -8711,7 +8902,7 @@
           "signature": "Scheduler",
           "lines": [
             163,
-            904
+            898
           ],
           "exported": true,
           "is_default": false,
@@ -9052,8 +9243,8 @@
           "kind": "method",
           "signature": "getStatus(): SchedulerStatus",
           "lines": [
-            372,
-            429
+            370,
+            423
           ],
           "exported": false,
           "is_default": false,
@@ -9071,8 +9262,8 @@
           "kind": "method",
           "signature": "triggerReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            434,
-            436
+            428,
+            430
           ],
           "exported": false,
           "is_default": false,
@@ -9090,8 +9281,8 @@
           "kind": "method",
           "signature": "triggerConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            441,
-            443
+            435,
+            437
           ],
           "exported": false,
           "is_default": false,
@@ -9109,8 +9300,8 @@
           "kind": "method",
           "signature": "triggerPatternAggregation(): ScheduledJobResult",
           "lines": [
-            448,
-            450
+            442,
+            444
           ],
           "exported": false,
           "is_default": false,
@@ -9128,8 +9319,8 @@
           "kind": "method",
           "signature": "triggerClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            455,
-            457
+            449,
+            451
           ],
           "exported": false,
           "is_default": false,
@@ -9147,8 +9338,8 @@
           "kind": "method",
           "signature": "triggerBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            462,
-            464
+            456,
+            458
           ],
           "exported": false,
           "is_default": false,
@@ -9166,8 +9357,8 @@
           "kind": "method",
           "signature": "async runReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            469,
-            558
+            463,
+            552
           ],
           "exported": false,
           "is_default": false,
@@ -9185,8 +9376,8 @@
           "kind": "method",
           "signature": "async runConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            563,
-            639
+            557,
+            633
           ],
           "exported": false,
           "is_default": false,
@@ -9204,8 +9395,8 @@
           "kind": "method",
           "signature": "runPatternAggregation(): ScheduledJobResult",
           "lines": [
-            645,
-            734
+            639,
+            728
           ],
           "exported": false,
           "is_default": false,
@@ -9223,8 +9414,8 @@
           "kind": "method",
           "signature": "createSchedulerEmbeddingProvider(): any",
           "lines": [
-            739,
-            759
+            733,
+            753
           ],
           "exported": false,
           "is_default": false,
@@ -9242,8 +9433,8 @@
           "kind": "method",
           "signature": "async runBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            765,
-            823
+            759,
+            817
           ],
           "exported": false,
           "is_default": false,
@@ -9261,8 +9452,8 @@
           "kind": "method",
           "signature": "async runClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            829,
-            903
+            823,
+            897
           ],
           "exported": false,
           "is_default": false,
@@ -9280,8 +9471,8 @@
           "kind": "function",
           "signature": "createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler",
           "lines": [
-            909,
-            939
+            903,
+            933
           ],
           "exported": true,
           "is_default": false,
@@ -9299,8 +9490,8 @@
           "kind": "function",
           "signature": "isValidCronExpression(expression: string): boolean",
           "lines": [
-            945,
-            955
+            939,
+            949
           ],
           "exported": true,
           "is_default": false,
@@ -9318,8 +9509,8 @@
           "kind": "function",
           "signature": "getNextRunTimes(expression: string, count = 5): {}",
           "lines": [
-            960,
-            977
+            954,
+            971
           ],
           "exported": true,
           "is_default": false,
@@ -10307,10 +10498,10 @@
       "language": "typescript",
       "lines": [
         1,
-        717
+        791
       ],
       "detail_level": "full",
-      "token_estimate": 961,
+      "token_estimate": 1212,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -10375,7 +10566,7 @@
           "signature": "Worker",
           "lines": [
             126,
-            656
+            730
           ],
           "exported": true,
           "is_default": false,
@@ -10906,8 +11097,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            337,
-            529
+            335,
+            377
           ],
           "exported": false,
           "is_default": false,
@@ -10921,12 +11112,107 @@
           "outgoing_refs": null
         },
         {
+          "name": "handleConnectionDiscoveryJob",
+          "kind": "method",
+          "signature": "async handleConnectionDiscoveryJob(job: AnalysisJob, startTime: number): Promise<JobProcessingResult>",
+          "lines": [
+            382,
+            411
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Handle connection discovery job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "handleAnalysisJob",
+          "kind": "method",
+          "signature": "async handleAnalysisJob(job: AnalysisJob, startTime: number): Promise<JobProcessingResult>",
+          "lines": [
+            416,
+            434
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Handle analysis job (initial, reanalysis, etc.)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "processAnalysisResult",
+          "kind": "method",
+          "signature": "async processAnalysisResult(job: AnalysisJob, result: Awaited<ReturnType<JobProcessor[\"process\"]>>, startTime: number): Promise<JobProcessingResult>",
+          "lines": [
+            439,
+            542
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Process successful analysis result and create/update node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "extractSegment",
+          "kind": "method",
+          "signature": "extractSegment(entries: { id: string; timestamp?: string }[], segmentStart?: string, segmentEnd?: string): { segmentEntries: {}; entryCount: number; }",
+          "lines": [
+            547,
+            570
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Extract segment entries and count from session entries",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "detectAbandonedRestart",
+          "kind": "method",
+          "signature": "detectAbandonedRestart(project: string | undefined, segmentStartTime: string, currentFilesTouched: string[]): boolean",
+          "lines": [
+            575,
+            603
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Detect if current segment is an abandoned restart",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "handleJobFailure",
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            534,
-            601
+            608,
+            675
           ],
           "exported": false,
           "is_default": false,
@@ -10944,8 +11230,8 @@
           "kind": "method",
           "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
           "lines": [
-            609,
-            646
+            683,
+            720
           ],
           "exported": false,
           "is_default": false,
@@ -10963,8 +11249,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            651,
-            655
+            725,
+            729
           ],
           "exported": false,
           "is_default": false,
@@ -10982,8 +11268,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            665,
-            667
+            739,
+            741
           ],
           "exported": true,
           "is_default": false,
@@ -11001,8 +11287,8 @@
           "kind": "function",
           "signature": "processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            673,
-            687
+            747,
+            761
           ],
           "exported": true,
           "is_default": false,
@@ -11020,8 +11306,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            692,
-            716
+            766,
+            790
           ],
           "exported": true,
           "is_default": false,
@@ -16373,6 +16659,100 @@
       ]
     },
     {
+      "path": "src/storage/filter-utils.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        191
+      ],
+      "detail_level": "full",
+      "token_estimate": 252,
+      "symbols": [
+        {
+          "name": "BaseFilters",
+          "kind": "interface",
+          "signature": "BaseFilters",
+          "lines": [
+            17,
+            38
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Base filter fields shared by all filter types",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ExtendedFilters",
+          "kind": "interface",
+          "signature": "ExtendedFilters extends BaseFilters",
+          "lines": [
+            41,
+            46
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Extended filters with additional fields for listNodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "WhereClauseResult",
+          "kind": "interface",
+          "signature": "WhereClauseResult",
+          "lines": [
+            49,
+            54
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of building a WHERE clause",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "buildWhereClause",
+          "kind": "function",
+          "signature": "buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = \"n\"): WhereClauseResult",
+          "lines": [
+            88,
+            190
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Build a WHERE clause from filter conditions.\n\nSupports filtering by:\n- project (partial match via LIKE)\n- exactProject (exact match)\n- type (exact match)\n- outcome (exact match)\n- date range (from/to on timestamp field)\n- computer (exact match)\n- hadClearGoal (boolean)\n- isNewProject (boolean)\n- sessionFile (exact match)\n- tags (AND logic - nodes must have ALL specified tags)\n- topics (AND logic - nodes must have ALL specified topics)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./node-types.js"
+      ]
+    },
+    {
       "path": "src/storage/graph-repository.ts",
       "language": "typescript",
       "lines": [
@@ -17363,18 +17743,18 @@
       "language": "typescript",
       "lines": [
         1,
-        455
+        336
       ],
       "detail_level": "full",
-      "token_estimate": 869,
+      "token_estimate": 782,
       "symbols": [
         {
           "name": "getNodeSummary",
           "kind": "function",
           "signature": "getNodeSummary(db: Database.Database, nodeId: string): string",
           "lines": [
-            21,
-            28
+            23,
+            30
           ],
           "exported": true,
           "is_default": false,
@@ -17392,8 +17772,8 @@
           "kind": "function",
           "signature": "getNodeTags(db: Database.Database, nodeId: string): {}",
           "lines": [
-            33,
-            37
+            35,
+            39
           ],
           "exported": true,
           "is_default": false,
@@ -17411,8 +17791,8 @@
           "kind": "function",
           "signature": "getNodeTopics(db: Database.Database, nodeId: string): {}",
           "lines": [
-            42,
-            46
+            44,
+            48
           ],
           "exported": true,
           "is_default": false,
@@ -17430,8 +17810,8 @@
           "kind": "function",
           "signature": "getAllTags(db: Database.Database): {}",
           "lines": [
-            51,
-            61
+            53,
+            63
           ],
           "exported": true,
           "is_default": false,
@@ -17449,8 +17829,8 @@
           "kind": "function",
           "signature": "getAllTopics(db: Database.Database): {}",
           "lines": [
-            66,
-            70
+            68,
+            72
           ],
           "exported": true,
           "is_default": false,
@@ -17468,8 +17848,8 @@
           "kind": "function",
           "signature": "getNodesByTag(db: Database.Database, tag: string): {}",
           "lines": [
-            75,
-            85
+            77,
+            87
           ],
           "exported": true,
           "is_default": false,
@@ -17487,8 +17867,8 @@
           "kind": "function",
           "signature": "getNodesByTopic(db: Database.Database, topic: string): {}",
           "lines": [
-            90,
-            101
+            92,
+            103
           ],
           "exported": true,
           "is_default": false,
@@ -17506,8 +17886,8 @@
           "kind": "type",
           "signature": "NodeSortField = | \"timestamp\"\n  | \"analyzed_at\"\n  | \"project\"\n  | \"type\"\n  | \"outcome\"\n  | \"tokens_used\"\n  | \"cost\"\n  | \"duration_minutes\"",
           "lines": [
-            108,
-            116
+            110,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -17525,8 +17905,8 @@
           "kind": "type",
           "signature": "SortOrder = \"asc\" | \"desc\"",
           "lines": [
-            119,
-            119
+            121,
+            121
           ],
           "exported": true,
           "is_default": false,
@@ -17540,50 +17920,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "NodeTypeFilter",
-          "kind": "type",
-          "signature": "NodeTypeFilter = | \"coding\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"debugging\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"refactor\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"other\"",
-          "lines": [
-            122,
-            134
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Node type filter values",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "OutcomeFilter",
-          "kind": "type",
-          "signature": "OutcomeFilter = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
-          "lines": [
-            137,
-            137
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Outcome filter values",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "ListNodesFilters",
-          "kind": "interface",
-          "signature": "ListNodesFilters",
+          "kind": "type",
+          "signature": "ListNodesFilters = ExtendedFilters",
           "lines": [
-            140,
-            165
+            124,
+            124
           ],
           "exported": true,
           "is_default": false,
@@ -17601,8 +17943,8 @@
           "kind": "interface",
           "signature": "ListNodesOptions",
           "lines": [
-            168,
-            177
+            127,
+            136
           ],
           "exported": true,
           "is_default": false,
@@ -17620,8 +17962,8 @@
           "kind": "interface",
           "signature": "ListNodesResult",
           "lines": [
-            180,
-            189
+            139,
+            148
           ],
           "exported": true,
           "is_default": false,
@@ -17639,8 +17981,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            192,
-            201
+            151,
+            160
           ],
           "exported": false,
           "is_default": false,
@@ -17658,8 +18000,8 @@
           "kind": "function",
           "signature": "listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult",
           "lines": [
-            219,
-            344
+            178,
+            225
           ],
           "exported": true,
           "is_default": false,
@@ -17677,8 +18019,8 @@
           "kind": "interface",
           "signature": "SessionSummaryRow",
           "lines": [
-            353,
-            365
+            234,
+            246
           ],
           "exported": true,
           "is_default": false,
@@ -17696,8 +18038,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            371,
-            400
+            252,
+            281
           ],
           "exported": true,
           "is_default": false,
@@ -17715,8 +18057,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            409,
-            417
+            290,
+            298
           ],
           "exported": true,
           "is_default": false,
@@ -17734,8 +18076,8 @@
           "kind": "function",
           "signature": "getAllNodeTypes(db: Database.Database): {}",
           "lines": [
-            422,
-            430
+            303,
+            311
           ],
           "exported": true,
           "is_default": false,
@@ -17753,8 +18095,8 @@
           "kind": "function",
           "signature": "getAllComputers(db: Database.Database): {}",
           "lines": [
-            435,
-            443
+            316,
+            324
           ],
           "exported": true,
           "is_default": false,
@@ -17772,8 +18114,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            448,
-            454
+            329,
+            335
           ],
           "exported": true,
           "is_default": false,
@@ -17791,6 +18133,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "./node-crud.js",
         "better-sqlite3"
       ]
@@ -18125,18 +18468,56 @@
       "language": "typescript",
       "lines": [
         1,
-        129
+        151
       ],
       "detail_level": "full",
-      "token_estimate": 406,
+      "token_estimate": 502,
       "symbols": [
+        {
+          "name": "NodeTypeFilter",
+          "kind": "type",
+          "signature": "NodeTypeFilter = | \"coding\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"debugging\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"refactor\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"other\"",
+          "lines": [
+            22,
+            34
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Node type filter values",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "OutcomeFilter",
+          "kind": "type",
+          "signature": "OutcomeFilter = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
+          "lines": [
+            37,
+            37
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Outcome filter values",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "generateNodeId",
           "kind": "function",
           "signature": "generateNodeId(): string",
           "lines": [
-            25,
-            27
+            47,
+            49
           ],
           "exported": true,
           "is_default": false,
@@ -18154,8 +18535,8 @@
           "kind": "function",
           "signature": "generateLessonId(): string",
           "lines": [
-            29,
-            31
+            51,
+            53
           ],
           "exported": true,
           "is_default": false,
@@ -18173,8 +18554,8 @@
           "kind": "function",
           "signature": "generateQuirkId(): string",
           "lines": [
-            33,
-            35
+            55,
+            57
           ],
           "exported": true,
           "is_default": false,
@@ -18192,8 +18573,8 @@
           "kind": "function",
           "signature": "generateErrorId(): string",
           "lines": [
-            37,
-            39
+            59,
+            61
           ],
           "exported": true,
           "is_default": false,
@@ -18211,8 +18592,8 @@
           "kind": "function",
           "signature": "generateDecisionId(): string",
           "lines": [
-            41,
-            43
+            63,
+            65
           ],
           "exported": true,
           "is_default": false,
@@ -18230,8 +18611,8 @@
           "kind": "function",
           "signature": "generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string",
           "lines": [
-            59,
-            69
+            81,
+            91
           ],
           "exported": true,
           "is_default": false,
@@ -18249,8 +18630,8 @@
           "kind": "function",
           "signature": "nodeRef(nodeId: string, version: number): string",
           "lines": [
-            74,
-            76
+            96,
+            98
           ],
           "exported": true,
           "is_default": false,
@@ -18268,8 +18649,8 @@
           "kind": "function",
           "signature": "parseNodeRef(ref: string): { nodeId: string; version: number; }",
           "lines": [
-            81,
-            90
+            103,
+            112
           ],
           "exported": true,
           "is_default": false,
@@ -18287,8 +18668,8 @@
           "kind": "function",
           "signature": "emptyLessons(): LessonsByLevel",
           "lines": [
-            95,
-            105
+            117,
+            127
           ],
           "exported": true,
           "is_default": false,
@@ -18306,8 +18687,8 @@
           "kind": "function",
           "signature": "emptyObservations(): ModelObservations",
           "lines": [
-            110,
-            118
+            132,
+            140
           ],
           "exported": true,
           "is_default": false,
@@ -18325,8 +18706,8 @@
           "kind": "function",
           "signature": "emptyDaemonMeta(): DaemonMeta",
           "lines": [
-            123,
-            128
+            145,
+            150
           ],
           "exported": true,
           "is_default": false,
@@ -18676,10 +19057,10 @@
       "language": "typescript",
       "lines": [
         1,
-        315
+        310
       ],
       "detail_level": "full",
-      "token_estimate": 615,
+      "token_estimate": 583,
       "symbols": [
         {
           "name": "QuirkFrequency",
@@ -18701,31 +19082,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "QuirkSeverity",
-          "kind": "type",
-          "signature": "QuirkSeverity = \"low\" | \"medium\" | \"high\"",
-          "lines": [
-            19,
-            19
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Severity values for model quirks (matches spec)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "ListQuirksFilters",
           "kind": "interface",
           "signature": "ListQuirksFilters",
           "lines": [
-            22,
-            31
+            19,
+            26
           ],
           "exported": true,
           "is_default": false,
@@ -18743,8 +19105,8 @@
           "kind": "interface",
           "signature": "ListQuirksOptions",
           "lines": [
-            34,
-            39
+            29,
+            34
           ],
           "exported": true,
           "is_default": false,
@@ -18762,8 +19124,8 @@
           "kind": "interface",
           "signature": "QuirkResult",
           "lines": [
-            42,
-            51
+            37,
+            46
           ],
           "exported": true,
           "is_default": false,
@@ -18781,8 +19143,8 @@
           "kind": "interface",
           "signature": "ListQuirksResult",
           "lines": [
-            54,
-            63
+            49,
+            58
           ],
           "exported": true,
           "is_default": false,
@@ -18800,8 +19162,8 @@
           "kind": "interface",
           "signature": "ModelQuirkStats",
           "lines": [
-            66,
-            76
+            61,
+            71
           ],
           "exported": true,
           "is_default": false,
@@ -18819,8 +19181,8 @@
           "kind": "type",
           "signature": "QuirksByModelResult = Record<string, ModelQuirkStats>",
           "lines": [
-            79,
-            79
+            74,
+            74
           ],
           "exported": true,
           "is_default": false,
@@ -18838,8 +19200,8 @@
           "kind": "variable",
           "signature": "Record<string, number>",
           "lines": [
-            86,
-            91
+            81,
+            86
           ],
           "exported": false,
           "is_default": false,
@@ -18857,8 +19219,8 @@
           "kind": "function",
           "signature": "listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult",
           "lines": [
-            107,
-            167
+            102,
+            162
           ],
           "exported": true,
           "is_default": false,
@@ -18876,8 +19238,8 @@
           "kind": "function",
           "signature": "getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats>",
           "lines": [
-            175,
-            213
+            170,
+            208
           ],
           "exported": true,
           "is_default": false,
@@ -18895,8 +19257,8 @@
           "kind": "function",
           "signature": "countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number",
           "lines": [
-            218,
-            224
+            213,
+            219
           ],
           "exported": true,
           "is_default": false,
@@ -18914,8 +19276,8 @@
           "kind": "function",
           "signature": "getAllQuirkModels(db: Database.Database): {}",
           "lines": [
-            229,
-            236
+            224,
+            231
           ],
           "exported": true,
           "is_default": false,
@@ -18933,8 +19295,8 @@
           "kind": "function",
           "signature": "getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {}",
           "lines": [
-            244,
-            286
+            239,
+            281
           ],
           "exported": true,
           "is_default": false,
@@ -18952,8 +19314,8 @@
           "kind": "function",
           "signature": "getNodeQuirks(db: Database.Database, nodeId: string): {}",
           "lines": [
-            291,
-            314
+            286,
+            309
           ],
           "exported": true,
           "is_default": false,
@@ -18979,18 +19341,18 @@
       "language": "typescript",
       "lines": [
         1,
-        549
+        449
       ],
       "detail_level": "full",
-      "token_estimate": 634,
+      "token_estimate": 595,
       "symbols": [
         {
           "name": "SearchField",
           "kind": "type",
           "signature": "SearchField = | \"summary\"\n  | \"decisions\"\n  | \"lessons\"\n  | \"tags\"\n  | \"topics\"",
           "lines": [
-            19,
-            24
+            21,
+            26
           ],
           "exported": true,
           "is_default": false,
@@ -19008,8 +19370,8 @@
           "kind": "variable",
           "signature": "SearchField[]",
           "lines": [
-            27,
-            33
+            29,
+            35
           ],
           "exported": false,
           "is_default": false,
@@ -19023,12 +19385,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "SearchFilters",
+          "kind": "type",
+          "signature": "SearchFilters = BaseFilters",
+          "lines": [
+            38,
+            38
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Filters for search queries (subset of node filters relevant to search)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "SearchHighlight",
           "kind": "interface",
           "signature": "SearchHighlight",
           "lines": [
-            36,
-            41
+            41,
+            46
           ],
           "exported": true,
           "is_default": false,
@@ -19046,8 +19427,8 @@
           "kind": "interface",
           "signature": "SearchResult",
           "lines": [
-            44,
-            51
+            49,
+            56
           ],
           "exported": true,
           "is_default": false,
@@ -19061,31 +19442,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "SearchFilters",
-          "kind": "interface",
-          "signature": "SearchFilters",
-          "lines": [
-            54,
-            75
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Filters for search queries (subset of node filters relevant to search)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "SearchOptions",
           "kind": "interface",
           "signature": "SearchOptions",
           "lines": [
-            78,
-            87
+            59,
+            68
           ],
           "exported": true,
           "is_default": false,
@@ -19103,8 +19465,8 @@
           "kind": "interface",
           "signature": "SearchNodesResult",
           "lines": [
-            90,
-            99
+            71,
+            80
           ],
           "exported": true,
           "is_default": false,
@@ -19122,8 +19484,8 @@
           "kind": "function",
           "signature": "indexNodeForSearch(db: Database.Database, node: Node): void",
           "lines": [
-            108,
-            136
+            89,
+            117
           ],
           "exported": true,
           "is_default": false,
@@ -19141,8 +19503,8 @@
           "kind": "function",
           "signature": "searchNodes(db: Database.Database, query: string, limit = 20): {}",
           "lines": [
-            146,
-            172
+            127,
+            153
           ],
           "exported": true,
           "is_default": false,
@@ -19160,8 +19522,8 @@
           "kind": "function",
           "signature": "quoteSearchQuery(query: string): string",
           "lines": [
-            182,
-            188
+            163,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -19179,8 +19541,8 @@
           "kind": "function",
           "signature": "buildFieldQuery(query: string, fields: SearchField[]): string",
           "lines": [
-            195,
-            217
+            176,
+            198
           ],
           "exported": false,
           "is_default": false,
@@ -19198,8 +19560,8 @@
           "kind": "variable",
           "signature": "(str: string): any",
           "lines": [
-            219,
-            220
+            200,
+            201
           ],
           "exported": false,
           "is_default": false,
@@ -19217,8 +19579,8 @@
           "kind": "function",
           "signature": "extractSnippet(text: string, query: string, maxLength = 100): string",
           "lines": [
-            226,
-            293
+            207,
+            274
           ],
           "exported": true,
           "is_default": false,
@@ -19236,8 +19598,8 @@
           "kind": "function",
           "signature": "findHighlights(db: Database.Database, nodeId: string, query: string, fields: SearchField[]): {}",
           "lines": [
-            299,
-            351
+            280,
+            332
           ],
           "exported": false,
           "is_default": false,
@@ -19251,31 +19613,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "buildFilterClause",
-          "kind": "function",
-          "signature": "buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; }",
-          "lines": [
-            361,
-            432
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Build WHERE clause conditions and params from search filters",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "searchNodesAdvanced",
           "kind": "function",
           "signature": "searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult",
           "lines": [
-            458,
-            518
+            358,
+            418
           ],
           "exported": true,
           "is_default": false,
@@ -19293,8 +19636,8 @@
           "kind": "function",
           "signature": "countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, \"fields\" | \"filters\"> = {}): number",
           "lines": [
-            523,
-            548
+            423,
+            448
           ],
           "exported": true,
           "is_default": false,
@@ -19312,6 +19655,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "./node-crud.js",
         "./node-types.js",
         "better-sqlite3"
@@ -19322,10 +19666,10 @@
       "language": "typescript",
       "lines": [
         1,
-        212
+        214
       ],
       "detail_level": "full",
-      "token_estimate": 253,
+      "token_estimate": 259,
       "symbols": [
         {
           "name": "SemanticSearchResult",
@@ -19371,7 +19715,7 @@
           "signature": "semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {}",
           "lines": [
             55,
-            154
+            156
           ],
           "exported": true,
           "is_default": false,
@@ -19389,8 +19733,8 @@
           "kind": "function",
           "signature": "getNodeEmbeddingVector(db: Database.Database, nodeId: string): {}",
           "lines": [
-            164,
-            177
+            166,
+            179
           ],
           "exported": true,
           "is_default": false,
@@ -19408,8 +19752,8 @@
           "kind": "function",
           "signature": "findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {}",
           "lines": [
-            187,
-            211
+            189,
+            213
           ],
           "exported": true,
           "is_default": false,
@@ -19429,6 +19773,7 @@
       "imports": [
         "./database.js",
         "./embedding-utils.js",
+        "./filter-utils.js",
         "./node-crud.js",
         "./search-repository.js",
         "better-sqlite3"
@@ -19779,10 +20124,10 @@
       "language": "typescript",
       "lines": [
         1,
-        353
+        405
       ],
       "detail_level": "full",
-      "token_estimate": 484,
+      "token_estimate": 655,
       "symbols": [
         {
           "name": "execFileAsync",
@@ -19899,12 +20244,88 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateRsyncSpoke",
+          "kind": "function",
+          "signature": "validateRsyncSpoke(spoke: SpokeConfig, startTime: number): RsyncResult",
+          "lines": [
+            140,
+            161
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate that a spoke is configured for rsync\n\nReturns a failed result if validation fails, undefined if valid.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ensureDestinationExists",
+          "kind": "function",
+          "signature": "ensureDestinationExists(spoke: SpokeConfig): void",
+          "lines": [
+            166,
+            170
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Ensure the destination directory exists for a spoke",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "buildRsyncArgs",
+          "kind": "function",
+          "signature": "buildRsyncArgs(spoke: SpokeConfig, options: RsyncOptions): { args: {}; source: string; dest: string; }",
+          "lines": [
+            175,
+            221
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Build rsync command arguments from options",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "handleRsyncError",
+          "kind": "function",
+          "signature": "handleRsyncError(execError: ExecFileException, spoke: SpokeConfig, timeoutMs: number, startTime: number): RsyncResult",
+          "lines": [
+            226,
+            265
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Handle errors from rsync execution",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "runRsync",
           "kind": "function",
           "signature": "async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult>",
           "lines": [
-            140,
-            269
+            270,
+            321
           ],
           "exported": true,
           "is_default": false,
@@ -19922,8 +20343,8 @@
           "kind": "function",
           "signature": "formatBytes(bytes: number): string",
           "lines": [
-            274,
-            285
+            326,
+            337
           ],
           "exported": true,
           "is_default": false,
@@ -19941,8 +20362,8 @@
           "kind": "function",
           "signature": "async isRsyncAvailable(): Promise<boolean>",
           "lines": [
-            293,
-            301
+            345,
+            353
           ],
           "exported": true,
           "is_default": false,
@@ -19960,8 +20381,8 @@
           "kind": "function",
           "signature": "countSpokeSessionFiles(spokePath: string): number",
           "lines": [
-            306,
-            317
+            358,
+            369
           ],
           "exported": true,
           "is_default": false,
@@ -19979,8 +20400,8 @@
           "kind": "function",
           "signature": "listSpokeSessions(spokePath: string): {}",
           "lines": [
-            322,
-            336
+            374,
+            388
           ],
           "exported": true,
           "is_default": false,
@@ -19998,8 +20419,8 @@
           "kind": "function",
           "signature": "getLastSyncTime(spokePath: string): any",
           "lines": [
-            341,
-            352
+            393,
+            404
           ],
           "exported": true,
           "is_default": false,

@@ -129,17 +129,18 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-157]
+src/api/routes/daemon.ts [1-214]
   function:
-    22-156: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 32 [call: 24, type: 8]
-        - src/api/routes/daemon.ts:22: type FastifyInstance -> external
-        - src/api/routes/daemon.ts:22: type Promise -> external
-        - src/api/routes/daemon.ts:26: call get -> external
-        - src/api/routes/daemon.ts:26: type FastifyRequest -> external
-        - src/api/routes/daemon.ts:26: type FastifyReply -> external
+    24-213: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 38 [call: 28, type: 10]
+        - src/api/routes/daemon.ts:24: type FastifyInstance -> external
+        - src/api/routes/daemon.ts:24: type Promise -> external
+        - src/api/routes/daemon.ts:28: call get -> external
+        - src/api/routes/daemon.ts:28: type FastifyRequest -> external
+        - src/api/routes/daemon.ts:28: type FastifyReply -> external
   imports:
     - ../../daemon/cli.js
+    - ../../daemon/errors.js
     - ../../daemon/queue.js
     - ../responses.js
     - fastify
@@ -224,7 +225,7 @@ src/api/routes/nodes.ts [1-243]
       refs out: 1 [call: 1]
         - src/api/routes/nodes.ts:56: call isNaN -> external
     59-242: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 43 [call: 35, type: 8]
+      refs out: 40 [call: 32, type: 8]
         - src/api/routes/nodes.ts:59: type FastifyInstance -> external
         - src/api/routes/nodes.ts:59: type Promise -> external
         - src/api/routes/nodes.ts:63: call get -> external
@@ -322,19 +323,19 @@ src/api/routes/query.ts [1-281]
     - node:os
     - node:path
 
-src/api/routes/quirks.ts [1-110]
+src/api/routes/quirks.ts [1-108]
   function:
     19-25: parseIntParam(value: string | undefined): number
       /** Parse integer query param */
       refs out: 1 [call: 1]
         - src/api/routes/quirks.ts:24: call isNaN -> external
-    27-109: async quirksRoutes(app: FastifyInstance): Promise<void> [exported]
+    27-107: async quirksRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 17 [call: 9, type: 8]
         - src/api/routes/quirks.ts:27: type FastifyInstance -> external
         - src/api/routes/quirks.ts:27: type Promise -> external
         - src/api/routes/quirks.ts:31: call get -> external
         - src/api/routes/quirks.ts:34: type FastifyRequest -> external
-        - src/api/routes/quirks.ts:44: type FastifyReply -> external
+        - src/api/routes/quirks.ts:43: type FastifyReply -> external
   imports:
     - ../../storage/quirk-repository.js
     - ../responses.js
@@ -829,4 +830,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,138 (codebase: ~1,090,953)
+Estimated tokens: 9,145 (codebase: ~1,093,386)

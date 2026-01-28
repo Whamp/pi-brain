@@ -15,6 +15,28 @@ import type {
 export * from "../types/index.js";
 
 // =============================================================================
+// Filter Types
+// =============================================================================
+
+/** Node type filter values */
+export type NodeTypeFilter =
+  | "coding"
+  | "sysadmin"
+  | "research"
+  | "planning"
+  | "debugging"
+  | "qa"
+  | "brainstorm"
+  | "handoff"
+  | "refactor"
+  | "documentation"
+  | "configuration"
+  | "other";
+
+/** Outcome filter values */
+export type OutcomeFilter = "success" | "partial" | "failed" | "abandoned";
+
+// =============================================================================
 // Utility Functions
 // =============================================================================
 

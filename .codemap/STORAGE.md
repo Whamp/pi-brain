@@ -1,14 +1,14 @@
 # Project Overview
 
 ## Languages
-- typescript: 17 files
+- typescript: 18 files
 
 ## Statistics
-- Total files: 17
-- Total symbols: 196
+- Total files: 18
+- Total symbols: 198
   - function: 132
-  - interface: 50
-  - type: 10
+  - interface: 51
+  - type: 11
   - variable: 4
 
 ---
@@ -145,6 +145,20 @@ src/storage/embedding-utils.ts [1-625]
     - ../types/index.js
     - ./database.js
     - better-sqlite3
+
+src/storage/filter-utils.ts [1-191]
+  interface:
+    17-38: interface BaseFilters [exported]
+      /** Base filter fields shared by all filter types */
+    41-46: interface ExtendedFilters extends BaseFilters [exported]
+      /** Extended filters with additional fields for listNodes */
+    49-54: interface WhereClauseResult [exported]
+      /** Result of building a WHERE clause */
+  function:
+    88-190: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
+      /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
+  imports:
+    - ./node-types.js
 
 src/storage/graph-repository.ts [1-366]
   interface:
@@ -297,18 +311,16 @@ src/storage/node-crud.ts [1-751]
     - ./search-repository.js
     - better-sqlite3
 
-src/storage/node-queries.ts [1-455]
+src/storage/node-queries.ts [1-336]
   interface:
-    140-165: interface ListNodesFilters [exported]
-      /** Filters for querying nodes */
-    168-177: interface ListNodesOptions [exported]
+    127-136: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-    180-189: interface ListNodesResult [exported]
+    139-148: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    353-365: interface SessionSummaryRow [exported]
+    234-246: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
   type:
-    108-116: NodeSortField = | "timestamp"
+    110-118: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -317,51 +329,39 @@ src/storage/node-queries.ts [1-455]
   | "cost"
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
-    119-119: SortOrder = "asc" | "desc" [exported]
+    121-121: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
-    122-134: NodeTypeFilter = | "coding"
-  | "sysadmin"
-  | "research"
-  | "planning"
-  | "debugging"
-  | "qa"
-  | "brainstorm"
-  | "handoff"
-  | "refactor"
-  | "documentation"
-  | "configuration"
-  | "other" [exported]
-      /** Node type filter values */
-    137-137: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
-      /** Outcome filter values */
+    124-124: ListNodesFilters = ExtendedFilters [exported]
+      /** Filters for querying nodes */
   function:
-    21-28: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+    23-30: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
-    33-37: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+    35-39: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
-    42-46: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+    44-48: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-    51-61: getAllTags(db: Database.Database): {} [exported]
+    53-63: getAllTags(db: Database.Database): {} [exported]
       /** Get all unique tags in the system */
-    66-70: getAllTopics(db: Database.Database): {} [exported]
+    68-72: getAllTopics(db: Database.Database): {} [exported]
       /** Get all unique topics in the system */
-    75-85: getNodesByTag(db: Database.Database, tag: string): {} [exported]
+    77-87: getNodesByTag(db: Database.Database, tag: string): {} [exported]
       /** Find nodes by tag (matches both node tags and lesson tags) */
-    90-101: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
+    92-103: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
       /** Find nodes by topic */
-    219-344: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+    178-225: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    371-400: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    252-281: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    409-417: getAllProjects(db: Database.Database): {} [exported]
+    290-298: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    422-430: getAllNodeTypes(db: Database.Database): {} [exported]
+    303-311: getAllNodeTypes(db: Database.Database): {} [exported]
       /** Get all unique node types that have been used */
-    435-443: getAllComputers(db: Database.Database): {} [exported]
+    316-324: getAllComputers(db: Database.Database): {} [exported]
       /** Get all unique computers (source machines) */
-    448-454: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    329-335: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
+    - ./filter-utils.js
     - ./node-crud.js
     - better-sqlite3
 
@@ -402,25 +402,41 @@ src/storage/node-storage.ts [1-323]
     - node:os
     - node:path
 
-src/storage/node-types.ts [1-129]
+src/storage/node-types.ts [1-151]
+  type:
+    22-34: NodeTypeFilter = | "coding"
+  | "sysadmin"
+  | "research"
+  | "planning"
+  | "debugging"
+  | "qa"
+  | "brainstorm"
+  | "handoff"
+  | "refactor"
+  | "documentation"
+  | "configuration"
+  | "other" [exported]
+      /** Node type filter values */
+    37-37: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
+      /** Outcome filter values */
   function:
-    25-27: generateNodeId(): string [exported]
+    47-49: generateNodeId(): string [exported]
       /** Generate a unique 16-character hex node ID Uses first 16 chars of UUID (64 bits of entropy) */
-    29-31: generateLessonId(): string [exported]
-    33-35: generateQuirkId(): string [exported]
-    37-39: generateErrorId(): string [exported]
-    41-43: generateDecisionId(): string [exported]
-    59-69: generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string [exported]
+    51-53: generateLessonId(): string [exported]
+    55-57: generateQuirkId(): string [exported]
+    59-61: generateErrorId(): string [exported]
+    63-65: generateDecisionId(): string [exported]
+    81-91: generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string [exported]
       /** Generate a deterministic 16-character hex node ID based on session and segment. This ensures idempotent ingestion - re-running the same job produces the same ID. The ID is derived from: - Session file path - Segment start entry ID - Segment end entry ID Uses length-prefix encoding to prevent collisions from inputs containing delimiter characters (e.g., "a:b" + "c" vs "a" + "b:c"). Two jobs with the same inputs will always produce the same node ID. */
-    74-76: nodeRef(nodeId: string, version: number): string [exported]
+    96-98: nodeRef(nodeId: string, version: number): string [exported]
       /** Create a full node reference with version */
-    81-90: parseNodeRef(ref: string): { nodeId: string; version: number; } [exported]
+    103-112: parseNodeRef(ref: string): { nodeId: string; version: number; } [exported]
       /** Parse a node reference into id and version */
-    95-105: emptyLessons(): LessonsByLevel [exported]
+    117-127: emptyLessons(): LessonsByLevel [exported]
       /** Create an empty lessons structure */
-    110-118: emptyObservations(): ModelObservations [exported]
+    132-140: emptyObservations(): ModelObservations [exported]
       /** Create an empty observations structure */
-    123-128: emptyDaemonMeta(): DaemonMeta [exported]
+    145-150: emptyDaemonMeta(): DaemonMeta [exported]
       /** Create an empty daemon meta structure */
   imports:
     - ../types/index.js
@@ -444,92 +460,90 @@ src/storage/pattern-repository.ts [1-369]
     - ../types/index.js
     - better-sqlite3
 
-src/storage/quirk-repository.ts [1-315]
+src/storage/quirk-repository.ts [1-310]
   interface:
-    22-31: interface ListQuirksFilters [exported]
+    19-26: interface ListQuirksFilters [exported]
       /** Filters for querying model quirks */
-    34-39: interface ListQuirksOptions [exported]
+    29-34: interface ListQuirksOptions [exported]
       /** Pagination options for quirks */
-    42-51: interface QuirkResult [exported]
+    37-46: interface QuirkResult [exported]
       /** A quirk result with metadata */
-    54-63: interface ListQuirksResult [exported]
+    49-58: interface ListQuirksResult [exported]
       /** Result from listQuirks query */
-    66-76: interface ModelQuirkStats [exported]
+    61-71: interface ModelQuirkStats [exported]
       /** Stats for a single model */
   type:
     16-16: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
       /** Frequency values for model quirks */
-    19-19: QuirkSeverity = "low" | "medium" | "high" [exported]
-      /** Severity values for model quirks (matches spec) */
-    79-79: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
+    74-74: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
       /** Result from getQuirksByModel */
   function:
-    107-167: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
+    102-162: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
       /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
-    175-213: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
+    170-208: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
       /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    218-224: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
+    213-219: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
       /** Count quirks matching filters (without fetching data) */
-    229-236: getAllQuirkModels(db: Database.Database): {} [exported]
+    224-231: getAllQuirkModels(db: Database.Database): {} [exported]
       /** Get all unique models that have quirks recorded */
-    244-286: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+    239-281: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
       /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
-    291-314: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+    286-309: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
   imports:
     - better-sqlite3
 
-src/storage/search-repository.ts [1-549]
+src/storage/search-repository.ts [1-449]
   interface:
-    36-41: interface SearchHighlight [exported]
+    41-46: interface SearchHighlight [exported]
       /** Highlight match for search results */
-    44-51: interface SearchResult [exported]
+    49-56: interface SearchResult [exported]
       /** Enhanced search result with score and highlights */
-    54-75: interface SearchFilters [exported]
-      /** Filters for search queries (subset of node filters relevant to search) */
-    78-87: interface SearchOptions [exported]
+    59-68: interface SearchOptions [exported]
       /** Options for enhanced search */
-    90-99: interface SearchNodesResult [exported]
+    71-80: interface SearchNodesResult [exported]
       /** Result from enhanced search with pagination metadata */
   type:
-    19-24: SearchField = | "summary"
+    21-26: SearchField = | "summary"
   | "decisions"
   | "lessons"
   | "tags"
   | "topics" [exported]
       /** Fields that can be searched in the FTS index */
+    38-38: SearchFilters = BaseFilters [exported]
+      /** Filters for search queries (subset of node filters relevant to search) */
   function:
-    108-136: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
+    89-117: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
       /** Index a node for full-text search */
-    146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
+    127-153: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    226-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    207-274: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
-    361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
-      /** Build WHERE clause conditions and params from search filters */
-    458-518: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    358-418: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    523-548: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    423-448: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
   imports:
+    - ./filter-utils.js
     - ./node-crud.js
     - ./node-types.js
     - better-sqlite3
 
-src/storage/semantic-search.ts [1-212]
+src/storage/semantic-search.ts [1-214]
   interface:
     25-28: interface SemanticSearchResult extends SearchResult [exported]
     30-39: interface SemanticSearchOptions [exported]
   function:
-    55-154: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
+    55-156: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
-    164-177: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
+    166-179: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
-    187-211: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
+    189-213: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
       /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
   imports:
     - ./database.js
     - ./embedding-utils.js
+    - ./filter-utils.js
     - ./node-crud.js
     - ./search-repository.js
     - better-sqlite3
@@ -573,5 +587,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 17
-Estimated tokens: 8,903 (codebase: ~1,090,953)
+Files: 18
+Estimated tokens: 9,098 (codebase: ~1,093,386)

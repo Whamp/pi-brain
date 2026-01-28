@@ -153,10 +153,98 @@ function validateSyncMethod(method: string, spokeName: string): SyncMethod {
 }
 
 /**
- * Validate spoke configuration
-
+ * Validate spoke schedule configuration
  */
-// oxlint-disable-next-line complexity
+function validateSpokeSchedule(
+  spokeName: string,
+  syncMethod: SyncMethod,
+  schedule: string,
+  index: number
+): void {
+  if (syncMethod !== "rsync") {
+    throw new Error(
+      `Spoke "${spokeName}" has schedule but sync_method is not rsync`
+    );
+  }
+  validateCronSchedule(schedule, `spokes[${index}].schedule`);
+}
+
+/**
+ * Validate rsync options configuration
+ */
+function validateRsyncOptions(
+  spokeName: string,
+  syncMethod: SyncMethod,
+  rawOptions: RawConfig["spokes"][number]["rsync_options"]
+): RsyncOptions | undefined {
+  if (!rawOptions) {
+    return undefined;
+  }
+
+  if (syncMethod !== "rsync") {
+    throw new Error(
+      `Spoke "${spokeName}" has rsync_options but sync_method is not rsync`
+    );
+  }
+
+  const rsyncOptions: RsyncOptions = {};
+
+  if (rawOptions.bw_limit !== undefined) {
+    if (!Number.isInteger(rawOptions.bw_limit) || rawOptions.bw_limit < 0) {
+      throw new Error(
+        `Spoke "${spokeName}" has invalid rsync_options.bw_limit: must be a non-negative integer`
+      );
+    }
+    rsyncOptions.bwLimit = rawOptions.bw_limit;
+  }
+
+  if (rawOptions.delete !== undefined) {
+    rsyncOptions.delete = rawOptions.delete;
+  }
+
+  if (rawOptions.extra_args !== undefined) {
+    if (!Array.isArray(rawOptions.extra_args)) {
+      throw new TypeError(
+        `Spoke "${spokeName}" has invalid rsync_options.extra_args: must be an array`
+      );
+    }
+    if (!rawOptions.extra_args.every((arg) => typeof arg === "string")) {
+      throw new TypeError(
+        `Spoke "${spokeName}" has invalid rsync_options.extra_args: all elements must be strings`
+      );
+    }
+    // Reject dangerous rsync options that could execute arbitrary commands
+    const dangerousOptions = ["--rsh", "-e"];
+    for (const arg of rawOptions.extra_args) {
+      for (const dangerous of dangerousOptions) {
+        if (arg === dangerous || arg.startsWith(`${dangerous}=`)) {
+          throw new Error(
+            `Spoke "${spokeName}" has disallowed rsync option "${arg}" in extra_args (security risk)`
+          );
+        }
+      }
+    }
+    rsyncOptions.extraArgs = rawOptions.extra_args;
+  }
+
+  if (rawOptions.timeout_seconds !== undefined) {
+    if (
+      !Number.isInteger(rawOptions.timeout_seconds) ||
+      rawOptions.timeout_seconds < 1
+    ) {
+      throw new Error(
+        `Spoke "${spokeName}" has invalid rsync_options.timeout_seconds: must be a positive integer`
+      );
+    }
+    rsyncOptions.timeoutSeconds = rawOptions.timeout_seconds;
+  }
+
+  return rsyncOptions;
+}
+
+/**
+ * Validate spoke configuration
+ */
 function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
   const spoke = raw?.[index];
   if (!spoke) {
@@ -184,82 +272,17 @@ function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
     );
   }
 
-  // Validate schedule if provided (only valid for rsync)
+  // Validate schedule if provided
   if (spoke.schedule) {
-    if (syncMethod !== "rsync") {
-      throw new Error(
-        `Spoke "${spoke.name}" has schedule but sync_method is not rsync`
-      );
-    }
-    validateCronSchedule(spoke.schedule, `spokes[${index}].schedule`);
+    validateSpokeSchedule(spoke.name, syncMethod, spoke.schedule, index);
   }
 
   // Transform rsync_options if provided
-  let rsyncOptions: RsyncOptions | undefined;
-  if (spoke.rsync_options) {
-    if (syncMethod !== "rsync") {
-      throw new Error(
-        `Spoke "${spoke.name}" has rsync_options but sync_method is not rsync`
-      );
-    }
-
-    rsyncOptions = {};
-
-    if (spoke.rsync_options.bw_limit !== undefined) {
-      if (
-        !Number.isInteger(spoke.rsync_options.bw_limit) ||
-        spoke.rsync_options.bw_limit < 0
-      ) {
-        throw new Error(
-          `Spoke "${spoke.name}" has invalid rsync_options.bw_limit: must be a non-negative integer`
-        );
-      }
-      rsyncOptions.bwLimit = spoke.rsync_options.bw_limit;
-    }
-
-    if (spoke.rsync_options.delete !== undefined) {
-      rsyncOptions.delete = spoke.rsync_options.delete;
-    }
-
-    if (spoke.rsync_options.extra_args !== undefined) {
-      if (!Array.isArray(spoke.rsync_options.extra_args)) {
-        throw new TypeError(
-          `Spoke "${spoke.name}" has invalid rsync_options.extra_args: must be an array`
-        );
-      }
-      if (
-        !spoke.rsync_options.extra_args.every((arg) => typeof arg === "string")
-      ) {
-        throw new TypeError(
-          `Spoke "${spoke.name}" has invalid rsync_options.extra_args: all elements must be strings`
-        );
-      }
-      // Reject dangerous rsync options that could execute arbitrary commands
-      const dangerousOptions = ["--rsh", "-e"];
-      for (const arg of spoke.rsync_options.extra_args) {
-        for (const dangerous of dangerousOptions) {
-          if (arg === dangerous || arg.startsWith(`${dangerous}=`)) {
-            throw new Error(
-              `Spoke "${spoke.name}" has disallowed rsync option "${arg}" in extra_args (security risk)`
-            );
-          }
-        }
-      }
-      rsyncOptions.extraArgs = spoke.rsync_options.extra_args;
-    }
-
-    if (spoke.rsync_options.timeout_seconds !== undefined) {
-      if (
-        !Number.isInteger(spoke.rsync_options.timeout_seconds) ||
-        spoke.rsync_options.timeout_seconds < 1
-      ) {
-        throw new Error(
-          `Spoke "${spoke.name}" has invalid rsync_options.timeout_seconds: must be a positive integer`
-        );
-      }
-      rsyncOptions.timeoutSeconds = spoke.rsync_options.timeout_seconds;
-    }
-  }
+  const rsyncOptions = validateRsyncOptions(
+    spoke.name,
+    syncMethod,
+    spoke.rsync_options
+  );
 
   return {
     name: spoke.name,
@@ -319,14 +342,12 @@ function validateNonNegativeInt(value: number, field: string): void {
 }
 
 /**
- * Transform raw YAML config to typed config with validation
-
+ * Transform hub configuration from raw config
  */
-// oxlint-disable-next-line complexity
-export function transformConfig(raw: RawConfig): PiBrainConfig {
-  const defaults = getDefaultConfig();
-
-  // Transform hub config
+function transformHubConfig(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): HubConfig {
   const hub: HubConfig = {
     sessionsDir: raw.hub?.sessions_dir
       ? expandPath(raw.hub.sessions_dir)
@@ -339,32 +360,24 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
 
   validatePort(hub.webUiPort, "hub.web_ui_port");
 
-  // Transform spokes
-  const spokes: SpokeConfig[] = [];
-  if (raw.spokes && Array.isArray(raw.spokes)) {
-    for (let i = 0; i < raw.spokes.length; i++) {
-      spokes.push(validateSpoke(raw.spokes, i));
-    }
-  }
+  return hub;
+}
 
-  // Check for duplicate spoke names
-  const spokeNames = new Set<string>();
-  for (const spoke of spokes) {
-    if (spokeNames.has(spoke.name)) {
-      throw new Error(`Duplicate spoke name: ${spoke.name}`);
-    }
-    spokeNames.add(spoke.name);
-  }
-
-  // Transform daemon config
-  const daemon: DaemonConfig = {
-    idleTimeoutMinutes:
-      raw.daemon?.idle_timeout_minutes ?? defaults.daemon.idleTimeoutMinutes,
-    parallelWorkers:
-      raw.daemon?.parallel_workers ?? defaults.daemon.parallelWorkers,
-    maxRetries: raw.daemon?.max_retries ?? defaults.daemon.maxRetries,
-    retryDelaySeconds:
-      raw.daemon?.retry_delay_seconds ?? defaults.daemon.retryDelaySeconds,
+/**
+ * Transform daemon scheduling configuration from raw config
+ */
+function transformDaemonSchedules(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): Pick<
+  DaemonConfig,
+  | "reanalysisSchedule"
+  | "connectionDiscoverySchedule"
+  | "patternAggregationSchedule"
+  | "clusteringSchedule"
+  | "backfillEmbeddingsSchedule"
+> {
+  return {
     reanalysisSchedule:
       raw.daemon?.reanalysis_schedule ?? defaults.daemon.reanalysisSchedule,
     connectionDiscoverySchedule:
@@ -378,6 +391,25 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     backfillEmbeddingsSchedule:
       raw.daemon?.backfill_embeddings_schedule ??
       defaults.daemon.backfillEmbeddingsSchedule,
+  };
+}
+
+/**
+ * Transform daemon limits and thresholds from raw config
+ */
+function transformDaemonLimits(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): Pick<
+  DaemonConfig,
+  | "backfillLimit"
+  | "reanalysisLimit"
+  | "connectionDiscoveryLimit"
+  | "connectionDiscoveryLookbackDays"
+  | "connectionDiscoveryCooldownHours"
+  | "semanticSearchThreshold"
+> {
+  return {
     backfillLimit: raw.daemon?.backfill_limit ?? defaults.daemon.backfillLimit,
     reanalysisLimit:
       raw.daemon?.reanalysis_limit ?? defaults.daemon.reanalysisLimit,
@@ -393,6 +425,24 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     semanticSearchThreshold:
       raw.daemon?.semantic_search_threshold ??
       defaults.daemon.semanticSearchThreshold,
+  };
+}
+
+/**
+ * Transform daemon embedding configuration from raw config
+ */
+function transformDaemonEmbeddings(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): Pick<
+  DaemonConfig,
+  | "embeddingProvider"
+  | "embeddingModel"
+  | "embeddingApiKey"
+  | "embeddingBaseUrl"
+  | "embeddingDimensions"
+> {
+  return {
     embeddingProvider:
       raw.daemon?.embedding_provider ?? defaults.daemon.embeddingProvider,
     embeddingModel:
@@ -400,6 +450,31 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     embeddingApiKey: raw.daemon?.embedding_api_key,
     embeddingBaseUrl: raw.daemon?.embedding_base_url,
     embeddingDimensions: raw.daemon?.embedding_dimensions,
+  };
+}
+
+/**
+ * Transform daemon configuration from raw config
+ */
+function transformDaemonConfig(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): DaemonConfig {
+  const schedules = transformDaemonSchedules(raw, defaults);
+  const limits = transformDaemonLimits(raw, defaults);
+  const embeddings = transformDaemonEmbeddings(raw, defaults);
+
+  const daemon: DaemonConfig = {
+    idleTimeoutMinutes:
+      raw.daemon?.idle_timeout_minutes ?? defaults.daemon.idleTimeoutMinutes,
+    parallelWorkers:
+      raw.daemon?.parallel_workers ?? defaults.daemon.parallelWorkers,
+    maxRetries: raw.daemon?.max_retries ?? defaults.daemon.maxRetries,
+    retryDelaySeconds:
+      raw.daemon?.retry_delay_seconds ?? defaults.daemon.retryDelaySeconds,
+    ...schedules,
+    ...limits,
+    ...embeddings,
     provider: raw.daemon?.provider ?? defaults.daemon.provider,
     model: raw.daemon?.model ?? defaults.daemon.model,
     promptFile: raw.daemon?.prompt_file
@@ -414,7 +489,13 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     maxQueueSize: raw.daemon?.max_queue_size ?? defaults.daemon.maxQueueSize,
   };
 
-  // Validate daemon config
+  return daemon;
+}
+
+/**
+ * Validate daemon configuration
+ */
+function validateDaemonConfig(daemon: DaemonConfig): void {
   validatePositiveInt(daemon.idleTimeoutMinutes, "daemon.idle_timeout_minutes");
   validatePositiveInt(daemon.parallelWorkers, "daemon.parallel_workers");
   validateNonNegativeInt(daemon.maxRetries, "daemon.max_retries");
@@ -437,12 +518,6 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     validateCronSchedule(
       daemon.clusteringSchedule,
       "daemon.clustering_schedule"
-    );
-  }
-  if (daemon.backfillEmbeddingsSchedule) {
-    validateCronSchedule(
-      daemon.backfillEmbeddingsSchedule,
-      "daemon.backfill_embeddings_schedule"
     );
   }
   if (daemon.backfillEmbeddingsSchedule) {
@@ -484,14 +559,28 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
       `Invalid value for daemon.semantic_search_threshold: ${daemon.semanticSearchThreshold}. Must be between 0.0 and 1.0.`
     );
   }
+}
 
-  // Transform query config
-  const query: QueryConfig = {
+/**
+ * Transform query configuration from raw config
+ */
+function transformQueryConfig(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): QueryConfig {
+  return {
     provider: raw.query?.provider ?? defaults.query.provider,
     model: raw.query?.model ?? defaults.query.model,
   };
+}
 
-  // Transform API config
+/**
+ * Transform API configuration from raw config
+ */
+function transformApiConfig(
+  raw: RawConfig,
+  defaults: PiBrainConfig
+): ApiConfig {
   const api: ApiConfig = {
     port: raw.api?.port ?? defaults.api.port,
     host: raw.api?.host ?? defaults.api.host,
@@ -499,6 +588,45 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
   };
 
   validatePort(api.port, "api.port");
+
+  return api;
+}
+
+/**
+ * Transform raw YAML config to typed config with validation
+ */
+export function transformConfig(raw: RawConfig): PiBrainConfig {
+  const defaults = getDefaultConfig();
+
+  // Transform hub config
+  const hub = transformHubConfig(raw, defaults);
+
+  // Transform spokes
+  const spokes: SpokeConfig[] = [];
+  if (raw.spokes && Array.isArray(raw.spokes)) {
+    for (let i = 0; i < raw.spokes.length; i++) {
+      spokes.push(validateSpoke(raw.spokes, i));
+    }
+  }
+
+  // Check for duplicate spoke names
+  const spokeNames = new Set<string>();
+  for (const spoke of spokes) {
+    if (spokeNames.has(spoke.name)) {
+      throw new Error(`Duplicate spoke name: ${spoke.name}`);
+    }
+    spokeNames.add(spoke.name);
+  }
+
+  // Transform daemon config
+  const daemon = transformDaemonConfig(raw, defaults);
+  validateDaemonConfig(daemon);
+
+  // Transform query config
+  const query = transformQueryConfig(raw, defaults);
+
+  // Transform API config
+  const api = transformApiConfig(raw, defaults);
 
   return { hub, spokes, daemon, query, api };
 }

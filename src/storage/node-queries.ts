@@ -11,6 +11,8 @@ import type Database from "better-sqlite3";
 
 import type { NodeRow } from "./node-crud.js";
 
+import { buildWhereClause, type ExtendedFilters } from "./filter-utils.js";
+
 // =============================================================================
 // Query Helpers
 // =============================================================================
@@ -118,51 +120,8 @@ export type NodeSortField =
 /** Sort order */
 export type SortOrder = "asc" | "desc";
 
-/** Node type filter values */
-export type NodeTypeFilter =
-  | "coding"
-  | "sysadmin"
-  | "research"
-  | "planning"
-  | "debugging"
-  | "qa"
-  | "brainstorm"
-  | "handoff"
-  | "refactor"
-  | "documentation"
-  | "configuration"
-  | "other";
-
-/** Outcome filter values */
-export type OutcomeFilter = "success" | "partial" | "failed" | "abandoned";
-
 /** Filters for querying nodes */
-export interface ListNodesFilters {
-  /** Filter by project path (partial match via LIKE %project%) */
-  project?: string;
-  /** Filter by project path (exact match) */
-  exactProject?: string;
-  /** Filter by exact node type */
-  type?: NodeTypeFilter;
-  /** Filter by exact outcome */
-  outcome?: OutcomeFilter;
-  /** Filter by start date (ISO 8601, inclusive) */
-  from?: string;
-  /** Filter by end date (ISO 8601, inclusive) */
-  to?: string;
-  /** Filter by source computer */
-  computer?: string;
-  /** Filter by whether goal was clear (vague prompting detection) */
-  hadClearGoal?: boolean;
-  /** Filter by new project flag */
-  isNewProject?: boolean;
-  /** Filter by tags (nodes must have ALL specified tags - AND logic) */
-  tags?: string[];
-  /** Filter by topics (nodes must have ALL specified topics - AND logic) */
-  topics?: string[];
-  /** Filter by session file path */
-  sessionFile?: string;
-}
+export type ListNodesFilters = ExtendedFilters;
 
 /** Pagination and sorting options */
 export interface ListNodesOptions {
@@ -233,89 +192,11 @@ export function listNodes(
     : "timestamp";
   const order: SortOrder = options.order === "asc" ? "asc" : "desc";
 
-  // Build WHERE clause dynamically
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
-
-  if (filters.project !== undefined) {
-    conditions.push("n.project LIKE ?");
-    params.push(`%${filters.project}%`);
-  }
-
-  if (filters.exactProject !== undefined) {
-    conditions.push("n.project = ?");
-    params.push(filters.exactProject);
-  }
-
-  if (filters.type !== undefined) {
-    conditions.push("n.type = ?");
-    params.push(filters.type);
-  }
-
-  if (filters.outcome !== undefined) {
-    conditions.push("n.outcome = ?");
-    params.push(filters.outcome);
-  }
-
-  if (filters.from !== undefined) {
-    conditions.push("n.timestamp >= ?");
-    params.push(filters.from);
-  }
-
-  if (filters.to !== undefined) {
-    conditions.push("n.timestamp <= ?");
-    params.push(filters.to);
-  }
-
-  if (filters.computer !== undefined) {
-    conditions.push("n.computer = ?");
-    params.push(filters.computer);
-  }
-
-  if (filters.hadClearGoal !== undefined) {
-    conditions.push("n.had_clear_goal = ?");
-    params.push(filters.hadClearGoal ? 1 : 0);
-  }
-
-  if (filters.isNewProject !== undefined) {
-    conditions.push("n.is_new_project = ?");
-    params.push(filters.isNewProject ? 1 : 0);
-  }
-
-  if (filters.sessionFile !== undefined) {
-    conditions.push("n.session_file = ?");
-    params.push(filters.sessionFile);
-  }
-
-  // Tags filter: nodes must have ALL specified tags (AND logic)
-  // Considers both node-level tags and lesson-level tags
-  if (filters.tags !== undefined && filters.tags.length > 0) {
-    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
-    conditions.push(`n.id IN (
-      SELECT node_id FROM (
-        SELECT node_id, tag FROM tags
-        UNION
-        SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
-      )
-      WHERE tag IN (${tagPlaceholders})
-      GROUP BY node_id
-      HAVING COUNT(DISTINCT tag) = ?
-    )`);
-    params.push(...filters.tags, filters.tags.length);
-  }
-
-  // Topics filter: nodes must have ALL specified topics (AND logic)
-  if (filters.topics !== undefined && filters.topics.length > 0) {
-    const topicPlaceholders = filters.topics.map(() => "?").join(", ");
-    conditions.push(`(
-      SELECT COUNT(DISTINCT tp.topic) FROM topics tp
-      WHERE tp.node_id = n.id AND tp.topic IN (${topicPlaceholders})
-    ) = ?`);
-    params.push(...filters.topics, filters.topics.length);
-  }
-
-  const whereClause =
-    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  // Build WHERE clause using shared filter builder
+  // buildWhereClause returns "AND ... " prefix for compatibility with FTS queries
+  // We need to convert it to "WHERE ..." format for listNodes
+  const { clause, params } = buildWhereClause(filters, "n");
+  const whereClause = clause ? `WHERE ${clause.slice(4)}` : ""; // Remove "AND " prefix
 
   // Count query for total (before pagination)
   const countStmt = db.prepare(

@@ -11,6 +11,8 @@ import type Database from "better-sqlite3";
 import type { NodeRow } from "./node-crud.js";
 import type { Node } from "./node-types.js";
 
+import { buildWhereClause, type BaseFilters } from "./filter-utils.js";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -32,6 +34,9 @@ const ALL_SEARCH_FIELDS: SearchField[] = [
   "topics",
 ];
 
+/** Filters for search queries (subset of node filters relevant to search) */
+export type SearchFilters = BaseFilters;
+
 /** Highlight match for search results */
 export interface SearchHighlight {
   /** The field where the match was found */
@@ -48,30 +53,6 @@ export interface SearchResult {
   score: number;
   /** Highlighted snippets showing where matches occurred */
   highlights: SearchHighlight[];
-}
-
-/** Filters for search queries (subset of node filters relevant to search) */
-export interface SearchFilters {
-  /** Filter by project path (partial match via LIKE %project%) */
-  project?: string;
-  /** Filter by exact node type */
-  type?: string;
-  /** Filter by exact outcome */
-  outcome?: string;
-  /** Filter by start date (ISO 8601, inclusive) */
-  from?: string;
-  /** Filter by end date (ISO 8601, inclusive) */
-  to?: string;
-  /** Filter by source computer */
-  computer?: string;
-  /** Filter by whether goal was clear (vague prompting detection) */
-  hadClearGoal?: boolean;
-  /** Filter by new project flag */
-  isNewProject?: boolean;
-  /** Filter by tags (nodes must have ALL specified tags - AND logic) */
-  tags?: string[];
-  /** Filter by topics (nodes must have ALL specified topics - AND logic) */
-  topics?: string[];
 }
 
 /** Options for enhanced search */
@@ -351,87 +332,6 @@ function findHighlights(
 }
 
 // =============================================================================
-// Build Filter Clause
-// =============================================================================
-
-/**
- * Build WHERE clause conditions and params from search filters
- * @internal
- */
-export function buildFilterClause(filters: SearchFilters | undefined): {
-  clause: string;
-  params: (string | number)[];
-} {
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
-
-  if (!filters) {
-    return { clause: "", params: [] };
-  }
-
-  if (filters.project) {
-    conditions.push("n.project LIKE ?");
-    params.push(`%${filters.project}%`);
-  }
-  if (filters.type) {
-    conditions.push("n.type = ?");
-    params.push(filters.type);
-  }
-  if (filters.outcome) {
-    conditions.push("n.outcome = ?");
-    params.push(filters.outcome);
-  }
-  if (filters.from) {
-    conditions.push("n.timestamp >= ?");
-    params.push(filters.from);
-  }
-  if (filters.to) {
-    conditions.push("n.timestamp <= ?");
-    params.push(filters.to);
-  }
-  if (filters.computer) {
-    conditions.push("n.computer = ?");
-    params.push(filters.computer);
-  }
-  if (filters.hadClearGoal !== undefined) {
-    conditions.push("n.had_clear_goal = ?");
-    params.push(filters.hadClearGoal ? 1 : 0);
-  }
-  if (filters.isNewProject !== undefined) {
-    conditions.push("n.is_new_project = ?");
-    params.push(filters.isNewProject ? 1 : 0);
-  }
-  if (filters.tags && filters.tags.length > 0) {
-    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
-    conditions.push(`n.id IN (
-      SELECT node_id FROM (
-        SELECT node_id, tag FROM tags
-        UNION
-        SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
-      )
-      WHERE tag IN (${tagPlaceholders})
-      GROUP BY node_id
-      HAVING COUNT(DISTINCT tag) = ?
-    )`);
-    params.push(...filters.tags, filters.tags.length);
-  }
-  if (filters.topics && filters.topics.length > 0) {
-    const topicPlaceholders = filters.topics.map(() => "?").join(", ");
-    conditions.push(`n.id IN (
-      SELECT node_id FROM topics 
-      WHERE topic IN (${topicPlaceholders})
-      GROUP BY node_id
-      HAVING COUNT(DISTINCT topic) = ?
-    )`);
-    params.push(...filters.topics, filters.topics.length);
-  }
-
-  const clause = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
-
-  return { clause, params };
-}
-
-// =============================================================================
 // Enhanced Search
 // =============================================================================
 
@@ -477,7 +377,7 @@ export function searchNodesAdvanced(
   }
 
   // Build WHERE clause from filters
-  const { clause: filterClause, params } = buildFilterClause(filters);
+  const { clause: filterClause, params } = buildWhereClause(filters, "n");
 
   // Get total count
   const countStmt = db.prepare(`
@@ -534,7 +434,7 @@ export function countSearchResults(
   }
 
   // Build WHERE clause from filters
-  const { clause: filterClause, params } = buildFilterClause(filters);
+  const { clause: filterClause, params } = buildWhereClause(filters, "n");
 
   const stmt = db.prepare(`
     SELECT COUNT(*) as count
