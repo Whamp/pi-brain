@@ -216,3 +216,20 @@ the reactivity chain.
   - All 1296 tests pass (5 new tests added)
 **Commit**: f01da352
 **Notes**: Completed Phase 1 of AutoMem Native Port. Schema and types are ready for Phase 2 (Analyzer Upgrade) and Phase 3 (Consolidation Engine).
+
+---
+
+## 2026-01-28 11:36 - Task 20.2.1
+
+**Status**: pending → done
+**Validation**: 
+  - Updated prompts/session-analyzer.md to include typed relationship extraction
+  - Added `relationships` field to output JSON schema with all 11 AutoMem edge types
+  - Added "Relationship Types" section with table documenting all edge types
+  - Added "When to Extract Relationships" guidance section
+  - Updated all 3 examples to include relationship extraction
+  - Added reminder #7 to Important Reminders about relationships
+  - All 1296 tests pass
+  - Lint/format checks pass
+**Commit**: 33c6c7c4
+**Notes**: Session analyzer prompt now instructs the LLM to extract typed relationships (LEADS_TO, PREFERS_OVER, CONTRADICTS, REINFORCES, DERIVED_FROM, EXEMPLIFIES, PART_OF, RELATES_TO, OCCURRED_BEFORE, INVALIDATED_BY, EVOLVED_INTO). Next task 20.2.2 will update processor.ts to parse and store these typed edges.

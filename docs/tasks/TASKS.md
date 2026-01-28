@@ -407,10 +407,10 @@ Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.m
 
 ### 20.2 Analyzer Upgrade
 
-| ID     | Task                                                      | Status  | Deps   | Notes      |
-| ------ | --------------------------------------------------------- | ------- | ------ | ---------- |
-| 20.2.1 | Update session-analyzer prompt to use specific edge types | active  | 20.1.3 | 2026-01-28 |
-| 20.2.2 | Update processor.ts to parse and store typed edges        | pending | 20.2.1 |            |
+| ID     | Task                                                      | Status  | Deps   | Notes                              |
+| ------ | --------------------------------------------------------- | ------- | ------ | ---------------------------------- |
+| 20.2.1 | Update session-analyzer prompt to use specific edge types | done    | 20.1.3 | 2026-01-28 - relationships section |
+| 20.2.2 | Update processor.ts to parse and store typed edges        | pending | 20.2.1 |                                    |
 
 ### 20.3 Consolidation Engine
 
