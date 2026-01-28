@@ -1657,14 +1657,17 @@ src/storage/database.ts [1-298]
     - node:url
     - sqlite-vec
 
-src/storage/decision-repository.test.ts [1-320]
+src/storage/decision-repository.test.ts [1-328]
   imports:
     - ./database.js
     - ./decision-repository.js
     - ./index.js
+    - ./node-crud.js
     - ./node-types.js
     - better-sqlite3
     - node:fs
+    - node:os
+    - node:path
     - vitest
 
 src/storage/decision-repository.ts [1-143]
@@ -1692,21 +1695,21 @@ src/storage/decision-repository.ts [1-143]
       refs in: 9 [call: 7, import: 2]
         - src/api/routes/decisions.ts:10: import (module)
         - src/api/routes/decisions.ts:51: call result
-        - src/storage/decision-repository.test.ts:10: import (module)
-        - src/storage/decision-repository.test.ts:98: call result
-        - src/storage/decision-repository.test.ts:232: call resA
-        - src/storage/decision-repository.test.ts:236: call resB
-        - src/storage/decision-repository.test.ts:305: call [decision]
-        - src/storage/decision-repository.test.ts:311: call [updatedDecision]
-        - src/storage/decision-repository.test.ts:316: call [clearedDecision]
+        - src/storage/decision-repository.test.ts:13: import (module)
+        - src/storage/decision-repository.test.ts:106: call result
+        - src/storage/decision-repository.test.ts:240: call resA
+        - src/storage/decision-repository.test.ts:244: call resB
+        - src/storage/decision-repository.test.ts:313: call [decision]
+        - src/storage/decision-repository.test.ts:319: call [updatedDecision]
+        - src/storage/decision-repository.test.ts:324: call [clearedDecision]
     129-142: updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean [exported]
       /** Update user feedback for a daemon decision */
       refs in: 5 [call: 3, import: 2]
         - src/api/routes/decisions.ts:11: import (module)
         - src/api/routes/decisions.ts:79: call updated
-        - src/storage/decision-repository.test.ts:11: import (module)
-        - src/storage/decision-repository.test.ts:308: call updated
-        - src/storage/decision-repository.test.ts:315: call (module)
+        - src/storage/decision-repository.test.ts:14: import (module)
+        - src/storage/decision-repository.test.ts:316: call updated
+        - src/storage/decision-repository.test.ts:323: call (module)
   imports:
     - better-sqlite3
 
@@ -2211,7 +2214,9 @@ src/storage/node-crud.ts [1-751]
   interface:
     39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-      refs in: 6 [import: 1, type: 5]
+      refs in: 8 [import: 2, type: 6]
+        - src/storage/decision-repository.test.ts:8: import (module)
+        - src/storage/decision-repository.test.ts:22: type options
         - src/storage/index.test.ts:67: import (module)
         - src/storage/index.test.ts:273: type options
         - src/storage/node-crud.ts:301: type createNode
@@ -3259,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,747 (codebase: ~1,090,736)
+Estimated tokens: 42,794 (codebase: ~1,091,604)

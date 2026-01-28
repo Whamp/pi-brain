@@ -16,6 +16,9 @@
 import type { FastifyInstance } from "fastify";
 
 import BetterSqlite3 from "better-sqlite3";
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   describe,
   it,
@@ -26,6 +29,7 @@ import {
   vi,
 } from "vitest";
 
+import type { RepositoryOptions } from "../storage/node-crud.js";
 import type { Node } from "../storage/node-types.js";
 
 import { createServer } from "../api/server.js";
@@ -152,8 +156,17 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
 describe("brain integration", () => {
   let app: FastifyInstance;
   let db: BetterSqlite3.Database;
+  let testDir: string;
+  let nodesDir: string;
+  let options: RepositoryOptions;
 
   beforeAll(async () => {
+    // Create temp directory for test nodes
+    testDir = mkdtempSync(join(tmpdir(), "brain-integration-test-"));
+    nodesDir = join(testDir, "nodes");
+    mkdirSync(nodesDir, { recursive: true });
+    options = { nodesDir, skipFts: true };
+
     // Create in-memory database
     db = new BetterSqlite3(":memory:");
     migrate(db);
@@ -169,6 +182,7 @@ describe("brain integration", () => {
   afterAll(async () => {
     await app.close();
     db.close();
+    rmSync(testDir, { recursive: true, force: true });
   });
 
   describe("query endpoint with test data", () => {
@@ -208,7 +222,7 @@ describe("brain integration", () => {
             topics: ["authentication"],
           },
         });
-        createNode(db, node, { skipFts: true });
+        createNode(db, node, options);
 
         // Query should find the node via search
         const response = await app.inject({
@@ -272,7 +286,7 @@ describe("brain integration", () => {
             toolUseErrors: [],
           },
         });
-        createNode(db, node, { skipFts: true });
+        createNode(db, node, options);
 
         // Query about model quirks
         const response = await app.inject({
@@ -335,7 +349,7 @@ describe("brain integration", () => {
             ],
           },
         });
-        createNode(db, node, { skipFts: true });
+        createNode(db, node, options);
 
         // Query about tool errors
         const response = await app.inject({
@@ -405,8 +419,8 @@ describe("brain integration", () => {
             hadClearGoal: true,
           },
         });
-        createNode(db, node1, { skipFts: true });
-        createNode(db, node2, { skipFts: true });
+        createNode(db, node1, options);
+        createNode(db, node2, options);
 
         // Query with project context
         const response = await app.inject({

@@ -1,8 +1,11 @@
 import type Database from "better-sqlite3";
 
-import { unlinkSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
+import type { RepositoryOptions } from "./node-crud.js";
 import type { Node } from "./node-types.js";
 
 import { openDatabase, closeDatabase, migrate } from "./database.js";
@@ -14,20 +17,25 @@ import { createNode } from "./index.js";
 
 describe("decisionRepository", () => {
   let db: Database.Database;
-  const dbPath = "./test-decisions.db";
+  let testDir: string;
+  let nodesDir: string;
+  let options: RepositoryOptions;
 
   beforeEach(() => {
+    testDir = mkdtempSync(join(tmpdir(), "decision-repo-test-"));
+    nodesDir = join(testDir, "nodes");
+    mkdirSync(nodesDir, { recursive: true });
+
+    const dbPath = join(testDir, "brain.db");
     db = openDatabase({ path: dbPath });
     migrate(db);
+
+    options = { nodesDir, skipFts: true };
   });
 
   afterEach(() => {
     closeDatabase(db);
-    try {
-      unlinkSync(dbPath);
-    } catch {
-      // ignore
-    }
+    rmSync(testDir, { recursive: true, force: true });
   });
 
   it("should list decisions", () => {
@@ -93,7 +101,7 @@ describe("decisionRepository", () => {
       },
     };
 
-    createNode(db, node, { skipFts: true });
+    createNode(db, node, options);
 
     const result = listDecisions(db);
     expect(result.decisions).toHaveLength(1);
@@ -163,7 +171,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true }
+      options
     );
 
     // Create node 2
@@ -226,7 +234,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true }
+      options
     );
 
     const resA = listDecisions(db, { project: "proj-a" });
@@ -299,7 +307,7 @@ describe("decisionRepository", () => {
           rlmUsed: false,
         },
       } as unknown as Node,
-      { skipFts: true }
+      options
     );
 
     const [decision] = listDecisions(db).decisions;
