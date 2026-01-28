@@ -50,6 +50,12 @@ function createTestConfig(tempDir: string): PiBrainConfig {
       maxConcurrentAnalysis: 1,
       analysisTimeoutMinutes: 30,
       maxQueueSize: 1000,
+      backfillLimit: 100,
+      reanalysisLimit: 100,
+      connectionDiscoveryLimit: 100,
+      connectionDiscoveryLookbackDays: 7,
+      connectionDiscoveryCooldownHours: 24,
+      semanticSearchThreshold: 0.5,
     },
     query: {
       provider: "test",
@@ -517,7 +523,8 @@ describe("embedding generation in worker", () => {
     const config = createTestConfig(tempDir);
     // Remove embedding configuration
     // Using type assertion since we're testing the absence of config
-    (config.daemon as Record<string, unknown>).embeddingProvider = undefined;
+    (config.daemon as unknown as Record<string, unknown>).embeddingProvider =
+      undefined;
 
     const worker = createWorker({ id: "test", config, logger });
     worker.initialize(db);

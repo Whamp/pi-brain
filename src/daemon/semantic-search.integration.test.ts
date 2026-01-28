@@ -1,9 +1,13 @@
 import type Database from "better-sqlite3";
 import type * as ChildProcess from "node:child_process";
 
+import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 import type { DaemonConfig } from "../config/types.js";
+import type { RepositoryOptions } from "../storage/types.js";
 import type { Node } from "../types/index.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
@@ -119,6 +123,9 @@ function createDummyNode(id: string, summary: string): Node {
 
 describe("semantic Search Integration", () => {
   let db: Database.Database;
+  let testDir: string;
+  let nodesDir: string;
+  let options: RepositoryOptions;
 
   const mockLogger = {
     info: vi.fn(),
@@ -134,12 +141,19 @@ describe("semantic Search Integration", () => {
   } as unknown as DaemonConfig;
 
   beforeEach(() => {
+    // Create temp directory for test nodes
+    testDir = mkdtempSync(join(tmpdir(), "semantic-search-test-"));
+    nodesDir = join(testDir, "nodes");
+    mkdirSync(nodesDir, { recursive: true });
+    options = { nodesDir, skipFts: true };
+
     // Open in-memory DB and run migrations
     db = openDatabase({ path: ":memory:", migrate: true });
   });
 
   afterEach(() => {
     db.close();
+    rmSync(testDir, { recursive: true, force: true });
   });
 
   it("should find nodes semantically when keywords don't match", async () => {
@@ -153,8 +167,8 @@ describe("semantic Search Integration", () => {
       "Database schema migration for users"
     );
 
-    createNode(db, node1);
-    createNode(db, node2);
+    createNode(db, node1, options);
+    createNode(db, node2, options);
 
     // Manual embeddings (4096 dimensions)
     const vec1 = Array.from({ length: 4096 }).fill(0) as number[];
@@ -200,7 +214,7 @@ describe("semantic Search Integration", () => {
     // 1. Setup node with specific keywords
     // FTS matches keywords. "SpecialUniqueKeyword" is not in the embedding text but it IS in the summary.
     const node1 = createDummyNode("node1", "SpecialUniqueKeyword search test");
-    createNode(db, node1);
+    createNode(db, node1, options);
 
     // Embedding far away from everything
     const vec1 = Array.from({ length: 4096 }).fill(0) as number[];
@@ -246,8 +260,8 @@ describe("semantic Search Integration", () => {
     const node2 = createDummyNode("node2", "Auth in project B");
     node2.classification.project = "/project-b";
 
-    createNode(db, node1);
-    createNode(db, node2);
+    createNode(db, node1, options);
+    createNode(db, node2, options);
 
     // Both have same embedding vector
     const vec = Array.from({ length: 4096 }).fill(0) as number[];
@@ -287,7 +301,7 @@ describe("semantic Search Integration", () => {
   it("should fall back to FTS when embedding dimensions mismatch", async () => {
     // 1. Setup node with 4096-dim embedding (standard in our test migrations)
     const node1 = createDummyNode("node1", "Dimension mismatch test");
-    createNode(db, node1);
+    createNode(db, node1, options);
     const vec4096 = Array.from({ length: 4096 }).fill(0) as number[];
     storeEmbeddingWithVec(db, node1.id, vec4096, "model-4096", "Text");
 

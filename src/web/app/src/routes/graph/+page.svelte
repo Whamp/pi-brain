@@ -2,7 +2,7 @@
   import Graph from "$lib/components/graph.svelte";
   import GettingStarted from "$lib/components/getting-started.svelte";
   import { nodesStore, selectedNode } from "$lib/stores/nodes";
-  import type { Node, NodeFilters, NodeType } from "$lib/types";
+  import type { NodeFilters, NodeType } from "$lib/types";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { parseDate, formatDateShort } from "$lib/utils/date";
@@ -79,15 +79,12 @@
     hasLoadedOnce = true;
   }
 
-  async function handleNodeClick(nodeId: string, _node: Node): Promise<void> {
+  async function handleNodeClick(nodeId: string): Promise<void> {
     nodesStore.selectNode(nodeId);
     await loadGraph();
   }
 
-  async function handleNodeDoubleClick(
-    nodeId: string,
-    _node: Node
-  ): Promise<void> {
+  async function handleNodeDoubleClick(nodeId: string): Promise<void> {
     await goto(`/nodes/${nodeId}`);
   }
 

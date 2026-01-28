@@ -27,12 +27,12 @@
   }
 
   // State
-  let clusters: ClusterWithNodes[] = [];
-  let loading = true;
-  let errorMessage: string | null = null;
-  let processingIds = new Set<string>();
-  let actionErrors = new Map<string, string>();
-  let pendingActions = new Map<string, PendingAction>();
+  let clusters = $state<ClusterWithNodes[]>([]);
+  let loading = $state(true);
+  let errorMessage = $state<string | null>(null);
+  let processingIds = $state(new Set<string>());
+  let actionErrors = $state(new Map<string, string>());
+  let pendingActions = $state(new Map<string, PendingAction>());
 
   /** Clear action error after a delay */
   function clearActionError(clusterId: string, delayMs = 3000) {
@@ -60,7 +60,6 @@
       const { clusters: loadedClusters } = await api.getClusterFeed(10);
       clusters = loadedClusters;
     } catch (error) {
-      console.error("Failed to load clusters:", error);
       errorMessage = isBackendOffline(error)
         ? "Backend is offline"
         : getErrorMessage(error);
@@ -78,8 +77,7 @@
       clusters = clusters.filter((c) => c.id !== clusterId);
       pendingActions.delete(clusterId);
       pendingActions = new Map(pendingActions);
-    } catch (error) {
-      console.error(`Failed to ${action} cluster:`, error);
+    } catch {
       actionErrors.set(clusterId, `Failed to ${action}`);
       actionErrors = new Map(actionErrors);
       clearActionError(clusterId);

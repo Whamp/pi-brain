@@ -5,17 +5,16 @@
   import type { DaemonDecisionEntity } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
 
-  let decisions: DaemonDecisionEntity[] = [];
-  let loading = true;
-  let errorMessage: string | null = null;
-  let feedbackLoading: Record<string, boolean> = {};
+  let decisions = $state<DaemonDecisionEntity[]>([]);
+  let loading = $state(true);
+  let errorMessage = $state<string | null>(null);
+  let feedbackLoading = $state<Record<string, boolean>>({});
 
   onMount(async () => {
     try {
       const res = await api.getDecisions({}, { limit: 5 });
       ({ decisions } = res);
     } catch (error) {
-      console.error("Failed to load decisions:", error);
       errorMessage = isBackendOffline(error)
         ? "Backend is offline"
         : getErrorMessage(error);
@@ -37,8 +36,8 @@
       decisions = decisions.map(d => 
         d.id === id ? { ...d, userFeedback: newFeedback } : d
       );
-    } catch (error) {
-      console.error("Failed to update feedback:", error);
+    } catch {
+      // Failed to update feedback - ignore
     } finally {
       feedbackLoading[id] = false;
     }

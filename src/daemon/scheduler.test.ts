@@ -136,16 +136,29 @@ function createCapturingLogger(): SchedulerLogger & { messages: string[] } {
   };
 }
 
+// Default test configuration with all required fields
+function getDefaultTestConfig(
+  overrides: Partial<SchedulerConfig> = {}
+): SchedulerConfig {
+  return {
+    reanalysisSchedule: "0 2 * * *",
+    connectionDiscoverySchedule: "0 3 * * *",
+    backfillLimit: 100,
+    reanalysisLimit: 100,
+    connectionDiscoveryLimit: 100,
+    connectionDiscoveryLookbackDays: 7,
+    connectionDiscoveryCooldownHours: 24,
+    ...overrides,
+  };
+}
+
 describe("scheduler", () => {
   let scheduler: Scheduler;
   let queue: ReturnType<typeof createMockQueue>;
   let db: Database.Database;
   let logger: ReturnType<typeof createCapturingLogger>;
 
-  const defaultConfig: SchedulerConfig = {
-    reanalysisSchedule: "0 2 * * *", // 2 AM daily
-    connectionDiscoverySchedule: "0 3 * * *", // 3 AM daily
-  };
+  const defaultConfig: SchedulerConfig = getDefaultTestConfig();
 
   beforeEach(() => {
     queue = createMockQueue();
@@ -482,10 +495,10 @@ describe("scheduler", () => {
 
   describe("invalid cron expressions", () => {
     it("should handle invalid reanalysis schedule gracefully", () => {
-      const badConfig: SchedulerConfig = {
+      const badConfig: SchedulerConfig = getDefaultTestConfig({
         reanalysisSchedule: "invalid cron",
         connectionDiscoverySchedule: "0 3 * * *",
-      };
+      });
       scheduler = new Scheduler(badConfig, queue, db, logger);
       scheduler.start();
 
@@ -499,10 +512,10 @@ describe("scheduler", () => {
     });
 
     it("should handle invalid connection discovery schedule gracefully", () => {
-      const badConfig: SchedulerConfig = {
+      const badConfig: SchedulerConfig = getDefaultTestConfig({
         reanalysisSchedule: "0 2 * * *",
         connectionDiscoverySchedule: "not valid",
-      };
+      });
       scheduler = new Scheduler(badConfig, queue, db, logger);
       scheduler.start();
 
@@ -519,10 +532,10 @@ describe("scheduler", () => {
 
   describe("empty schedules", () => {
     it("should handle empty reanalysis schedule", () => {
-      const config: SchedulerConfig = {
+      const config: SchedulerConfig = getDefaultTestConfig({
         reanalysisSchedule: "",
         connectionDiscoverySchedule: "0 3 * * *",
-      };
+      });
       scheduler = new Scheduler(config, queue, db, logger);
       scheduler.start();
 
@@ -532,10 +545,10 @@ describe("scheduler", () => {
     });
 
     it("should handle empty connection discovery schedule", () => {
-      const config: SchedulerConfig = {
+      const config: SchedulerConfig = getDefaultTestConfig({
         reanalysisSchedule: "0 2 * * *",
         connectionDiscoverySchedule: "",
-      };
+      });
       scheduler = new Scheduler(config, queue, db, logger);
       scheduler.start();
 
@@ -644,11 +657,9 @@ describe("clustering job", () => {
   });
 
   it("should include clustering job in status when configured", () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
-    };
+    });
     db = createMockDatabase();
     const scheduler = new Scheduler(config, queue, db, logger);
     scheduler.start();
@@ -665,10 +676,7 @@ describe("clustering job", () => {
   });
 
   it("should not include clustering job in status when not configured", () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
-    };
+    const config: SchedulerConfig = getDefaultTestConfig();
     db = createMockDatabase();
     const scheduler = new Scheduler(config, queue, db, logger);
     scheduler.start();
@@ -681,11 +689,9 @@ describe("clustering job", () => {
   });
 
   it("should log schedule info for clustering on start", () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
-    };
+    });
     db = createMockDatabase();
     const scheduler = new Scheduler(config, queue, db, logger);
     scheduler.start();
@@ -698,11 +704,9 @@ describe("clustering job", () => {
   });
 
   it("should handle invalid clustering schedule gracefully", () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "invalid cron",
-    };
+    });
     db = createMockDatabase();
     const scheduler = new Scheduler(config, queue, db, logger);
     scheduler.start();
@@ -718,11 +722,9 @@ describe("clustering job", () => {
   });
 
   it("should run triggerClustering and return result", async () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
-    };
+    });
 
     // Create mock DB with proper tables for FacetDiscovery
     const mockDb = {
@@ -751,11 +753,9 @@ describe("clustering job", () => {
   });
 
   it("should update lastResult for clustering in status", async () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
-    };
+    });
 
     const mockDb = {
       prepare: vi.fn(() => ({
@@ -781,13 +781,11 @@ describe("clustering job", () => {
   });
 
   it("should pass provider and model to config for LLM analysis", () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
       provider: "zai",
       model: "glm-4.7",
-    };
+    });
     db = createMockDatabase();
     const scheduler = new Scheduler(config, queue, db, logger);
 
@@ -800,14 +798,12 @@ describe("clustering job", () => {
   });
 
   it("should skip clustering gracefully when embedding API key is missing for openrouter", async () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
       embeddingProvider: "openrouter",
       embeddingModel: "qwen/qwen3-embedding-8b",
       // Note: embeddingApiKey is intentionally not set
-    };
+    });
 
     const mockDb = {
       prepare: vi.fn(() => ({
@@ -838,13 +834,11 @@ describe("clustering job", () => {
   });
 
   it("should skip clustering gracefully when embedding API key is missing for openai", async () => {
-    const config: SchedulerConfig = {
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
+    const config: SchedulerConfig = getDefaultTestConfig({
       clusteringSchedule: "0 4 * * *",
       embeddingProvider: "openai",
       // Note: embeddingApiKey is intentionally not set
-    };
+    });
 
     const mockDb = {
       prepare: vi.fn(() => ({

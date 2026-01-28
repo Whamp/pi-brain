@@ -1258,7 +1258,8 @@ See [settings-ui-complete.md](settings-ui-complete.md) for full plan.
 - [x] Refactor: Shared Type Library (extract to `src/types` or configure imports) ✅
 - [x] Architecture: Idempotent Ingestion (deterministic IDs or upsert logic) ✅
 - [x] Architecture: SQLite Rebuild CLI (restore DB from JSON) ✅
-- [ ] Build: Fix TypeScript type errors in daemon-process.ts
+- [x] Build: Fix TypeScript type errors in daemon test files (scheduler, watcher, worker, processor) ✅
+- [ ] Build: Fix remaining TypeScript type errors (cli, query-processor, graph-export, etc.)
 - [ ] Config: Improve validation for non-YAML files
 - [ ] API: Implement port conflict detection and cleanup
 

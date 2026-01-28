@@ -692,6 +692,12 @@ describe("jobProcessor", () => {
           maxConcurrentAnalysis: 1,
           analysisTimeoutMinutes: 30,
           maxQueueSize: 1000,
+          backfillLimit: 100,
+          reanalysisLimit: 100,
+          connectionDiscoveryLimit: 100,
+          connectionDiscoveryLookbackDays: 7,
+          connectionDiscoveryCooldownHours: 24,
+          semanticSearchThreshold: 0.5,
         },
         logger: silentLogger,
       });

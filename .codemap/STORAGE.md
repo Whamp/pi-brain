@@ -365,33 +365,33 @@ src/storage/node-queries.ts [1-455]
     - ./node-crud.js
     - better-sqlite3
 
-src/storage/node-storage.ts [1-292]
+src/storage/node-storage.ts [1-323]
   interface:
-    24-27: interface NodeStorageOptions [exported]
+    44-47: interface NodeStorageOptions [exported]
   function:
-    33-41: getNodeDir(timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
+    53-61: getNodeDir(timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
       /** Get the directory path for a node based on its timestamp Returns: nodesDir/YYYY/MM */
-    47-55: getNodePath(nodeId: string, version: number, timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
+    67-75: getNodePath(nodeId: string, version: number, timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
       /** Get the full file path for a node Returns: nodesDir/YYYY/MM/<nodeId>-v<version>.json */
-    60-82: writeNode(node: Node, options: NodeStorageOptions = {}): string [exported]
+    82-113: writeNode(node: Node, options: NodeStorageOptions = {}): string [exported]
       /** Write a node to JSON file storage */
-    87-102: readNode(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): Node [exported]
+    118-133: readNode(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): Node [exported]
       /** Read a node from JSON file storage */
-    107-114: readNodeFromPath(filePath: string): Node [exported]
+    138-145: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-    119-128: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
+    150-159: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
       /** Check if a node file exists */
-    134-175: listNodeFiles(options: NodeStorageOptions = {}): {} [exported]
+    165-206: listNodeFiles(options: NodeStorageOptions = {}): {} [exported]
       /** List all node files in the storage directory Returns array of file paths */
-    181-202: listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {} [exported]
+    212-233: listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {} [exported]
       /** List all versions of a specific node Returns array of { version, path } sorted by version ascending */
-    207-217: getLatestNodeVersion(nodeId: string, options: NodeStorageOptions = {}): { version: number; path: string; } [exported]
+    238-248: getLatestNodeVersion(nodeId: string, options: NodeStorageOptions = {}): { version: number; path: string; } [exported]
       /** Get the latest version of a node */
-    222-231: readLatestNode(nodeId: string, options: NodeStorageOptions = {}): any [exported]
+    253-262: readLatestNode(nodeId: string, options: NodeStorageOptions = {}): any [exported]
       /** Read the latest version of a node */
-    236-261: parseNodePath(filePath: string): { nodeId: string; version: number; year: string; month: string; } [exported]
+    267-292: parseNodePath(filePath: string): { nodeId: string; version: number; year: string; month: string; } [exported]
       /** Parse a node file path to extract node ID, version, year, and month */
-    267-291: createNodeVersion(existingNode: Node, updates: Partial<Node>, options: NodeStorageOptions = {}): Node [exported]
+    298-322: createNodeVersion(existingNode: Node, updates: Partial<Node>, options: NodeStorageOptions = {}): Node [exported]
       /** Create a new version of an existing node Copies the node with incremented version and updated previousVersions */
   variable:
     22-22: any [exported]
@@ -574,4 +574,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 17
-Estimated tokens: 8,902 (codebase: ~1,090,677)
+Estimated tokens: 8,903 (codebase: ~1,090,953)

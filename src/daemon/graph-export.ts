@@ -10,7 +10,7 @@ import type { NodeRow } from "../storage/node-crud.js";
 import { loadConfig } from "../config/index.js";
 import { openDatabase, migrate } from "../storage/database.js";
 import { getAllEdges, edgeRowToEdge } from "../storage/edge-repository.js";
-import { listNodes } from "../storage/node-queries.js";
+import { listNodes, getNodeSummary } from "../storage/node-queries.js";
 
 export interface GraphExportOptions {
   project?: string;
@@ -64,9 +64,10 @@ export function exportGraphviz(
 
     // Nodes
     for (const node of nodes) {
-      const label = formatNodeLabel(node);
-      const color = getNodeColor(node.type);
-      const tooltip = escapeString(node.summary || "");
+      const summary = getNodeSummary(db, node.id);
+      const label = formatNodeLabel(node, summary);
+      const color = getNodeColor(node.type ?? "other");
+      const tooltip = escapeString(summary || "");
       dot += `  "${node.id}" [label="${label}", fillcolor="${color}", tooltip="${tooltip}"];\n`;
     }
 
@@ -94,12 +95,14 @@ function escapeString(str: string): string {
   return str.replaceAll('"', String.raw`\"`).replaceAll("\n", String.raw`\n`);
 }
 
-function formatNodeLabel(node: NodeRow): string {
-  const summary = escapeString(node.summary || "No summary");
-  const { type } = node;
+function formatNodeLabel(node: NodeRow, summary: string | null): string {
+  const escapedSummary = escapeString(summary || "No summary");
+  const type = node.type ?? "other";
   // Truncate summary to 30 chars
   const truncatedSummary =
-    summary.length > 30 ? `${summary.slice(0, 30)}...` : summary;
+    escapedSummary.length > 30
+      ? `${escapedSummary.slice(0, 30)}...`
+      : escapedSummary;
   return `${type}\\n${truncatedSummary}`;
 }
 

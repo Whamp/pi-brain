@@ -21,7 +21,7 @@
     AggregatedModelStats
   } from "$lib/types";
   import { daemonStore } from "$lib/stores/daemon";
-  import { wsStore } from "$lib/stores/websocket";
+
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
@@ -42,13 +42,7 @@
   let loading = $state(true);
   let errorMessage = $state<string | null>(null);
 
-  // Auto-refresh when new nodes are created
-  $effect(() => {
-    if ($wsStore.connected) {
-      // The wsStore handles the subscription and stores.
-      // We listen for changes in the subscribe call in onMount.
-    }
-  });
+
 
   // Function to refresh activity and stats
   async function refreshDashboardData(silent = false) {
@@ -80,7 +74,6 @@
       modelStats = modelsRes;
 
     } catch (error) {
-      console.error("Failed to refresh dashboard data:", error);
       errorMessage = getErrorMessage(error);
     } finally {
       if (!silent) {
@@ -91,21 +84,6 @@
 
   onMount(async () => {
     await refreshDashboardData();
-
-    // Subscribe to websocket events
-    /*
-    const unsubscribe = wsStore.subscribe(state => {
-      // Check for node.created event in messages
-      // This is a bit simplified; real implementation might want to check message type
-      // but for now, any update to the websocket store is a good time to refresh
-      if (state.connected && !loading) {
-        // We could be more specific here, but refreshing everything ensures UI is in sync
-        refreshDashboardData(true);
-      }
-    });
-
-    return unsubscribe;
-    */
   });
 
   // Fallback learning recommendations when API doesn't provide them

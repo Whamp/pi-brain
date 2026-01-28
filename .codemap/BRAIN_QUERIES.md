@@ -614,13 +614,13 @@ src/daemon/facet-discovery.ts [1-1760]
     - node:path
     - node:url
 
-src/daemon/graph-export.ts [1-131]
+src/daemon/graph-export.ts [1-134]
   interface:
     15-20: interface GraphExportOptions [exported]
       refs in: 1 [type: 1]
         - src/daemon/graph-export.ts:28: type exportGraphviz
   function:
-    25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
+    25-92: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
       /** Export knowledge graph to Graphviz DOT format */
   imports:
     - ../config/index.js
@@ -700,7 +700,7 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-723]
+src/daemon/processor.test.ts [1-729]
   imports:
     - ./processor.js
     - ./queue.js
@@ -729,7 +729,7 @@ src/daemon/processor.ts [1-809]
         - src/daemon/processor.ts:759: type JobProcessor.process
     37-116: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs in: 8 [import: 1, reexport: 1, type: 6]
+      refs in: 12 [import: 3, reexport: 1, type: 8]
         - src/daemon/index.ts:72: reexport (module)
         - src/daemon/processor.test.ts:26: import (module)
         - src/daemon/processor.test.ts:49: type createValidNodeOutput
@@ -738,6 +738,8 @@ src/daemon/processor.ts [1-809]
         - src/daemon/processor.ts:654: type parsed
         - src/daemon/processor.ts:668: type parsed
         - src/daemon/processor.ts:684: type isValidNodeOutput
+        - src/storage/index.test.ts:11: import (module)
+        - src/storage/index.test.ts:168: type createTestAgentOutput
     128-132: interface SkillInfo [exported]
       /** Skill availability information */
       refs in: 3 [reexport: 1, type: 2]
@@ -965,7 +967,7 @@ src/daemon/query-processor.ts [1-786]
         - src/daemon/query-processor.test.ts:357: call response
         - src/daemon/query-processor.test.ts:402: call response
         - src/daemon/query-processor.test.ts:445: call (module)
-        - src/daemon/semantic-search.integration.test.ts:13: import (module)
+        - src/daemon/semantic-search.integration.test.ts:17: import (module)
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -1098,7 +1100,7 @@ src/daemon/queue.ts [1-787]
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
         - src/daemon/worker.test.ts:16: import (module)
-        - src/daemon/worker.test.ts:275: call (module)
+        - src/daemon/worker.test.ts:281: call (module)
         - src/daemon/worker.ts:56: import (module)
     768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
@@ -1117,7 +1119,7 @@ src/daemon/queue.ts [1-787]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-967]
+src/daemon/scheduler.test.ts [1-961]
   imports:
     - ./queue.js
     - ./scheduler.js
@@ -1131,14 +1133,14 @@ src/daemon/scheduler.ts [1-978]
       refs in: 31 [import: 1, instantiate: 27, reexport: 1, type: 2]
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:12: import (module)
-        - src/daemon/scheduler.test.ts:140: type scheduler
-        - src/daemon/scheduler.test.ts:154: instantiate (module)
-        - src/daemon/scheduler.test.ts:245: instantiate (module)
-        - src/daemon/scheduler.test.ts:267: instantiate (module)
-        - src/daemon/scheduler.test.ts:286: instantiate (module)
-        - src/daemon/scheduler.test.ts:302: instantiate (module)
-        - src/daemon/scheduler.test.ts:322: instantiate (module)
-        - src/daemon/scheduler.test.ts:350: instantiate (module)
+        - src/daemon/scheduler.test.ts:156: type scheduler
+        - src/daemon/scheduler.test.ts:167: instantiate (module)
+        - src/daemon/scheduler.test.ts:258: instantiate (module)
+        - src/daemon/scheduler.test.ts:280: instantiate (module)
+        - src/daemon/scheduler.test.ts:299: instantiate (module)
+        - src/daemon/scheduler.test.ts:315: instantiate (module)
+        - src/daemon/scheduler.test.ts:335: instantiate (module)
+        - src/daemon/scheduler.test.ts:363: instantiate (module)
   interface:
     59-66: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
@@ -1165,17 +1167,17 @@ src/daemon/scheduler.ts [1-978]
         - src/daemon/scheduler.ts:913: type createScheduler
     95-146: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-      refs in: 20 [import: 1, reexport: 1, type: 18]
+      refs in: 22 [import: 1, reexport: 1, type: 20]
         - src/daemon/index.ts:154: reexport (module)
         - src/daemon/scheduler.test.ts:18: import (module)
-        - src/daemon/scheduler.test.ts:145: type defaultConfig
-        - src/daemon/scheduler.test.ts:485: type badConfig
-        - src/daemon/scheduler.test.ts:502: type badConfig
-        - src/daemon/scheduler.test.ts:522: type config
+        - src/daemon/scheduler.test.ts:141: type getDefaultTestConfig
+        - src/daemon/scheduler.test.ts:142: type getDefaultTestConfig
+        - src/daemon/scheduler.test.ts:161: type defaultConfig
+        - src/daemon/scheduler.test.ts:498: type badConfig
+        - src/daemon/scheduler.test.ts:515: type badConfig
         - src/daemon/scheduler.test.ts:535: type config
-        - src/daemon/scheduler.test.ts:647: type config
-        - src/daemon/scheduler.test.ts:668: type config
-        - src/daemon/scheduler.test.ts:684: type config
+        - src/daemon/scheduler.test.ts:548: type config
+        - src/daemon/scheduler.test.ts:660: type config
     149-158: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs in: 3 [reexport: 1, type: 2]
@@ -1201,28 +1203,28 @@ src/daemon/scheduler.ts [1-978]
         - src/daemon/daemon-process.ts:170: call scheduler
         - src/daemon/index.ts:146: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
-        - src/daemon/scheduler.test.ts:562: call scheduler
+        - src/daemon/scheduler.test.ts:575: call scheduler
     945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
         - src/daemon/scheduler.test.ts:14: import (module)
-        - src/daemon/scheduler.test.ts:573: call (module)
-        - src/daemon/scheduler.test.ts:574: call (module)
-        - src/daemon/scheduler.test.ts:575: call (module)
-        - src/daemon/scheduler.test.ts:576: call (module)
-        - src/daemon/scheduler.test.ts:577: call (module)
-        - src/daemon/scheduler.test.ts:581: call (module)
-        - src/daemon/scheduler.test.ts:582: call (module)
-        - src/daemon/scheduler.test.ts:583: call (module)
+        - src/daemon/scheduler.test.ts:586: call (module)
+        - src/daemon/scheduler.test.ts:587: call (module)
+        - src/daemon/scheduler.test.ts:588: call (module)
+        - src/daemon/scheduler.test.ts:589: call (module)
+        - src/daemon/scheduler.test.ts:590: call (module)
+        - src/daemon/scheduler.test.ts:594: call (module)
+        - src/daemon/scheduler.test.ts:595: call (module)
+        - src/daemon/scheduler.test.ts:596: call (module)
     960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:148: reexport (module)
         - src/daemon/scheduler.test.ts:15: import (module)
-        - src/daemon/scheduler.test.ts:591: call times
-        - src/daemon/scheduler.test.ts:613: call (module)
-        - src/daemon/scheduler.test.ts:617: call times
+        - src/daemon/scheduler.test.ts:604: call times
+        - src/daemon/scheduler.test.ts:626: call (module)
+        - src/daemon/scheduler.test.ts:630: call times
   variable:
     78-83: SchedulerLogger [exported]
       /** Default no-op logger */
@@ -1247,17 +1249,21 @@ src/daemon/scheduler.ts [1-978]
     - better-sqlite3
     - croner
 
-src/daemon/semantic-search.integration.test.ts [1-323]
+src/daemon/semantic-search.integration.test.ts [1-337]
   imports:
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
+    - ../storage/types.js
     - ../types/index.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
     - node:child_process
+    - node:fs
+    - node:os
+    - node:path
     - vitest
 
 src/daemon/watcher-events.ts [1-117]
@@ -1322,29 +1328,30 @@ src/daemon/watcher-events.ts [1-117]
         - src/daemon/daemon-process.ts:185: call sessionPath
         - src/daemon/daemon-process.ts:203: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
-        - src/daemon/watcher.test.ts:16: import (module)
-        - src/daemon/watcher.test.ts:228: call (module)
-        - src/daemon/watcher.test.ts:271: call (module)
-        - src/daemon/watcher.test.ts:302: call (module)
-        - src/daemon/watcher.test.ts:330: call (module)
-        - src/daemon/watcher.test.ts:364: call (module)
+        - src/daemon/watcher.test.ts:18: import (module)
+        - src/daemon/watcher.test.ts:261: call (module)
+        - src/daemon/watcher.test.ts:304: call (module)
+        - src/daemon/watcher.test.ts:335: call (module)
+        - src/daemon/watcher.test.ts:363: call (module)
+        - src/daemon/watcher.test.ts:397: call (module)
     111-116: getEventError(event: Event): any [exported]
       /** Helper to get error from an error event */
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:34: reexport (module)
-        - src/daemon/watcher.test.ts:13: import (module)
-        - src/daemon/watcher.test.ts:840: call (module)
+        - src/daemon/watcher.test.ts:15: import (module)
+        - src/daemon/watcher.test.ts:822: call (module)
   variable:
     24-37: SESSION_EVENTS [exported]
       /** Session event names */
       refs in: 4 [import: 3, reexport: 1]
         - src/daemon/daemon-process.ts:22: import (module)
         - src/daemon/index.ts:27: reexport (module)
-        - src/daemon/watcher.test.ts:18: import (module)
+        - src/daemon/watcher.test.ts:20: import (module)
         - src/daemon/watcher.ts:18: import (module)
 
-src/daemon/watcher.test.ts [1-844]
+src/daemon/watcher.test.ts [1-826]
   imports:
+    - ../config/types.js
     - ./index.js
     - node:fs/promises
     - node:os
@@ -1359,13 +1366,13 @@ src/daemon/watcher.ts [1-582]
         - src/daemon/daemon-process.ts:23: import (module)
         - src/daemon/daemon-process.ts:179: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
-        - src/daemon/watcher.test.ts:19: import (module)
-        - src/daemon/watcher.test.ts:53: type waitForEvent
-        - src/daemon/watcher.test.ts:73: type createTestWatcher
-        - src/daemon/watcher.test.ts:74: instantiate createTestWatcher
-        - src/daemon/watcher.test.ts:84: instantiate watcher
-        - src/daemon/watcher.test.ts:90: instantiate watcher
-        - src/daemon/watcher.test.ts:343: instantiate watcher
+        - src/daemon/watcher.test.ts:21: import (module)
+        - src/daemon/watcher.test.ts:86: type waitForEvent
+        - src/daemon/watcher.test.ts:106: type createTestWatcher
+        - src/daemon/watcher.test.ts:107: instantiate createTestWatcher
+        - src/daemon/watcher.test.ts:117: instantiate watcher
+        - src/daemon/watcher.test.ts:123: instantiate watcher
+        - src/daemon/watcher.test.ts:376: instantiate watcher
   interface:
     27-42: interface SessionState [exported]
       /** State tracking for a single session file */
@@ -1387,38 +1394,38 @@ src/daemon/watcher.ts [1-582]
       /** Create a watcher from daemon config */
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:16: reexport (module)
-        - src/daemon/watcher.test.ts:11: import (module)
-        - src/daemon/watcher.test.ts:776: call watcher
+        - src/daemon/watcher.test.ts:13: import (module)
+        - src/daemon/watcher.test.ts:758: call watcher
     555-557: isSessionFile(filePath: string): boolean [exported]
       /** Check if a path is a valid session file */
       refs in: 7 [call: 5, import: 1, reexport: 1]
         - src/daemon/index.ts:17: reexport (module)
-        - src/daemon/watcher.test.ts:17: import (module)
-        - src/daemon/watcher.test.ts:783: call (module)
-        - src/daemon/watcher.test.ts:784: call (module)
-        - src/daemon/watcher.test.ts:788: call (module)
-        - src/daemon/watcher.test.ts:789: call (module)
-        - src/daemon/watcher.test.ts:790: call (module)
+        - src/daemon/watcher.test.ts:19: import (module)
+        - src/daemon/watcher.test.ts:765: call (module)
+        - src/daemon/watcher.test.ts:766: call (module)
+        - src/daemon/watcher.test.ts:770: call (module)
+        - src/daemon/watcher.test.ts:771: call (module)
+        - src/daemon/watcher.test.ts:772: call (module)
     562-564: getSessionName(sessionPath: string): string [exported]
       /** Extract session name from path */
       refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:18: reexport (module)
-        - src/daemon/watcher.test.ts:15: import (module)
-        - src/daemon/watcher.test.ts:796: call (module)
-        - src/daemon/watcher.test.ts:798: call (module)
+        - src/daemon/watcher.test.ts:17: import (module)
+        - src/daemon/watcher.test.ts:778: call (module)
+        - src/daemon/watcher.test.ts:780: call (module)
     571-581: getProjectFromSessionPath(sessionPath: string): string [exported]
       /** Extract project name from session path Session paths are typically: ~/.pi/agent/sessions/<project-name>/<session-file>.jsonl */
       refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:19: reexport (module)
-        - src/daemon/watcher.test.ts:14: import (module)
-        - src/daemon/watcher.test.ts:806: call (module)
-        - src/daemon/watcher.test.ts:814: call (module)
+        - src/daemon/watcher.test.ts:16: import (module)
+        - src/daemon/watcher.test.ts:788: call (module)
+        - src/daemon/watcher.test.ts:796: call (module)
   variable:
     67-73: WatcherConfig [exported]
       /** Default watcher configuration */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:20: reexport (module)
-        - src/daemon/watcher.test.ts:12: import (module)
+        - src/daemon/watcher.test.ts:14: import (module)
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1428,7 +1435,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-539]
+src/daemon/worker.test.ts [1-546]
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -1457,8 +1464,8 @@ src/daemon/worker.ts [1-717]
       refs in: 6 [import: 1, reexport: 1, type: 4]
         - src/daemon/index.ts:107: reexport (module)
         - src/daemon/worker.test.ts:21: import (module)
-        - src/daemon/worker.test.ts:68: type createTestWorkerConfig
-        - src/daemon/worker.test.ts:69: type createTestWorkerConfig
+        - src/daemon/worker.test.ts:74: type createTestWorkerConfig
+        - src/daemon/worker.test.ts:75: type createTestWorkerConfig
         - src/daemon/worker.ts:159: type Worker.constructor
         - src/daemon/worker.ts:665: type createWorker
     86-101: interface WorkerStatus [exported]
@@ -1481,12 +1488,12 @@ src/daemon/worker.ts [1-717]
         - src/daemon/daemon-process.ts:139: call worker
         - src/daemon/index.ts:104: reexport (module)
         - src/daemon/worker.test.ts:18: import (module)
-        - src/daemon/worker.test.ts:119: call worker
-        - src/daemon/worker.test.ts:126: call worker
-        - src/daemon/worker.test.ts:135: call worker
-        - src/daemon/worker.test.ts:143: call worker
-        - src/daemon/worker.test.ts:159: call worker
-        - src/daemon/worker.test.ts:173: call worker
+        - src/daemon/worker.test.ts:125: call worker
+        - src/daemon/worker.test.ts:132: call worker
+        - src/daemon/worker.test.ts:141: call worker
+        - src/daemon/worker.test.ts:149: call worker
+        - src/daemon/worker.test.ts:165: call worker
+        - src/daemon/worker.test.ts:179: call worker
     673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
@@ -1496,14 +1503,14 @@ src/daemon/worker.ts [1-717]
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
         - src/daemon/worker.test.ts:19: import (module)
-        - src/daemon/worker.test.ts:188: call result
-        - src/daemon/worker.test.ts:198: call result
-        - src/daemon/worker.test.ts:207: call result
-        - src/daemon/worker.test.ts:216: call result
-        - src/daemon/worker.test.ts:234: call result
-        - src/daemon/worker.test.ts:253: call result0
-        - src/daemon/worker.test.ts:254: call result1
-        - src/daemon/worker.test.ts:255: call result2
+        - src/daemon/worker.test.ts:194: call result
+        - src/daemon/worker.test.ts:204: call result
+        - src/daemon/worker.test.ts:213: call result
+        - src/daemon/worker.test.ts:222: call result
+        - src/daemon/worker.test.ts:240: call result
+        - src/daemon/worker.test.ts:259: call result0
+        - src/daemon/worker.test.ts:260: call result1
+        - src/daemon/worker.test.ts:261: call result2
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1613,10 +1620,10 @@ src/storage/database.ts [1-298]
         - src/daemon/queue.test.ts:12: import (module)
         - src/daemon/queue.test.ts:34: call (module)
         - src/daemon/worker.test.ts:14: import (module)
-        - src/daemon/worker.test.ts:112: call (module)
-        - src/daemon/worker.test.ts:279: call (module)
-        - src/daemon/worker.test.ts:373: call (module)
-        - src/daemon/worker.test.ts:461: call (module)
+        - src/daemon/worker.test.ts:118: call (module)
+        - src/daemon/worker.test.ts:285: call (module)
+        - src/daemon/worker.test.ts:379: call (module)
+        - src/daemon/worker.test.ts:467: call (module)
         - src/storage/database-vec.test.ts:8: import (module)
         - src/storage/database-vec.test.ts:17: call (module)
         - src/storage/database.test.ts:13: import (module)
@@ -1886,13 +1893,13 @@ src/storage/embedding-utils.ts [1-625]
     135-205: storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; } [exported]
       /** Store an embedding for a node in both node_embeddings and node_embeddings_vec tables. Handles upsert semantics - if an embedding already exists for the node, it will be replaced. The vec table is only updated if sqlite-vec is loaded. Uses a transaction to ensure atomicity - either both tables are updated or neither. */
       refs in: 26 [call: 23, import: 3]
-        - src/daemon/semantic-search.integration.test.ts:11: import (module)
-        - src/daemon/semantic-search.integration.test.ts:166: call (module)
-        - src/daemon/semantic-search.integration.test.ts:167: call (module)
-        - src/daemon/semantic-search.integration.test.ts:208: call (module)
-        - src/daemon/semantic-search.integration.test.ts:256: call (module)
-        - src/daemon/semantic-search.integration.test.ts:257: call (module)
-        - src/daemon/semantic-search.integration.test.ts:292: call (module)
+        - src/daemon/semantic-search.integration.test.ts:15: import (module)
+        - src/daemon/semantic-search.integration.test.ts:180: call (module)
+        - src/daemon/semantic-search.integration.test.ts:181: call (module)
+        - src/daemon/semantic-search.integration.test.ts:222: call (module)
+        - src/daemon/semantic-search.integration.test.ts:270: call (module)
+        - src/daemon/semantic-search.integration.test.ts:271: call (module)
+        - src/daemon/semantic-search.integration.test.ts:306: call (module)
         - src/daemon/worker.ts:29: import (module)
         - src/daemon/worker.ts:630: call Worker.{ vecUpdated }
         - src/storage/embedding-utils.test.ts:25: import (module)
@@ -1913,7 +1920,7 @@ src/storage/embedding-utils.ts [1-625]
       /** Check if a node has an embedding stored. */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.test.ts:15: import (module)
-        - src/daemon/worker.test.ts:536: call (module)
+        - src/daemon/worker.test.ts:543: call (module)
         - src/storage/embedding-utils.test.ts:22: import (module)
         - src/storage/embedding-utils.test.ts:516: call (module)
         - src/storage/embedding-utils.test.ts:548: call (module)
@@ -2230,7 +2237,7 @@ src/storage/node-crud.ts [1-751]
         - src/daemon/connection-discovery.ts:311: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:332: type ConnectionDiscoverer.findCandidates
         - src/daemon/graph-export.ts:8: import (module)
-        - src/daemon/graph-export.ts:97: type formatNodeLabel
+        - src/daemon/graph-export.ts:98: type formatNodeLabel
         - src/daemon/query-processor.ts:16: import (module)
         - src/daemon/query-processor.ts:296: type nodeRowToRelevant
         - src/storage/graph-repository.ts:13: import (module)
@@ -2467,9 +2474,11 @@ src/storage/node-queries.ts [1-455]
   function:
     21-28: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
-      refs in: 2 [call: 1, import: 1]
+      refs in: 4 [call: 2, import: 2]
         - src/daemon/connection-discovery.ts:15: import (module)
         - src/daemon/connection-discovery.ts:219: call ConnectionDiscoverer.sourceSummary
+        - src/daemon/graph-export.ts:13: import (module)
+        - src/daemon/graph-export.ts:67: call summary
     33-37: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
       refs in: 8 [call: 6, import: 2]
@@ -2566,7 +2575,7 @@ src/storage/node-queries.ts [1-455]
     - ./node-crud.js
     - better-sqlite3
 
-src/storage/node-storage.test.ts [1-849]
+src/storage/node-storage.test.ts [1-874]
   imports:
     - ./node-storage.js
     - ./node-types.js
@@ -2575,22 +2584,22 @@ src/storage/node-storage.test.ts [1-849]
     - node:path
     - vitest
 
-src/storage/node-storage.ts [1-292]
+src/storage/node-storage.ts [1-323]
   interface:
-    24-27: interface NodeStorageOptions [exported]
+    44-47: interface NodeStorageOptions [exported]
       refs in: 10 [extends: 1, import: 1, type: 8]
         - src/storage/node-crud.ts:17: import (module)
         - src/storage/node-crud.ts:39: extends RepositoryOptions
-        - src/storage/node-storage.ts:62: type writeNode
-        - src/storage/node-storage.ts:91: type readNode
-        - src/storage/node-storage.ts:123: type nodeExists
-        - src/storage/node-storage.ts:134: type listNodeFiles
-        - src/storage/node-storage.ts:183: type listNodeVersions
-        - src/storage/node-storage.ts:209: type getLatestNodeVersion
-        - src/storage/node-storage.ts:224: type readLatestNode
-        - src/storage/node-storage.ts:270: type createNodeVersion
+        - src/storage/node-storage.ts:84: type writeNode
+        - src/storage/node-storage.ts:122: type readNode
+        - src/storage/node-storage.ts:154: type nodeExists
+        - src/storage/node-storage.ts:165: type listNodeFiles
+        - src/storage/node-storage.ts:214: type listNodeVersions
+        - src/storage/node-storage.ts:240: type getLatestNodeVersion
+        - src/storage/node-storage.ts:255: type readLatestNode
+        - src/storage/node-storage.ts:301: type createNodeVersion
   function:
-    33-41: getNodeDir(timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
+    53-61: getNodeDir(timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
       /** Get the directory path for a node based on its timestamp Returns: nodesDir/YYYY/MM */
       refs in: 6 [call: 5, import: 1]
         - src/storage/node-storage.test.ts:13: import (module)
@@ -2598,19 +2607,19 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:123: call dir
         - src/storage/node-storage.test.ts:133: call dir
         - src/storage/node-storage.test.ts:203: call expectedDir
-        - src/storage/node-storage.ts:53: call dir
-    47-55: getNodePath(nodeId: string, version: number, timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
+        - src/storage/node-storage.ts:73: call dir
+    67-75: getNodePath(nodeId: string, version: number, timestamp: string, nodesDir = DEFAULT_NODES_DIR): string [exported]
       /** Get the full file path for a node Returns: nodesDir/YYYY/MM/<nodeId>-v<version>.json */
       refs in: 6 [call: 5, import: 1]
         - src/storage/node-storage.test.ts:14: import (module)
         - src/storage/node-storage.test.ts:145: call path
         - src/storage/node-storage.test.ts:162: call path
-        - src/storage/node-storage.ts:65: call filePath
-        - src/storage/node-storage.ts:94: call filePath
-        - src/storage/node-storage.ts:126: call filePath
-    60-82: writeNode(node: Node, options: NodeStorageOptions = {}): string [exported]
+        - src/storage/node-storage.ts:96: call filePath
+        - src/storage/node-storage.ts:125: call filePath
+        - src/storage/node-storage.ts:157: call filePath
+    82-113: writeNode(node: Node, options: NodeStorageOptions = {}): string [exported]
       /** Write a node to JSON file storage */
-      refs in: 26 [call: 24, import: 2]
+      refs in: 28 [call: 26, import: 2]
         - src/storage/node-crud.ts:16: import (module)
         - src/storage/node-crud.ts:305: call dataFile
         - src/storage/node-crud.ts:332: call dataFile
@@ -2621,17 +2630,15 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:234: call path
         - src/storage/node-storage.test.ts:255: call (module)
         - src/storage/node-storage.test.ts:337: call (module)
-    87-102: readNode(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): Node [exported]
+    118-133: readNode(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): Node [exported]
       /** Read a node from JSON file storage */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-storage.test.ts:20: import (module)
         - src/storage/node-storage.test.ts:186: call readBack
         - src/storage/node-storage.test.ts:219: call (module)
-    107-114: readNodeFromPath(filePath: string): Node [exported]
+    138-145: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 24 [call: 13, import: 11]
-        - src/api/routes/nodes.ts:20: import (module)
-        - src/api/routes/nodes.ts:152: call node
+      refs in: 19 [call: 11, import: 8]
         - src/daemon/cli.ts:38: import (module)
         - src/daemon/cli.ts:1063: call node
         - src/daemon/cli.ts:1088: call node
@@ -2640,13 +2647,15 @@ src/storage/node-storage.ts [1-292]
         - src/daemon/facet-discovery.ts:39: import (module)
         - src/daemon/facet-discovery.ts:875: call FacetDiscovery.fullNode
         - src/daemon/insight-aggregation.ts:20: import (module)
-    119-128: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
+        - src/daemon/insight-aggregation.ts:400: call InsightAggregator.aggregatePromptingPatterns
+        - src/daemon/scheduler.ts:28: import (module)
+    150-159: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
       /** Check if a node file exists */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-storage.test.ts:17: import (module)
         - src/storage/node-storage.test.ts:258: call (module)
         - src/storage/node-storage.test.ts:271: call (module)
-    134-175: listNodeFiles(options: NodeStorageOptions = {}): {} [exported]
+    165-206: listNodeFiles(options: NodeStorageOptions = {}): {} [exported]
       /** List all node files in the storage directory Returns array of file paths */
       refs in: 9 [call: 6, import: 3]
         - src/daemon/cli.ts:36: import (module)
@@ -2657,8 +2666,8 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:285: call files
         - src/storage/node-storage.test.ts:295: call files
         - src/storage/node-storage.test.ts:341: call files
-        - src/storage/node-storage.ts:185: call allFiles
-    181-202: listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {} [exported]
+        - src/storage/node-storage.ts:216: call allFiles
+    212-233: listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {} [exported]
       /** List all versions of a specific node Returns array of { version, path } sorted by version ascending */
       refs in: 7 [call: 5, import: 2]
         - src/storage/node-crud.ts:14: import (module)
@@ -2667,21 +2676,21 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:356: call versions
         - src/storage/node-storage.test.ts:420: call versions
         - src/storage/node-storage.test.ts:714: call versions
-        - src/storage/node-storage.ts:211: call versions
-    207-217: getLatestNodeVersion(nodeId: string, options: NodeStorageOptions = {}): { version: number; path: string; } [exported]
+        - src/storage/node-storage.ts:242: call versions
+    238-248: getLatestNodeVersion(nodeId: string, options: NodeStorageOptions = {}): { version: number; path: string; } [exported]
       /** Get the latest version of a node */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-storage.test.ts:12: import (module)
         - src/storage/node-storage.test.ts:436: call latest
         - src/storage/node-storage.test.ts:495: call latest
-        - src/storage/node-storage.ts:226: call latest
-    222-231: readLatestNode(nodeId: string, options: NodeStorageOptions = {}): any [exported]
+        - src/storage/node-storage.ts:257: call latest
+    253-262: readLatestNode(nodeId: string, options: NodeStorageOptions = {}): any [exported]
       /** Read the latest version of a node */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-storage.test.ts:19: import (module)
         - src/storage/node-storage.test.ts:509: call node
         - src/storage/node-storage.test.ts:570: call latest
-    236-261: parseNodePath(filePath: string): { nodeId: string; version: number; year: string; month: string; } [exported]
+    267-292: parseNodePath(filePath: string): { nodeId: string; version: number; year: string; month: string; } [exported]
       /** Parse a node file path to extract node ID, version, year, and month */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/cli.ts:37: import (module)
@@ -2693,7 +2702,7 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:614: call result
         - src/storage/node-storage.test.ts:620: call result
         - src/storage/node-storage.test.ts:626: call result
-    267-291: createNodeVersion(existingNode: Node, updates: Partial<Node>, options: NodeStorageOptions = {}): Node [exported]
+    298-322: createNodeVersion(existingNode: Node, updates: Partial<Node>, options: NodeStorageOptions = {}): Node [exported]
       /** Create a new version of an existing node Copies the node with incremented version and updated previousVersions */
       refs in: 7 [call: 6, import: 1]
         - src/storage/node-storage.test.ts:11: import (module)
@@ -3264,4 +3273,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,794 (codebase: ~1,091,604)
+Estimated tokens: 42,899 (codebase: ~1,091,955)

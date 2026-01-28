@@ -7,6 +7,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
+import type { DaemonConfig } from "../config/types.js";
+
 import {
   createWatcher,
   DEFAULT_WATCHER_CONFIG,
@@ -18,6 +20,37 @@ import {
   SESSION_EVENTS,
   SessionWatcher,
 } from "./index.js";
+
+// Helper to create a complete DaemonConfig for tests
+function getTestDaemonConfig(
+  overrides: Partial<DaemonConfig> = {}
+): DaemonConfig {
+  return {
+    idleTimeoutMinutes: 15,
+    parallelWorkers: 1,
+    maxRetries: 3,
+    retryDelaySeconds: 60,
+    reanalysisSchedule: "0 2 * * *",
+    connectionDiscoverySchedule: "0 3 * * *",
+    patternAggregationSchedule: "0 3 * * *",
+    clusteringSchedule: "0 4 * * *",
+    embeddingProvider: "openrouter" as const,
+    embeddingModel: "mock",
+    provider: "zai",
+    model: "glm-4.7",
+    promptFile: "/test/prompt.md",
+    maxConcurrentAnalysis: 1,
+    analysisTimeoutMinutes: 30,
+    maxQueueSize: 1000,
+    backfillLimit: 100,
+    reanalysisLimit: 100,
+    connectionDiscoveryLimit: 100,
+    connectionDiscoveryLookbackDays: 7,
+    connectionDiscoveryCooldownHours: 24,
+    semanticSearchThreshold: 0.5,
+    ...overrides,
+  };
+}
 
 // Test helpers
 async function createTempDir(): Promise<string> {
@@ -486,24 +519,7 @@ describe("sessionWatcher", () => {
           webUiPort: 8765,
         },
         spokes: [],
-        daemon: {
-          idleTimeoutMinutes: 15,
-          parallelWorkers: 1,
-          maxRetries: 3,
-          retryDelaySeconds: 60,
-          reanalysisSchedule: "0 2 * * *",
-          connectionDiscoverySchedule: "0 3 * * *",
-          patternAggregationSchedule: "0 3 * * *",
-          clusteringSchedule: "0 4 * * *",
-          embeddingProvider: "openrouter" as const,
-          embeddingModel: "mock",
-          provider: "zai",
-          model: "glm-4.7",
-          promptFile: "/test/prompt.md",
-          maxConcurrentAnalysis: 1,
-          analysisTimeoutMinutes: 30,
-          maxQueueSize: 1000,
-        },
+        daemon: getTestDaemonConfig(),
         query: {
           provider: "zai",
           model: "glm-4.7",
@@ -547,24 +563,7 @@ describe("sessionWatcher", () => {
             enabled: false,
           },
         ],
-        daemon: {
-          idleTimeoutMinutes: 15,
-          parallelWorkers: 1,
-          maxRetries: 3,
-          retryDelaySeconds: 60,
-          reanalysisSchedule: "0 2 * * *",
-          connectionDiscoverySchedule: "0 3 * * *",
-          patternAggregationSchedule: "0 3 * * *",
-          clusteringSchedule: "0 4 * * *",
-          embeddingProvider: "openrouter" as const,
-          embeddingModel: "mock",
-          provider: "zai",
-          model: "glm-4.7",
-          promptFile: "/test/prompt.md",
-          maxConcurrentAnalysis: 1,
-          analysisTimeoutMinutes: 30,
-          maxQueueSize: 1000,
-        },
+        daemon: getTestDaemonConfig(),
         query: {
           provider: "zai",
           model: "glm-4.7",
@@ -754,24 +753,7 @@ describe("sessionWatcher", () => {
 
 describe("createWatcher", () => {
   it("should create watcher from daemon config", () => {
-    const daemonConfig = {
-      idleTimeoutMinutes: 20,
-      parallelWorkers: 1,
-      maxRetries: 3,
-      retryDelaySeconds: 60,
-      reanalysisSchedule: "0 2 * * *",
-      connectionDiscoverySchedule: "0 3 * * *",
-      patternAggregationSchedule: "0 3 * * *",
-      clusteringSchedule: "0 4 * * *",
-      embeddingProvider: "openrouter" as const,
-      embeddingModel: "mock",
-      provider: "zai",
-      model: "glm-4.7",
-      promptFile: "/test/prompt.md",
-      maxConcurrentAnalysis: 1,
-      analysisTimeoutMinutes: 30,
-      maxQueueSize: 1000,
-    };
+    const daemonConfig = getTestDaemonConfig({ idleTimeoutMinutes: 20 });
 
     const watcher = createWatcher(daemonConfig);
     expect(watcher).toBeInstanceOf(SessionWatcher);

@@ -487,17 +487,17 @@ src/daemon/facet-discovery.ts [1-1760]
     - node:path
     - node:url
 
-src/daemon/graph-export.ts [1-131]
+src/daemon/graph-export.ts [1-134]
   interface:
     15-20: interface GraphExportOptions [exported]
   function:
-    25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
+    25-92: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
       /** Export knowledge graph to Graphviz DOT format */
       refs out: 4 [call: 3, type: 1]
         - src/daemon/graph-export.ts:28: type GraphExportOptions -> src/daemon/graph-export.ts
         - src/daemon/graph-export.ts:33: call migrate -> src/storage/database.ts
-        - src/daemon/graph-export.ts:82: call writeFileSync -> external
-        - src/daemon/graph-export.ts:89: call close -> external
+        - src/daemon/graph-export.ts:83: call writeFileSync -> external
+        - src/daemon/graph-export.ts:90: call close -> external
   imports:
     - ../config/index.js
     - ../storage/database.js
@@ -557,7 +557,7 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-723]
+src/daemon/processor.test.ts [1-729]
   imports:
     - ./processor.js
     - ./queue.js
@@ -849,7 +849,7 @@ src/daemon/queue.ts [1-787]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-967]
+src/daemon/scheduler.test.ts [1-961]
   imports:
     - ./queue.js
     - ./scheduler.js
@@ -932,17 +932,21 @@ src/daemon/scheduler.ts [1-978]
     - better-sqlite3
     - croner
 
-src/daemon/semantic-search.integration.test.ts [1-323]
+src/daemon/semantic-search.integration.test.ts [1-337]
   imports:
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
+    - ../storage/types.js
     - ../types/index.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
     - node:child_process
+    - node:fs
+    - node:os
+    - node:path
     - vitest
 
 src/daemon/watcher-events.ts [1-117]
@@ -1010,8 +1014,9 @@ src/daemon/watcher-events.ts [1-117]
       refs out: 1 [type: 1]
         - src/daemon/watcher-events.ts:37: type const -> external
 
-src/daemon/watcher.test.ts [1-844]
+src/daemon/watcher.test.ts [1-826]
   imports:
+    - ../config/types.js
     - ./index.js
     - node:fs/promises
     - node:os
@@ -1062,7 +1067,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-539]
+src/daemon/worker.test.ts [1-546]
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -1608,4 +1613,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,977 (codebase: ~1,091,604)
+Estimated tokens: 21,001 (codebase: ~1,091,955)

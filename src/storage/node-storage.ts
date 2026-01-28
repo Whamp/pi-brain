@@ -21,6 +21,26 @@ import type { Node } from "./node-types.js";
 /** Default nodes directory */
 export const DEFAULT_NODES_DIR = join(homedir(), ".pi-brain", "data", "nodes");
 
+/**
+ * Check if running in a test environment
+ */
+function isTestEnvironment(): boolean {
+  return (
+    process.env.NODE_ENV === "test" ||
+    process.env.VITEST !== undefined ||
+    process.env.JEST_WORKER_ID !== undefined
+  );
+}
+
+/**
+ * Check if a path is within the production nodes directory
+ */
+function isProductionPath(nodesDir: string): boolean {
+  const normalizedNodesDir = nodesDir.replace(/\/+$/, "");
+  const normalizedDefault = DEFAULT_NODES_DIR.replace(/\/+$/, "");
+  return normalizedNodesDir === normalizedDefault;
+}
+
 export interface NodeStorageOptions {
   /** Base directory for node files */
   nodesDir?: string;
@@ -56,12 +76,23 @@ export function getNodePath(
 
 /**
  * Write a node to JSON file storage
+ *
+ * @throws Error if running in test environment and attempting to write to production paths
  */
 export function writeNode(
   node: Node,
   options: NodeStorageOptions = {}
 ): string {
   const nodesDir = options.nodesDir ?? DEFAULT_NODES_DIR;
+
+  // Guard: prevent test code from writing to production paths
+  if (isTestEnvironment() && isProductionPath(nodesDir)) {
+    throw new Error(
+      "Test attempted to write to production nodes directory (~/.pi-brain/data/nodes). " +
+        "Pass a temp nodesDir option to writeNode()/createNode() in tests."
+    );
+  }
+
   const filePath = getNodePath(
     node.id,
     node.version,

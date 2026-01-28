@@ -845,4 +845,29 @@ describe("node-types", () => {
       }
     });
   });
+
+  describe("test environment guard", () => {
+    it("should throw when writing to production path in test environment", () => {
+      const node = createTestNode();
+
+      // This should throw because we're in a test environment and not passing nodesDir
+      expect(() => writeNode(node)).toThrow(
+        /Test attempted to write to production nodes directory/
+      );
+    });
+
+    it("should allow writing to custom temp directory in test environment", () => {
+      const tempDir = join(tmpdir(), `test-guard-${Date.now()}`);
+      mkdirSync(tempDir, { recursive: true });
+
+      try {
+        const node = createTestNode();
+        const filePath = writeNode(node, { nodesDir: tempDir });
+
+        expect(existsSync(filePath)).toBeTruthy();
+      } finally {
+        rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+  });
 });

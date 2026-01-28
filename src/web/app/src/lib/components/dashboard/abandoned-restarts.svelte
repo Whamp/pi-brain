@@ -12,10 +12,10 @@
   import Spinner from "$lib/components/spinner.svelte";
 
   // State
-  let patterns: AbandonedRestartPattern[] = [];
-  let summary: FrictionSummary | null = null;
-  let loading = true;
-  let errorMessage: string | null = null;
+  let patterns = $state<AbandonedRestartPattern[]>([]);
+  let summary = $state<FrictionSummary | null>(null);
+  let loading = $state(true);
+  let errorMessage = $state<string | null>(null);
 
   onMount(async () => {
     await loadData();
@@ -48,7 +48,6 @@
           : getErrorMessage(firstError);
       }
     } catch (error) {
-      console.error("Failed to load friction data:", error);
       errorMessage = isBackendOffline(error)
         ? "Backend is offline"
         : getErrorMessage(error);

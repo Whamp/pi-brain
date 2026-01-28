@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1132,
+    "totalSymbols": 1134,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 501,
+      "function": 503,
       "type": 41,
       "interface": 262,
       "variable": 119,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38977,
-  "codebase_tokens": 1091604,
+  "total_tokens": 39038,
+  "codebase_tokens": 1091955,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -5856,10 +5856,10 @@
       "language": "typescript",
       "lines": [
         1,
-        131
+        134
       ],
       "detail_level": "full",
-      "token_estimate": 177,
+      "token_estimate": 183,
       "symbols": [
         {
           "name": "GraphExportOptions",
@@ -5886,7 +5886,7 @@
           "signature": "exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; }",
           "lines": [
             25,
-            91
+            92
           ],
           "exported": true,
           "is_default": false,
@@ -5904,8 +5904,8 @@
           "kind": "function",
           "signature": "escapeString(str: string): string",
           "lines": [
-            93,
-            95
+            94,
+            96
           ],
           "exported": false,
           "is_default": false,
@@ -5921,10 +5921,10 @@
         {
           "name": "formatNodeLabel",
           "kind": "function",
-          "signature": "formatNodeLabel(node: NodeRow): string",
+          "signature": "formatNodeLabel(node: NodeRow, summary: string | null): string",
           "lines": [
-            97,
-            104
+            98,
+            107
           ],
           "exported": false,
           "is_default": false,
@@ -5942,8 +5942,8 @@
           "kind": "function",
           "signature": "getNodeColor(type: string): string",
           "lines": [
-            106,
-            117
+            109,
+            120
           ],
           "exported": false,
           "is_default": false,
@@ -5961,8 +5961,8 @@
           "kind": "function",
           "signature": "getEdgeStyle(type: string): string",
           "lines": [
-            119,
-            130
+            122,
+            133
           ],
           "exported": false,
           "is_default": false,
@@ -17800,10 +17800,10 @@
       "language": "typescript",
       "lines": [
         1,
-        292
+        323
       ],
       "detail_level": "full",
-      "token_estimate": 598,
+      "token_estimate": 653,
       "symbols": [
         {
           "name": "DEFAULT_NODES_DIR",
@@ -17825,12 +17825,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "isTestEnvironment",
+          "kind": "function",
+          "signature": "isTestEnvironment(): boolean",
+          "lines": [
+            27,
+            33
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if running in a test environment",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isProductionPath",
+          "kind": "function",
+          "signature": "isProductionPath(nodesDir: string): boolean",
+          "lines": [
+            38,
+            42
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a path is within the production nodes directory",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "NodeStorageOptions",
           "kind": "interface",
           "signature": "NodeStorageOptions",
           "lines": [
-            24,
-            27
+            44,
+            47
           ],
           "exported": true,
           "is_default": false,
@@ -17848,8 +17886,8 @@
           "kind": "function",
           "signature": "getNodeDir(timestamp: string, nodesDir = DEFAULT_NODES_DIR): string",
           "lines": [
-            33,
-            41
+            53,
+            61
           ],
           "exported": true,
           "is_default": false,
@@ -17867,8 +17905,8 @@
           "kind": "function",
           "signature": "getNodePath(nodeId: string, version: number, timestamp: string, nodesDir = DEFAULT_NODES_DIR): string",
           "lines": [
-            47,
-            55
+            67,
+            75
           ],
           "exported": true,
           "is_default": false,
@@ -17886,8 +17924,8 @@
           "kind": "function",
           "signature": "writeNode(node: Node, options: NodeStorageOptions = {}): string",
           "lines": [
-            60,
-            82
+            82,
+            113
           ],
           "exported": true,
           "is_default": false,
@@ -17905,8 +17943,8 @@
           "kind": "function",
           "signature": "readNode(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): Node",
           "lines": [
-            87,
-            102
+            118,
+            133
           ],
           "exported": true,
           "is_default": false,
@@ -17924,8 +17962,8 @@
           "kind": "function",
           "signature": "readNodeFromPath(filePath: string): Node",
           "lines": [
-            107,
-            114
+            138,
+            145
           ],
           "exported": true,
           "is_default": false,
@@ -17943,8 +17981,8 @@
           "kind": "function",
           "signature": "nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean",
           "lines": [
-            119,
-            128
+            150,
+            159
           ],
           "exported": true,
           "is_default": false,
@@ -17962,8 +18000,8 @@
           "kind": "function",
           "signature": "listNodeFiles(options: NodeStorageOptions = {}): {}",
           "lines": [
-            134,
-            175
+            165,
+            206
           ],
           "exported": true,
           "is_default": false,
@@ -17981,8 +18019,8 @@
           "kind": "function",
           "signature": "listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {}",
           "lines": [
-            181,
-            202
+            212,
+            233
           ],
           "exported": true,
           "is_default": false,
@@ -18000,8 +18038,8 @@
           "kind": "function",
           "signature": "getLatestNodeVersion(nodeId: string, options: NodeStorageOptions = {}): { version: number; path: string; }",
           "lines": [
-            207,
-            217
+            238,
+            248
           ],
           "exported": true,
           "is_default": false,
@@ -18019,8 +18057,8 @@
           "kind": "function",
           "signature": "readLatestNode(nodeId: string, options: NodeStorageOptions = {}): any",
           "lines": [
-            222,
-            231
+            253,
+            262
           ],
           "exported": true,
           "is_default": false,
@@ -18038,8 +18076,8 @@
           "kind": "function",
           "signature": "parseNodePath(filePath: string): { nodeId: string; version: number; year: string; month: string; }",
           "lines": [
-            236,
-            261
+            267,
+            292
           ],
           "exported": true,
           "is_default": false,
@@ -18057,8 +18095,8 @@
           "kind": "function",
           "signature": "createNodeVersion(existingNode: Node, updates: Partial<Node>, options: NodeStorageOptions = {}): Node",
           "lines": [
-            267,
-            291
+            298,
+            322
           ],
           "exported": true,
           "is_default": false,
