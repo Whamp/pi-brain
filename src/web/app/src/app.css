@@ -50,6 +50,19 @@
   --color-edge-continuation: #06b6d4;
   --color-edge-reference: #a1a1aa;
 
+  /* AutoMem Edge Types */
+  --color-edge-leads-to: #3b82f6;
+  --color-edge-occurred-before: #64748b;
+  --color-edge-prefers-over: #22c55e;
+  --color-edge-exemplifies: #a855f7;
+  --color-edge-contradicts: #ef4444;
+  --color-edge-reinforces: #14b8a6;
+  --color-edge-invalidated-by: #f97316;
+  --color-edge-evolved-into: #6366f1;
+  --color-edge-derived-from: #06b6d4;
+  --color-edge-part-of: #ec4899;
+  --color-edge-relates-to: #94a3b8;
+
   /* Typography */
   --font-sans:
     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

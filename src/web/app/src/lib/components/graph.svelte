@@ -2,6 +2,7 @@
   /**
    * Graph component - D3.js force-directed graph visualization
    * Task 5.3: Node rendering
+   * Task 20.5.1: Color-coded edge types
    */
   import { onMount, onDestroy } from "svelte";
   import * as d3 from "d3";
@@ -12,6 +13,7 @@
     nodes?: Node[];
     edges?: Edge[];
     selectedNodeId?: string | null;
+    showLegend?: boolean;
     onNodeClick?: (nodeId: string, node: Node) => void;
     onNodeDoubleClick?: (nodeId: string, node: Node) => void;
   }
@@ -20,6 +22,7 @@
     nodes = [],
     edges = [],
     selectedNodeId = null,
+    showLegend = true,
     onNodeClick,
     onNodeDoubleClick,
   }: Props = $props();
@@ -66,12 +69,59 @@
     return nodeColors[type] || "var(--color-node-other)";
   }
 
+  // Edge type to color mapping
+  const edgeColors: Record<string, string> = {
+    // Structural
+    fork: "var(--color-edge-fork)",
+    branch: "var(--color-edge-branch)",
+    tree_jump: "var(--color-edge-tree-jump)",
+    resume: "var(--color-edge-resume)",
+    compaction: "var(--color-edge-compaction)",
+    continuation: "var(--color-edge-continuation)",
+    handoff: "var(--color-edge-handoff)",
+
+    // Semantic
+    semantic: "var(--color-edge-semantic)",
+    reference: "var(--color-edge-reference)",
+    lesson_application: "var(--color-edge-semantic)", // Reuse semantic color
+    failure_pattern: "var(--color-node-debugging)", // Use debugging color
+    project_related: "var(--color-edge-branch)", // Use branch color
+    technique_shared: "var(--color-edge-semantic)", // Reuse semantic color
+
+    // AutoMem
+    LEADS_TO: "var(--color-edge-leads-to)",
+    OCCURRED_BEFORE: "var(--color-edge-occurred-before)",
+    PREFERS_OVER: "var(--color-edge-prefers-over)",
+    EXEMPLIFIES: "var(--color-edge-exemplifies)",
+    CONTRADICTS: "var(--color-edge-contradicts)",
+    REINFORCES: "var(--color-edge-reinforces)",
+    INVALIDATED_BY: "var(--color-edge-invalidated-by)",
+    EVOLVED_INTO: "var(--color-edge-evolved-into)",
+    DERIVED_FROM: "var(--color-edge-derived-from)",
+    PART_OF: "var(--color-edge-part-of)",
+    RELATES_TO: "var(--color-edge-relates-to)",
+  };
+
+  function getEdgeColor(type: string): string {
+    return edgeColors[type] || "var(--color-border)";
+  }
+
   function truncateLabel(text: string, maxLength: number): string {
     if (text.length <= maxLength) {
       return text;
     }
     return `${text.slice(0, maxLength - 1)}…`;
   }
+
+  // Compute unique edge types present in the graph for the legend
+  let presentEdgeTypes = $derived.by(() => {
+    const types = new Set<string>();
+    for (const e of edges) {
+      types.add(e.type);
+    }
+    // Create a new array and sort it to avoid mutation issues
+    return [...types].toSorted();
+  });
 
   function initGraph(): void {
     if (!container || !svgElement) {
@@ -90,10 +140,10 @@
     // Add defs for markers (arrowheads)
     const defs = svg.append("defs");
 
-    // Arrowhead marker
+    // Default marker
     defs
       .append("marker")
-      .attr("id", "arrowhead")
+      .attr("id", "arrowhead-default")
       .attr("viewBox", "-0 -5 10 10")
       .attr("refX", NODE_RADIUS + 10)
       .attr("refY", 0)
@@ -103,6 +153,22 @@
       .append("path")
       .attr("d", "M 0,-5 L 10,0 L 0,5")
       .attr("fill", "var(--color-border)");
+      
+    // Create a marker for each edge color
+    for (const [type, color] of Object.entries(edgeColors)) {
+      defs
+        .append("marker")
+        .attr("id", `arrowhead-${type}`)
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", NODE_RADIUS + 10)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .append("path")
+        .attr("d", "M 0,-5 L 10,0 L 0,5")
+        .attr("fill", color);
+    }
 
     // Main group for zoom/pan
     g = svg.append("g").attr("class", "graph-content");
@@ -186,10 +252,19 @@
     edgeSelection
       .enter()
       .append("line")
-      .attr("stroke", "var(--color-border)")
+      .attr("stroke", d => getEdgeColor(d.type))
       .attr("stroke-width", 2)
-      .attr("marker-end", "url(#arrowhead)")
+      .attr("marker-end", d => 
+        edgeColors[d.type] ? `url(#arrowhead-${d.type})` : "url(#arrowhead-default)"
+      )
       .attr("opacity", 0.6);
+
+    // Update existing edges
+    edgeSelection
+       .attr("stroke", d => getEdgeColor(d.type))
+       .attr("marker-end", d => 
+         edgeColors[d.type] ? `url(#arrowhead-${d.type})` : "url(#arrowhead-default)"
+       );
 
     // Update nodes
     const nodeGroup = g.select<SVGGElement>(".nodes");
@@ -532,6 +607,20 @@
       </svg>
     </button>
   </div>
+  
+  {#if showLegend && presentEdgeTypes.length > 0}
+    <div class="legend" role="complementary" aria-label="Edge type legend">
+      <div class="legend-title">Relationships</div>
+      <div class="legend-items">
+        {#each presentEdgeTypes as type}
+          <div class="legend-item">
+            <span class="legend-color" style:background-color={getEdgeColor(type)}></span>
+            <span class="legend-label">{type.replace(/_/g, ' ')}</span>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
 
   {#if nodes.length === 0}
     <div class="empty-state" role="status">
@@ -568,6 +657,51 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     padding: var(--space-1);
+    z-index: 10;
+  }
+  
+  .legend {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    max-height: 50%;
+    overflow-y: auto;
+    z-index: 10;
+    font-size: var(--text-xs);
+    opacity: 0.9;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .legend-title {
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--color-text-muted);
+  }
+  
+  .legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  
+  .legend-color {
+    width: 12px;
+    height: 3px;
+    border-radius: 1px;
+  }
+  
+  .legend-label {
+    text-transform: capitalize;
   }
 
   .controls button {
