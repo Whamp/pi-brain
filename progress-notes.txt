@@ -30,3 +30,22 @@ Changes made:
    overriding (no partial nested objects allowed)
 
 All 1239 tests pass. Ready for merge.
+
+---
+
+## 2026-01-27 21:16 - Task 17.2.2
+
+**Status**: pending → done
+**Validation**: 
+  - 2 new unit tests in facet-discovery.test.ts:
+    - "should re-embed nodes with old simple format (not rich format)"
+    - "should use cached embedding when already in rich format"
+  - All 1241 tests pass
+**Commit**: 5409dbac
+**Notes**: Updated facet-discovery.ts to use the rich embedding format from embedding-utils.ts:
+  - Import buildEmbeddingText, buildSimpleEmbeddingText, isRichEmbeddingFormat
+  - Import readNodeFromPath for loading full node data from JSON
+  - Added data_file to NodeSummaryRow interface and SQL query
+  - Updated embedNodes to check isRichEmbeddingFormat on cached embeddings
+  - New buildNodeEmbeddingText method loads full node from JSON for rich format
+  - Graceful fallback to simple format if JSON loading fails
