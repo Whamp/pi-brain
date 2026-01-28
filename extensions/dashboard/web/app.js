@@ -269,7 +269,7 @@ class Dashboard {
     el.innerHTML = html;
 
     // Bind click events
-    el.querySelectorAll(".session-item").forEach((item) => {
+    for (const item of el.querySelectorAll(".session-item")) {
       item.addEventListener("click", () => {
         const { path } = item.dataset;
         if (
@@ -279,7 +279,7 @@ class Dashboard {
           this.switchSession(path);
         }
       });
-    });
+    }
   }
 
   switchSession(path) {
@@ -367,7 +367,7 @@ class Dashboard {
     this.elements.treeView.innerHTML = html;
 
     // Bind node click events
-    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(".node-content")) {
       el.addEventListener("click", (e) => {
         e.stopPropagation();
         const { id } = el.dataset;
@@ -382,10 +382,10 @@ class Dashboard {
           children.classList.toggle("collapsed");
         }
       });
-    });
+    }
 
     // Bind toggle buttons
-    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(".toggle-btn")) {
       el.addEventListener("click", (e) => {
         e.stopPropagation();
         const children = el
@@ -396,7 +396,7 @@ class Dashboard {
           el.textContent = children.classList.contains("collapsed") ? "▶" : "▼";
         }
       });
-    });
+    }
 
     this.updateTreeStats();
   }
@@ -595,9 +595,9 @@ class Dashboard {
   // Node selection
   selectNode(id) {
     // Update visual state
-    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(".node-content")) {
       el.classList.toggle("selected", el.dataset.id === id);
-    });
+    }
 
     // Find entry
     const entry = this.sessionData?.entries.find((e) => e.id === id);
@@ -617,11 +617,11 @@ class Dashboard {
   }
 
   clearSelection() {
-    this.elements.treeView
-      .querySelectorAll(".node-content.selected")
-      .forEach((el) => {
-        el.classList.remove("selected");
-      });
+    for (const el of this.elements.treeView.querySelectorAll(
+      ".node-content.selected"
+    )) {
+      el.classList.remove("selected");
+    }
 
     this.selectedNode = null;
     this.elements.entryDetails.innerHTML = `
@@ -727,21 +727,25 @@ class Dashboard {
 
   // Actions
   expandAll() {
-    this.elements.treeView.querySelectorAll(".tree-children").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(
+      ".tree-children"
+    )) {
       el.classList.remove("collapsed");
-    });
-    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+    }
+    for (const el of this.elements.treeView.querySelectorAll(".toggle-btn")) {
       el.textContent = "▼";
-    });
+    }
   }
 
   collapseAll() {
-    this.elements.treeView.querySelectorAll(".tree-children").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(
+      ".tree-children"
+    )) {
       el.classList.add("collapsed");
-    });
-    this.elements.treeView.querySelectorAll(".toggle-btn").forEach((el) => {
+    }
+    for (const el of this.elements.treeView.querySelectorAll(".toggle-btn")) {
       el.textContent = "▶";
-    });
+    }
   }
 
   zoomToLeaf() {
@@ -808,7 +812,7 @@ class Dashboard {
   onSearch(query) {
     const lowerQuery = query.toLowerCase();
 
-    this.elements.treeView.querySelectorAll(".node-content").forEach((el) => {
+    for (const el of this.elements.treeView.querySelectorAll(".node-content")) {
       const label =
         el.querySelector(".node-label")?.textContent?.toLowerCase() || "";
       const matches = !query || label.includes(lowerQuery);
@@ -823,7 +827,7 @@ class Dashboard {
           parent = parent.parentElement?.closest(".tree-children");
         }
       }
-    });
+    }
   }
 
   escapeHtml(str) {

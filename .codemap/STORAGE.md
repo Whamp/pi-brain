@@ -103,7 +103,7 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-623]
+src/storage/embedding-utils.ts [1-625]
   interface:
     325-329: interface BackfillEmbeddingProvider [exported]
       /** Embedding provider interface for backfill operations. Matches the EmbeddingProvider interface from facet-discovery.ts. */
@@ -132,11 +132,11 @@ src/storage/embedding-utils.ts [1-623]
       /** Serialize an embedding array to a binary Buffer (Float32 little-endian). This format is used for storing in the node_embeddings table. */
     309-315: deserializeEmbedding(buffer: Buffer): {} [exported]
       /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
-    401-441: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
+    403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
       /** Find nodes that need embedding generation or update. A node needs embedding if: 1. No embedding exists for it 2. Embedding uses a different model than the current provider 3. Embedding uses old format (not rich format with decisions/lessons) */
-    457-583: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
+    459-585: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
-    590-622: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
+    592-624: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
   variable:
     19-19: "[emb:v2]" [exported]
@@ -566,4 +566,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 17
-Estimated tokens: 8,753 (codebase: ~1,053,345)
+Estimated tokens: 8,753 (codebase: ~1,053,564)

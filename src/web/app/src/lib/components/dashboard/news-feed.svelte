@@ -166,7 +166,7 @@
     if (summary.length <= maxLen) {
       return summary;
     }
-    return summary.slice(0, maxLen).trim() + "...";
+    return `${summary.slice(0, maxLen).trim()}...`;
   }
 
   function getActionLabel(action: "confirmed" | "dismissed"): string {

@@ -244,7 +244,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-248]
+src/daemon/daemon-process.ts [1-252]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -415,9 +415,9 @@ src/daemon/facet-discovery.test.ts [1-913]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1757]
+src/daemon/facet-discovery.ts [1-1760]
   class:
-    667-1728: class FacetDiscovery [exported]
+    670-1731: class FacetDiscovery [exported]
   interface:
     99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -431,7 +431,7 @@ src/daemon/facet-discovery.ts [1-1757]
       /** Interface for embedding providers */
       refs out: 1 [type: 1]
         - src/daemon/facet-discovery.ts:141: type Promise -> external
-    655-659: interface FacetDiscoveryLogger [exported]
+    656-660: interface FacetDiscoveryLogger [exported]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
@@ -444,21 +444,21 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.ts:185: instantiate Error -> external
         - src/daemon/facet-discovery.ts:187: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:195: instantiate Error -> external
-    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+    331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs out: 1 [type: 1]
         - src/daemon/facet-discovery.ts:331: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    384-451: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs out: 3 [call: 2, type: 1]
-        - src/daemon/facet-discovery.ts:387: type KMeansResult -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:394: call map -> external
+        - src/daemon/facet-discovery.ts:388: type KMeansResult -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:395: call map -> external
-    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+        - src/daemon/facet-discovery.ts:396: call map -> external
+    494-513: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs out: 2 [call: 2]
-        - src/daemon/facet-discovery.ts:499: call fill -> external
-        - src/daemon/facet-discovery.ts:499: call from -> external
+        - src/daemon/facet-discovery.ts:500: call fill -> external
+        - src/daemon/facet-discovery.ts:500: call from -> external
   imports:
     - ../storage/embedding-utils.js
     - ../storage/node-storage.js
@@ -576,7 +576,8 @@ src/daemon/processor.ts [1-773]
       /** Result of environment validation */
     701-706: interface ProcessorConfig [exported]
       /** Processor configuration */
-      refs out: 1 [type: 1]
+      refs out: 2 [type: 2]
+        - src/daemon/processor.ts:703: type DaemonConfig -> src/config/types.ts
         - src/daemon/processor.ts:705: type ProcessorLogger -> src/daemon/processor.ts
   function:
     170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
@@ -618,8 +619,9 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:279: call join -> external
     313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-      refs out: 13 [call: 9, type: 4]
+      refs out: 14 [call: 9, type: 5]
         - src/daemon/processor.ts:314: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/processor.ts:315: type DaemonConfig -> src/config/types.ts
         - src/daemon/processor.ts:316: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/processor.ts:317: type Promise -> external
         - src/daemon/processor.ts:317: type AgentResult -> src/daemon/processor.ts
@@ -628,7 +630,6 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:335: call access -> external
         - src/daemon/processor.ts:342: call now -> external
         - src/daemon/processor.ts:354: call now -> external
-        - src/daemon/processor.ts:378: call debug -> src/daemon/processor.ts
     535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
@@ -826,9 +827,9 @@ src/daemon/scheduler.test.ts [1-967]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-972]
+src/daemon/scheduler.ts [1-978]
   class:
-    161-900: class Scheduler [exported]
+    163-904: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     59-66: interface ScheduledJobResult [exported]
@@ -839,15 +840,15 @@ src/daemon/scheduler.ts [1-972]
         - src/daemon/scheduler.ts:62: type Date -> external
     69-74: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    93-144: interface SchedulerConfig [exported]
+    95-146: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    147-156: interface SchedulerStatus [exported]
+    149-158: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs out: 4 [type: 4]
-        - src/daemon/scheduler.ts:150: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:152: type Date -> external
-        - src/daemon/scheduler.ts:153: type Date -> external
-        - src/daemon/scheduler.ts:154: type ScheduledJobResult -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:152: type ScheduledJobType -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:154: type Date -> external
+        - src/daemon/scheduler.ts:155: type Date -> external
+        - src/daemon/scheduler.ts:156: type ScheduledJobResult -> src/daemon/scheduler.ts
   type:
     51-56: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -856,38 +857,39 @@ src/daemon/scheduler.ts [1-972]
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    905-935: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    909-939: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-      refs out: 5 [instantiate: 1, type: 4]
-        - src/daemon/scheduler.ts:907: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:908: type Database -> external
-        - src/daemon/scheduler.ts:909: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:910: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:911: instantiate Scheduler -> src/daemon/scheduler.ts
-    941-950: isValidCronExpression(expression: string): boolean [exported]
+      refs out: 6 [instantiate: 1, type: 5]
+        - src/daemon/scheduler.ts:910: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:911: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:912: type Database -> external
+        - src/daemon/scheduler.ts:913: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:914: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:915: instantiate Scheduler -> src/daemon/scheduler.ts
+    945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:945: call Cron.stop -> external
-    955-971: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:950: call Cron.stop -> external
+    960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:955: type Date -> external
-        - src/daemon/scheduler.ts:962: call push -> external
-        - src/daemon/scheduler.ts:963: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:966: call Cron.stop -> external
+        - src/daemon/scheduler.ts:960: type Date -> external
+        - src/daemon/scheduler.ts:968: call push -> external
+        - src/daemon/scheduler.ts:969: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:972: call Cron.stop -> external
   variable:
-    77-82: SchedulerLogger [exported]
+    78-83: SchedulerLogger [exported]
       /** Default no-op logger */
       refs out: 1 [type: 1]
-        - src/daemon/scheduler.ts:77: type SchedulerLogger -> src/daemon/scheduler.ts
-    85-90: SchedulerLogger [exported]
+        - src/daemon/scheduler.ts:78: type SchedulerLogger -> src/daemon/scheduler.ts
+    87-92: SchedulerLogger [exported]
       /** Console logger for production use */
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/scheduler.ts:85: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:86: call log -> external
-        - src/daemon/scheduler.ts:87: call warn -> external
-        - src/daemon/scheduler.ts:88: call error -> external
-        - src/daemon/scheduler.ts:89: call debug -> external
+        - src/daemon/scheduler.ts:87: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:88: call log -> external
+        - src/daemon/scheduler.ts:89: call warn -> external
+        - src/daemon/scheduler.ts:90: call error -> external
+        - src/daemon/scheduler.ts:91: call debug -> external
   imports:
     - ../config/types.js
     - ../prompt/effectiveness.js
@@ -990,7 +992,8 @@ src/daemon/watcher.ts [1-582]
   function:
     546-550: createWatcher(daemonConfig: DaemonConfig): SessionWatcher [exported]
       /** Create a watcher from daemon config */
-      refs out: 2 [instantiate: 1, type: 1]
+      refs out: 3 [instantiate: 1, type: 2]
+        - src/daemon/watcher.ts:546: type DaemonConfig -> src/config/types.ts
         - src/daemon/watcher.ts:546: type SessionWatcher -> src/daemon/watcher.ts
         - src/daemon/watcher.ts:547: instantiate SessionWatcher -> src/daemon/watcher.ts
     555-557: isSessionFile(filePath: string): boolean [exported]
@@ -1030,9 +1033,9 @@ src/daemon/worker.test.ts [1-539]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-715]
+src/daemon/worker.ts [1-717]
   class:
-    126-654: class Worker [exported]
+    126-656: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     66-83: interface WorkerConfig [exported]
@@ -1059,32 +1062,32 @@ src/daemon/worker.ts [1-715]
         - src/daemon/worker.ts:108: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:112: type Error -> external
   function:
-    663-665: createWorker(config: WorkerConfig): Worker [exported]
+    665-667: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:663: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:663: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:664: instantiate Worker -> src/daemon/worker.ts
-    671-685: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+        - src/daemon/worker.ts:665: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:665: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:666: instantiate Worker -> src/daemon/worker.ts
+    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:672: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:673: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:674: type Database -> external
-        - src/daemon/worker.ts:675: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:676: type Promise -> external
-        - src/daemon/worker.ts:676: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:683: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:684: call Worker.processJob -> src/daemon/worker.ts
-    690-714: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:674: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:675: type PiBrainConfig -> src/config/types.ts
+        - src/daemon/worker.ts:676: type Database -> external
+        - src/daemon/worker.ts:677: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/worker.ts:678: type Promise -> external
+        - src/daemon/worker.ts:678: type JobProcessingResult -> src/daemon/worker.ts
+        - src/daemon/worker.ts:685: call Worker.initialize -> src/daemon/worker.ts
+        - src/daemon/worker.ts:686: call Worker.processJob -> src/daemon/worker.ts
+    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:691: type Error -> external
-        - src/daemon/worker.ts:692: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:693: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:698: type ReturnType -> external
-        - src/daemon/worker.ts:710: call ceil -> external
-        - src/daemon/worker.ts:711: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:693: type Error -> external
+        - src/daemon/worker.ts:694: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:695: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:700: type ReturnType -> external
+        - src/daemon/worker.ts:712: call ceil -> external
+        - src/daemon/worker.ts:713: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1208,7 +1211,7 @@ src/parser/boundary.test.ts [1-776]
     - ./boundary.js
     - vitest
 
-src/parser/boundary.ts [1-571]
+src/parser/boundary.ts [1-573]
   class:
     214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
@@ -1226,11 +1229,11 @@ src/parser/boundary.ts [1-571]
         - src/parser/boundary.ts:81: type Boundary -> src/parser/boundary.ts
     103-109: interface BoundaryOptions [exported]
       /** Options for boundary detection */
-    533-537: interface BoundaryStats [exported]
+    535-539: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
       refs out: 2 [type: 2]
-        - src/parser/boundary.ts:535: type Record -> external
-        - src/parser/boundary.ts:535: type BoundaryType -> src/parser/boundary.ts
+        - src/parser/boundary.ts:537: type Record -> external
+        - src/parser/boundary.ts:537: type BoundaryType -> src/parser/boundary.ts
   type:
     29-34: BoundaryType = | "branch"
   | "tree_jump"
@@ -1252,24 +1255,24 @@ src/parser/boundary.ts [1-571]
         - src/parser/boundary.ts:358: call LeafTracker.getCurrentLeaf -> src/parser/boundary.ts
         - src/parser/boundary.ts:379: call push -> external
         - src/parser/boundary.ts:383: call LeafTracker.getPreviousEntryId -> src/parser/boundary.ts
-    454-528: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
+    474-530: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
       refs out: 9 [call: 6, type: 3]
-        - src/parser/boundary.ts:455: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:456: type BoundaryOptions -> src/parser/boundary.ts
-        - src/parser/boundary.ts:457: type Segment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:475: call push -> external
-        - src/parser/boundary.ts:476: call set -> external
-        - src/parser/boundary.ts:513: call push -> external
-        - src/parser/boundary.ts:513: call createSegment -> src/parser/boundary.ts
-        - src/parser/boundary.ts:524: call push -> external
-        - src/parser/boundary.ts:524: call createSegment -> src/parser/boundary.ts
-    546-570: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
+        - src/parser/boundary.ts:475: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:476: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:477: type Segment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:495: call push -> external
+        - src/parser/boundary.ts:496: call set -> external
+        - src/parser/boundary.ts:515: call push -> external
+        - src/parser/boundary.ts:515: call createSegment -> src/parser/boundary.ts
+        - src/parser/boundary.ts:526: call push -> external
+        - src/parser/boundary.ts:526: call createSegment -> src/parser/boundary.ts
+    548-572: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
       refs out: 3 [type: 3]
-        - src/parser/boundary.ts:547: type SessionEntry -> src/types.ts
-        - src/parser/boundary.ts:548: type BoundaryOptions -> src/parser/boundary.ts
-        - src/parser/boundary.ts:549: type BoundaryStats -> src/parser/boundary.ts
+        - src/parser/boundary.ts:549: type SessionEntry -> src/types.ts
+        - src/parser/boundary.ts:550: type BoundaryOptions -> src/parser/boundary.ts
+        - src/parser/boundary.ts:551: type BoundaryStats -> src/parser/boundary.ts
   variable:
     98-98: 10 [exported]
       /** Default minimum gap in minutes to trigger a resume boundary. Can be overridden via BoundaryOptions.resumeGapMinutes. */
@@ -1349,7 +1352,7 @@ src/parser/session.test.ts [1-1128]
     - ./session.js
     - vitest
 
-src/parser/session.ts [1-415]
+src/parser/session.ts [1-419]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
@@ -1393,35 +1396,35 @@ src/parser/session.ts [1-415]
         - src/parser/session.ts:224: call map -> external
         - src/parser/session.ts:224: call filter -> external
         - src/parser/session.ts:224: call entries -> external
-    232-300: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+    232-304: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
       refs out: 4 [call: 1, type: 3]
         - src/parser/session.ts:233: type SessionEntry -> src/types.ts
         - src/parser/session.ts:234: type TreeNode -> src/types.ts
         - src/parser/session.ts:235: type SessionStats -> src/types.ts
         - src/parser/session.ts:258: call add -> external
-    347-366: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+    351-370: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
       refs out: 6 [call: 3, type: 3]
-        - src/parser/session.ts:348: type UserMessage -> src/types.ts
-        - src/parser/session.ts:348: type AssistantMessage -> src/types.ts
-        - src/parser/session.ts:354: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:357: call isArray -> external
-        - src/parser/session.ts:360: call truncate -> src/parser/session.ts
-        - src/parser/session.ts:360: type TextContent -> src/types.ts
-    382-404: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+        - src/parser/session.ts:352: type UserMessage -> src/types.ts
+        - src/parser/session.ts:352: type AssistantMessage -> src/types.ts
+        - src/parser/session.ts:358: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:361: call isArray -> external
+        - src/parser/session.ts:364: call truncate -> src/parser/session.ts
+        - src/parser/session.ts:364: type TextContent -> src/types.ts
+    386-408: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
       refs out: 4 [call: 2, type: 2]
-        - src/parser/session.ts:383: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:385: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:388: call set -> external
-        - src/parser/session.ts:399: call unshift -> external
-    409-414: getEntry(entries: SessionEntry[], id: string): any [exported]
+        - src/parser/session.ts:387: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:389: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:392: call set -> external
+        - src/parser/session.ts:403: call unshift -> external
+    413-418: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/session.ts:410: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:412: type SessionEntry -> src/types.ts
-        - src/parser/session.ts:413: call find -> external
+        - src/parser/session.ts:414: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:416: type SessionEntry -> src/types.ts
+        - src/parser/session.ts:417: call find -> external
   imports:
     - ../types.js
     - node:fs/promises
@@ -1563,4 +1566,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,421 (codebase: ~1,053,294)
+Estimated tokens: 20,481 (codebase: ~1,052,531)

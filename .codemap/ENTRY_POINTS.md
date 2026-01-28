@@ -295,9 +295,6 @@ src/api/routes/query.ts [1-281]
   embeddingDimensions?: number;
 }): any
       /** Get or create the embedding provider with caching. Cache is invalidated if the configuration changes. */
-      refs out: 2 [call: 1, type: 1]
-        - src/api/routes/query.ts:66: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-        - src/api/routes/query.ts:94: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
     106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 37 [call: 30, instantiate: 1, type: 6]
         - src/api/routes/query.ts:106: type FastifyInstance -> external
@@ -314,8 +311,6 @@ src/api/routes/query.ts [1-281]
         - src/api/routes/query.ts:42: type const -> external
     53-53: EmbeddingProvider | undefined
       /** Cached embedding provider instance. Created once on first use to avoid HTTP client setup overhead per request. */
-      refs out: 1 [type: 1]
-        - src/api/routes/query.ts:53: type EmbeddingProvider -> src/daemon/facet-discovery.ts
     54-54: string | undefined
   imports:
     - ../../daemon/facet-discovery.js
@@ -508,7 +503,7 @@ src/api/server.test.ts [1-703]
     - node:path
     - vitest
 
-src/api/server.ts [1-203]
+src/api/server.ts [1-205]
   interface:
     49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
@@ -516,13 +511,13 @@ src/api/server.ts [1-203]
         - src/api/server.ts:50: type Database -> external
         - src/api/server.ts:51: type ApiConfig -> src/config/types.ts
         - src/api/server.ts:53: type DaemonConfig -> src/config/types.ts
-    169-172: interface ServerResult [exported]
+    171-174: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
       refs out: 2 [type: 2]
-        - src/api/server.ts:170: type FastifyInstance -> external
-        - src/api/server.ts:171: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:172: type FastifyInstance -> external
+        - src/api/server.ts:173: type WebSocketManager -> src/api/websocket.ts
   function:
-    68-164: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
+    68-166: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
       refs out: 34 [call: 27, instantiate: 1, type: 6]
         - src/api/server.ts:69: type Database -> external
@@ -530,14 +525,14 @@ src/api/server.ts [1-203]
         - src/api/server.ts:71: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:72: type WebSocketManager -> src/api/websocket.ts
         - src/api/server.ts:73: type Promise -> external
-    177-195: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
+    179-197: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
       refs out: 8 [call: 2, type: 6]
-        - src/api/server.ts:178: type Database -> external
-        - src/api/server.ts:179: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:180: type DaemonConfig -> src/config/types.ts
-        - src/api/server.ts:181: type WebSocketManager -> src/api/websocket.ts
-        - src/api/server.ts:182: type Promise -> external
+        - src/api/server.ts:180: type Database -> external
+        - src/api/server.ts:181: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:182: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:183: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:184: type Promise -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -768,31 +763,31 @@ src/api/websocket.ts [1-388]
     - fastify
     - ws
 
-src/cli.ts [1-1141]
+src/cli.ts [1-1143]
   variable:
     73-73: any
       refs out: 1 [instantiate: 1]
         - src/cli.ts:73: instantiate Command -> external
-    199-201: any
+    200-202: any
       refs out: 2 [call: 2]
-        - src/cli.ts:199: call Command.description -> external
-        - src/cli.ts:199: call Command.command -> external
-    382-384: any
+        - src/cli.ts:200: call Command.description -> external
+        - src/cli.ts:200: call Command.command -> external
+    384-386: any
       refs out: 2 [call: 2]
-        - src/cli.ts:382: call Command.description -> external
-        - src/cli.ts:382: call Command.command -> external
-    547-549: any
+        - src/cli.ts:384: call Command.description -> external
+        - src/cli.ts:384: call Command.command -> external
+    549-551: any
       refs out: 2 [call: 2]
-        - src/cli.ts:547: call Command.description -> external
-        - src/cli.ts:547: call Command.command -> external
-    934-936: any
+        - src/cli.ts:549: call Command.description -> external
+        - src/cli.ts:549: call Command.command -> external
+    936-938: any
       refs out: 2 [call: 2]
-        - src/cli.ts:934: call Command.description -> external
-        - src/cli.ts:934: call Command.command -> external
-    1085-1087: any
+        - src/cli.ts:936: call Command.description -> external
+        - src/cli.ts:936: call Command.command -> external
+    1087-1089: any
       refs out: 2 [call: 2]
-        - src/cli.ts:1085: call Command.description -> external
-        - src/cli.ts:1085: call Command.command -> external
+        - src/cli.ts:1087: call Command.description -> external
+        - src/cli.ts:1087: call Command.command -> external
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -816,4 +811,4 @@ src/cli.ts [1-1141]
 
 ---
 Files: 27
-Estimated tokens: 9,139 (codebase: ~1,053,345)
+Estimated tokens: 9,050 (codebase: ~1,053,564)

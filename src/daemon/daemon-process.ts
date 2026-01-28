@@ -38,6 +38,15 @@ for (let i = 0; i < args.length; i++) {
 }
 
 // =============================================================================
+// Event Handlers
+// =============================================================================
+
+const handleWatcherError = (event: Event) => {
+  const customEvent = event as CustomEvent;
+  console.error("[daemon] Watcher error:", customEvent.detail?.error);
+};
+
+// =============================================================================
 // Main Daemon Process
 // =============================================================================
 
@@ -102,15 +111,15 @@ async function main(): Promise<void> {
       error: (msg: string) => console.error(`[worker] ${msg}`),
       debug: (msg: string) => console.debug(`[worker] ${msg}`),
     },
-    onJobStarted: async (job, workerId) => {
+    onJobStarted: (job, workerId) => {
       // Broadcast analysis started via WebSocket
       wsManager.broadcastAnalysisStarted(job, workerId);
     },
-    onNodeCreated: async (job, node) => {
+    onNodeCreated: (job, node) => {
       // Broadcast analysis completed + node created via WebSocket
       wsManager.broadcastAnalysisCompleted(job, node);
     },
-    onJobFailed: async (job, error) => {
+    onJobFailed: (job, error) => {
       // Broadcast analysis failed via WebSocket
       wsManager.broadcastAnalysisFailed(job, error, false);
     },
@@ -161,14 +170,9 @@ async function main(): Promise<void> {
     }
   };
 
-  const handleError = (event: Event) => {
-    const customEvent = event as CustomEvent;
-    console.error("[daemon] Watcher error:", customEvent.detail?.error);
-  };
-
   watcher.addEventListener(SESSION_EVENTS.IDLE, handleSessionIdle);
   watcher.addEventListener(SESSION_EVENTS.CHANGE, handleSessionChange);
-  watcher.addEventListener(SESSION_EVENTS.ERROR, handleError);
+  watcher.addEventListener(SESSION_EVENTS.ERROR, handleWatcherError);
 
   // Start components - use startFromConfig for PiBrainConfig
   await watcher.startFromConfig(config);

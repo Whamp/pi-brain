@@ -27,7 +27,7 @@ src/daemon/insight-aggregation.ts [1-553]
         - src/daemon/insight-aggregation.test.ts:492: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:552: instantiate aggregator
         - src/daemon/scheduler.ts:34: import (module)
-        - src/daemon/scheduler.ts:174: type Scheduler.insightAggregator
+        - src/daemon/scheduler.ts:176: type Scheduler.insightAggregator
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -70,12 +70,17 @@ src/prompt/agents-generator.ts [1-649]
   function:
     129-189: gatherModelData(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): ModelInsightData [exported]
       /** Gather all insights and clusters for a specific model */
-      refs in: 2 [call: 2]
+      refs in: 5 [call: 4, import: 1]
+        - src/api/routes/agents.ts:15: import (module)
+        - src/api/routes/agents.ts:55: call data
+        - src/api/routes/agents.ts:190: call data
         - src/prompt/agents-generator.ts:509: call data
         - src/prompt/agents-generator.ts:598: call data
     231-298: formatDataForPrompt(data: ModelInsightData): string [exported]
       /** Format model data into a structured prompt for LLM synthesis */
-      refs in: 5 [call: 4, import: 1]
+      refs in: 7 [call: 5, import: 2]
+        - src/api/routes/agents.ts:16: import (module)
+        - src/api/routes/agents.ts:199: call promptContent
         - src/prompt/agents-generator.test.ts:8: import (module)
         - src/prompt/agents-generator.test.ts:72: call result
         - src/prompt/agents-generator.test.ts:96: call result
@@ -96,10 +101,25 @@ src/prompt/agents-generator.ts [1-649]
         - src/prompt/agents-generator.ts:620: call previewAgentsForModel
     500-571: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Generate AGENTS.md for a specific model */
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/agents.ts:12: import (module)
+        - src/api/routes/agents.ts:155: call result
+        - src/cli.ts:41: import (module)
+        - src/cli.ts:1002: call result
     576-586: listModelsWithInsights(db: Database.Database): {} [exported]
       /** List all models that have insights in the database */
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/agents.ts:13: import (module)
+        - src/api/routes/agents.ts:31: call models
+        - src/cli.ts:42: import (module)
+        - src/cli.ts:950: call models
     591-648: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Preview AGENTS.md generation without saving */
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/agents.ts:14: import (module)
+        - src/api/routes/agents.ts:109: call result
+        - src/cli.ts:43: import (module)
+        - src/cli.ts:1063: call result
   imports:
     - ../storage/pattern-repository.js
     - ../types/index.js
@@ -181,7 +201,11 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.ts:469: call result
     456-621: measureAndStoreEffectiveness(db: Database.Database, insightId: string, beforePeriod: DateRange, afterPeriod: DateRange, promptVersion: string, options: MeasureEffectivenessOptions = {}): PromptEffectiveness [exported]
       /** Measure effectiveness and store the result in the database */
-      refs in: 5 [call: 4, import: 1]
+      refs in: 9 [call: 6, import: 3]
+        - src/cli.ts:47: import (module)
+        - src/cli.ts:789: call result
+        - src/daemon/scheduler.ts:21: import (module)
+        - src/daemon/scheduler.ts:695: call Scheduler.runPatternAggregation
         - src/prompt/effectiveness.test.ts:22: import (module)
         - src/prompt/effectiveness.test.ts:711: call result
         - src/prompt/effectiveness.test.ts:752: call result1
@@ -203,7 +227,9 @@ src/prompt/effectiveness.ts [1-881]
       /** Get the latest effectiveness measurements for multiple insights in a single query. Returns a map of insightId -> PromptEffectiveness. */
     705-731: getInsightsNeedingMeasurement(db: Database.Database, measureAfterDays = 7): {} [exported]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
-      refs in: 4 [call: 3, import: 1]
+      refs in: 6 [call: 4, import: 2]
+        - src/daemon/scheduler.ts:20: import (module)
+        - src/daemon/scheduler.ts:664: call Scheduler.needingMeasurement
         - src/prompt/effectiveness.test.ts:19: import (module)
         - src/prompt/effectiveness.test.ts:933: call needing
         - src/prompt/effectiveness.test.ts:957: call needing
@@ -213,7 +239,11 @@ src/prompt/effectiveness.ts [1-881]
     minSessions?: number;
   } = {}): {} [exported]
       /** Auto-disable insights that have been measured as ineffective. Returns the IDs of disabled insights. */
-      refs in: 5 [call: 4, import: 1]
+      refs in: 9 [call: 6, import: 3]
+        - src/cli.ts:46: import (module)
+        - src/cli.ts:808: call disabled
+        - src/daemon/scheduler.ts:19: import (module)
+        - src/daemon/scheduler.ts:711: call Scheduler.disabled
         - src/prompt/effectiveness.test.ts:13: import (module)
         - src/prompt/effectiveness.test.ts:1035: call disabled
         - src/prompt/effectiveness.test.ts:1068: call disabled
@@ -312,7 +342,7 @@ src/prompt/prompt-generator.ts [1-360]
       /** Generate prompt additions from the database Fetches insights from aggregated_insights table and generates additions. */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:50: import (module)
-        - src/cli.ts:592: call additions
+        - src/cli.ts:594: call additions
         - src/prompt/prompt-generator.test.ts:16: import (module)
         - src/prompt/prompt-generator.test.ts:516: call additions
         - src/prompt/prompt-generator.test.ts:533: call additions
@@ -324,7 +354,7 @@ src/prompt/prompt-generator.ts [1-360]
       /** Format a complete prompt additions document Combines all model-specific additions into a single markdown document. */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:51: import (module)
-        - src/cli.ts:605: call (module)
+        - src/cli.ts:607: call (module)
         - src/prompt/prompt-generator.test.ts:14: import (module)
         - src/prompt/prompt-generator.test.ts:418: call doc
         - src/prompt/prompt-generator.test.ts:446: call doc
@@ -341,7 +371,7 @@ src/prompt/prompt-generator.ts [1-360]
       /** Get prompt additions for a specific model */
       refs in: 7 [call: 4, import: 3]
         - src/cli.ts:52: import (module)
-        - src/cli.ts:572: call addition
+        - src/cli.ts:574: call addition
         - src/prompt/prompt-generator.test.ts:18: import (module)
         - src/prompt/prompt-generator.test.ts:603: call addition
         - src/prompt/prompt-generator.test.ts:620: call addition
@@ -432,7 +462,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Inject insights into prompts using configured method */
       refs in: 5 [call: 3, import: 2]
         - src/cli.ts:55: import (module)
-        - src/cli.ts:838: call result
+        - src/cli.ts:840: call result
         - src/prompt/prompt-injector.test.ts:19: import (module)
         - src/prompt/prompt-injector.test.ts:456: call result
         - src/prompt/prompt-injector.test.ts:463: call result
@@ -440,7 +470,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Remove injected insights */
       refs in: 5 [call: 3, import: 2]
         - src/cli.ts:56: import (module)
-        - src/cli.ts:876: call result
+        - src/cli.ts:878: call result
         - src/prompt/prompt-injector.test.ts:20: import (module)
         - src/prompt/prompt-injector.test.ts:490: call result
         - src/prompt/prompt-injector.test.ts:500: call result
@@ -448,7 +478,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Check current injection status */
       refs in: 6 [call: 4, import: 2]
         - src/cli.ts:57: import (module)
-        - src/cli.ts:900: call status
+        - src/cli.ts:902: call status
         - src/prompt/prompt-injector.test.ts:21: import (module)
         - src/prompt/prompt-injector.test.ts:525: call status
         - src/prompt/prompt-injector.test.ts:536: call status
@@ -542,7 +572,7 @@ src/prompt/prompt.ts [1-388]
       /** Get the latest prompt version from database */
       refs in: 5 [call: 3, import: 2]
         - src/daemon/scheduler.ts:23: import (module)
-        - src/daemon/scheduler.ts:474: call Scheduler.latestVersion
+        - src/daemon/scheduler.ts:478: call Scheduler.latestVersion
         - src/prompt/prompt.test.ts:28: import (module)
         - src/prompt/prompt.test.ts:235: call (module)
         - src/prompt/prompt.test.ts:251: call result
@@ -572,7 +602,7 @@ src/prompt/prompt.ts [1-388]
       /** Get or create a prompt version If the current prompt has the same hash as an existing version, returns that version. Otherwise, creates a new version, archives the prompt, and records it in the database. */
       refs in: 11 [call: 9, import: 2]
         - src/daemon/worker.ts:26: import (module)
-        - src/daemon/worker.ts:453: call Worker.promptVersion
+        - src/daemon/worker.ts:455: call Worker.promptVersion
         - src/prompt/prompt.test.ts:32: import (module)
         - src/prompt/prompt.test.ts:403: call (module)
         - src/prompt/prompt.test.ts:421: call version
@@ -699,8 +729,8 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:12: import (module)
         - src/api/routes/prompt-learning.ts:51: call insights
         - src/cli.ts:62: import (module)
-        - src/cli.ts:633: call insights
-        - src/cli.ts:776: call (module)
+        - src/cli.ts:635: call insights
+        - src/cli.ts:778: call (module)
         - src/prompt/agents-generator.ts:21: import (module)
         - src/prompt/agents-generator.ts:143: call insights
         - src/prompt/agents-generator.ts:151: call generalToolErrors
@@ -711,9 +741,9 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:13: import (module)
         - src/api/routes/prompt-learning.ts:146: call insight
         - src/cli.ts:61: import (module)
-        - src/cli.ts:684: call insight
-        - src/cli.ts:716: call insight
-        - src/cli.ts:768: call insight
+        - src/cli.ts:686: call insight
+        - src/cli.ts:718: call insight
+        - src/cli.ts:770: call insight
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
@@ -735,8 +765,8 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:14: import (module)
         - src/api/routes/prompt-learning.ts:153: call promptLearningRoutes
         - src/cli.ts:63: import (module)
-        - src/cli.ts:690: call (module)
-        - src/cli.ts:722: call (module)
+        - src/cli.ts:692: call (module)
+        - src/cli.ts:724: call (module)
         - src/prompt/effectiveness.ts:25: import (module)
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
@@ -748,4 +778,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 14
-Estimated tokens: 10,330 (codebase: ~1,053,294)
+Estimated tokens: 10,701 (codebase: ~1,052,531)

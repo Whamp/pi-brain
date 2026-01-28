@@ -284,7 +284,7 @@ export class SessionWatcher extends EventTarget {
    * This automatically includes both local sessions (hub) and synced sessions (enabled spokes).
    * Spoke paths are registered here to support standalone usage without fromConfig().
    */
-  async startFromConfig(config: PiBrainConfig): Promise<void> {
+  startFromConfig(config: PiBrainConfig): Promise<void> {
     // Register spoke paths (idempotent - safe if already registered via fromConfig)
     for (const spoke of config.spokes) {
       if (spoke.enabled) {

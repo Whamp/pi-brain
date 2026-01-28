@@ -145,7 +145,7 @@ describe("query Processor", () => {
               },
             ],
           };
-          cb(Buffer.from(JSON.stringify(output) + "\n"));
+          cb(Buffer.from(`${JSON.stringify(output)}\n`));
         }
       );
 

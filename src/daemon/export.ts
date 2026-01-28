@@ -113,7 +113,7 @@ export async function exportFineTuneData(
           ],
         };
 
-        outStream.write(JSON.stringify(example) + "\n");
+        outStream.write(`${JSON.stringify(example)}\n`);
         count++;
 
         if (count % 100 === 0) {

@@ -194,16 +194,16 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-203]
+src/api/server.ts [1-205]
   interface:
     49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
-    169-172: interface ServerResult [exported]
+    171-174: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
   function:
-    68-164: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
+    68-166: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    177-195: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
+    179-197: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -263,7 +263,7 @@ src/api/websocket.ts [1-388]
     - fastify
     - ws
 
-src/cli.ts [1-1141]
+src/cli.ts [1-1143]
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -285,9 +285,9 @@ src/cli.ts [1-1141]
     - node:path
     - open
 
-src/config/config.ts [1-760]
+src/config/config.ts [1-764]
   class:
-    505-513: class ConfigError extends Error [exported]
+    509-517: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
@@ -302,25 +302,25 @@ src/config/config.ts [1-760]
       /** Default API configuration */
     123-131: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    322-500: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    326-504: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    518-564: loadConfig(configPath?: string): PiBrainConfig [exported]
+    522-568: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    569-574: ensureConfigDir(configDir?: string): void [exported]
+    573-578: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    579-614: ensureDirectories(config: PiBrainConfig): void [exported]
+    583-618: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    619-678: writeDefaultConfig(configPath?: string): void [exported]
+    623-682: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    683-691: getSessionDirs(config: PiBrainConfig): {} [exported]
+    687-695: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    696-698: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    700-702: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    703-707: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    707-711: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    712-719: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    716-723: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    730-759: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    734-763: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -447,7 +447,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-248]
+src/daemon/daemon-process.ts [1-252]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -528,9 +528,9 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.ts [1-1757]
+src/daemon/facet-discovery.ts [1-1760]
   class:
-    667-1728: class FacetDiscovery [exported]
+    670-1731: class FacetDiscovery [exported]
   interface:
     99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -540,15 +540,15 @@ src/daemon/facet-discovery.ts [1-1757]
       /** Result from analyzing multiple clusters */
     140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-    655-659: interface FacetDiscoveryLogger [exported]
+    656-660: interface FacetDiscoveryLogger [exported]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+    331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
-    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    384-451: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
-    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    494-513: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
   imports:
     - ../storage/embedding-utils.js
@@ -728,18 +728,18 @@ src/daemon/queue.ts [1-766]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-972]
+src/daemon/scheduler.ts [1-978]
   class:
-    161-900: class Scheduler [exported]
+    163-904: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     59-66: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
     69-74: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    93-144: interface SchedulerConfig [exported]
+    95-146: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    147-156: interface SchedulerStatus [exported]
+    149-158: interface SchedulerStatus [exported]
       /** Scheduler state */
   type:
     51-56: ScheduledJobType = | "reanalysis"
@@ -749,16 +749,16 @@ src/daemon/scheduler.ts [1-972]
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    905-935: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    909-939: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    941-950: isValidCronExpression(expression: string): boolean [exported]
+    945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    955-971: getNextRunTimes(expression: string, count = 5): {} [exported]
+    960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
-    77-82: SchedulerLogger [exported]
+    78-83: SchedulerLogger [exported]
       /** Default no-op logger */
-    85-90: SchedulerLogger [exported]
+    87-92: SchedulerLogger [exported]
       /** Console logger for production use */
   imports:
     - ../config/types.js
@@ -831,9 +831,9 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-715]
+src/daemon/worker.ts [1-717]
   class:
-    126-654: class Worker [exported]
+    126-656: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     66-83: interface WorkerConfig [exported]
@@ -843,11 +843,11 @@ src/daemon/worker.ts [1-715]
     104-117: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    663-665: createWorker(config: WorkerConfig): Worker [exported]
+    665-667: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    671-685: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    690-714: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -914,7 +914,7 @@ src/parser/analyzer.ts [1-336]
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-571]
+src/parser/boundary.ts [1-573]
   class:
     214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
@@ -927,7 +927,7 @@ src/parser/boundary.ts [1-571]
       /** A segment is a contiguous span of entries between boundaries */
     103-109: interface BoundaryOptions [exported]
       /** Options for boundary detection */
-    533-537: interface BoundaryStats [exported]
+    535-539: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
     29-34: BoundaryType = | "branch"
@@ -939,9 +939,9 @@ src/parser/boundary.ts [1-571]
   function:
     304-443: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    454-528: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
+    474-530: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    546-570: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
+    548-572: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
   variable:
     98-98: 10 [exported]
@@ -976,7 +976,7 @@ src/parser/index.ts [1-9]
     - ./session.js
     - ./signals.js
 
-src/parser/session.ts [1-415]
+src/parser/session.ts [1-419]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
@@ -988,13 +988,13 @@ src/parser/session.ts [1-415]
       /** Find the current leaf entry ID The leaf is the latest entry that has no children */
     215-227: findBranchPoints(entries: SessionEntry[]): {} [exported]
       /** Find branch points (entries with multiple children) */
-    232-300: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+    232-304: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
-    347-366: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+    351-370: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
-    382-404: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+    386-408: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
-    409-414: getEntry(entries: SessionEntry[], id: string): any [exported]
+    413-418: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
   imports:
     - ../types.js
@@ -1343,7 +1343,7 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-623]
+src/storage/embedding-utils.ts [1-625]
   interface:
     325-329: interface BackfillEmbeddingProvider [exported]
       /** Embedding provider interface for backfill operations. Matches the EmbeddingProvider interface from facet-discovery.ts. */
@@ -1372,11 +1372,11 @@ src/storage/embedding-utils.ts [1-623]
       /** Serialize an embedding array to a binary Buffer (Float32 little-endian). This format is used for storing in the node_embeddings table. */
     309-315: deserializeEmbedding(buffer: Buffer): {} [exported]
       /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
-    401-441: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
+    403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
       /** Find nodes that need embedding generation or update. A node needs embedding if: 1. No embedding exists for it 2. Embedding uses a different model than the current provider 3. Embedding uses old format (not rich format with decisions/lessons) */
-    457-583: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
+    459-585: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
-    590-622: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
+    592-624: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
   variable:
     19-19: "[emb:v2]" [exported]
@@ -1809,24 +1809,24 @@ src/sync/index.ts [1-9]
     - ./rsync.js
     - ./status.js
 
-src/sync/rsync.ts [1-351]
+src/sync/rsync.ts [1-353]
   interface:
     20-28: interface RsyncResult [exported]
       /** Result of an rsync operation */
     33-44: interface RsyncOptions [exported]
       /** Options for running rsync */
   function:
-    138-267: async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult> [exported]
+    140-269: async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult> [exported]
       /** Run rsync for a spoke with rsync sync method */
-    272-283: formatBytes(bytes: number): string [exported]
+    274-285: formatBytes(bytes: number): string [exported]
       /** Format bytes to human-readable string */
-    291-299: async isRsyncAvailable(): Promise<boolean> [exported]
+    293-301: async isRsyncAvailable(): Promise<boolean> [exported]
       /** Check if rsync is available on the system Uses `rsync --version` instead of `which` for cross-platform compatibility (works on Windows, Linux, macOS). Gracefully handles ENOENT. */
-    304-315: countSpokeSessionFiles(spokePath: string): number [exported]
+    306-317: countSpokeSessionFiles(spokePath: string): number [exported]
       /** Count session files in a spoke's sync directory */
-    320-334: listSpokeSessions(spokePath: string): {} [exported]
+    322-336: listSpokeSessions(spokePath: string): {} [exported]
       /** Get list of session files from a spoke's sync directory */
-    339-350: getLastSyncTime(spokePath: string): any [exported]
+    341-352: getLastSyncTime(spokePath: string): any [exported]
       /** Get last sync time for a spoke (based on directory modification time) */
   imports:
     - ../config/types.js
@@ -2054,9 +2054,9 @@ src/web/app/src/lib/stores/nodes.ts [1-112]
     - $lib/types
     - svelte/store
 
-src/web/app/src/lib/stores/websocket.ts [1-175]
+src/web/app/src/lib/stores/websocket.ts [1-179]
   variable:
-    174-174: wsStore [exported]
+    178-178: wsStore [exported]
   imports:
     - ./daemon
     - ./nodes
@@ -2117,4 +2117,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 89
-Estimated tokens: 26,684 (codebase: ~1,053,345)
+Estimated tokens: 26,683 (codebase: ~1,053,564)

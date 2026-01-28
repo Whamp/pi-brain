@@ -189,14 +189,14 @@ export class ConnectionDiscoverer {
    * });
    * ```
    */
-  public async discover(
+  public discover(
     nodeId: string,
     options: {
       threshold?: number;
       limit?: number;
       daysToLookBack?: number;
     } = {}
-  ): Promise<ConnectionResult> {
+  ): ConnectionResult {
     const threshold = options.threshold ?? 0.2; // Similarity threshold (0-1)
     const limit = options.limit ?? 50; // Max candidates to check
     const daysToLookBack = options.daysToLookBack ?? 30;
@@ -521,7 +521,7 @@ export class ConnectionDiscoverer {
     let bestLesson: LessonRow | null = null;
 
     const targetTokens = this.tokenize(
-      targetLesson.summary + " " + (targetLesson.details || "")
+      `${targetLesson.summary} ${targetLesson.details || ""}`
     );
 
     for (const candidate of candidateLessons) {
@@ -532,7 +532,7 @@ export class ConnectionDiscoverer {
       }
 
       const candidateTokens = this.tokenize(
-        candidate.summary + " " + (candidate.details || "")
+        `${candidate.summary} ${candidate.details || ""}`
       );
       const score = this.jaccardIndex(targetTokens, candidateTokens);
 

@@ -549,7 +549,7 @@ export function queueAnalysis(
 /**
  * Check if the pi CLI is available
  */
-async function checkPiCli(): Promise<HealthCheckResult> {
+function checkPiCli(): Promise<HealthCheckResult> {
   return new Promise((resolve) => {
     const child = spawn("which", ["pi"]);
     let output = "";
@@ -922,7 +922,7 @@ function truncatePath(filePath: string, maxLen: number): string {
   if (filePath.length <= maxLen) {
     return filePath;
   }
-  return "..." + filePath.slice(-(maxLen - 3));
+  return `...${filePath.slice(-(maxLen - 3))}`;
 }
 
 /**
@@ -1144,5 +1144,5 @@ function truncateString(str: string, maxLen: number): string {
   if (str.length <= maxLen) {
     return str;
   }
-  return str.slice(0, maxLen - 3) + "...";
+  return `${str.slice(0, maxLen - 3)}...`;
 }

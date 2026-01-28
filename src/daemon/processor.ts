@@ -440,7 +440,7 @@ interface SpawnResult {
 /**
  * Spawn the pi process and wait for completion
  */
-async function spawnPiProcess(
+function spawnPiProcess(
   args: string[],
   timeoutMinutes: number,
   logger: ProcessorLogger

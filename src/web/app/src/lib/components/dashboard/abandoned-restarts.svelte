@@ -62,14 +62,14 @@
   }
 
   function formatFrictionScore(score: number): string {
-    return (score * 100).toFixed(0) + "%";
+    return `${(score * 100).toFixed(0)}%`;
   }
 
   function truncateSummary(text: string, maxLen = 50): string {
     if (text.length <= maxLen) {
       return text;
     }
-    return text.slice(0, maxLen).trim() + "...";
+    return `${text.slice(0, maxLen).trim()}...`;
   }
 </script>
 

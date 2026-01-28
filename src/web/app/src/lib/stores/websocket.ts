@@ -78,6 +78,10 @@ function createWebSocketStore() {
           // Could add error notification here
           break;
         }
+        default: {
+          // Ignore unknown message types
+          break;
+        }
       }
     } catch {
       console.error("Failed to parse WebSocket message");

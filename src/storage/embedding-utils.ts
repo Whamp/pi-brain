@@ -375,12 +375,14 @@ export interface BackfillResult {
 // =============================================================================
 
 /** Default no-op logger for backfill */
+/* oxlint-disable no-empty-function */
 const noopLogger: BackfillLogger = {
   info: () => {},
   warn: () => {},
   error: () => {},
   debug: () => {},
 };
+/* oxlint-enable no-empty-function */
 
 /**
  * Row type for nodes query

@@ -363,6 +363,16 @@ export async function createServer(
         }
         break;
       }
+
+      default: {
+        ws.send(
+          JSON.stringify({
+            data: { message: `Unknown command type: ${command.type}` },
+            type: "error",
+          })
+        );
+        break;
+      }
     }
   }
 

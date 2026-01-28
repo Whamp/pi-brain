@@ -332,8 +332,8 @@ export function createMockEmbeddingProvider(dims = 384): EmbeddingProvider {
   return {
     modelName: "mock",
     dimensions: dims,
-    async embed(texts: string[]): Promise<number[][]> {
-      return texts.map((text) => {
+    embed(texts: string[]): Promise<number[][]> {
+      const result = texts.map((text) => {
         const embedding: number[] = [];
         let seed = hashString(text);
 
@@ -349,6 +349,7 @@ export function createMockEmbeddingProvider(dims = 384): EmbeddingProvider {
         );
         return embedding.map((v) => v / magnitude);
       });
+      return Promise.resolve(result);
     },
   };
 }
@@ -658,11 +659,13 @@ export interface FacetDiscoveryLogger {
   debug?: (message: string) => void;
 }
 
+/* oxlint-disable no-empty-function */
 const noopLogger: FacetDiscoveryLogger = {
   info: () => {},
   error: () => {},
   debug: () => {},
 };
+/* oxlint-enable no-empty-function */
 
 export class FacetDiscovery {
   private provider: EmbeddingProvider;

@@ -1,6 +1,10 @@
 /**
  * Library exports for pi-brain
+ *
+ * This is the public API surface for the package.
+ * Barrel file is intentional here for consumer ergonomics.
  */
+/* oxlint-disable no-barrel-file */
 
 // Types
 export * from "./types.js";

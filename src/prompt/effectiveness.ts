@@ -81,9 +81,9 @@ function normalizePattern(text: string): string {
  */
 function escapeLikePattern(pattern: string): string {
   return pattern
-    .replaceAll(LIKE_ESCAPE_CHAR, LIKE_ESCAPE_CHAR + LIKE_ESCAPE_CHAR) // Escape the escape character itself
-    .replaceAll("%", LIKE_ESCAPE_CHAR + "%")
-    .replaceAll("_", LIKE_ESCAPE_CHAR + "_");
+    .replaceAll(LIKE_ESCAPE_CHAR, `${LIKE_ESCAPE_CHAR}${LIKE_ESCAPE_CHAR}`) // Escape the escape character itself
+    .replaceAll("%", `${LIKE_ESCAPE_CHAR}%`)
+    .replaceAll("_", `${LIKE_ESCAPE_CHAR}_`);
 }
 
 /**

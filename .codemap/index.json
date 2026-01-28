@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 89,
-    "totalSymbols": 1112,
+    "totalSymbols": 1114,
     "byLanguage": {
       "typescript": 89
     },
     "bySymbolKind": {
-      "function": 495,
+      "function": 496,
       "type": 40,
       "interface": 260,
-      "variable": 109,
+      "variable": 110,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38359,
-  "codebase_tokens": 1053294,
+  "total_tokens": 38398,
+  "codebase_tokens": 1052531,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1410,7 +1410,7 @@
       "language": "typescript",
       "lines": [
         1,
-        203
+        205
       ],
       "detail_level": "full",
       "token_estimate": 321,
@@ -1440,7 +1440,7 @@
           "signature": "async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance>",
           "lines": [
             68,
-            164
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -1458,8 +1458,8 @@
           "kind": "interface",
           "signature": "ServerResult",
           "lines": [
-            169,
-            172
+            171,
+            174
           ],
           "exported": true,
           "is_default": false,
@@ -1477,8 +1477,8 @@
           "kind": "function",
           "signature": "async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult>",
           "lines": [
-            177,
-            195
+            179,
+            197
           ],
           "exported": true,
           "is_default": false,
@@ -2061,7 +2061,7 @@
       "language": "typescript",
       "lines": [
         1,
-        1141
+        1143
       ],
       "detail_level": "full",
       "token_estimate": 157,
@@ -2090,8 +2090,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            199,
-            201
+            200,
+            202
           ],
           "exported": false,
           "is_default": false,
@@ -2109,8 +2109,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            382,
-            384
+            384,
+            386
           ],
           "exported": false,
           "is_default": false,
@@ -2128,8 +2128,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            547,
-            549
+            549,
+            551
           ],
           "exported": false,
           "is_default": false,
@@ -2147,8 +2147,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            934,
-            936
+            936,
+            938
           ],
           "exported": false,
           "is_default": false,
@@ -2166,8 +2166,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            1085,
-            1087
+            1087,
+            1089
           ],
           "exported": false,
           "is_default": false,
@@ -2211,7 +2211,7 @@
       "language": "typescript",
       "lines": [
         1,
-        760
+        764
       ],
       "detail_level": "full",
       "token_estimate": 836,
@@ -2392,8 +2392,8 @@
           "kind": "function",
           "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
           "lines": [
-            158,
-            271
+            160,
+            273
           ],
           "exported": false,
           "is_default": false,
@@ -2411,8 +2411,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            276,
-            284
+            278,
+            286
           ],
           "exported": false,
           "is_default": false,
@@ -2430,8 +2430,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            289,
-            295
+            291,
+            297
           ],
           "exported": false,
           "is_default": false,
@@ -2449,8 +2449,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            300,
-            306
+            302,
+            308
           ],
           "exported": false,
           "is_default": false,
@@ -2468,8 +2468,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            311,
-            317
+            313,
+            319
           ],
           "exported": false,
           "is_default": false,
@@ -2487,8 +2487,8 @@
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            322,
-            500
+            326,
+            504
           ],
           "exported": true,
           "is_default": false,
@@ -2506,8 +2506,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            505,
-            513
+            509,
+            517
           ],
           "exported": true,
           "is_default": false,
@@ -2525,8 +2525,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            506,
-            512
+            510,
+            516
           ],
           "exported": false,
           "is_default": false,
@@ -2544,8 +2544,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            518,
-            564
+            522,
+            568
           ],
           "exported": true,
           "is_default": false,
@@ -2563,8 +2563,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            569,
-            574
+            573,
+            578
           ],
           "exported": true,
           "is_default": false,
@@ -2582,8 +2582,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            579,
-            614
+            583,
+            618
           ],
           "exported": true,
           "is_default": false,
@@ -2601,8 +2601,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            619,
-            678
+            623,
+            682
           ],
           "exported": true,
           "is_default": false,
@@ -2620,8 +2620,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            683,
-            691
+            687,
+            695
           ],
           "exported": true,
           "is_default": false,
@@ -2639,8 +2639,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            696,
-            698
+            700,
+            702
           ],
           "exported": true,
           "is_default": false,
@@ -2658,8 +2658,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            703,
-            707
+            707,
+            711
           ],
           "exported": true,
           "is_default": false,
@@ -2677,8 +2677,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            712,
-            719
+            716,
+            723
           ],
           "exported": true,
           "is_default": false,
@@ -2696,8 +2696,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            730,
-            759
+            734,
+            763
           ],
           "exported": true,
           "is_default": false,
@@ -2935,7 +2935,7 @@
         1149
       ],
       "detail_level": "full",
-      "token_estimate": 1145,
+      "token_estimate": 1144,
       "symbols": [
         {
           "name": "sleep",
@@ -3358,14 +3358,14 @@
         {
           "name": "checkPiCli",
           "kind": "function",
-          "signature": "async checkPiCli(): Promise<HealthCheckResult>",
+          "signature": "checkPiCli(): Promise<HealthCheckResult>",
           "lines": [
             552,
             589
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -3667,7 +3667,7 @@
         620
       ],
       "detail_level": "full",
-      "token_estimate": 649,
+      "token_estimate": 646,
       "symbols": [
         {
           "name": "LessonRow",
@@ -3767,14 +3767,14 @@
         {
           "name": "discover",
           "kind": "method",
-          "signature": "async discover(nodeId: string, options: {\n      threshold?: number;\n      limit?: number;\n      daysToLookBack?: number;\n    } = {}): Promise<ConnectionResult>",
+          "signature": "discover(nodeId: string, options: {\n      threshold?: number;\n      limit?: number;\n      daysToLookBack?: number;\n    } = {}): ConnectionResult",
           "lines": [
             192,
             284
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "ConnectionDiscoverer",
@@ -4010,10 +4010,10 @@
       "language": "typescript",
       "lines": [
         1,
-        248
+        252
       ],
       "detail_level": "full",
-      "token_estimate": 92,
+      "token_estimate": 100,
       "symbols": [
         {
           "name": "args",
@@ -4054,12 +4054,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "handleWatcherError",
+          "kind": "variable",
+          "signature": "(event: Event): void",
+          "lines": [
+            44,
+            47
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "main",
           "kind": "function",
           "signature": "async main(): Promise<void>",
           "lines": [
-            44,
-            236
+            53,
+            240
           ],
           "exported": false,
           "is_default": false,
@@ -4572,7 +4591,7 @@
       "language": "typescript",
       "lines": [
         1,
-        1757
+        1760
       ],
       "detail_level": "full",
       "token_estimate": 1857,
@@ -4887,7 +4906,7 @@
           "signature": "createMockEmbeddingProvider(dims = 384): EmbeddingProvider",
           "lines": [
             331,
-            354
+            355
           ],
           "exported": true,
           "is_default": false,
@@ -4905,8 +4924,8 @@
           "kind": "function",
           "signature": "hashString(str: string): number",
           "lines": [
-            359,
-            366
+            360,
+            367
           ],
           "exported": false,
           "is_default": false,
@@ -4924,8 +4943,8 @@
           "kind": "interface",
           "signature": "KMeansResult",
           "lines": [
-            375,
-            378
+            376,
+            379
           ],
           "exported": false,
           "is_default": false,
@@ -4943,8 +4962,8 @@
           "kind": "function",
           "signature": "kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult",
           "lines": [
-            383,
-            450
+            384,
+            451
           ],
           "exported": true,
           "is_default": false,
@@ -4962,8 +4981,8 @@
           "kind": "function",
           "signature": "kMeansPlusPlusInit(embeddings: number[][], k: number): {}",
           "lines": [
-            455,
-            488
+            456,
+            489
           ],
           "exported": false,
           "is_default": false,
@@ -4981,8 +5000,8 @@
           "kind": "function",
           "signature": "hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {}",
           "lines": [
-            493,
-            512
+            494,
+            513
           ],
           "exported": true,
           "is_default": false,
@@ -5000,8 +5019,8 @@
           "kind": "function",
           "signature": "computeDistanceMatrix(embeddings: number[][]): {}",
           "lines": [
-            514,
-            529
+            515,
+            530
           ],
           "exported": false,
           "is_default": false,
@@ -5019,8 +5038,8 @@
           "kind": "function",
           "signature": "computeCoreDistances(distances: number[][], minSamples: number): {}",
           "lines": [
-            531,
-            539
+            532,
+            540
           ],
           "exported": false,
           "is_default": false,
@@ -5038,8 +5057,8 @@
           "kind": "function",
           "signature": "computeMutualReachability(distances: number[][], coreDistances: number[]): {}",
           "lines": [
-            541,
-            559
+            542,
+            560
           ],
           "exported": false,
           "is_default": false,
@@ -5057,8 +5076,8 @@
           "kind": "function",
           "signature": "extractClusters(reachability: number[][], n: number, minClusterSize: number): {}",
           "lines": [
-            561,
-            640
+            562,
+            641
           ],
           "exported": false,
           "is_default": false,
@@ -5076,8 +5095,8 @@
           "kind": "function",
           "signature": "euclideanDistance(a: number[], b: number[]): number",
           "lines": [
-            642,
-            649
+            643,
+            650
           ],
           "exported": false,
           "is_default": false,
@@ -5095,8 +5114,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryLogger",
           "lines": [
-            655,
-            659
+            656,
+            660
           ],
           "exported": true,
           "is_default": false,
@@ -5114,8 +5133,8 @@
           "kind": "variable",
           "signature": "FacetDiscoveryLogger",
           "lines": [
-            661,
-            665
+            663,
+            667
           ],
           "exported": false,
           "is_default": false,
@@ -5133,8 +5152,8 @@
           "kind": "class",
           "signature": "FacetDiscovery",
           "lines": [
-            667,
-            1728
+            670,
+            1731
           ],
           "exported": true,
           "is_default": false,
@@ -5152,8 +5171,8 @@
           "kind": "property",
           "signature": "provider: EmbeddingProvider",
           "lines": [
-            668,
-            668
+            671,
+            671
           ],
           "exported": false,
           "is_default": false,
@@ -5171,8 +5190,8 @@
           "kind": "property",
           "signature": "clusteringConfig: ClusteringConfig",
           "lines": [
-            669,
-            669
+            672,
+            672
           ],
           "exported": false,
           "is_default": false,
@@ -5190,8 +5209,8 @@
           "kind": "property",
           "signature": "logger: FacetDiscoveryLogger",
           "lines": [
-            670,
-            670
+            673,
+            673
           ],
           "exported": false,
           "is_default": false,
@@ -5209,8 +5228,8 @@
           "kind": "constructor",
           "signature": "constructor(private db: Database.Database, embeddingConfigOrProvider: EmbeddingConfig | EmbeddingProvider, clusteringConfig?: ClusteringConfig, logger?: FacetDiscoveryLogger)",
           "lines": [
-            672,
-            687
+            675,
+            690
           ],
           "exported": false,
           "is_default": false,
@@ -5228,8 +5247,8 @@
           "kind": "method",
           "signature": "async run(options?: {\n    signalType?: ClusterSignalType;\n    model?: string;\n    maxNodes?: number;\n  }): Promise<FacetDiscoveryResult>",
           "lines": [
-            689,
-            757
+            692,
+            760
           ],
           "exported": false,
           "is_default": false,
@@ -5247,8 +5266,8 @@
           "kind": "method",
           "signature": "getNodesForClustering(maxNodes: number, _signalType?: ClusterSignalType, model?: string): {}",
           "lines": [
-            759,
-            794
+            762,
+            797
           ],
           "exported": false,
           "is_default": false,
@@ -5266,8 +5285,8 @@
           "kind": "method",
           "signature": "async embedNodes(nodes: NodeSummaryRow[], runId: string): Promise<{}>",
           "lines": [
-            796,
-            861
+            799,
+            864
           ],
           "exported": false,
           "is_default": false,
@@ -5285,8 +5304,8 @@
           "kind": "method",
           "signature": "buildNodeEmbeddingText(node: NodeSummaryRow): string",
           "lines": [
-            869,
-            881
+            872,
+            884
           ],
           "exported": false,
           "is_default": false,
@@ -5304,8 +5323,8 @@
           "kind": "method",
           "signature": "getCachedEmbeddings(nodeIds: string[]): {}",
           "lines": [
-            883,
-            903
+            886,
+            906
           ],
           "exported": false,
           "is_default": false,
@@ -5323,8 +5342,8 @@
           "kind": "method",
           "signature": "cacheEmbedding(nodeId: string, embedding: number[], inputText: string): void",
           "lines": [
-            905,
-            918
+            908,
+            921
           ],
           "exported": false,
           "is_default": false,
@@ -5342,8 +5361,8 @@
           "kind": "method",
           "signature": "clusterEmbeddings(embeddings: { nodeId: string; embedding: number[] }[]): {}",
           "lines": [
-            920,
-            938
+            923,
+            941
           ],
           "exported": false,
           "is_default": false,
@@ -5361,8 +5380,8 @@
           "kind": "method",
           "signature": "createClusters(_nodes: NodeSummaryRow[], embeddings: { nodeId: string; embedding: number[] }[], labels: number[], runId: string, signalType?: ClusterSignalType, model?: string): {}",
           "lines": [
-            940,
-            1032
+            943,
+            1035
           ],
           "exported": false,
           "is_default": false,
@@ -5380,8 +5399,8 @@
           "kind": "method",
           "signature": "computeCentroid(embeddings: number[][]): {}",
           "lines": [
-            1034,
-            1053
+            1037,
+            1056
           ],
           "exported": false,
           "is_default": false,
@@ -5399,8 +5418,8 @@
           "kind": "method",
           "signature": "completeRun(runId: string, clusters: Cluster[], nodesEmbedded: number, nodesClustered: number, clustersCreated: number): FacetDiscoveryResult",
           "lines": [
-            1055,
-            1081
+            1058,
+            1084
           ],
           "exported": false,
           "is_default": false,
@@ -5418,8 +5437,8 @@
           "kind": "method",
           "signature": "failRun(runId: string, error: string): void",
           "lines": [
-            1083,
-            1095
+            1086,
+            1098
           ],
           "exported": false,
           "is_default": false,
@@ -5437,8 +5456,8 @@
           "kind": "method",
           "signature": "getClusteringRun(runId: string): any",
           "lines": [
-            1097,
-            1120
+            1100,
+            1123
           ],
           "exported": false,
           "is_default": false,
@@ -5456,8 +5475,8 @@
           "kind": "method",
           "signature": "getClusters(options?: {\n    status?: string;\n    signalType?: ClusterSignalType;\n    limit?: number;\n  }): {}",
           "lines": [
-            1122,
-            1166
+            1125,
+            1169
           ],
           "exported": false,
           "is_default": false,
@@ -5475,8 +5494,8 @@
           "kind": "method",
           "signature": "getClusterNodes(clusterId: string, options?: { representativeOnly?: boolean }): {}",
           "lines": [
-            1168,
-            1198
+            1171,
+            1201
           ],
           "exported": false,
           "is_default": false,
@@ -5494,8 +5513,8 @@
           "kind": "method",
           "signature": "updateClusterStatus(clusterId: string, status: \"confirmed\" | \"dismissed\"): void",
           "lines": [
-            1200,
-            1213
+            1203,
+            1216
           ],
           "exported": false,
           "is_default": false,
@@ -5513,8 +5532,8 @@
           "kind": "method",
           "signature": "updateClusterDetails(clusterId: string, name: string, description: string): void",
           "lines": [
-            1215,
-            1227
+            1218,
+            1230
           ],
           "exported": false,
           "is_default": false,
@@ -5532,8 +5551,8 @@
           "kind": "method",
           "signature": "async analyzeClusters(config: ClusterAnalysisConfig, options?: { limit?: number }): Promise<ClusterAnalysisBatchResult>",
           "lines": [
-            1243,
-            1298
+            1246,
+            1301
           ],
           "exported": false,
           "is_default": false,
@@ -5551,8 +5570,8 @@
           "kind": "method",
           "signature": "async analyzeCluster(cluster: Cluster, config: ClusterAnalysisConfig): Promise<ClusterAnalysisResult>",
           "lines": [
-            1303,
-            1365
+            1306,
+            1368
           ],
           "exported": false,
           "is_default": false,
@@ -5570,8 +5589,8 @@
           "kind": "method",
           "signature": "getNodeSummaries(nodeIds: string[]): {}",
           "lines": [
-            1370,
-            1391
+            1373,
+            1394
           ],
           "exported": false,
           "is_default": false,
@@ -5589,8 +5608,8 @@
           "kind": "method",
           "signature": "buildClusterAnalysisPrompt(nodes: NodeSummaryRow[], cluster: Cluster): string",
           "lines": [
-            1396,
-            1445
+            1399,
+            1448
           ],
           "exported": false,
           "is_default": false,
@@ -5608,8 +5627,8 @@
           "kind": "method",
           "signature": "async invokeClusterAnalysisAgent(prompt: string, config: ClusterAnalysisConfig): Promise<{ success: boolean; name?: string; description?: string; confidence?: \"high\" | \"medium\" | \"low\"; reasoning?: string; error?: string; }>",
           "lines": [
-            1450,
-            1549
+            1453,
+            1552
           ],
           "exported": false,
           "is_default": false,
@@ -5627,8 +5646,8 @@
           "kind": "method",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number): Promise<{ stdout: string; stderr: string; exitCode: number; timedOut: boolean; spawnError?: string; }>",
           "lines": [
-            1554,
-            1642
+            1557,
+            1645
           ],
           "exported": false,
           "is_default": false,
@@ -5646,8 +5665,8 @@
           "kind": "method",
           "signature": "parseClusterAnalysisOutput(stdout: string): { success: boolean; name?: string; description?: string; confidence?: \"high\" | \"medium\" | \"low\"; reasoning?: string; error?: string; }",
           "lines": [
-            1647,
-            1727
+            1650,
+            1730
           ],
           "exported": false,
           "is_default": false,
@@ -5665,8 +5684,8 @@
           "kind": "function",
           "signature": "generateId(): string",
           "lines": [
-            1734,
-            1736
+            1737,
+            1739
           ],
           "exported": false,
           "is_default": false,
@@ -5684,8 +5703,8 @@
           "kind": "function",
           "signature": "serializeEmbedding(embedding: number[]): Buffer",
           "lines": [
-            1738,
-            1744
+            1741,
+            1747
           ],
           "exported": false,
           "is_default": false,
@@ -5703,8 +5722,8 @@
           "kind": "function",
           "signature": "deserializeEmbedding(buffer: Buffer): {}",
           "lines": [
-            1746,
-            1752
+            1749,
+            1755
           ],
           "exported": false,
           "is_default": false,
@@ -5722,8 +5741,8 @@
           "kind": "function",
           "signature": "countNoise(labels: number[]): number",
           "lines": [
-            1754,
-            1756
+            1757,
+            1759
           ],
           "exported": false,
           "is_default": false,
@@ -6537,7 +6556,7 @@
         773
       ],
       "detail_level": "full",
-      "token_estimate": 974,
+      "token_estimate": 972,
       "symbols": [
         {
           "name": "AgentResult",
@@ -6884,14 +6903,14 @@
         {
           "name": "spawnPiProcess",
           "kind": "function",
-          "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
+          "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
             443,
             507
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -7187,7 +7206,7 @@
         779
       ],
       "detail_level": "full",
-      "token_estimate": 721,
+      "token_estimate": 720,
       "symbols": [
         {
           "name": "QueryRequest",
@@ -7458,14 +7477,14 @@
         {
           "name": "spawnPiProcess",
           "kind": "function",
-          "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
+          "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
             554,
             616
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -8354,10 +8373,10 @@
       "language": "typescript",
       "lines": [
         1,
-        972
+        978
       ],
       "detail_level": "full",
-      "token_estimate": 1223,
+      "token_estimate": 1210,
       "symbols": [
         {
           "name": "EFFECTIVENESS_BEFORE_PERIOD_DAYS",
@@ -8478,8 +8497,8 @@
           "kind": "variable",
           "signature": "SchedulerLogger",
           "lines": [
-            77,
-            82
+            78,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -8497,8 +8516,8 @@
           "kind": "variable",
           "signature": "SchedulerLogger",
           "lines": [
-            85,
-            90
+            87,
+            92
           ],
           "exported": true,
           "is_default": false,
@@ -8516,8 +8535,8 @@
           "kind": "interface",
           "signature": "SchedulerConfig",
           "lines": [
-            93,
-            144
+            95,
+            146
           ],
           "exported": true,
           "is_default": false,
@@ -8535,8 +8554,8 @@
           "kind": "interface",
           "signature": "SchedulerStatus",
           "lines": [
-            147,
-            156
+            149,
+            158
           ],
           "exported": true,
           "is_default": false,
@@ -8554,8 +8573,8 @@
           "kind": "class",
           "signature": "Scheduler",
           "lines": [
-            161,
-            900
+            163,
+            904
           ],
           "exported": true,
           "is_default": false,
@@ -8573,8 +8592,8 @@
           "kind": "property",
           "signature": "reanalysisJob: Cron | null",
           "lines": [
-            162,
-            162
+            164,
+            164
           ],
           "exported": false,
           "is_default": false,
@@ -8592,8 +8611,8 @@
           "kind": "property",
           "signature": "connectionDiscoveryJob: Cron | null",
           "lines": [
-            163,
-            163
+            165,
+            165
           ],
           "exported": false,
           "is_default": false,
@@ -8611,8 +8630,8 @@
           "kind": "property",
           "signature": "patternAggregationJob: Cron | null",
           "lines": [
-            164,
-            164
+            166,
+            166
           ],
           "exported": false,
           "is_default": false,
@@ -8630,8 +8649,8 @@
           "kind": "property",
           "signature": "clusteringJob: Cron | null",
           "lines": [
-            165,
-            165
+            167,
+            167
           ],
           "exported": false,
           "is_default": false,
@@ -8649,8 +8668,8 @@
           "kind": "property",
           "signature": "backfillEmbeddingsJob: Cron | null",
           "lines": [
-            166,
-            166
+            168,
+            168
           ],
           "exported": false,
           "is_default": false,
@@ -8668,8 +8687,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            167,
-            167
+            169,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -8687,8 +8706,8 @@
           "kind": "property",
           "signature": "lastReanalysisResult: ScheduledJobResult | null",
           "lines": [
-            168,
-            168
+            170,
+            170
           ],
           "exported": false,
           "is_default": false,
@@ -8706,8 +8725,8 @@
           "kind": "property",
           "signature": "lastConnectionDiscoveryResult: ScheduledJobResult | null",
           "lines": [
-            169,
-            169
+            171,
+            171
           ],
           "exported": false,
           "is_default": false,
@@ -8725,8 +8744,8 @@
           "kind": "property",
           "signature": "lastPatternAggregationResult: ScheduledJobResult | null",
           "lines": [
-            170,
-            170
+            172,
+            172
           ],
           "exported": false,
           "is_default": false,
@@ -8744,8 +8763,8 @@
           "kind": "property",
           "signature": "lastClusteringResult: ScheduledJobResult | null",
           "lines": [
-            171,
-            171
+            173,
+            173
           ],
           "exported": false,
           "is_default": false,
@@ -8763,8 +8782,8 @@
           "kind": "property",
           "signature": "lastBackfillEmbeddingsResult: ScheduledJobResult | null",
           "lines": [
-            172,
-            172
+            174,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -8782,8 +8801,8 @@
           "kind": "property",
           "signature": "patternAggregator: PatternAggregator",
           "lines": [
-            173,
-            173
+            175,
+            175
           ],
           "exported": false,
           "is_default": false,
@@ -8801,8 +8820,8 @@
           "kind": "property",
           "signature": "insightAggregator: InsightAggregator",
           "lines": [
-            174,
-            174
+            176,
+            176
           ],
           "exported": false,
           "is_default": false,
@@ -8820,8 +8839,8 @@
           "kind": "constructor",
           "signature": "constructor(private config: SchedulerConfig, private queue: QueueManager, private db: Database.Database, private logger: SchedulerLogger = noopLogger)",
           "lines": [
-            176,
-            184
+            178,
+            186
           ],
           "exported": false,
           "is_default": false,
@@ -8839,8 +8858,8 @@
           "kind": "method",
           "signature": "start(): void",
           "lines": [
-            189,
-            318
+            191,
+            320
           ],
           "exported": false,
           "is_default": false,
@@ -8858,8 +8877,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            323,
-            356
+            325,
+            358
           ],
           "exported": false,
           "is_default": false,
@@ -8877,8 +8896,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            361,
-            363
+            363,
+            365
           ],
           "exported": false,
           "is_default": false,
@@ -8896,8 +8915,8 @@
           "kind": "method",
           "signature": "getStatus(): SchedulerStatus",
           "lines": [
-            368,
-            425
+            372,
+            429
           ],
           "exported": false,
           "is_default": false,
@@ -8913,14 +8932,14 @@
         {
           "name": "triggerReanalysis",
           "kind": "method",
-          "signature": "async triggerReanalysis(): Promise<ScheduledJobResult>",
+          "signature": "triggerReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            430,
-            432
+            434,
+            436
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -8932,14 +8951,14 @@
         {
           "name": "triggerConnectionDiscovery",
           "kind": "method",
-          "signature": "async triggerConnectionDiscovery(): Promise<ScheduledJobResult>",
+          "signature": "triggerConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            437,
-            439
+            441,
+            443
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -8951,14 +8970,14 @@
         {
           "name": "triggerPatternAggregation",
           "kind": "method",
-          "signature": "async triggerPatternAggregation(): Promise<ScheduledJobResult>",
+          "signature": "triggerPatternAggregation(): ScheduledJobResult",
           "lines": [
-            444,
-            446
+            448,
+            450
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -8970,14 +8989,14 @@
         {
           "name": "triggerClustering",
           "kind": "method",
-          "signature": "async triggerClustering(): Promise<ScheduledJobResult>",
+          "signature": "triggerClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            451,
-            453
+            455,
+            457
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -8989,14 +9008,14 @@
         {
           "name": "triggerBackfillEmbeddings",
           "kind": "method",
-          "signature": "async triggerBackfillEmbeddings(): Promise<ScheduledJobResult>",
+          "signature": "triggerBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            458,
-            460
+            462,
+            464
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -9010,8 +9029,8 @@
           "kind": "method",
           "signature": "async runReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            465,
-            554
+            469,
+            558
           ],
           "exported": false,
           "is_default": false,
@@ -9029,8 +9048,8 @@
           "kind": "method",
           "signature": "async runConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            559,
-            635
+            563,
+            639
           ],
           "exported": false,
           "is_default": false,
@@ -9046,14 +9065,14 @@
         {
           "name": "runPatternAggregation",
           "kind": "method",
-          "signature": "async runPatternAggregation(): Promise<ScheduledJobResult>",
+          "signature": "runPatternAggregation(): ScheduledJobResult",
           "lines": [
-            641,
-            730
+            645,
+            734
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "Scheduler",
@@ -9067,8 +9086,8 @@
           "kind": "method",
           "signature": "createSchedulerEmbeddingProvider(): any",
           "lines": [
-            735,
-            755
+            739,
+            759
           ],
           "exported": false,
           "is_default": false,
@@ -9086,8 +9105,8 @@
           "kind": "method",
           "signature": "async runBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            761,
-            819
+            765,
+            823
           ],
           "exported": false,
           "is_default": false,
@@ -9105,8 +9124,8 @@
           "kind": "method",
           "signature": "async runClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            825,
-            899
+            829,
+            903
           ],
           "exported": false,
           "is_default": false,
@@ -9124,8 +9143,8 @@
           "kind": "function",
           "signature": "createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler",
           "lines": [
-            905,
-            935
+            909,
+            939
           ],
           "exported": true,
           "is_default": false,
@@ -9143,8 +9162,8 @@
           "kind": "function",
           "signature": "isValidCronExpression(expression: string): boolean",
           "lines": [
-            941,
-            950
+            945,
+            955
           ],
           "exported": true,
           "is_default": false,
@@ -9162,8 +9181,8 @@
           "kind": "function",
           "signature": "getNextRunTimes(expression: string, count = 5): {}",
           "lines": [
-            955,
-            971
+            960,
+            977
           ],
           "exported": true,
           "is_default": false,
@@ -9427,7 +9446,7 @@
         582
       ],
       "detail_level": "full",
-      "token_estimate": 1255,
+      "token_estimate": 1254,
       "symbols": [
         {
           "name": "SessionState",
@@ -9793,14 +9812,14 @@
         {
           "name": "startFromConfig",
           "kind": "method",
-          "signature": "async startFromConfig(config: PiBrainConfig): Promise<void>",
+          "signature": "startFromConfig(config: PiBrainConfig): Promise<void>",
           "lines": [
             287,
             297
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "SessionWatcher",
@@ -10151,10 +10170,10 @@
       "language": "typescript",
       "lines": [
         1,
-        715
+        717
       ],
       "detail_level": "full",
-      "token_estimate": 962,
+      "token_estimate": 961,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -10219,7 +10238,7 @@
           "signature": "Worker",
           "lines": [
             126,
-            654
+            656
           ],
           "exported": true,
           "is_default": false,
@@ -10750,8 +10769,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            335,
-            527
+            337,
+            529
           ],
           "exported": false,
           "is_default": false,
@@ -10769,8 +10788,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            532,
-            599
+            534,
+            601
           ],
           "exported": false,
           "is_default": false,
@@ -10788,8 +10807,8 @@
           "kind": "method",
           "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
           "lines": [
-            607,
-            644
+            609,
+            646
           ],
           "exported": false,
           "is_default": false,
@@ -10807,8 +10826,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            649,
-            653
+            651,
+            655
           ],
           "exported": false,
           "is_default": false,
@@ -10826,8 +10845,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            663,
-            665
+            665,
+            667
           ],
           "exported": true,
           "is_default": false,
@@ -10843,14 +10862,14 @@
         {
           "name": "processSingleJob",
           "kind": "function",
-          "signature": "async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
+          "signature": "processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            671,
-            685
+            673,
+            687
           ],
           "exported": true,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -10864,8 +10883,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            690,
-            714
+            692,
+            716
           ],
           "exported": true,
           "is_default": false,
@@ -11183,10 +11202,10 @@
       "language": "typescript",
       "lines": [
         1,
-        571
+        573
       ],
       "detail_level": "full",
-      "token_estimate": 1009,
+      "token_estimate": 1062,
       "symbols": [
         {
           "name": "BoundaryType",
@@ -11664,12 +11683,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "createSegment",
+          "kind": "function",
+          "signature": "createSegment(segmentEntries: SessionEntry[], endingBoundaries: Boundary[]): Segment",
+          "lines": [
+            449,
+            463
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Create a segment from a slice of entries\nPrecondition: segmentEntries.length > 0 (ensured by caller)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "extractSegments",
           "kind": "function",
           "signature": "extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {}",
           "lines": [
-            454,
-            528
+            474,
+            530
           ],
           "exported": true,
           "is_default": false,
@@ -11687,8 +11725,8 @@
           "kind": "interface",
           "signature": "BoundaryStats",
           "lines": [
-            533,
-            537
+            535,
+            539
           ],
           "exported": true,
           "is_default": false,
@@ -11706,8 +11744,8 @@
           "kind": "function",
           "signature": "getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats",
           "lines": [
-            546,
-            570
+            548,
+            572
           ],
           "exported": true,
           "is_default": false,
@@ -11904,7 +11942,7 @@
       "language": "typescript",
       "lines": [
         1,
-        415
+        419
       ],
       "detail_level": "full",
       "token_estimate": 435,
@@ -12010,7 +12048,7 @@
           "signature": "calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats",
           "lines": [
             232,
-            300
+            304
           ],
           "exported": true,
           "is_default": false,
@@ -12028,8 +12066,8 @@
           "kind": "function",
           "signature": "calculateMaxDepth(node: TreeNode): number",
           "lines": [
-            305,
-            310
+            309,
+            314
           ],
           "exported": false,
           "is_default": false,
@@ -12047,8 +12085,8 @@
           "kind": "function",
           "signature": "findSessionName(entries: SessionEntry[]): string",
           "lines": [
-            315,
-            327
+            319,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -12066,8 +12104,8 @@
           "kind": "function",
           "signature": "findFirstMessage(entries: SessionEntry[]): string",
           "lines": [
-            332,
-            342
+            336,
+            346
           ],
           "exported": false,
           "is_default": false,
@@ -12085,8 +12123,8 @@
           "kind": "function",
           "signature": "extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string",
           "lines": [
-            347,
-            366
+            351,
+            370
           ],
           "exported": true,
           "is_default": false,
@@ -12104,8 +12142,8 @@
           "kind": "function",
           "signature": "truncate(str: string, maxLength: number): string",
           "lines": [
-            371,
-            377
+            375,
+            381
           ],
           "exported": false,
           "is_default": false,
@@ -12123,8 +12161,8 @@
           "kind": "function",
           "signature": "getPathToEntry(entries: SessionEntry[], targetId: string): {}",
           "lines": [
-            382,
-            404
+            386,
+            408
           ],
           "exported": true,
           "is_default": false,
@@ -12142,8 +12180,8 @@
           "kind": "function",
           "signature": "getEntry(entries: SessionEntry[], id: string): any",
           "lines": [
-            409,
-            414
+            413,
+            418
           ],
           "exported": true,
           "is_default": false,
@@ -15821,7 +15859,7 @@
       "language": "typescript",
       "lines": [
         1,
-        623
+        625
       ],
       "detail_level": "full",
       "token_estimate": 1306,
@@ -16097,8 +16135,8 @@
           "kind": "variable",
           "signature": "BackfillLogger",
           "lines": [
-            378,
-            383
+            379,
+            384
           ],
           "exported": false,
           "is_default": false,
@@ -16116,8 +16154,8 @@
           "kind": "interface",
           "signature": "NodeNeedingEmbeddingRow",
           "lines": [
-            388,
-            391
+            390,
+            393
           ],
           "exported": false,
           "is_default": false,
@@ -16135,8 +16173,8 @@
           "kind": "function",
           "signature": "findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {}",
           "lines": [
-            401,
-            441
+            403,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -16154,8 +16192,8 @@
           "kind": "function",
           "signature": "async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult>",
           "lines": [
-            457,
-            583
+            459,
+            585
           ],
           "exported": true,
           "is_default": false,
@@ -16173,8 +16211,8 @@
           "kind": "function",
           "signature": "countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; }",
           "lines": [
-            590,
-            622
+            592,
+            624
           ],
           "exported": true,
           "is_default": false,
@@ -19507,7 +19545,7 @@
       "language": "typescript",
       "lines": [
         1,
-        351
+        353
       ],
       "detail_level": "full",
       "token_estimate": 484,
@@ -19631,8 +19669,8 @@
           "kind": "function",
           "signature": "async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult>",
           "lines": [
-            138,
-            267
+            140,
+            269
           ],
           "exported": true,
           "is_default": false,
@@ -19650,8 +19688,8 @@
           "kind": "function",
           "signature": "formatBytes(bytes: number): string",
           "lines": [
-            272,
-            283
+            274,
+            285
           ],
           "exported": true,
           "is_default": false,
@@ -19669,8 +19707,8 @@
           "kind": "function",
           "signature": "async isRsyncAvailable(): Promise<boolean>",
           "lines": [
-            291,
-            299
+            293,
+            301
           ],
           "exported": true,
           "is_default": false,
@@ -19688,8 +19726,8 @@
           "kind": "function",
           "signature": "countSpokeSessionFiles(spokePath: string): number",
           "lines": [
-            304,
-            315
+            306,
+            317
           ],
           "exported": true,
           "is_default": false,
@@ -19707,8 +19745,8 @@
           "kind": "function",
           "signature": "listSpokeSessions(spokePath: string): {}",
           "lines": [
-            320,
-            334
+            322,
+            336
           ],
           "exported": true,
           "is_default": false,
@@ -19726,8 +19764,8 @@
           "kind": "function",
           "signature": "getLastSyncTime(spokePath: string): any",
           "lines": [
-            339,
-            350
+            341,
+            352
           ],
           "exported": true,
           "is_default": false,
@@ -22108,7 +22146,7 @@
       "language": "typescript",
       "lines": [
         1,
-        175
+        179
       ],
       "detail_level": "full",
       "token_estimate": 110,
@@ -22195,7 +22233,7 @@
           "signature": "createWebSocketStore(): { subscribe: any; connect: (url?: string) => void; disconnect: () => void; send: (message: Record<string, unknown>) => void; }",
           "lines": [
             41,
-            172
+            176
           ],
           "exported": false,
           "is_default": false,
@@ -22213,8 +22251,8 @@
           "kind": "variable",
           "signature": "wsStore",
           "lines": [
-            174,
-            174
+            178,
+            178
           ],
           "exported": true,
           "is_default": false,

@@ -92,6 +92,7 @@ export async function createServer(
   }
 
   // Add timing hook
+  // oxlint-disable-next-line eslint/require-await -- Fastify hooks require async signature
   app.addHook("onRequest", async (request) => {
     request.startTime = Date.now();
   });
@@ -101,6 +102,7 @@ export async function createServer(
   app.decorate("ctx", context);
 
   // Health check endpoint
+  // oxlint-disable-next-line eslint/require-await -- Fastify route handlers require async signature
   app.get("/health", async () => ({
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -131,7 +133,7 @@ export async function createServer(
   );
 
   // Global error handler
-  async function handleError(
+  function handleError(
     error: Error,
     _request: FastifyRequest,
     reply: FastifyReply

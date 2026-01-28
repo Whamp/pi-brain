@@ -28,6 +28,27 @@ import {
 
 const DEFAULT_PORT = 8765;
 
+/**
+ * Build session data for the dashboard
+ */
+function buildSessionData(ctx: ExtensionContext) {
+  const sm = ctx.sessionManager;
+  const entries = sm.getEntries();
+  const branch = sm.getBranch();
+  const leafId = sm.getLeafId();
+  const sessionFile = sm.getSessionFile() ?? null;
+  const sessionId = sm.getSessionId() ?? null;
+
+  return {
+    branch,
+    entries,
+    isStreaming: !ctx.isIdle(),
+    leafId,
+    sessionFile,
+    sessionId,
+  };
+}
+
 export default function dashboardExtension(pi: ExtensionAPI) {
   let server: DashboardServer | null = null;
   let currentCtx: ExtensionContext | null = null;
@@ -75,27 +96,6 @@ export default function dashboardExtension(pi: ExtensionAPI) {
     });
 
     return server;
-  }
-
-  /**
-   * Build session data for the dashboard
-   */
-  function buildSessionData(ctx: ExtensionContext) {
-    const sm = ctx.sessionManager;
-    const entries = sm.getEntries();
-    const branch = sm.getBranch();
-    const leafId = sm.getLeafId();
-    const sessionFile = sm.getSessionFile() ?? null;
-    const sessionId = sm.getSessionId() ?? null;
-
-    return {
-      branch,
-      entries,
-      isStreaming: !ctx.isIdle(),
-      leafId,
-      sessionFile,
-      sessionId,
-    };
   }
 
   /**
@@ -271,6 +271,11 @@ export default function dashboardExtension(pi: ExtensionAPI) {
           } catch (error) {
             ctx.ui.notify(`Summarization failed: ${error}`, "error");
           }
+          break;
+        }
+
+        default: {
+          ctx.ui.notify(`Unknown action type: ${action.type}`, "error");
           break;
         }
       }

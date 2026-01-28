@@ -93,7 +93,7 @@ describe("connectionDiscoverer", () => {
     const current = db
       .prepare("SELECT lessons FROM nodes_fts WHERE node_id = ?")
       .get(nodeId) as { lessons: string } | undefined;
-    const newLessons = (current?.lessons || "") + " " + summary + " " + details;
+    const newLessons = `${current?.lessons || ""} ${summary} ${details}`;
     db.prepare("UPDATE nodes_fts SET lessons = ? WHERE node_id = ?").run(
       newLessons,
       nodeId

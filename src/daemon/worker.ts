@@ -331,7 +331,9 @@ export class Worker {
 
   /**
    * Process a single job (can be called directly for testing)
+  
    */
+  // oxlint-disable-next-line complexity
   async processJob(job: AnalysisJob): Promise<JobProcessingResult> {
     if (
       !this.queue ||
@@ -668,7 +670,7 @@ export function createWorker(config: WorkerConfig): Worker {
  * Process a single job without the full worker loop
  * Useful for one-off processing or testing
  */
-export async function processSingleJob(
+export function processSingleJob(
   job: AnalysisJob,
   config: PiBrainConfig,
   db: Database.Database,

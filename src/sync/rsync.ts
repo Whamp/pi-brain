@@ -134,7 +134,9 @@ function parseRsyncError(
 
 /**
  * Run rsync for a spoke with rsync sync method
+
  */
+// oxlint-disable-next-line complexity
 export async function runRsync(
   spoke: SpokeConfig,
   options: RsyncOptions = {}

@@ -141,7 +141,7 @@
   }
 
   function formatPercent(val: number): string {
-    return Math.round(val * 100) + "%";
+    return `${Math.round(val * 100)}%`;
   }
 </script>
 

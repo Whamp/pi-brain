@@ -74,12 +74,14 @@ export interface SchedulerLogger {
 }
 
 /** Default no-op logger */
+/* oxlint-disable no-empty-function */
 export const noopLogger: SchedulerLogger = {
   info: () => {},
   warn: () => {},
   error: () => {},
   debug: () => {},
 };
+/* oxlint-enable no-empty-function */
 
 /** Console logger for production use */
 export const consoleLogger: SchedulerLogger = {
@@ -364,7 +366,9 @@ export class Scheduler {
 
   /**
    * Get scheduler status including next run times
+  
    */
+  // oxlint-disable-next-line complexity
   getStatus(): SchedulerStatus {
     const jobs: SchedulerStatus["jobs"] = [];
 
@@ -427,35 +431,35 @@ export class Scheduler {
   /**
    * Manually trigger reanalysis job
    */
-  async triggerReanalysis(): Promise<ScheduledJobResult> {
+  triggerReanalysis(): Promise<ScheduledJobResult> {
     return this.runReanalysis();
   }
 
   /**
    * Manually trigger connection discovery job
    */
-  async triggerConnectionDiscovery(): Promise<ScheduledJobResult> {
+  triggerConnectionDiscovery(): Promise<ScheduledJobResult> {
     return this.runConnectionDiscovery();
   }
 
   /**
    * Manually trigger pattern aggregation job
    */
-  async triggerPatternAggregation(): Promise<ScheduledJobResult> {
+  triggerPatternAggregation(): ScheduledJobResult {
     return this.runPatternAggregation();
   }
 
   /**
    * Manually trigger clustering job
    */
-  async triggerClustering(): Promise<ScheduledJobResult> {
+  triggerClustering(): Promise<ScheduledJobResult> {
     return this.runClustering();
   }
 
   /**
    * Manually trigger backfill embeddings job
    */
-  async triggerBackfillEmbeddings(): Promise<ScheduledJobResult> {
+  triggerBackfillEmbeddings(): Promise<ScheduledJobResult> {
     return this.runBackfillEmbeddings();
   }
 
@@ -638,7 +642,7 @@ export class Scheduler {
    * Run pattern aggregation - aggregates tool errors into failure patterns
    * and model-specific insights for prompt learning
    */
-  private async runPatternAggregation(): Promise<ScheduledJobResult> {
+  private runPatternAggregation(): ScheduledJobResult {
     const startedAt = new Date();
     let errorMessage: string | undefined;
     let itemsProcessed = 0;
@@ -941,6 +945,7 @@ export function createScheduler(
 export function isValidCronExpression(expression: string): boolean {
   try {
     // Create a cron job but don't start it
+    // oxlint-disable-next-line no-empty-function
     const job = new Cron(expression, { paused: true }, () => {});
     job.stop();
     return true;
@@ -954,6 +959,7 @@ export function isValidCronExpression(expression: string): boolean {
  */
 export function getNextRunTimes(expression: string, count = 5): Date[] | null {
   try {
+    // oxlint-disable-next-line no-empty-function
     const job = new Cron(expression, { paused: true }, () => {});
     const times: Date[] = [];
     let next = job.nextRun();

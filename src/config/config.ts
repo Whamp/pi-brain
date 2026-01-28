@@ -154,7 +154,9 @@ function validateSyncMethod(method: string, spokeName: string): SyncMethod {
 
 /**
  * Validate spoke configuration
+
  */
+// oxlint-disable-next-line complexity
 function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
   const spoke = raw?.[index];
   if (!spoke) {
@@ -318,7 +320,9 @@ function validateNonNegativeInt(value: number, field: string): void {
 
 /**
  * Transform raw YAML config to typed config with validation
+
  */
+// oxlint-disable-next-line complexity
 export function transformConfig(raw: RawConfig): PiBrainConfig {
   const defaults = getDefaultConfig();
 

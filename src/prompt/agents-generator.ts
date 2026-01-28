@@ -538,7 +538,7 @@ export async function generateAgentsForModel(
 
     // Determine output path
     // Convert model name to filename-safe format (e.g., "zai/glm-4.7" -> "zai_glm-4.7.md")
-    const filename = model.replaceAll("/", "_") + ".md";
+    const filename = `${model.replaceAll("/", "_")}.md`;
     const outputPath = path.join(outputDir, filename);
 
     // Ensure output directory exists

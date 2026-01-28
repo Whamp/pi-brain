@@ -277,6 +277,10 @@ export function calculateStats(
         branchSummaryCount++;
         break;
       }
+      default: {
+        // Ignore other entry types (e.g., session_start, config)
+        break;
+      }
     }
   }
 
@@ -373,7 +377,7 @@ function truncate(str: string, maxLength: number): string {
   if (cleaned.length <= maxLength) {
     return cleaned;
   }
-  return cleaned.slice(0, maxLength - 3) + "...";
+  return `${cleaned.slice(0, maxLength - 3)}...`;
 }
 
 /**

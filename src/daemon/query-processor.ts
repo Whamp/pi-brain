@@ -551,7 +551,7 @@ interface SpawnResult {
   spawnError?: string;
 }
 
-async function spawnPiProcess(
+function spawnPiProcess(
   args: string[],
   timeoutMinutes: number,
   logger: ProcessorLogger

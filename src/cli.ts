@@ -97,6 +97,7 @@ program
   .option("-p, --project <path>", "Filter to specific project path")
   .option("-q, --quiet", "Suppress output except errors")
   .action(async (options) => {
+    // oxlint-disable-next-line no-empty-function
     const log = options.quiet ? () => {} : console.log;
 
     try {
@@ -226,6 +227,7 @@ daemonCmd
           process.exit(0);
         });
         // Keep process running
+        // oxlint-disable-next-line no-empty-function
         await new Promise(() => {});
       }
     } else {
@@ -675,7 +677,7 @@ promptCmd
   .command("enable <id>")
   .description("Enable an insight in system prompts")
   .option("-c, --config <path>", "Config file path")
-  .action(async (id, options) => {
+  .action((id, options) => {
     try {
       const config = loadConfig(options.config);
       const db = openDatabase({ path: config.hub.databaseDir });
@@ -707,7 +709,7 @@ promptCmd
   .command("disable <id>")
   .description("Disable an insight in system prompts")
   .option("-c, --config <path>", "Config file path")
-  .action(async (id, options) => {
+  .action((id, options) => {
     try {
       const config = loadConfig(options.config);
       const db = openDatabase({ path: config.hub.databaseDir });
@@ -741,7 +743,7 @@ promptCmd
   .option("-c, --config <path>", "Config file path")
   .option("-i, --id <id>", "Measure specific insight only")
   .option("--days <n>", "Number of days for before/after periods", "7")
-  .action(async (options) => {
+  .action((options) => {
     try {
       const config = loadConfig(options.config);
       const db = openDatabase({ path: config.hub.databaseDir });

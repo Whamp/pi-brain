@@ -143,7 +143,7 @@ export function decodeProjectDir(encodedName: string): string {
   }
 
   const inner = encodedName.slice(2, -2);
-  return "/" + inner.replaceAll("-", "/");
+  return `/${inner.replaceAll("-", "/")}`;
 }
 
 /**

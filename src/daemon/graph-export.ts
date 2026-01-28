@@ -99,7 +99,7 @@ function formatNodeLabel(node: NodeRow): string {
   const { type } = node;
   // Truncate summary to 30 chars
   const truncatedSummary =
-    summary.length > 30 ? summary.slice(0, 30) + "..." : summary;
+    summary.length > 30 ? `${summary.slice(0, 30)}...` : summary;
   return `${type}\\n${truncatedSummary}`;
 }
 

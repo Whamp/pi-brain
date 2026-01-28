@@ -105,7 +105,7 @@
     const parts = sessionFile.split(/[/\\]/);
     const filename = parts.at(-1) || sessionFile;
     // Truncate if too long
-    return filename.length > 50 ? filename.slice(0, 47) + "..." : filename;
+    return filename.length > 50 ? `${filename.slice(0, 47)}...` : filename;
   }
 
   // Get outcome icon component
@@ -147,10 +147,10 @@
   // Format token count
   function formatTokens(tokens: number): string {
     if (tokens >= 1_000_000) {
-      return (tokens / 1_000_000).toFixed(1) + "M";
+      return `${(tokens / 1_000_000).toFixed(1)}M`;
     }
     if (tokens >= 1000) {
-      return (tokens / 1000).toFixed(1) + "K";
+      return `${(tokens / 1000).toFixed(1)}K`;
     }
     return tokens.toString();
   }

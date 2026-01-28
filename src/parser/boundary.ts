@@ -443,6 +443,26 @@ export function detectBoundaries(
 }
 
 /**
+ * Create a segment from a slice of entries
+ * Precondition: segmentEntries.length > 0 (ensured by caller)
+ */
+function createSegment(
+  segmentEntries: SessionEntry[],
+  endingBoundaries: Boundary[]
+): Segment {
+  const [first, ...rest] = segmentEntries;
+  const last = rest.length > 0 ? (rest.at(-1) ?? first) : first;
+  return {
+    startEntryId: first.id,
+    endEntryId: last.id,
+    boundaries: endingBoundaries,
+    entryCount: segmentEntries.length,
+    startTimestamp: first.timestamp,
+    endTimestamp: last.timestamp,
+  };
+}
+
+/**
  * Extract segments from entries based on detected boundaries
  *
  * A segment is a contiguous span of entries. Boundaries define the split points.
@@ -474,24 +494,6 @@ export function extractSegments(
     const existing = boundariesByEntryId.get(boundary.entryId) ?? [];
     existing.push(boundary);
     boundariesByEntryId.set(boundary.entryId, existing);
-  }
-
-  // Helper to create a segment from a slice of entries
-  // Precondition: segmentEntries.length > 0 (ensured by caller)
-  function createSegment(
-    segmentEntries: SessionEntry[],
-    endingBoundaries: Boundary[]
-  ): Segment {
-    const [first, ...rest] = segmentEntries;
-    const last = rest.length > 0 ? (rest.at(-1) ?? first) : first;
-    return {
-      startEntryId: first.id,
-      endEntryId: last.id,
-      boundaries: endingBoundaries,
-      entryCount: segmentEntries.length,
-      startTimestamp: first.timestamp,
-      endTimestamp: last.timestamp,
-    };
   }
 
   let segmentStartIndex = 0;

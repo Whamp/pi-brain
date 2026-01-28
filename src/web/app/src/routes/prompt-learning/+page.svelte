@@ -91,7 +91,7 @@
         }
       }
     } catch (error) {
-      alert("Failed to update insight: " + getErrorMessage(error));
+      alert(`Failed to update insight: ${getErrorMessage(error)}`);
     } finally {
       togglingInsightId = null;
     }

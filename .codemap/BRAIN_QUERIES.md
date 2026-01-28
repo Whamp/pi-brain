@@ -87,7 +87,7 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/cli.ts:292: call startDaemon
         - src/daemon/cli.ts:342: call startDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:59: call main
+        - src/daemon/daemon-process.ts:68: call main
         - src/daemon/index.ts:117: reexport (module)
     148-156: removePidFile(): void [exported]
       /** Remove the PID file */
@@ -98,8 +98,8 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/cli.ts:401: call stopDaemon
         - src/daemon/cli.ts:419: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:221: call shutdown
-        - src/daemon/daemon-process.ts:244: call (module)
+        - src/daemon/daemon-process.ts:225: call shutdown
+        - src/daemon/daemon-process.ts:248: call (module)
         - src/daemon/index.ts:118: reexport (module)
     161-169: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
@@ -129,47 +129,70 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/index.ts:122: reexport (module)
     253-363: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:22: import (module)
+        - src/cli.ts:210: call result
         - src/daemon/index.ts:123: reexport (module)
     368-430: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:23: import (module)
+        - src/cli.ts:244: call result
         - src/daemon/index.ts:124: reexport (module)
     435-447: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:24: import (module)
+        - src/cli.ts:260: call status
         - src/daemon/index.ts:125: reexport (module)
     456-485: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:25: import (module)
+        - src/cli.ts:276: call queueStatus
         - src/daemon/index.ts:126: reexport (module)
     490-543: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:26: import (module)
+        - src/cli.ts:294: call result
         - src/daemon/index.ts:127: reexport (module)
     763-793: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:27: import (module)
+        - src/cli.ts:366: call status
         - src/daemon/index.ts:128: reexport (module)
     802-823: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:28: import (module)
+        - src/cli.ts:265: call (module)
         - src/daemon/index.ts:129: reexport (module)
     828-878: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:29: import (module)
+        - src/cli.ts:281: call (module)
         - src/daemon/index.ts:130: reexport (module)
     893-916: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:30: import (module)
+        - src/cli.ts:371: call (module)
         - src/daemon/index.ts:131: reexport (module)
     931-1051: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs in: 1 [reexport: 1]
+      refs in: 4 [call: 2, import: 1, reexport: 1]
+        - src/cli.ts:31: import (module)
+        - src/cli.ts:309: call result
+        - src/cli.ts:336: call result
         - src/daemon/index.ts:132: reexport (module)
     1056-1138: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
-      refs in: 7 [call: 5, import: 1, reexport: 1]
+      refs in: 9 [call: 6, import: 2, reexport: 1]
+        - src/cli.ts:32: import (module)
+        - src/cli.ts:345: call result
         - src/daemon/cli.test.ts:12: import (module)
         - src/daemon/cli.test.ts:83: call result
         - src/daemon/cli.test.ts:95: call result
@@ -232,7 +255,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-248]
+src/daemon/daemon-process.ts [1-252]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -355,8 +378,8 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.test.ts:366: call stored
         - src/daemon/index.ts:84: reexport (module)
         - src/daemon/worker.ts:41: import (module)
-        - src/daemon/worker.ts:552: call Worker.storedError
-        - src/daemon/worker.ts:711: call handleJobError
+        - src/daemon/worker.ts:554: call Worker.storedError
+        - src/daemon/worker.ts:713: call handleJobError
     375-393: parseStoredError(stored: string): { timestamp: string; type: ErrorCategoryType; reason: string; message: string; stack?: string; } [exported]
       /** Parse stored error back to object */
       refs in: 5 [call: 3, import: 1, reexport: 1]
@@ -466,9 +489,9 @@ src/daemon/facet-discovery.test.ts [1-913]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1757]
+src/daemon/facet-discovery.ts [1-1760]
   class:
-    667-1728: class FacetDiscovery [exported]
+    670-1731: class FacetDiscovery [exported]
       refs in: 11 [import: 2, instantiate: 5, reexport: 1, type: 3]
         - src/daemon/facet-discovery.test.ts:17: import (module)
         - src/daemon/facet-discovery.test.ts:301: type discovery
@@ -484,56 +507,56 @@ src/daemon/facet-discovery.ts [1-1757]
     99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:1244: type FacetDiscovery.analyzeClusters
-        - src/daemon/facet-discovery.ts:1305: type FacetDiscovery.analyzeCluster
-        - src/daemon/facet-discovery.ts:1452: type FacetDiscovery.invokeClusterAnalysisAgent
+        - src/daemon/facet-discovery.ts:1247: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1308: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:1455: type FacetDiscovery.invokeClusterAnalysisAgent
         - src/daemon/index.ts:175: reexport (module)
     113-121: interface ClusterAnalysisResult [exported]
       /** Result from analyzing a single cluster */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/facet-discovery.ts:130: type ClusterAnalysisBatchResult
-        - src/daemon/facet-discovery.ts:1267: type FacetDiscovery.results
-        - src/daemon/facet-discovery.ts:1306: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:1270: type FacetDiscovery.results
+        - src/daemon/facet-discovery.ts:1309: type FacetDiscovery.analyzeCluster
         - src/daemon/index.ts:176: reexport (module)
     126-131: interface ClusterAnalysisBatchResult [exported]
       /** Result from analyzing multiple clusters */
       refs in: 2 [reexport: 1, type: 1]
-        - src/daemon/facet-discovery.ts:1246: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1249: type FacetDiscovery.analyzeClusters
         - src/daemon/index.ts:177: reexport (module)
     140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-      refs in: 26 [import: 5, reexport: 1, type: 20]
-        - src/api/routes/query.ts:14: import (module)
-        - src/api/routes/query.ts:53: type cachedEmbeddingProvider
-        - src/api/routes/query.ts:66: type getEmbeddingProvider
-        - src/api/routes/query.ts:166: type embeddingProvider
+      refs in: 22 [import: 4, reexport: 1, type: 17]
         - src/daemon/facet-discovery.ts:150: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:151: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:153: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:154: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:155: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:164: type createEmbeddingProvider
-    655-659: interface FacetDiscoveryLogger [exported]
+        - src/daemon/facet-discovery.ts:206: type createOllamaProvider
+        - src/daemon/facet-discovery.ts:252: type createOpenAIProvider
+        - src/daemon/facet-discovery.ts:294: type createOpenRouterProvider
+        - src/daemon/facet-discovery.ts:331: type createMockEmbeddingProvider
+    656-660: interface FacetDiscoveryLogger [exported]
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:661: type noopLogger
-        - src/daemon/facet-discovery.ts:670: type FacetDiscovery.logger
-        - src/daemon/facet-discovery.ts:676: type FacetDiscovery.constructor
+        - src/daemon/facet-discovery.ts:663: type noopLogger
+        - src/daemon/facet-discovery.ts:673: type FacetDiscovery.logger
+        - src/daemon/facet-discovery.ts:679: type FacetDiscovery.constructor
         - src/daemon/index.ts:174: reexport (module)
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs in: 13 [call: 7, import: 5, reexport: 1]
-        - src/api/routes/query.ts:13: import (module)
-        - src/api/routes/query.ts:94: call getEmbeddingProvider
+      refs in: 11 [call: 6, import: 4, reexport: 1]
         - src/daemon/cli.ts:39: import (module)
         - src/daemon/cli.ts:1083: call provider
         - src/daemon/facet-discovery.test.ts:15: import (module)
         - src/daemon/facet-discovery.test.ts:81: call (module)
         - src/daemon/facet-discovery.test.ts:90: call (module)
-        - src/daemon/facet-discovery.ts:681: call FacetDiscovery.constructor
+        - src/daemon/facet-discovery.ts:684: call FacetDiscovery.constructor
         - src/daemon/index.ts:170: reexport (module)
         - src/daemon/scheduler.ts:30: import (module)
-    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+        - src/daemon/scheduler.ts:758: call Scheduler.createSchedulerEmbeddingProvider
+        - src/daemon/worker.ts:46: import (module)
+    331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs in: 9 [call: 8, import: 1]
         - src/daemon/facet-discovery.test.ts:16: import (module)
@@ -545,7 +568,7 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:704: call (module)
         - src/daemon/facet-discovery.test.ts:754: call (module)
         - src/daemon/facet-discovery.test.ts:854: call discoveryWithMore
-    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    384-451: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs in: 8 [call: 6, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:19: import (module)
@@ -554,9 +577,9 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:174: call result
         - src/daemon/facet-discovery.test.ts:194: call result
         - src/daemon/facet-discovery.test.ts:205: call result
-        - src/daemon/facet-discovery.ts:929: call FacetDiscovery.result
+        - src/daemon/facet-discovery.ts:932: call FacetDiscovery.result
         - src/daemon/index.ts:171: reexport (module)
-    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    494-513: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:18: import (module)
@@ -567,7 +590,7 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:290: call labels6
         - src/daemon/facet-discovery.test.ts:670: call labels
         - src/daemon/facet-discovery.test.ts:686: call labels
-        - src/daemon/facet-discovery.ts:933: call FacetDiscovery.clusterEmbeddings
+        - src/daemon/facet-discovery.ts:936: call FacetDiscovery.clusterEmbeddings
         - src/daemon/index.ts:172: reexport (module)
   imports:
     - ../storage/embedding-utils.js
@@ -639,7 +662,7 @@ src/daemon/insight-aggregation.ts [1-553]
         - src/daemon/insight-aggregation.test.ts:492: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:552: instantiate aggregator
         - src/daemon/scheduler.ts:34: import (module)
-        - src/daemon/scheduler.ts:174: type Scheduler.insightAggregator
+        - src/daemon/scheduler.ts:176: type Scheduler.insightAggregator
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -661,8 +684,8 @@ src/daemon/pattern-aggregation.ts [1-332]
         - src/daemon/pattern-aggregation.test.ts:21: type aggregator
         - src/daemon/pattern-aggregation.test.ts:81: instantiate (module)
         - src/daemon/scheduler.ts:35: import (module)
-        - src/daemon/scheduler.ts:173: type Scheduler.patternAggregator
-        - src/daemon/scheduler.ts:182: instantiate Scheduler.constructor
+        - src/daemon/scheduler.ts:175: type Scheduler.patternAggregator
+        - src/daemon/scheduler.ts:184: instantiate Scheduler.constructor
   imports:
     - better-sqlite3
     - node:crypto
@@ -695,7 +718,7 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:723: type JobProcessor.process
     37-116: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs in: 12 [import: 3, reexport: 1, type: 8]
+      refs in: 10 [import: 2, reexport: 1, type: 7]
         - src/daemon/index.ts:72: reexport (module)
         - src/daemon/processor.test.ts:24: import (module)
         - src/daemon/processor.test.ts:47: type createValidNodeOutput
@@ -887,9 +910,7 @@ src/daemon/query-processor.ts [1-779]
   interface:
     31-44: interface QueryRequest [exported]
       /** Query request from the API */
-      refs in: 12 [import: 2, type: 10]
-        - src/api/routes/query.ts:18: import (module)
-        - src/api/routes/query.ts:155: type queryRequest
+      refs in: 10 [import: 1, type: 9]
         - src/daemon/query-processor.test.ts:19: import (module)
         - src/daemon/query-processor.test.ts:87: type request
         - src/daemon/query-processor.test.ts:161: type request
@@ -898,11 +919,11 @@ src/daemon/query-processor.ts [1-779]
         - src/daemon/query-processor.test.ts:303: type request
         - src/daemon/query-processor.test.ts:351: type request
         - src/daemon/query-processor.test.ts:396: type request
+        - src/daemon/query-processor.test.ts:436: type request
+        - src/daemon/query-processor.ts:109: type processQuery
     47-65: interface QueryResponse [exported]
       /** Query response to return to the client */
-      refs in: 5 [import: 1, type: 4]
-        - src/api/routes/query.ts:19: import (module)
-        - src/api/routes/query.ts:176: type response
+      refs in: 3 [type: 3]
         - src/daemon/query-processor.ts:70: type AgentQueryResult
         - src/daemon/query-processor.ts:111: type processQuery
         - src/daemon/query-processor.ts:640: type ParseResult
@@ -913,9 +934,7 @@ src/daemon/query-processor.ts [1-779]
   function:
     108-187: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
-      refs in: 11 [call: 9, import: 2]
-        - src/api/routes/query.ts:17: import (module)
-        - src/api/routes/query.ts:176: call response
+      refs in: 9 [call: 8, import: 1]
         - src/daemon/query-processor.test.ts:19: import (module)
         - src/daemon/query-processor.test.ts:88: call response
         - src/daemon/query-processor.test.ts:162: call response
@@ -924,6 +943,7 @@ src/daemon/query-processor.ts [1-779]
         - src/daemon/query-processor.test.ts:304: call response
         - src/daemon/query-processor.test.ts:352: call response
         - src/daemon/query-processor.test.ts:397: call response
+        - src/daemon/query-processor.test.ts:440: call (module)
   imports:
     - ../config/types.js
     - ../storage/node-crud.js
@@ -1050,7 +1070,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/cli.ts:47: import (module)
         - src/daemon/cli.ts:516: call queue
         - src/daemon/daemon-process.ts:20: import (module)
-        - src/daemon/daemon-process.ts:63: call queue
+        - src/daemon/daemon-process.ts:72: call queue
         - src/daemon/index.ts:43: reexport (module)
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
@@ -1081,9 +1101,9 @@ src/daemon/scheduler.test.ts [1-967]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-972]
+src/daemon/scheduler.ts [1-978]
   class:
-    161-900: class Scheduler [exported]
+    163-904: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
       refs in: 31 [import: 1, instantiate: 27, reexport: 1, type: 2]
         - src/daemon/index.ts:145: reexport (module)
@@ -1101,26 +1121,26 @@ src/daemon/scheduler.ts [1-972]
       /** Result of a scheduled job execution */
       refs in: 24 [reexport: 1, type: 23]
         - src/daemon/index.ts:152: reexport (module)
-        - src/daemon/scheduler.ts:154: type SchedulerStatus
-        - src/daemon/scheduler.ts:168: type Scheduler.lastReanalysisResult
-        - src/daemon/scheduler.ts:169: type Scheduler.lastConnectionDiscoveryResult
-        - src/daemon/scheduler.ts:170: type Scheduler.lastPatternAggregationResult
-        - src/daemon/scheduler.ts:171: type Scheduler.lastClusteringResult
-        - src/daemon/scheduler.ts:172: type Scheduler.lastBackfillEmbeddingsResult
-        - src/daemon/scheduler.ts:430: type Scheduler.triggerReanalysis
-        - src/daemon/scheduler.ts:437: type Scheduler.triggerConnectionDiscovery
-        - src/daemon/scheduler.ts:444: type Scheduler.triggerPatternAggregation
+        - src/daemon/scheduler.ts:156: type SchedulerStatus
+        - src/daemon/scheduler.ts:170: type Scheduler.lastReanalysisResult
+        - src/daemon/scheduler.ts:171: type Scheduler.lastConnectionDiscoveryResult
+        - src/daemon/scheduler.ts:172: type Scheduler.lastPatternAggregationResult
+        - src/daemon/scheduler.ts:173: type Scheduler.lastClusteringResult
+        - src/daemon/scheduler.ts:174: type Scheduler.lastBackfillEmbeddingsResult
+        - src/daemon/scheduler.ts:434: type Scheduler.triggerReanalysis
+        - src/daemon/scheduler.ts:441: type Scheduler.triggerConnectionDiscovery
+        - src/daemon/scheduler.ts:448: type Scheduler.triggerPatternAggregation
     69-74: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
       refs in: 7 [import: 1, reexport: 1, type: 5]
         - src/daemon/index.ts:153: reexport (module)
         - src/daemon/scheduler.test.ts:19: import (module)
         - src/daemon/scheduler.test.ts:128: type createCapturingLogger
-        - src/daemon/scheduler.ts:77: type noopLogger
-        - src/daemon/scheduler.ts:85: type consoleLogger
-        - src/daemon/scheduler.ts:180: type Scheduler.constructor
-        - src/daemon/scheduler.ts:909: type createScheduler
-    93-144: interface SchedulerConfig [exported]
+        - src/daemon/scheduler.ts:78: type noopLogger
+        - src/daemon/scheduler.ts:87: type consoleLogger
+        - src/daemon/scheduler.ts:182: type Scheduler.constructor
+        - src/daemon/scheduler.ts:913: type createScheduler
+    95-146: interface SchedulerConfig [exported]
       /** Scheduler configuration */
       refs in: 20 [import: 1, reexport: 1, type: 18]
         - src/daemon/index.ts:154: reexport (module)
@@ -1133,12 +1153,12 @@ src/daemon/scheduler.ts [1-972]
         - src/daemon/scheduler.test.ts:647: type config
         - src/daemon/scheduler.test.ts:668: type config
         - src/daemon/scheduler.test.ts:684: type config
-    147-156: interface SchedulerStatus [exported]
+    149-158: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:155: reexport (module)
-        - src/daemon/scheduler.ts:368: type Scheduler.getStatus
-        - src/daemon/scheduler.ts:369: type Scheduler.jobs
+        - src/daemon/scheduler.ts:372: type Scheduler.getStatus
+        - src/daemon/scheduler.ts:373: type Scheduler.jobs
   type:
     51-56: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
@@ -1149,17 +1169,17 @@ src/daemon/scheduler.ts [1-972]
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:151: reexport (module)
         - src/daemon/scheduler.ts:60: type ScheduledJobResult
-        - src/daemon/scheduler.ts:150: type SchedulerStatus
+        - src/daemon/scheduler.ts:152: type SchedulerStatus
   function:
-    905-935: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    909-939: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
-        - src/daemon/daemon-process.ts:124: call scheduler
+        - src/daemon/daemon-process.ts:133: call scheduler
         - src/daemon/index.ts:146: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:562: call scheduler
-    941-950: isValidCronExpression(expression: string): boolean [exported]
+    945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
@@ -1172,7 +1192,7 @@ src/daemon/scheduler.ts [1-972]
         - src/daemon/scheduler.test.ts:581: call (module)
         - src/daemon/scheduler.test.ts:582: call (module)
         - src/daemon/scheduler.test.ts:583: call (module)
-    955-971: getNextRunTimes(expression: string, count = 5): {} [exported]
+    960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:148: reexport (module)
@@ -1181,12 +1201,12 @@ src/daemon/scheduler.ts [1-972]
         - src/daemon/scheduler.test.ts:613: call (module)
         - src/daemon/scheduler.test.ts:617: call times
   variable:
-    77-82: SchedulerLogger [exported]
+    78-83: SchedulerLogger [exported]
       /** Default no-op logger */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:149: reexport (module)
         - src/daemon/scheduler.test.ts:16: import (module)
-    85-90: SchedulerLogger [exported]
+    87-92: SchedulerLogger [exported]
       /** Console logger for production use */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:150: reexport (module)
@@ -1263,8 +1283,8 @@ src/daemon/watcher-events.ts [1-117]
       /** Helper to get session path from a session event */
       refs in: 12 [call: 9, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:22: import (module)
-        - src/daemon/daemon-process.ts:139: call sessionPath
-        - src/daemon/daemon-process.ts:157: call sessionPath
+        - src/daemon/daemon-process.ts:148: call sessionPath
+        - src/daemon/daemon-process.ts:166: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
         - src/daemon/watcher.test.ts:228: call (module)
@@ -1301,7 +1321,7 @@ src/daemon/watcher.ts [1-582]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
       refs in: 21 [import: 2, instantiate: 14, reexport: 1, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
-        - src/daemon/daemon-process.ts:133: instantiate watcher
+        - src/daemon/daemon-process.ts:142: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
         - src/daemon/watcher.test.ts:53: type waitForEvent
@@ -1385,16 +1405,16 @@ src/daemon/worker.test.ts [1-539]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-715]
+src/daemon/worker.ts [1-717]
   class:
-    126-654: class Worker [exported]
+    126-656: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
       refs in: 5 [import: 1, instantiate: 2, reexport: 1, type: 1]
         - src/daemon/index.ts:103: reexport (module)
         - src/daemon/worker.test.ts:20: import (module)
-        - src/daemon/worker.ts:663: type createWorker
-        - src/daemon/worker.ts:664: instantiate createWorker
-        - src/daemon/worker.ts:677: instantiate worker
+        - src/daemon/worker.ts:665: type createWorker
+        - src/daemon/worker.ts:666: instantiate createWorker
+        - src/daemon/worker.ts:679: instantiate worker
   interface:
     66-83: interface WorkerConfig [exported]
       /** Worker configuration */
@@ -1404,7 +1424,7 @@ src/daemon/worker.ts [1-715]
         - src/daemon/worker.test.ts:68: type createTestWorkerConfig
         - src/daemon/worker.test.ts:69: type createTestWorkerConfig
         - src/daemon/worker.ts:159: type Worker.constructor
-        - src/daemon/worker.ts:663: type createWorker
+        - src/daemon/worker.ts:665: type createWorker
     86-101: interface WorkerStatus [exported]
       /** Worker status */
       refs in: 2 [reexport: 1, type: 1]
@@ -1414,15 +1434,15 @@ src/daemon/worker.ts [1-715]
       /** Result from processing a single job */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:109: reexport (module)
-        - src/daemon/worker.ts:335: type Worker.processJob
-        - src/daemon/worker.ts:536: type Worker.handleJobFailure
-        - src/daemon/worker.ts:676: type processSingleJob
+        - src/daemon/worker.ts:337: type Worker.processJob
+        - src/daemon/worker.ts:538: type Worker.handleJobFailure
+        - src/daemon/worker.ts:678: type processSingleJob
   function:
-    663-665: createWorker(config: WorkerConfig): Worker [exported]
+    665-667: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs in: 19 [call: 16, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
-        - src/daemon/daemon-process.ts:96: call worker
+        - src/daemon/daemon-process.ts:105: call worker
         - src/daemon/index.ts:104: reexport (module)
         - src/daemon/worker.test.ts:18: import (module)
         - src/daemon/worker.test.ts:119: call worker
@@ -1431,11 +1451,11 @@ src/daemon/worker.ts [1-715]
         - src/daemon/worker.test.ts:143: call worker
         - src/daemon/worker.test.ts:159: call worker
         - src/daemon/worker.test.ts:173: call worker
-    671-685: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
         - src/daemon/index.ts:105: reexport (module)
-    690-714: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
@@ -1763,37 +1783,37 @@ src/storage/embedding-utils.test.ts [1-1069]
     - better-sqlite3
     - vitest
 
-src/storage/embedding-utils.ts [1-623]
+src/storage/embedding-utils.ts [1-625]
   interface:
     325-329: interface BackfillEmbeddingProvider [exported]
       /** Embedding provider interface for backfill operations. Matches the EmbeddingProvider interface from facet-discovery.ts. */
       refs in: 3 [type: 3]
-        - src/storage/embedding-utils.ts:403: type findNodesNeedingEmbedding
-        - src/storage/embedding-utils.ts:459: type backfillEmbeddings
-        - src/storage/embedding-utils.ts:592: type countNodesNeedingEmbedding
+        - src/storage/embedding-utils.ts:405: type findNodesNeedingEmbedding
+        - src/storage/embedding-utils.ts:461: type backfillEmbeddings
+        - src/storage/embedding-utils.ts:594: type countNodesNeedingEmbedding
     334-339: interface BackfillLogger [exported]
       /** Logger interface for backfill operations. */
       refs in: 2 [type: 2]
         - src/storage/embedding-utils.ts:352: type BackfillEmbeddingsOptions
-        - src/storage/embedding-utils.ts:378: type noopLogger
+        - src/storage/embedding-utils.ts:379: type noopLogger
     344-355: interface BackfillEmbeddingsOptions [exported]
       /** Options for backfillEmbeddings function. */
       refs in: 1 [type: 1]
-        - src/storage/embedding-utils.ts:461: type backfillEmbeddings
+        - src/storage/embedding-utils.ts:463: type backfillEmbeddings
     360-371: interface BackfillResult [exported]
       /** Result of a backfill operation. */
       refs in: 3 [import: 1, type: 2]
         - src/daemon/scheduler.ts:26: import (module)
-        - src/daemon/scheduler.ts:763: type Scheduler.result
-        - src/storage/embedding-utils.ts:462: type backfillEmbeddings
+        - src/daemon/scheduler.ts:767: type Scheduler.result
+        - src/storage/embedding-utils.ts:464: type backfillEmbeddings
   function:
     43-83: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
       refs in: 11 [call: 8, import: 3]
         - src/daemon/facet-discovery.ts:35: import (module)
-        - src/daemon/facet-discovery.ts:873: call FacetDiscovery.buildNodeEmbeddingText
+        - src/daemon/facet-discovery.ts:876: call FacetDiscovery.buildNodeEmbeddingText
         - src/daemon/worker.ts:28: import (module)
-        - src/daemon/worker.ts:615: call Worker.text
+        - src/daemon/worker.ts:617: call Worker.text
         - src/storage/embedding-utils.test.ts:14: import (module)
         - src/storage/embedding-utils.test.ts:143: call text
         - src/storage/embedding-utils.test.ts:173: call text
@@ -1804,7 +1824,7 @@ src/storage/embedding-utils.ts [1-623]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
       refs in: 7 [call: 5, import: 2]
         - src/daemon/facet-discovery.ts:36: import (module)
-        - src/daemon/facet-discovery.ts:879: call FacetDiscovery.buildNodeEmbeddingText
+        - src/daemon/facet-discovery.ts:882: call FacetDiscovery.buildNodeEmbeddingText
         - src/storage/embedding-utils.test.ts:15: import (module)
         - src/storage/embedding-utils.test.ts:328: call text
         - src/storage/embedding-utils.test.ts:333: call text
@@ -1814,7 +1834,7 @@ src/storage/embedding-utils.ts [1-623]
       /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection relies on the version marker [emb:v2]. This avoids strict dependencies on whitespace or formatting of the sections. */
       refs in: 13 [call: 11, import: 2]
         - src/daemon/facet-discovery.ts:37: import (module)
-        - src/daemon/facet-discovery.ts:817: call FacetDiscovery.embedNodes
+        - src/daemon/facet-discovery.ts:820: call FacetDiscovery.embedNodes
         - src/storage/embedding-utils.test.ts:23: import (module)
         - src/storage/embedding-utils.test.ts:352: call (module)
         - src/storage/embedding-utils.test.ts:357: call (module)
@@ -1827,7 +1847,7 @@ src/storage/embedding-utils.ts [1-623]
       /** Store an embedding for a node in both node_embeddings and node_embeddings_vec tables. Handles upsert semantics - if an embedding already exists for the node, it will be replaced. The vec table is only updated if sqlite-vec is loaded. Uses a transaction to ensure atomicity - either both tables are updated or neither. */
       refs in: 19 [call: 17, import: 2]
         - src/daemon/worker.ts:29: import (module)
-        - src/daemon/worker.ts:628: call Worker.{ vecUpdated }
+        - src/daemon/worker.ts:630: call Worker.{ vecUpdated }
         - src/storage/embedding-utils.test.ts:25: import (module)
         - src/storage/embedding-utils.test.ts:420: call result
         - src/storage/embedding-utils.test.ts:447: call (module)
@@ -1880,7 +1900,7 @@ src/storage/embedding-utils.ts [1-623]
         - src/storage/semantic-search.test.ts:9: import (module)
         - src/storage/semantic-search.ts:13: import (module)
         - src/storage/semantic-search.ts:173: call getNodeEmbeddingVector
-    401-441: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
+    403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
       /** Find nodes that need embedding generation or update. A node needs embedding if: 1. No embedding exists for it 2. Embedding uses a different model than the current provider 3. Embedding uses old format (not rich format with decisions/lessons) */
       refs in: 10 [call: 9, import: 1]
         - src/storage/embedding-utils.test.ts:20: import (module)
@@ -1892,21 +1912,21 @@ src/storage/embedding-utils.ts [1-623]
         - src/storage/embedding-utils.test.ts:748: call (module)
         - src/storage/embedding-utils.test.ts:750: call nodes
         - src/storage/embedding-utils.test.ts:775: call nodes
-        - src/storage/embedding-utils.ts:474: call nodes
-    457-583: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
+        - src/storage/embedding-utils.ts:476: call nodes
+    459-585: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
       refs in: 13 [call: 10, import: 3]
         - src/daemon/cli.ts:28: import (module)
         - src/daemon/cli.ts:1102: call result
         - src/daemon/scheduler.ts:25: import (module)
-        - src/daemon/scheduler.ts:790: call Scheduler.runBackfillEmbeddings
+        - src/daemon/scheduler.ts:794: call Scheduler.runBackfillEmbeddings
         - src/storage/embedding-utils.test.ts:13: import (module)
         - src/storage/embedding-utils.test.ts:895: call result
         - src/storage/embedding-utils.test.ts:919: call result
         - src/storage/embedding-utils.test.ts:941: call result
         - src/storage/embedding-utils.test.ts:964: call result
         - src/storage/embedding-utils.test.ts:994: call result
-    590-622: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
+    592-624: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
       refs in: 3 [call: 2, import: 1]
         - src/storage/embedding-utils.test.ts:16: import (module)
@@ -2122,7 +2142,7 @@ src/storage/node-conversion.ts [1-260]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
       refs in: 24 [call: 22, import: 2]
         - src/daemon/worker.ts:36: import (module)
-        - src/daemon/worker.ts:462: call Worker.node
+        - src/daemon/worker.ts:464: call Worker.node
         - src/storage/index.test.ts:16: import (module)
         - src/storage/index.test.ts:824: call newNode
         - src/storage/index.test.ts:849: call (module)
@@ -2214,7 +2234,7 @@ src/storage/node-crud.ts [1-751]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:34: import (module)
-        - src/daemon/worker.ts:479: call Worker.{ created }
+        - src/daemon/worker.ts:481: call Worker.{ created }
         - src/storage/index.test.ts:65: import (module)
         - src/storage/index.test.ts:625: call { node: resultNode, created }
         - src/storage/index.test.ts:655: call { node: resultNode, created }
@@ -2285,7 +2305,7 @@ src/storage/node-crud.ts [1-751]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:32: import (module)
-        - src/daemon/worker.ts:423: call Worker.previousNode
+        - src/daemon/worker.ts:425: call Worker.previousNode
         - src/storage/index.test.ts:54: import (module)
         - src/storage/index.test.ts:490: call result
         - src/storage/index.test.ts:527: call result
@@ -2300,7 +2320,7 @@ src/storage/node-crud.ts [1-751]
         - src/daemon/cli.ts:32: import (module)
         - src/daemon/cli.ts:1016: call processLinkBatch
         - src/daemon/worker.ts:33: import (module)
-        - src/daemon/worker.ts:486: call Worker.processJob
+        - src/daemon/worker.ts:488: call Worker.processJob
         - src/storage/index.test.ts:56: import (module)
         - src/storage/index.test.ts:1108: call edges
         - src/storage/index.test.ts:1133: call edges
@@ -2560,7 +2580,7 @@ src/storage/node-storage.ts [1-292]
         - src/daemon/export.ts:12: import (module)
         - src/daemon/export.ts:65: call node
         - src/daemon/facet-discovery.ts:39: import (module)
-        - src/daemon/facet-discovery.ts:872: call FacetDiscovery.fullNode
+        - src/daemon/facet-discovery.ts:875: call FacetDiscovery.fullNode
         - src/daemon/insight-aggregation.ts:20: import (module)
     119-128: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
       /** Check if a node file exists */
@@ -2761,8 +2781,8 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:12: import (module)
         - src/api/routes/prompt-learning.ts:51: call insights
         - src/cli.ts:62: import (module)
-        - src/cli.ts:633: call insights
-        - src/cli.ts:776: call (module)
+        - src/cli.ts:635: call insights
+        - src/cli.ts:778: call (module)
         - src/prompt/agents-generator.ts:21: import (module)
         - src/prompt/agents-generator.ts:143: call insights
         - src/prompt/agents-generator.ts:151: call generalToolErrors
@@ -2773,9 +2793,9 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:13: import (module)
         - src/api/routes/prompt-learning.ts:146: call insight
         - src/cli.ts:61: import (module)
-        - src/cli.ts:684: call insight
-        - src/cli.ts:716: call insight
-        - src/cli.ts:768: call insight
+        - src/cli.ts:686: call insight
+        - src/cli.ts:718: call insight
+        - src/cli.ts:770: call insight
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
@@ -2797,8 +2817,8 @@ src/storage/pattern-repository.ts [1-369]
         - src/api/routes/prompt-learning.ts:14: import (module)
         - src/api/routes/prompt-learning.ts:153: call promptLearningRoutes
         - src/cli.ts:63: import (module)
-        - src/cli.ts:690: call (module)
-        - src/cli.ts:722: call (module)
+        - src/cli.ts:692: call (module)
+        - src/cli.ts:724: call (module)
         - src/prompt/effectiveness.ts:25: import (module)
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
@@ -3173,4 +3193,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 55
-Estimated tokens: 41,669 (codebase: ~1,053,294)
+Estimated tokens: 41,928 (codebase: ~1,052,531)
