@@ -5,11 +5,11 @@
 
 ## Statistics
 - Total files: 88
-- Total symbols: 632
+- Total symbols: 633
   - function: 354
   - interface: 200
   - type: 39
-  - variable: 27
+  - variable: 28
   - class: 12
 
 ---
@@ -1331,14 +1331,17 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-119]
+src/storage/embedding-utils.ts [1-137]
   function:
-    32-67: buildEmbeddingText(node: Node): string [exported]
+    39-79: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
-    81-93: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+    93-105: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
-    106-118: isRichEmbeddingFormat(inputText: string): boolean [exported]
-      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria: 1. Text must start with `[type]` format (e.g., `[coding]`) 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n` This is more robust than just checking for `\nDecisions:` which could match user content. */
+    119-136: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria (any of these indicate rich format): 1. Contains the version marker [emb:v2] 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-` The version marker is the primary check - it handles nodes with empty decisions/lessons that would otherwise be perpetually re-embedded. */
+  variable:
+    15-15: "[emb:v2]" [exported]
+      /** Format version marker appended to rich embedding text. Used to distinguish new-format embeddings (even with empty decisions/lessons) from old simple-format embeddings. */
   imports:
     - ../types/index.js
 
@@ -2053,4 +2056,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 88
-Estimated tokens: 25,363 (codebase: ~1,015,086)
+Estimated tokens: 25,429 (codebase: ~1,016,095)

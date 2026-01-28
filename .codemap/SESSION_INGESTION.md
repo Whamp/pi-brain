@@ -391,7 +391,7 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.test.ts [1-888]
+src/daemon/facet-discovery.test.ts [1-912]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -1531,4 +1531,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,063 (codebase: ~1,015,513)
+Estimated tokens: 20,063 (codebase: ~1,016,621)

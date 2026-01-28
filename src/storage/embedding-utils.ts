@@ -8,6 +8,13 @@
 import type { Node } from "../types/index.js";
 
 /**
+ * Format version marker appended to rich embedding text.
+ * Used to distinguish new-format embeddings (even with empty decisions/lessons)
+ * from old simple-format embeddings.
+ */
+export const EMBEDDING_FORMAT_VERSION = "[emb:v2]";
+
+/**
  * Build embedding text from a node for semantic search.
  *
  * Format:
@@ -63,6 +70,11 @@ export function buildEmbeddingText(node: Node): string {
     }
   }
 
+  // Append version marker to identify new-format embeddings
+  // This ensures even nodes with empty decisions/lessons are recognized as new format
+  parts.push("");
+  parts.push(EMBEDDING_FORMAT_VERSION);
+
   return parts.join("\n");
 }
 
@@ -97,13 +109,19 @@ export function buildSimpleEmbeddingText(
  *
  * Used to detect nodes with old-format embeddings that need re-embedding.
  *
- * Detection criteria:
- * 1. Text must start with `[type]` format (e.g., `[coding]`)
- * 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n`
+ * Detection criteria (any of these indicate rich format):
+ * 1. Contains the version marker [emb:v2]
+ * 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-`
  *
- * This is more robust than just checking for `\nDecisions:` which could match user content.
+ * The version marker is the primary check - it handles nodes with empty
+ * decisions/lessons that would otherwise be perpetually re-embedded.
  */
 export function isRichEmbeddingFormat(inputText: string): boolean {
+  // Check for version marker first (handles empty decisions/lessons case)
+  if (inputText.includes(EMBEDDING_FORMAT_VERSION)) {
+    return true;
+  }
+
   // Must start with [type] format
   if (!inputText.startsWith("[")) {
     return false;
