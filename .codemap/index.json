@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 95,
-    "totalSymbols": 1205,
+    "totalFiles": 96,
+    "totalSymbols": 1225,
     "byLanguage": {
-      "typescript": 95
+      "typescript": 96
     },
     "bySymbolKind": {
-      "function": 507,
+      "function": 518,
       "type": 42,
-      "interface": 275,
-      "variable": 128,
+      "interface": 280,
+      "variable": 132,
       "class": 15,
       "property": 62,
       "constructor": 14,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 41243,
-  "codebase_tokens": 1131233,
+  "total_tokens": 42105,
+  "codebase_tokens": 1146922,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -17843,14 +17843,416 @@
       ]
     },
     {
+      "path": "src/storage/hybrid-search.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        609
+      ],
+      "detail_level": "full",
+      "token_estimate": 849,
+      "symbols": [
+        {
+          "name": "HYBRID_WEIGHTS",
+          "kind": "variable",
+          "signature": "HYBRID_WEIGHTS",
+          "lines": [
+            33,
+            42
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Weights for each scoring component.\nSum should equal ~1.3 to allow strong signals to boost final score.\nFinal scores are normalized to 0..1 range.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_EDGES_FOR_SCORE",
+          "kind": "variable",
+          "signature": "10",
+          "lines": [
+            45,
+            45
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Max edges to consider for relation score (diminishing returns after)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RECENCY_HALF_LIFE_DAYS",
+          "kind": "variable",
+          "signature": "30",
+          "lines": [
+            48,
+            48
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Days after which recency score starts decaying",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MS_PER_DAY",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            51,
+            51
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Milliseconds per day",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridScoreBreakdown",
+          "kind": "interface",
+          "signature": "HybridScoreBreakdown",
+          "lines": [
+            60,
+            79
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Breakdown of scores for transparency and debugging.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchResult",
+          "kind": "interface",
+          "signature": "HybridSearchResult",
+          "lines": [
+            84,
+            95
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Enhanced search result with hybrid scoring.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchOptions",
+          "kind": "interface",
+          "signature": "HybridSearchOptions",
+          "lines": [
+            100,
+            117
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for hybrid search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchResponse",
+          "kind": "interface",
+          "signature": "HybridSearchResponse",
+          "lines": [
+            122,
+            133
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from hybrid search with pagination metadata.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CandidateNode",
+          "kind": "interface",
+          "signature": "CandidateNode",
+          "lines": [
+            139,
+            146
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateVectorScore",
+          "kind": "function",
+          "signature": "calculateVectorScore(distance: number | null): number",
+          "lines": [
+            156,
+            162
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate vector similarity score from distance.\nLower distance = higher score.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateKeywordScore",
+          "kind": "function",
+          "signature": "calculateKeywordScore(rank: number | null): number",
+          "lines": [
+            168,
+            177
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate keyword score from FTS5 rank.\nFTS5 rank is negative, lower (more negative) is better.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelationScore",
+          "kind": "function",
+          "signature": "calculateRelationScore(edgeCount: number): number",
+          "lines": [
+            183,
+            186
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate relation score based on edge count.\nMore edges = higher score (up to MAX_EDGES_FOR_SCORE).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateContentScore",
+          "kind": "function",
+          "signature": "calculateContentScore(query: string, summary: string | null): number",
+          "lines": [
+            192,
+            222
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate content overlap score.\nBased on exact token matching between query and summary.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateTemporalScore",
+          "kind": "function",
+          "signature": "calculateTemporalScore(nodeTimestamp: string, referenceTime: Date | null): number",
+          "lines": [
+            228,
+            243
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate temporal proximity score.\nNodes closer to the reference time get higher scores.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateTagScore",
+          "kind": "function",
+          "signature": "calculateTagScore(matchedTags: number, totalBoostTags: number): number",
+          "lines": [
+            248,
+            256
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate tag match score.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateImportanceScore",
+          "kind": "function",
+          "signature": "calculateImportanceScore(importance: number | null): number",
+          "lines": [
+            261,
+            263
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate importance score from node importance field.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRecencyScore",
+          "kind": "function",
+          "signature": "calculateRecencyScore(nodeTimestamp: string): number",
+          "lines": [
+            269,
+            276
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate recency score based on node age.\nNewer nodes get higher scores.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateHybridScore",
+          "kind": "function",
+          "signature": "calculateHybridScore(candidate: CandidateNode, query: string, options: HybridSearchOptions): HybridScoreBreakdown",
+          "lines": [
+            281,
+            334
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate final hybrid score from all components.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "hybridSearch",
+          "kind": "function",
+          "signature": "hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse",
+          "lines": [
+            351,
+            553
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Perform hybrid search combining vector, FTS, relation, and other signals.\n\nThe algorithm:\n1. If queryEmbedding provided, perform vector search to get initial candidates\n2. Perform FTS search to get keyword matches\n3. Merge candidates from both sources\n4. For each candidate, calculate edge count (relation score)\n5. Calculate all score components and weighted final score\n6. Sort by final score, apply pagination",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateNodeHybridScore",
+          "kind": "function",
+          "signature": "calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown",
+          "lines": [
+            562,
+            608
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate hybrid score for a single node (useful for re-ranking).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./database.js",
+        "./node-crud.js",
+        "./search-repository.js",
+        "./semantic-search.js",
+        "better-sqlite3"
+      ]
+    },
+    {
       "path": "src/storage/index.ts",
       "language": "typescript",
       "lines": [
         1,
-        19
+        21
       ],
       "detail_level": "full",
-      "token_estimate": 102,
+      "token_estimate": 115,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -17860,6 +18262,7 @@
         "./edge-repository.js",
         "./embedding-utils.js",
         "./graph-repository.js",
+        "./hybrid-search.js",
         "./lesson-repository.js",
         "./node-conversion.js",
         "./node-crud.js",
@@ -17869,6 +18272,7 @@
         "./quirk-repository.js",
         "./relationship-edges.js",
         "./search-repository.js",
+        "./semantic-search.js",
         "./tool-error-repository.js"
       ]
     },

@@ -1,14 +1,14 @@
 # Project Overview
 
 ## Languages
-- typescript: 59 files
+- typescript: 61 files
 
 ## Statistics
-- Total files: 59
-- Total symbols: 344
-  - function: 209
-  - interface: 92
-  - variable: 17
+- Total files: 61
+- Total symbols: 351
+  - function: 211
+  - interface: 96
+  - variable: 18
   - type: 17
   - class: 9
 
@@ -1638,7 +1638,7 @@ src/storage/database.ts [1-298]
         - src/storage/database.ts:68: call loaded
     286-297: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
-      refs in: 11 [call: 6, import: 5]
+      refs in: 13 [call: 7, import: 6]
         - src/daemon/query-processor.ts:19: import (module)
         - src/daemon/query-processor.ts:228: call findRelevantNodes
         - src/storage/database-vec.test.ts:8: import (module)
@@ -1647,8 +1647,8 @@ src/storage/database.ts [1-298]
         - src/storage/embedding-utils.ts:12: import (module)
         - src/storage/embedding-utils.ts:182: call txn
         - src/storage/embedding-utils.ts:227: call deleteEmbedding
-        - src/storage/semantic-search.test.ts:8: import (module)
-        - src/storage/semantic-search.ts:12: import (module)
+        - src/storage/hybrid-search.ts:16: import (module)
+        - src/storage/hybrid-search.ts:384: call hybridSearch
   variable:
     15-15: any [exported]
       /** Default pi-brain data directory */
@@ -2065,6 +2065,73 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
+src/storage/hybrid-search.test.ts [1-420]
+  imports:
+    - ./database.js
+    - ./hybrid-search.js
+    - ./semantic-search.js
+    - better-sqlite3
+    - vitest
+
+src/storage/hybrid-search.ts [1-609]
+  interface:
+    60-79: interface HybridScoreBreakdown [exported]
+      /** Breakdown of scores for transparency and debugging. */
+      refs in: 4 [type: 4]
+        - src/storage/hybrid-search.ts:90: type HybridSearchResult
+        - src/storage/hybrid-search.ts:285: type calculateHybridScore
+        - src/storage/hybrid-search.ts:291: type breakdown
+        - src/storage/hybrid-search.ts:567: type calculateNodeHybridScore
+    84-95: interface HybridSearchResult [exported]
+      /** Enhanced search result with hybrid scoring. */
+      refs in: 2 [type: 2]
+        - src/storage/hybrid-search.ts:124: type HybridSearchResponse
+        - src/storage/hybrid-search.ts:524: type scoredResults
+    100-117: interface HybridSearchOptions [exported]
+      /** Options for hybrid search. */
+      refs in: 3 [type: 3]
+        - src/storage/hybrid-search.ts:284: type calculateHybridScore
+        - src/storage/hybrid-search.ts:354: type hybridSearch
+        - src/storage/hybrid-search.ts:566: type calculateNodeHybridScore
+    122-133: interface HybridSearchResponse [exported]
+      /** Result from hybrid search with pagination metadata. */
+      refs in: 1 [type: 1]
+        - src/storage/hybrid-search.ts:355: type hybridSearch
+  function:
+    351-553: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+      /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
+      refs in: 13 [call: 12, import: 1]
+        - src/storage/hybrid-search.test.ts:14: import (module)
+        - src/storage/hybrid-search.test.ts:251: call result
+        - src/storage/hybrid-search.test.ts:258: call result
+        - src/storage/hybrid-search.test.ts:265: call result
+        - src/storage/hybrid-search.test.ts:272: call result
+        - src/storage/hybrid-search.test.ts:278: call result
+        - src/storage/hybrid-search.test.ts:283: call resultWithoutBoost
+        - src/storage/hybrid-search.test.ts:284: call resultWithBoost
+        - src/storage/hybrid-search.test.ts:307: call result
+        - src/storage/hybrid-search.test.ts:316: call result
+    562-608: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+      /** Calculate hybrid score for a single node (useful for re-ranking). */
+      refs in: 6 [call: 5, import: 1]
+        - src/storage/hybrid-search.test.ts:13: import (module)
+        - src/storage/hybrid-search.test.ts:334: call result
+        - src/storage/hybrid-search.test.ts:339: call result
+        - src/storage/hybrid-search.test.ts:346: call result
+        - src/storage/hybrid-search.test.ts:351: call resultWithBoost
+        - src/storage/hybrid-search.test.ts:358: call result
+  variable:
+    33-42: HYBRID_WEIGHTS [exported]
+      /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
+      refs in: 1 [import: 1]
+        - src/storage/hybrid-search.test.ts:15: import (module)
+  imports:
+    - ./database.js
+    - ./node-crud.js
+    - ./search-repository.js
+    - ./semantic-search.js
+    - better-sqlite3
+
 src/storage/index.test.ts [1-4087]
   imports:
     - ../daemon/processor.js
@@ -2078,12 +2145,13 @@ src/storage/index.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/index.ts [1-19]
+src/storage/index.ts [1-21]
   imports:
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
     - ./graph-repository.js
+    - ./hybrid-search.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -2093,6 +2161,7 @@ src/storage/index.ts [1-19]
     - ./quirk-repository.js
     - ./relationship-edges.js
     - ./search-repository.js
+    - ./semantic-search.js
     - ./tool-error-repository.js
 
 src/storage/lesson-repository.ts [1-284]
@@ -2226,7 +2295,7 @@ src/storage/node-crud.ts [1-763]
         - src/storage/node-crud.ts:582: type getAllNodeVersions
     45-72: interface NodeRow [exported]
       /** Node row from the database */
-      refs in: 42 [import: 8, type: 34]
+      refs in: 47 [import: 9, type: 38]
         - src/daemon/connection-discovery.ts:10: import (module)
         - src/daemon/connection-discovery.ts:311: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:332: type ConnectionDiscoverer.findCandidates
@@ -3074,7 +3143,9 @@ src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
       /** Highlight match for search results */
-      refs in: 5 [import: 1, type: 4]
+      refs in: 7 [import: 2, type: 5]
+        - src/storage/hybrid-search.ts:20: import (module)
+        - src/storage/hybrid-search.ts:92: type HybridSearchResult
         - src/storage/search-repository.ts:50: type SearchResult
         - src/storage/search-repository.ts:304: type findHighlights
         - src/storage/search-repository.ts:305: type highlights
@@ -3089,7 +3160,9 @@ src/storage/search-repository.ts [1-549]
         - src/storage/semantic-search.ts:25: extends SemanticSearchResult
     54-75: interface SearchFilters [exported]
       /** Filters for search queries (subset of node filters relevant to search) */
-      refs in: 5 [import: 1, type: 4]
+      refs in: 7 [import: 2, type: 5]
+        - src/storage/hybrid-search.ts:19: import (module)
+        - src/storage/hybrid-search.ts:106: type HybridSearchOptions
         - src/storage/search-repository.ts:86: type SearchOptions
         - src/storage/search-repository.ts:361: type buildFilterClause
         - src/storage/semantic-search.ts:18: import (module)
@@ -3150,7 +3223,9 @@ src/storage/search-repository.ts [1-549]
         - src/storage/search-repository.ts:345: call findHighlights
     361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
-      refs in: 4 [call: 3, import: 1]
+      refs in: 6 [call: 4, import: 2]
+        - src/storage/hybrid-search.ts:18: import (module)
+        - src/storage/hybrid-search.ts:370: call { clause: filterClause, params: filterParams }
         - src/storage/search-repository.ts:480: call { clause: filterClause, params }
         - src/storage/search-repository.ts:537: call { clause: filterClause, params }
         - src/storage/semantic-search.ts:17: import (module)
@@ -3202,17 +3277,17 @@ src/storage/semantic-search.ts [1-212]
   function:
     55-154: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
-      refs in: 17 [call: 14, import: 3]
+      refs in: 19 [call: 15, import: 4]
         - src/daemon/query-processor.test.ts:19: import (module)
         - src/daemon/query-processor.ts:23: import (module)
         - src/daemon/query-processor.ts:239: call semanticResults
+        - src/storage/hybrid-search.ts:22: import (module)
+        - src/storage/hybrid-search.ts:386: call vectorResults
         - src/storage/semantic-search.test.ts:11: import (module)
         - src/storage/semantic-search.test.ts:49: call result
         - src/storage/semantic-search.test.ts:72: call result
         - src/storage/semantic-search.test.ts:104: call result
         - src/storage/semantic-search.test.ts:116: call (module)
-        - src/storage/semantic-search.test.ts:132: call result
-        - src/storage/semantic-search.test.ts:142: call result
     164-177: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
       refs in: 5 [call: 4, import: 1]
@@ -3345,5 +3420,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 59
-Estimated tokens: 44,104 (codebase: ~1,131,233)
+Files: 61
+Estimated tokens: 45,158 (codebase: ~1,146,922)

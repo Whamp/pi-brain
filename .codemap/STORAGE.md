@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 18 files
+- typescript: 19 files
 
 ## Statistics
-- Total files: 18
-- Total symbols: 203
-  - function: 137
-  - interface: 52
+- Total files: 19
+- Total symbols: 210
+  - function: 139
+  - interface: 56
   - type: 10
-  - variable: 4
+  - variable: 5
 
 ---
 
@@ -176,12 +176,38 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-19]
+src/storage/hybrid-search.ts [1-609]
+  interface:
+    60-79: interface HybridScoreBreakdown [exported]
+      /** Breakdown of scores for transparency and debugging. */
+    84-95: interface HybridSearchResult [exported]
+      /** Enhanced search result with hybrid scoring. */
+    100-117: interface HybridSearchOptions [exported]
+      /** Options for hybrid search. */
+    122-133: interface HybridSearchResponse [exported]
+      /** Result from hybrid search with pagination metadata. */
+  function:
+    351-553: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+      /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
+    562-608: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+      /** Calculate hybrid score for a single node (useful for re-ranking). */
+  variable:
+    33-42: HYBRID_WEIGHTS [exported]
+      /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
+  imports:
+    - ./database.js
+    - ./node-crud.js
+    - ./search-repository.js
+    - ./semantic-search.js
+    - better-sqlite3
+
+src/storage/index.ts [1-21]
   imports:
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
     - ./graph-repository.js
+    - ./hybrid-search.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -191,6 +217,7 @@ src/storage/index.ts [1-19]
     - ./quirk-repository.js
     - ./relationship-edges.js
     - ./search-repository.js
+    - ./semantic-search.js
     - ./tool-error-repository.js
 
 src/storage/lesson-repository.ts [1-284]
@@ -599,5 +626,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 18
-Estimated tokens: 9,365 (codebase: ~1,131,009)
+Files: 19
+Estimated tokens: 9,787 (codebase: ~1,135,760)
