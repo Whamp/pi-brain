@@ -211,3 +211,10 @@ Ref: docs/plans/integration-repair-plan.md
 | 14.4 | Configure Vite Proxy                        | done   | -    | 2026-01-27                                                    |
 | 14.5 | Frontend Graceful API Failure Handling      | done   | -    | 2026-01-27                                                    |
 | 14.6 | RLM Skill Installation (optional, see 14.3) | done   | -    | 2026-01-27 - Verified symlink to ~/projects/pi-rlm/skills/rlm |
+
+## Phase 15: Enhancements
+
+| ID   | Task                                            | Status  | Deps | Notes      |
+| ---- | ----------------------------------------------- | ------- | ---- | ---------- |
+| 15.1 | Implement fine-tuning data export (CLI command) | done    | -    | 2026-01-27 |
+| 15.2 | Implement Graphviz/DOT export (CLI command)     | pending | -    |            |

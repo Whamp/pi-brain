@@ -1040,6 +1040,35 @@ agentsCmd
   });
 
 // =============================================================================
+// Export command
+// =============================================================================
+
+const exportCmd = program
+  .command("export")
+  .description("Export data from the knowledge graph");
+
+exportCmd
+  .command("finetune")
+  .description("Export fine-tuning dataset (JSONL)")
+  .option("-c, --config <path>", "Config file path")
+  .option("-o, --output <path>", "Output file path", "finetune.jsonl")
+  .action(async (options) => {
+    try {
+      const { exportFineTuneData } = await import("./daemon/export.js");
+      const result = await exportFineTuneData(options.output, options.config);
+      if (result.success) {
+        console.log(result.message);
+      } else {
+        console.error(result.message);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
 // Parse and run
 // =============================================================================
 

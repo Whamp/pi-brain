@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 84,
-    "totalSymbols": 1030,
+    "totalFiles": 85,
+    "totalSymbols": 1033,
     "byLanguage": {
-      "typescript": 84
+      "typescript": 85
     },
     "bySymbolKind": {
-      "function": 462,
+      "function": 464,
       "type": 37,
       "interface": 248,
-      "variable": 101,
+      "variable": 102,
       "class": 11,
       "constructor": 10,
       "method": 114,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34388,
-  "codebase_tokens": 972253,
+  "total_tokens": 34557,
+  "codebase_tokens": 974844,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1448,10 +1448,10 @@
       "language": "typescript",
       "lines": [
         1,
-        1047
+        1076
       ],
       "detail_level": "full",
-      "token_estimate": 138,
+      "token_estimate": 149,
       "symbols": [
         {
           "name": "program",
@@ -1547,6 +1547,25 @@
           "comment": null,
           "incoming_refs": null,
           "outgoing_refs": null
+        },
+        {
+          "name": "exportCmd",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            1046,
+            1048
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
         }
       ],
       "annotation": null,
@@ -1554,6 +1573,7 @@
       "code_blocks": null,
       "imports": [
         "./config/index.js",
+        "./daemon/export.js",
         "./daemon/index.js",
         "./parser/analyzer.js",
         "./prompt/agents-generator.js",
@@ -3849,6 +3869,67 @@
       "code_blocks": null,
       "imports": [
         "./queue.js"
+      ]
+    },
+    {
+      "path": "src/daemon/export.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        148
+      ],
+      "detail_level": "full",
+      "token_estimate": 158,
+      "symbols": [
+        {
+          "name": "getSegmentEntries",
+          "kind": "function",
+          "signature": "getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {}",
+          "lines": [
+            17,
+            30
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Extract entries within a segment range",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "exportFineTuneData",
+          "kind": "function",
+          "signature": "async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }>",
+          "lines": [
+            41,
+            147
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Export fine-tuning data to JSONL\n\nFormat:\n{\n  \"input\": <JSON string of segment entries>,\n  \"output\": <JSON string of node analysis>\n}",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../config/index.js",
+        "../parser/session.js",
+        "../storage/node-storage.js",
+        "../types.js",
+        "node:fs",
+        "node:path"
       ]
     },
     {

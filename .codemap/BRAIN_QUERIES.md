@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 47 files
+- typescript: 48 files
 
 ## Statistics
-- Total files: 47
-- Total symbols: 297
-  - function: 173
+- Total files: 48
+- Total symbols: 299
+  - function: 175
   - interface: 82
   - type: 17
   - variable: 16
@@ -161,28 +161,38 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/index.ts:122: reexport (module)
     251-361: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:22: import (module)
+        - src/cli.ts:208: call result
         - src/daemon/index.ts:123: reexport (module)
     366-428: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:23: import (module)
+        - src/cli.ts:241: call result
         - src/daemon/index.ts:124: reexport (module)
     433-445: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
+      refs in: 5 [call: 2, import: 2, reexport: 1]
+        - src/cli.ts:24: import (module)
+        - src/cli.ts:257: call status
         - src/daemon/cli.test.ts:29: import (module)
         - src/daemon/cli.test.ts:156: call status
         - src/daemon/index.ts:125: reexport (module)
     454-483: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-      refs in: 4 [call: 2, import: 1, reexport: 1]
+      refs in: 6 [call: 3, import: 2, reexport: 1]
+        - src/cli.ts:25: import (module)
+        - src/cli.ts:273: call queueStatus
         - src/daemon/cli.test.ts:30: import (module)
         - src/daemon/cli.test.ts:201: call status
         - src/daemon/cli.test.ts:233: call status
         - src/daemon/index.ts:126: reexport (module)
     488-541: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-      refs in: 7 [call: 5, import: 1, reexport: 1]
+      refs in: 9 [call: 6, import: 2, reexport: 1]
+        - src/cli.ts:26: import (module)
+        - src/cli.ts:291: call result
         - src/daemon/cli.test.ts:31: import (module)
         - src/daemon/cli.test.ts:279: call result
         - src/daemon/cli.test.ts:289: call result
@@ -192,25 +202,33 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/index.ts:127: reexport (module)
     761-791: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-      refs in: 1 [reexport: 1]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/cli.ts:27: import (module)
+        - src/cli.ts:325: call status
         - src/daemon/index.ts:128: reexport (module)
     800-821: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-      refs in: 4 [call: 2, import: 1, reexport: 1]
+      refs in: 6 [call: 3, import: 2, reexport: 1]
+        - src/cli.ts:28: import (module)
+        - src/cli.ts:262: call (module)
         - src/daemon/cli.test.ts:32: import (module)
         - src/daemon/cli.test.ts:325: call output
         - src/daemon/cli.test.ts:343: call output
         - src/daemon/index.ts:129: reexport (module)
     826-876: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-      refs in: 4 [call: 2, import: 1, reexport: 1]
+      refs in: 6 [call: 3, import: 2, reexport: 1]
+        - src/cli.ts:29: import (module)
+        - src/cli.ts:278: call (module)
         - src/daemon/cli.test.ts:33: import (module)
         - src/daemon/cli.test.ts:367: call output
         - src/daemon/cli.test.ts:402: call output
         - src/daemon/index.ts:130: reexport (module)
     891-914: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-      refs in: 5 [call: 3, import: 1, reexport: 1]
+      refs in: 7 [call: 4, import: 2, reexport: 1]
+        - src/cli.ts:30: import (module)
+        - src/cli.ts:330: call (module)
         - src/daemon/cli.test.ts:34: import (module)
         - src/daemon/cli.test.ts:435: call output
         - src/daemon/cli.test.ts:458: call output
@@ -218,7 +236,9 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/index.ts:131: reexport (module)
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs in: 9 [call: 7, import: 1, reexport: 1]
+      refs in: 11 [call: 8, import: 2, reexport: 1]
+        - src/cli.ts:31: import (module)
+        - src/cli.ts:306: call result
         - src/daemon/cli.test.ts:35: import (module)
         - src/daemon/cli.test.ts:573: call result
         - src/daemon/cli.test.ts:586: call result
@@ -227,7 +247,6 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.test.ts:701: call (module)
         - src/daemon/cli.test.ts:720: call result
         - src/daemon/cli.test.ts:752: call result
-        - src/daemon/index.ts:132: reexport (module)
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -488,6 +507,22 @@ src/daemon/errors.ts [1-457]
         - src/daemon/worker.ts:39: import (module)
   imports:
     - ./queue.js
+
+src/daemon/export.ts [1-148]
+  function:
+    17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
+      /** Extract entries within a segment range */
+      refs in: 1 [call: 1]
+        - src/daemon/export.ts:85: call segmentEntries
+    41-147: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+      /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
+  imports:
+    - ../config/index.js
+    - ../parser/session.js
+    - ../storage/node-storage.js
+    - ../types.js
+    - node:fs
+    - node:path
 
 src/daemon/facet-discovery.test.ts [1-827]
   imports:
@@ -2336,7 +2371,7 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:219: call (module)
     107-114: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 21 [call: 13, import: 8]
+      refs in: 23 [call: 14, import: 9]
         - src/api/routes/nodes.ts:19: import (module)
         - src/api/routes/nodes.ts:147: call node
         - src/daemon/cli.test.ts:14: import (module)
@@ -2346,7 +2381,7 @@ src/storage/node-storage.ts [1-292]
         - src/daemon/cli.ts:36: import (module)
         - src/daemon/cli.ts:988: call node
         - src/daemon/cli.ts:1013: call node
-        - src/daemon/insight-aggregation.ts:20: import (module)
+        - src/daemon/export.ts:12: import (module)
     119-128: nodeExists(nodeId: string, version: number, timestamp: string, options: NodeStorageOptions = {}): boolean [exported]
       /** Check if a node file exists */
       refs in: 3 [call: 2, import: 1]
@@ -2355,9 +2390,11 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:271: call (module)
     134-175: listNodeFiles(options: NodeStorageOptions = {}): {} [exported]
       /** List all node files in the storage directory Returns array of file paths */
-      refs in: 7 [call: 5, import: 2]
+      refs in: 9 [call: 6, import: 3]
         - src/daemon/cli.ts:34: import (module)
         - src/daemon/cli.ts:953: call files
+        - src/daemon/export.ts:12: import (module)
+        - src/daemon/export.ts:57: call files
         - src/storage/node-storage.test.ts:15: import (module)
         - src/storage/node-storage.test.ts:285: call files
         - src/storage/node-storage.test.ts:295: call files
@@ -2888,5 +2925,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 47
-Estimated tokens: 37,199 (codebase: ~972,253)
+Files: 48
+Estimated tokens: 37,601 (codebase: ~974,844)

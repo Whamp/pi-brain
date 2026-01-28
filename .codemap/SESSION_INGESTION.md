@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 38 files
+- typescript: 39 files
 
 ## Statistics
-- Total files: 38
-- Total symbols: 193
-  - function: 115
+- Total files: 39
+- Total symbols: 195
+  - function: 117
   - interface: 46
   - variable: 14
   - class: 10
@@ -361,6 +361,35 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.ts:73: type RetryPolicy -> src/daemon/errors.ts
   imports:
     - ./queue.js
+
+src/daemon/export.ts [1-148]
+  function:
+    17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
+      /** Extract entries within a segment range */
+      refs out: 3 [call: 1, type: 2]
+        - src/daemon/export.ts:18: type SessionEntry -> src/types.ts
+        - src/daemon/export.ts:21: type SessionEntry -> src/types.ts
+        - src/daemon/export.ts:29: call slice -> external
+    41-147: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+      /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
+      refs out: 12 [call: 9, instantiate: 1, type: 2]
+        - src/daemon/export.ts:44: type Promise -> external
+        - src/daemon/export.ts:49: call existsSync -> external
+        - src/daemon/export.ts:61: call log -> external
+        - src/daemon/export.ts:78: call existsSync -> external
+        - src/daemon/export.ts:116: call Writable.write -> external
+        - src/daemon/export.ts:116: call stringify -> external
+        - src/daemon/export.ts:120: call Socket.write -> external
+        - src/daemon/export.ts:128: call Writable.end -> external
+        - src/daemon/export.ts:129: instantiate Promise -> external
+        - src/daemon/export.ts:130: call WriteStream.on -> external
+  imports:
+    - ../config/index.js
+    - ../parser/session.js
+    - ../storage/node-storage.js
+    - ../types.js
+    - node:fs
+    - node:path
 
 src/daemon/facet-discovery.test.ts [1-827]
   imports:
@@ -1478,5 +1507,5 @@ src/parser/signals.ts [1-1095]
     - ../types/index.js
 
 ---
-Files: 38
-Estimated tokens: 19,419 (codebase: ~972,253)
+Files: 39
+Estimated tokens: 19,809 (codebase: ~974,844)

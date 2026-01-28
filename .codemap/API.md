@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 84 files
+- typescript: 85 files
 
 ## Statistics
-- Total files: 84
-- Total symbols: 611
-  - function: 339
+- Total files: 85
+- Total symbols: 613
+  - function: 341
   - interface: 197
   - type: 37
   - variable: 27
@@ -226,9 +226,10 @@ src/api/server.ts [1-183]
     - better-sqlite3
     - fastify
 
-src/cli.ts [1-1047]
+src/cli.ts [1-1076]
   imports:
     - ./config/index.js
+    - ./daemon/export.js
     - ./daemon/index.js
     - ./parser/analyzer.js
     - ./prompt/agents-generator.js
@@ -470,6 +471,20 @@ src/daemon/errors.ts [1-457]
       /** Default retry policy */
   imports:
     - ./queue.js
+
+src/daemon/export.ts [1-148]
+  function:
+    17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
+      /** Extract entries within a segment range */
+    41-147: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+      /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
+  imports:
+    - ../config/index.js
+    - ../parser/session.js
+    - ../storage/node-storage.js
+    - ../types.js
+    - node:fs
+    - node:path
 
 src/daemon/facet-discovery.ts [1-1734]
   class:
@@ -1958,5 +1973,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 84
-Estimated tokens: 24,062 (codebase: ~972,448)
+Files: 85
+Estimated tokens: 24,226 (codebase: ~973,469)

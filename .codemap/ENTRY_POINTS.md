@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 25
-- Total symbols: 62
+- Total symbols: 63
   - function: 46
   - interface: 9
-  - variable: 6
+  - variable: 7
   - type: 1
 
 ---
@@ -537,7 +537,7 @@ src/api/server.ts [1-183]
     - better-sqlite3
     - fastify
 
-src/cli.ts [1-1047]
+src/cli.ts [1-1076]
   variable:
     72-72: any
       refs out: 1 [instantiate: 1]
@@ -558,8 +558,13 @@ src/cli.ts [1-1047]
       refs out: 2 [call: 2]
         - src/cli.ts:895: call Command.description -> external
         - src/cli.ts:895: call Command.command -> external
+    1046-1048: any
+      refs out: 2 [call: 2]
+        - src/cli.ts:1046: call Command.description -> external
+        - src/cli.ts:1046: call Command.command -> external
   imports:
     - ./config/index.js
+    - ./daemon/export.js
     - ./daemon/index.js
     - ./parser/analyzer.js
     - ./prompt/agents-generator.js
@@ -579,4 +584,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 6,107 (codebase: ~972,448)
+Estimated tokens: 6,156 (codebase: ~973,469)

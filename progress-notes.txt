@@ -298,3 +298,16 @@ Functions still in node-repository.ts (CRUD operations: clearAllData, insertNode
 **Commit**: [no code changes]
 
 **Notes**: Confirmed RLM skill is correctly installed and detected by the daemon.
+
+## 2026-01-27 18:45 - Task 15.1 (Fine-Tuning Export)
+
+**Status**: pending → done
+**Validation**: 
+- Implemented `exportFineTuneData` in `src/daemon/export.ts`
+- Integrated into CLI via `pi-brain export finetune`
+- Verified with unit tests covering node iteration, session parsing, and JSONL formatting
+- Ran full test suite to ensure no regressions (1200 tests passed)
+
+**Commit**: [pending]
+
+**Notes**: Added first enhancement task for Phase 15. Export format is JSONL with `input` (session segment) and `output` (node analysis).
