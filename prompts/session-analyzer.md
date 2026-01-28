@@ -13,6 +13,7 @@ Given a session segment (a sequence of entries from a pi session), extract:
 5. **Model Observations** — Quirks, wins, failures
 6. **Tool Use Patterns** — Errors and successes
 7. **Tags and Topics** — For semantic search
+8. **Relationships** — Typed connections to other knowledge (causal, preferential, etc.)
 
 ## Reading the Session
 
@@ -132,6 +133,16 @@ Return a **single JSON object** matching this exact structure. Do not include an
     "topics": ["broader concepts", "authentication"]
   },
 
+  "relationships": [
+    {
+      "targetNodeId": "referenced-node-uuid-or-null",
+      "targetDescription": "Short description of target if no ID known",
+      "type": "LEADS_TO | PREFERS_OVER | CONTRADICTS | REINFORCES | DERIVED_FROM | EXEMPLIFIES | PART_OF | RELATES_TO | OCCURRED_BEFORE | INVALIDATED_BY | EVOLVED_INTO",
+      "confidence": 0.8,
+      "reason": "Why this relationship exists"
+    }
+  ],
+
   "daemonMeta": {
     "decisions": [
       {
@@ -218,6 +229,48 @@ Subagent patterns:
 
 - "Worker agents need explicit completion criteria"
 - "Scout agents should summarize, not implement"
+
+## Relationship Types
+
+When extracting relationships, use one of these specific types to connect this session/node to other knowledge:
+
+| Type              | Use When                                       | Example                                            |
+| ----------------- | ---------------------------------------------- | -------------------------------------------------- |
+| `LEADS_TO`        | A causes or results in B (causal chain)        | "Auth bug → Decided to refactor token handling"    |
+| `PREFERS_OVER`    | A is chosen instead of B (explicit preference) | "PostgreSQL preferred over MongoDB for this app"   |
+| `CONTRADICTS`     | A conflicts with or disproves B                | "New testing approach contradicts old flaky tests" |
+| `REINFORCES`      | A provides supporting evidence for B           | "Second auth failure reinforces need for logging"  |
+| `DERIVED_FROM`    | A was created based on B (source tracking)     | "Implementation derived from the spec document"    |
+| `EXEMPLIFIES`     | A is an example of pattern B                   | "This session exemplifies the 'flaky test' issue"  |
+| `PART_OF`         | A is a component of larger work B              | "Login endpoint is part of auth epic"              |
+| `RELATES_TO`      | General connection when no specific type fits  | "Related to earlier database work"                 |
+| `OCCURRED_BEFORE` | A happened temporally before B (sequence)      | "Planning occurred before implementation"          |
+| `INVALIDATED_BY`  | A is outdated due to B                         | "Old docs invalidated by new API version"          |
+| `EVOLVED_INTO`    | A transformed or evolved into B over time      | "Initial design evolved into final architecture"   |
+
+### When to Extract Relationships
+
+Extract relationships when you observe:
+
+1. **Causal decisions**: "We did X because of Y" → `LEADS_TO`
+2. **Explicit choices**: "Chose X over Y" → `PREFERS_OVER`
+3. **Contradictions**: "This disproves our earlier assumption" → `CONTRADICTS`
+4. **Reinforcement**: "This confirms what we saw before" → `REINFORCES`
+5. **References**: "Based on the spec" → `DERIVED_FROM`
+6. **Patterns**: "This is another example of..." → `EXEMPLIFIES`
+7. **Hierarchy**: "Part of the larger effort" → `PART_OF`
+
+### Relationship Format
+
+Each relationship in the output array should have:
+
+- `targetNodeId`: UUID of the target node if known (null if unknown)
+- `targetDescription`: Human-readable description of what this connects to
+- `type`: One of the 11 types above
+- `confidence`: 0.0-1.0 (how certain is this relationship?)
+- `reason`: Brief explanation of why this relationship exists
+
+**Note**: Even without a known target UUID, include relationships with a `targetDescription`. The daemon will attempt to resolve these to actual nodes using semantic search.
 
 ## Extraction Guidelines
 
@@ -417,6 +470,22 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     ],
     "topics": ["authentication", "web security", "API development"]
   },
+  "relationships": [
+    {
+      "targetNodeId": null,
+      "targetDescription": "Earlier API design planning session",
+      "type": "DERIVED_FROM",
+      "confidence": 0.7,
+      "reason": "Implementation follows patterns established in earlier API design discussions"
+    },
+    {
+      "targetNodeId": null,
+      "targetDescription": "httpOnly cookies over localStorage for tokens",
+      "type": "PREFERS_OVER",
+      "confidence": 0.95,
+      "reason": "Explicit decision to use httpOnly cookies instead of localStorage for security"
+    }
+  ],
   "daemonMeta": {
     "decisions": [],
     "rlmUsed": false,
@@ -536,6 +605,22 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     ],
     "topics": ["database management", "debugging", "resource management"]
   },
+  "relationships": [
+    {
+      "targetNodeId": null,
+      "targetDescription": "Connection pool exhaustion leads to implementing explicit release pattern",
+      "type": "LEADS_TO",
+      "confidence": 0.9,
+      "reason": "The bug discovery directly caused the fix implementation"
+    },
+    {
+      "targetNodeId": null,
+      "targetDescription": "Claude tool-use quirk pattern with bash/sed",
+      "type": "EXEMPLIFIES",
+      "confidence": 0.85,
+      "reason": "This session is another example of Claude's tendency to use bash for file reading"
+    }
+  ],
   "daemonMeta": {
     "decisions": [],
     "rlmUsed": false,
@@ -649,6 +734,22 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
     "tags": ["refactoring", "failed", "edit-tool", "auth"],
     "topics": ["code refactoring", "tool usage"]
   },
+  "relationships": [
+    {
+      "targetNodeId": null,
+      "targetDescription": "Edit tool exact match failure pattern",
+      "type": "EXEMPLIFIES",
+      "confidence": 0.9,
+      "reason": "This failed session is an example of a common edit tool failure pattern"
+    },
+    {
+      "targetNodeId": null,
+      "targetDescription": "Vague prompting leads to abandoned session",
+      "type": "LEADS_TO",
+      "confidence": 0.85,
+      "reason": "The vague 'refactor' request directly contributed to the session being abandoned"
+    }
+  ],
   "daemonMeta": {
     "decisions": [
       {
@@ -672,3 +773,4 @@ Set `needsReview: true` for decisions that should be reviewed by the user.
 4. **Look for patterns** — The same model quirk across sessions is valuable
 5. **Document uncertainty** — Use daemonMeta.decisions for judgment calls
 6. **Detect vague goals** — This helps identify prompting improvement opportunities
+7. **Extract relationships** — Use the 11 typed edge types to capture causal chains, preferences, and connections

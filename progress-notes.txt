@@ -193,3 +193,26 @@ the reactivity chain.
   - All 1291 tests pass, including new integration tests.
 **Commit**: 60c88128
 **Notes**: Completed Phase 17 Semantic Search implementation and verification. The system now has robust error handling and graceful degradation for vector search.
+
+---
+
+## 2026-01-28 11:23 - Tasks 20.1.1, 20.1.2, 20.1.3
+
+**Status**: pending → done
+**Validation**:
+  - Created migration 013_automem_consolidation.sql with:
+    - nodes table: relevance_score, last_accessed, archived, importance
+    - edges table: confidence, similarity
+    - 4 new indexes for consolidation queries
+  - Updated src/types/index.ts with 11 AutoMem relationship types:
+    - RELATES_TO, LEADS_TO, OCCURRED_BEFORE, PREFERS_OVER, EXEMPLIFIES
+    - CONTRADICTS, REINFORCES, INVALIDATED_BY, EVOLVED_INTO, DERIVED_FROM, PART_OF
+  - Added AUTOMEM_EDGE_TYPES const and AutoMemEdgeType type
+  - Updated Node interface with memory consolidation fields
+  - Updated Edge interface with confidence/similarity fields
+  - Updated storage layer (node-crud.ts, edge-repository.ts, node-conversion.ts)
+  - Added 5 new database tests for AutoMem schema validation
+  - Fixed connection-discovery.test.ts inline schema
+  - All 1296 tests pass (5 new tests added)
+**Commit**: f01da352
+**Notes**: Completed Phase 1 of AutoMem Native Port. Schema and types are ready for Phase 2 (Analyzer Upgrade) and Phase 3 (Consolidation Engine).
