@@ -49,3 +49,19 @@ Main branch: major/pi-brain
   - Store using storeEmbeddingWithVec (both node_embeddings table and vec0 virtual table)
   - Handle failures gracefully (log warning, don't fail job) - backfill job will catch gaps
   - API key validation on startup with appropriate warning messages
+
+---
+
+## 2026-01-27 21:52 - Task 17.4.1
+
+**Status**: active → done
+**Validation**: 
+  - 15 new unit tests for backfill functions (findNodesNeedingEmbedding, countNodesNeedingEmbedding, backfillEmbeddings)
+  - Tests cover: finding missing embeddings, detecting old format, different models, batch processing, loading failure handling, API error handling, force mode
+  - Verified batch processing (e.g. 5 nodes with batch size 2 results in 3 batches)
+  - All 1274 tests pass
+**Commit**: 5d7179c9
+**Notes**: Implemented core backfill logic in embedding-utils.ts.
+  - findNodesNeedingEmbedding uses model name and isRichEmbeddingFormat to detect outdated embeddings.
+  - backfillEmbeddings supports batching and is resilient to individual node/batch failures.
+  - Used dependency injection for readNodeFromPath to maintain modularity.

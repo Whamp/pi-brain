@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 88,
-    "totalSymbols": 1099,
+    "totalSymbols": 1098,
     "byLanguage": {
       "typescript": 88
     },
     "bySymbolKind": {
       "function": 490,
       "type": 40,
-      "interface": 259,
+      "interface": 258,
       "variable": 107,
       "class": 12,
       "property": 49,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 37681,
-  "codebase_tokens": 1032831,
+  "total_tokens": 37616,
+  "codebase_tokens": 1035630,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15643,10 +15643,10 @@
       "language": "typescript",
       "lines": [
         1,
-        682
+        623
       ],
       "detail_level": "full",
-      "token_estimate": 1371,
+      "token_estimate": 1306,
       "symbols": [
         {
           "name": "EMBEDDING_FORMAT_VERSION",
@@ -15710,8 +15710,8 @@
           "kind": "function",
           "signature": "isRichEmbeddingFormat(inputText: string): boolean",
           "lines": [
-            123,
-            140
+            119,
+            121
           ],
           "exported": true,
           "is_default": false,
@@ -15720,7 +15720,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection criteria (any of these indicate rich format):\n1. Contains the version marker [emb:v2]\n2. Contains section headers: `\\n\\nDecisions:\\n-` or `\\n\\nLessons:\\n-`\n\nThe version marker is the primary check - it handles nodes with empty\ndecisions/lessons that would otherwise be perpetually re-embedded.",
+          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection relies on the version marker [emb:v2]. This avoids strict\ndependencies on whitespace or formatting of the sections.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -15729,8 +15729,8 @@
           "kind": "function",
           "signature": "storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; }",
           "lines": [
-            154,
-            231
+            135,
+            205
           ],
           "exported": true,
           "is_default": false,
@@ -15748,8 +15748,8 @@
           "kind": "function",
           "signature": "deleteEmbedding(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            236,
-            263
+            210,
+            237
           ],
           "exported": true,
           "is_default": false,
@@ -15767,8 +15767,8 @@
           "kind": "function",
           "signature": "getEmbedding(db: Database.Database, nodeId: string): { embedding: {}; modelName: string; inputText: string; createdAt: string; }",
           "lines": [
-            268,
-            301
+            242,
+            275
           ],
           "exported": true,
           "is_default": false,
@@ -15786,8 +15786,8 @@
           "kind": "function",
           "signature": "hasEmbedding(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            306,
-            311
+            280,
+            285
           ],
           "exported": true,
           "is_default": false,
@@ -15805,8 +15805,8 @@
           "kind": "function",
           "signature": "serializeEmbedding(embedding: number[]): Buffer",
           "lines": [
-            322,
-            328
+            296,
+            302
           ],
           "exported": true,
           "is_default": false,
@@ -15824,8 +15824,8 @@
           "kind": "function",
           "signature": "deserializeEmbedding(buffer: Buffer): {}",
           "lines": [
-            335,
-            341
+            309,
+            315
           ],
           "exported": true,
           "is_default": false,
@@ -15843,8 +15843,8 @@
           "kind": "interface",
           "signature": "BackfillEmbeddingProvider",
           "lines": [
-            351,
-            355
+            325,
+            329
           ],
           "exported": true,
           "is_default": false,
@@ -15862,8 +15862,8 @@
           "kind": "interface",
           "signature": "BackfillLogger",
           "lines": [
-            360,
-            365
+            334,
+            339
           ],
           "exported": true,
           "is_default": false,
@@ -15881,8 +15881,8 @@
           "kind": "interface",
           "signature": "BackfillEmbeddingsOptions",
           "lines": [
-            370,
-            381
+            344,
+            355
           ],
           "exported": true,
           "is_default": false,
@@ -15900,8 +15900,8 @@
           "kind": "interface",
           "signature": "BackfillResult",
           "lines": [
-            386,
-            397
+            360,
+            371
           ],
           "exported": true,
           "is_default": false,
@@ -15919,8 +15919,8 @@
           "kind": "variable",
           "signature": "BackfillLogger",
           "lines": [
-            404,
-            409
+            378,
+            383
           ],
           "exported": false,
           "is_default": false,
@@ -15938,8 +15938,8 @@
           "kind": "interface",
           "signature": "NodeNeedingEmbeddingRow",
           "lines": [
-            414,
-            417
+            388,
+            391
           ],
           "exported": false,
           "is_default": false,
@@ -15953,31 +15953,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "EmbeddingCheckRow",
-          "kind": "interface",
-          "signature": "EmbeddingCheckRow",
-          "lines": [
-            422,
-            426
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Row type for embedding check",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "findNodesNeedingEmbedding",
           "kind": "function",
           "signature": "findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {}",
           "lines": [
-            436,
-            500
+            401,
+            441
           ],
           "exported": true,
           "is_default": false,
@@ -15995,8 +15976,8 @@
           "kind": "function",
           "signature": "async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult>",
           "lines": [
-            516,
-            642
+            457,
+            583
           ],
           "exported": true,
           "is_default": false,
@@ -16014,8 +15995,8 @@
           "kind": "function",
           "signature": "countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; }",
           "lines": [
-            649,
-            681
+            590,
+            622
           ],
           "exported": true,
           "is_default": false,

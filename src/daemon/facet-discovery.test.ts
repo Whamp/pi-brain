@@ -428,8 +428,7 @@ describe("facetDiscovery", () => {
         mockEmbedding.writeFloatLE(0.5, i * 4);
       }
       // Include version marker so it's recognized as rich format
-      const richInputText =
-        `[coding] Test summary\n\nDecisions:\n- Used X (why: because Y)\n\n${EMBEDDING_FORMAT_VERSION}`;
+      const richInputText = `[coding] Test summary\n\nDecisions:\n- Used X (why: because Y)\n\n${EMBEDDING_FORMAT_VERSION}`;
       db.prepare(
         `INSERT INTO node_embeddings (node_id, embedding, embedding_model, input_text)
          VALUES (?, ?, ?, ?)`

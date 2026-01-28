@@ -14,7 +14,7 @@
 
 ---
 
-src/daemon/cli.test.ts [1-758]
+src/daemon/cli.test.ts [1-769]
   imports:
     - ../storage/database.js
     - ../storage/index.js
@@ -391,9 +391,10 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.test.ts [1-912]
+src/daemon/facet-discovery.test.ts [1-913]
   imports:
     - ../storage/database.js
+    - ../storage/embedding-utils.js
     - ./facet-discovery.js
     - better-sqlite3
     - node:fs
@@ -1534,4 +1535,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,088 (codebase: ~1,032,831)
+Estimated tokens: 20,097 (codebase: ~1,035,630)

@@ -260,7 +260,7 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 | ID     | Task                                            | Status  | Deps   | Notes      |
 | ------ | ----------------------------------------------- | ------- | ------ | ---------- |
-| 17.4.1 | Create backfillEmbeddings() function            | active  | 17.3.1 | 2026-01-27 |
+| 17.4.1 | Create backfillEmbeddings() function            | done    | 17.3.1 | 2026-01-27 |
 | 17.4.2 | Add backfill job to scheduler                   | pending | 17.4.1 |            |
 | 17.4.3 | Add `pi-brain rebuild --embeddings` CLI command | pending | 17.4.1 |            |
 
