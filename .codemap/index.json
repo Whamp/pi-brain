@@ -1,9 +1,9 @@
 {
   "stats": {
-    "totalFiles": 81,
+    "totalFiles": 82,
     "totalSymbols": 1024,
     "byLanguage": {
-      "typescript": 81
+      "typescript": 82
     },
     "bySymbolKind": {
       "function": 462,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34061,
-  "codebase_tokens": 964583,
+  "total_tokens": 34097,
+  "codebase_tokens": 965723,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14639,10 +14639,10 @@
       "language": "typescript",
       "lines": [
         1,
-        14
+        15
       ],
       "detail_level": "full",
-      "token_estimate": 66,
+      "token_estimate": 73,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -14656,6 +14656,7 @@
         "./node-repository.js",
         "./node-storage.js",
         "./node-types.js",
+        "./quirk-repository.js",
         "./search-repository.js"
       ]
     },
@@ -15121,18 +15122,18 @@
       "language": "typescript",
       "lines": [
         1,
-        2082
+        1812
       ],
       "detail_level": "full",
-      "token_estimate": 3437,
+      "token_estimate": 2851,
       "symbols": [
         {
           "name": "clearAllData",
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            117,
-            146
+            135,
+            164
           ],
           "exported": true,
           "is_default": false,
@@ -15150,8 +15151,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            152,
-            218
+            170,
+            236
           ],
           "exported": true,
           "is_default": false,
@@ -15169,8 +15170,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            224,
-            238
+            242,
+            256
           ],
           "exported": true,
           "is_default": false,
@@ -15188,8 +15189,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            249,
-            356
+            267,
+            374
           ],
           "exported": true,
           "is_default": false,
@@ -15207,8 +15208,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            363,
-            453
+            381,
+            471
           ],
           "exported": true,
           "is_default": false,
@@ -15226,8 +15227,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): any",
           "lines": [
-            458,
-            464
+            476,
+            482
           ],
           "exported": true,
           "is_default": false,
@@ -15245,8 +15246,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): any",
           "lines": [
-            471,
-            481
+            489,
+            499
           ],
           "exported": true,
           "is_default": false,
@@ -15264,8 +15265,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            486,
-            489
+            504,
+            507
           ],
           "exported": true,
           "is_default": false,
@@ -15283,8 +15284,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            494,
-            500
+            512,
+            518
           ],
           "exported": true,
           "is_default": false,
@@ -15302,8 +15303,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            506,
-            512
+            524,
+            530
           ],
           "exported": true,
           "is_default": false,
@@ -15321,8 +15322,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any",
           "lines": [
-            517,
-            529
+            535,
+            547
           ],
           "exported": true,
           "is_default": false,
@@ -15340,8 +15341,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            534,
-            545
+            552,
+            563
           ],
           "exported": true,
           "is_default": false,
@@ -15359,8 +15360,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            550,
-            561
+            568,
+            579
           ],
           "exported": true,
           "is_default": false,
@@ -15378,8 +15379,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            570,
-            595
+            588,
+            613
           ],
           "exported": true,
           "is_default": false,
@@ -15397,8 +15398,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            598,
-            605
+            616,
+            623
           ],
           "exported": false,
           "is_default": false,
@@ -15416,8 +15417,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            610,
-            615
+            628,
+            633
           ],
           "exported": false,
           "is_default": false,
@@ -15435,8 +15436,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            622,
-            660
+            640,
+            678
           ],
           "exported": true,
           "is_default": false,
@@ -15454,8 +15455,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            665,
-            676
+            683,
+            694
           ],
           "exported": false,
           "is_default": false,
@@ -15469,278 +15470,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "QuirkFrequency",
-          "kind": "type",
-          "signature": "QuirkFrequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
-          "lines": [
-            694,
-            694
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Frequency values for model quirks",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "QuirkSeverity",
-          "kind": "type",
-          "signature": "QuirkSeverity = \"low\" | \"medium\" | \"high\"",
-          "lines": [
-            697,
-            697
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Severity values for model quirks (matches spec)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ListQuirksFilters",
-          "kind": "interface",
-          "signature": "ListQuirksFilters",
-          "lines": [
-            700,
-            709
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Filters for querying model quirks",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ListQuirksOptions",
-          "kind": "interface",
-          "signature": "ListQuirksOptions",
-          "lines": [
-            712,
-            717
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Pagination options for quirks",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "QuirkResult",
-          "kind": "interface",
-          "signature": "QuirkResult",
-          "lines": [
-            720,
-            729
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "A quirk result with metadata",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ListQuirksResult",
-          "kind": "interface",
-          "signature": "ListQuirksResult",
-          "lines": [
-            732,
-            741
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Result from listQuirks query",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "FREQUENCY_RANK",
-          "kind": "variable",
-          "signature": "Record<string, number>",
-          "lines": [
-            744,
-            749
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Frequency ranking for filtering (higher = more frequent)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "listQuirks",
-          "kind": "function",
-          "signature": "listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult",
-          "lines": [
-            761,
-            821
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "List model quirks with filters and pagination.\n\nSupports filtering by:\n- model (exact match)\n- frequency (minimum frequency ranking)\n- project (partial match via nodes table)\n\nPer specs/api.md GET /api/v1/quirks endpoint.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ModelQuirkStats",
-          "kind": "interface",
-          "signature": "ModelQuirkStats",
-          "lines": [
-            824,
-            834
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Stats for a single model",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "QuirksByModelResult",
-          "kind": "type",
-          "signature": "QuirksByModelResult = Record<string, ModelQuirkStats>",
-          "lines": [
-            837,
-            837
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Result from getQuirksByModel",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getQuirksByModel",
-          "kind": "function",
-          "signature": "getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats>",
-          "lines": [
-            845,
-            883
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get aggregated quirk stats by model.\nReturns counts and most recent quirks for each model that has quirks.\n\nPer specs/api.md GET /api/v1/stats/models endpoint (quirkCount field).",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "countQuirks",
-          "kind": "function",
-          "signature": "countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number",
-          "lines": [
-            888,
-            894
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Count quirks matching filters (without fetching data)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAllQuirkModels",
-          "kind": "function",
-          "signature": "getAllQuirkModels(db: Database.Database): {}",
-          "lines": [
-            899,
-            906
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all unique models that have quirks recorded",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAggregatedQuirks",
-          "kind": "function",
-          "signature": "getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {}",
-          "lines": [
-            914,
-            956
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get aggregated quirks - similar observations grouped together.\nUseful for the dashboard \"Model Quirks\" panel.\n\nPer specs/storage.md \"Find model quirks by frequency\" query.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "ListToolErrorsFilters",
           "kind": "interface",
           "signature": "ListToolErrorsFilters",
           "lines": [
-            963,
-            972
+            718,
+            727
           ],
           "exported": true,
           "is_default": false,
@@ -15758,8 +15493,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsOptions",
           "lines": [
-            975,
-            980
+            730,
+            735
           ],
           "exported": true,
           "is_default": false,
@@ -15777,8 +15512,8 @@
           "kind": "interface",
           "signature": "ToolErrorResult",
           "lines": [
-            983,
-            992
+            738,
+            747
           ],
           "exported": true,
           "is_default": false,
@@ -15796,8 +15531,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsResult",
           "lines": [
-            995,
-            1004
+            750,
+            759
           ],
           "exported": true,
           "is_default": false,
@@ -15815,8 +15550,8 @@
           "kind": "function",
           "signature": "listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult",
           "lines": [
-            1009,
-            1067
+            764,
+            822
           ],
           "exported": true,
           "is_default": false,
@@ -15834,8 +15569,8 @@
           "kind": "function",
           "signature": "getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {}",
           "lines": [
-            1073,
-            1161
+            828,
+            916
           ],
           "exported": true,
           "is_default": false,
@@ -15853,8 +15588,8 @@
           "kind": "function",
           "signature": "getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; }",
           "lines": [
-            1167,
-            1225
+            922,
+            980
           ],
           "exported": true,
           "is_default": false,
@@ -15872,8 +15607,8 @@
           "kind": "function",
           "signature": "countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number",
           "lines": [
-            1230,
-            1236
+            985,
+            991
           ],
           "exported": true,
           "is_default": false,
@@ -15891,8 +15626,8 @@
           "kind": "function",
           "signature": "getAllToolsWithErrors(db: Database.Database): {}",
           "lines": [
-            1241,
-            1248
+            996,
+            1003
           ],
           "exported": true,
           "is_default": false,
@@ -15910,8 +15645,8 @@
           "kind": "function",
           "signature": "getNodeSummary(db: Database.Database, nodeId: string): string",
           "lines": [
-            1257,
-            1264
+            1012,
+            1019
           ],
           "exported": true,
           "is_default": false,
@@ -15929,8 +15664,8 @@
           "kind": "function",
           "signature": "getNodeTags(db: Database.Database, nodeId: string): {}",
           "lines": [
-            1269,
-            1273
+            1024,
+            1028
           ],
           "exported": true,
           "is_default": false,
@@ -15948,8 +15683,8 @@
           "kind": "function",
           "signature": "getNodeTopics(db: Database.Database, nodeId: string): {}",
           "lines": [
-            1278,
-            1282
+            1033,
+            1037
           ],
           "exported": true,
           "is_default": false,
@@ -15963,31 +15698,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "getNodeQuirks",
-          "kind": "function",
-          "signature": "getNodeQuirks(db: Database.Database, nodeId: string): {}",
-          "lines": [
-            1287,
-            1310
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get model quirks for a node",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "getNodeToolErrors",
           "kind": "function",
           "signature": "getNodeToolErrors(db: Database.Database, nodeId: string): {}",
           "lines": [
-            1315,
-            1338
+            1045,
+            1068
           ],
           "exported": true,
           "is_default": false,
@@ -16005,8 +15721,8 @@
           "kind": "function",
           "signature": "getAllTags(db: Database.Database): {}",
           "lines": [
-            1343,
-            1353
+            1073,
+            1083
           ],
           "exported": true,
           "is_default": false,
@@ -16024,8 +15740,8 @@
           "kind": "function",
           "signature": "getAllTopics(db: Database.Database): {}",
           "lines": [
-            1358,
-            1362
+            1088,
+            1092
           ],
           "exported": true,
           "is_default": false,
@@ -16043,8 +15759,8 @@
           "kind": "function",
           "signature": "getNodesByTag(db: Database.Database, tag: string): {}",
           "lines": [
-            1367,
-            1377
+            1097,
+            1107
           ],
           "exported": true,
           "is_default": false,
@@ -16062,8 +15778,8 @@
           "kind": "function",
           "signature": "getNodesByTopic(db: Database.Database, topic: string): {}",
           "lines": [
-            1382,
-            1393
+            1112,
+            1123
           ],
           "exported": true,
           "is_default": false,
@@ -16081,8 +15797,8 @@
           "kind": "type",
           "signature": "NodeSortField = | \"timestamp\"\n  | \"analyzed_at\"\n  | \"project\"\n  | \"type\"\n  | \"outcome\"\n  | \"tokens_used\"\n  | \"cost\"\n  | \"duration_minutes\"",
           "lines": [
-            1400,
-            1408
+            1130,
+            1138
           ],
           "exported": true,
           "is_default": false,
@@ -16100,8 +15816,8 @@
           "kind": "type",
           "signature": "SortOrder = \"asc\" | \"desc\"",
           "lines": [
-            1411,
-            1411
+            1141,
+            1141
           ],
           "exported": true,
           "is_default": false,
@@ -16119,8 +15835,8 @@
           "kind": "type",
           "signature": "NodeTypeFilter = | \"coding\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"debugging\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"refactor\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"other\"",
           "lines": [
-            1414,
-            1426
+            1144,
+            1156
           ],
           "exported": true,
           "is_default": false,
@@ -16138,8 +15854,8 @@
           "kind": "type",
           "signature": "OutcomeFilter = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
           "lines": [
-            1429,
-            1429
+            1159,
+            1159
           ],
           "exported": true,
           "is_default": false,
@@ -16157,8 +15873,8 @@
           "kind": "interface",
           "signature": "ListNodesFilters",
           "lines": [
-            1432,
-            1457
+            1162,
+            1187
           ],
           "exported": true,
           "is_default": false,
@@ -16176,8 +15892,8 @@
           "kind": "interface",
           "signature": "ListNodesOptions",
           "lines": [
-            1460,
-            1469
+            1190,
+            1199
           ],
           "exported": true,
           "is_default": false,
@@ -16195,8 +15911,8 @@
           "kind": "interface",
           "signature": "ListNodesResult",
           "lines": [
-            1472,
-            1481
+            1202,
+            1211
           ],
           "exported": true,
           "is_default": false,
@@ -16214,8 +15930,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            1484,
-            1493
+            1214,
+            1223
           ],
           "exported": false,
           "is_default": false,
@@ -16233,8 +15949,8 @@
           "kind": "function",
           "signature": "listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult",
           "lines": [
-            1511,
-            1636
+            1241,
+            1366
           ],
           "exported": true,
           "is_default": false,
@@ -16252,8 +15968,8 @@
           "kind": "interface",
           "signature": "SessionSummaryRow",
           "lines": [
-            1641,
-            1653
+            1371,
+            1383
           ],
           "exported": true,
           "is_default": false,
@@ -16271,8 +15987,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            1659,
-            1688
+            1389,
+            1418
           ],
           "exported": true,
           "is_default": false,
@@ -16290,8 +16006,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            1693,
-            1701
+            1423,
+            1431
           ],
           "exported": true,
           "is_default": false,
@@ -16309,8 +16025,8 @@
           "kind": "function",
           "signature": "getAllNodeTypes(db: Database.Database): {}",
           "lines": [
-            1706,
-            1714
+            1436,
+            1444
           ],
           "exported": true,
           "is_default": false,
@@ -16328,8 +16044,8 @@
           "kind": "function",
           "signature": "getAllComputers(db: Database.Database): {}",
           "lines": [
-            1719,
-            1727
+            1449,
+            1457
           ],
           "exported": true,
           "is_default": false,
@@ -16347,8 +16063,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            1732,
-            1738
+            1462,
+            1468
           ],
           "exported": true,
           "is_default": false,
@@ -16366,8 +16082,8 @@
           "kind": "type",
           "signature": "TraversalDirection = \"incoming\" | \"outgoing\" | \"both\"",
           "lines": [
-            1745,
-            1745
+            1475,
+            1475
           ],
           "exported": true,
           "is_default": false,
@@ -16385,8 +16101,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesOptions",
           "lines": [
-            1748,
-            1764
+            1478,
+            1494
           ],
           "exported": true,
           "is_default": false,
@@ -16404,8 +16120,8 @@
           "kind": "interface",
           "signature": "TraversalEdge",
           "lines": [
-            1767,
-            1782
+            1497,
+            1512
           ],
           "exported": true,
           "is_default": false,
@@ -16423,8 +16139,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesResult",
           "lines": [
-            1785,
-            1792
+            1515,
+            1522
           ],
           "exported": true,
           "is_default": false,
@@ -16442,8 +16158,8 @@
           "kind": "function",
           "signature": "getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            1823,
-            1928
+            1553,
+            1658
           ],
           "exported": true,
           "is_default": false,
@@ -16461,8 +16177,8 @@
           "kind": "function",
           "signature": "getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            1937,
-            1984
+            1667,
+            1714
           ],
           "exported": true,
           "is_default": false,
@@ -16480,8 +16196,8 @@
           "kind": "function",
           "signature": "findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; }",
           "lines": [
-            1992,
-            2046
+            1722,
+            1776
           ],
           "exported": true,
           "is_default": false,
@@ -16499,8 +16215,8 @@
           "kind": "function",
           "signature": "getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            2052,
-            2062
+            1782,
+            1792
           ],
           "exported": true,
           "is_default": false,
@@ -16518,8 +16234,8 @@
           "kind": "function",
           "signature": "getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            2068,
-            2078
+            1798,
+            1808
           ],
           "exported": true,
           "is_default": false,
@@ -16543,6 +16259,7 @@
         "./node-crud.js",
         "./node-storage.js",
         "./node-types.js",
+        "./quirk-repository.js",
         "./search-repository.js",
         "better-sqlite3"
       ]
@@ -17306,6 +17023,309 @@
       "code_blocks": null,
       "imports": [
         "../types/index.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/quirk-repository.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        315
+      ],
+      "detail_level": "full",
+      "token_estimate": 615,
+      "symbols": [
+        {
+          "name": "QuirkFrequency",
+          "kind": "type",
+          "signature": "QuirkFrequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
+          "lines": [
+            16,
+            16
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Frequency values for model quirks",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "QuirkSeverity",
+          "kind": "type",
+          "signature": "QuirkSeverity = \"low\" | \"medium\" | \"high\"",
+          "lines": [
+            19,
+            19
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Severity values for model quirks (matches spec)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ListQuirksFilters",
+          "kind": "interface",
+          "signature": "ListQuirksFilters",
+          "lines": [
+            22,
+            31
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Filters for querying model quirks",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ListQuirksOptions",
+          "kind": "interface",
+          "signature": "ListQuirksOptions",
+          "lines": [
+            34,
+            39
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Pagination options for quirks",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "QuirkResult",
+          "kind": "interface",
+          "signature": "QuirkResult",
+          "lines": [
+            42,
+            51
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "A quirk result with metadata",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ListQuirksResult",
+          "kind": "interface",
+          "signature": "ListQuirksResult",
+          "lines": [
+            54,
+            63
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from listQuirks query",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ModelQuirkStats",
+          "kind": "interface",
+          "signature": "ModelQuirkStats",
+          "lines": [
+            66,
+            76
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Stats for a single model",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "QuirksByModelResult",
+          "kind": "type",
+          "signature": "QuirksByModelResult = Record<string, ModelQuirkStats>",
+          "lines": [
+            79,
+            79
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from getQuirksByModel",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "FREQUENCY_RANK",
+          "kind": "variable",
+          "signature": "Record<string, number>",
+          "lines": [
+            86,
+            91
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Frequency ranking for filtering (higher = more frequent)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "listQuirks",
+          "kind": "function",
+          "signature": "listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult",
+          "lines": [
+            107,
+            167
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "List model quirks with filters and pagination.\n\nSupports filtering by:\n- model (exact match)\n- frequency (minimum frequency ranking)\n- project (partial match via nodes table)\n\nPer specs/api.md GET /api/v1/quirks endpoint.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getQuirksByModel",
+          "kind": "function",
+          "signature": "getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats>",
+          "lines": [
+            175,
+            213
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get aggregated quirk stats by model.\nReturns counts and most recent quirks for each model that has quirks.\n\nPer specs/api.md GET /api/v1/stats/models endpoint (quirkCount field).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "countQuirks",
+          "kind": "function",
+          "signature": "countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number",
+          "lines": [
+            218,
+            224
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Count quirks matching filters (without fetching data)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAllQuirkModels",
+          "kind": "function",
+          "signature": "getAllQuirkModels(db: Database.Database): {}",
+          "lines": [
+            229,
+            236
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all unique models that have quirks recorded",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAggregatedQuirks",
+          "kind": "function",
+          "signature": "getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {}",
+          "lines": [
+            244,
+            286
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get aggregated quirks - similar observations grouped together.\nUseful for the dashboard \"Model Quirks\" panel.\n\nPer specs/storage.md \"Find model quirks by frequency\" query.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNodeQuirks",
+          "kind": "function",
+          "signature": "getNodeQuirks(db: Database.Database, nodeId: string): {}",
+          "lines": [
+            291,
+            314
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get model quirks for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "better-sqlite3"
       ]
     },

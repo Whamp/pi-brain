@@ -82,6 +82,8 @@ src/storage/index.ts
     - src/storage/node-types.ts
       - src/types/index.ts
       - [builtin] crypto
+    - src/storage/quirk-repository.ts
+      - [external] better-sqlite3
     - src/storage/search-repository.ts
       - src/storage/node-crud.ts
         - src/storage/node-storage.ts
@@ -110,6 +112,8 @@ src/storage/index.ts
   - src/storage/node-types.ts
     - src/types/index.ts
     - [builtin] crypto
+  - src/storage/quirk-repository.ts
+    - [external] better-sqlite3
   - src/storage/search-repository.ts
     - src/storage/node-crud.ts
       - src/storage/node-storage.ts

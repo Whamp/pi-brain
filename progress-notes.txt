@@ -107,3 +107,25 @@ The daemon gracefully degrades when skills are missing.
 - Removed broken `~/skills/rlm` (only had README.md)
 - Created symlink: `~/skills/rlm` → `~/projects/pi-rlm/skills/rlm`
 - Daemon now finds rlm skill and processes sessions without warnings
+
+---
+
+## 2026-01-27 17:04 - Task 13.6 (Extract quirk-repository.ts)
+
+**Status**: pending → done
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+- Verified exports work correctly via index.ts
+
+**Commit**: 6f53c5e
+
+**Changes**:
+- Created `src/storage/quirk-repository.ts` (~314 lines)
+- Extracted quirk query functions: `listQuirks`, `getQuirksByModel`, `countQuirks`, `getAllQuirkModels`, `getAggregatedQuirks`, `getNodeQuirks`
+- Extracted quirk types: `QuirkFrequency`, `QuirkSeverity`, `ListQuirksFilters`, `ListQuirksOptions`, `QuirkResult`, `ListQuirksResult`, `ModelQuirkStats`, `QuirksByModelResult`
+- Added re-exports in `node-repository.ts` for backward compatibility
+- Added export in `src/storage/index.ts`
+- Reduced `node-repository.ts` from 2099 to 1811 lines (288 lines removed)
+
+**Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.

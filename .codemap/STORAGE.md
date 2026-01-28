@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 12 files
+- typescript: 13 files
 
 ## Statistics
-- Total files: 12
+- Total files: 13
 - Total symbols: 158
   - function: 107
   - interface: 38
@@ -90,7 +90,7 @@ src/storage/edge-repository.ts [1-178]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-14]
+src/storage/index.ts [1-15]
   imports:
     - ./database.js
     - ./edge-repository.js
@@ -100,6 +100,7 @@ src/storage/index.ts [1-14]
     - ./node-repository.js
     - ./node-storage.js
     - ./node-types.js
+    - ./quirk-repository.js
     - ./search-repository.js
 
 src/storage/lesson-repository.ts [1-284]
@@ -173,48 +174,32 @@ src/storage/node-crud.ts [1-189]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/node-repository.ts [1-2082]
+src/storage/node-repository.ts [1-1812]
   interface:
-    700-709: interface ListQuirksFilters [exported]
-      /** Filters for querying model quirks */
-    712-717: interface ListQuirksOptions [exported]
-      /** Pagination options for quirks */
-    720-729: interface QuirkResult [exported]
-      /** A quirk result with metadata */
-    732-741: interface ListQuirksResult [exported]
-      /** Result from listQuirks query */
-    824-834: interface ModelQuirkStats [exported]
-      /** Stats for a single model */
-    963-972: interface ListToolErrorsFilters [exported]
+    718-727: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
-    975-980: interface ListToolErrorsOptions [exported]
+    730-735: interface ListToolErrorsOptions [exported]
       /** Pagination options for tool errors */
-    983-992: interface ToolErrorResult [exported]
+    738-747: interface ToolErrorResult [exported]
       /** A tool error result with metadata */
-    995-1004: interface ListToolErrorsResult [exported]
+    750-759: interface ListToolErrorsResult [exported]
       /** Result from listToolErrors query */
-    1432-1457: interface ListNodesFilters [exported]
+    1162-1187: interface ListNodesFilters [exported]
       /** Filters for querying nodes */
-    1460-1469: interface ListNodesOptions [exported]
+    1190-1199: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-    1472-1481: interface ListNodesResult [exported]
+    1202-1211: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    1641-1653: interface SessionSummaryRow [exported]
+    1371-1383: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
-    1748-1764: interface ConnectedNodesOptions [exported]
+    1478-1494: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
-    1767-1782: interface TraversalEdge [exported]
+    1497-1512: interface TraversalEdge [exported]
       /** An edge with direction information for traversal results */
-    1785-1792: interface ConnectedNodesResult [exported]
+    1515-1522: interface ConnectedNodesResult [exported]
       /** Result from getConnectedNodes */
   type:
-    694-694: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
-      /** Frequency values for model quirks */
-    697-697: QuirkSeverity = "low" | "medium" | "high" [exported]
-      /** Severity values for model quirks (matches spec) */
-    837-837: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
-      /** Result from getQuirksByModel */
-    1400-1408: NodeSortField = | "timestamp"
+    1130-1138: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -223,9 +208,9 @@ src/storage/node-repository.ts [1-2082]
   | "cost"
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
-    1411-1411: SortOrder = "asc" | "desc" [exported]
+    1141-1141: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
-    1414-1426: NodeTypeFilter = | "coding"
+    1144-1156: NodeTypeFilter = | "coding"
   | "sysadmin"
   | "research"
   | "planning"
@@ -238,102 +223,90 @@ src/storage/node-repository.ts [1-2082]
   | "configuration"
   | "other" [exported]
       /** Node type filter values */
-    1429-1429: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
+    1159-1159: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
       /** Outcome filter values */
-    1745-1745: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
+    1475-1475: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
       /** Direction for graph traversal */
   function:
-    117-146: clearAllData(db: Database.Database): void [exported]
+    135-164: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    152-218: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    170-236: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    224-238: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    242-256: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    249-356: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    267-374: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    363-453: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    381-471: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    458-464: getNode(db: Database.Database, nodeId: string): any [exported]
+    476-482: getNode(db: Database.Database, nodeId: string): any [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    471-481: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
+    489-499: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    486-489: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    504-507: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    494-500: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    512-518: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    506-512: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    524-530: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    517-529: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
+    535-547: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    534-545: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+    552-563: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the latest node for a given session file */
-    550-561: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+    568-579: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the first node for a given session file */
-    570-595: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    588-613: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    622-660: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    640-678: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
-    761-821: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
-      /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
-    845-883: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
-      /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    888-894: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
-      /** Count quirks matching filters (without fetching data) */
-    899-906: getAllQuirkModels(db: Database.Database): {} [exported]
-      /** Get all unique models that have quirks recorded */
-    914-956: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
-      /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
-    1009-1067: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    764-822: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    1073-1161: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+    828-916: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
-    1167-1225: getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; } [exported]
+    922-980: getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; } [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
-    1230-1236: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
+    985-991: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
       /** Count tool errors matching filters. */
-    1241-1248: getAllToolsWithErrors(db: Database.Database): {} [exported]
+    996-1003: getAllToolsWithErrors(db: Database.Database): {} [exported]
       /** Get all unique tools that have errors recorded */
-    1257-1264: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+    1012-1019: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
-    1269-1273: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+    1024-1028: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
-    1278-1282: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+    1033-1037: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-    1287-1310: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
-      /** Get model quirks for a node */
-    1315-1338: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
+    1045-1068: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
-    1343-1353: getAllTags(db: Database.Database): {} [exported]
+    1073-1083: getAllTags(db: Database.Database): {} [exported]
       /** Get all unique tags in the system */
-    1358-1362: getAllTopics(db: Database.Database): {} [exported]
+    1088-1092: getAllTopics(db: Database.Database): {} [exported]
       /** Get all unique topics in the system */
-    1367-1377: getNodesByTag(db: Database.Database, tag: string): {} [exported]
+    1097-1107: getNodesByTag(db: Database.Database, tag: string): {} [exported]
       /** Find nodes by tag (matches both node tags and lesson tags) */
-    1382-1393: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
+    1112-1123: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
       /** Find nodes by topic */
-    1511-1636: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+    1241-1366: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    1659-1688: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    1389-1418: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    1693-1701: getAllProjects(db: Database.Database): {} [exported]
+    1423-1431: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    1706-1714: getAllNodeTypes(db: Database.Database): {} [exported]
+    1436-1444: getAllNodeTypes(db: Database.Database): {} [exported]
       /** Get all unique node types that have been used */
-    1719-1727: getAllComputers(db: Database.Database): {} [exported]
+    1449-1457: getAllComputers(db: Database.Database): {} [exported]
       /** Get all unique computers (source machines) */
-    1732-1738: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    1462-1468: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
-    1823-1928: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    1553-1658: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    1937-1984: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    1667-1714: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    1992-2046: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    1722-1776: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    2052-2062: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    1782-1792: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    2068-2078: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    1798-1808: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
   imports:
     - ./edge-repository.js
@@ -342,6 +315,7 @@ src/storage/node-repository.ts [1-2082]
     - ./node-crud.js
     - ./node-storage.js
     - ./node-types.js
+    - ./quirk-repository.js
     - ./search-repository.js
     - better-sqlite3
 
@@ -420,6 +394,41 @@ src/storage/pattern-repository.ts [1-369]
     - ../types/index.js
     - better-sqlite3
 
+src/storage/quirk-repository.ts [1-315]
+  interface:
+    22-31: interface ListQuirksFilters [exported]
+      /** Filters for querying model quirks */
+    34-39: interface ListQuirksOptions [exported]
+      /** Pagination options for quirks */
+    42-51: interface QuirkResult [exported]
+      /** A quirk result with metadata */
+    54-63: interface ListQuirksResult [exported]
+      /** Result from listQuirks query */
+    66-76: interface ModelQuirkStats [exported]
+      /** Stats for a single model */
+  type:
+    16-16: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
+      /** Frequency values for model quirks */
+    19-19: QuirkSeverity = "low" | "medium" | "high" [exported]
+      /** Severity values for model quirks (matches spec) */
+    79-79: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
+      /** Result from getQuirksByModel */
+  function:
+    107-167: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
+      /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
+    175-213: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
+      /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
+    218-224: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
+      /** Count quirks matching filters (without fetching data) */
+    229-236: getAllQuirkModels(db: Database.Database): {} [exported]
+      /** Get all unique models that have quirks recorded */
+    244-286: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+      /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
+    291-314: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+      /** Get model quirks for a node */
+  imports:
+    - better-sqlite3
+
 src/storage/search-repository.ts [1-532]
   interface:
     36-41: interface SearchHighlight [exported]
@@ -454,5 +463,5 @@ src/storage/search-repository.ts [1-532]
     - better-sqlite3
 
 ---
-Files: 12
-Estimated tokens: 6,722 (codebase: ~964,173)
+Files: 13
+Estimated tokens: 6,756 (codebase: ~965,109)
