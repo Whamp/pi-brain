@@ -196,6 +196,25 @@ the reactivity chain.
 
 ---
 
+## 2026-01-28 13:11 - Task 19.1.3
+
+**Status**: pending → done
+**Validation**:
+  - Added maxQueueSize (10-10_000) to PUT /config/daemon API
+  - Added backfillLimit (1-1000) to PUT /config/daemon API
+  - Added reanalysisLimit (1-1000) to PUT /config/daemon API
+  - Added validation for all three fields in validateDaemonUpdate
+  - Updated applyDaemonUpdates to persist all three fields to config
+  - Added all three fields to GET /config/daemon response
+  - Added all three fields to PUT /config/daemon response
+  - Added 12 new tests covering validation (min/max, integer) and update behavior
+  - All 1331 tests pass (1331 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: (will be committed shortly)
+**Notes**: Extended daemon configuration API with queue and limit settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
+
+---
+
 ## 2026-01-28 12:39 - Task 19.1.1
 
 **Status**: pending → done

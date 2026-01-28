@@ -51,6 +51,9 @@ interface DaemonConfigUpdateBody {
   retryDelaySeconds?: number;
   analysisTimeoutMinutes?: number;
   maxConcurrentAnalysis?: number;
+  maxQueueSize?: number;
+  backfillLimit?: number;
+  reanalysisLimit?: number;
 }
 
 /**
@@ -64,6 +67,9 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     retryDelaySeconds,
     analysisTimeoutMinutes,
     maxConcurrentAnalysis,
+    maxQueueSize,
+    backfillLimit,
+    reanalysisLimit,
   } = body;
 
   const validations: ValidationResult[] = [
@@ -73,6 +79,9 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     validateIntRange(retryDelaySeconds, "retryDelaySeconds", 1, 3600),
     validateIntRange(analysisTimeoutMinutes, "analysisTimeoutMinutes", 1, 120),
     validateIntRange(maxConcurrentAnalysis, "maxConcurrentAnalysis", 1, 10),
+    validateIntRange(maxQueueSize, "maxQueueSize", 10, 10_000),
+    validateIntRange(backfillLimit, "backfillLimit", 1, 1000),
+    validateIntRange(reanalysisLimit, "reanalysisLimit", 1, 1000),
   ];
 
   for (const error of validations) {
@@ -100,6 +109,9 @@ function applyDaemonUpdates(
     retryDelaySeconds,
     analysisTimeoutMinutes,
     maxConcurrentAnalysis,
+    maxQueueSize,
+    backfillLimit,
+    reanalysisLimit,
   } = body;
 
   // Initialize daemon section if needed
@@ -132,6 +144,15 @@ function applyDaemonUpdates(
   if (maxConcurrentAnalysis !== undefined) {
     rawConfig.daemon.max_concurrent_analysis = maxConcurrentAnalysis;
   }
+  if (maxQueueSize !== undefined) {
+    rawConfig.daemon.max_queue_size = maxQueueSize;
+  }
+  if (backfillLimit !== undefined) {
+    rawConfig.daemon.backfill_limit = backfillLimit;
+  }
+  if (reanalysisLimit !== undefined) {
+    rawConfig.daemon.reanalysis_limit = reanalysisLimit;
+  }
 }
 
 export async function configRoutes(app: FastifyInstance): Promise<void> {
@@ -156,6 +177,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           retryDelaySeconds: config.daemon.retryDelaySeconds,
           analysisTimeoutMinutes: config.daemon.analysisTimeoutMinutes,
           maxConcurrentAnalysis: config.daemon.maxConcurrentAnalysis,
+          maxQueueSize: config.daemon.maxQueueSize,
+          backfillLimit: config.daemon.backfillLimit,
+          reanalysisLimit: config.daemon.reanalysisLimit,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
@@ -187,6 +211,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         retryDelaySeconds,
         analysisTimeoutMinutes,
         maxConcurrentAnalysis,
+        maxQueueSize,
+        backfillLimit,
+        reanalysisLimit,
       } = body;
 
       // Validate at least one field is provided
@@ -198,7 +225,10 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         maxRetries !== undefined ||
         retryDelaySeconds !== undefined ||
         analysisTimeoutMinutes !== undefined ||
-        maxConcurrentAnalysis !== undefined;
+        maxConcurrentAnalysis !== undefined ||
+        maxQueueSize !== undefined ||
+        backfillLimit !== undefined ||
+        reanalysisLimit !== undefined;
 
       if (!hasAnyField) {
         return reply
@@ -253,6 +283,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             retryDelaySeconds: updatedConfig.daemon.retryDelaySeconds,
             analysisTimeoutMinutes: updatedConfig.daemon.analysisTimeoutMinutes,
             maxConcurrentAnalysis: updatedConfig.daemon.maxConcurrentAnalysis,
+            maxQueueSize: updatedConfig.daemon.maxQueueSize,
+            backfillLimit: updatedConfig.daemon.backfillLimit,
+            reanalysisLimit: updatedConfig.daemon.reanalysisLimit,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

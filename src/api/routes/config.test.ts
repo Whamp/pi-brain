@@ -51,6 +51,9 @@ describe("config api routes", () => {
       expect(body.data.retryDelaySeconds).toBeDefined();
       expect(body.data.analysisTimeoutMinutes).toBeDefined();
       expect(body.data.maxConcurrentAnalysis).toBeDefined();
+      expect(body.data.maxQueueSize).toBeDefined();
+      expect(body.data.backfillLimit).toBeDefined();
+      expect(body.data.reanalysisLimit).toBeDefined();
       expect(body.data.defaults).toBeDefined();
     });
 
@@ -328,6 +331,194 @@ describe("config api routes", () => {
       const body = JSON.parse(response.body);
       expect(body.data.analysisTimeoutMinutes).toBe(45); // Updated by previous test
       expect(body.data.maxConcurrentAnalysis).toBe(2); // Updated by previous test
+    });
+
+    // maxQueueSize tests
+    it("validates maxQueueSize minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxQueueSize: 9 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxQueueSize");
+      expect(body.error.message).toContain("between 10 and 10000");
+    });
+
+    it("validates maxQueueSize maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxQueueSize: 10_001 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxQueueSize");
+    });
+
+    it("accepts valid maxQueueSize", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxQueueSize: 5000 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.maxQueueSize).toBe(5000);
+    });
+
+    it("validates maxQueueSize must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { maxQueueSize: 1000.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("maxQueueSize");
+      expect(body.error.message).toContain("integer");
+    });
+
+    // backfillLimit tests
+    it("validates backfillLimit minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillLimit: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("backfillLimit");
+      expect(body.error.message).toContain("between 1 and 1000");
+    });
+
+    it("validates backfillLimit maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillLimit: 1001 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("backfillLimit");
+    });
+
+    it("accepts valid backfillLimit", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillLimit: 200 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.backfillLimit).toBe(200);
+    });
+
+    it("validates backfillLimit must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillLimit: 50.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("backfillLimit");
+      expect(body.error.message).toContain("integer");
+    });
+
+    // reanalysisLimit tests
+    it("validates reanalysisLimit minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisLimit: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("reanalysisLimit");
+      expect(body.error.message).toContain("between 1 and 1000");
+    });
+
+    it("validates reanalysisLimit maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisLimit: 1001 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("reanalysisLimit");
+    });
+
+    it("accepts valid reanalysisLimit", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisLimit: 50 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.reanalysisLimit).toBe(50);
+    });
+
+    it("validates reanalysisLimit must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisLimit: 25.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("reanalysisLimit");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("updates all three new fields together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          maxQueueSize: 2000,
+          backfillLimit: 150,
+          reanalysisLimit: 75,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.maxQueueSize).toBe(2000);
+      expect(body.data.backfillLimit).toBe(150);
+      expect(body.data.reanalysisLimit).toBe(75);
+    });
+
+    it("returns new fields on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.maxQueueSize).toBe(2000); // Updated by previous test
+      expect(body.data.backfillLimit).toBe(150); // Updated by previous test
+      expect(body.data.reanalysisLimit).toBe(75); // Updated by previous test
     });
   });
 

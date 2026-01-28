@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 39146,
-  "codebase_tokens": 1099158,
+  "codebase_tokens": 1101266,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,7 +327,7 @@
       "language": "typescript",
       "lines": [
         1,
-        307
+        340
       ],
       "detail_level": "full",
       "token_estimate": 232,
@@ -376,7 +376,7 @@
           "signature": "DaemonConfigUpdateBody",
           "lines": [
             45,
-            54
+            57
           ],
           "exported": false,
           "is_default": false,
@@ -394,8 +394,8 @@
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            59,
-            85
+            62,
+            94
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +413,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            90,
-            135
+            99,
+            156
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +432,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            137,
-            306
+            158,
+            339
           ],
           "exported": true,
           "is_default": false,
