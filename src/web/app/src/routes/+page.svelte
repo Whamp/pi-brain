@@ -107,11 +107,7 @@
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
-      if (isBackendOffline(error)) {
-        errorMessage = "Backend is offline. Start the daemon with 'pi-brain daemon start'.";
-      } else {
-        errorMessage = getErrorMessage(error);
-      }
+      errorMessage = getErrorMessage(error);
     } finally {
       loading = false;
     }
