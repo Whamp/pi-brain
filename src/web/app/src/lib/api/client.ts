@@ -496,6 +496,52 @@ export const api = {
       }[];
     }>("/config/providers"),
 
+  // Query Configuration
+  getQueryConfig: () =>
+    request<{
+      provider: string;
+      model: string;
+      defaults: { provider: string; model: string };
+    }>("/config/query"),
+
+  updateQueryConfig: (config: { provider?: string; model?: string }) =>
+    request<{
+      provider: string;
+      model: string;
+      message: string;
+    }>("/config/query", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
+  // API Configuration
+  getApiConfig: () =>
+    request<{
+      port: number;
+      host: string;
+      corsOrigins: string[];
+      defaults: {
+        port: number;
+        host: string;
+        corsOrigins: string[];
+      };
+    }>("/config/api"),
+
+  updateApiConfig: (config: {
+    port?: number;
+    host?: string;
+    corsOrigins?: string[];
+  }) =>
+    request<{
+      port: number;
+      host: string;
+      corsOrigins: string[];
+      message: string;
+    }>("/config/api", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
   // Prompt Learning
   getPromptInsights: (options?: {
     limit?: number;

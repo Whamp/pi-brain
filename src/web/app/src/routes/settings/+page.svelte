@@ -31,6 +31,10 @@
   let connectionDiscoveryCooldownHours = $state(24);
   let semanticSearchThreshold = $state(0.6);
 
+  // Query config values
+  let queryProvider = $state("");
+  let queryModel = $state("");
+
   // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
@@ -47,6 +51,10 @@
   let originalConnectionDiscoveryLookbackDays = $state(7);
   let originalConnectionDiscoveryCooldownHours = $state(24);
   let originalSemanticSearchThreshold = $state(0.6);
+
+  // Query config original values
+  let originalQueryProvider = $state("");
+  let originalQueryModel = $state("");
 
   // Available providers
   let providers: Provider[] = $state([]);
@@ -72,11 +80,13 @@
     connectionDiscoveryLimit !== originalConnectionDiscoveryLimit ||
     connectionDiscoveryLookbackDays !== originalConnectionDiscoveryLookbackDays ||
     connectionDiscoveryCooldownHours !== originalConnectionDiscoveryCooldownHours ||
-    semanticSearchThreshold !== originalSemanticSearchThreshold
+    semanticSearchThreshold !== originalSemanticSearchThreshold ||
+    queryProvider !== originalQueryProvider ||
+    queryModel !== originalQueryModel
   );
 
   onMount(async () => {
-    await Promise.all([loadConfig(), loadProviders()]);
+    await Promise.all([loadConfig(), loadProviders(), loadQueryConfig()]);
     loading = false;
   });
 
@@ -140,11 +150,31 @@
     }
   }
 
+  async function loadQueryConfig() {
+    try {
+      const config = await api.getQueryConfig();
+      ({ provider: queryProvider } = config);
+      ({ model: queryModel } = config);
+
+      // Store originals
+      originalQueryProvider = queryProvider;
+      originalQueryModel = queryModel;
+    } catch (error) {
+      console.error("Failed to load query config:", error);
+      toastStore.error(
+        isBackendOffline(error)
+          ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+          : getErrorMessage(error)
+      );
+    }
+  }
+
   async function saveConfig() {
     saving = true;
 
     try {
-      const result = await api.updateDaemonConfig({
+      // Save daemon config
+      const daemonResult = await api.updateDaemonConfig({
         provider,
         model,
         idleTimeoutMinutes,
@@ -162,24 +192,32 @@
         semanticSearchThreshold,
       });
 
-      // Update originals
-      originalProvider = result.provider;
-      originalModel = result.model;
-      originalIdleTimeoutMinutes = result.idleTimeoutMinutes;
-      originalParallelWorkers = result.parallelWorkers;
-      originalMaxRetries = result.maxRetries;
-      originalRetryDelaySeconds = result.retryDelaySeconds;
-      originalAnalysisTimeoutMinutes = result.analysisTimeoutMinutes;
-      originalMaxConcurrentAnalysis = result.maxConcurrentAnalysis;
-      originalMaxQueueSize = result.maxQueueSize;
-      originalBackfillLimit = result.backfillLimit;
-      originalReanalysisLimit = result.reanalysisLimit;
-      originalConnectionDiscoveryLimit = result.connectionDiscoveryLimit;
-      originalConnectionDiscoveryLookbackDays = result.connectionDiscoveryLookbackDays;
-      originalConnectionDiscoveryCooldownHours = result.connectionDiscoveryCooldownHours;
-      originalSemanticSearchThreshold = result.semanticSearchThreshold;
+      // Save query config
+      const queryResult = await api.updateQueryConfig({
+        provider: queryProvider,
+        model: queryModel,
+      });
 
-      toastStore.success(result.message);
+      // Update originals
+      originalProvider = daemonResult.provider;
+      originalModel = daemonResult.model;
+      originalIdleTimeoutMinutes = daemonResult.idleTimeoutMinutes;
+      originalParallelWorkers = daemonResult.parallelWorkers;
+      originalMaxRetries = daemonResult.maxRetries;
+      originalRetryDelaySeconds = daemonResult.retryDelaySeconds;
+      originalAnalysisTimeoutMinutes = daemonResult.analysisTimeoutMinutes;
+      originalMaxConcurrentAnalysis = daemonResult.maxConcurrentAnalysis;
+      originalMaxQueueSize = daemonResult.maxQueueSize;
+      originalBackfillLimit = daemonResult.backfillLimit;
+      originalReanalysisLimit = daemonResult.reanalysisLimit;
+      originalConnectionDiscoveryLimit = daemonResult.connectionDiscoveryLimit;
+      originalConnectionDiscoveryLookbackDays = daemonResult.connectionDiscoveryLookbackDays;
+      originalConnectionDiscoveryCooldownHours = daemonResult.connectionDiscoveryCooldownHours;
+      originalSemanticSearchThreshold = daemonResult.semanticSearchThreshold;
+      originalQueryProvider = queryResult.provider;
+      originalQueryModel = queryResult.model;
+
+      toastStore.success(daemonResult.message);
     } catch (error) {
       console.error("Failed to save config:", error);
       toastStore.error(
@@ -208,6 +246,8 @@
     connectionDiscoveryLookbackDays = originalConnectionDiscoveryLookbackDays;
     connectionDiscoveryCooldownHours = originalConnectionDiscoveryCooldownHours;
     semanticSearchThreshold = originalSemanticSearchThreshold;
+    queryProvider = originalQueryProvider;
+    queryModel = originalQueryModel;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -475,6 +515,38 @@
             <span class="range-value">{semanticSearchThreshold.toFixed(2)}</span>
           </div>
           <span class="hint">Minimum similarity score (0.0 - 1.0) for matches</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Query Configuration</h2>
+      <p class="section-description">
+        Configure the AI model used for /brain queries
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="queryProvider">Provider</label>
+          <select
+            id="queryProvider"
+            bind:value={queryProvider}
+          >
+            {#each providers as p}
+              <option value={p.id}>{p.name}</option>
+            {/each}
+          </select>
+          <span class="hint">Provider for /brain query responses</span>
+        </div>
+
+        <div class="form-group">
+          <label for="queryModel">Model</label>
+          <select id="queryModel" bind:value={queryModel}>
+            {#each providers.find(p => p.id === queryProvider)?.models ?? [] as m}
+              <option value={m}>{m}</option>
+            {/each}
+          </select>
+          <span class="hint">Model used to answer /brain queries</span>
         </div>
       </div>
     </section>
