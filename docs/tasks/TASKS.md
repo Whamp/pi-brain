@@ -301,7 +301,7 @@ Ref: docs/plans/Web-UI-Functionality-Report.md
 | ---- | ----------------------------------------------------- | ------- | ---- | ---------- |
 | 18.1 | Settings Save Button State (disable after save)       | done    | -    | 2026-01-28 |
 | 18.2 | Add toast/notification system for feedback            | done    | -    | 2026-01-28 |
-| 18.3 | Empty state "Getting Started" guide (Sessions, Graph) | pending | -    |            |
+| 18.3 | Empty state "Getting Started" guide (Sessions, Graph) | active  | -    | 2026-01-28 |
 | 18.4 | Fix sidebar overflow on small viewports               | pending | -    |            |
 | 18.5 | Real-time Dashboard stats via WebSocket               | pending | 16.2 |            |
 | 18.6 | Search result FTS term highlighting                   | pending | -    |            |
