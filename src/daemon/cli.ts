@@ -29,7 +29,7 @@ import {
   clearAllData,
   insertNodeToDb,
   linkNodeToPredecessors,
-} from "../storage/node-repository.js";
+} from "../storage/index.js";
 import {
   listNodeFiles,
   parseNodePath,

@@ -30,7 +30,7 @@ import type { Node } from "../storage/node-types.js";
 
 import { createServer } from "../api/server.js";
 import { migrate } from "../storage/database.js";
-import { createNode, generateNodeId } from "../storage/node-repository.js";
+import { createNode, generateNodeId } from "../storage/index.js";
 
 // Integration tests that invoke pi agent need longer timeout
 const INTEGRATION_TIMEOUT = 60_000; // 60 seconds - agent queries can be slow

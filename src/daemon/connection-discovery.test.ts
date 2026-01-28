@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import { describe, it, expect, beforeEach } from "vitest";
 
-import { createEdge } from "../storage/node-repository.js";
+import { createEdge } from "../storage/index.js";
 import { ConnectionDiscoverer } from "./connection-discovery.js";
 
 // Manual insertion helper to avoid FS side effects

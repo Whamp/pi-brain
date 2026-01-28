@@ -10,7 +10,7 @@ import {
   listDecisions,
   updateDecisionFeedback,
 } from "./decision-repository.js";
-import { createNode } from "./node-repository.js";
+import { createNode } from "./index.js";
 
 describe("decisionRepository", () => {
   let db: Database.Database;

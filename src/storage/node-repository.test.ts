@@ -65,7 +65,7 @@ import {
   upsertNode,
   type NodeConversionContext,
   type RepositoryOptions,
-} from "./node-repository.js";
+} from "./index.js";
 import {
   emptyDaemonMeta,
   emptyLessons,

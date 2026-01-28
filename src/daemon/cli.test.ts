@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { Node } from "../types/index.js";
 
 import { openDatabase, migrate } from "../storage/database.js";
-import { getNode, listNodes } from "../storage/node-repository.js";
+import { getNode, listNodes } from "../storage/index.js";
 import { writeNode, readNodeFromPath } from "../storage/node-storage.js";
 import {
   generateNodeId,

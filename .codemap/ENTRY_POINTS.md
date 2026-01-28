@@ -227,9 +227,9 @@ src/api/routes/nodes.ts [1-233]
         - src/api/routes/nodes.ts:83: type FastifyReply -> external
   imports:
     - ../../storage/graph-repository.js
+    - ../../storage/index.js
     - ../../storage/lesson-repository.js
     - ../../storage/node-queries.js
-    - ../../storage/node-repository.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
     - ../../storage/quirk-repository.js
@@ -479,7 +479,7 @@ src/api/server.test.ts [1-683]
   imports:
     - ../config/types.js
     - ../storage/database.js
-    - ../storage/node-repository.js
+    - ../storage/index.js
     - ../storage/node-types.js
     - ./server.js
     - node:fs
@@ -579,4 +579,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 6,111 (codebase: ~971,994)
+Estimated tokens: 6,107 (codebase: ~971,374)

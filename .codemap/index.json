@@ -1,9 +1,9 @@
 {
   "stats": {
-    "totalFiles": 85,
+    "totalFiles": 84,
     "totalSymbols": 1030,
     "byLanguage": {
-      "typescript": 85
+      "typescript": 84
     },
     "bySymbolKind": {
       "function": 462,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34470,
-  "codebase_tokens": 972765,
+  "total_tokens": 34387,
+  "codebase_tokens": 974805,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -607,7 +607,7 @@
         233
       ],
       "detail_level": "full",
-      "token_estimate": 198,
+      "token_estimate": 196,
       "symbols": [
         {
           "name": "parseArrayParam",
@@ -691,9 +691,9 @@
       "code_blocks": null,
       "imports": [
         "../../storage/graph-repository.js",
+        "../../storage/index.js",
         "../../storage/lesson-repository.js",
         "../../storage/node-queries.js",
-        "../../storage/node-repository.js",
         "../../storage/node-storage.js",
         "../../storage/node-types.js",
         "../../storage/quirk-repository.js",
@@ -2301,7 +2301,7 @@
         1060
       ],
       "detail_level": "full",
-      "token_estimate": 1078,
+      "token_estimate": 1076,
       "symbols": [
         {
           "name": "sleep",
@@ -2995,7 +2995,7 @@
         "../config/config.js",
         "../config/types.js",
         "../storage/database.js",
-        "../storage/node-repository.js",
+        "../storage/index.js",
         "../storage/node-storage.js",
         "./processor.js",
         "./queue.js",
@@ -3012,7 +3012,7 @@
         620
       ],
       "detail_level": "full",
-      "token_estimate": 652,
+      "token_estimate": 649,
       "symbols": [
         {
           "name": "LessonRow",
@@ -3343,9 +3343,9 @@
       "code_blocks": null,
       "imports": [
         "../storage/edge-repository.js",
+        "../storage/index.js",
         "../storage/node-crud.js",
         "../storage/node-queries.js",
-        "../storage/node-repository.js",
         "../types/index.js",
         "better-sqlite3"
       ]
@@ -9180,7 +9180,7 @@
         594
       ],
       "detail_level": "full",
-      "token_estimate": 798,
+      "token_estimate": 795,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -9837,8 +9837,8 @@
         "../config/types.js",
         "../parser/index.js",
         "../prompt/prompt.js",
+        "../storage/index.js",
         "../storage/node-conversion.js",
-        "../storage/node-repository.js",
         "../storage/node-types.js",
         "./connection-discovery.js",
         "./errors.js",
@@ -14846,10 +14846,10 @@
       "language": "typescript",
       "lines": [
         1,
-        18
+        17
       ],
       "detail_level": "full",
-      "token_estimate": 95,
+      "token_estimate": 88,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -14862,7 +14862,6 @@
         "./node-conversion.js",
         "./node-crud.js",
         "./node-queries.js",
-        "./node-repository.js",
         "./node-storage.js",
         "./node-types.js",
         "./quirk-repository.js",
@@ -15122,18 +15121,18 @@
       "language": "typescript",
       "lines": [
         1,
-        189
+        774
       ],
       "detail_level": "full",
-      "token_estimate": 291,
+      "token_estimate": 1295,
       "symbols": [
         {
           "name": "RepositoryOptions",
           "kind": "interface",
           "signature": "RepositoryOptions extends NodeStorageOptions",
           "lines": [
-            26,
-            29
+            40,
+            43
           ],
           "exported": true,
           "is_default": false,
@@ -15151,8 +15150,8 @@
           "kind": "interface",
           "signature": "NodeRow",
           "lines": [
-            32,
-            54
+            46,
+            68
           ],
           "exported": true,
           "is_default": false,
@@ -15170,8 +15169,8 @@
           "kind": "function",
           "signature": "generateLessonId(): string",
           "lines": [
-            60,
-            62
+            76,
+            78
           ],
           "exported": true,
           "is_default": false,
@@ -15189,8 +15188,8 @@
           "kind": "function",
           "signature": "generateQuirkId(): string",
           "lines": [
-            64,
-            66
+            80,
+            82
           ],
           "exported": true,
           "is_default": false,
@@ -15208,8 +15207,8 @@
           "kind": "function",
           "signature": "generateErrorId(): string",
           "lines": [
-            68,
-            70
+            84,
+            86
           ],
           "exported": true,
           "is_default": false,
@@ -15227,8 +15226,8 @@
           "kind": "function",
           "signature": "generateDecisionId(): string",
           "lines": [
-            72,
-            74
+            88,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -15246,8 +15245,8 @@
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            83,
-            114
+            99,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -15265,8 +15264,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            119,
-            139
+            135,
+            155
           ],
           "exported": true,
           "is_default": false,
@@ -15284,8 +15283,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            144,
-            164
+            160,
+            180
           ],
           "exported": true,
           "is_default": false,
@@ -15303,8 +15302,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            169,
-            188
+            185,
+            204
           ],
           "exported": true,
           "is_default": false,
@@ -15316,14 +15315,358 @@
           "comment": "Insert daemon decisions for a node",
           "incoming_refs": null,
           "outgoing_refs": null
+        },
+        {
+          "name": "clearAllData",
+          "kind": "function",
+          "signature": "clearAllData(db: Database.Database): void",
+          "lines": [
+            214,
+            243
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Clear all data from the database (nodes, edges, etc.)\nUsed by rebuild-index CLI",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "insertNodeToDb",
+          "kind": "function",
+          "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
+          "lines": [
+            249,
+            315
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Insert a node into the database (without writing JSON file)\nUsed by createNode and rebuild-index CLI",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createNode",
+          "kind": "function",
+          "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
+          "lines": [
+            321,
+            335
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Create a node - writes to both SQLite and JSON storage\nReturns the node with any auto-generated fields filled in",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "upsertNode",
+          "kind": "function",
+          "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
+          "lines": [
+            346,
+            453
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Upsert a node - creates if not exists, updates if exists.\nThis provides idempotent ingestion for analysis jobs.\n\nIf a job crashes after writing JSON but before DB insert, re-running\nwill update the existing data cleanly without duplicates or errors.\n\nReturns the node and whether it was created (true) or updated (false).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "updateNode",
+          "kind": "function",
+          "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
+          "lines": [
+            460,
+            550
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Update a node - writes new JSON version and updates SQLite row.\nThrows if the node doesn't exist in the database.\nReturns the updated node.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNode",
+          "kind": "function",
+          "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
+          "lines": [
+            555,
+            561
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get a node by ID (returns the row from SQLite - always the latest version)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNodeVersion",
+          "kind": "function",
+          "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
+          "lines": [
+            568,
+            578
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get a specific version of a node from SQLite.\nNote: SQLite only stores the current/latest version. For historical versions,\nuse getAllNodeVersions() which reads from JSON storage.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "nodeExistsInDb",
+          "kind": "function",
+          "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
+          "lines": [
+            583,
+            586
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a node exists in the database",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAllNodeVersions",
+          "kind": "function",
+          "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
+          "lines": [
+            591,
+            597
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all versions of a node from JSON storage",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "deleteNode",
+          "kind": "function",
+          "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
+          "lines": [
+            603,
+            609
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Delete a node and all related data\nNote: Due to ON DELETE CASCADE, related records are automatically deleted",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findNodeByEndEntryId",
+          "kind": "function",
+          "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
+          "lines": [
+            614,
+            626
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find a node that contains a specific entry ID as its end boundary",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findLastNodeInSession",
+          "kind": "function",
+          "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
+          "lines": [
+            631,
+            642
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find the latest node for a given session file",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findFirstNodeInSession",
+          "kind": "function",
+          "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
+          "lines": [
+            647,
+            658
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find the first node for a given session file",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findPreviousProjectNode",
+          "kind": "function",
+          "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
+          "lines": [
+            667,
+            692
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find the most recent node for a project before a given timestamp.\nUsed for abandoned restart detection.\n\nReturns the full Node from JSON storage (not just the row) to access\nfilesTouched and other content fields.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "STRUCTURAL_EDGE_TYPES",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            695,
+            702
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Valid structural edge types for boundary detection",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "normalizeEdgeType",
+          "kind": "function",
+          "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
+          "lines": [
+            707,
+            712
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate and normalize a boundary type to a valid EdgeType",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "linkNodeToPredecessors",
+          "kind": "function",
+          "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
+          "lines": [
+            719,
+            757
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Automatically link a node to its predecessors based on session structure.\nCreates structural edges based on session continuity and fork relationships.\nIdempotent: will not create duplicate edges if called multiple times.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "edgeExistsInSameSession",
+          "kind": "function",
+          "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
+          "lines": [
+            762,
+            773
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a node has any incoming edges from the same session",
+          "incoming_refs": null,
+          "outgoing_refs": null
         }
       ],
       "annotation": null,
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./edge-repository.js",
         "./node-storage.js",
         "./node-types.js",
+        "./search-repository.js",
         "better-sqlite3"
       ]
     },
@@ -15761,376 +16104,6 @@
       "code_blocks": null,
       "imports": [
         "./node-crud.js",
-        "better-sqlite3"
-      ]
-    },
-    {
-      "path": "src/storage/node-repository.ts",
-      "language": "typescript",
-      "lines": [
-        1,
-        769
-      ],
-      "detail_level": "full",
-      "token_estimate": 1070,
-      "symbols": [
-        {
-          "name": "clearAllData",
-          "kind": "function",
-          "signature": "clearAllData(db: Database.Database): void",
-          "lines": [
-            159,
-            188
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Clear all data from the database (nodes, edges, etc.)\nUsed by rebuild-index CLI",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "insertNodeToDb",
-          "kind": "function",
-          "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
-          "lines": [
-            194,
-            260
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Insert a node into the database (without writing JSON file)\nUsed by createNode and rebuild-index CLI",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "createNode",
-          "kind": "function",
-          "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
-          "lines": [
-            266,
-            280
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Create a node - writes to both SQLite and JSON storage\nReturns the node with any auto-generated fields filled in",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "upsertNode",
-          "kind": "function",
-          "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
-          "lines": [
-            291,
-            398
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Upsert a node - creates if not exists, updates if exists.\nThis provides idempotent ingestion for analysis jobs.\n\nIf a job crashes after writing JSON but before DB insert, re-running\nwill update the existing data cleanly without duplicates or errors.\n\nReturns the node and whether it was created (true) or updated (false).",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "updateNode",
-          "kind": "function",
-          "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
-          "lines": [
-            405,
-            495
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Update a node - writes new JSON version and updates SQLite row.\nThrows if the node doesn't exist in the database.\nReturns the updated node.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getNode",
-          "kind": "function",
-          "signature": "getNode(db: Database.Database, nodeId: string): any",
-          "lines": [
-            500,
-            506
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get a node by ID (returns the row from SQLite - always the latest version)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getNodeVersion",
-          "kind": "function",
-          "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): any",
-          "lines": [
-            513,
-            523
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get a specific version of a node from SQLite.\nNote: SQLite only stores the current/latest version. For historical versions,\nuse getAllNodeVersions() which reads from JSON storage.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "nodeExistsInDb",
-          "kind": "function",
-          "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
-          "lines": [
-            528,
-            531
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Check if a node exists in the database",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAllNodeVersions",
-          "kind": "function",
-          "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
-          "lines": [
-            536,
-            542
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all versions of a node from JSON storage",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "deleteNode",
-          "kind": "function",
-          "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
-          "lines": [
-            548,
-            554
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Delete a node and all related data\nNote: Due to ON DELETE CASCADE, related records are automatically deleted",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "findNodeByEndEntryId",
-          "kind": "function",
-          "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any",
-          "lines": [
-            559,
-            571
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Find a node that contains a specific entry ID as its end boundary",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "findLastNodeInSession",
-          "kind": "function",
-          "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): any",
-          "lines": [
-            576,
-            587
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Find the latest node for a given session file",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "findFirstNodeInSession",
-          "kind": "function",
-          "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): any",
-          "lines": [
-            592,
-            603
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Find the first node for a given session file",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "findPreviousProjectNode",
-          "kind": "function",
-          "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
-          "lines": [
-            612,
-            637
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Find the most recent node for a project before a given timestamp.\nUsed for abandoned restart detection.\n\nReturns the full Node from JSON storage (not just the row) to access\nfilesTouched and other content fields.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "STRUCTURAL_EDGE_TYPES",
-          "kind": "variable",
-          "signature": "any",
-          "lines": [
-            640,
-            647
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Valid structural edge types for boundary detection",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "normalizeEdgeType",
-          "kind": "function",
-          "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
-          "lines": [
-            652,
-            657
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Validate and normalize a boundary type to a valid EdgeType",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "linkNodeToPredecessors",
-          "kind": "function",
-          "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
-          "lines": [
-            664,
-            702
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Automatically link a node to its predecessors based on session structure.\nCreates structural edges based on session continuity and fork relationships.\nIdempotent: will not create duplicate edges if called multiple times.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "edgeExistsInSameSession",
-          "kind": "function",
-          "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
-          "lines": [
-            707,
-            718
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Check if a node has any incoming edges from the same session",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        }
-      ],
-      "annotation": null,
-      "headings": null,
-      "code_blocks": null,
-      "imports": [
-        "./edge-repository.js",
-        "./graph-repository.js",
-        "./lesson-repository.js",
-        "./node-conversion.js",
-        "./node-crud.js",
-        "./node-queries.js",
-        "./node-storage.js",
-        "./node-types.js",
-        "./quirk-repository.js",
-        "./search-repository.js",
         "better-sqlite3"
       ]
     },

@@ -237,3 +237,50 @@ The daemon gracefully degrades when skills are missing.
 - Reduced `node-repository.ts` from 1091 to 768 lines (323 lines removed)
 
 **Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
+Updated modules in storage/index.ts
+- Verified all 1198 tests pass
+- Nodes now re-import from correct extracted modules
+
+---
+
+## 2026-01-27 17:47 - Task 13.10 (Update internal imports to use new modules)
+
+**Status**: pending → done
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+- Verified all imports are from correct source modules
+
+**Commit**: 6f81b51
+
+**Changes**:
+Updated 10 files to import from extracted modules instead of node-repository.ts:
+
+API routes:
+- `edges.ts`: import from edge-repository.ts
+- `lessons.ts`: import from lesson-repository.ts
+- `quirks.ts`: import from quirk-repository.ts
+- `search.ts`: import from search-repository.ts + node-queries.ts
+- `stats.ts`: import from node-queries.ts
+- `nodes.ts`: import from graph-repository.ts, lesson-repository.ts, node-queries.ts, quirk-repository.ts
+- `sessions.ts`: import from node-queries.ts
+
+Daemon:
+- `query-processor.ts`: import from node-crud.ts, node-queries.ts, quirk-repository.ts, search-repository.ts
+- `connection-discovery.ts`: import from edge-repository.ts, node-crud.ts, node-queries.ts
+- `worker.ts`: import from node-conversion.ts
+
+Functions still in node-repository.ts (CRUD operations: clearAllData, insertNodeToDb, createNode, upsertNode, updateNode, getNode, getNodeVersion, nodeExistsInDb, getAllNodeVersions, deleteNode, findNodeByEndEntryId, findLastNodeInSession, findFirstNodeInSession, findPreviousProjectNode, linkNodeToPredecessors) maintain existing imports.
+
+**Notes**: Backward compatibility re-exports in node-repository.ts remain for external consumers.
+
+## 2026-01-27 18:30 - Task 13.11
+
+**Status**: pending → done
+**Validation**: 
+- All 1198 tests passed (`npm test -- --run`)
+- `npm run check` passed
+- Verified no remaining references to `node-repository.js` via grep
+- Deleted the now redundant monolithic file
+**Commit**: f18663b
+**Notes**: Completed Phase 13 refactoring. The node repository monolith is fully decomposed into modular components.

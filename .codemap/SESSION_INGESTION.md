@@ -17,7 +17,7 @@
 src/daemon/cli.test.ts [1-758]
   imports:
     - ../storage/database.js
-    - ../storage/node-repository.js
+    - ../storage/index.js
     - ../storage/node-storage.js
     - ../storage/node-types.js
     - ../types/index.js
@@ -182,7 +182,7 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
         - src/daemon/cli.ts:975: call log -> external
-        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-repository.ts
+        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-crud.ts
         - src/daemon/cli.ts:980: call log -> external
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
@@ -200,7 +200,7 @@ src/daemon/cli.ts [1-1060]
     - ../config/config.js
     - ../config/types.js
     - ../storage/database.js
-    - ../storage/node-repository.js
+    - ../storage/index.js
     - ../storage/node-storage.js
     - ./processor.js
     - ./queue.js
@@ -210,7 +210,7 @@ src/daemon/cli.ts [1-1060]
 
 src/daemon/connection-discovery.test.ts [1-440]
   imports:
-    - ../storage/node-repository.js
+    - ../storage/index.js
     - ./connection-discovery.js
     - better-sqlite3
     - vitest
@@ -225,9 +225,9 @@ src/daemon/connection-discovery.ts [1-620]
         - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
+    - ../storage/index.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
-    - ../storage/node-repository.js
     - ../types/index.js
     - better-sqlite3
 
@@ -1008,8 +1008,8 @@ src/daemon/worker.ts [1-594]
     - ../config/types.js
     - ../parser/index.js
     - ../prompt/prompt.js
+    - ../storage/index.js
     - ../storage/node-conversion.js
-    - ../storage/node-repository.js
     - ../storage/node-types.js
     - ./connection-discovery.js
     - ./errors.js
@@ -1479,4 +1479,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 38
-Estimated tokens: 19,433 (codebase: ~972,765)
+Estimated tokens: 19,419 (codebase: ~974,805)

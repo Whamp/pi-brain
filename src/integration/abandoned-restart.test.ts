@@ -17,10 +17,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
 
 import { isAbandonedRestartFromNode } from "../parser/signals.js";
 import { migrate } from "../storage/database.js";
-import {
-  createNode,
-  findPreviousProjectNode,
-} from "../storage/node-repository.js";
+import { createNode, findPreviousProjectNode } from "../storage/index.js";
 import { generateNodeId, type Node } from "../storage/node-types.js";
 
 // =============================================================================

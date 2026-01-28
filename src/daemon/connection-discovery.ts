@@ -11,8 +11,8 @@ import type { NodeRow } from "../storage/node-crud.js";
 import type { Edge } from "../types/index.js";
 
 import { createEdge, edgeExists } from "../storage/edge-repository.js";
+import { getNode } from "../storage/index.js";
 import { getNodeSummary } from "../storage/node-queries.js";
-import { getNode } from "../storage/node-repository.js";
 
 interface LessonRow {
   id: string;

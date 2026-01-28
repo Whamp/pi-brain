@@ -24,12 +24,12 @@ import {
   parseSession,
 } from "../parser/index.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
-import { agentOutputToNode } from "../storage/node-conversion.js";
 import {
   findPreviousProjectNode,
   linkNodeToPredecessors,
   upsertNode,
-} from "../storage/node-repository.js";
+} from "../storage/index.js";
+import { agentOutputToNode } from "../storage/node-conversion.js";
 import { ConnectionDiscoverer } from "./connection-discovery.js";
 import {
   classifyError,
