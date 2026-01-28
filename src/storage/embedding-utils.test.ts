@@ -26,6 +26,13 @@ import {
 } from "./embedding-utils.js";
 
 /**
+ * Helper to create an embedding of valid size (4096) or custom size.
+ */
+function createEmbedding(length = 4096): number[] {
+  return Array.from({ length }, (_, i) => i / length);
+}
+
+/**
  * Create a minimal Node for testing.
  *
  * Accepts only top-level overrides that replace entire sub-objects.
@@ -339,20 +346,21 @@ describe("buildSimpleEmbeddingText", () => {
 });
 
 describe("isRichEmbeddingFormat", () => {
-  it("should return true for text with Decisions section", () => {
+  it("should return false for text with sections but no version marker", () => {
+    // Rely primarily on version marker now to avoid strict whitespace dependency
     const text = "[coding] Summary\n\nDecisions:\n- Decision 1";
-    expect(isRichEmbeddingFormat(text)).toBeTruthy();
+    expect(isRichEmbeddingFormat(text)).toBeFalsy();
   });
 
-  it("should return true for text with Lessons section", () => {
+  it("should return false for text with Lessons section but no version marker", () => {
     const text = "[coding] Summary\n\nLessons:\n- Lesson 1";
-    expect(isRichEmbeddingFormat(text)).toBeTruthy();
+    expect(isRichEmbeddingFormat(text)).toBeFalsy();
   });
 
-  it("should return true for text with both sections", () => {
+  it("should return false for text with both sections but no version marker", () => {
     const text =
       "[coding] Summary\n\nDecisions:\n- Decision 1\n\nLessons:\n- Lesson 1";
-    expect(isRichEmbeddingFormat(text)).toBeTruthy();
+    expect(isRichEmbeddingFormat(text)).toBeFalsy();
   });
 
   it("should return false for simple format", () => {
@@ -408,7 +416,7 @@ describe("storeEmbeddingWithVec", () => {
     db = openDatabase({ path: ":memory:" });
     createTestNodeInDb("test-node-1");
 
-    const embedding = [0.1, 0.2, 0.3, 0.4];
+    const embedding = createEmbedding();
     const result = storeEmbeddingWithVec(
       db,
       "test-node-1",
@@ -418,14 +426,15 @@ describe("storeEmbeddingWithVec", () => {
     );
 
     expect(result.rowid).toBeDefined();
-    // vecUpdated will be false due to dimension mismatch (4 vs 4096)
-    expect(result.vecUpdated).toBeFalsy();
+    // vecUpdated will be true now since dimensions match
+    expect(result.vecUpdated).toBeTruthy();
 
     const stored = getEmbedding(db, "test-node-1");
     expect(stored).not.toBeNull();
     expect(stored?.modelName).toBe("test-model");
     expect(stored?.inputText).toBe("[coding] Test summary");
-    for (let i = 0; i < embedding.length; i++) {
+    for (let i = 0; i < 5; i++) {
+      // Check first few
       expect(stored?.embedding[i]).toBeCloseTo(embedding[i], 5);
     }
   });
@@ -434,10 +443,13 @@ describe("storeEmbeddingWithVec", () => {
     db = openDatabase({ path: ":memory:" });
     createTestNodeInDb("test-node-2");
 
-    const embedding1 = [0.1, 0.2, 0.3, 0.4];
+    const embedding1 = createEmbedding();
     storeEmbeddingWithVec(db, "test-node-2", embedding1, "model-v1", "Text v1");
 
-    const embedding2 = [0.5, 0.6, 0.7, 0.8];
+    const embedding2 = createEmbedding();
+    // modify slightly to verify update
+    embedding2[0] = 0.99;
+
     const result = storeEmbeddingWithVec(
       db,
       "test-node-2",
@@ -446,15 +458,12 @@ describe("storeEmbeddingWithVec", () => {
       "Text v2"
     );
 
-    // vecUpdated will be false due to dimension mismatch (4 vs 4096)
-    expect(result.vecUpdated).toBeFalsy();
+    expect(result.vecUpdated).toBeTruthy();
 
     const stored = getEmbedding(db, "test-node-2");
     expect(stored?.modelName).toBe("model-v2");
     expect(stored?.inputText).toBe("Text v2");
-    for (let i = 0; i < embedding2.length; i++) {
-      expect(stored?.embedding[i]).toBeCloseTo(embedding2[i], 5);
-    }
+    expect(stored?.embedding[0]).toBeCloseTo(0.99, 5);
 
     const count = db
       .prepare(
@@ -486,26 +495,25 @@ describe("storeEmbeddingWithVec", () => {
     expect(vecCount.count).toBeGreaterThan(0);
   });
 
-  it("should gracefully handle dimension mismatch", () => {
+  it("should throw on dimension mismatch", () => {
     db = openDatabase({ path: ":memory:" });
     createTestNodeInDb("test-node-4");
 
     // Use small embedding that won't match vec table schema (4096)
     const embedding = [1, 0, 0, 0];
-    const result = storeEmbeddingWithVec(
-      db,
-      "test-node-4",
-      embedding,
-      "test-model",
-      "[coding] Test"
-    );
 
-    // Should still store in node_embeddings, just not in vec table
-    expect(result.rowid).toBeDefined();
-    expect(result.vecUpdated).toBeFalsy();
+    expect(() => {
+      storeEmbeddingWithVec(
+        db,
+        "test-node-4",
+        embedding,
+        "test-model",
+        "[coding] Test"
+      );
+    }).toThrow("Dimension mismatch");
 
-    // Verify embedding was stored
-    expect(hasEmbedding(db, "test-node-4")).toBeTruthy();
+    // Verify embedding was NOT stored (transaction rolled back)
+    expect(hasEmbedding(db, "test-node-4")).toBeFalsy();
   });
 });
 
@@ -532,7 +540,7 @@ describe("hasEmbedding", () => {
     storeEmbeddingWithVec(
       db,
       "node-with-embedding",
-      [0.1, 0.2],
+      createEmbedding(),
       "model",
       "text"
     );
@@ -568,7 +576,13 @@ describe("deleteEmbedding", () => {
     db = openDatabase({ path: ":memory:" });
     createTestNodeInDb("node-to-delete");
 
-    storeEmbeddingWithVec(db, "node-to-delete", [0.1, 0.2], "model", "text");
+    storeEmbeddingWithVec(
+      db,
+      "node-to-delete",
+      createEmbedding(),
+      "model",
+      "text"
+    );
 
     expect(hasEmbedding(db, "node-to-delete")).toBeTruthy();
 
@@ -626,9 +640,8 @@ describe("serializeEmbedding and deserializeEmbedding", () => {
 describe("findNodesNeedingEmbedding", () => {
   let db: Database.Database;
   const mockProvider = {
-    embed: async (texts: string[]) =>
-      texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-    dimensions: 64,
+    embed: async (texts: string[]) => texts.map(() => createEmbedding(4096)),
+    dimensions: 4096,
     modelName: "test-model",
   };
 
@@ -665,7 +678,13 @@ describe("findNodesNeedingEmbedding", () => {
     insertTestNode("node-1");
 
     const richText = `[coding] Test summary\n\nDecisions:\n- Use X (why: because Y)\n\n${EMBEDDING_FORMAT_VERSION}`;
-    storeEmbeddingWithVec(db, "node-1", [0.1, 0.2], "test-model", richText);
+    storeEmbeddingWithVec(
+      db,
+      "node-1",
+      createEmbedding(),
+      "test-model",
+      richText
+    );
 
     const nodes = findNodesNeedingEmbedding(db, mockProvider);
     expect(nodes).toHaveLength(0);
@@ -676,7 +695,13 @@ describe("findNodesNeedingEmbedding", () => {
     insertTestNode("node-1");
 
     const oldText = "[coding] Test summary";
-    storeEmbeddingWithVec(db, "node-1", [0.1, 0.2], "test-model", oldText);
+    storeEmbeddingWithVec(
+      db,
+      "node-1",
+      createEmbedding(),
+      "test-model",
+      oldText
+    );
 
     const nodes = findNodesNeedingEmbedding(db, mockProvider);
     expect(nodes).toHaveLength(1);
@@ -689,7 +714,7 @@ describe("findNodesNeedingEmbedding", () => {
     storeEmbeddingWithVec(
       db,
       "node-1",
-      [0.1, 0.2],
+      createEmbedding(),
       "different-model",
       `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
     );
@@ -715,7 +740,7 @@ describe("findNodesNeedingEmbedding", () => {
     storeEmbeddingWithVec(
       db,
       "node-1",
-      [0.1, 0.2],
+      createEmbedding(),
       "test-model",
       `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
     );
@@ -725,14 +750,39 @@ describe("findNodesNeedingEmbedding", () => {
     const nodes = findNodesNeedingEmbedding(db, mockProvider, { force: true });
     expect(nodes).toHaveLength(1);
   });
+
+  it("should find older nodes even if recent nodes are valid (P0 fix)", () => {
+    db = openDatabase({ path: ":memory:" });
+
+    // Create 5 recent valid nodes
+    for (let i = 0; i < 5; i++) {
+      insertTestNode(`valid-${i}`, { timestamp: `2026-01-27T12:0${i}:00Z` });
+      storeEmbeddingWithVec(
+        db,
+        `valid-${i}`,
+        createEmbedding(),
+        "test-model",
+        `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
+      );
+    }
+
+    // Create 1 old invalid node (no embedding)
+    insertTestNode("old-invalid", { timestamp: "2025-01-01T00:00:00Z" });
+
+    // With a limit of 3, a simple "ORDER BY timestamp DESC LIMIT 3" would only see
+    // valid-4, valid-3, valid-2 and filter them all out, returning empty.
+    // The fixed query should ignore the valid ones and find the old invalid one.
+    const nodes = findNodesNeedingEmbedding(db, mockProvider, { limit: 3 });
+    expect(nodes).toHaveLength(1);
+    expect(nodes[0].id).toBe("old-invalid");
+  });
 });
 
 describe("countNodesNeedingEmbedding", () => {
   let db: Database.Database;
   const mockProvider = {
-    embed: async (texts: string[]) =>
-      texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-    dimensions: 64,
+    embed: async (texts: string[]) => texts.map(() => createEmbedding(4096)),
+    dimensions: 4096,
     modelName: "test-model",
   };
 
@@ -759,7 +809,7 @@ describe("countNodesNeedingEmbedding", () => {
     storeEmbeddingWithVec(
       db,
       "node-0",
-      [0.1, 0.2],
+      createEmbedding(),
       "test-model",
       `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
     );
@@ -777,7 +827,7 @@ describe("countNodesNeedingEmbedding", () => {
       storeEmbeddingWithVec(
         db,
         `node-${i}`,
-        [0.1, 0.2],
+        createEmbedding(),
         "test-model",
         `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
       );
@@ -822,9 +872,8 @@ describe("backfillEmbeddings", () => {
     db = openDatabase({ path: ":memory:" });
 
     mockProvider = {
-      embed: async (texts) =>
-        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-      dimensions: 64,
+      embed: async (texts) => texts.map(() => createEmbedding(4096)),
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -852,7 +901,7 @@ describe("backfillEmbeddings", () => {
 
     expect(hasEmbedding(db, "node-1")).toBeTruthy();
     const stored = getEmbedding(db, "node-1");
-    expect(stored?.embedding).toHaveLength(64);
+    expect(stored?.embedding).toHaveLength(4096);
     expect(isRichEmbeddingFormat(stored?.inputText ?? "")).toBeTruthy();
   });
 
@@ -860,9 +909,8 @@ describe("backfillEmbeddings", () => {
     db = openDatabase({ path: ":memory:" });
 
     mockProvider = {
-      embed: async (texts) =>
-        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-      dimensions: 64,
+      embed: async (texts) => texts.map(() => createEmbedding(4096)),
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -879,9 +927,8 @@ describe("backfillEmbeddings", () => {
     db = openDatabase({ path: ":memory:" });
 
     mockProvider = {
-      embed: async (texts) =>
-        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-      dimensions: 64,
+      embed: async (texts) => texts.map(() => createEmbedding(4096)),
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -906,7 +953,7 @@ describe("backfillEmbeddings", () => {
       embed: async () => {
         throw new Error("API error");
       },
-      dimensions: 64,
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -929,9 +976,9 @@ describe("backfillEmbeddings", () => {
     mockProvider = {
       embed: async (texts) => {
         embedCallCount++;
-        return texts.map(() => Array.from({ length: 64 }, () => Math.random()));
+        return texts.map(() => createEmbedding(4096));
       },
-      dimensions: 64,
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -957,9 +1004,8 @@ describe("backfillEmbeddings", () => {
     db = openDatabase({ path: ":memory:" });
 
     mockProvider = {
-      embed: async (texts) =>
-        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-      dimensions: 64,
+      embed: async (texts) => texts.map(() => createEmbedding(4096)),
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -991,9 +1037,8 @@ describe("backfillEmbeddings", () => {
     db = openDatabase({ path: ":memory:" });
 
     mockProvider = {
-      embed: async (texts) =>
-        texts.map(() => Array.from({ length: 64 }, () => Math.random())),
-      dimensions: 64,
+      embed: async (texts) => texts.map(() => createEmbedding(4096)),
+      dimensions: 4096,
       modelName: "test-model",
     };
 
@@ -1006,7 +1051,7 @@ describe("backfillEmbeddings", () => {
     storeEmbeddingWithVec(
       db,
       "node-1",
-      [0.1, 0.2],
+      createEmbedding(),
       "test-model",
       `[coding] Test\n\n${EMBEDDING_FORMAT_VERSION}`
     );

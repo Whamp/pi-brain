@@ -10,6 +10,7 @@ import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { openDatabase } from "../storage/database.js";
+import { EMBEDDING_FORMAT_VERSION } from "../storage/embedding-utils.js";
 import {
   createEmbeddingProvider,
   createMockEmbeddingProvider,
@@ -426,8 +427,9 @@ describe("facetDiscovery", () => {
       for (let i = 0; i < provider.dimensions; i++) {
         mockEmbedding.writeFloatLE(0.5, i * 4);
       }
+      // Include version marker so it's recognized as rich format
       const richInputText =
-        "[coding] Test summary\n\nDecisions:\n- Used X (why: because Y)";
+        `[coding] Test summary\n\nDecisions:\n- Used X (why: because Y)\n\n${EMBEDDING_FORMAT_VERSION}`;
       db.prepare(
         `INSERT INTO node_embeddings (node_id, embedding, embedding_model, input_text)
          VALUES (?, ?, ?, ?)`
