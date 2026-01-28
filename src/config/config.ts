@@ -66,6 +66,8 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     connectionDiscoverySchedule: "0 3 * * *",
     patternAggregationSchedule: "0 3 * * *",
     clusteringSchedule: "0 4 * * *",
+    backfillEmbeddingsSchedule: "0 5 * * *",
+    backfillLimit: 100,
     reanalysisLimit: 100,
     connectionDiscoveryLimit: 100,
     connectionDiscoveryLookbackDays: 7,
@@ -368,6 +370,10 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
       defaults.daemon.patternAggregationSchedule,
     clusteringSchedule:
       raw.daemon?.clustering_schedule ?? defaults.daemon.clusteringSchedule,
+    backfillEmbeddingsSchedule:
+      raw.daemon?.backfill_embeddings_schedule ??
+      defaults.daemon.backfillEmbeddingsSchedule,
+    backfillLimit: raw.daemon?.backfill_limit ?? defaults.daemon.backfillLimit,
     reanalysisLimit:
       raw.daemon?.reanalysis_limit ?? defaults.daemon.reanalysisLimit,
     connectionDiscoveryLimit:
@@ -425,6 +431,18 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
       "daemon.clustering_schedule"
     );
   }
+  if (daemon.backfillEmbeddingsSchedule) {
+    validateCronSchedule(
+      daemon.backfillEmbeddingsSchedule,
+      "daemon.backfill_embeddings_schedule"
+    );
+  }
+  if (daemon.backfillEmbeddingsSchedule) {
+    validateCronSchedule(
+      daemon.backfillEmbeddingsSchedule,
+      "daemon.backfill_embeddings_schedule"
+    );
+  }
   validatePositiveInt(
     daemon.maxConcurrentAnalysis,
     "daemon.max_concurrent_analysis"
@@ -434,6 +452,7 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     "daemon.analysis_timeout_minutes"
   );
   validatePositiveInt(daemon.maxQueueSize, "daemon.max_queue_size");
+  validatePositiveInt(daemon.backfillLimit, "daemon.backfill_limit");
   validatePositiveInt(daemon.reanalysisLimit, "daemon.reanalysis_limit");
   validatePositiveInt(
     daemon.connectionDiscoveryLimit,

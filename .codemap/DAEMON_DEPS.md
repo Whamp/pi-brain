@@ -512,6 +512,23 @@ src/daemon/index.ts
       - [builtin] os
       - [builtin] path
       - [builtin] url
+    - src/storage/embedding-utils.ts
+      - src/storage/database.ts
+        - [external] better-sqlite3
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+        - [external] sqlite-vec
+        - [builtin] url
+      - src/types/index.ts
+      - [external] better-sqlite3
+    - src/storage/node-storage.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
     - [external] better-sqlite3
     - [external] croner
   - src/daemon/watcher-events.ts

@@ -98,6 +98,12 @@ export interface DaemonConfig {
   /** Cron schedule for facet discovery/clustering (optional) */
   clusteringSchedule: string;
 
+  /** Cron schedule for embedding backfill (optional) */
+  backfillEmbeddingsSchedule?: string;
+
+  /** Max nodes to backfill per run */
+  backfillLimit: number;
+
   /** Max nodes to queue for reanalysis per nightly run */
   reanalysisLimit: number;
 
@@ -223,6 +229,8 @@ export interface RawConfig {
     connection_discovery_schedule?: string;
     pattern_aggregation_schedule?: string;
     clustering_schedule?: string;
+    backfill_embeddings_schedule?: string;
+    backfill_limit?: number;
     reanalysis_limit?: number;
     connection_discovery_limit?: number;
     connection_discovery_lookback_days?: number;

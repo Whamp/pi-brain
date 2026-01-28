@@ -548,7 +548,7 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:754: instantiate (module)
         - src/daemon/facet-discovery.test.ts:852: instantiate discoveryWithMore
         - src/daemon/index.ts:168: reexport (module)
-        - src/daemon/scheduler.ts:24: import (module)
+        - src/daemon/scheduler.ts:31: import (module)
   interface:
     99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -571,7 +571,7 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/index.ts:176: reexport (module)
     140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-      refs in: 15 [import: 1, reexport: 1, type: 13]
+      refs in: 17 [import: 2, reexport: 1, type: 14]
         - src/daemon/facet-discovery.ts:150: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:151: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:153: type isEmbeddingProvider
@@ -591,12 +591,14 @@ src/daemon/facet-discovery.ts [1-1757]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs in: 7 [call: 4, import: 2, reexport: 1]
+      refs in: 9 [call: 5, import: 3, reexport: 1]
         - src/daemon/facet-discovery.test.ts:15: import (module)
         - src/daemon/facet-discovery.test.ts:81: call (module)
         - src/daemon/facet-discovery.test.ts:90: call (module)
         - src/daemon/facet-discovery.ts:681: call FacetDiscovery.constructor
         - src/daemon/index.ts:169: reexport (module)
+        - src/daemon/scheduler.ts:30: import (module)
+        - src/daemon/scheduler.ts:754: call Scheduler.createSchedulerEmbeddingProvider
         - src/daemon/worker.ts:46: import (module)
         - src/daemon/worker.ts:212: call Worker.initializeEmbeddingProvider
     331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
@@ -706,8 +708,8 @@ src/daemon/insight-aggregation.ts [1-553]
         - src/daemon/insight-aggregation.test.ts:472: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:492: instantiate aggregator
         - src/daemon/insight-aggregation.test.ts:552: instantiate aggregator
-        - src/daemon/scheduler.ts:25: import (module)
-        - src/daemon/scheduler.ts:156: type Scheduler.insightAggregator
+        - src/daemon/scheduler.ts:34: import (module)
+        - src/daemon/scheduler.ts:174: type Scheduler.insightAggregator
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -728,9 +730,9 @@ src/daemon/pattern-aggregation.ts [1-332]
         - src/daemon/pattern-aggregation.test.ts:4: import (module)
         - src/daemon/pattern-aggregation.test.ts:21: type aggregator
         - src/daemon/pattern-aggregation.test.ts:81: instantiate (module)
-        - src/daemon/scheduler.ts:26: import (module)
-        - src/daemon/scheduler.ts:155: type Scheduler.patternAggregator
-        - src/daemon/scheduler.ts:164: instantiate Scheduler.constructor
+        - src/daemon/scheduler.ts:35: import (module)
+        - src/daemon/scheduler.ts:173: type Scheduler.patternAggregator
+        - src/daemon/scheduler.ts:182: instantiate Scheduler.constructor
   imports:
     - better-sqlite3
     - node:crypto
@@ -1108,18 +1110,18 @@ src/daemon/queue.ts [1-766]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.test.ts [1-876]
+src/daemon/scheduler.test.ts [1-967]
   imports:
     - ./queue.js
     - ./scheduler.js
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-831]
+src/daemon/scheduler.ts [1-972]
   class:
-    145-761: class Scheduler [exported]
+    161-900: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
-      refs in: 28 [import: 1, instantiate: 24, reexport: 1, type: 2]
+      refs in: 31 [import: 1, instantiate: 27, reexport: 1, type: 2]
         - src/daemon/index.ts:144: reexport (module)
         - src/daemon/scheduler.test.ts:12: import (module)
         - src/daemon/scheduler.test.ts:140: type scheduler
@@ -1131,32 +1133,32 @@ src/daemon/scheduler.ts [1-831]
         - src/daemon/scheduler.test.ts:322: instantiate (module)
         - src/daemon/scheduler.test.ts:350: instantiate (module)
   interface:
-    49-56: interface ScheduledJobResult [exported]
+    59-66: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
-      refs in: 19 [reexport: 1, type: 18]
+      refs in: 24 [reexport: 1, type: 23]
         - src/daemon/index.ts:151: reexport (module)
-        - src/daemon/scheduler.ts:138: type SchedulerStatus
-        - src/daemon/scheduler.ts:151: type Scheduler.lastReanalysisResult
-        - src/daemon/scheduler.ts:152: type Scheduler.lastConnectionDiscoveryResult
-        - src/daemon/scheduler.ts:153: type Scheduler.lastPatternAggregationResult
-        - src/daemon/scheduler.ts:154: type Scheduler.lastClusteringResult
-        - src/daemon/scheduler.ts:373: type Scheduler.triggerReanalysis
-        - src/daemon/scheduler.ts:380: type Scheduler.triggerConnectionDiscovery
-        - src/daemon/scheduler.ts:387: type Scheduler.triggerPatternAggregation
-        - src/daemon/scheduler.ts:394: type Scheduler.triggerClustering
-    59-64: interface SchedulerLogger [exported]
+        - src/daemon/scheduler.ts:154: type SchedulerStatus
+        - src/daemon/scheduler.ts:168: type Scheduler.lastReanalysisResult
+        - src/daemon/scheduler.ts:169: type Scheduler.lastConnectionDiscoveryResult
+        - src/daemon/scheduler.ts:170: type Scheduler.lastPatternAggregationResult
+        - src/daemon/scheduler.ts:171: type Scheduler.lastClusteringResult
+        - src/daemon/scheduler.ts:172: type Scheduler.lastBackfillEmbeddingsResult
+        - src/daemon/scheduler.ts:430: type Scheduler.triggerReanalysis
+        - src/daemon/scheduler.ts:437: type Scheduler.triggerConnectionDiscovery
+        - src/daemon/scheduler.ts:444: type Scheduler.triggerPatternAggregation
+    69-74: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
       refs in: 7 [import: 1, reexport: 1, type: 5]
         - src/daemon/index.ts:152: reexport (module)
         - src/daemon/scheduler.test.ts:19: import (module)
         - src/daemon/scheduler.test.ts:128: type createCapturingLogger
-        - src/daemon/scheduler.ts:67: type noopLogger
-        - src/daemon/scheduler.ts:75: type consoleLogger
-        - src/daemon/scheduler.ts:162: type Scheduler.constructor
-        - src/daemon/scheduler.ts:770: type createScheduler
-    83-128: interface SchedulerConfig [exported]
+        - src/daemon/scheduler.ts:77: type noopLogger
+        - src/daemon/scheduler.ts:85: type consoleLogger
+        - src/daemon/scheduler.ts:180: type Scheduler.constructor
+        - src/daemon/scheduler.ts:909: type createScheduler
+    93-144: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-      refs in: 17 [import: 1, reexport: 1, type: 15]
+      refs in: 20 [import: 1, reexport: 1, type: 18]
         - src/daemon/index.ts:153: reexport (module)
         - src/daemon/scheduler.test.ts:18: import (module)
         - src/daemon/scheduler.test.ts:145: type defaultConfig
@@ -1167,24 +1169,25 @@ src/daemon/scheduler.ts [1-831]
         - src/daemon/scheduler.test.ts:647: type config
         - src/daemon/scheduler.test.ts:668: type config
         - src/daemon/scheduler.test.ts:684: type config
-    131-140: interface SchedulerStatus [exported]
+    147-156: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:154: reexport (module)
-        - src/daemon/scheduler.ts:321: type Scheduler.getStatus
-        - src/daemon/scheduler.ts:322: type Scheduler.jobs
+        - src/daemon/scheduler.ts:368: type Scheduler.getStatus
+        - src/daemon/scheduler.ts:369: type Scheduler.jobs
   type:
-    42-46: ScheduledJobType = | "reanalysis"
+    51-56: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
   | "pattern_aggregation"
-  | "clustering" [exported]
+  | "clustering"
+  | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:150: reexport (module)
-        - src/daemon/scheduler.ts:50: type ScheduledJobResult
-        - src/daemon/scheduler.ts:134: type SchedulerStatus
+        - src/daemon/scheduler.ts:60: type ScheduledJobResult
+        - src/daemon/scheduler.ts:150: type SchedulerStatus
   function:
-    766-794: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    905-935: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
@@ -1192,7 +1195,7 @@ src/daemon/scheduler.ts [1-831]
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:562: call scheduler
-    800-809: isValidCronExpression(expression: string): boolean [exported]
+    941-950: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:146: reexport (module)
@@ -1205,7 +1208,7 @@ src/daemon/scheduler.ts [1-831]
         - src/daemon/scheduler.test.ts:581: call (module)
         - src/daemon/scheduler.test.ts:582: call (module)
         - src/daemon/scheduler.test.ts:583: call (module)
-    814-830: getNextRunTimes(expression: string, count = 5): {} [exported]
+    955-971: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:147: reexport (module)
@@ -1214,12 +1217,12 @@ src/daemon/scheduler.ts [1-831]
         - src/daemon/scheduler.test.ts:613: call (module)
         - src/daemon/scheduler.test.ts:617: call times
   variable:
-    67-72: SchedulerLogger [exported]
+    77-82: SchedulerLogger [exported]
       /** Default no-op logger */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:148: reexport (module)
         - src/daemon/scheduler.test.ts:16: import (module)
-    75-80: SchedulerLogger [exported]
+    85-90: SchedulerLogger [exported]
       /** Console logger for production use */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:149: reexport (module)
@@ -1228,6 +1231,8 @@ src/daemon/scheduler.ts [1-831]
     - ../config/types.js
     - ../prompt/effectiveness.js
     - ../prompt/prompt.js
+    - ../storage/embedding-utils.js
+    - ../storage/node-storage.js
     - ./facet-discovery.js
     - ./insight-aggregation.js
     - ./pattern-aggregation.js
@@ -1827,7 +1832,9 @@ src/storage/embedding-utils.ts [1-623]
         - src/storage/embedding-utils.ts:461: type backfillEmbeddings
     360-371: interface BackfillResult [exported]
       /** Result of a backfill operation. */
-      refs in: 1 [type: 1]
+      refs in: 3 [import: 1, type: 2]
+        - src/daemon/scheduler.ts:26: import (module)
+        - src/daemon/scheduler.ts:763: type Scheduler.result
         - src/storage/embedding-utils.ts:462: type backfillEmbeddings
   function:
     43-83: buildEmbeddingText(node: Node): string [exported]
@@ -1935,7 +1942,9 @@ src/storage/embedding-utils.ts [1-623]
         - src/storage/embedding-utils.ts:474: call nodes
     457-583: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
-      refs in: 9 [call: 8, import: 1]
+      refs in: 11 [call: 9, import: 2]
+        - src/daemon/scheduler.ts:25: import (module)
+        - src/daemon/scheduler.ts:790: call Scheduler.runBackfillEmbeddings
         - src/storage/embedding-utils.test.ts:13: import (module)
         - src/storage/embedding-utils.test.ts:895: call result
         - src/storage/embedding-utils.test.ts:919: call result
@@ -1944,7 +1953,6 @@ src/storage/embedding-utils.ts [1-623]
         - src/storage/embedding-utils.test.ts:994: call result
         - src/storage/embedding-utils.test.ts:1023: call (module)
         - src/storage/embedding-utils.test.ts:1059: call result1
-        - src/storage/embedding-utils.test.ts:1062: call result2
     590-622: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
       refs in: 3 [call: 2, import: 1]
@@ -2590,7 +2598,7 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:219: call (module)
     107-114: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 25 [call: 15, import: 10]
+      refs in: 26 [call: 15, import: 11]
         - src/api/routes/nodes.ts:19: import (module)
         - src/api/routes/nodes.ts:147: call node
         - src/daemon/cli.test.ts:14: import (module)
@@ -3151,4 +3159,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 41,229 (codebase: ~1,035,630)
+Estimated tokens: 41,338 (codebase: ~1,037,606)

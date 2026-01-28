@@ -21,7 +21,16 @@ import {
   measureAndStoreEffectiveness,
 } from "../prompt/effectiveness.js";
 import { getLatestVersion } from "../prompt/prompt.js";
-import { FacetDiscovery } from "./facet-discovery.js";
+import {
+  backfillEmbeddings,
+  type BackfillResult,
+} from "../storage/embedding-utils.js";
+import { readNodeFromPath } from "../storage/node-storage.js";
+import {
+  createEmbeddingProvider,
+  FacetDiscovery,
+  type EmbeddingProvider,
+} from "./facet-discovery.js";
 import { InsightAggregator } from "./insight-aggregation.js";
 import { PatternAggregator } from "./pattern-aggregation.js";
 
@@ -43,7 +52,8 @@ export type ScheduledJobType =
   | "reanalysis"
   | "connection_discovery"
   | "pattern_aggregation"
-  | "clustering";
+  | "clustering"
+  | "backfill_embeddings";
 
 /** Result of a scheduled job execution */
 export interface ScheduledJobResult {
@@ -92,6 +102,12 @@ export interface SchedulerConfig {
 
   /** Cron schedule for facet discovery/clustering (optional) */
   clusteringSchedule?: string;
+
+  /** Cron schedule for embedding backfill (optional) */
+  backfillEmbeddingsSchedule?: string;
+
+  /** Max nodes to backfill per run */
+  backfillLimit: number;
 
   /** Max nodes to queue for reanalysis per run */
   reanalysisLimit: number;
@@ -147,11 +163,13 @@ export class Scheduler {
   private connectionDiscoveryJob: Cron | null = null;
   private patternAggregationJob: Cron | null = null;
   private clusteringJob: Cron | null = null;
+  private backfillEmbeddingsJob: Cron | null = null;
   private running = false;
   private lastReanalysisResult: ScheduledJobResult | null = null;
   private lastConnectionDiscoveryResult: ScheduledJobResult | null = null;
   private lastPatternAggregationResult: ScheduledJobResult | null = null;
   private lastClusteringResult: ScheduledJobResult | null = null;
+  private lastBackfillEmbeddingsResult: ScheduledJobResult | null = null;
   private patternAggregator: PatternAggregator;
   private insightAggregator: InsightAggregator;
 
@@ -272,6 +290,30 @@ export class Scheduler {
       }
     }
 
+    // Start backfill embeddings job if schedule is configured
+    if (this.config.backfillEmbeddingsSchedule) {
+      try {
+        this.backfillEmbeddingsJob = new Cron(
+          this.config.backfillEmbeddingsSchedule,
+          { name: "backfill_embeddings" },
+          async () => {
+            try {
+              await this.runBackfillEmbeddings();
+            } catch (error) {
+              this.logger.error(`Backfill embeddings cron error: ${error}`);
+            }
+          }
+        );
+        this.logger.info(
+          `Backfill embeddings scheduled: ${this.config.backfillEmbeddingsSchedule} (next: ${this.backfillEmbeddingsJob.nextRun()?.toISOString() ?? "unknown"})`
+        );
+      } catch (error) {
+        this.logger.error(
+          `Invalid backfill embeddings schedule "${this.config.backfillEmbeddingsSchedule}": ${error}`
+        );
+      }
+    }
+
     this.logger.info("Scheduler started");
   }
 
@@ -302,6 +344,11 @@ export class Scheduler {
     if (this.clusteringJob) {
       this.clusteringJob.stop();
       this.clusteringJob = null;
+    }
+
+    if (this.backfillEmbeddingsJob) {
+      this.backfillEmbeddingsJob.stop();
+      this.backfillEmbeddingsJob = null;
     }
 
     this.running = false;
@@ -361,6 +408,16 @@ export class Scheduler {
       });
     }
 
+    if (this.config.backfillEmbeddingsSchedule) {
+      jobs.push({
+        type: "backfill_embeddings",
+        schedule: this.config.backfillEmbeddingsSchedule,
+        nextRun: this.backfillEmbeddingsJob?.nextRun() ?? null,
+        lastRun: this.lastBackfillEmbeddingsResult?.completedAt ?? null,
+        lastResult: this.lastBackfillEmbeddingsResult ?? undefined,
+      });
+    }
+
     return {
       running: this.running,
       jobs,
@@ -393,6 +450,13 @@ export class Scheduler {
    */
   async triggerClustering(): Promise<ScheduledJobResult> {
     return this.runClustering();
+  }
+
+  /**
+   * Manually trigger backfill embeddings job
+   */
+  async triggerBackfillEmbeddings(): Promise<ScheduledJobResult> {
+    return this.runBackfillEmbeddings();
   }
 
   /**
@@ -666,6 +730,100 @@ export class Scheduler {
   }
 
   /**
+   * Create embedding provider from configuration
+   */
+  private createSchedulerEmbeddingProvider(): EmbeddingProvider | null {
+    const embeddingProvider = this.config.embeddingProvider ?? "openrouter";
+
+    // Skip if API key is missing for providers that require it
+    if (
+      (embeddingProvider === "openrouter" || embeddingProvider === "openai") &&
+      !this.config.embeddingApiKey
+    ) {
+      return null;
+    }
+
+    const embeddingConfig = {
+      provider: embeddingProvider,
+      model: this.config.embeddingModel ?? "qwen/qwen3-embedding-8b",
+      apiKey: this.config.embeddingApiKey,
+      baseUrl: this.config.embeddingBaseUrl,
+      dimensions: this.config.embeddingDimensions,
+    };
+
+    return createEmbeddingProvider(embeddingConfig);
+  }
+
+  /**
+   * Run backfill embeddings - finds nodes missing embeddings or with old format
+   * and generates rich embeddings for them
+   */
+  private async runBackfillEmbeddings(): Promise<ScheduledJobResult> {
+    const startedAt = new Date();
+    let result: BackfillResult | undefined;
+    let errorMessage: string | undefined;
+
+    try {
+      this.logger.info("Starting backfill embeddings job");
+
+      const provider = this.createSchedulerEmbeddingProvider();
+
+      if (!provider) {
+        this.logger.warn(
+          `Backfill skipped: No embedding API key configured for ${this.config.embeddingProvider} provider.`
+        );
+        const jobResult: ScheduledJobResult = {
+          type: "backfill_embeddings",
+          startedAt,
+          completedAt: new Date(),
+          itemsProcessed: 0,
+          error: undefined,
+        };
+        this.lastBackfillEmbeddingsResult = jobResult;
+        return jobResult;
+      }
+
+      // Run backfill
+      // Limit to a reasonable batch size per nightly run to avoid blowing API limits/costs
+      const backfillLimit = this.config.backfillLimit;
+
+      result = await backfillEmbeddings(
+        this.db,
+        provider,
+        readNodeFromPath,
+        {
+          limit: backfillLimit,
+          batchSize: 10,
+          logger: {
+            info: (msg) => this.logger.info(`[backfill] ${msg}`),
+            warn: (msg) => this.logger.warn(`[backfill] ${msg}`),
+            error: (msg) => this.logger.error(`[backfill] ${msg}`),
+            debug: (msg) => this.logger.debug?.(`[backfill] ${msg}`),
+          },
+        }
+      );
+
+      this.logger.info(
+        `Backfill embeddings completed: ${result.successCount} succeeded, ${result.failureCount} failed`
+      );
+    } catch (error) {
+      errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Backfill embeddings job failed: ${errorMessage}`);
+    }
+
+    const jobResult: ScheduledJobResult = {
+      type: "backfill_embeddings",
+      startedAt,
+      completedAt: new Date(),
+      itemsProcessed: result?.successCount ?? 0,
+      error: errorMessage,
+    };
+
+    this.lastBackfillEmbeddingsResult = jobResult;
+    return jobResult;
+  }
+
+  /**
    * Run clustering - discovers patterns across nodes using embedding + clustering
    * and analyzes clusters with LLM to generate names/descriptions
    */
@@ -678,18 +836,12 @@ export class Scheduler {
     try {
       this.logger.info("Starting clustering job");
 
-      // Build embedding config from scheduler config
-      const embeddingProvider = this.config.embeddingProvider ?? "openrouter";
+      const provider = this.createSchedulerEmbeddingProvider();
 
-      // Skip clustering if API key is missing for providers that require it
-      if (
-        (embeddingProvider === "openrouter" ||
-          embeddingProvider === "openai") &&
-        !this.config.embeddingApiKey
-      ) {
+      // Skip clustering if provider creation failed (e.g. missing API key)
+      if (!provider) {
         this.logger.warn(
-          `Clustering skipped: No embedding API key configured for ${embeddingProvider} provider. ` +
-            `Set 'embedding_api_key' in config.yaml to enable semantic clustering.`
+          `Clustering skipped: No embedding API key configured for ${this.config.embeddingProvider} provider.`
         );
         const result: ScheduledJobResult = {
           type: "clustering",
@@ -702,17 +854,9 @@ export class Scheduler {
         return result;
       }
 
-      const embeddingConfig = {
-        provider: embeddingProvider,
-        model: this.config.embeddingModel ?? "qwen/qwen3-embedding-8b",
-        apiKey: this.config.embeddingApiKey,
-        baseUrl: this.config.embeddingBaseUrl,
-        dimensions: this.config.embeddingDimensions,
-      };
-
       const facetDiscovery = new FacetDiscovery(
         this.db,
-        embeddingConfig,
+        provider,
         { algorithm: "hdbscan", minClusterSize: 3 },
         {
           info: (msg: string) => this.logger.info(`[facet] ${msg}`),
@@ -775,7 +919,9 @@ export function createScheduler(
       connectionDiscoverySchedule: config.connectionDiscoverySchedule,
       patternAggregationSchedule: config.patternAggregationSchedule,
       clusteringSchedule: config.clusteringSchedule,
+      backfillEmbeddingsSchedule: config.backfillEmbeddingsSchedule,
       reanalysisLimit: config.reanalysisLimit,
+      backfillLimit: config.backfillLimit,
       connectionDiscoveryLimit: config.connectionDiscoveryLimit,
       connectionDiscoveryLookbackDays: config.connectionDiscoveryLookbackDays,
       connectionDiscoveryCooldownHours: config.connectionDiscoveryCooldownHours,

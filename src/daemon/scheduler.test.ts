@@ -873,3 +873,94 @@ describe("clustering job", () => {
     ).toBeTruthy();
   });
 });
+
+describe("backfill job", () => {
+  let queue: ReturnType<typeof createMockQueue>;
+  let db: Database.Database;
+  let logger: ReturnType<typeof createCapturingLogger>;
+
+  beforeEach(() => {
+    queue = createMockQueue();
+    logger = createCapturingLogger();
+  });
+
+  it("should include backfill job in status when configured", () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      backfillEmbeddingsSchedule: "0 5 * * *",
+      backfillLimit: 100,
+      reanalysisLimit: 100,
+      connectionDiscoveryLimit: 100,
+      connectionDiscoveryLookbackDays: 7,
+      connectionDiscoveryCooldownHours: 24,
+    };
+    db = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, db, logger);
+    scheduler.start();
+
+    const status = scheduler.getStatus();
+    const job = status.jobs.find((j) => j.type === "backfill_embeddings");
+    expect(job).toBeDefined();
+    expect(job?.schedule).toBe("0 5 * * *");
+    expect(job?.nextRun).toBeInstanceOf(Date);
+
+    scheduler.stop();
+  });
+
+  it("should run triggerBackfillEmbeddings and return result", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      backfillEmbeddingsSchedule: "0 5 * * *",
+      backfillLimit: 100,
+      reanalysisLimit: 100,
+      connectionDiscoveryLimit: 100,
+      connectionDiscoveryLookbackDays: 7,
+      connectionDiscoveryCooldownHours: 24,
+      embeddingProvider: "openrouter",
+      embeddingApiKey: "test-key", // Mock key needed
+    };
+
+    const mockDb = {
+      prepare: vi.fn(() => ({
+        run: vi.fn(),
+        get: vi.fn(() => ({ count: 0 })), // countNodesNeedingEmbedding
+        all: vi.fn(() => []), // findNodesNeedingEmbedding
+      })),
+      transaction: vi.fn((fn) => fn),
+    } as unknown as Database.Database;
+
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+
+    const result = await scheduler.triggerBackfillEmbeddings();
+
+    expect(result.type).toBe("backfill_embeddings");
+    expect(result.error).toBeUndefined();
+  });
+
+  it("should skip backfill when embedding API key is missing", async () => {
+    const config: SchedulerConfig = {
+      reanalysisSchedule: "0 2 * * *",
+      connectionDiscoverySchedule: "0 3 * * *",
+      backfillEmbeddingsSchedule: "0 5 * * *",
+      backfillLimit: 100,
+      reanalysisLimit: 100,
+      connectionDiscoveryLimit: 100,
+      connectionDiscoveryLookbackDays: 7,
+      connectionDiscoveryCooldownHours: 24,
+      embeddingProvider: "openrouter",
+      // No API key
+    };
+
+    const mockDb = createMockDatabase();
+    const scheduler = new Scheduler(config, queue, mockDb, logger);
+
+    const result = await scheduler.triggerBackfillEmbeddings();
+
+    expect(result.itemsProcessed).toBe(0);
+    expect(
+      logger.messages.some((m) => m.includes("Backfill skipped"))
+    ).toBeTruthy();
+  });
+});
