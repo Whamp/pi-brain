@@ -80,3 +80,20 @@ Missing database cleanup on test failure. If openDatabase() throws, tempDir is s
 - [P1] Added loadVec option to DatabaseOptions (true/false/'optional')
 - [P2] Fixed isVecLoaded type assertion for null/undefined edge cases  
 - [P3] Improved test cleanup with afterEach handling
+
+## 2026-01-27 20:51 - Task 17.1.3
+
+**Status**: pending → done
+**Validation**:
+- All 1223 tests pass (1 new test added)
+- Lint/format checks pass
+- Verified migration creates `node_embeddings_vec` virtual table when vec loaded
+- Verified migration skips gracefully when vec not loaded (records as "skipped: vec not loaded")
+- Manual test confirmed vector insert and similarity search work
+**Commit**: 1130542a
+**Notes**:
+- Created 012_semantic_search.sql migration with vec0 virtual table (4096 dimensions for qwen3-embedding-8b)
+- Added graceful degradation in migrate() - skips vec-dependent migrations when extension not loaded
+- Skipped migrations are recorded with "(skipped: vec not loaded)" in description
+- Added comprehensive test for virtual table creation, vector insertion, and similarity search
+- Note: sqlite-vec requires BigInt for rowid values when inserting
