@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 87,
-    "totalSymbols": 1068,
+    "totalSymbols": 1069,
     "byLanguage": {
       "typescript": 87
     },
@@ -9,7 +9,7 @@
       "function": 473,
       "type": 40,
       "interface": 253,
-      "variable": 103,
+      "variable": 104,
       "class": 12,
       "property": 47,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 35761,
-  "codebase_tokens": 994722,
+  "total_tokens": 35774,
+  "codebase_tokens": 995456,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -21006,18 +21006,37 @@
       "language": "typescript",
       "lines": [
         1,
-        68
+        132
       ],
       "detail_level": "full",
-      "token_estimate": 112,
+      "token_estimate": 125,
       "symbols": [
+        {
+          "name": "DEFAULT_POLL_INTERVAL_MS",
+          "kind": "variable",
+          "signature": "30000",
+          "lines": [
+            15,
+            15
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default polling interval: 30 seconds",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "DaemonState",
           "kind": "interface",
           "signature": "DaemonState",
           "lines": [
-            10,
-            15
+            17,
+            26
           ],
           "exported": false,
           "is_default": false,
@@ -21035,8 +21054,8 @@
           "kind": "variable",
           "signature": "DaemonState",
           "lines": [
-            17,
-            22
+            28,
+            35
           ],
           "exported": false,
           "is_default": false,
@@ -21052,10 +21071,10 @@
         {
           "name": "createDaemonStore",
           "kind": "function",
-          "signature": "createDaemonStore(): { subscribe: any; loadStatus(): any; setStatus(status: DaemonStatus): void; reset(): void; }",
+          "signature": "createDaemonStore(): { subscribe: any; loadStatus(): any; startPolling(intervalMs?: number): void; stopPolling(): void; setStatus(status: DaemonStatus): void; reset(): void; }",
           "lines": [
-            24,
-            65
+            37,
+            129
           ],
           "exported": false,
           "is_default": false,
@@ -21071,10 +21090,10 @@
         {
           "name": "daemonStore",
           "kind": "variable",
-          "signature": "{ subscribe: any; loadStatus(): any; setStatus(status: DaemonStatus): void; reset(): void; }",
+          "signature": "daemonStore",
           "lines": [
-            67,
-            67
+            131,
+            131
           ],
           "exported": true,
           "is_default": false,

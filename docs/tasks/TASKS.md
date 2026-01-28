@@ -227,5 +227,5 @@ Ref: docs/plans/web-ui-feature-report-repair-plan.md
 | ---- | ---------------------------------------- | ------- | ---- | ---------- |
 | 16.1 | Implement Stale Job Recovery             | done    | -    | 2026-01-27 |
 | 16.2 | Implement WebSocket Route Implementation | done    | -    | 2026-01-27 |
-| 16.3 | Implement Status Polling Fallback        | pending | 16.2 |            |
+| 16.3 | Implement Status Polling Fallback        | active  | 16.2 | 2026-01-27 |
 | 16.4 | News Feed UX Refinement                  | pending | -    |            |

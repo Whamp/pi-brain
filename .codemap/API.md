@@ -1948,9 +1948,9 @@ src/web/app/src/lib/index.ts [1-17]
     - ./stores/websocket
     - ./types
 
-src/web/app/src/lib/stores/daemon.ts [1-68]
+src/web/app/src/lib/stores/daemon.ts [1-132]
   variable:
-    67-67: { subscribe: any; loadStatus(): any; setStatus(status: DaemonStatus): void; reset(): void; } [exported]
+    131-131: daemonStore [exported]
   imports:
     - $lib/api/client
     - $lib/types
@@ -2028,4 +2028,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,737 (codebase: ~990,245)
+Estimated tokens: 24,718 (codebase: ~995,204)

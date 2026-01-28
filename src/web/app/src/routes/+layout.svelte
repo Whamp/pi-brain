@@ -38,11 +38,30 @@
   let { children } = $props();
 
   onMount(() => {
-    // Load initial daemon status and connect WebSocket
+    // Load initial daemon status
     daemonStore.loadStatus();
+
+    // Connect WebSocket for real-time updates
     wsStore.connect();
 
+    // Set up reactive polling: start when WS disconnected, stop when connected.
+    // Subscribe to wsStore to react to connection changes.
+    const unsubscribeWs = wsStore.subscribe((wsState) => {
+      if (wsState.connected) {
+        // WebSocket connected - stop polling fallback
+        daemonStore.stopPolling();
+      } else if (!wsState.connected && !wsState.reconnecting) {
+        // WebSocket fully disconnected (not just reconnecting) - start polling
+        daemonStore.startPolling();
+      } else if (wsState.reconnecting) {
+        // Reconnecting - also start polling as fallback during reconnection
+        daemonStore.startPolling();
+      }
+    });
+
     return () => {
+      unsubscribeWs();
+      daemonStore.stopPolling();
       wsStore.disconnect();
     };
   });
@@ -81,10 +100,13 @@
           class="status-dot"
           class:success={$daemonStore.status?.running}
           class:error={$daemonStore.status && !$daemonStore.status.running}
+          class:offline={$daemonStore.backendOffline}
         ></span>
         <span class="status-text">
           {#if $daemonStore.loading}
             Checking...
+          {:else if $daemonStore.backendOffline}
+            Backend offline
           {:else if $daemonStore.status?.running}
             Daemon running
           {:else if $daemonStore.status}
@@ -204,6 +226,16 @@
 
   .status-dot.error {
     background: var(--color-error);
+  }
+
+  .status-dot.offline {
+    background: var(--color-warning, #f59e0b);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
   .main-content {
