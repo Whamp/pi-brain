@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import * as sqliteVec from "sqlite-vec";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -53,6 +54,9 @@ export function openDatabase(options: DatabaseOptions = {}): Database.Database {
   db.pragma("journal_mode = WAL");
   db.pragma("synchronous = NORMAL");
   db.pragma("foreign_keys = ON");
+
+  // Load sqlite-vec extension
+  loadVecExtension(db);
 
   // Run migrations if requested (default: true)
   if (options.migrate !== false) {
@@ -148,6 +152,33 @@ export function isDatabaseHealthy(db: Database.Database): boolean {
   try {
     const result = db.prepare("SELECT 1 as ok").get() as { ok: number };
     return result.ok === 1;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Load the sqlite-vec extension
+ */
+export function loadVecExtension(db: Database.Database): boolean {
+  try {
+    sqliteVec.load(db);
+    return true;
+  } catch (error) {
+    console.warn("Failed to load sqlite-vec extension:", error);
+    return false;
+  }
+}
+
+/**
+ * Check if sqlite-vec extension is loaded
+ */
+export function isVecLoaded(db: Database.Database): boolean {
+  try {
+    const result = db.prepare("SELECT vec_version() as version").get() as {
+      version: string;
+    };
+    return !!result.version;
   } catch {
     return false;
   }

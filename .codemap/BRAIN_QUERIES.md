@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 50 files
+- typescript: 51 files
 
 ## Statistics
-- Total files: 50
-- Total symbols: 302
-  - function: 177
+- Total files: 51
+- Total symbols: 304
+  - function: 179
   - interface: 83
   - type: 17
   - variable: 16
@@ -1004,7 +1004,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/queue.ts:707: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 51 [import: 7, reexport: 1, type: 43]
+      refs in: 54 [import: 8, reexport: 1, type: 45]
         - src/api/websocket.test.ts:9: import (module)
         - src/api/websocket.test.ts:300: type mockJob
         - src/api/websocket.test.ts:415: type mockJob
@@ -1505,6 +1505,14 @@ src/daemon/worker.ts [1-610]
     - better-sqlite3
     - node:path
 
+src/storage/database-vec.test.ts [1-65]
+  imports:
+    - ./database
+    - node:fs
+    - node:os
+    - node:path
+    - vitest
+
 src/storage/database.test.ts [1-574]
   imports:
     - ./database.js
@@ -1514,38 +1522,38 @@ src/storage/database.test.ts [1-574]
     - node:path
     - vitest
 
-src/storage/database.ts [1-155]
+src/storage/database.ts [1-186]
   interface:
-    19-26: interface DatabaseOptions [exported]
+    20-27: interface DatabaseOptions [exported]
       refs in: 1 [type: 1]
-        - src/storage/database.ts:38: type openDatabase
-    28-33: interface MigrationInfo [exported]
+        - src/storage/database.ts:39: type openDatabase
+    29-34: interface MigrationInfo [exported]
       refs in: 2 [type: 2]
-        - src/storage/database.ts:68: type loadMigrations
-        - src/storage/database.ts:74: type migrations
+        - src/storage/database.ts:72: type loadMigrations
+        - src/storage/database.ts:78: type migrations
   function:
-    38-63: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
+    39-67: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 86 [call: 73, import: 13]
-        - src/api/server.test.ts:13: import (module)
-        - src/api/server.test.ts:131: call db
-        - src/api/server.test.ts:145: call db
-        - src/api/server.test.ts:166: call db
-        - src/api/server.test.ts:188: call db
-        - src/api/server.test.ts:210: call db
-        - src/api/server.test.ts:244: call db
-        - src/api/server.test.ts:294: call db
-        - src/api/server.test.ts:315: call db
-        - src/api/server.test.ts:342: call db
-    68-91: loadMigrations(): {} [exported]
+      refs in: 59 [call: 47, import: 12]
+        - src/daemon/cli.test.ts:12: import (module)
+        - src/daemon/cli.test.ts:215: call db
+        - src/daemon/cli.test.ts:594: call db
+        - src/daemon/cli.test.ts:634: call db
+        - src/daemon/cli.test.ts:675: call db
+        - src/daemon/cli.test.ts:704: call db
+        - src/daemon/cli.test.ts:725: call (module)
+        - src/daemon/cli.ts:27: import (module)
+        - src/daemon/cli.ts:475: call db
+        - src/daemon/cli.ts:512: call db
+    72-95: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
       refs in: 5 [call: 4, import: 1]
         - src/storage/database.test.ts:16: import (module)
         - src/storage/database.test.ts:50: call migrations
         - src/storage/database.test.ts:58: call migrations
         - src/storage/database.test.ts:143: call migrations
-        - src/storage/database.ts:113: call migrations
-    96-106: getSchemaVersion(db: Database.Database): number [exported]
+        - src/storage/database.ts:117: call migrations
+    100-110: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
       refs in: 7 [call: 6, import: 1]
         - src/storage/database.test.ts:14: import (module)
@@ -1554,44 +1562,53 @@ src/storage/database.ts [1-155]
         - src/storage/database.test.ts:148: call (module)
         - src/storage/database.test.ts:159: call firstVersion
         - src/storage/database.test.ts:165: call (module)
-        - src/storage/database.ts:112: call currentVersion
-    111-135: migrate(db: Database.Database): number [exported]
+        - src/storage/database.ts:116: call currentVersion
+    115-139: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 63 [call: 50, import: 13]
-        - src/api/routes/clusters.test.ts:10: import (module)
-        - src/api/routes/clusters.test.ts:21: call (module)
-        - src/api/routes/query.test.ts:10: import (module)
-        - src/api/routes/query.test.ts:19: call (module)
-        - src/api/server.test.ts:13: import (module)
-        - src/api/server.test.ts:132: call (module)
-        - src/api/server.test.ts:146: call (module)
-        - src/api/server.test.ts:167: call (module)
-        - src/api/server.test.ts:189: call (module)
-        - src/api/server.test.ts:211: call (module)
-    140-142: closeDatabase(db: Database.Database): void [exported]
+      refs in: 24 [call: 17, import: 7]
+        - src/daemon/cli.test.ts:12: import (module)
+        - src/daemon/cli.test.ts:216: call (module)
+        - src/daemon/cli.test.ts:595: call (module)
+        - src/daemon/cli.test.ts:635: call (module)
+        - src/daemon/cli.test.ts:676: call (module)
+        - src/daemon/cli.test.ts:705: call (module)
+        - src/daemon/cli.test.ts:726: call (module)
+        - src/daemon/cli.ts:27: import (module)
+        - src/daemon/cli.ts:476: call getQueueStatus
+        - src/daemon/cli.ts:513: call queueAnalysis
+    144-146: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-      refs in: 10 [call: 6, import: 4]
+      refs in: 12 [call: 7, import: 5]
         - src/daemon/queue.test.ts:12: import (module)
         - src/daemon/queue.test.ts:34: call (module)
         - src/daemon/worker.test.ts:14: import (module)
         - src/daemon/worker.test.ts:111: call (module)
         - src/daemon/worker.test.ts:278: call (module)
         - src/daemon/worker.test.ts:372: call (module)
+        - src/storage/database-vec.test.ts:6: import (module)
+        - src/storage/database-vec.test.ts:61: call (module)
         - src/storage/database.test.ts:13: import (module)
         - src/storage/database.test.ts:382: call (module)
-        - src/storage/decision-repository.test.ts:8: import (module)
-        - src/storage/decision-repository.test.ts:25: call (module)
-    147-154: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    151-158: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
       refs in: 4 [call: 3, import: 1]
         - src/storage/database.test.ts:15: import (module)
         - src/storage/database.test.ts:355: call (module)
         - src/storage/database.test.ts:368: call (module)
         - src/storage/database.test.ts:384: call (module)
+    163-171: loadVecExtension(db: Database.Database): boolean [exported]
+      /** Load the sqlite-vec extension */
+      refs in: 1 [call: 1]
+        - src/storage/database.ts:59: call openDatabase
+    176-185: isVecLoaded(db: Database.Database): boolean [exported]
+      /** Check if sqlite-vec extension is loaded */
+      refs in: 2 [call: 1, import: 1]
+        - src/storage/database-vec.test.ts:6: import (module)
+        - src/storage/database-vec.test.ts:25: call (module)
   variable:
-    14-14: any [exported]
+    15-15: any [exported]
       /** Default pi-brain data directory */
-    17-17: any [exported]
+    18-18: any [exported]
       /** Default database path */
   imports:
     - better-sqlite3
@@ -1599,6 +1616,7 @@ src/storage/database.ts [1-155]
     - node:os
     - node:path
     - node:url
+    - sqlite-vec
 
 src/storage/decision-repository.test.ts [1-320]
   imports:
@@ -2942,5 +2960,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 50
-Estimated tokens: 37,685 (codebase: ~1,003,687)
+Files: 51
+Estimated tokens: 37,828 (codebase: ~1,004,483)

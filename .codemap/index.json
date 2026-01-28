@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 87,
-    "totalSymbols": 1071,
+    "totalSymbols": 1073,
     "byLanguage": {
       "typescript": 87
     },
     "bySymbolKind": {
-      "function": 473,
+      "function": 475,
       "type": 40,
       "interface": 253,
       "variable": 105,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 35841,
-  "codebase_tokens": 1003687,
+  "total_tokens": 35904,
+  "codebase_tokens": 1004483,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14895,18 +14895,18 @@
       "language": "typescript",
       "lines": [
         1,
-        155
+        186
       ],
       "detail_level": "full",
-      "token_estimate": 270,
+      "token_estimate": 333,
       "symbols": [
         {
           "name": "__dirname",
           "kind": "variable",
           "signature": "any",
           "lines": [
-            11,
-            11
+            12,
+            12
           ],
           "exported": false,
           "is_default": false,
@@ -14924,8 +14924,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            14,
-            14
+            15,
+            15
           ],
           "exported": true,
           "is_default": false,
@@ -14943,8 +14943,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            17,
-            17
+            18,
+            18
           ],
           "exported": true,
           "is_default": false,
@@ -14962,8 +14962,8 @@
           "kind": "interface",
           "signature": "DatabaseOptions",
           "lines": [
-            19,
-            26
+            20,
+            27
           ],
           "exported": true,
           "is_default": false,
@@ -14981,8 +14981,8 @@
           "kind": "interface",
           "signature": "MigrationInfo",
           "lines": [
-            28,
-            33
+            29,
+            34
           ],
           "exported": true,
           "is_default": false,
@@ -15000,8 +15000,8 @@
           "kind": "function",
           "signature": "openDatabase(options: DatabaseOptions = {}): Database.Database",
           "lines": [
-            38,
-            63
+            39,
+            67
           ],
           "exported": true,
           "is_default": false,
@@ -15019,8 +15019,8 @@
           "kind": "function",
           "signature": "loadMigrations(): {}",
           "lines": [
-            68,
-            91
+            72,
+            95
           ],
           "exported": true,
           "is_default": false,
@@ -15038,8 +15038,8 @@
           "kind": "function",
           "signature": "getSchemaVersion(db: Database.Database): number",
           "lines": [
-            96,
-            106
+            100,
+            110
           ],
           "exported": true,
           "is_default": false,
@@ -15057,8 +15057,8 @@
           "kind": "function",
           "signature": "migrate(db: Database.Database): number",
           "lines": [
-            111,
-            135
+            115,
+            139
           ],
           "exported": true,
           "is_default": false,
@@ -15076,8 +15076,8 @@
           "kind": "function",
           "signature": "closeDatabase(db: Database.Database): void",
           "lines": [
-            140,
-            142
+            144,
+            146
           ],
           "exported": true,
           "is_default": false,
@@ -15095,8 +15095,8 @@
           "kind": "function",
           "signature": "isDatabaseHealthy(db: Database.Database): boolean",
           "lines": [
-            147,
-            154
+            151,
+            158
           ],
           "exported": true,
           "is_default": false,
@@ -15106,6 +15106,44 @@
           "parent_name": null,
           "annotation": null,
           "comment": "Check if the database is healthy",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "loadVecExtension",
+          "kind": "function",
+          "signature": "loadVecExtension(db: Database.Database): boolean",
+          "lines": [
+            163,
+            171
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Load the sqlite-vec extension",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isVecLoaded",
+          "kind": "function",
+          "signature": "isVecLoaded(db: Database.Database): boolean",
+          "lines": [
+            176,
+            185
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if sqlite-vec extension is loaded",
           "incoming_refs": null,
           "outgoing_refs": null
         }
@@ -15118,7 +15156,8 @@
         "node:fs",
         "node:os",
         "node:path",
-        "node:url"
+        "node:url",
+        "sqlite-vec"
       ]
     },
     {

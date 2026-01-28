@@ -123,18 +123,16 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:443: call join -> external
     454-483: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-      refs out: 5 [call: 4, type: 1]
+      refs out: 4 [call: 3, type: 1]
         - src/daemon/cli.ts:454: type QueueStatus -> src/daemon/cli.ts
         - src/daemon/cli.ts:459: call existsSync -> external
-        - src/daemon/cli.ts:476: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:479: call getQueueStatusSummary -> src/daemon/queue.ts
         - src/daemon/cli.ts:481: call close -> external
     488-541: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-      refs out: 5 [call: 5]
+      refs out: 4 [call: 4]
         - src/daemon/cli.ts:494: call existsSync -> external
         - src/daemon/cli.ts:501: call endsWith -> external
-        - src/daemon/cli.ts:513: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:518: call QueueManager.hasExistingJob -> src/daemon/queue.ts
         - src/daemon/cli.ts:539: call close -> external
     761-791: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
@@ -176,8 +174,7 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:913: call join -> external
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 17 [call: 16, type: 1]
-        - src/daemon/cli.ts:949: call migrate -> src/storage/database.ts
+      refs out: 16 [call: 15, type: 1]
         - src/daemon/cli.ts:952: call log -> external
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
@@ -187,6 +184,7 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
         - src/daemon/cli.ts:1004: call log -> external
+        - src/daemon/cli.ts:1007: call log -> external
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -461,9 +459,8 @@ src/daemon/graph-export.ts [1-131]
   function:
     25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
       /** Export knowledge graph to Graphviz DOT format */
-      refs out: 4 [call: 3, type: 1]
+      refs out: 3 [call: 2, type: 1]
         - src/daemon/graph-export.ts:28: type GraphExportOptions -> src/daemon/graph-export.ts
-        - src/daemon/graph-export.ts:33: call migrate -> src/storage/database.ts
         - src/daemon/graph-export.ts:82: call writeFileSync -> external
         - src/daemon/graph-export.ts:89: call close -> external
   imports:
@@ -1529,4 +1526,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,045 (codebase: ~1,003,687)
+Estimated tokens: 19,984 (codebase: ~1,004,483)

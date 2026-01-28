@@ -239,7 +239,7 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 | ID     | Task                                          | Status  | Deps   | Notes      |
 | ------ | --------------------------------------------- | ------- | ------ | ---------- |
 | 17.1.1 | Install sqlite-vec extension (npm or binary)  | done    | -      | 2026-01-27 |
-| 17.1.2 | Load extension in database.ts + isVecLoaded() | pending | 17.1.1 |            |
+| 17.1.2 | Load extension in database.ts + isVecLoaded() | active  | 17.1.1 | 2026-01-27 |
 | 17.1.3 | Create 012_semantic_search.sql migration      | pending | 17.1.2 |            |
 
 ### 17.2 Richer Embedding Format

@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 87
-- Total symbols: 624
-  - function: 346
+- Total symbols: 626
+  - function: 348
   - interface: 200
   - type: 39
   - variable: 27
@@ -1239,27 +1239,31 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
-src/storage/database.ts [1-155]
+src/storage/database.ts [1-186]
   interface:
-    19-26: interface DatabaseOptions [exported]
-    28-33: interface MigrationInfo [exported]
+    20-27: interface DatabaseOptions [exported]
+    29-34: interface MigrationInfo [exported]
   function:
-    38-63: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
+    39-67: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-    68-91: loadMigrations(): {} [exported]
+    72-95: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
-    96-106: getSchemaVersion(db: Database.Database): number [exported]
+    100-110: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    111-135: migrate(db: Database.Database): number [exported]
+    115-139: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    140-142: closeDatabase(db: Database.Database): void [exported]
+    144-146: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    147-154: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    151-158: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
+    163-171: loadVecExtension(db: Database.Database): boolean [exported]
+      /** Load the sqlite-vec extension */
+    176-185: isVecLoaded(db: Database.Database): boolean [exported]
+      /** Check if sqlite-vec extension is loaded */
   variable:
-    14-14: any [exported]
+    15-15: any [exported]
       /** Default pi-brain data directory */
-    17-17: any [exported]
+    18-18: any [exported]
       /** Default database path */
   imports:
     - better-sqlite3
@@ -1267,6 +1271,7 @@ src/storage/database.ts [1-155]
     - node:os
     - node:path
     - node:url
+    - sqlite-vec
 
 src/storage/decision-repository.ts [1-143]
   interface:
@@ -2028,4 +2033,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,718 (codebase: ~997,667)
+Estimated tokens: 24,782 (codebase: ~1,003,851)

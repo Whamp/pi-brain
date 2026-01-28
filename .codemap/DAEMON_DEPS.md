@@ -22,6 +22,7 @@ src/daemon/index.ts
       - [builtin] fs
       - [builtin] os
       - [builtin] path
+      - [external] sqlite-vec
       - [builtin] url
     - src/storage/index.ts
       - src/storage/database.ts
@@ -29,6 +30,7 @@ src/daemon/index.ts
         - [builtin] fs
         - [builtin] os
         - [builtin] path
+        - [external] sqlite-vec
         - [builtin] url
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
@@ -191,6 +193,7 @@ src/daemon/index.ts
         - [builtin] fs
         - [builtin] os
         - [builtin] path
+        - [external] sqlite-vec
         - [builtin] url
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
@@ -491,6 +494,7 @@ src/daemon/index.ts
           - [builtin] fs
           - [builtin] os
           - [builtin] path
+          - [external] sqlite-vec
           - [builtin] url
         - src/storage/edge-repository.ts
           - src/storage/node-types.ts
@@ -725,6 +729,7 @@ src/daemon/index.ts
         - [builtin] fs
         - [builtin] os
         - [builtin] path
+        - [external] sqlite-vec
         - [builtin] url
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts

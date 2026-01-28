@@ -4,6 +4,7 @@ src/storage/index.ts
     - [builtin] fs
     - [builtin] os
     - [builtin] path
+    - [external] sqlite-vec
     - [builtin] url
   - src/storage/edge-repository.ts
     - src/storage/node-types.ts
