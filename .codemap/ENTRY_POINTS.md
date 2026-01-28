@@ -286,7 +286,7 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-281]
+src/api/routes/query.ts [1-282]
   function:
     60-104: getEmbeddingProvider(config: {
   embeddingProvider?: "openrouter" | "ollama" | "openai";
@@ -296,13 +296,16 @@ src/api/routes/query.ts [1-281]
   embeddingDimensions?: number;
 }): any
       /** Get or create the embedding provider with caching. Cache is invalidated if the configuration changes. */
-    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 2 [call: 1, type: 1]
+        - src/api/routes/query.ts:66: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/api/routes/query.ts:94: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
+    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 37 [call: 30, instantiate: 1, type: 6]
         - src/api/routes/query.ts:106: type FastifyInstance -> external
         - src/api/routes/query.ts:106: type Promise -> external
         - src/api/routes/query.ts:117: call post -> external
         - src/api/routes/query.ts:120: type FastifyRequest -> external
-        - src/api/routes/query.ts:133: type FastifyReply -> external
+        - src/api/routes/query.ts:134: type FastifyReply -> external
   variable:
     24-47: DEFAULT_QUERY_CONFIG
       /** Default daemon config for query processing */
@@ -312,6 +315,8 @@ src/api/routes/query.ts [1-281]
         - src/api/routes/query.ts:42: type const -> external
     53-53: EmbeddingProvider | undefined
       /** Cached embedding provider instance. Created once on first use to avoid HTTP client setup overhead per request. */
+      refs out: 1 [type: 1]
+        - src/api/routes/query.ts:53: type EmbeddingProvider -> src/daemon/facet-discovery.ts
     54-54: string | undefined
   imports:
     - ../../daemon/facet-discovery.js
@@ -484,13 +489,15 @@ src/api/server.test.ts [1-703]
         - src/api/server.test.ts:28: call existsSync -> external
         - src/api/server.test.ts:29: call rmSync -> external
     33-39: createTestApiConfig(): ApiConfig
+      refs out: 1 [type: 1]
+        - src/api/server.test.ts:33: type ApiConfig -> src/config/types.ts
     41-111: createTestNode(overrides: Partial<Node> = {}): Node
-      refs out: 6 [call: 3, instantiate: 2, type: 1]
+      refs out: 8 [call: 3, instantiate: 2, type: 3]
         - src/api/server.test.ts:41: type Partial -> external
+        - src/api/server.test.ts:41: type Node -> src/types/index.ts
+        - src/api/server.test.ts:41: type Node -> src/types/index.ts
         - src/api/server.test.ts:43: call now -> external
         - src/api/server.test.ts:92: call toISOString -> external
-        - src/api/server.test.ts:92: instantiate Date -> external
-        - src/api/server.test.ts:93: call toISOString -> external
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -507,8 +514,10 @@ src/api/server.ts [1-205]
   interface:
     49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
-      refs out: 1 [type: 1]
+      refs out: 3 [type: 3]
         - src/api/server.ts:50: type Database -> external
+        - src/api/server.ts:51: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:53: type DaemonConfig -> src/config/types.ts
     171-174: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
       refs out: 2 [type: 2]
@@ -517,20 +526,20 @@ src/api/server.ts [1-205]
   function:
     68-166: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-      refs out: 32 [call: 27, instantiate: 1, type: 4]
+      refs out: 34 [call: 27, instantiate: 1, type: 6]
         - src/api/server.ts:69: type Database -> external
+        - src/api/server.ts:70: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:71: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:72: type WebSocketManager -> src/api/websocket.ts
         - src/api/server.ts:73: type Promise -> external
-        - src/api/server.ts:73: type FastifyInstance -> external
-        - src/api/server.ts:81: call register -> external
     179-197: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
-      refs out: 6 [call: 2, type: 4]
+      refs out: 8 [call: 2, type: 6]
         - src/api/server.ts:180: type Database -> external
+        - src/api/server.ts:181: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:182: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:183: type WebSocketManager -> src/api/websocket.ts
         - src/api/server.ts:184: type Promise -> external
-        - src/api/server.ts:184: type ServerResult -> src/api/server.ts
-        - src/api/server.ts:189: call listen -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -825,4 +834,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,072 (codebase: ~1,153,399)
+Estimated tokens: 9,233 (codebase: ~1,157,134)

@@ -711,14 +711,14 @@ src/daemon/processor.ts [1-800]
     - node:os
     - node:path
 
-src/daemon/query-processor.test.ts [1-463]
+src/daemon/query-processor.test.ts [1-411]
   imports:
     - ../config/types.js
+    - ../storage/bridge-discovery.js
     - ../storage/database.js
+    - ../storage/hybrid-search.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
-    - ../storage/search-repository.js
-    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./query-processor.js
@@ -727,39 +727,40 @@ src/daemon/query-processor.test.ts [1-463]
     - node:fs/promises
     - vitest
 
-src/daemon/query-processor.ts [1-786]
+src/daemon/query-processor.ts [1-823]
   interface:
-    32-45: interface QueryRequest [exported]
+    38-52: interface QueryRequest [exported]
       /** Query request from the API */
-    48-66: interface QueryResponse [exported]
+    55-73: interface QueryResponse [exported]
       /** Query response to return to the client */
-    91-104: interface QueryProcessorConfig [exported]
-      refs out: 3 [type: 3]
-        - src/daemon/query-processor.ts:93: type Database -> external
-        - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:101: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+    98-111: interface QueryProcessorConfig [exported]
+      refs out: 4 [type: 4]
+        - src/daemon/query-processor.ts:100: type Database -> external
+        - src/daemon/query-processor.ts:102: type DaemonConfig -> src/config/types.ts
+        - src/daemon/query-processor.ts:104: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:108: type EmbeddingProvider -> src/daemon/facet-discovery.ts
   function:
-    109-188: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    116-211: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
-      refs out: 12 [call: 8, type: 4]
-        - src/daemon/query-processor.ts:110: type QueryRequest -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:111: type QueryProcessorConfig -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:112: type Promise -> external
-        - src/daemon/query-processor.ts:112: type QueryResponse -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:116: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:116: call slice -> external
-        - src/daemon/query-processor.ts:129: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:164: call error -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:169: call map -> external
-        - src/daemon/query-processor.ts:180: call map -> external
+      refs out: 14 [call: 10, type: 4]
+        - src/daemon/query-processor.ts:117: type QueryRequest -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:118: type QueryProcessorConfig -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:119: type Promise -> external
+        - src/daemon/query-processor.ts:119: type QueryResponse -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:123: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:123: call slice -> external
+        - src/daemon/query-processor.ts:135: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:158: call findBridgePaths -> src/storage/bridge-discovery.ts
+        - src/daemon/query-processor.ts:165: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:187: call error -> src/daemon/processor.ts
   imports:
     - ../config/types.js
+    - ../storage/bridge-discovery.js
     - ../storage/database.js
+    - ../storage/hybrid-search.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
-    - ../storage/search-repository.js
-    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./processor.js
@@ -1591,4 +1592,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,641 (codebase: ~1,156,830)
+Estimated tokens: 20,675 (codebase: ~1,158,413)

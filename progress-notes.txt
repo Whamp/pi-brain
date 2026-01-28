@@ -351,3 +351,17 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: [hash]
 **Notes**: Bridge discovery enables the system to explain "why" two nodes are related by finding causal or semantic paths between them. Next task 20.4.3 will expose these new query capabilities via the API.
+
+## 2026-01-28 12:50 - Task 20.4.3
+
+**Status**: pending → done
+**Validation**: 
+  - Updated src/daemon/query-processor.ts to use hybridSearch instead of findRelevantNodes (FTS/Semantic fallback)
+  - Added bridge discovery integration to processQuery (top 3 nodes as seeds, max depth 2)
+  - Updated QueryRequest and API route options to support enableBridgeDiscovery flag
+  - Updated src/daemon/query-processor.test.ts to verify hybrid search and bridge discovery calls
+  - Updated src/daemon/semantic-search.integration.test.ts to verify hybrid search results and fallback logic
+  - All 1383 tests pass
+  - Lint/format checks pass
+**Commit**: [hash]
+**Notes**: The query API now leverages the full power of the new storage engines (hybrid search + graph traversal). Next task 20.5.1 will update the UI to visualize these new capabilities.

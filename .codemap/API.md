@@ -131,9 +131,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-281]
+src/api/routes/query.ts [1-282]
   function:
-    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -726,24 +726,24 @@ src/daemon/processor.ts [1-800]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-786]
+src/daemon/query-processor.ts [1-823]
   interface:
-    32-45: interface QueryRequest [exported]
+    38-52: interface QueryRequest [exported]
       /** Query request from the API */
-    48-66: interface QueryResponse [exported]
+    55-73: interface QueryResponse [exported]
       /** Query response to return to the client */
-    91-104: interface QueryProcessorConfig [exported]
+    98-111: interface QueryProcessorConfig [exported]
   function:
-    109-188: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    116-211: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
+    - ../storage/bridge-discovery.js
     - ../storage/database.js
+    - ../storage/hybrid-search.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
-    - ../storage/search-repository.js
-    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./processor.js
@@ -2272,4 +2272,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 97
-Estimated tokens: 28,619 (codebase: ~1,153,399)
+Estimated tokens: 28,618 (codebase: ~1,157,134)
