@@ -45,16 +45,19 @@
     wsStore.connect();
 
     // Set up reactive polling: start when WS disconnected, stop when connected.
-    // Subscribe to wsStore to react to connection changes.
+    // Skip the initial subscription callback (before WebSocket has connected)
+    // to avoid an unnecessary HTTP request on page load.
+    let isFirstEmission = true;
     const unsubscribeWs = wsStore.subscribe((wsState) => {
+      if (isFirstEmission) {
+        isFirstEmission = false;
+        return;
+      }
+
+      // Simple logic: poll when not connected, stop when connected
       if (wsState.connected) {
-        // WebSocket connected - stop polling fallback
         daemonStore.stopPolling();
-      } else if (!wsState.connected && !wsState.reconnecting) {
-        // WebSocket fully disconnected (not just reconnecting) - start polling
-        daemonStore.startPolling();
-      } else if (wsState.reconnecting) {
-        // Reconnecting - also start polling as fallback during reconnection
+      } else {
         daemonStore.startPolling();
       }
     });

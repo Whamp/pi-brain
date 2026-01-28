@@ -1,27 +1,25 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-191155
-Created: 2026-01-27 19:11
+Branch: fix/code-review-20260127-192539
+Created: 2026-01-27 19:25
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-1. [P1] Type mismatch in channel validation (src/api/websocket.ts:152-160)
-   - `validChannels` declared as `WSChannel[]` but assigned a `Set<string>`
-   - TypeScript errors: TS2740, TS2339
+### P1: Race condition on initial mount
+- File: src/web/app/src/routes/+layout.svelte:53-63
+- Problem: Subscription runs synchronously with initial state `{ connected: false, reconnecting: false }`, 
+  triggering `startPolling()` immediately before WebSocket has a chance to connect.
+- Fix: Skip the first emission from the subscription (initial state).
 
-2. [P2] No input validation on `message.channels` (src/api/websocket.ts:152-163)
-   - If client sends string instead of array, `for...of` iterates characters
-   - Could cause unexpected behavior or log spam
+### P2: Redundant condition branches
+- File: src/web/app/src/routes/+layout.svelte:53-63  
+- Problem: Two branches both call `startPolling()` - confusing even if guarded.
+- Fix: Simplify to `if (connected) { stopPolling() } else { startPolling() }`.
 
-3. [P2] Missing `broadcastAnalysisStarted` wiring (src/daemon/daemon-process.ts:77-86)
-   - Method exists but never called from worker callbacks
-   - Clients won't get `analysis.started` events
-
-4. [P3] Magic number for WebSocket ready state (src/api/websocket.ts:172)
-   - Uses `readyState === 1` with comment instead of constant
-
-5. [P3] Test type errors (src/api/websocket.test.ts:305-363)
-   - Incomplete mock objects fail `tsc --noEmit`
+### P3: Missing finally block for loading cleanup
+- File: src/web/app/src/lib/stores/daemon.ts:38-53
+- Problem: If fetchStatus throws before catch, loading remains true.
+- Fix: Use finally block to ensure loading is always reset.
 
 ---
