@@ -31,6 +31,13 @@ import type {
   NodeEmbedding,
 } from "../types/index.js";
 
+import {
+  buildEmbeddingText,
+  buildSimpleEmbeddingText,
+  isRichEmbeddingFormat,
+} from "../storage/embedding-utils.js";
+import { readNodeFromPath } from "../storage/node-storage.js";
+
 // =============================================================================
 // Constants
 // =============================================================================
@@ -57,6 +64,7 @@ interface NodeSummaryRow {
   type: string | null;
   project: string | null;
   outcome: string | null;
+  data_file: string;
 }
 
 interface EmbeddingRow {
@@ -759,7 +767,8 @@ export class FacetDiscovery {
         fts.summary,
         n.type,
         n.project,
-        n.outcome
+        n.outcome,
+        n.data_file
       FROM nodes n
       LEFT JOIN nodes_fts fts ON fts.node_id = n.id
       WHERE fts.summary IS NOT NULL
@@ -801,7 +810,12 @@ export class FacetDiscovery {
     const needsEmbedding: NodeSummaryRow[] = [];
     for (const node of nodes) {
       const cachedEmb = cachedMap.get(node.id);
-      if (cachedEmb && cachedEmb.embeddingModel === this.provider.modelName) {
+      // Check model match AND rich format - re-embed if using old simple format
+      if (
+        cachedEmb &&
+        cachedEmb.embeddingModel === this.provider.modelName &&
+        isRichEmbeddingFormat(cachedEmb.inputText)
+      ) {
         results.push({
           nodeId: node.id,
           embedding: cachedEmb.embedding,
@@ -818,7 +832,7 @@ export class FacetDiscovery {
 
     for (let i = 0; i < needsEmbedding.length; i += EMBEDDING_BATCH_SIZE) {
       const batch = needsEmbedding.slice(i, i + EMBEDDING_BATCH_SIZE);
-      const texts = batch.map((n) => this.buildEmbeddingText(n));
+      const texts = batch.map((n) => this.buildNodeEmbeddingText(n));
 
       try {
         const embeddings = await this.provider.embed(texts);
@@ -846,15 +860,24 @@ export class FacetDiscovery {
     return results;
   }
 
-  private buildEmbeddingText(node: NodeSummaryRow): string {
-    const parts: string[] = [];
-    if (node.type) {
-      parts.push(`[${node.type}]`);
+  /**
+   * Build embedding text for a node, using the rich format when possible.
+   *
+   * Attempts to load the full node from JSON storage to include decisions
+   * and lessons in the embedding. Falls back to simple format if loading fails.
+   */
+  private buildNodeEmbeddingText(node: NodeSummaryRow): string {
+    try {
+      // Load full node from JSON to get decisions and lessons
+      const fullNode = readNodeFromPath(node.data_file);
+      return buildEmbeddingText(fullNode);
+    } catch (error) {
+      // Fall back to simple format if JSON loading fails
+      this.logger.debug?.(
+        `Could not load full node ${node.id}, using simple format: ${error}`
+      );
+      return buildSimpleEmbeddingText(node.type, node.summary);
     }
-    if (node.summary) {
-      parts.push(node.summary);
-    }
-    return parts.join(" ");
   }
 
   private getCachedEmbeddings(nodeIds: string[]): NodeEmbedding[] {

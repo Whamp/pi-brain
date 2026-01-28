@@ -392,6 +392,15 @@ src/daemon/index.ts
     - src/daemon/queue.ts
       - [external] better-sqlite3
   - src/daemon/facet-discovery.ts
+    - src/storage/embedding-utils.ts
+      - src/types/index.ts
+    - src/storage/node-storage.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
+      - [builtin] fs
+      - [builtin] os
+      - [builtin] path
     - src/types/index.ts
     - [external] better-sqlite3
     - [builtin] child_process
@@ -416,6 +425,15 @@ src/daemon/index.ts
   - src/daemon/scheduler.ts
     - src/config/types.ts
     - src/daemon/facet-discovery.ts
+      - src/storage/embedding-utils.ts
+        - src/types/index.ts
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
       - src/types/index.ts
       - [external] better-sqlite3
       - [builtin] child_process

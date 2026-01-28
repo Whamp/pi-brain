@@ -391,7 +391,7 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.test.ts [1-827]
+src/daemon/facet-discovery.test.ts [1-888]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -401,51 +401,53 @@ src/daemon/facet-discovery.test.ts [1-827]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1734]
+src/daemon/facet-discovery.ts [1-1757]
   class:
-    659-1705: class FacetDiscovery [exported]
+    667-1728: class FacetDiscovery [exported]
   interface:
-    91-100: interface ClusterAnalysisConfig [exported]
+    99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
-    105-113: interface ClusterAnalysisResult [exported]
+    113-121: interface ClusterAnalysisResult [exported]
       /** Result from analyzing a single cluster */
-    118-123: interface ClusterAnalysisBatchResult [exported]
+    126-131: interface ClusterAnalysisBatchResult [exported]
       /** Result from analyzing multiple clusters */
       refs out: 1 [type: 1]
-        - src/daemon/facet-discovery.ts:122: type ClusterAnalysisResult -> src/daemon/facet-discovery.ts
-    132-136: interface EmbeddingProvider [exported]
+        - src/daemon/facet-discovery.ts:130: type ClusterAnalysisResult -> src/daemon/facet-discovery.ts
+    140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
       refs out: 1 [type: 1]
-        - src/daemon/facet-discovery.ts:133: type Promise -> external
-    647-651: interface FacetDiscoveryLogger [exported]
+        - src/daemon/facet-discovery.ts:141: type Promise -> external
+    655-659: interface FacetDiscoveryLogger [exported]
   function:
-    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
       refs out: 8 [call: 3, instantiate: 3, type: 2]
-        - src/daemon/facet-discovery.ts:155: type EmbeddingConfig -> src/types/index.ts
-        - src/daemon/facet-discovery.ts:156: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:159: call createOllamaProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:166: instantiate Error -> external
-        - src/daemon/facet-discovery.ts:168: call createOpenAIProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:177: instantiate Error -> external
-        - src/daemon/facet-discovery.ts:179: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:187: instantiate Error -> external
-    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
+        - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:174: instantiate Error -> external
+        - src/daemon/facet-discovery.ts:176: call createOpenAIProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:185: instantiate Error -> external
+        - src/daemon/facet-discovery.ts:187: call createOpenRouterProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:195: instantiate Error -> external
+    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs out: 1 [type: 1]
-        - src/daemon/facet-discovery.ts:323: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+        - src/daemon/facet-discovery.ts:331: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs out: 3 [call: 2, type: 1]
-        - src/daemon/facet-discovery.ts:379: type KMeansResult -> src/daemon/facet-discovery.ts
-        - src/daemon/facet-discovery.ts:386: call map -> external
-        - src/daemon/facet-discovery.ts:387: call map -> external
-    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+        - src/daemon/facet-discovery.ts:387: type KMeansResult -> src/daemon/facet-discovery.ts
+        - src/daemon/facet-discovery.ts:394: call map -> external
+        - src/daemon/facet-discovery.ts:395: call map -> external
+    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs out: 2 [call: 2]
-        - src/daemon/facet-discovery.ts:491: call fill -> external
-        - src/daemon/facet-discovery.ts:491: call from -> external
+        - src/daemon/facet-discovery.ts:499: call fill -> external
+        - src/daemon/facet-discovery.ts:499: call from -> external
   imports:
+    - ../storage/embedding-utils.js
+    - ../storage/node-storage.js
     - ../types/index.js
     - better-sqlite3
     - node:child_process
@@ -1529,4 +1531,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,045 (codebase: ~1,014,052)
+Estimated tokens: 20,063 (codebase: ~1,015,086)

@@ -524,7 +524,7 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.test.ts [1-827]
+src/daemon/facet-discovery.test.ts [1-888]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -534,69 +534,69 @@ src/daemon/facet-discovery.test.ts [1-827]
     - node:path
     - vitest
 
-src/daemon/facet-discovery.ts [1-1734]
+src/daemon/facet-discovery.ts [1-1757]
   class:
-    659-1705: class FacetDiscovery [exported]
+    667-1728: class FacetDiscovery [exported]
       refs in: 11 [import: 2, instantiate: 5, reexport: 1, type: 3]
         - src/daemon/facet-discovery.test.ts:16: import (module)
         - src/daemon/facet-discovery.test.ts:300: type discovery
-        - src/daemon/facet-discovery.test.ts:307: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:611: type discovery
-        - src/daemon/facet-discovery.test.ts:618: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:661: type discovery
-        - src/daemon/facet-discovery.test.ts:668: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:766: instantiate discoveryWithMore
+        - src/daemon/facet-discovery.test.ts:309: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:672: type discovery
+        - src/daemon/facet-discovery.test.ts:679: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:722: type discovery
+        - src/daemon/facet-discovery.test.ts:729: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:827: instantiate discoveryWithMore
         - src/daemon/index.ts:168: reexport (module)
         - src/daemon/scheduler.ts:24: import (module)
   interface:
-    91-100: interface ClusterAnalysisConfig [exported]
+    99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:1221: type FacetDiscovery.analyzeClusters
-        - src/daemon/facet-discovery.ts:1282: type FacetDiscovery.analyzeCluster
-        - src/daemon/facet-discovery.ts:1429: type FacetDiscovery.invokeClusterAnalysisAgent
+        - src/daemon/facet-discovery.ts:1244: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1305: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:1452: type FacetDiscovery.invokeClusterAnalysisAgent
         - src/daemon/index.ts:174: reexport (module)
-    105-113: interface ClusterAnalysisResult [exported]
+    113-121: interface ClusterAnalysisResult [exported]
       /** Result from analyzing a single cluster */
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:122: type ClusterAnalysisBatchResult
-        - src/daemon/facet-discovery.ts:1244: type FacetDiscovery.results
-        - src/daemon/facet-discovery.ts:1283: type FacetDiscovery.analyzeCluster
+        - src/daemon/facet-discovery.ts:130: type ClusterAnalysisBatchResult
+        - src/daemon/facet-discovery.ts:1267: type FacetDiscovery.results
+        - src/daemon/facet-discovery.ts:1306: type FacetDiscovery.analyzeCluster
         - src/daemon/index.ts:175: reexport (module)
-    118-123: interface ClusterAnalysisBatchResult [exported]
+    126-131: interface ClusterAnalysisBatchResult [exported]
       /** Result from analyzing multiple clusters */
       refs in: 2 [reexport: 1, type: 1]
-        - src/daemon/facet-discovery.ts:1223: type FacetDiscovery.analyzeClusters
+        - src/daemon/facet-discovery.ts:1246: type FacetDiscovery.analyzeClusters
         - src/daemon/index.ts:176: reexport (module)
-    132-136: interface EmbeddingProvider [exported]
+    140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
       refs in: 13 [reexport: 1, type: 12]
-        - src/daemon/facet-discovery.ts:142: type isEmbeddingProvider
-        - src/daemon/facet-discovery.ts:143: type isEmbeddingProvider
-        - src/daemon/facet-discovery.ts:145: type isEmbeddingProvider
-        - src/daemon/facet-discovery.ts:146: type isEmbeddingProvider
-        - src/daemon/facet-discovery.ts:147: type isEmbeddingProvider
-        - src/daemon/facet-discovery.ts:156: type createEmbeddingProvider
-        - src/daemon/facet-discovery.ts:198: type createOllamaProvider
-        - src/daemon/facet-discovery.ts:244: type createOpenAIProvider
-        - src/daemon/facet-discovery.ts:286: type createOpenRouterProvider
-        - src/daemon/facet-discovery.ts:323: type createMockEmbeddingProvider
-    647-651: interface FacetDiscoveryLogger [exported]
+        - src/daemon/facet-discovery.ts:150: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:151: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:153: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:154: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:155: type isEmbeddingProvider
+        - src/daemon/facet-discovery.ts:164: type createEmbeddingProvider
+        - src/daemon/facet-discovery.ts:206: type createOllamaProvider
+        - src/daemon/facet-discovery.ts:252: type createOpenAIProvider
+        - src/daemon/facet-discovery.ts:294: type createOpenRouterProvider
+        - src/daemon/facet-discovery.ts:331: type createMockEmbeddingProvider
+    655-659: interface FacetDiscoveryLogger [exported]
       refs in: 4 [reexport: 1, type: 3]
-        - src/daemon/facet-discovery.ts:653: type noopLogger
-        - src/daemon/facet-discovery.ts:662: type FacetDiscovery.logger
-        - src/daemon/facet-discovery.ts:668: type FacetDiscovery.constructor
+        - src/daemon/facet-discovery.ts:661: type noopLogger
+        - src/daemon/facet-discovery.ts:670: type FacetDiscovery.logger
+        - src/daemon/facet-discovery.ts:676: type FacetDiscovery.constructor
         - src/daemon/index.ts:173: reexport (module)
   function:
-    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:14: import (module)
         - src/daemon/facet-discovery.test.ts:80: call (module)
         - src/daemon/facet-discovery.test.ts:89: call (module)
-        - src/daemon/facet-discovery.ts:673: call FacetDiscovery.constructor
+        - src/daemon/facet-discovery.ts:681: call FacetDiscovery.constructor
         - src/daemon/index.ts:169: reexport (module)
-    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs in: 9 [call: 8, import: 1]
         - src/daemon/facet-discovery.test.ts:15: import (module)
@@ -604,11 +604,11 @@ src/daemon/facet-discovery.ts [1-1734]
         - src/daemon/facet-discovery.test.ts:106: call provider
         - src/daemon/facet-discovery.test.ts:116: call provider
         - src/daemon/facet-discovery.test.ts:126: call provider
-        - src/daemon/facet-discovery.test.ts:307: call (module)
-        - src/daemon/facet-discovery.test.ts:618: call (module)
-        - src/daemon/facet-discovery.test.ts:668: call (module)
-        - src/daemon/facet-discovery.test.ts:768: call discoveryWithMore
-    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+        - src/daemon/facet-discovery.test.ts:308: call (module)
+        - src/daemon/facet-discovery.test.ts:679: call (module)
+        - src/daemon/facet-discovery.test.ts:729: call (module)
+        - src/daemon/facet-discovery.test.ts:829: call discoveryWithMore
+    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs in: 8 [call: 6, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:18: import (module)
@@ -617,9 +617,9 @@ src/daemon/facet-discovery.ts [1-1734]
         - src/daemon/facet-discovery.test.ts:173: call result
         - src/daemon/facet-discovery.test.ts:193: call result
         - src/daemon/facet-discovery.test.ts:204: call result
-        - src/daemon/facet-discovery.ts:906: call FacetDiscovery.result
+        - src/daemon/facet-discovery.ts:929: call FacetDiscovery.result
         - src/daemon/index.ts:170: reexport (module)
-    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/facet-discovery.test.ts:17: import (module)
@@ -628,11 +628,13 @@ src/daemon/facet-discovery.ts [1-1734]
         - src/daemon/facet-discovery.test.ts:243: call labels
         - src/daemon/facet-discovery.test.ts:269: call labels
         - src/daemon/facet-discovery.test.ts:289: call labels6
-        - src/daemon/facet-discovery.test.ts:584: call labels
-        - src/daemon/facet-discovery.test.ts:600: call labels
-        - src/daemon/facet-discovery.ts:910: call FacetDiscovery.clusterEmbeddings
+        - src/daemon/facet-discovery.test.ts:645: call labels
+        - src/daemon/facet-discovery.test.ts:661: call labels
+        - src/daemon/facet-discovery.ts:933: call FacetDiscovery.clusterEmbeddings
         - src/daemon/index.ts:171: reexport (module)
   imports:
+    - ../storage/embedding-utils.js
+    - ../storage/node-storage.js
     - ../types/index.js
     - better-sqlite3
     - node:child_process
@@ -1799,7 +1801,9 @@ src/storage/embedding-utils.ts [1-119]
   function:
     32-67: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
-      refs in: 6 [call: 5, import: 1]
+      refs in: 8 [call: 6, import: 2]
+        - src/daemon/facet-discovery.ts:35: import (module)
+        - src/daemon/facet-discovery.ts:873: call FacetDiscovery.buildNodeEmbeddingText
         - src/storage/embedding-utils.test.ts:10: import (module)
         - src/storage/embedding-utils.test.ts:123: call text
         - src/storage/embedding-utils.test.ts:151: call text
@@ -1808,7 +1812,9 @@ src/storage/embedding-utils.ts [1-119]
         - src/storage/embedding-utils.test.ts:294: call text
     81-93: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
-      refs in: 5 [call: 4, import: 1]
+      refs in: 7 [call: 5, import: 2]
+        - src/daemon/facet-discovery.ts:36: import (module)
+        - src/daemon/facet-discovery.ts:879: call FacetDiscovery.buildNodeEmbeddingText
         - src/storage/embedding-utils.test.ts:11: import (module)
         - src/storage/embedding-utils.test.ts:304: call text
         - src/storage/embedding-utils.test.ts:309: call text
@@ -1816,7 +1822,9 @@ src/storage/embedding-utils.ts [1-119]
         - src/storage/embedding-utils.test.ts:319: call text
     106-118: isRichEmbeddingFormat(inputText: string): boolean [exported]
       /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria: 1. Text must start with `[type]` format (e.g., `[coding]`) 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n` This is more robust than just checking for `\nDecisions:` which could match user content. */
-      refs in: 8 [call: 7, import: 1]
+      refs in: 10 [call: 8, import: 2]
+        - src/daemon/facet-discovery.ts:37: import (module)
+        - src/daemon/facet-discovery.ts:817: call FacetDiscovery.embedNodes
         - src/storage/embedding-utils.test.ts:12: import (module)
         - src/storage/embedding-utils.test.ts:327: call (module)
         - src/storage/embedding-utils.test.ts:332: call (module)
@@ -2456,7 +2464,7 @@ src/storage/node-storage.ts [1-292]
         - src/storage/node-storage.test.ts:219: call (module)
     107-114: readNodeFromPath(filePath: string): Node [exported]
       /** Read a node by file path */
-      refs in: 23 [call: 14, import: 9]
+      refs in: 25 [call: 15, import: 10]
         - src/api/routes/nodes.ts:19: import (module)
         - src/api/routes/nodes.ts:147: call node
         - src/daemon/cli.test.ts:14: import (module)
@@ -3017,4 +3025,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 38,865 (codebase: ~1,014,052)
+Estimated tokens: 38,990 (codebase: ~1,015,086)

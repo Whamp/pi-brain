@@ -523,29 +523,31 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.ts [1-1734]
+src/daemon/facet-discovery.ts [1-1757]
   class:
-    659-1705: class FacetDiscovery [exported]
+    667-1728: class FacetDiscovery [exported]
   interface:
-    91-100: interface ClusterAnalysisConfig [exported]
+    99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
-    105-113: interface ClusterAnalysisResult [exported]
+    113-121: interface ClusterAnalysisResult [exported]
       /** Result from analyzing a single cluster */
-    118-123: interface ClusterAnalysisBatchResult [exported]
+    126-131: interface ClusterAnalysisBatchResult [exported]
       /** Result from analyzing multiple clusters */
-    132-136: interface EmbeddingProvider [exported]
+    140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-    647-651: interface FacetDiscoveryLogger [exported]
+    655-659: interface FacetDiscoveryLogger [exported]
   function:
-    154-190: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
+    162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-    323-346: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
+    331-354: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
-    375-442: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
-    485-504: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    493-512: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
   imports:
+    - ../storage/embedding-utils.js
+    - ../storage/node-storage.js
     - ../types/index.js
     - better-sqlite3
     - node:child_process
@@ -2051,4 +2053,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 88
-Estimated tokens: 25,346 (codebase: ~1,013,602)
+Estimated tokens: 25,363 (codebase: ~1,013,826)
