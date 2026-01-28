@@ -21,3 +21,18 @@ Main branch: major/pi-brain
    The transformation is harmless but adds unnecessary indirection.
 
 ---
+
+## 2026-01-28 07:12 - Task 17.6.2
+
+**Status**: pending → done
+**Validation**: 
+- All 103 config tests pass including 6 new tests for semanticSearchThreshold
+- Full test suite: 1283 passed, 4 skipped
+- Linting: 0 errors, 0 warnings in project files
+**Commit**: c72a3792
+**Notes**: 
+- Added semanticSearchThreshold (default 0.5) to DEFAULT_QUERY_CONFIG in query.ts
+- Added semantic_search_threshold to default config YAML template
+- Added unit tests for default value, transform, and validation (range 0.0-1.0)
+- Configuration was already implemented in types.ts and config.ts with proper validation
+

@@ -70,17 +70,12 @@ src/prompt/agents-generator.ts [1-649]
   function:
     129-189: gatherModelData(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): ModelInsightData [exported]
       /** Gather all insights and clusters for a specific model */
-      refs in: 5 [call: 4, import: 1]
-        - src/api/routes/agents.ts:15: import (module)
-        - src/api/routes/agents.ts:55: call data
-        - src/api/routes/agents.ts:190: call data
+      refs in: 2 [call: 2]
         - src/prompt/agents-generator.ts:509: call data
         - src/prompt/agents-generator.ts:598: call data
     231-298: formatDataForPrompt(data: ModelInsightData): string [exported]
       /** Format model data into a structured prompt for LLM synthesis */
-      refs in: 7 [call: 5, import: 2]
-        - src/api/routes/agents.ts:16: import (module)
-        - src/api/routes/agents.ts:199: call promptContent
+      refs in: 5 [call: 4, import: 1]
         - src/prompt/agents-generator.test.ts:8: import (module)
         - src/prompt/agents-generator.test.ts:72: call result
         - src/prompt/agents-generator.test.ts:96: call result
@@ -101,25 +96,10 @@ src/prompt/agents-generator.ts [1-649]
         - src/prompt/agents-generator.ts:620: call previewAgentsForModel
     500-571: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Generate AGENTS.md for a specific model */
-      refs in: 4 [call: 2, import: 2]
-        - src/api/routes/agents.ts:12: import (module)
-        - src/api/routes/agents.ts:155: call result
-        - src/cli.ts:41: import (module)
-        - src/cli.ts:1000: call result
     576-586: listModelsWithInsights(db: Database.Database): {} [exported]
       /** List all models that have insights in the database */
-      refs in: 4 [call: 2, import: 2]
-        - src/api/routes/agents.ts:13: import (module)
-        - src/api/routes/agents.ts:31: call models
-        - src/cli.ts:42: import (module)
-        - src/cli.ts:948: call models
     591-648: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Preview AGENTS.md generation without saving */
-      refs in: 4 [call: 2, import: 2]
-        - src/api/routes/agents.ts:14: import (module)
-        - src/api/routes/agents.ts:109: call result
-        - src/cli.ts:43: import (module)
-        - src/cli.ts:1061: call result
   imports:
     - ../storage/pattern-repository.js
     - ../types/index.js
@@ -201,11 +181,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.ts:469: call result
     456-621: measureAndStoreEffectiveness(db: Database.Database, insightId: string, beforePeriod: DateRange, afterPeriod: DateRange, promptVersion: string, options: MeasureEffectivenessOptions = {}): PromptEffectiveness [exported]
       /** Measure effectiveness and store the result in the database */
-      refs in: 9 [call: 6, import: 3]
-        - src/cli.ts:47: import (module)
-        - src/cli.ts:787: call result
-        - src/daemon/scheduler.ts:21: import (module)
-        - src/daemon/scheduler.ts:691: call Scheduler.runPatternAggregation
+      refs in: 5 [call: 4, import: 1]
         - src/prompt/effectiveness.test.ts:22: import (module)
         - src/prompt/effectiveness.test.ts:711: call result
         - src/prompt/effectiveness.test.ts:752: call result1
@@ -213,9 +189,7 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.test.ts:954: call (module)
     626-640: getEffectivenessHistory(db: Database.Database, insightId: string): {} [exported]
       /** Get effectiveness measurements for an insight */
-      refs in: 5 [call: 3, import: 2]
-        - src/api/routes/prompt-learning.ts:8: import (module)
-        - src/api/routes/prompt-learning.ts:95: call history
+      refs in: 3 [call: 2, import: 1]
         - src/prompt/effectiveness.test.ts:18: import (module)
         - src/prompt/effectiveness.test.ts:791: call history
         - src/prompt/effectiveness.test.ts:842: call history
@@ -227,14 +201,9 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.test.ts:907: call result
     669-699: getLatestEffectivenessBatch(db: Database.Database, insightIds: string[]): Map<string, PromptEffectiveness> [exported]
       /** Get the latest effectiveness measurements for multiple insights in a single query. Returns a map of insightId -> PromptEffectiveness. */
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/prompt-learning.ts:9: import (module)
-        - src/api/routes/prompt-learning.ts:60: call effectivenessMap
     705-731: getInsightsNeedingMeasurement(db: Database.Database, measureAfterDays = 7): {} [exported]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
-      refs in: 6 [call: 4, import: 2]
-        - src/daemon/scheduler.ts:20: import (module)
-        - src/daemon/scheduler.ts:660: call Scheduler.needingMeasurement
+      refs in: 4 [call: 3, import: 1]
         - src/prompt/effectiveness.test.ts:19: import (module)
         - src/prompt/effectiveness.test.ts:933: call needing
         - src/prompt/effectiveness.test.ts:957: call needing
@@ -244,11 +213,7 @@ src/prompt/effectiveness.ts [1-881]
     minSessions?: number;
   } = {}): {} [exported]
       /** Auto-disable insights that have been measured as ineffective. Returns the IDs of disabled insights. */
-      refs in: 9 [call: 6, import: 3]
-        - src/cli.ts:46: import (module)
-        - src/cli.ts:806: call disabled
-        - src/daemon/scheduler.ts:19: import (module)
-        - src/daemon/scheduler.ts:707: call Scheduler.disabled
+      refs in: 5 [call: 4, import: 1]
         - src/prompt/effectiveness.test.ts:13: import (module)
         - src/prompt/effectiveness.test.ts:1035: call disabled
         - src/prompt/effectiveness.test.ts:1068: call disabled
@@ -783,4 +748,4 @@ src/storage/pattern-repository.ts [1-369]
 
 ---
 Files: 14
-Estimated tokens: 10,775 (codebase: ~1,053,345)
+Estimated tokens: 10,330 (codebase: ~1,053,294)

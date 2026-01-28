@@ -129,70 +129,47 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/index.ts:122: reexport (module)
     253-363: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:22: import (module)
-        - src/cli.ts:209: call result
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:123: reexport (module)
     368-430: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:23: import (module)
-        - src/cli.ts:242: call result
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:124: reexport (module)
     435-447: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:24: import (module)
-        - src/cli.ts:258: call status
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:125: reexport (module)
     456-485: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:25: import (module)
-        - src/cli.ts:274: call queueStatus
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:126: reexport (module)
     490-543: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:26: import (module)
-        - src/cli.ts:292: call result
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:127: reexport (module)
     763-793: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:27: import (module)
-        - src/cli.ts:364: call status
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:128: reexport (module)
     802-823: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:28: import (module)
-        - src/cli.ts:263: call (module)
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:129: reexport (module)
     828-878: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:29: import (module)
-        - src/cli.ts:279: call (module)
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:130: reexport (module)
     893-916: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-      refs in: 3 [call: 1, import: 1, reexport: 1]
-        - src/cli.ts:30: import (module)
-        - src/cli.ts:369: call (module)
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:131: reexport (module)
     931-1051: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs in: 4 [call: 2, import: 1, reexport: 1]
-        - src/cli.ts:31: import (module)
-        - src/cli.ts:307: call result
-        - src/cli.ts:334: call result
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:132: reexport (module)
     1056-1138: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
-      refs in: 9 [call: 6, import: 2, reexport: 1]
-        - src/cli.ts:32: import (module)
-        - src/cli.ts:343: call result
+      refs in: 7 [call: 5, import: 1, reexport: 1]
         - src/daemon/cli.test.ts:12: import (module)
         - src/daemon/cli.test.ts:83: call result
         - src/daemon/cli.test.ts:95: call result
@@ -1563,7 +1540,7 @@ src/storage/database.ts [1-298]
         - src/storage/database.ts:221: call unsatisfied
     192-249: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 51 [call: 41, import: 10]
+      refs in: 53 [call: 42, import: 11]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
         - src/api/routes/query.test.ts:10: import (module)
@@ -3196,4 +3173,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 55
-Estimated tokens: 41,949 (codebase: ~1,053,345)
+Estimated tokens: 41,669 (codebase: ~1,053,294)
