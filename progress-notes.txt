@@ -213,3 +213,21 @@ the reactivity chain.
   - Linting: 0 errors, 0 warnings
 **Commit**: 2be29217
 **Notes**: Extended daemon configuration API with retry settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
+
+---
+
+## 2026-01-28 12:47 - Task 19.1.2
+
+**Status**: pending → done
+**Validation**:
+  - Added analysisTimeoutMinutes (1-120) field to PUT /config/daemon API
+  - Added maxConcurrentAnalysis (1-10) field to PUT /config/daemon API
+  - Added validation for both fields in validateDaemonUpdate
+  - Updated applyDaemonUpdates to persist both fields to config
+  - Added both fields to GET /config/daemon response
+  - Added both fields to PUT /config/daemon response
+  - Added 10 new tests covering validation and update behavior
+  - All 1321 tests pass (1321 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: ba9c02b6
+**Notes**: Extended daemon configuration API with timeout and concurrency settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
