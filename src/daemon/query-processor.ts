@@ -228,11 +228,16 @@ async function findRelevantNodes(
       // Embed the query
       const [queryEmbedding] = await embeddingProvider.embed([query]);
 
+      // Guard against empty embedding result
+      if (!queryEmbedding) {
+        throw new Error("Embedding returned empty result");
+      }
+
       // Perform semantic search
       const semanticResults = semanticSearch(db, queryEmbedding, {
         limit: maxNodes,
         maxDistance: semanticSearchThreshold,
-        filters: filters ? { project: filters.project } : undefined,
+        filters,
       });
 
       if (semanticResults.length > 0) {

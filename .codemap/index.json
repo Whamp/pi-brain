@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 89,
-    "totalSymbols": 1109,
+    "totalSymbols": 1112,
     "byLanguage": {
       "typescript": 89
     },
     "bySymbolKind": {
-      "function": 494,
+      "function": 495,
       "type": 40,
       "interface": 260,
-      "variable": 107,
+      "variable": 109,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38225,
-  "codebase_tokens": 1050447,
+  "total_tokens": 38359,
+  "codebase_tokens": 1049308,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -806,10 +806,10 @@
       "language": "typescript",
       "lines": [
         1,
-        241
+        280
       ],
       "detail_level": "full",
-      "token_estimate": 100,
+      "token_estimate": 234,
       "symbols": [
         {
           "name": "DEFAULT_QUERY_CONFIG",
@@ -831,12 +831,69 @@
           "outgoing_refs": null
         },
         {
+          "name": "cachedEmbeddingProvider",
+          "kind": "variable",
+          "signature": "EmbeddingProvider | undefined",
+          "lines": [
+            52,
+            52
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Cached embedding provider instance.\nCreated once on first use to avoid HTTP client setup overhead per request.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "cachedEmbeddingConfig",
+          "kind": "variable",
+          "signature": "string | undefined",
+          "lines": [
+            53,
+            53
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getEmbeddingProvider",
+          "kind": "function",
+          "signature": "getEmbeddingProvider(config: {\n  embeddingProvider?: \"openrouter\" | \"ollama\" | \"openai\";\n  embeddingModel?: string;\n  embeddingApiKey?: string;\n  embeddingBaseUrl?: string;\n  embeddingDimensions?: number;\n}): any",
+          "lines": [
+            59,
+            103
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get or create the embedding provider with caching.\nCache is invalidated if the configuration changes.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "queryRoutes",
           "kind": "function",
           "signature": "async queryRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            48,
-            240
+            105,
+            279
           ],
           "exported": true,
           "is_default": false,
@@ -7127,7 +7184,7 @@
       "language": "typescript",
       "lines": [
         1,
-        774
+        779
       ],
       "detail_level": "full",
       "token_estimate": 721,
@@ -7271,7 +7328,7 @@
           "signature": "async findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number, embeddingProvider: EmbeddingProvider | undefined, semanticSearchThreshold: number | undefined, logger: ProcessorLogger): Promise<{}>",
           "lines": [
             212,
-            279
+            284
           ],
           "exported": false,
           "is_default": false,
@@ -7289,8 +7346,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            284,
-            294
+            289,
+            299
           ],
           "exported": false,
           "is_default": false,
@@ -7308,8 +7365,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            300,
-            303
+            305,
+            308
           ],
           "exported": false,
           "is_default": false,
@@ -7327,8 +7384,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            308,
-            358
+            313,
+            363
           ],
           "exported": false,
           "is_default": false,
@@ -7346,8 +7403,8 @@
           "kind": "function",
           "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            367,
-            468
+            372,
+            473
           ],
           "exported": false,
           "is_default": false,
@@ -7365,8 +7422,8 @@
           "kind": "function",
           "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
           "lines": [
-            473,
-            535
+            478,
+            540
           ],
           "exported": false,
           "is_default": false,
@@ -7384,8 +7441,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            541,
-            547
+            546,
+            552
           ],
           "exported": false,
           "is_default": false,
@@ -7403,8 +7460,8 @@
           "kind": "function",
           "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            549,
-            611
+            554,
+            616
           ],
           "exported": false,
           "is_default": false,
@@ -7422,8 +7479,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            617,
-            621
+            622,
+            626
           ],
           "exported": false,
           "is_default": false,
@@ -7441,8 +7498,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            623,
-            626
+            628,
+            631
           ],
           "exported": false,
           "is_default": false,
@@ -7460,8 +7517,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            628,
-            631
+            633,
+            636
           ],
           "exported": false,
           "is_default": false,
@@ -7479,8 +7536,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            633,
-            637
+            638,
+            642
           ],
           "exported": false,
           "is_default": false,
@@ -7498,8 +7555,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            639,
-            715
+            644,
+            720
           ],
           "exported": false,
           "is_default": false,
@@ -7517,8 +7574,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            717,
-            750
+            722,
+            755
           ],
           "exported": false,
           "is_default": false,
@@ -7536,8 +7593,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            752,
-            773
+            757,
+            778
           ],
           "exported": false,
           "is_default": false,

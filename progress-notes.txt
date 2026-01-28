@@ -1,134 +1,23 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-211938
-Created: 2026-01-27 21:19
+Branch: fix/code-review-20260128-064546
+Created: 2026-01-28 06:46
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-1. [P2] Nodes with empty decisions/lessons perpetually re-embedded
-2. [P3] Test doesn't verify embedding regeneration  
-3. [P3] Tests rely on implicit test.json absence
+1. [P2] src/api/routes/query.ts:106-128 - Embedding provider created on every request
+   The embedding provider is created fresh on every query request. If createEmbeddingProvider
+   performs any initialization (HTTP client setup, connection pooling, etc.), this creates
+   unnecessary overhead. Consider creating the provider once at server startup or caching it.
+
+2. [P3] src/daemon/query-processor.ts:217-219 - Destructuring assumes single element array
+   The code destructures the first element from the embedding result without checking if the
+   array is empty or the result is malformed. If embed() returns an empty array, queryEmbedding
+   would be undefined, causing confusing errors downstream.
+
+3. [P3] src/daemon/query-processor.ts:222-225 - Redundant filter transformation
+   The filters are already in the correct shape but are being transformed redundantly.
+   The transformation is harmless but adds unnecessary indirection.
 
 ---
-
-## Progress Log
-
-
----
-
-## 2026-01-27 21:30 - Task 17.3.1
-
-**Status**: pending → done
-**Validation**: 
-  - 11 new unit tests for storage functions (storeEmbeddingWithVec, deleteEmbedding, getEmbedding, hasEmbedding, serializeEmbedding, deserializeEmbedding)
-  - Tests cover: basic storage, upsert semantics, vec table updates with correct dimensions, dimension mismatch handling
-  - All 1255 tests pass
-**Commit**: 64435dcc
-**Notes**: Added storeEmbeddingWithVec helper function to embedding-utils.ts:
-  - Stores embeddings in both node_embeddings (binary blob) and node_embeddings_vec (vec0 virtual table)
-  - Handles upsert semantics (INSERT OR REPLACE)
-  - Gracefully handles dimension mismatch (stores in node_embeddings, skips vec table)
-  - Uses BigInt for vec table rowid as required by sqlite-vec
-  - Also added getEmbedding, hasEmbedding, deleteEmbedding helper functions
-  - Added serializeEmbedding/deserializeEmbedding for binary blob conversion
-
----
-
-## 2026-01-27 21:38 - Task 17.3.2
-
-**Status**: pending → done
-**Validation**: 
-  - 4 new unit tests for embedding provider initialization in worker
-  - Tests cover: missing API key warning, successful initialization log, skipped initialization when not configured, hasEmbedding utility
-  - All 1259 tests pass
-**Commit**: ba8bf99f
-**Notes**: Added embedding generation at node ingest time in worker.ts:
-  - Initialize embedding provider during worker startup (if configured)
-  - Generate embeddings after node creation using buildEmbeddingText (rich format with summary + decisions + lessons)
-  - Store using storeEmbeddingWithVec (both node_embeddings table and vec0 virtual table)
-  - Handle failures gracefully (log warning, don't fail job) - backfill job will catch gaps
-  - API key validation on startup with appropriate warning messages
-
----
-
-## 2026-01-27 21:52 - Task 17.4.1
-
-**Status**: active → done
-**Validation**: 
-  - 15 new unit tests for backfill functions (findNodesNeedingEmbedding, countNodesNeedingEmbedding, backfillEmbeddings)
-  - Tests cover: finding missing embeddings, detecting old format, different models, batch processing, loading failure handling, API error handling, force mode
-  - Verified batch processing (e.g. 5 nodes with batch size 2 results in 3 batches)
-  - All 1274 tests pass
-**Commit**: 5d7179c9
-**Notes**: Implemented core backfill logic in embedding-utils.ts.
-  - findNodesNeedingEmbedding uses model name and isRichEmbeddingFormat to detect outdated embeddings.
-  - backfillEmbeddings supports batching and is resilient to individual node/batch failures.
-  - Used dependency injection for readNodeFromPath to maintain modularity.
-
-## 2026-01-27 22:15 - Task 17.4.2
-
-**Status**: active → done
-**Validation**: 
-  - Added `backfillEmbeddingsSchedule` and `backfillLimit` to configuration.
-  - Implemented `runBackfillEmbeddings` job in `Scheduler` class.
-  - Updated `createScheduler` to pass new configuration options.
-  - Added unit tests for backfill scheduling and execution logic in `src/daemon/scheduler.test.ts`.
-  - Verified tests pass with `npm test`.
-**Commit**: 6f69b57e
-**Notes**: 
-  - The backfill job is scheduled via cron (default: "0 5 * * *").
-  - It uses a configurable limit (default: 100) to batch process nodes needing embeddings.
-  - Skips gracefully if embedding provider/API key is missing.
-
-## 2026-01-27 22:45 - Task 17.4.3
-
-**Status**: pending → done
-**Validation**: 
-  - Verified `pi-brain rebuild --embeddings` command implementation in src/cli.ts and src/daemon/cli.ts
-  - Fixed lint errors in src/daemon/cli.test.ts, src/daemon/query-processor.test.ts, and src/storage/semantic-search.test.ts
-  - Verified tests pass for daemon CLI: `npm test -- --run src/daemon/cli.test.ts`
-  - Command correctly initializes embedding provider and calls backfillEmbeddings with force option support
-**Commit**: a3553cbd
-**Notes**: The command was already largely implemented in previous commits but had lint issues in tests. Cleaned up tests and verified functionality.
-
----
-
-## 2026-01-27 13:25 - Task 17.5.1, 17.5.2
-
-**Status**: pending → done
-**Validation**: 
-  - semanticSearch() function was already implemented in src/storage/semantic-search.ts
-  - Added 11 new unit tests for comprehensive coverage:
-    - Empty results when DB returns no matches
-    - Distance ordering verification
-    - Highlights generation (includeHighlights option)
-    - Default and custom limit options
-    - Non-dimension error rethrow behavior
-    - getNodeEmbeddingVector function (3 tests)
-    - findSimilarNodes limit handling after self-filtering
-  - All 18 tests in semantic-search.test.ts pass
-  - All 1272 tests pass overall
-**Commit**: d807f469
-**Notes**: Task 17.5.1 was already implemented; completed 17.5.2 by adding missing unit tests per spec requirements.
-
----
-
-## 2026-01-28 06:36 - Task 17.6.1
-
-**Status**: active → done
-**Validation**: 
-  - 5 new unit tests for semantic search integration in query-processor.test.ts:
-    - Should use semantic search when embedding provider configured
-    - Should fall back to FTS when semantic search returns no results
-    - Should fall back to FTS when semantic search throws an error
-    - Should skip semantic search when no embedding provider configured
-    - Should pass project filter to semantic search
-  - All 1277 tests pass
-**Commit**: 005d8ca9
-**Notes**: Updated findRelevantNodes to be async and accept embedding provider:
-  - Phase 1: Try semantic search when embedding provider configured
-  - Phase 2: Fall back to FTS if semantic returns no results or throws
-  - Phase 3: Fall back to listing recent nodes as last resort
-  - Updated API route to create embedding provider from config
-  - Logs strategy transitions for debugging (semantic → FTS fallback)

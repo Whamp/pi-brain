@@ -17,72 +17,58 @@ Ultracite wraps two tools:
 
 **Critical Principle:** Always run read-only checks before applying any auto-fixes. Never skip exploration by running fix commands directly.
 
-### 📖 Read-Only Commands (No file changes)
+### 📖 Read-Only Commands
 
-Use these for exploration and understanding. They report issues without modifying files.
+| Command                | What it does                                          |
+| ---------------------- | ----------------------------------------------------- |
+| `npm run check`        | Runs linter + formatter check. Fails if issues exist. |
+| `npx ultracite doctor` | Diagnoses Ultracite setup issues.                     |
 
-| Command                | What it does                                                         |
-| ---------------------- | -------------------------------------------------------------------- |
-| `npm run check`        | **Read-only.** Runs linter + formatter check. Fails if issues found. |
-| `npx ultracite doctor` | **Read-only.** Diagnoses Ultracite setup issues.                     |
+### ✏️ Auto-Modify Commands
 
-### ✏️ Auto-Modify Commands (Will change your files)
+Run `npm run check` first to understand what will change.
 
-Use these only when you understand what changes will be made and have reviewed the issues first.
+| Command               | What it does                                |
+| --------------------- | ------------------------------------------- |
+| `npm run fix`         | **MODIFIES FILES.** Auto-fixes lint issues. |
+| `npx oxfmt --write .` | **MODIFIES FILES.** Auto-fixes formatting.  |
 
-| Command               | What it does                                                       |
-| --------------------- | ------------------------------------------------------------------ |
-| `npm run fix`         | **MODIFIES FILES.** Auto-fixes lint issues (does NOT format).      |
-| `npx oxfmt --write .` | **MODIFIES FILES.** Auto-fixes formatting issues across all files. |
+### 🔄 Blocking Commands
 
-### 🔄 Blocking Commands (Will hang until interrupted)
+Use tmux—these never exit on their own.
 
-Use tmux for these commands to avoid getting blocked.
+| Command           | What it does                                                           |
+| ----------------- | ---------------------------------------------------------------------- |
+| `npm test`        | **BLOCKS.** Vitest watch mode. Use `npm test -- --run` for single run. |
+| `npm run dev`     | **BLOCKS.** tsup watch mode.                                           |
+| `npm run web:dev` | **BLOCKS.** Vite dev server for web app.                               |
 
-| Command           | What it does                                                                                          |
-| ----------------- | ----------------------------------------------------------------------------------------------------- |
-| `npm test`        | **BLOCKING.** Runs Vitest in watch mode. Never use directly - use `npm test -- --run` or run in tmux. |
-| `npm run dev`     | **BLOCKING.** Runs tsup in watch mode for this project. Run in tmux for development.                  |
-| `npm run web:dev` | **BLOCKING.** Runs web app dev server. Run in tmux.                                                   |
+### 🏗️ Build Commands
 
-### 🏗️ Build Commands (Run once, then exit)
+Safe to run directly—these exit when done.
 
-These commands complete their work and exit. Safe to run directly.
+| Command             | What it does                    |
+| ------------------- | ------------------------------- |
+| `npm run build`     | Builds with tsup. Output: dist/ |
+| `npm run web:build` | Builds the web app.             |
 
-| Command             | What it does                                             |
-| ------------------- | -------------------------------------------------------- |
-| `npm run build`     | Builds the project with tsup. Generates dist/ directory. |
-| `npm run web:build` | Builds the web app.                                      |
-
-### Recommended Exploration Workflow
+### Workflow
 
 ```bash
-# Step 1: Check what issues exist (no changes)
-npm run check
-
-# Step 2: Review and understand the issues manually
-# (Read the files, understand what needs fixing)
-
-# Step 3: Only when ready, apply fixes
-npm run fix && npx oxfmt --write .
-
-# Step 4: Verify fixes worked
-npm run check
-
-# Step 5: Run tests in non-blocking mode
-npm test -- --run
+npm run check                    # See issues (no changes)
+npm run fix && npx oxfmt --write . # Apply fixes
+npm run check                    # Verify
+npm test -- --run                # Test (non-blocking)
 ```
 
 ### When to Use tmux
 
-Always use tmux for commands that **never exit** and will block your session:
+Commands that never exit block your session. Use tmux for:
 
-- Dev servers: `npm run dev`, `yarn dev`, `vite`, `next dev`, `rails server`, `flask run`, `uvicorn`
-- Watch modes: `tsc --watch`, `cargo watch`, `nodemon`, `npm test` (without `--run`)
-- Log streaming: `tail -f`, `docker logs -f`, `journalctl -f`
-- Interactive REPLs: `python3`, `node`, `psql`, `mysql`, `gdb`, `lldb`, `ipdb`, `pdb`
-
-**Pattern:** If the command expects continuous input/output and doesn't have a natural exit, use tmux.
+- Watch modes: `npm run dev`, `npm test`, `tsc --watch`
+- Dev servers: `npm run web:dev`, `vite`
+- Log streaming: `tail -f`, `docker logs -f`
+- REPLs: `node`, `python3`, `psql`
 
 ### Pre-commit Hook
 
@@ -110,11 +96,9 @@ This project uses **codemap** to provide structured navigation aids for agents. 
 | [.codemap/BRAIN_QUERIES.md](.codemap/BRAIN_QUERIES.md)         | Knowledge graph query patterns               |
 | [.codemap/index.json](.codemap/index.json)                     | Complete machine-readable symbol index       |
 
-**Usage for Agents:**
-
-- Always check `.codemap/API.md` before implementing new features.
-- Use `codemap callers <symbol>` to understand how a function is used.
-- Use `codemap call-graph <symbol>` to trace complex data flows.
+- Check `.codemap/API.md` before implementing new features
+- Use `codemap callers <symbol>` to understand how a function is used
+- Use `codemap call-graph <symbol>` to trace data flows
 
 ---
 
@@ -167,40 +151,35 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Handle errors appropriately in async code with try-catch blocks
 - Don't use async functions as Promise executors
 
-### React & JSX
+### Svelte & SvelteKit
 
-- Use function components over class components
-- Call hooks at the top level only, never conditionally
-- Specify all dependencies in hook dependency arrays correctly
-- Use the `key` prop for elements in iterables (prefer unique IDs over array indices)
-- Nest children between opening and closing tags instead of passing as props
-- Don't define components inside other components
-- Use semantic HTML and ARIA attributes for accessibility:
-  - Provide meaningful alt text for images
-  - Use proper heading hierarchy
-  - Add labels for form inputs
-  - Include keyboard event handlers alongside mouse events
-  - Use semantic elements (`<button>`, `<nav>`, etc.) instead of divs with roles
+The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 
-### Error Handling & Debugging
+- Use `class` and `for` attributes (not `className` or `htmlFor`)
+- Use runes (`$state`, `$derived`, `$effect`) for reactivity in Svelte 5
+- Use `{#each items as item (item.id)}` with keys for lists
+- Use semantic HTML and ARIA attributes for accessibility
+- Prefer `+page.server.ts` load functions over client-side fetching
 
-- Remove `console.log`, `debugger`, and `alert` statements from production code
-- Throw `Error` objects with descriptive messages, not strings or other values
-- Use `try-catch` blocks meaningfully - don't catch errors just to rethrow them
-- Prefer early returns over nested conditionals for error cases
+### Error Handling
+
+- Remove `console.log`, `debugger`, and `alert` before committing
+- Throw `Error` objects with descriptive messages, not strings
+- Use `try-catch` meaningfully—don't catch just to rethrow
+- Prefer early returns over nested conditionals
 
 ### Code Organization
 
-- Keep functions focused and under reasonable cognitive complexity limits
+- Keep functions focused—limit cognitive complexity
 - Extract complex conditions into well-named boolean variables
 - Use early returns to reduce nesting
-- Prefer simple conditionals over nested ternary operators
-- Group related code together and separate concerns
+- Prefer simple conditionals over nested ternaries
+- Group related code; separate concerns
 
 ### Security
 
 - Add `rel="noopener"` when using `target="_blank"` on links
-- Avoid `dangerouslySetInnerHTML` unless absolutely necessary
+- Use `{@html}` sparingly in Svelte—sanitize untrusted content
 - Don't use `eval()` or assign directly to `document.cookie`
 - Validate and sanitize user input
 
@@ -210,41 +189,23 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Use top-level regex literals instead of creating them in loops
 - Prefer specific imports over namespace imports
 - Avoid barrel files (index files that re-export everything)
-- Use proper image components (e.g., Next.js `<Image>`) over `<img>` tags
-
-### Framework-Specific Guidance
-
-**Next.js:**
-
-- Use Next.js `<Image>` component for images
-- Use `next/head` or App Router metadata API for head elements
-- Use Server Components for async data fetching instead of async Client Components
-
-**React 19+:**
-
-- Use ref as a prop instead of `React.forwardRef`
-
-**Solid/Svelte/Vue/Qwik:**
-
-- Use `class` and `for` attributes (not `className` or `htmlFor`)
 
 ---
 
 ## Testing
 
-- **Never run `npm test` directly** - it blocks in watch mode. Use `npm test -- --run` for single-run execution, or run in tmux.
 - Write assertions inside `it()` or `test()` blocks
-- Avoid done callbacks in async tests - use async/await instead
+- Avoid done callbacks in async tests—use async/await
 - Don't use `.only` or `.skip` in committed code
-- Keep test suites reasonably flat - avoid excessive `describe` nesting
+- Keep test suites reasonably flat—avoid excessive `describe` nesting
 
-## When Oxlint + Oxfmt Can't Help
+## What Linting Can't Catch
 
-Oxlint + Oxfmt's linter will catch most issues automatically. Focus your attention on:
+Focus on:
 
-1. **Business logic correctness** - Oxlint + Oxfmt can't validate your algorithms
-2. **Meaningful naming** - Use descriptive names for functions, variables, and types
-3. **Architecture decisions** - Component structure, data flow, and API design
-4. **Edge cases** - Handle boundary conditions and error states
-5. **User experience** - Accessibility, performance, and usability considerations
-6. **Documentation** - Add comments for complex logic, but prefer self-documenting code
+1. **Business logic** - The linter can't validate your algorithms
+2. **Meaningful naming** - Descriptive names for functions, variables, types
+3. **Architecture** - Component structure, data flow, API design
+4. **Edge cases** - Boundary conditions and error states
+5. **UX** - Accessibility, performance, usability
+6. **Documentation** - Comments for complex logic; prefer self-documenting code

@@ -707,7 +707,7 @@ src/daemon/query-processor.test.ts [1-458]
     - node:fs/promises
     - vitest
 
-src/daemon/query-processor.ts [1-774]
+src/daemon/query-processor.ts [1-779]
   interface:
     31-44: interface QueryRequest [exported]
       /** Query request from the API */
@@ -1563,4 +1563,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,421 (codebase: ~1,050,447)
+Estimated tokens: 20,421 (codebase: ~1,049,308)

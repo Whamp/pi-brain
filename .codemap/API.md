@@ -130,9 +130,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-241]
+src/api/routes/query.ts [1-280]
   function:
-    48-240: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    105-279: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -665,7 +665,7 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-774]
+src/daemon/query-processor.ts [1-779]
   interface:
     31-44: interface QueryRequest [exported]
       /** Query request from the API */
@@ -2117,4 +2117,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 89
-Estimated tokens: 26,684 (codebase: ~1,046,372)
+Estimated tokens: 26,684 (codebase: ~1,050,573)
