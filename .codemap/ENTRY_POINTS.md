@@ -219,7 +219,7 @@ src/api/routes/nodes.ts [1-234]
       refs out: 1 [call: 1]
         - src/api/routes/nodes.ts:56: call isNaN -> external
     59-233: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 43 [call: 35, type: 8]
+      refs out: 41 [call: 33, type: 8]
         - src/api/routes/nodes.ts:59: type FastifyInstance -> external
         - src/api/routes/nodes.ts:59: type Promise -> external
         - src/api/routes/nodes.ts:63: call get -> external
@@ -574,4 +574,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 6,063 (codebase: ~968,279)
+Estimated tokens: 6,063 (codebase: ~968,915)

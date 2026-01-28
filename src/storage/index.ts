@@ -12,4 +12,5 @@ export * from "./search-repository.js";
 export * from "./lesson-repository.js";
 export * from "./quirk-repository.js";
 export * from "./tool-error-repository.js";
+export * from "./node-queries.js";
 export * from "./node-repository.js";

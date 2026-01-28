@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 46 files
+- typescript: 47 files
 
 ## Statistics
-- Total files: 46
+- Total files: 47
 - Total symbols: 297
   - function: 173
   - interface: 82
@@ -1670,7 +1670,7 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/node-repository.test.ts:2176: call (module)
         - src/storage/node-repository.ts:17: import (module)
         - src/storage/node-repository.ts:70: reexport (module)
-        - src/storage/node-repository.ts:1276: call outgoing
+        - src/storage/node-repository.ts:867: call outgoing
     100-107: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
       refs in: 7 [call: 4, import: 2, reexport: 1]
@@ -1680,7 +1680,7 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/node-repository.test.ts:2177: call (module)
         - src/storage/node-repository.ts:18: import (module)
         - src/storage/node-repository.ts:71: reexport (module)
-        - src/storage/node-repository.ts:1283: call incoming
+        - src/storage/node-repository.ts:874: call incoming
     112-119: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
       refs in: 5 [call: 2, import: 2, reexport: 1]
@@ -1688,7 +1688,7 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/node-repository.test.ts:1324: call edges
         - src/storage/node-repository.ts:19: import (module)
         - src/storage/node-repository.ts:72: reexport (module)
-        - src/storage/node-repository.ts:1444: call allEdges
+        - src/storage/node-repository.ts:1035: call allEdges
     124-127: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
       refs in: 6 [call: 3, import: 2, reexport: 1]
@@ -1730,13 +1730,14 @@ src/storage/edge-repository.ts [1-178]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-16]
+src/storage/index.ts [1-17]
   imports:
     - ./database.js
     - ./edge-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
+    - ./node-queries.js
     - ./node-repository.js
     - ./node-storage.js
     - ./node-types.js
@@ -1864,23 +1865,23 @@ src/storage/node-crud.ts [1-189]
         - src/storage/node-repository.test.ts:273: type options
         - src/storage/node-repository.ts:32: import (module)
         - src/storage/node-repository.ts:60: reexport (module)
-        - src/storage/node-repository.ts:245: type createNode
-        - src/storage/node-repository.ts:270: type upsertNode
-        - src/storage/node-repository.ts:384: type updateNode
-        - src/storage/node-repository.ts:514: type getAllNodeVersions
+        - src/storage/node-repository.ts:270: type createNode
+        - src/storage/node-repository.ts:295: type upsertNode
+        - src/storage/node-repository.ts:409: type updateNode
+        - src/storage/node-repository.ts:539: type getAllNodeVersions
     32-54: interface NodeRow [exported]
       /** Node row from the database */
-      refs in: 34 [import: 4, reexport: 1, type: 29]
+      refs in: 35 [import: 5, reexport: 1, type: 29]
         - src/daemon/connection-discovery.ts:17: import (module)
         - src/daemon/connection-discovery.ts:314: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:335: type ConnectionDiscoverer.findCandidates
         - src/daemon/query-processor.ts:22: import (module)
         - src/daemon/query-processor.ts:237: type nodeRowToRelevant
-        - src/storage/node-repository.ts:31: import (module)
-        - src/storage/node-repository.ts:60: reexport (module)
-        - src/storage/node-repository.ts:476: type getNode
-        - src/storage/node-repository.ts:481: type getNode
-        - src/storage/node-repository.ts:493: type getNodeVersion
+        - src/storage/node-queries.ts:12: import (module)
+        - src/storage/node-queries.ts:75: type getNodesByTag
+        - src/storage/node-queries.ts:84: type getNodesByTag
+        - src/storage/node-queries.ts:93: type getNodesByTopic
+        - src/storage/node-queries.ts:100: type getNodesByTopic
   function:
     60-62: generateLessonId(): string [exported]
       refs in: 1 [call: 1]
@@ -1898,33 +1899,202 @@ src/storage/node-crud.ts [1-189]
       /** Insert lessons for a node */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-repository.ts:28: import (module)
-        - src/storage/node-repository.ts:227: call insertNodeToDb
-        - src/storage/node-repository.ts:362: call upsertNode
-        - src/storage/node-repository.ts:459: call updateNode
+        - src/storage/node-repository.ts:252: call insertNodeToDb
+        - src/storage/node-repository.ts:387: call upsertNode
+        - src/storage/node-repository.ts:484: call updateNode
     119-139: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-repository.ts:29: import (module)
-        - src/storage/node-repository.ts:228: call insertNodeToDb
-        - src/storage/node-repository.ts:363: call upsertNode
-        - src/storage/node-repository.ts:460: call updateNode
+        - src/storage/node-repository.ts:253: call insertNodeToDb
+        - src/storage/node-repository.ts:388: call upsertNode
+        - src/storage/node-repository.ts:485: call updateNode
     144-164: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-repository.ts:30: import (module)
-        - src/storage/node-repository.ts:229: call insertNodeToDb
-        - src/storage/node-repository.ts:364: call upsertNode
-        - src/storage/node-repository.ts:461: call updateNode
+        - src/storage/node-repository.ts:254: call insertNodeToDb
+        - src/storage/node-repository.ts:389: call upsertNode
+        - src/storage/node-repository.ts:486: call updateNode
     169-188: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-repository.ts:27: import (module)
-        - src/storage/node-repository.ts:230: call insertNodeToDb
-        - src/storage/node-repository.ts:365: call upsertNode
-        - src/storage/node-repository.ts:462: call updateNode
+        - src/storage/node-repository.ts:255: call insertNodeToDb
+        - src/storage/node-repository.ts:390: call upsertNode
+        - src/storage/node-repository.ts:487: call updateNode
   imports:
     - ./node-storage.js
     - ./node-types.js
+    - better-sqlite3
+
+src/storage/node-queries.ts [1-455]
+  interface:
+    140-165: interface ListNodesFilters [exported]
+      /** Filters for querying nodes */
+      refs in: 6 [import: 1, reexport: 1, type: 4]
+        - src/daemon/query-processor.ts:21: import (module)
+        - src/daemon/query-processor.ts:207: type filters
+        - src/daemon/query-processor.ts:220: type listFilters
+        - src/storage/node-queries.ts:221: type listNodes
+        - src/storage/node-queries.ts:450: type countNodes
+        - src/storage/node-repository.ts:142: reexport (module)
+    168-177: interface ListNodesOptions [exported]
+      /** Pagination and sorting options */
+      refs in: 2 [reexport: 1, type: 1]
+        - src/storage/node-queries.ts:222: type listNodes
+        - src/storage/node-repository.ts:143: reexport (module)
+    180-189: interface ListNodesResult [exported]
+      /** Result from listNodes query */
+      refs in: 2 [reexport: 1, type: 1]
+        - src/storage/node-queries.ts:223: type listNodes
+        - src/storage/node-repository.ts:144: reexport (module)
+    353-365: interface SessionSummaryRow [exported]
+      /** Session summary row from aggregation query */
+      refs in: 3 [reexport: 1, type: 2]
+        - src/storage/node-queries.ts:375: type getSessionSummaries
+        - src/storage/node-queries.ts:399: type getSessionSummaries
+        - src/storage/node-repository.ts:148: reexport (module)
+  type:
+    108-116: NodeSortField = | "timestamp"
+  | "analyzed_at"
+  | "project"
+  | "type"
+  | "outcome"
+  | "tokens_used"
+  | "cost"
+  | "duration_minutes" [exported]
+      /** Valid sort fields for listNodes */
+      refs in: 6 [reexport: 1, type: 5]
+        - src/storage/node-queries.ts:174: type ListNodesOptions
+        - src/storage/node-queries.ts:192: type ALLOWED_SORT_FIELDS
+        - src/storage/node-queries.ts:229: type sort
+        - src/storage/node-queries.ts:230: type sort
+        - src/storage/node-queries.ts:232: type sort
+        - src/storage/node-repository.ts:145: reexport (module)
+    119-119: SortOrder = "asc" | "desc" [exported]
+      /** Sort order */
+      refs in: 3 [reexport: 1, type: 2]
+        - src/storage/node-queries.ts:176: type ListNodesOptions
+        - src/storage/node-queries.ts:234: type order
+        - src/storage/node-repository.ts:149: reexport (module)
+    122-134: NodeTypeFilter = | "coding"
+  | "sysadmin"
+  | "research"
+  | "planning"
+  | "debugging"
+  | "qa"
+  | "brainstorm"
+  | "handoff"
+  | "refactor"
+  | "documentation"
+  | "configuration"
+  | "other" [exported]
+      /** Node type filter values */
+      refs in: 2 [reexport: 1, type: 1]
+        - src/storage/node-queries.ts:146: type ListNodesFilters
+        - src/storage/node-repository.ts:146: reexport (module)
+    137-137: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
+      /** Outcome filter values */
+      refs in: 2 [reexport: 1, type: 1]
+        - src/storage/node-queries.ts:148: type ListNodesFilters
+        - src/storage/node-repository.ts:147: reexport (module)
+  function:
+    21-28: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+      /** Get node summary from FTS index */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/daemon/connection-discovery.ts:16: import (module)
+        - src/daemon/connection-discovery.ts:222: call ConnectionDiscoverer.sourceSummary
+        - src/storage/node-repository.ts:137: reexport (module)
+    33-37: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+      /** Get tags for a node */
+      refs in: 7 [call: 5, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:49: import (module)
+        - src/storage/node-repository.test.ts:321: call tags
+        - src/storage/node-repository.test.ts:705: call tags
+        - src/storage/node-repository.test.ts:798: call (module)
+        - src/storage/node-repository.test.ts:837: call tags
+        - src/storage/node-repository.test.ts:2138: call tags
+        - src/storage/node-repository.ts:138: reexport (module)
+    42-46: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+      /** Get topics for a node */
+      refs in: 5 [call: 3, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:50: import (module)
+        - src/storage/node-repository.test.ts:337: call topics
+        - src/storage/node-repository.test.ts:711: call topics
+        - src/storage/node-repository.test.ts:799: call (module)
+        - src/storage/node-repository.ts:139: reexport (module)
+    51-61: getAllTags(db: Database.Database): {} [exported]
+      /** Get all unique tags in the system */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:32: import (module)
+        - src/storage/node-repository.test.ts:954: call allTags
+        - src/storage/node-repository.ts:133: reexport (module)
+    66-70: getAllTopics(db: Database.Database): {} [exported]
+      /** Get all unique topics in the system */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:33: import (module)
+        - src/storage/node-repository.test.ts:974: call allTopics
+        - src/storage/node-repository.ts:134: reexport (module)
+    75-85: getNodesByTag(db: Database.Database, tag: string): {} [exported]
+      /** Find nodes by tag (matches both node tags and lesson tags) */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:47: import (module)
+        - src/storage/node-repository.test.ts:1030: call results
+        - src/storage/node-repository.ts:135: reexport (module)
+    90-101: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
+      /** Find nodes by topic */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:48: import (module)
+        - src/storage/node-repository.test.ts:1048: call results
+        - src/storage/node-repository.ts:136: reexport (module)
+    219-344: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+      /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
+      refs in: 43 [call: 39, import: 3, reexport: 1]
+        - src/daemon/cli.test.ts:13: import (module)
+        - src/daemon/cli.test.ts:637: call listResult
+        - src/daemon/cli.test.ts:706: call listResult
+        - src/daemon/cli.test.ts:727: call (module)
+        - src/daemon/query-processor.ts:19: import (module)
+        - src/daemon/query-processor.ts:225: call nodes
+        - src/storage/node-queries.ts:452: call result
+        - src/storage/node-repository.test.ts:58: import (module)
+        - src/storage/node-repository.test.ts:2202: call result
+        - src/storage/node-repository.test.ts:2226: call result
+    371-400: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+      /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
+      refs in: 1 [reexport: 1]
+        - src/storage/node-repository.ts:140: reexport (module)
+    409-417: getAllProjects(db: Database.Database): {} [exported]
+      /** Get all unique projects in the system */
+      refs in: 4 [call: 2, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:31: import (module)
+        - src/storage/node-repository.test.ts:2878: call projects
+        - src/storage/node-repository.test.ts:2884: call projects
+        - src/storage/node-repository.ts:132: reexport (module)
+    422-430: getAllNodeTypes(db: Database.Database): {} [exported]
+      /** Get all unique node types that have been used */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:29: import (module)
+        - src/storage/node-repository.test.ts:2903: call types
+        - src/storage/node-repository.ts:131: reexport (module)
+    435-443: getAllComputers(db: Database.Database): {} [exported]
+      /** Get all unique computers (source machines) */
+      refs in: 3 [call: 1, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:28: import (module)
+        - src/storage/node-repository.test.ts:2920: call computers
+        - src/storage/node-repository.ts:130: reexport (module)
+    448-454: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+      /** Count nodes matching filters (without fetching data) */
+      refs in: 6 [call: 4, import: 1, reexport: 1]
+        - src/storage/node-repository.test.ts:18: import (module)
+        - src/storage/node-repository.test.ts:2944: call (module)
+        - src/storage/node-repository.test.ts:2945: call (module)
+        - src/storage/node-repository.test.ts:2946: call (module)
+        - src/storage/node-repository.test.ts:2947: call (module)
+        - src/storage/node-repository.ts:129: reexport (module)
+  imports:
+    - ./node-crud.js
     - better-sqlite3
 
 src/storage/node-repository.test.ts [1-4087]
@@ -1940,126 +2110,58 @@ src/storage/node-repository.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/node-repository.ts [1-1501]
+src/storage/node-repository.ts [1-1092]
   interface:
-    851-876: interface ListNodesFilters [exported]
-      /** Filters for querying nodes */
-      refs in: 9 [import: 2, type: 7]
-        - src/api/routes/nodes.ts:18: import (module)
-        - src/api/routes/nodes.ts:90: type filters
-        - src/api/routes/nodes.ts:92: type filters
-        - src/api/routes/nodes.ts:93: type filters
-        - src/daemon/query-processor.ts:21: import (module)
-        - src/daemon/query-processor.ts:207: type filters
-        - src/daemon/query-processor.ts:220: type listFilters
-        - src/storage/node-repository.ts:932: type listNodes
-        - src/storage/node-repository.ts:1153: type countNodes
-    879-888: interface ListNodesOptions [exported]
-      /** Pagination and sorting options */
-      refs in: 5 [import: 1, type: 4]
-        - src/api/routes/nodes.ts:19: import (module)
-        - src/api/routes/nodes.ts:103: type options
-        - src/api/routes/nodes.ts:106: type options
-        - src/api/routes/nodes.ts:107: type options
-        - src/storage/node-repository.ts:933: type listNodes
-    891-900: interface ListNodesResult [exported]
-      /** Result from listNodes query */
-      refs in: 1 [type: 1]
-        - src/storage/node-repository.ts:934: type listNodes
-    1060-1072: interface SessionSummaryRow [exported]
-      /** Session summary row from aggregation query */
-      refs in: 2 [type: 2]
-        - src/storage/node-repository.ts:1082: type getSessionSummaries
-        - src/storage/node-repository.ts:1106: type getSessionSummaries
-    1167-1183: interface ConnectedNodesOptions [exported]
+    758-774: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
       refs in: 2 [type: 2]
-        - src/storage/node-repository.ts:1245: type getConnectedNodes
-        - src/storage/node-repository.ts:1359: type getSubgraph
-    1186-1201: interface TraversalEdge [exported]
+        - src/storage/node-repository.ts:836: type getConnectedNodes
+        - src/storage/node-repository.ts:950: type getSubgraph
+    777-792: interface TraversalEdge [exported]
       /** An edge with direction information for traversal results */
       refs in: 3 [type: 3]
-        - src/storage/node-repository.ts:1210: type ConnectedNodesResult
-        - src/storage/node-repository.ts:1254: type traversalEdges
-        - src/storage/node-repository.ts:1368: type allEdges
-    1204-1211: interface ConnectedNodesResult [exported]
+        - src/storage/node-repository.ts:801: type ConnectedNodesResult
+        - src/storage/node-repository.ts:845: type traversalEdges
+        - src/storage/node-repository.ts:959: type allEdges
+    795-802: interface ConnectedNodesResult [exported]
       /** Result from getConnectedNodes */
       refs in: 4 [type: 4]
-        - src/storage/node-repository.ts:1246: type getConnectedNodes
-        - src/storage/node-repository.ts:1360: type getSubgraph
-        - src/storage/node-repository.ts:1475: type getAncestors
-        - src/storage/node-repository.ts:1491: type getDescendants
+        - src/storage/node-repository.ts:837: type getConnectedNodes
+        - src/storage/node-repository.ts:951: type getSubgraph
+        - src/storage/node-repository.ts:1066: type getAncestors
+        - src/storage/node-repository.ts:1082: type getDescendants
   type:
-    819-827: NodeSortField = | "timestamp"
-  | "analyzed_at"
-  | "project"
-  | "type"
-  | "outcome"
-  | "tokens_used"
-  | "cost"
-  | "duration_minutes" [exported]
-      /** Valid sort fields for listNodes */
-      refs in: 5 [type: 5]
-        - src/storage/node-repository.ts:885: type ListNodesOptions
-        - src/storage/node-repository.ts:903: type ALLOWED_SORT_FIELDS
-        - src/storage/node-repository.ts:940: type sort
-        - src/storage/node-repository.ts:941: type sort
-        - src/storage/node-repository.ts:943: type sort
-    830-830: SortOrder = "asc" | "desc" [exported]
-      /** Sort order */
-      refs in: 2 [type: 2]
-        - src/storage/node-repository.ts:887: type ListNodesOptions
-        - src/storage/node-repository.ts:945: type order
-    833-845: NodeTypeFilter = | "coding"
-  | "sysadmin"
-  | "research"
-  | "planning"
-  | "debugging"
-  | "qa"
-  | "brainstorm"
-  | "handoff"
-  | "refactor"
-  | "documentation"
-  | "configuration"
-  | "other" [exported]
-      /** Node type filter values */
-      refs in: 1 [type: 1]
-        - src/storage/node-repository.ts:857: type ListNodesFilters
-    848-848: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
-      /** Outcome filter values */
-      refs in: 1 [type: 1]
-        - src/storage/node-repository.ts:859: type ListNodesFilters
-    1164-1164: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
+    755-755: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
       /** Direction for graph traversal */
       refs in: 1 [type: 1]
-        - src/storage/node-repository.ts:1177: type ConnectedNodesOptions
+        - src/storage/node-repository.ts:768: type ConnectedNodesOptions
   function:
-    135-164: clearAllData(db: Database.Database): void [exported]
+    160-189: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/cli.ts:29: import (module)
         - src/daemon/cli.ts:977: call rebuildIndex
-    170-236: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    195-261: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
       refs in: 4 [call: 3, import: 1]
         - src/daemon/cli.ts:30: import (module)
         - src/daemon/cli.ts:989: call processInsertBatch
-        - src/storage/node-repository.ts:252: call createNode
-        - src/storage/node-repository.ts:280: call upsertNode
-    242-256: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+        - src/storage/node-repository.ts:277: call createNode
+        - src/storage/node-repository.ts:305: call upsertNode
+    267-281: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-      refs in: 251 [call: 248, import: 3]
-        - src/api/server.test.ts:14: import (module)
-        - src/api/server.test.ts:204: call (module)
-        - src/api/server.test.ts:252: call (module)
-        - src/api/server.test.ts:253: call (module)
-        - src/api/server.test.ts:300: call (module)
-        - src/api/server.test.ts:458: call (module)
-        - src/api/server.test.ts:459: call (module)
-        - src/api/server.test.ts:564: call (module)
-        - src/api/server.test.ts:565: call (module)
-        - src/api/server.test.ts:640: call (module)
-    267-374: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+      refs in: 240 [call: 238, import: 2]
+        - src/storage/decision-repository.test.ts:13: import (module)
+        - src/storage/decision-repository.test.ts:96: call (module)
+        - src/storage/decision-repository.test.ts:107: call (module)
+        - src/storage/decision-repository.test.ts:170: call (module)
+        - src/storage/decision-repository.test.ts:243: call (module)
+        - src/storage/node-repository.test.ts:21: import (module)
+        - src/storage/node-repository.test.ts:299: call created
+        - src/storage/node-repository.test.ts:319: call (module)
+        - src/storage/node-repository.test.ts:335: call (module)
+        - src/storage/node-repository.test.ts:367: call (module)
+    292-399: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:31: import (module)
@@ -2071,7 +2173,7 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:677: call second
         - src/storage/node-repository.test.ts:703: call (module)
         - src/storage/node-repository.test.ts:751: call (module)
-    381-471: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    406-496: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
       refs in: 6 [call: 5, import: 1]
         - src/storage/node-repository.test.ts:64: import (module)
@@ -2080,12 +2182,9 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:868: call (module)
         - src/storage/node-repository.test.ts:895: call (module)
         - src/storage/node-repository.test.ts:908: call (module)
-    476-482: getNode(db: Database.Database, nodeId: string): any [exported]
+    501-507: getNode(db: Database.Database, nodeId: string): any [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-      refs in: 17 [call: 13, import: 4]
-        - src/api/routes/nodes.ts:10: import (module)
-        - src/api/routes/nodes.ts:139: call nodeRow
-        - src/api/routes/nodes.ts:216: call nodeRow
+      refs in: 14 [call: 11, import: 3]
         - src/daemon/cli.test.ts:13: import (module)
         - src/daemon/cli.test.ts:597: call retrieved
         - src/daemon/cli.test.ts:678: call retrieved
@@ -2093,13 +2192,16 @@ src/storage/node-repository.ts [1-1501]
         - src/daemon/connection-discovery.ts:208: call ConnectionDiscoverer.sourceNode
         - src/daemon/connection-discovery.ts:393: call ConnectionDiscoverer.targetNode
         - src/storage/node-repository.test.ts:43: import (module)
-    489-499: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
+        - src/storage/node-repository.test.ts:304: call row
+        - src/storage/node-repository.test.ts:442: call result
+        - src/storage/node-repository.test.ts:450: call result
+    514-524: getNodeVersion(db: Database.Database, nodeId: string, version: number): any [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-repository.test.ts:51: import (module)
         - src/storage/node-repository.test.ts:461: call result
         - src/storage/node-repository.test.ts:470: call result
-    504-507: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    529-532: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
       refs in: 8 [call: 7, import: 1]
         - src/storage/node-repository.test.ts:61: import (module)
@@ -2108,31 +2210,29 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:629: call (module)
         - src/storage/node-repository.test.ts:681: call (module)
         - src/storage/node-repository.test.ts:767: call (module)
-        - src/storage/node-repository.ts:273: call exists
-        - src/storage/node-repository.ts:388: call updateNode
-    512-518: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+        - src/storage/node-repository.ts:298: call exists
+        - src/storage/node-repository.ts:413: call updateNode
+    537-543: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-      refs in: 4 [call: 2, import: 2]
-        - src/api/routes/nodes.ts:17: import (module)
-        - src/api/routes/nodes.ts:182: call allVersions
+      refs in: 2 [call: 1, import: 1]
         - src/storage/node-repository.test.ts:30: import (module)
         - src/storage/node-repository.test.ts:897: call allVersions
-    524-530: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    549-555: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
       refs in: 4 [call: 3, import: 1]
         - src/storage/node-repository.test.ts:23: import (module)
         - src/storage/node-repository.test.ts:765: call result
         - src/storage/node-repository.test.ts:771: call result
         - src/storage/node-repository.test.ts:796: call (module)
-    535-547: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
+    560-572: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    552-563: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+    577-588: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the latest node for a given session file */
       refs in: 1 [call: 1]
-        - src/storage/node-repository.ts:671: call parentLastNode
-    568-579: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
+        - src/storage/node-repository.ts:696: call parentLastNode
+    593-604: findFirstNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find the first node for a given session file */
-    588-613: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    613-638: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:29: import (module)
@@ -2143,7 +2243,7 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:553: call result
         - src/storage/node-repository.test.ts:578: call result
         - src/storage/node-repository.test.ts:607: call result
-    640-678: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    665-703: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -2158,103 +2258,9 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:1160: call edges
         - src/storage/node-repository.test.ts:1186: call edges1
         - src/storage/node-repository.test.ts:1187: call edges2
-    726-733: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
-      /** Get node summary from FTS index */
-      refs in: 2 [call: 1, import: 1]
-        - src/daemon/connection-discovery.ts:16: import (module)
-        - src/daemon/connection-discovery.ts:222: call ConnectionDiscoverer.sourceSummary
-    738-742: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
-      /** Get tags for a node */
-      refs in: 8 [call: 6, import: 2]
-        - src/api/routes/nodes.ts:15: import (module)
-        - src/api/routes/nodes.ts:168: call nodesRoutes
-        - src/storage/node-repository.test.ts:49: import (module)
-        - src/storage/node-repository.test.ts:321: call tags
-        - src/storage/node-repository.test.ts:705: call tags
-        - src/storage/node-repository.test.ts:798: call (module)
-        - src/storage/node-repository.test.ts:837: call tags
-        - src/storage/node-repository.test.ts:2138: call tags
-    747-751: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
-      /** Get topics for a node */
-      refs in: 6 [call: 4, import: 2]
-        - src/api/routes/nodes.ts:16: import (module)
-        - src/api/routes/nodes.ts:172: call nodesRoutes
-        - src/storage/node-repository.test.ts:50: import (module)
-        - src/storage/node-repository.test.ts:337: call topics
-        - src/storage/node-repository.test.ts:711: call topics
-        - src/storage/node-repository.test.ts:799: call (module)
-    762-772: getAllTags(db: Database.Database): {} [exported]
-      /** Get all unique tags in the system */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:32: import (module)
-        - src/storage/node-repository.test.ts:954: call allTags
-    777-781: getAllTopics(db: Database.Database): {} [exported]
-      /** Get all unique topics in the system */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:33: import (module)
-        - src/storage/node-repository.test.ts:974: call allTopics
-    786-796: getNodesByTag(db: Database.Database, tag: string): {} [exported]
-      /** Find nodes by tag (matches both node tags and lesson tags) */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:47: import (module)
-        - src/storage/node-repository.test.ts:1030: call results
-    801-812: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
-      /** Find nodes by topic */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:48: import (module)
-        - src/storage/node-repository.test.ts:1048: call results
-    930-1055: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
-      /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-      refs in: 46 [call: 41, import: 5]
-        - src/api/routes/nodes.ts:11: import (module)
-        - src/api/routes/nodes.ts:110: call result
-        - src/api/routes/stats.ts:11: import (module)
-        - src/api/routes/stats.ts:91: call recentNodes
-        - src/daemon/cli.test.ts:13: import (module)
-        - src/daemon/cli.test.ts:637: call listResult
-        - src/daemon/cli.test.ts:706: call listResult
-        - src/daemon/cli.test.ts:727: call (module)
-        - src/daemon/query-processor.ts:19: import (module)
-        - src/daemon/query-processor.ts:225: call nodes
-    1078-1107: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
-      /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    1112-1120: getAllProjects(db: Database.Database): {} [exported]
-      /** Get all unique projects in the system */
-      refs in: 5 [call: 3, import: 2]
-        - src/api/routes/stats.ts:10: import (module)
-        - src/api/routes/stats.ts:49: call allProjects
-        - src/storage/node-repository.test.ts:31: import (module)
-        - src/storage/node-repository.test.ts:2878: call projects
-        - src/storage/node-repository.test.ts:2884: call projects
-    1125-1133: getAllNodeTypes(db: Database.Database): {} [exported]
-      /** Get all unique node types that have been used */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:29: import (module)
-        - src/storage/node-repository.test.ts:2903: call types
-    1138-1146: getAllComputers(db: Database.Database): {} [exported]
-      /** Get all unique computers (source machines) */
-      refs in: 2 [call: 1, import: 1]
-        - src/storage/node-repository.test.ts:28: import (module)
-        - src/storage/node-repository.test.ts:2920: call computers
-    1151-1157: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
-      /** Count nodes matching filters (without fetching data) */
-      refs in: 18 [call: 16, import: 2]
-        - src/api/routes/stats.ts:9: import (module)
-        - src/api/routes/stats.ts:25: call totalNodes
-        - src/api/routes/stats.ts:31: call nodesThisWeek
-        - src/api/routes/stats.ts:38: call nodesToday
-        - src/api/routes/stats.ts:43: call successCount
-        - src/api/routes/stats.ts:44: call partialCount
-        - src/api/routes/stats.ts:45: call failedCount
-        - src/api/routes/stats.ts:46: call abandonedCount
-        - src/api/routes/stats.ts:54: call projectCounts
-        - src/api/routes/stats.ts:59: call vagueThisWeek
-    1242-1347: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    833-938: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-      refs in: 18 [call: 16, import: 2]
-        - src/api/routes/nodes.ts:12: import (module)
-        - src/api/routes/nodes.ts:176: call connected
-        - src/api/routes/nodes.ts:223: call result
+      refs in: 15 [call: 14, import: 1]
         - src/storage/node-repository.test.ts:36: import (module)
         - src/storage/node-repository.test.ts:2956: call result
         - src/storage/node-repository.test.ts:2976: call result
@@ -2262,7 +2268,10 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:3020: call result
         - src/storage/node-repository.test.ts:3039: call result
         - src/storage/node-repository.test.ts:3058: call result
-    1356-1403: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+        - src/storage/node-repository.test.ts:3079: call result
+        - src/storage/node-repository.test.ts:3099: call result
+        - src/storage/node-repository.test.ts:3116: call result
+    947-994: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
       refs in: 5 [call: 4, import: 1]
         - src/storage/node-repository.test.ts:53: import (module)
@@ -2270,7 +2279,7 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:3186: call result
         - src/storage/node-repository.test.ts:3201: call result
         - src/storage/node-repository.test.ts:3222: call result
-    1411-1465: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    1002-1056: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
       refs in: 6 [call: 5, import: 1]
         - src/storage/node-repository.test.ts:26: import (module)
@@ -2279,13 +2288,13 @@ src/storage/node-repository.ts [1-1501]
         - src/storage/node-repository.test.ts:3270: call result
         - src/storage/node-repository.test.ts:3281: call result
         - src/storage/node-repository.test.ts:3301: call result
-    1471-1481: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    1062-1072: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-repository.test.ts:27: import (module)
         - src/storage/node-repository.test.ts:3320: call result
         - src/storage/node-repository.test.ts:3340: call result
-    1487-1497: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    1078-1088: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
       refs in: 3 [call: 2, import: 1]
         - src/storage/node-repository.test.ts:37: import (module)
@@ -2296,6 +2305,7 @@ src/storage/node-repository.ts [1-1501]
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
+    - ./node-queries.js
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
@@ -2396,7 +2406,7 @@ src/storage/node-storage.ts [1-292]
       /** List all versions of a specific node Returns array of { version, path } sorted by version ascending */
       refs in: 7 [call: 5, import: 2]
         - src/storage/node-repository.ts:35: import (module)
-        - src/storage/node-repository.ts:516: call versions
+        - src/storage/node-repository.ts:541: call versions
         - src/storage/node-storage.test.ts:16: import (module)
         - src/storage/node-storage.test.ts:356: call versions
         - src/storage/node-storage.test.ts:420: call versions
@@ -2767,9 +2777,9 @@ src/storage/search-repository.ts [1-532]
         - src/storage/node-repository.test.ts:1498: call (module)
         - src/storage/node-repository.ts:48: import (module)
         - src/storage/node-repository.ts:85: reexport (module)
-        - src/storage/node-repository.ts:234: call insertNodeToDb
-        - src/storage/node-repository.ts:369: call upsertNode
-        - src/storage/node-repository.ts:466: call updateNode
+        - src/storage/node-repository.ts:259: call insertNodeToDb
+        - src/storage/node-repository.ts:394: call upsertNode
+        - src/storage/node-repository.ts:491: call updateNode
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
       refs in: 12 [call: 9, import: 2, reexport: 1]
@@ -2915,5 +2925,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 46
-Estimated tokens: 38,538 (codebase: ~968,573)
+Files: 47
+Estimated tokens: 38,736 (codebase: ~969,474)
