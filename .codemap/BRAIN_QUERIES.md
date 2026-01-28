@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 57 files
+- typescript: 59 files
 
 ## Statistics
-- Total files: 57
-- Total symbols: 336
-  - function: 204
-  - interface: 89
+- Total files: 59
+- Total symbols: 344
+  - function: 209
+  - interface: 92
   - variable: 17
   - type: 17
   - class: 9
@@ -249,9 +249,9 @@ src/daemon/connection-discovery.ts [1-620]
         - src/daemon/connection-discovery.test.ts:39: type discoverer
         - src/daemon/connection-discovery.test.ts:78: instantiate (module)
         - src/daemon/index.ts:160: reexport (module)
-        - src/daemon/worker.ts:37: import (module)
-        - src/daemon/worker.ts:147: type Worker.connectionDiscoverer
-        - src/daemon/worker.ts:180: instantiate Worker.initialize
+        - src/daemon/worker.ts:38: import (module)
+        - src/daemon/worker.ts:148: type Worker.connectionDiscoverer
+        - src/daemon/worker.ts:181: instantiate Worker.initialize
   interface:
     138-143: interface ConnectionResult [exported]
       refs in: 2 [reexport: 1, type: 1]
@@ -297,7 +297,7 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.ts:319: type calculateRetryDelay
         - src/daemon/errors.ts:331: type calculateRetryDelayMinutes
         - src/daemon/index.ts:95: reexport (module)
-        - src/daemon/worker.ts:42: import (module)
+        - src/daemon/worker.ts:43: import (module)
     55-66: interface ClassifiedError [exported]
       /** Classified error with metadata */
       refs in: 2 [reexport: 1, type: 1]
@@ -387,9 +387,9 @@ src/daemon/errors.ts [1-457]
         - src/daemon/errors.test.ts:358: call stored
         - src/daemon/errors.test.ts:366: call stored
         - src/daemon/index.ts:84: reexport (module)
-        - src/daemon/worker.ts:41: import (module)
-        - src/daemon/worker.ts:554: call Worker.storedError
-        - src/daemon/worker.ts:713: call handleJobError
+        - src/daemon/worker.ts:42: import (module)
+        - src/daemon/worker.ts:578: call Worker.storedError
+        - src/daemon/worker.ts:737: call handleJobError
     375-393: parseStoredError(stored: string): { timestamp: string; type: ErrorCategoryType; reason: string; message: string; stack?: string; } [exported]
       /** Parse stored error back to object */
       refs in: 5 [call: 3, import: 1, reexport: 1]
@@ -468,7 +468,7 @@ src/daemon/errors.ts [1-457]
       refs in: 3 [import: 2, reexport: 1]
         - src/daemon/errors.test.ts:18: import (module)
         - src/daemon/index.ts:94: reexport (module)
-        - src/daemon/worker.ts:43: import (module)
+        - src/daemon/worker.ts:44: import (module)
   imports:
     - ./queue.js
 
@@ -565,7 +565,7 @@ src/daemon/facet-discovery.ts [1-1760]
         - src/daemon/index.ts:170: reexport (module)
         - src/daemon/scheduler.ts:30: import (module)
         - src/daemon/scheduler.ts:758: call Scheduler.createSchedulerEmbeddingProvider
-        - src/daemon/worker.ts:46: import (module)
+        - src/daemon/worker.ts:47: import (module)
     331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs in: 9 [call: 8, import: 1]
@@ -708,69 +708,82 @@ src/daemon/processor.test.ts [1-668]
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-773]
+src/daemon/processor.ts [1-800]
   class:
-    711-765: class JobProcessor [exported]
+    738-792: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
       refs in: 5 [import: 1, instantiate: 1, reexport: 1, type: 2]
         - src/daemon/index.ts:56: reexport (module)
-        - src/daemon/processor.ts:770: type createProcessor
-        - src/daemon/processor.ts:771: instantiate createProcessor
-        - src/daemon/worker.ts:52: import (module)
-        - src/daemon/worker.ts:146: type Worker.processor
+        - src/daemon/processor.ts:797: type createProcessor
+        - src/daemon/processor.ts:798: instantiate createProcessor
+        - src/daemon/worker.ts:53: import (module)
+        - src/daemon/worker.ts:147: type Worker.processor
   interface:
     21-34: interface AgentResult [exported]
       /** Result from invoking the pi agent */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:71: reexport (module)
-        - src/daemon/processor.ts:317: type invokeAgent
-        - src/daemon/processor.ts:538: type parseAgentOutput
-        - src/daemon/processor.ts:723: type JobProcessor.process
-    37-116: interface AgentNodeOutput [exported]
+        - src/daemon/processor.ts:344: type invokeAgent
+        - src/daemon/processor.ts:565: type parseAgentOutput
+        - src/daemon/processor.ts:750: type JobProcessor.process
+    37-118: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs in: 12 [import: 3, reexport: 1, type: 8]
+      refs in: 10 [import: 2, reexport: 1, type: 7]
         - src/daemon/index.ts:72: reexport (module)
         - src/daemon/processor.test.ts:24: import (module)
         - src/daemon/processor.test.ts:47: type createValidNodeOutput
         - src/daemon/processor.ts:27: type AgentResult
-        - src/daemon/processor.ts:613: type extractNodeFromText
-        - src/daemon/processor.ts:618: type parsed
-        - src/daemon/processor.ts:632: type parsed
-        - src/daemon/processor.ts:648: type isValidNodeOutput
+        - src/daemon/processor.ts:640: type extractNodeFromText
+        - src/daemon/processor.ts:645: type parsed
+        - src/daemon/processor.ts:659: type parsed
+        - src/daemon/processor.ts:675: type isValidNodeOutput
         - src/storage/index.test.ts:11: import (module)
         - src/storage/index.test.ts:168: type createTestAgentOutput
-    128-132: interface SkillInfo [exported]
+    121-143: interface RelationshipOutput [exported]
+      /** Output schema for relationships extracted by the session analyzer */
+      refs in: 16 [import: 2, type: 14]
+        - src/daemon/processor.ts:117: type AgentNodeOutput
+        - src/storage/relationship-edges.test.ts:12: import (module)
+        - src/storage/relationship-edges.test.ts:84: type rel
+        - src/storage/relationship-edges.test.ts:96: type rel
+        - src/storage/relationship-edges.test.ts:108: type rel
+        - src/storage/relationship-edges.test.ts:111: type rel
+        - src/storage/relationship-edges.test.ts:125: type rel
+        - src/storage/relationship-edges.test.ts:142: type rel
+        - src/storage/relationship-edges.test.ts:159: type rel
+        - src/storage/relationship-edges.test.ts:178: type relationships
+    155-159: interface SkillInfo [exported]
       /** Skill availability information */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:73: reexport (module)
-        - src/daemon/processor.ts:183: type getSkillAvailability
-        - src/daemon/processor.ts:184: type availability
-    135-140: interface ProcessorLogger [exported]
+        - src/daemon/processor.ts:210: type getSkillAvailability
+        - src/daemon/processor.ts:211: type availability
+    162-167: interface ProcessorLogger [exported]
       /** Logger interface for processor */
       refs in: 22 [import: 3, reexport: 1, type: 18]
         - src/daemon/index.ts:74: reexport (module)
         - src/daemon/processor.test.ts:25: import (module)
         - src/daemon/processor.test.ts:105: type silentLogger
-        - src/daemon/processor.ts:143: type consoleLogger
-        - src/daemon/processor.ts:316: type invokeAgent
-        - src/daemon/processor.ts:446: type spawnPiProcess
-        - src/daemon/processor.ts:537: type parseAgentOutput
-        - src/daemon/processor.ts:612: type extractNodeFromText
-        - src/daemon/processor.ts:705: type ProcessorConfig
-        - src/daemon/processor.ts:713: type JobProcessor.logger
-    202-209: interface EnvironmentValidationResult [exported]
+        - src/daemon/processor.ts:170: type consoleLogger
+        - src/daemon/processor.ts:343: type invokeAgent
+        - src/daemon/processor.ts:473: type spawnPiProcess
+        - src/daemon/processor.ts:564: type parseAgentOutput
+        - src/daemon/processor.ts:639: type extractNodeFromText
+        - src/daemon/processor.ts:732: type ProcessorConfig
+        - src/daemon/processor.ts:740: type JobProcessor.logger
+    229-236: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
       refs in: 2 [type: 2]
-        - src/daemon/processor.ts:215: type validateRequiredSkills
-        - src/daemon/processor.ts:745: type JobProcessor.validateEnvironment
-    701-706: interface ProcessorConfig [exported]
+        - src/daemon/processor.ts:242: type validateRequiredSkills
+        - src/daemon/processor.ts:772: type JobProcessor.validateEnvironment
+    728-733: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:75: reexport (module)
-        - src/daemon/processor.ts:715: type JobProcessor.constructor
-        - src/daemon/processor.ts:770: type createProcessor
+        - src/daemon/processor.ts:742: type JobProcessor.constructor
+        - src/daemon/processor.ts:797: type createProcessor
   function:
-    170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    197-205: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
       refs in: 8 [call: 5, import: 2, reexport: 1]
         - src/daemon/cli.ts:42: import (module)
@@ -780,30 +793,30 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:14: import (module)
         - src/daemon/processor.test.ts:549: call available
         - src/daemon/processor.test.ts:555: call available
-        - src/daemon/processor.ts:189: call available
-    183-199: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+        - src/daemon/processor.ts:216: call available
+    210-226: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
       refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:64: reexport (module)
         - src/daemon/processor.test.ts:18: import (module)
         - src/daemon/processor.test.ts:564: call availability
         - src/daemon/processor.test.ts:580: call availability
-        - src/daemon/processor.ts:216: call skills
-        - src/daemon/processor.ts:234: call skills
-    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+        - src/daemon/processor.ts:243: call skills
+        - src/daemon/processor.ts:261: call skills
+    242-254: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:66: reexport (module)
-        - src/daemon/processor.ts:747: call JobProcessor.skillsResult
-    233-239: async buildSkillsArg(): Promise<string> [exported]
+        - src/daemon/processor.ts:774: call JobProcessor.skillsResult
+    260-266: async buildSkillsArg(): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
       refs in: 5 [call: 3, import: 1, reexport: 1]
         - src/daemon/index.ts:63: reexport (module)
         - src/daemon/processor.test.ts:13: import (module)
         - src/daemon/processor.test.ts:594: call skills
         - src/daemon/processor.test.ts:599: call skills
-        - src/daemon/processor.ts:347: call skills
-    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.ts:374: call skills
+    275-307: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:62: reexport (module)
@@ -815,13 +828,13 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:162: call prompt
         - src/daemon/processor.test.ts:175: call prompt
         - src/daemon/processor.test.ts:187: call prompt
-        - src/daemon/processor.ts:359: call prompt
-    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.ts:386: call prompt
+    340-456: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:58: reexport (module)
-        - src/daemon/processor.ts:728: call JobProcessor.result
-    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:755: call JobProcessor.result
+    562-631: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:59: reexport (module)
@@ -834,7 +847,7 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:462: call result
         - src/daemon/processor.test.ts:486: call result
         - src/daemon/processor.test.ts:514: call result
-    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    637-670: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:60: reexport (module)
@@ -846,8 +859,8 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:341: call result
         - src/daemon/processor.test.ts:346: call result
         - src/daemon/processor.test.ts:363: call result
-        - src/daemon/processor.ts:589: call nodeData
-    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.ts:616: call nodeData
+    675-721: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs in: 19 [call: 17, import: 1, reexport: 1]
         - src/daemon/index.ts:61: reexport (module)
@@ -860,35 +873,35 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.test.ts:224: call (module)
         - src/daemon/processor.test.ts:231: call (module)
         - src/daemon/processor.test.ts:238: call (module)
-    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    797-799: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/index.ts:57: reexport (module)
         - src/daemon/processor.test.ts:16: import (module)
         - src/daemon/processor.test.ts:622: call processor
-        - src/daemon/worker.ts:51: import (module)
-        - src/daemon/worker.ts:176: call Worker.initialize
+        - src/daemon/worker.ts:52: import (module)
+        - src/daemon/worker.ts:177: call Worker.initialize
   variable:
-    143-148: ProcessorLogger [exported]
+    170-175: ProcessorLogger [exported]
       /** Default console logger */
       refs in: 4 [import: 3, reexport: 1]
         - src/daemon/index.ts:67: reexport (module)
         - src/daemon/processor.test.ts:15: import (module)
         - src/daemon/query-processor.ts:25: import (module)
-        - src/daemon/worker.ts:50: import (module)
-    155-155: readonly ["rlm"] [exported]
+        - src/daemon/worker.ts:51: import (module)
+    182-182: readonly ["rlm"] [exported]
       /** Required skills for analysis - must be available */
       refs in: 3 [import: 2, reexport: 1]
         - src/daemon/cli.ts:43: import (module)
         - src/daemon/index.ts:68: reexport (module)
         - src/daemon/processor.test.ts:21: import (module)
-    158-158: readonly ["codemap"] [exported]
+    185-185: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
       refs in: 3 [import: 2, reexport: 1]
         - src/daemon/cli.ts:44: import (module)
         - src/daemon/index.ts:69: reexport (module)
         - src/daemon/processor.test.ts:22: import (module)
-    161-161: any [exported]
+    188-188: any [exported]
       /** Skills directory location */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:70: reexport (module)
@@ -1089,7 +1102,7 @@ src/daemon/queue.ts [1-787]
         - src/daemon/queue.test.ts:30: call (module)
         - src/daemon/worker.test.ts:16: import (module)
         - src/daemon/worker.test.ts:275: call (module)
-        - src/daemon/worker.ts:56: import (module)
+        - src/daemon/worker.ts:57: import (module)
     768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs in: 2 [call: 1, import: 1]
@@ -1431,40 +1444,40 @@ src/daemon/worker.test.ts [1-539]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-717]
+src/daemon/worker.ts [1-741]
   class:
-    126-656: class Worker [exported]
+    127-680: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
       refs in: 5 [import: 1, instantiate: 2, reexport: 1, type: 1]
         - src/daemon/index.ts:103: reexport (module)
         - src/daemon/worker.test.ts:20: import (module)
-        - src/daemon/worker.ts:665: type createWorker
-        - src/daemon/worker.ts:666: instantiate createWorker
-        - src/daemon/worker.ts:679: instantiate worker
+        - src/daemon/worker.ts:689: type createWorker
+        - src/daemon/worker.ts:690: instantiate createWorker
+        - src/daemon/worker.ts:703: instantiate worker
   interface:
-    66-83: interface WorkerConfig [exported]
+    67-84: interface WorkerConfig [exported]
       /** Worker configuration */
       refs in: 6 [import: 1, reexport: 1, type: 4]
         - src/daemon/index.ts:107: reexport (module)
         - src/daemon/worker.test.ts:21: import (module)
         - src/daemon/worker.test.ts:68: type createTestWorkerConfig
         - src/daemon/worker.test.ts:69: type createTestWorkerConfig
-        - src/daemon/worker.ts:159: type Worker.constructor
-        - src/daemon/worker.ts:665: type createWorker
-    86-101: interface WorkerStatus [exported]
+        - src/daemon/worker.ts:160: type Worker.constructor
+        - src/daemon/worker.ts:689: type createWorker
+    87-102: interface WorkerStatus [exported]
       /** Worker status */
       refs in: 2 [reexport: 1, type: 1]
         - src/daemon/index.ts:108: reexport (module)
-        - src/daemon/worker.ts:320: type Worker.getStatus
-    104-117: interface JobProcessingResult [exported]
+        - src/daemon/worker.ts:321: type Worker.getStatus
+    105-118: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:109: reexport (module)
-        - src/daemon/worker.ts:337: type Worker.processJob
-        - src/daemon/worker.ts:538: type Worker.handleJobFailure
-        - src/daemon/worker.ts:678: type processSingleJob
+        - src/daemon/worker.ts:338: type Worker.processJob
+        - src/daemon/worker.ts:562: type Worker.handleJobFailure
+        - src/daemon/worker.ts:702: type processSingleJob
   function:
-    665-667: createWorker(config: WorkerConfig): Worker [exported]
+    689-691: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs in: 19 [call: 16, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
@@ -1477,11 +1490,11 @@ src/daemon/worker.ts [1-717]
         - src/daemon/worker.test.ts:143: call worker
         - src/daemon/worker.test.ts:159: call worker
         - src/daemon/worker.test.ts:173: call worker
-    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    697-711: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
         - src/daemon/index.ts:105: reexport (module)
-    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    716-740: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
@@ -1503,6 +1516,7 @@ src/daemon/worker.ts [1-717]
     - ../storage/index.js
     - ../storage/node-conversion.js
     - ../storage/node-types.js
+    - ../storage/relationship-edges.js
     - ./connection-discovery.js
     - ./errors.js
     - ./facet-discovery.js
@@ -1541,7 +1555,7 @@ src/storage/database.ts [1-298]
   function:
     46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 116 [call: 101, import: 15]
+      refs in: 118 [call: 102, import: 16]
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:131: call db
         - src/api/server.test.ts:145: call db
@@ -1586,7 +1600,7 @@ src/storage/database.ts [1-298]
         - src/storage/database.ts:221: call unsatisfied
     192-249: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 53 [call: 42, import: 11]
+      refs in: 55 [call: 43, import: 12]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
         - src/api/routes/query.test.ts:10: import (module)
@@ -1727,7 +1741,7 @@ src/storage/edge-repository.ts [1-197]
     similarity?: number;
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-      refs in: 59 [call: 55, import: 4]
+      refs in: 62 [call: 57, import: 5]
         - src/daemon/connection-discovery.test.ts:4: import (module)
         - src/daemon/connection-discovery.test.ts:192: call (module)
         - src/daemon/connection-discovery.ts:13: import (module)
@@ -1740,13 +1754,17 @@ src/storage/edge-repository.ts [1-197]
         - src/storage/index.test.ts:1275: call (module)
     97-104: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-      refs in: 6 [call: 4, import: 2]
+      refs in: 10 [call: 7, import: 3]
         - src/storage/graph-repository.ts:17: import (module)
         - src/storage/graph-repository.ts:144: call outgoing
         - src/storage/index.test.ts:39: import (module)
         - src/storage/index.test.ts:1278: call edges
         - src/storage/index.test.ts:1288: call edges
         - src/storage/index.test.ts:2176: call (module)
+        - src/storage/relationship-edges.test.ts:15: import (module)
+        - src/storage/relationship-edges.test.ts:196: call edges
+        - src/storage/relationship-edges.test.ts:221: call edges
+        - src/storage/relationship-edges.test.ts:384: call edges
     109-116: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
       refs in: 6 [call: 4, import: 2]
@@ -1842,7 +1860,7 @@ src/storage/embedding-utils.ts [1-625]
         - src/daemon/facet-discovery.ts:35: import (module)
         - src/daemon/facet-discovery.ts:876: call FacetDiscovery.buildNodeEmbeddingText
         - src/daemon/worker.ts:28: import (module)
-        - src/daemon/worker.ts:617: call Worker.text
+        - src/daemon/worker.ts:641: call Worker.text
         - src/storage/embedding-utils.test.ts:14: import (module)
         - src/storage/embedding-utils.test.ts:143: call text
         - src/storage/embedding-utils.test.ts:173: call text
@@ -1883,7 +1901,7 @@ src/storage/embedding-utils.ts [1-625]
         - src/daemon/semantic-search.integration.test.ts:257: call (module)
         - src/daemon/semantic-search.integration.test.ts:292: call (module)
         - src/daemon/worker.ts:29: import (module)
-        - src/daemon/worker.ts:630: call Worker.{ vecUpdated }
+        - src/daemon/worker.ts:654: call Worker.{ vecUpdated }
         - src/storage/embedding-utils.test.ts:25: import (module)
     210-237: deleteEmbedding(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete an embedding from both node_embeddings and node_embeddings_vec tables. */
@@ -2059,7 +2077,7 @@ src/storage/index.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/index.ts [1-18]
+src/storage/index.ts [1-19]
   imports:
     - ./database.js
     - ./edge-repository.js
@@ -2072,6 +2090,7 @@ src/storage/index.ts [1-18]
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
+    - ./relationship-edges.js
     - ./search-repository.js
     - ./tool-error-repository.js
 
@@ -2171,7 +2190,7 @@ src/storage/node-conversion.ts [1-356]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
       refs in: 24 [call: 22, import: 2]
         - src/daemon/worker.ts:36: import (module)
-        - src/daemon/worker.ts:464: call Worker.node
+        - src/daemon/worker.ts:465: call Worker.node
         - src/storage/index.test.ts:16: import (module)
         - src/storage/index.test.ts:824: call newNode
         - src/storage/index.test.ts:849: call (module)
@@ -2271,7 +2290,7 @@ src/storage/node-crud.ts [1-763]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:34: import (module)
-        - src/daemon/worker.ts:481: call Worker.{ created }
+        - src/daemon/worker.ts:482: call Worker.{ created }
         - src/storage/index.test.ts:65: import (module)
         - src/storage/index.test.ts:625: call { node: resultNode, created }
         - src/storage/index.test.ts:655: call { node: resultNode, created }
@@ -2342,7 +2361,7 @@ src/storage/node-crud.ts [1-763]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:32: import (module)
-        - src/daemon/worker.ts:425: call Worker.previousNode
+        - src/daemon/worker.ts:426: call Worker.previousNode
         - src/storage/index.test.ts:54: import (module)
         - src/storage/index.test.ts:490: call result
         - src/storage/index.test.ts:527: call result
@@ -2357,7 +2376,7 @@ src/storage/node-crud.ts [1-763]
         - src/daemon/cli.ts:33: import (module)
         - src/daemon/cli.ts:1089: call processLinkBatch
         - src/daemon/worker.ts:33: import (module)
-        - src/daemon/worker.ts:488: call Worker.processJob
+        - src/daemon/worker.ts:489: call Worker.processJob
         - src/storage/index.test.ts:56: import (module)
         - src/storage/index.test.ts:1108: call edges
         - src/storage/index.test.ts:1133: call edges
@@ -2962,6 +2981,89 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
+src/storage/relationship-edges.test.ts [1-409]
+  imports:
+    - ../daemon/processor.js
+    - ./database.js
+    - ./edge-repository.js
+    - ./relationship-edges.js
+    - better-sqlite3
+    - node:fs
+    - node:os
+    - node:path
+    - vitest
+
+src/storage/relationship-edges.ts [1-290]
+  interface:
+    28-37: interface StoreRelationshipsResult [exported]
+      /** Result of storing relationships for a node */
+      refs in: 2 [type: 2]
+        - src/storage/relationship-edges.ts:122: type storeRelationshipEdges
+        - src/storage/relationship-edges.ts:123: type result
+    49-56: interface UnresolvedRelationship [exported]
+      /** Result type for unresolved relationships */
+      refs in: 2 [type: 2]
+        - src/storage/relationship-edges.ts:197: type findUnresolvedRelationships
+        - src/storage/relationship-edges.ts:207: type results
+  function:
+    65-67: isAutoMemEdgeType(type: string): boolean [exported]
+      /** Check if a type is a valid AutoMem edge type */
+      refs in: 18 [call: 17, import: 1]
+        - src/storage/relationship-edges.test.ts:18: import (module)
+        - src/storage/relationship-edges.test.ts:57: call (module)
+        - src/storage/relationship-edges.test.ts:58: call (module)
+        - src/storage/relationship-edges.test.ts:59: call (module)
+        - src/storage/relationship-edges.test.ts:60: call (module)
+        - src/storage/relationship-edges.test.ts:61: call (module)
+        - src/storage/relationship-edges.test.ts:62: call (module)
+        - src/storage/relationship-edges.test.ts:63: call (module)
+        - src/storage/relationship-edges.test.ts:64: call (module)
+        - src/storage/relationship-edges.test.ts:65: call (module)
+    72-105: validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; } [exported]
+      /** Validate a relationship output from the analyzer */
+      refs in: 8 [call: 7, import: 1]
+        - src/storage/relationship-edges.test.ts:21: import (module)
+        - src/storage/relationship-edges.test.ts:92: call (module)
+        - src/storage/relationship-edges.test.ts:104: call (module)
+        - src/storage/relationship-edges.test.ts:116: call result
+        - src/storage/relationship-edges.test.ts:133: call result
+        - src/storage/relationship-edges.test.ts:150: call result
+        - src/storage/relationship-edges.test.ts:167: call result
+        - src/storage/relationship-edges.ts:136: call validation
+    118-185: storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult [exported]
+      /** Store relationships extracted by the analyzer as edges For resolved relationships (with targetNodeId), creates an edge directly. For unresolved relationships (targetNodeId is null), stores the description in metadata for potential future resolution via semantic search. */
+      refs in: 13 [call: 11, import: 2]
+        - src/daemon/worker.ts:37: import (module)
+        - src/daemon/worker.ts:502: call Worker.relResult
+        - src/storage/relationship-edges.test.ts:20: import (module)
+        - src/storage/relationship-edges.test.ts:188: call result
+        - src/storage/relationship-edges.test.ts:214: call result
+        - src/storage/relationship-edges.test.ts:250: call result
+        - src/storage/relationship-edges.test.ts:258: call result
+        - src/storage/relationship-edges.test.ts:284: call result
+        - src/storage/relationship-edges.test.ts:294: call (module)
+        - src/storage/relationship-edges.test.ts:315: call (module)
+    194-234: findUnresolvedRelationships(db: Database.Database, nodeId?: string): {} [exported]
+      /** Find unresolved relationships (edges with unresolvedTarget in metadata) These are relationships where the analyzer identified a connection but couldn't determine the target node ID. They can be resolved later via semantic search. */
+      refs in: 6 [call: 5, import: 1]
+        - src/storage/relationship-edges.test.ts:17: import (module)
+        - src/storage/relationship-edges.test.ts:304: call unresolved
+        - src/storage/relationship-edges.test.ts:335: call unresolved
+        - src/storage/relationship-edges.test.ts:352: call unresolved
+        - src/storage/relationship-edges.test.ts:372: call unresolved
+        - src/storage/relationship-edges.test.ts:395: call stillUnresolved
+    242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
+      /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/relationship-edges.test.ts:19: import (module)
+        - src/storage/relationship-edges.test.ts:376: call success
+        - src/storage/relationship-edges.test.ts:400: call success
+  imports:
+    - ../daemon/processor.js
+    - ../types/index.js
+    - ./edge-repository.js
+    - better-sqlite3
+
 src/storage/search-highlight.test.ts [1-39]
   imports:
     - ./search-repository.js
@@ -3242,5 +3344,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 57
-Estimated tokens: 42,553 (codebase: ~1,097,806)
+Files: 59
+Estimated tokens: 44,097 (codebase: ~1,105,310)

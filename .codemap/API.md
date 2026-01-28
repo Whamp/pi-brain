@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 90 files
+- typescript: 91 files
 
 ## Statistics
-- Total files: 90
-- Total symbols: 664
-  - function: 373
-  - interface: 207
+- Total files: 91
+- Total symbols: 672
+  - function: 378
+  - interface: 210
   - type: 41
   - variable: 31
   - class: 12
@@ -617,52 +617,54 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-773]
+src/daemon/processor.ts [1-800]
   class:
-    711-765: class JobProcessor [exported]
+    738-792: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
       /** Result from invoking the pi agent */
-    37-116: interface AgentNodeOutput [exported]
+    37-118: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-    128-132: interface SkillInfo [exported]
+    121-143: interface RelationshipOutput [exported]
+      /** Output schema for relationships extracted by the session analyzer */
+    155-159: interface SkillInfo [exported]
       /** Skill availability information */
-    135-140: interface ProcessorLogger [exported]
+    162-167: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    202-209: interface EnvironmentValidationResult [exported]
+    229-236: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    701-706: interface ProcessorConfig [exported]
+    728-733: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
-    170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    197-205: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-    183-199: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+    210-226: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    242-254: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    233-239: async buildSkillsArg(): Promise<string> [exported]
+    260-266: async buildSkillsArg(): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
-    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    275-307: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    340-456: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    562-631: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    637-670: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
+    675-721: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    797-799: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
-    143-148: ProcessorLogger [exported]
+    170-175: ProcessorLogger [exported]
       /** Default console logger */
-    155-155: readonly ["rlm"] [exported]
+    182-182: readonly ["rlm"] [exported]
       /** Required skills for analysis - must be available */
-    158-158: readonly ["codemap"] [exported]
+    185-185: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
-    161-161: any [exported]
+    188-188: any [exported]
       /** Skills directory location */
   imports:
     - ../config/types.js
@@ -839,23 +841,23 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-717]
+src/daemon/worker.ts [1-741]
   class:
-    126-656: class Worker [exported]
+    127-680: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    66-83: interface WorkerConfig [exported]
+    67-84: interface WorkerConfig [exported]
       /** Worker configuration */
-    86-101: interface WorkerStatus [exported]
+    87-102: interface WorkerStatus [exported]
       /** Worker status */
-    104-117: interface JobProcessingResult [exported]
+    105-118: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    665-667: createWorker(config: WorkerConfig): Worker [exported]
+    689-691: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    697-711: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    716-740: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -866,6 +868,7 @@ src/daemon/worker.ts [1-717]
     - ../storage/index.js
     - ../storage/node-conversion.js
     - ../storage/node-types.js
+    - ../storage/relationship-edges.js
     - ./connection-discovery.js
     - ./errors.js
     - ./facet-discovery.js
@@ -1424,7 +1427,7 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-18]
+src/storage/index.ts [1-19]
   imports:
     - ./database.js
     - ./edge-repository.js
@@ -1437,6 +1440,7 @@ src/storage/index.ts [1-18]
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
+    - ./relationship-edges.js
     - ./search-repository.js
     - ./tool-error-repository.js
 
@@ -1727,6 +1731,29 @@ src/storage/quirk-repository.ts [1-315]
     291-314: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
   imports:
+    - better-sqlite3
+
+src/storage/relationship-edges.ts [1-290]
+  interface:
+    28-37: interface StoreRelationshipsResult [exported]
+      /** Result of storing relationships for a node */
+    49-56: interface UnresolvedRelationship [exported]
+      /** Result type for unresolved relationships */
+  function:
+    65-67: isAutoMemEdgeType(type: string): boolean [exported]
+      /** Check if a type is a valid AutoMem edge type */
+    72-105: validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; } [exported]
+      /** Validate a relationship output from the analyzer */
+    118-185: storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult [exported]
+      /** Store relationships extracted by the analyzer as edges For resolved relationships (with targetNodeId), creates an edge directly. For unresolved relationships (targetNodeId is null), stores the description in metadata for potential future resolution via semantic search. */
+    194-234: findUnresolvedRelationships(db: Database.Database, nodeId?: string): {} [exported]
+      /** Find unresolved relationships (edges with unresolvedTarget in metadata) These are relationships where the analyzer identified a connection but couldn't determine the target node ID. They can be resolved later via semantic search. */
+    242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
+      /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
+  imports:
+    - ../daemon/processor.js
+    - ../types/index.js
+    - ./edge-repository.js
     - better-sqlite3
 
 src/storage/search-repository.ts [1-549]
@@ -2150,5 +2177,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 90
-Estimated tokens: 27,079 (codebase: ~1,097,521)
+Files: 91
+Estimated tokens: 27,572 (codebase: ~1,100,354)

@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 17 files
+- typescript: 18 files
 
 ## Statistics
-- Total files: 17
-- Total symbols: 196
-  - function: 132
-  - interface: 50
+- Total files: 18
+- Total symbols: 203
+  - function: 137
+  - interface: 52
   - type: 10
   - variable: 4
 
@@ -176,7 +176,7 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-18]
+src/storage/index.ts [1-19]
   imports:
     - ./database.js
     - ./edge-repository.js
@@ -189,6 +189,7 @@ src/storage/index.ts [1-18]
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
+    - ./relationship-edges.js
     - ./search-repository.js
     - ./tool-error-repository.js
 
@@ -481,6 +482,29 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
+src/storage/relationship-edges.ts [1-290]
+  interface:
+    28-37: interface StoreRelationshipsResult [exported]
+      /** Result of storing relationships for a node */
+    49-56: interface UnresolvedRelationship [exported]
+      /** Result type for unresolved relationships */
+  function:
+    65-67: isAutoMemEdgeType(type: string): boolean [exported]
+      /** Check if a type is a valid AutoMem edge type */
+    72-105: validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; } [exported]
+      /** Validate a relationship output from the analyzer */
+    118-185: storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult [exported]
+      /** Store relationships extracted by the analyzer as edges For resolved relationships (with targetNodeId), creates an edge directly. For unresolved relationships (targetNodeId is null), stores the description in metadata for potential future resolution via semantic search. */
+    194-234: findUnresolvedRelationships(db: Database.Database, nodeId?: string): {} [exported]
+      /** Find unresolved relationships (edges with unresolvedTarget in metadata) These are relationships where the analyzer identified a connection but couldn't determine the target node ID. They can be resolved later via semantic search. */
+    242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
+      /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
+  imports:
+    - ../daemon/processor.js
+    - ../types/index.js
+    - ./edge-repository.js
+    - better-sqlite3
+
 src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
@@ -575,5 +599,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 17
-Estimated tokens: 8,914 (codebase: ~1,097,521)
+Files: 18
+Estimated tokens: 9,365 (codebase: ~1,100,354)

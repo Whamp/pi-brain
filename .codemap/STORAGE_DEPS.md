@@ -160,6 +160,22 @@ src/storage/index.ts
     - [builtin] crypto
   - src/storage/quirk-repository.ts
     - [external] better-sqlite3
+  - src/storage/relationship-edges.ts
+    - src/daemon/processor.ts
+      - src/config/types.ts
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+    - src/storage/edge-repository.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
+      - [external] better-sqlite3
+    - src/types/index.ts
+    - [external] better-sqlite3
   - src/storage/search-repository.ts
     - src/storage/node-crud.ts
       - src/storage/edge-repository.ts

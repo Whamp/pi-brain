@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 90,
-    "totalSymbols": 1132,
+    "totalFiles": 91,
+    "totalSymbols": 1141,
     "byLanguage": {
-      "typescript": 90
+      "typescript": 91
     },
     "bySymbolKind": {
-      "function": 501,
+      "function": 506,
       "type": 42,
-      "interface": 262,
+      "interface": 266,
       "variable": 118,
       "class": 12,
       "property": 51,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38970,
-  "codebase_tokens": 1097806,
+  "total_tokens": 39487,
+  "codebase_tokens": 1105310,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -6632,10 +6632,10 @@
       "language": "typescript",
       "lines": [
         1,
-        773
+        800
       ],
       "detail_level": "full",
-      "token_estimate": 972,
+      "token_estimate": 1005,
       "symbols": [
         {
           "name": "AgentResult",
@@ -6662,7 +6662,7 @@
           "signature": "AgentNodeOutput",
           "lines": [
             37,
-            116
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -6676,12 +6676,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "RelationshipOutput",
+          "kind": "interface",
+          "signature": "RelationshipOutput",
+          "lines": [
+            121,
+            143
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Output schema for relationships extracted by the session analyzer",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "LessonOutput",
           "kind": "interface",
           "signature": "LessonOutput",
           "lines": [
-            118,
-            125
+            145,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -6699,8 +6718,8 @@
           "kind": "interface",
           "signature": "SkillInfo",
           "lines": [
-            128,
-            132
+            155,
+            159
           ],
           "exported": true,
           "is_default": false,
@@ -6718,8 +6737,8 @@
           "kind": "interface",
           "signature": "ProcessorLogger",
           "lines": [
-            135,
-            140
+            162,
+            167
           ],
           "exported": true,
           "is_default": false,
@@ -6737,8 +6756,8 @@
           "kind": "variable",
           "signature": "ProcessorLogger",
           "lines": [
-            143,
-            148
+            170,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -6756,8 +6775,8 @@
           "kind": "variable",
           "signature": "readonly [\"rlm\"]",
           "lines": [
-            155,
-            155
+            182,
+            182
           ],
           "exported": true,
           "is_default": false,
@@ -6775,8 +6794,8 @@
           "kind": "variable",
           "signature": "readonly [\"codemap\"]",
           "lines": [
-            158,
-            158
+            185,
+            185
           ],
           "exported": true,
           "is_default": false,
@@ -6794,8 +6813,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            161,
-            161
+            188,
+            188
           ],
           "exported": true,
           "is_default": false,
@@ -6813,8 +6832,8 @@
           "kind": "function",
           "signature": "async checkSkillAvailable(skillName: string): Promise<boolean>",
           "lines": [
-            170,
-            178
+            197,
+            205
           ],
           "exported": true,
           "is_default": false,
@@ -6832,8 +6851,8 @@
           "kind": "function",
           "signature": "async getSkillAvailability(): Promise<Map<string, SkillInfo>>",
           "lines": [
-            183,
-            199
+            210,
+            226
           ],
           "exported": true,
           "is_default": false,
@@ -6851,8 +6870,8 @@
           "kind": "interface",
           "signature": "EnvironmentValidationResult",
           "lines": [
-            202,
-            209
+            229,
+            236
           ],
           "exported": true,
           "is_default": false,
@@ -6870,8 +6889,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            215,
-            227
+            242,
+            254
           ],
           "exported": true,
           "is_default": false,
@@ -6889,8 +6908,8 @@
           "kind": "function",
           "signature": "async buildSkillsArg(): Promise<string>",
           "lines": [
-            233,
-            239
+            260,
+            266
           ],
           "exported": true,
           "is_default": false,
@@ -6908,8 +6927,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            248,
-            280
+            275,
+            307
           ],
           "exported": true,
           "is_default": false,
@@ -6927,8 +6946,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            285,
-            304
+            312,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -6946,8 +6965,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            313,
-            429
+            340,
+            456
           ],
           "exported": true,
           "is_default": false,
@@ -6965,8 +6984,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            432,
-            438
+            459,
+            465
           ],
           "exported": false,
           "is_default": false,
@@ -6984,8 +7003,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            443,
-            507
+            470,
+            534
           ],
           "exported": false,
           "is_default": false,
@@ -7003,8 +7022,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            514,
-            519
+            541,
+            546
           ],
           "exported": false,
           "is_default": false,
@@ -7022,8 +7041,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            521,
-            524
+            548,
+            551
           ],
           "exported": false,
           "is_default": false,
@@ -7041,8 +7060,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            526,
-            530
+            553,
+            557
           ],
           "exported": false,
           "is_default": false,
@@ -7060,8 +7079,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            535,
-            604
+            562,
+            631
           ],
           "exported": true,
           "is_default": false,
@@ -7079,8 +7098,8 @@
           "kind": "function",
           "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput",
           "lines": [
-            610,
-            643
+            637,
+            670
           ],
           "exported": true,
           "is_default": false,
@@ -7098,8 +7117,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            648,
-            694
+            675,
+            721
           ],
           "exported": true,
           "is_default": false,
@@ -7117,8 +7136,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            701,
-            706
+            728,
+            733
           ],
           "exported": true,
           "is_default": false,
@@ -7136,8 +7155,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            711,
-            765
+            738,
+            792
           ],
           "exported": true,
           "is_default": false,
@@ -7155,8 +7174,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            712,
-            712
+            739,
+            739
           ],
           "exported": false,
           "is_default": false,
@@ -7174,8 +7193,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            713,
-            713
+            740,
+            740
           ],
           "exported": false,
           "is_default": false,
@@ -7193,8 +7212,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            715,
-            718
+            742,
+            745
           ],
           "exported": false,
           "is_default": false,
@@ -7212,8 +7231,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            723,
-            739
+            750,
+            766
           ],
           "exported": false,
           "is_default": false,
@@ -7231,8 +7250,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            745,
-            764
+            772,
+            791
           ],
           "exported": false,
           "is_default": false,
@@ -7250,8 +7269,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            770,
-            772
+            797,
+            799
           ],
           "exported": true,
           "is_default": false,
@@ -10269,18 +10288,18 @@
       "language": "typescript",
       "lines": [
         1,
-        717
+        741
       ],
       "detail_level": "full",
-      "token_estimate": 961,
+      "token_estimate": 970,
       "symbols": [
         {
           "name": "WorkerConfig",
           "kind": "interface",
           "signature": "WorkerConfig",
           "lines": [
-            66,
-            83
+            67,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -10298,8 +10317,8 @@
           "kind": "interface",
           "signature": "WorkerStatus",
           "lines": [
-            86,
-            101
+            87,
+            102
           ],
           "exported": true,
           "is_default": false,
@@ -10317,8 +10336,8 @@
           "kind": "interface",
           "signature": "JobProcessingResult",
           "lines": [
-            104,
-            117
+            105,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -10336,8 +10355,8 @@
           "kind": "class",
           "signature": "Worker",
           "lines": [
-            126,
-            656
+            127,
+            680
           ],
           "exported": true,
           "is_default": false,
@@ -10355,8 +10374,8 @@
           "kind": "property",
           "signature": "id: string",
           "lines": [
-            127,
-            127
+            128,
+            128
           ],
           "exported": false,
           "is_default": false,
@@ -10374,8 +10393,8 @@
           "kind": "property",
           "signature": "config: PiBrainConfig",
           "lines": [
-            128,
-            128
+            129,
+            129
           ],
           "exported": false,
           "is_default": false,
@@ -10393,8 +10412,8 @@
           "kind": "property",
           "signature": "retryPolicy: RetryPolicy",
           "lines": [
-            129,
-            129
+            130,
+            130
           ],
           "exported": false,
           "is_default": false,
@@ -10412,8 +10431,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            130,
-            130
+            131,
+            131
           ],
           "exported": false,
           "is_default": false,
@@ -10431,8 +10450,8 @@
           "kind": "property",
           "signature": "onJobStarted?: (\n    job: AnalysisJob,\n    workerId: string\n  ) => Promise<void>",
           "lines": [
-            131,
-            134
+            132,
+            135
           ],
           "exported": false,
           "is_default": false,
@@ -10450,8 +10469,8 @@
           "kind": "property",
           "signature": "onNodeCreated?: (\n    job: AnalysisJob,\n    node: Node\n  ) => Promise<void>",
           "lines": [
-            135,
-            138
+            136,
+            139
           ],
           "exported": false,
           "is_default": false,
@@ -10469,8 +10488,8 @@
           "kind": "property",
           "signature": "onJobFailed?: (\n    job: AnalysisJob,\n    error: Error\n  ) => Promise<void>",
           "lines": [
-            139,
-            142
+            140,
+            143
           ],
           "exported": false,
           "is_default": false,
@@ -10488,8 +10507,8 @@
           "kind": "property",
           "signature": "pollIntervalMs: number",
           "lines": [
-            143,
-            143
+            144,
+            144
           ],
           "exported": false,
           "is_default": false,
@@ -10507,8 +10526,8 @@
           "kind": "property",
           "signature": "queue: QueueManager | null",
           "lines": [
-            145,
-            145
+            146,
+            146
           ],
           "exported": false,
           "is_default": false,
@@ -10526,8 +10545,8 @@
           "kind": "property",
           "signature": "processor: JobProcessor | null",
           "lines": [
-            146,
-            146
+            147,
+            147
           ],
           "exported": false,
           "is_default": false,
@@ -10545,8 +10564,8 @@
           "kind": "property",
           "signature": "connectionDiscoverer: ConnectionDiscoverer | null",
           "lines": [
-            147,
-            147
+            148,
+            148
           ],
           "exported": false,
           "is_default": false,
@@ -10564,8 +10583,8 @@
           "kind": "property",
           "signature": "embeddingProvider: EmbeddingProvider | null",
           "lines": [
-            148,
-            148
+            149,
+            149
           ],
           "exported": false,
           "is_default": false,
@@ -10583,8 +10602,8 @@
           "kind": "property",
           "signature": "db: Database.Database | null",
           "lines": [
-            149,
-            149
+            150,
+            150
           ],
           "exported": false,
           "is_default": false,
@@ -10602,8 +10621,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            150,
-            150
+            151,
+            151
           ],
           "exported": false,
           "is_default": false,
@@ -10621,8 +10640,8 @@
           "kind": "property",
           "signature": "currentJob: AnalysisJob | null",
           "lines": [
-            151,
-            151
+            152,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -10640,8 +10659,8 @@
           "kind": "property",
           "signature": "startedAt: Date | null",
           "lines": [
-            152,
-            152
+            153,
+            153
           ],
           "exported": false,
           "is_default": false,
@@ -10659,8 +10678,8 @@
           "kind": "property",
           "signature": "jobsProcessed",
           "lines": [
-            155,
-            155
+            156,
+            156
           ],
           "exported": false,
           "is_default": false,
@@ -10678,8 +10697,8 @@
           "kind": "property",
           "signature": "jobsSucceeded",
           "lines": [
-            156,
-            156
+            157,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -10697,8 +10716,8 @@
           "kind": "property",
           "signature": "jobsFailed",
           "lines": [
-            157,
-            157
+            158,
+            158
           ],
           "exported": false,
           "is_default": false,
@@ -10716,8 +10735,8 @@
           "kind": "constructor",
           "signature": "constructor(config: WorkerConfig)",
           "lines": [
-            159,
-            168
+            160,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -10735,8 +10754,8 @@
           "kind": "method",
           "signature": "initialize(db: Database.Database): void",
           "lines": [
-            173,
-            184
+            174,
+            185
           ],
           "exported": false,
           "is_default": false,
@@ -10754,8 +10773,8 @@
           "kind": "method",
           "signature": "initializeEmbeddingProvider(): void",
           "lines": [
-            190,
-            229
+            191,
+            230
           ],
           "exported": false,
           "is_default": false,
@@ -10773,8 +10792,8 @@
           "kind": "method",
           "signature": "async start(): Promise<void>",
           "lines": [
-            234,
-            293
+            235,
+            294
           ],
           "exported": false,
           "is_default": false,
@@ -10792,8 +10811,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            298,
-            301
+            299,
+            302
           ],
           "exported": false,
           "is_default": false,
@@ -10811,8 +10830,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            306,
-            308
+            307,
+            309
           ],
           "exported": false,
           "is_default": false,
@@ -10830,8 +10849,8 @@
           "kind": "method",
           "signature": "getCurrentJob(): any",
           "lines": [
-            313,
-            315
+            314,
+            316
           ],
           "exported": false,
           "is_default": false,
@@ -10849,8 +10868,8 @@
           "kind": "method",
           "signature": "getStatus(): WorkerStatus",
           "lines": [
-            320,
-            330
+            321,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -10868,8 +10887,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            337,
-            529
+            338,
+            553
           ],
           "exported": false,
           "is_default": false,
@@ -10887,8 +10906,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            534,
-            601
+            558,
+            625
           ],
           "exported": false,
           "is_default": false,
@@ -10906,8 +10925,8 @@
           "kind": "method",
           "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
           "lines": [
-            609,
-            646
+            633,
+            670
           ],
           "exported": false,
           "is_default": false,
@@ -10925,8 +10944,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            651,
-            655
+            675,
+            679
           ],
           "exported": false,
           "is_default": false,
@@ -10944,8 +10963,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            665,
-            667
+            689,
+            691
           ],
           "exported": true,
           "is_default": false,
@@ -10963,8 +10982,8 @@
           "kind": "function",
           "signature": "processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            673,
-            687
+            697,
+            711
           ],
           "exported": true,
           "is_default": false,
@@ -10982,8 +11001,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            692,
-            716
+            716,
+            740
           ],
           "exported": true,
           "is_default": false,
@@ -11009,6 +11028,7 @@
         "../storage/index.js",
         "../storage/node-conversion.js",
         "../storage/node-types.js",
+        "../storage/relationship-edges.js",
         "./connection-discovery.js",
         "./errors.js",
         "./facet-discovery.js",
@@ -16531,10 +16551,10 @@
       "language": "typescript",
       "lines": [
         1,
-        18
+        19
       ],
       "detail_level": "full",
-      "token_estimate": 95,
+      "token_estimate": 102,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -16551,6 +16571,7 @@
         "./node-storage.js",
         "./node-types.js",
         "./quirk-repository.js",
+        "./relationship-edges.js",
         "./search-repository.js",
         "./tool-error-repository.js"
       ]
@@ -18895,6 +18916,179 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/relationship-edges.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        290
+      ],
+      "detail_level": "full",
+      "token_estimate": 468,
+      "symbols": [
+        {
+          "name": "StoreRelationshipsResult",
+          "kind": "interface",
+          "signature": "StoreRelationshipsResult",
+          "lines": [
+            28,
+            37
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of storing relationships for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "UnresolvedEdgeRow",
+          "kind": "interface",
+          "signature": "UnresolvedEdgeRow",
+          "lines": [
+            40,
+            46
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Row shape for unresolved relationship edges",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "UnresolvedRelationship",
+          "kind": "interface",
+          "signature": "UnresolvedRelationship",
+          "lines": [
+            49,
+            56
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result type for unresolved relationships",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isAutoMemEdgeType",
+          "kind": "function",
+          "signature": "isAutoMemEdgeType(type: string): boolean",
+          "lines": [
+            65,
+            67
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a type is a valid AutoMem edge type",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateRelationship",
+          "kind": "function",
+          "signature": "validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; }",
+          "lines": [
+            72,
+            105
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a relationship output from the analyzer",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "storeRelationshipEdges",
+          "kind": "function",
+          "signature": "storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult",
+          "lines": [
+            118,
+            185
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Store relationships extracted by the analyzer as edges\n\nFor resolved relationships (with targetNodeId), creates an edge directly.\nFor unresolved relationships (targetNodeId is null), stores the description\nin metadata for potential future resolution via semantic search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findUnresolvedRelationships",
+          "kind": "function",
+          "signature": "findUnresolvedRelationships(db: Database.Database, nodeId?: string): {}",
+          "lines": [
+            194,
+            234
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find unresolved relationships (edges with unresolvedTarget in metadata)\n\nThese are relationships where the analyzer identified a connection but\ncouldn't determine the target node ID. They can be resolved later via\nsemantic search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "resolveRelationship",
+          "kind": "function",
+          "signature": "resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean",
+          "lines": [
+            242,
+            289
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Resolve an unresolved relationship by updating its target node\n\nCall this after semantic search finds a matching node for an unresolved\nrelationship.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../daemon/processor.js",
+        "../types/index.js",
+        "./edge-repository.js",
         "better-sqlite3"
       ]
     },

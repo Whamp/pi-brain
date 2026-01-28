@@ -15,3 +15,4 @@ export * from "./tool-error-repository.js";
 export * from "./node-queries.js";
 export * from "./graph-repository.js";
 export * from "./embedding-utils.js";
+export * from "./relationship-edges.js";
