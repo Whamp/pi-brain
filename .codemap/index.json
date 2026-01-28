@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 82,
-    "totalSymbols": 1024,
+    "totalFiles": 83,
+    "totalSymbols": 1030,
     "byLanguage": {
-      "typescript": 82
+      "typescript": 83
     },
     "bySymbolKind": {
       "function": 462,
       "type": 37,
-      "interface": 242,
+      "interface": 248,
       "variable": 101,
       "class": 11,
       "constructor": 10,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34097,
-  "codebase_tokens": 965723,
+  "total_tokens": 34253,
+  "codebase_tokens": 966572,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14639,10 +14639,10 @@
       "language": "typescript",
       "lines": [
         1,
-        15
+        16
       ],
       "detail_level": "full",
-      "token_estimate": 73,
+      "token_estimate": 82,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -14657,7 +14657,8 @@
         "./node-storage.js",
         "./node-types.js",
         "./quirk-repository.js",
-        "./search-repository.js"
+        "./search-repository.js",
+        "./tool-error-repository.js"
       ]
     },
     {
@@ -15122,18 +15123,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1812
+        1521
       ],
       "detail_level": "full",
-      "token_estimate": 2851,
+      "token_estimate": 2441,
       "symbols": [
         {
           "name": "clearAllData",
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            135,
-            164
+            155,
+            184
           ],
           "exported": true,
           "is_default": false,
@@ -15151,8 +15152,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            170,
-            236
+            190,
+            256
           ],
           "exported": true,
           "is_default": false,
@@ -15170,8 +15171,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            242,
-            256
+            262,
+            276
           ],
           "exported": true,
           "is_default": false,
@@ -15189,8 +15190,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            267,
-            374
+            287,
+            394
           ],
           "exported": true,
           "is_default": false,
@@ -15208,8 +15209,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            381,
-            471
+            401,
+            491
           ],
           "exported": true,
           "is_default": false,
@@ -15227,8 +15228,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): any",
           "lines": [
-            476,
-            482
+            496,
+            502
           ],
           "exported": true,
           "is_default": false,
@@ -15246,8 +15247,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): any",
           "lines": [
-            489,
-            499
+            509,
+            519
           ],
           "exported": true,
           "is_default": false,
@@ -15265,8 +15266,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            504,
-            507
+            524,
+            527
           ],
           "exported": true,
           "is_default": false,
@@ -15284,8 +15285,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            512,
-            518
+            532,
+            538
           ],
           "exported": true,
           "is_default": false,
@@ -15303,8 +15304,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            524,
-            530
+            544,
+            550
           ],
           "exported": true,
           "is_default": false,
@@ -15322,8 +15323,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): any",
           "lines": [
-            535,
-            547
+            555,
+            567
           ],
           "exported": true,
           "is_default": false,
@@ -15341,8 +15342,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            552,
-            563
+            572,
+            583
           ],
           "exported": true,
           "is_default": false,
@@ -15360,8 +15361,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            568,
-            579
+            588,
+            599
           ],
           "exported": true,
           "is_default": false,
@@ -15379,8 +15380,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            588,
-            613
+            608,
+            633
           ],
           "exported": true,
           "is_default": false,
@@ -15398,8 +15399,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            616,
-            623
+            636,
+            643
           ],
           "exported": false,
           "is_default": false,
@@ -15417,8 +15418,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            628,
-            633
+            648,
+            653
           ],
           "exported": false,
           "is_default": false,
@@ -15436,8 +15437,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            640,
-            678
+            660,
+            698
           ],
           "exported": true,
           "is_default": false,
@@ -15455,8 +15456,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            683,
-            694
+            703,
+            714
           ],
           "exported": false,
           "is_default": false,
@@ -15470,183 +15471,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "ListToolErrorsFilters",
-          "kind": "interface",
-          "signature": "ListToolErrorsFilters",
-          "lines": [
-            718,
-            727
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Filters for querying tool errors",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ListToolErrorsOptions",
-          "kind": "interface",
-          "signature": "ListToolErrorsOptions",
-          "lines": [
-            730,
-            735
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Pagination options for tool errors",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ToolErrorResult",
-          "kind": "interface",
-          "signature": "ToolErrorResult",
-          "lines": [
-            738,
-            747
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "A tool error result with metadata",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "ListToolErrorsResult",
-          "kind": "interface",
-          "signature": "ListToolErrorsResult",
-          "lines": [
-            750,
-            759
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Result from listToolErrors query",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "listToolErrors",
-          "kind": "function",
-          "signature": "listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult",
-          "lines": [
-            764,
-            822
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "List individual tool errors with filters and pagination.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAggregatedToolErrors",
-          "kind": "function",
-          "signature": "getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {}",
-          "lines": [
-            828,
-            916
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get aggregated tool errors - grouped by tool and error type (and optionally model).\nPer specs/api.md GET /api/v1/tool-errors.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getToolErrorStats",
-          "kind": "function",
-          "signature": "getToolErrorStats(db: Database.Database): { byTool: {}; byModel: {}; trends: { thisWeek: number; lastWeek: number; change: number; }; }",
-          "lines": [
-            922,
-            980
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get tool error statistics for the dashboard.\nPer specs/api.md GET /api/v1/stats/tool-errors.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "countToolErrors",
-          "kind": "function",
-          "signature": "countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number",
-          "lines": [
-            985,
-            991
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Count tool errors matching filters.",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "getAllToolsWithErrors",
-          "kind": "function",
-          "signature": "getAllToolsWithErrors(db: Database.Database): {}",
-          "lines": [
-            996,
-            1003
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get all unique tools that have errors recorded",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "getNodeSummary",
           "kind": "function",
           "signature": "getNodeSummary(db: Database.Database, nodeId: string): string",
           "lines": [
-            1012,
-            1019
+            746,
+            753
           ],
           "exported": true,
           "is_default": false,
@@ -15664,8 +15494,8 @@
           "kind": "function",
           "signature": "getNodeTags(db: Database.Database, nodeId: string): {}",
           "lines": [
-            1024,
-            1028
+            758,
+            762
           ],
           "exported": true,
           "is_default": false,
@@ -15683,8 +15513,8 @@
           "kind": "function",
           "signature": "getNodeTopics(db: Database.Database, nodeId: string): {}",
           "lines": [
-            1033,
-            1037
+            767,
+            771
           ],
           "exported": true,
           "is_default": false,
@@ -15698,31 +15528,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "getNodeToolErrors",
-          "kind": "function",
-          "signature": "getNodeToolErrors(db: Database.Database, nodeId: string): {}",
-          "lines": [
-            1045,
-            1068
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Get tool errors for a node",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "getAllTags",
           "kind": "function",
           "signature": "getAllTags(db: Database.Database): {}",
           "lines": [
-            1073,
-            1083
+            782,
+            792
           ],
           "exported": true,
           "is_default": false,
@@ -15740,8 +15551,8 @@
           "kind": "function",
           "signature": "getAllTopics(db: Database.Database): {}",
           "lines": [
-            1088,
-            1092
+            797,
+            801
           ],
           "exported": true,
           "is_default": false,
@@ -15759,8 +15570,8 @@
           "kind": "function",
           "signature": "getNodesByTag(db: Database.Database, tag: string): {}",
           "lines": [
-            1097,
-            1107
+            806,
+            816
           ],
           "exported": true,
           "is_default": false,
@@ -15778,8 +15589,8 @@
           "kind": "function",
           "signature": "getNodesByTopic(db: Database.Database, topic: string): {}",
           "lines": [
-            1112,
-            1123
+            821,
+            832
           ],
           "exported": true,
           "is_default": false,
@@ -15797,8 +15608,8 @@
           "kind": "type",
           "signature": "NodeSortField = | \"timestamp\"\n  | \"analyzed_at\"\n  | \"project\"\n  | \"type\"\n  | \"outcome\"\n  | \"tokens_used\"\n  | \"cost\"\n  | \"duration_minutes\"",
           "lines": [
-            1130,
-            1138
+            839,
+            847
           ],
           "exported": true,
           "is_default": false,
@@ -15816,8 +15627,8 @@
           "kind": "type",
           "signature": "SortOrder = \"asc\" | \"desc\"",
           "lines": [
-            1141,
-            1141
+            850,
+            850
           ],
           "exported": true,
           "is_default": false,
@@ -15835,8 +15646,8 @@
           "kind": "type",
           "signature": "NodeTypeFilter = | \"coding\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"debugging\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"refactor\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"other\"",
           "lines": [
-            1144,
-            1156
+            853,
+            865
           ],
           "exported": true,
           "is_default": false,
@@ -15854,8 +15665,8 @@
           "kind": "type",
           "signature": "OutcomeFilter = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
           "lines": [
-            1159,
-            1159
+            868,
+            868
           ],
           "exported": true,
           "is_default": false,
@@ -15873,8 +15684,8 @@
           "kind": "interface",
           "signature": "ListNodesFilters",
           "lines": [
-            1162,
-            1187
+            871,
+            896
           ],
           "exported": true,
           "is_default": false,
@@ -15892,8 +15703,8 @@
           "kind": "interface",
           "signature": "ListNodesOptions",
           "lines": [
-            1190,
-            1199
+            899,
+            908
           ],
           "exported": true,
           "is_default": false,
@@ -15911,8 +15722,8 @@
           "kind": "interface",
           "signature": "ListNodesResult",
           "lines": [
-            1202,
-            1211
+            911,
+            920
           ],
           "exported": true,
           "is_default": false,
@@ -15930,8 +15741,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            1214,
-            1223
+            923,
+            932
           ],
           "exported": false,
           "is_default": false,
@@ -15949,8 +15760,8 @@
           "kind": "function",
           "signature": "listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult",
           "lines": [
-            1241,
-            1366
+            950,
+            1075
           ],
           "exported": true,
           "is_default": false,
@@ -15968,8 +15779,8 @@
           "kind": "interface",
           "signature": "SessionSummaryRow",
           "lines": [
-            1371,
-            1383
+            1080,
+            1092
           ],
           "exported": true,
           "is_default": false,
@@ -15987,8 +15798,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            1389,
-            1418
+            1098,
+            1127
           ],
           "exported": true,
           "is_default": false,
@@ -16006,8 +15817,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            1423,
-            1431
+            1132,
+            1140
           ],
           "exported": true,
           "is_default": false,
@@ -16025,8 +15836,8 @@
           "kind": "function",
           "signature": "getAllNodeTypes(db: Database.Database): {}",
           "lines": [
-            1436,
-            1444
+            1145,
+            1153
           ],
           "exported": true,
           "is_default": false,
@@ -16044,8 +15855,8 @@
           "kind": "function",
           "signature": "getAllComputers(db: Database.Database): {}",
           "lines": [
-            1449,
-            1457
+            1158,
+            1166
           ],
           "exported": true,
           "is_default": false,
@@ -16063,8 +15874,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            1462,
-            1468
+            1171,
+            1177
           ],
           "exported": true,
           "is_default": false,
@@ -16082,8 +15893,8 @@
           "kind": "type",
           "signature": "TraversalDirection = \"incoming\" | \"outgoing\" | \"both\"",
           "lines": [
-            1475,
-            1475
+            1184,
+            1184
           ],
           "exported": true,
           "is_default": false,
@@ -16101,8 +15912,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesOptions",
           "lines": [
-            1478,
-            1494
+            1187,
+            1203
           ],
           "exported": true,
           "is_default": false,
@@ -16120,8 +15931,8 @@
           "kind": "interface",
           "signature": "TraversalEdge",
           "lines": [
-            1497,
-            1512
+            1206,
+            1221
           ],
           "exported": true,
           "is_default": false,
@@ -16139,8 +15950,8 @@
           "kind": "interface",
           "signature": "ConnectedNodesResult",
           "lines": [
-            1515,
-            1522
+            1224,
+            1231
           ],
           "exported": true,
           "is_default": false,
@@ -16158,8 +15969,8 @@
           "kind": "function",
           "signature": "getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            1553,
-            1658
+            1262,
+            1367
           ],
           "exported": true,
           "is_default": false,
@@ -16177,8 +15988,8 @@
           "kind": "function",
           "signature": "getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult",
           "lines": [
-            1667,
-            1714
+            1376,
+            1423
           ],
           "exported": true,
           "is_default": false,
@@ -16196,8 +16007,8 @@
           "kind": "function",
           "signature": "findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; }",
           "lines": [
-            1722,
-            1776
+            1431,
+            1485
           ],
           "exported": true,
           "is_default": false,
@@ -16215,8 +16026,8 @@
           "kind": "function",
           "signature": "getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            1782,
-            1792
+            1491,
+            1501
           ],
           "exported": true,
           "is_default": false,
@@ -16234,8 +16045,8 @@
           "kind": "function",
           "signature": "getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult",
           "lines": [
-            1798,
-            1808
+            1507,
+            1517
           ],
           "exported": true,
           "is_default": false,
@@ -16261,6 +16072,7 @@
         "./node-types.js",
         "./quirk-repository.js",
         "./search-repository.js",
+        "./tool-error-repository.js",
         "better-sqlite3"
       ]
     },
@@ -17650,6 +17462,328 @@
       "imports": [
         "./node-crud.js",
         "./node-types.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/tool-error-repository.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        350
+      ],
+      "detail_level": "full",
+      "token_estimate": 557,
+      "symbols": [
+        {
+          "name": "ListToolErrorsFilters",
+          "kind": "interface",
+          "signature": "ListToolErrorsFilters",
+          "lines": [
+            16,
+            25
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Filters for querying tool errors",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ListToolErrorsOptions",
+          "kind": "interface",
+          "signature": "ListToolErrorsOptions",
+          "lines": [
+            28,
+            33
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Pagination options for tool errors",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToolErrorResult",
+          "kind": "interface",
+          "signature": "ToolErrorResult",
+          "lines": [
+            36,
+            45
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "A tool error result with metadata",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ListToolErrorsResult",
+          "kind": "interface",
+          "signature": "ListToolErrorsResult",
+          "lines": [
+            48,
+            57
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from listToolErrors query",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToolStats",
+          "kind": "interface",
+          "signature": "ToolStats",
+          "lines": [
+            60,
+            64
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Stats by tool from getToolErrorStats",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ModelErrorStats",
+          "kind": "interface",
+          "signature": "ModelErrorStats",
+          "lines": [
+            67,
+            70
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Stats by model from getToolErrorStats",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToolErrorTrends",
+          "kind": "interface",
+          "signature": "ToolErrorTrends",
+          "lines": [
+            73,
+            77
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Trend data from getToolErrorStats",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToolErrorStatsResult",
+          "kind": "interface",
+          "signature": "ToolErrorStatsResult",
+          "lines": [
+            80,
+            84
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from getToolErrorStats",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AggregatedToolError",
+          "kind": "interface",
+          "signature": "AggregatedToolError",
+          "lines": [
+            87,
+            94
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Aggregated tool error result",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeToolError",
+          "kind": "interface",
+          "signature": "NodeToolError",
+          "lines": [
+            97,
+            103
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "A single tool error for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "listToolErrors",
+          "kind": "function",
+          "signature": "listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult",
+          "lines": [
+            112,
+            170
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "List individual tool errors with filters and pagination.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAggregatedToolErrors",
+          "kind": "function",
+          "signature": "getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {}",
+          "lines": [
+            176,
+            250
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get aggregated tool errors - grouped by tool and error type (and optionally model).\nPer specs/api.md GET /api/v1/tool-errors.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getToolErrorStats",
+          "kind": "function",
+          "signature": "getToolErrorStats(db: Database.Database): ToolErrorStatsResult",
+          "lines": [
+            256,
+            310
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get tool error statistics for the dashboard.\nPer specs/api.md GET /api/v1/stats/tool-errors.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "countToolErrors",
+          "kind": "function",
+          "signature": "countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number",
+          "lines": [
+            315,
+            321
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Count tool errors matching filters.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAllToolsWithErrors",
+          "kind": "function",
+          "signature": "getAllToolsWithErrors(db: Database.Database): {}",
+          "lines": [
+            326,
+            333
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all unique tools that have errors recorded",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNodeToolErrors",
+          "kind": "function",
+          "signature": "getNodeToolErrors(db: Database.Database, nodeId: string): {}",
+          "lines": [
+            338,
+            349
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get tool errors for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "better-sqlite3"
       ]
     },

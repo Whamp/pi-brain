@@ -101,6 +101,8 @@ src/storage/index.ts
         - src/types/index.ts
         - [builtin] crypto
       - [external] better-sqlite3
+    - src/storage/tool-error-repository.ts
+      - [external] better-sqlite3
     - [external] better-sqlite3
   - src/storage/node-storage.ts
     - src/storage/node-types.ts
@@ -130,4 +132,6 @@ src/storage/index.ts
     - src/storage/node-types.ts
       - src/types/index.ts
       - [builtin] crypto
+    - [external] better-sqlite3
+  - src/storage/tool-error-repository.ts
     - [external] better-sqlite3
