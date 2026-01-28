@@ -189,17 +189,17 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:988: call join -> external
     1004-1124: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 17 [call: 16, type: 1]
+      refs out: 16 [call: 15, type: 1]
         - src/daemon/cli.ts:1024: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:1027: call log -> external
         - src/daemon/cli.ts:1043: call set -> external
         - src/daemon/cli.ts:1047: call log -> external
         - src/daemon/cli.ts:1050: call log -> external
-        - src/daemon/cli.ts:1052: call clearAllData -> src/storage/node-crud.ts
         - src/daemon/cli.ts:1055: call log -> external
         - src/daemon/cli.ts:1074: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1075: call Socket.write -> external
         - src/daemon/cli.ts:1079: call log -> external
+        - src/daemon/cli.ts:1082: call log -> external
     1129-1211: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
       refs out: 12 [call: 10, type: 2]
@@ -237,7 +237,7 @@ src/daemon/cli.ts [1-1222]
     - node:net
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-440]
+src/daemon/connection-discovery.test.ts [1-442]
   imports:
     - ../storage/index.js
     - ./connection-discovery.js
@@ -250,8 +250,6 @@ src/daemon/connection-discovery.ts [1-620]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
     138-143: interface ConnectionResult [exported]
-      refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
     - ../storage/index.js
@@ -451,8 +449,7 @@ src/daemon/facet-discovery.ts [1-1760]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 8 [call: 3, instantiate: 3, type: 2]
-        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
+      refs out: 7 [call: 3, instantiate: 3, type: 1]
         - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:174: instantiate Error -> external
@@ -1071,17 +1068,17 @@ src/daemon/worker.ts [1-717]
   interface:
     66-83: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 11 [type: 11]
+      refs out: 10 [type: 10]
         - src/daemon/worker.ts:70: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:72: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:74: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:76: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:76: type Promise -> external
         - src/daemon/worker.ts:78: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:78: type Node -> src/types/index.ts
         - src/daemon/worker.ts:78: type Promise -> external
         - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:80: type Error -> external
+        - src/daemon/worker.ts:80: type Promise -> external
     86-101: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1503,25 +1500,21 @@ src/parser/signals.ts [1-1095]
         - src/parser/signals.ts:428: call hasGenuineSuccessIndicator -> src/parser/signals.ts
     479-507: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 2 [call: 1, type: 1]
         - src/parser/signals.ts:479: type SessionEntry -> src/types.ts
-        - src/parser/signals.ts:479: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:497: call push -> external
-        - src/parser/signals.ts:498: type ManualFlag -> src/types/index.ts
     518-546: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 5 [call: 4, type: 1]
-        - src/parser/signals.ts:518: type FrictionSignals -> src/types/index.ts
+      refs out: 4 [call: 4]
         - src/parser/signals.ts:522: call min -> external
         - src/parser/signals.ts:525: call min -> external
         - src/parser/signals.ts:528: call min -> external
         - src/parser/signals.ts:545: call min -> external
     569-601: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:570: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:571: type FrictionDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:572: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:598: call calculateFrictionScore -> src/parser/signals.ts
     611-642: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1581,15 +1574,13 @@ src/parser/signals.ts [1-1095]
         - src/parser/signals.ts:998: call hasGenuinePraise -> src/parser/signals.ts
     1039-1058: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:1039: type DelightSignals -> src/types/index.ts
+      refs out: 1 [call: 1]
         - src/parser/signals.ts:1057: call min -> external
     1075-1094: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:1076: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:1077: type DelightDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:1078: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1091: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types.js
@@ -1597,4 +1588,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,797 (codebase: ~1,090,387)
+Estimated tokens: 20,618 (codebase: ~1,095,870)

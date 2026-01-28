@@ -487,12 +487,12 @@ src/api/server.test.ts [1-703]
       refs out: 1 [type: 1]
         - src/api/server.test.ts:33: type ApiConfig -> src/config/types.ts
     41-111: createTestNode(overrides: Partial<Node> = {}): Node
-      refs out: 8 [call: 3, instantiate: 2, type: 3]
+      refs out: 6 [call: 3, instantiate: 2, type: 1]
         - src/api/server.test.ts:41: type Partial -> external
-        - src/api/server.test.ts:41: type Node -> src/types/index.ts
-        - src/api/server.test.ts:41: type Node -> src/types/index.ts
         - src/api/server.test.ts:43: call now -> external
         - src/api/server.test.ts:92: call toISOString -> external
+        - src/api/server.test.ts:92: instantiate Date -> external
+        - src/api/server.test.ts:93: call toISOString -> external
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -692,12 +692,12 @@ src/api/websocket.ts [1-404]
           - src/api/websocket.ts:294: instantiate Date -> external
       301-323: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
         /** Broadcast analysis completed event */
-        refs out: 8 [call: 4, instantiate: 2, type: 2]
+        refs out: 7 [call: 4, instantiate: 2, type: 1]
           - src/api/websocket.ts:301: type AnalysisJob -> src/daemon/queue.ts
-          - src/api/websocket.ts:301: type Node -> src/types/index.ts
           - src/api/websocket.ts:302: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:309: call toISOString -> external
           - src/api/websocket.ts:309: instantiate Date -> external
+          - src/api/websocket.ts:313: call WebSocketManager.broadcast -> src/api/websocket.ts
       328-342: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
         /** Broadcast analysis failed event */
         refs out: 5 [call: 2, instantiate: 1, type: 2]
@@ -829,4 +829,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,138 (codebase: ~1,075,759)
+Estimated tokens: 9,142 (codebase: ~1,076,608)

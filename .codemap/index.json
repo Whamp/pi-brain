@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1130,
+    "totalSymbols": 1132,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
       "function": 501,
-      "type": 41,
+      "type": 42,
       "interface": 262,
-      "variable": 117,
+      "variable": 118,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38889,
-  "codebase_tokens": 1090387,
+  "total_tokens": 38970,
+  "codebase_tokens": 1095870,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15730,10 +15730,10 @@
       "language": "typescript",
       "lines": [
         1,
-        186
+        197
       ],
       "detail_level": "full",
-      "token_estimate": 393,
+      "token_estimate": 405,
       "symbols": [
         {
           "name": "EdgeRow",
@@ -15741,7 +15741,7 @@
           "signature": "EdgeRow",
           "lines": [
             19,
-            27
+            30
           ],
           "exported": true,
           "is_default": false,
@@ -15759,8 +15759,8 @@
           "kind": "function",
           "signature": "generateEdgeId(): string",
           "lines": [
-            36,
-            38
+            39,
+            41
           ],
           "exported": true,
           "is_default": false,
@@ -15776,10 +15776,10 @@
         {
           "name": "createEdge",
           "kind": "function",
-          "signature": "createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {\n    metadata?: EdgeMetadata;\n    createdBy?: \"boundary\" | \"daemon\" | \"user\";\n  } = {}): Edge",
+          "signature": "createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {\n    metadata?: EdgeMetadata;\n    createdBy?: \"boundary\" | \"daemon\" | \"user\";\n    confidence?: number;\n    similarity?: number;\n  } = {}): Edge",
           "lines": [
-            47,
-            83
+            50,
+            92
           ],
           "exported": true,
           "is_default": false,
@@ -15797,8 +15797,8 @@
           "kind": "function",
           "signature": "getEdgesFrom(db: Database.Database, nodeId: string): {}",
           "lines": [
-            88,
-            95
+            97,
+            104
           ],
           "exported": true,
           "is_default": false,
@@ -15816,8 +15816,8 @@
           "kind": "function",
           "signature": "getEdgesTo(db: Database.Database, nodeId: string): {}",
           "lines": [
-            100,
-            107
+            109,
+            116
           ],
           "exported": true,
           "is_default": false,
@@ -15835,8 +15835,8 @@
           "kind": "function",
           "signature": "getNodeEdges(db: Database.Database, nodeId: string): {}",
           "lines": [
-            112,
-            119
+            121,
+            128
           ],
           "exported": true,
           "is_default": false,
@@ -15854,8 +15854,8 @@
           "kind": "function",
           "signature": "getAllEdges(db: Database.Database): {}",
           "lines": [
-            124,
-            127
+            133,
+            136
           ],
           "exported": true,
           "is_default": false,
@@ -15873,8 +15873,8 @@
           "kind": "function",
           "signature": "getEdge(db: Database.Database, edgeId: string): EdgeRow",
           "lines": [
-            132,
-            135
+            141,
+            144
           ],
           "exported": true,
           "is_default": false,
@@ -15892,8 +15892,8 @@
           "kind": "function",
           "signature": "deleteEdge(db: Database.Database, edgeId: string): boolean",
           "lines": [
-            140,
-            143
+            149,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -15911,8 +15911,8 @@
           "kind": "function",
           "signature": "edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean",
           "lines": [
-            148,
-            166
+            157,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -15930,8 +15930,8 @@
           "kind": "function",
           "signature": "edgeRowToEdge(row: EdgeRow): Edge",
           "lines": [
-            175,
-            185
+            184,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -16749,7 +16749,7 @@
       "language": "typescript",
       "lines": [
         1,
-        343
+        356
       ],
       "detail_level": "full",
       "token_estimate": 240,
@@ -16798,7 +16798,7 @@
           "signature": "nodeRowToNode(row: NodeRow, loadFull = false): Node",
           "lines": [
             268,
-            335
+            348
           ],
           "exported": true,
           "is_default": false,
@@ -16816,8 +16816,8 @@
           "kind": "function",
           "signature": "nodeRowsToNodes(rows: NodeRow[], loadFull = false): {}",
           "lines": [
-            340,
-            342
+            353,
+            355
           ],
           "exported": true,
           "is_default": false,
@@ -16847,7 +16847,7 @@
       "language": "typescript",
       "lines": [
         1,
-        751
+        763
       ],
       "detail_level": "full",
       "token_estimate": 1246,
@@ -16877,7 +16877,7 @@
           "signature": "NodeRow",
           "lines": [
             45,
-            67
+            72
           ],
           "exported": true,
           "is_default": false,
@@ -16895,8 +16895,8 @@
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            76,
-            107
+            81,
+            112
           ],
           "exported": true,
           "is_default": false,
@@ -16914,8 +16914,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            112,
-            132
+            117,
+            137
           ],
           "exported": true,
           "is_default": false,
@@ -16933,8 +16933,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            137,
-            157
+            142,
+            162
           ],
           "exported": true,
           "is_default": false,
@@ -16952,8 +16952,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            162,
-            181
+            167,
+            186
           ],
           "exported": true,
           "is_default": false,
@@ -16971,8 +16971,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            191,
-            220
+            196,
+            225
           ],
           "exported": true,
           "is_default": false,
@@ -16990,8 +16990,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            226,
-            292
+            231,
+            304
           ],
           "exported": true,
           "is_default": false,
@@ -17009,8 +17009,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            298,
-            312
+            310,
+            324
           ],
           "exported": true,
           "is_default": false,
@@ -17028,8 +17028,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            323,
-            430
+            335,
+            442
           ],
           "exported": true,
           "is_default": false,
@@ -17047,8 +17047,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            437,
-            527
+            449,
+            539
           ],
           "exported": true,
           "is_default": false,
@@ -17066,8 +17066,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
           "lines": [
-            532,
-            538
+            544,
+            550
           ],
           "exported": true,
           "is_default": false,
@@ -17085,8 +17085,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
           "lines": [
-            545,
-            555
+            557,
+            567
           ],
           "exported": true,
           "is_default": false,
@@ -17104,8 +17104,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            560,
-            563
+            572,
+            575
           ],
           "exported": true,
           "is_default": false,
@@ -17123,8 +17123,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            568,
-            574
+            580,
+            586
           ],
           "exported": true,
           "is_default": false,
@@ -17142,8 +17142,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            580,
-            586
+            592,
+            598
           ],
           "exported": true,
           "is_default": false,
@@ -17161,8 +17161,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
           "lines": [
-            591,
-            603
+            603,
+            615
           ],
           "exported": true,
           "is_default": false,
@@ -17180,8 +17180,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            608,
-            619
+            620,
+            631
           ],
           "exported": true,
           "is_default": false,
@@ -17199,8 +17199,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            624,
-            635
+            636,
+            647
           ],
           "exported": true,
           "is_default": false,
@@ -17218,8 +17218,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            644,
-            669
+            656,
+            681
           ],
           "exported": true,
           "is_default": false,
@@ -17237,8 +17237,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            672,
-            679
+            684,
+            691
           ],
           "exported": false,
           "is_default": false,
@@ -17256,8 +17256,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            684,
-            689
+            696,
+            701
           ],
           "exported": false,
           "is_default": false,
@@ -17275,8 +17275,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            696,
-            734
+            708,
+            746
           ],
           "exported": true,
           "is_default": false,
@@ -17294,8 +17294,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            739,
-            750
+            751,
+            762
           ],
           "exported": false,
           "is_default": false,
@@ -20712,10 +20712,10 @@
       "language": "typescript",
       "lines": [
         1,
-        661
+        707
       ],
       "detail_level": "full",
-      "token_estimate": 1060,
+      "token_estimate": 1129,
       "symbols": [
         {
           "name": "Node",
@@ -20723,7 +20723,7 @@
           "signature": "Node",
           "lines": [
             12,
-            30
+            40
           ],
           "exported": true,
           "is_default": false,
@@ -20741,8 +20741,8 @@
           "kind": "interface",
           "signature": "NodeSource",
           "lines": [
-            32,
-            49
+            42,
+            59
           ],
           "exported": true,
           "is_default": false,
@@ -20760,8 +20760,8 @@
           "kind": "type",
           "signature": "NodeType = | \"coding\"\n  | \"debugging\"\n  | \"refactoring\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"data\"\n  | \"other\"",
           "lines": [
-            51,
-            64
+            61,
+            74
           ],
           "exported": true,
           "is_default": false,
@@ -20779,8 +20779,8 @@
           "kind": "interface",
           "signature": "NodeClassification",
           "lines": [
-            66,
-            78
+            76,
+            88
           ],
           "exported": true,
           "is_default": false,
@@ -20798,8 +20798,8 @@
           "kind": "type",
           "signature": "Outcome = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
           "lines": [
-            80,
-            80
+            90,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -20817,8 +20817,8 @@
           "kind": "interface",
           "signature": "Decision",
           "lines": [
-            82,
-            86
+            92,
+            96
           ],
           "exported": true,
           "is_default": false,
@@ -20836,8 +20836,8 @@
           "kind": "interface",
           "signature": "ErrorSummary",
           "lines": [
-            88,
-            92
+            98,
+            102
           ],
           "exported": true,
           "is_default": false,
@@ -20855,8 +20855,8 @@
           "kind": "interface",
           "signature": "NodeContent",
           "lines": [
-            94,
-            105
+            104,
+            115
           ],
           "exported": true,
           "is_default": false,
@@ -20874,8 +20874,8 @@
           "kind": "type",
           "signature": "LessonLevel = | \"project\"\n  | \"task\"\n  | \"user\"\n  | \"model\"\n  | \"tool\"\n  | \"skill\"\n  | \"subagent\"",
           "lines": [
-            111,
-            118
+            121,
+            128
           ],
           "exported": true,
           "is_default": false,
@@ -20893,8 +20893,8 @@
           "kind": "type",
           "signature": "Confidence = \"high\" | \"medium\" | \"low\"",
           "lines": [
-            120,
-            120
+            130,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -20912,8 +20912,8 @@
           "kind": "interface",
           "signature": "Lesson",
           "lines": [
-            122,
-            133
+            132,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -20931,8 +20931,8 @@
           "kind": "interface",
           "signature": "LessonsByLevel",
           "lines": [
-            135,
-            143
+            145,
+            153
           ],
           "exported": true,
           "is_default": false,
@@ -20950,8 +20950,8 @@
           "kind": "interface",
           "signature": "ModelUsage",
           "lines": [
-            149,
-            157
+            159,
+            167
           ],
           "exported": true,
           "is_default": false,
@@ -20969,8 +20969,8 @@
           "kind": "type",
           "signature": "Frequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
           "lines": [
-            159,
-            159
+            169,
+            169
           ],
           "exported": true,
           "is_default": false,
@@ -20988,8 +20988,8 @@
           "kind": "interface",
           "signature": "ModelQuirk",
           "lines": [
-            161,
-            168
+            171,
+            178
           ],
           "exported": true,
           "is_default": false,
@@ -21007,8 +21007,8 @@
           "kind": "interface",
           "signature": "ToolError",
           "lines": [
-            170,
-            176
+            180,
+            186
           ],
           "exported": true,
           "is_default": false,
@@ -21026,8 +21026,8 @@
           "kind": "interface",
           "signature": "ModelObservations",
           "lines": [
-            178,
-            186
+            188,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -21045,8 +21045,8 @@
           "kind": "interface",
           "signature": "NodeMetadata",
           "lines": [
-            192,
-            205
+            202,
+            215
           ],
           "exported": true,
           "is_default": false,
@@ -21064,8 +21064,8 @@
           "kind": "interface",
           "signature": "SemanticData",
           "lines": [
-            207,
-            216
+            217,
+            226
           ],
           "exported": true,
           "is_default": false,
@@ -21083,8 +21083,8 @@
           "kind": "interface",
           "signature": "DaemonDecision",
           "lines": [
-            218,
-            225
+            228,
+            235
           ],
           "exported": true,
           "is_default": false,
@@ -21102,8 +21102,8 @@
           "kind": "interface",
           "signature": "DaemonMeta",
           "lines": [
-            227,
-            237
+            237,
+            247
           ],
           "exported": true,
           "is_default": false,
@@ -21121,8 +21121,8 @@
           "kind": "type",
           "signature": "EdgeType = | \"fork\"\n  | \"branch\"\n  | \"tree_jump\"\n  | \"resume\"\n  | \"compaction\"\n  | \"continuation\"\n  | \"handoff\"\n  // Semantic edges (daemon discovers)\n  | \"semantic\"\n  | \"reference\"\n  | \"lesson_application\"\n  | ...",
           "lines": [
-            243,
-            258
+            253,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -21140,8 +21140,8 @@
           "kind": "type",
           "signature": "EdgeCreator = \"boundary\" | \"daemon\" | \"user\"",
           "lines": [
-            260,
-            260
+            282,
+            282
           ],
           "exported": true,
           "is_default": false,
@@ -21159,8 +21159,8 @@
           "kind": "interface",
           "signature": "EdgeMetadata",
           "lines": [
-            262,
-            275
+            284,
+            297
           ],
           "exported": true,
           "is_default": false,
@@ -21178,8 +21178,46 @@
           "kind": "interface",
           "signature": "Edge",
           "lines": [
-            277,
-            286
+            299,
+            312
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AUTOMEM_EDGE_TYPES",
+          "kind": "variable",
+          "signature": "AUTOMEM_EDGE_TYPES",
+          "lines": [
+            318,
+            330
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "AutoMem typed relationship edge types (per automem-features.md)\nThese enable semantic reasoning (\"why\" queries, causal chains)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AutoMemEdgeType",
+          "kind": "type",
+          "signature": "AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number]",
+          "lines": [
+            332,
+            332
           ],
           "exported": true,
           "is_default": false,
@@ -21197,8 +21235,8 @@
           "kind": "type",
           "signature": "VersionTrigger = | \"initial\"\n  | \"prompt_update\"\n  | \"connection_found\"\n  | \"user_feedback\"\n  | \"schema_migration\"",
           "lines": [
-            292,
-            297
+            338,
+            343
           ],
           "exported": true,
           "is_default": false,
@@ -21216,8 +21254,8 @@
           "kind": "interface",
           "signature": "NodeVersion",
           "lines": [
-            299,
-            306
+            345,
+            352
           ],
           "exported": true,
           "is_default": false,
@@ -21235,8 +21273,8 @@
           "kind": "interface",
           "signature": "AggregatedFailurePattern",
           "lines": [
-            312,
-            322
+            358,
+            368
           ],
           "exported": true,
           "is_default": false,
@@ -21254,8 +21292,8 @@
           "kind": "interface",
           "signature": "AggregatedModelStats",
           "lines": [
-            324,
-            333
+            370,
+            379
           ],
           "exported": true,
           "is_default": false,
@@ -21273,8 +21311,8 @@
           "kind": "interface",
           "signature": "AggregatedLessonPattern",
           "lines": [
-            335,
-            344
+            381,
+            390
           ],
           "exported": true,
           "is_default": false,
@@ -21292,8 +21330,8 @@
           "kind": "type",
           "signature": "InsightType = \"quirk\" | \"win\" | \"failure\" | \"tool_error\" | \"lesson\"",
           "lines": [
-            350,
-            350
+            396,
+            396
           ],
           "exported": true,
           "is_default": false,
@@ -21311,8 +21349,8 @@
           "kind": "type",
           "signature": "InsightSeverity = \"low\" | \"medium\" | \"high\"",
           "lines": [
-            351,
-            351
+            397,
+            397
           ],
           "exported": true,
           "is_default": false,
@@ -21330,8 +21368,8 @@
           "kind": "interface",
           "signature": "AggregatedInsight",
           "lines": [
-            353,
-            380
+            399,
+            426
           ],
           "exported": true,
           "is_default": false,
@@ -21349,8 +21387,8 @@
           "kind": "interface",
           "signature": "PromptAddition",
           "lines": [
-            386,
-            397
+            432,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -21368,8 +21406,8 @@
           "kind": "interface",
           "signature": "DateRange",
           "lines": [
-            406,
-            411
+            452,
+            457
           ],
           "exported": true,
           "is_default": false,
@@ -21387,8 +21425,8 @@
           "kind": "interface",
           "signature": "EffectivenessResult",
           "lines": [
-            416,
-            434
+            462,
+            480
           ],
           "exported": true,
           "is_default": false,
@@ -21406,8 +21444,8 @@
           "kind": "interface",
           "signature": "PromptEffectiveness",
           "lines": [
-            439,
-            475
+            485,
+            521
           ],
           "exported": true,
           "is_default": false,
@@ -21425,8 +21463,8 @@
           "kind": "interface",
           "signature": "ManualFlag",
           "lines": [
-            484,
-            491
+            530,
+            537
           ],
           "exported": true,
           "is_default": false,
@@ -21444,8 +21482,8 @@
           "kind": "interface",
           "signature": "FrictionSignals",
           "lines": [
-            496,
-            511
+            542,
+            557
           ],
           "exported": true,
           "is_default": false,
@@ -21463,8 +21501,8 @@
           "kind": "interface",
           "signature": "DelightSignals",
           "lines": [
-            516,
-            525
+            562,
+            571
           ],
           "exported": true,
           "is_default": false,
@@ -21482,8 +21520,8 @@
           "kind": "interface",
           "signature": "NodeSignals",
           "lines": [
-            530,
-            534
+            576,
+            580
           ],
           "exported": true,
           "is_default": false,
@@ -21501,8 +21539,8 @@
           "kind": "type",
           "signature": "ClusterStatus = \"pending\" | \"confirmed\" | \"dismissed\"",
           "lines": [
-            543,
-            543
+            589,
+            589
           ],
           "exported": true,
           "is_default": false,
@@ -21520,8 +21558,8 @@
           "kind": "type",
           "signature": "ClusterSignalType = \"friction\" | \"delight\" | null",
           "lines": [
-            548,
-            548
+            594,
+            594
           ],
           "exported": true,
           "is_default": false,
@@ -21539,8 +21577,8 @@
           "kind": "interface",
           "signature": "Cluster",
           "lines": [
-            553,
-            575
+            599,
+            621
           ],
           "exported": true,
           "is_default": false,
@@ -21558,8 +21596,8 @@
           "kind": "interface",
           "signature": "ClusterNode",
           "lines": [
-            580,
-            587
+            626,
+            633
           ],
           "exported": true,
           "is_default": false,
@@ -21577,8 +21615,8 @@
           "kind": "interface",
           "signature": "NodeEmbedding",
           "lines": [
-            592,
-            602
+            638,
+            648
           ],
           "exported": true,
           "is_default": false,
@@ -21596,8 +21634,8 @@
           "kind": "interface",
           "signature": "ClusteringRun",
           "lines": [
-            607,
-            620
+            653,
+            666
           ],
           "exported": true,
           "is_default": false,
@@ -21615,8 +21653,8 @@
           "kind": "interface",
           "signature": "EmbeddingConfig",
           "lines": [
-            625,
-            636
+            671,
+            682
           ],
           "exported": true,
           "is_default": false,
@@ -21634,8 +21672,8 @@
           "kind": "interface",
           "signature": "ClusteringConfig",
           "lines": [
-            641,
-            652
+            687,
+            698
           ],
           "exported": true,
           "is_default": false,
@@ -21653,8 +21691,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryResult",
           "lines": [
-            657,
-            660
+            703,
+            706
           ],
           "exported": true,
           "is_default": false,
