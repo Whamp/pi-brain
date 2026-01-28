@@ -229,3 +229,80 @@ Ref: docs/plans/web-ui-feature-report-repair-plan.md
 | 16.2 | Implement WebSocket Route Implementation | done   | -    | 2026-01-27                            |
 | 16.3 | Implement Status Polling Fallback        | done   | 16.2 | 2026-01-27 (code review fixes merged) |
 | 16.4 | News Feed UX Refinement                  | done   | -    | 2026-01-27 (undo window implemented)  |
+
+## Phase 17: Semantic Search
+
+Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.md
+
+### 17.1 Foundation (sqlite-vec setup)
+
+| ID     | Task                                          | Status  | Deps   | Notes      |
+| ------ | --------------------------------------------- | ------- | ------ | ---------- |
+| 17.1.1 | Install sqlite-vec extension (npm or binary)  | done    | -      | 2026-01-27 |
+| 17.1.2 | Load extension in database.ts + isVecLoaded() | pending | 17.1.1 |            |
+| 17.1.3 | Create 012_semantic_search.sql migration      | pending | 17.1.2 |            |
+
+### 17.2 Richer Embedding Format
+
+| ID     | Task                                           | Status  | Deps   | Notes |
+| ------ | ---------------------------------------------- | ------- | ------ | ----- |
+| 17.2.1 | Create buildEmbeddingText() in embedding-utils | pending | -      |       |
+| 17.2.2 | Update facet-discovery to use new format       | pending | 17.2.1 |       |
+
+### 17.3 Embedding at Ingest Time
+
+| ID     | Task                                      | Status  | Deps          | Notes |
+| ------ | ----------------------------------------- | ------- | ------------- | ----- |
+| 17.3.1 | Add storeEmbeddingWithVec helper function | pending | 17.1.3        |       |
+| 17.3.2 | Add embedding generation in worker.ts     | pending | 17.3.1,17.2.1 |       |
+
+### 17.4 Backfill Job
+
+| ID     | Task                                            | Status  | Deps   | Notes |
+| ------ | ----------------------------------------------- | ------- | ------ | ----- |
+| 17.4.1 | Create backfillEmbeddings() function            | pending | 17.3.1 |       |
+| 17.4.2 | Add backfill job to scheduler                   | pending | 17.4.1 |       |
+| 17.4.3 | Add `pi-brain rebuild --embeddings` CLI command | pending | 17.4.1 |       |
+
+### 17.5 Semantic Search Function
+
+| ID     | Task                               | Status  | Deps   | Notes |
+| ------ | ---------------------------------- | ------- | ------ | ----- |
+| 17.5.1 | Create semanticSearch() function   | pending | 17.1.3 |       |
+| 17.5.2 | Add unit tests for semantic search | pending | 17.5.1 |       |
+
+### 17.6 Query Processor Integration
+
+| ID     | Task                                         | Status  | Deps   | Notes |
+| ------ | -------------------------------------------- | ------- | ------ | ----- |
+| 17.6.1 | Update findRelevantNodes with semantic + FTS | pending | 17.5.1 |       |
+| 17.6.2 | Add semantic_search_threshold config option  | pending | -      |       |
+| 17.6.3 | Integration tests for semantic search        | pending | 17.6.1 |       |
+
+### 17.7 Error Handling & Polish
+
+| ID     | Task                                          | Status  | Deps   | Notes |
+| ------ | --------------------------------------------- | ------- | ------ | ----- |
+| 17.7.1 | Implement graceful degradation (no vec/embed) | pending | 17.6.1 |       |
+| 17.7.2 | Handle embedding dimension mismatches         | pending | 17.5.1 |       |
+| 17.7.3 | Document semantic search configuration        | pending | 17.6.2 |       |
+
+### 17.8 Migration & Rollout
+
+| ID     | Task                                     | Status  | Deps      | Notes |
+| ------ | ---------------------------------------- | ------- | --------- | ----- |
+| 17.8.1 | Run backfill on existing data and verify | pending | 17.1-17.7 |       |
+
+## Phase 18: Web UI Polish
+
+Ref: docs/plans/Web-UI-Functionality-Report.md
+
+| ID   | Task                                                  | Status  | Deps | Notes |
+| ---- | ----------------------------------------------------- | ------- | ---- | ----- |
+| 18.1 | Settings Save Button State (disable after save)       | pending | -    |       |
+| 18.2 | Add toast/notification system for feedback            | pending | -    |       |
+| 18.3 | Empty state "Getting Started" guide (Sessions, Graph) | pending | -    |       |
+| 18.4 | Fix sidebar overflow on small viewports               | pending | -    |       |
+| 18.5 | Real-time Dashboard stats via WebSocket               | pending | 16.2 |       |
+| 18.6 | Search result FTS term highlighting                   | pending | -    |       |
+| 18.7 | Breadcrumb click on current page is no-op             | pending | -    |       |

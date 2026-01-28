@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 49 files
+- typescript: 50 files
 
 ## Statistics
-- Total files: 49
+- Total files: 50
 - Total symbols: 302
   - function: 177
   - interface: 83
@@ -2832,6 +2832,12 @@ src/storage/search-repository.ts [1-532]
     - ./node-types.js
     - better-sqlite3
 
+src/storage/sqlite-vec.test.ts [1-98]
+  imports:
+    - better-sqlite3
+    - sqlite-vec
+    - vitest
+
 src/storage/tool-error-repository.ts [1-352]
   interface:
     16-25: interface ListToolErrorsFilters [exported]
@@ -2936,5 +2942,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 49
-Estimated tokens: 37,660 (codebase: ~999,621)
+Files: 50
+Estimated tokens: 37,685 (codebase: ~1,003,491)

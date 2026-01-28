@@ -35,6 +35,21 @@ npm run build
 npm link
 ```
 
+### Dependencies
+
+pi-brain uses the following key dependencies:
+
+- **better-sqlite3**: High-performance SQLite bindings for Node.js
+- **sqlite-vec**: Vector similarity search extension for semantic queries
+
+The `sqlite-vec` extension is installed automatically via npm and provides native vector search capabilities. Supported platforms:
+
+- Linux (x64, arm64)
+- macOS (x64, arm64)
+- Windows (x64)
+
+No additional configuration is needed - the extension loads automatically when the database opens.
+
 ## Usage
 
 ### Daemon
