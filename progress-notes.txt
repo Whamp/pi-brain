@@ -80,3 +80,30 @@ Main branch: major/pi-brain
 - `src/web/app/src/routes/+page.svelte`: Simplified catch block since API errors are handled by `Promise.allSettled`.
 
 **Notes**: Addressed P2 and P3 issues from code review.
+
+---
+
+## 2026-01-27 16:47 - Integration Repair Plan Verification
+
+**Status**: ALL TASKS COMPLETE ✅
+**Validation**: Full verification of all checklist items
+
+**Verified:**
+- 2.1 Build Pipeline: `npm run build` creates `dist/migrations/` with 11 SQL files
+- 2.2 Worker Initialization: Daemon starts without crashing
+- 2.3 Non-Fatal Environment Validation: Worker idles gracefully when skills missing
+- 2.4 Frontend Error Handling: Graceful API failure handling (completed in earlier commit 17a82cc)
+- 2.5 Vite Proxy: Frontend correctly proxies `/api/*` to backend on port 8765
+- 2.6 RLM Skill: User configuration issue - worker idles with warning message
+
+**Health check**: `curl http://localhost:8765/health` → `{"status":"ok",...}`
+**Proxy test**: `curl http://localhost:5173/api/v1/stats` → `{"status":"success",...}`
+
+**Notes**: All integration issues identified in the repair plan have been addressed.
+The rlm skill installation (2.6) is a user configuration task, not a code fix.
+The daemon gracefully degrades when skills are missing.
+
+**Update**: Fixed rlm skill symlink
+- Removed broken `~/skills/rlm` (only had README.md)
+- Created symlink: `~/skills/rlm` → `~/projects/pi-rlm/skills/rlm`
+- Daemon now finds rlm skill and processes sessions without warnings

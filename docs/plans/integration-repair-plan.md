@@ -1,5 +1,7 @@
 # Integration Repair Plan: Web UI ↔ Backend Connection
 
+> **Status: ✅ COMPLETE** — All tasks implemented and verified on 2026-01-27.
+
 This document outlines the steps required to fix the critical integration issues preventing the pi-brain web UI from functioning. These issues were identified through systematic exploration of the running application.
 
 ## 1. Problem Summary
@@ -245,17 +247,23 @@ The SvelteKit frontend successfully loads but displays errors on every page beca
 
 ## 4. Verification Checklist
 
+**Status: ✅ ALL TASKS COMPLETE** (verified 2026-01-27)
+
 After completing all tasks, verify the following:
 
-- [ ] `npm run build` succeeds and `dist/migrations/` contains SQL files.
-- [ ] `node dist/src/daemon/daemon-process.js` starts without crashing.
-- [ ] `curl http://localhost:8765/health` returns `{"status":"ok",...}`.
-- [ ] `npm run web:dev` starts the frontend.
-- [ ] Dashboard page loads stats or shows "No data yet" (not error).
-- [ ] Graph page shows empty state or nodes (not JSON parsing error).
-- [ ] Sessions page shows projects list or empty state.
-- [ ] Settings page loads configuration values.
-- [ ] Sidebar shows "Daemon running" status indicator.
+- [x] `npm run build` succeeds and `dist/migrations/` contains SQL files.
+- [x] `node dist/src/daemon/daemon-process.js` starts without crashing.
+- [x] `curl http://localhost:8765/health` returns `{"status":"ok",...}`.
+- [x] `npm run web:dev` starts the frontend.
+- [x] Dashboard page loads stats or shows "No data yet" (not error).
+- [x] Graph page shows empty state or nodes (not JSON parsing error).
+- [x] Sessions page shows projects list or empty state.
+- [x] Settings page loads configuration values.
+- [x] Sidebar shows "Daemon running" status indicator.
+
+**Note on Task 2.6 (RLM Skill)**: This is a user configuration issue, not a code fix.
+The worker gracefully idles when the skill is missing, logging:
+`[worker] Missing skills: rlm. Worker will idle until skills are installed.`
 
 ---
 
