@@ -40,3 +40,23 @@ Main branch: major/pi-brain
 - Animated timer bar showing remaining time
 - Proper cleanup of timeouts on component destroy
 - Responsive mobile layout for undo UI
+
+---
+
+## 2026-01-27 20:28 - Task 17.1.1
+
+**Status**: pending → done
+**Validation**: 
+- sqlite-vec extension loads successfully via `sqliteVec.load(db)`
+- vec0 virtual table creation works
+- Vector insertion and cosine distance search verified
+- Dimension mismatch error handling confirmed
+- All 1221 tests pass (4 new tests added)
+- Lint/format checks pass
+**Commit**: b1d8693a
+**Notes**: 
+- Added sqlite-vec npm package (v0.1.7-alpha.2)
+- Package includes native binaries for Linux/macOS/Windows (x64/arm64)
+- Extension loaded via `sqliteVec.load(db)` function
+- vec0 virtual tables require BigInt for rowid values
+- Updated README with sqlite-vec dependency documentation
