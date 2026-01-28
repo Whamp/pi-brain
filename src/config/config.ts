@@ -527,6 +527,15 @@ export function loadConfig(configPath?: string): PiBrainConfig {
     return getDefaultConfig();
   }
 
+  // Validate file extension
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext && ext !== ".yaml" && ext !== ".yml") {
+    throw new ConfigError(
+      `Config file must be YAML format (.yaml or .yml), got: ${ext}`,
+      filePath
+    );
+  }
+
   let content: string;
   try {
     content = fs.readFileSync(filePath, "utf8");

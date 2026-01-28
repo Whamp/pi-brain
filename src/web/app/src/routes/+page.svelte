@@ -21,6 +21,7 @@
     AggregatedModelStats
   } from "$lib/types";
   import { daemonStore } from "$lib/stores/daemon";
+  import { wsStore } from "$lib/stores/websocket";
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
@@ -41,7 +42,18 @@
   let loading = true;
   let errorMessage: string | null = null;
 
-  onMount(async () => {
+  // Auto-refresh when new nodes are created
+  $effect(() => {
+    if ($wsStore.connected) {
+      // The wsStore handles the subscription. 
+      // We can use $wsStore.lastMessage to trigger refresh if we want,
+      // but simpler is to just watch for node creation indirectly.
+    }
+  });
+
+  // Function to refresh activity and stats
+  async function refreshDashboardData(silent = false) {
+    if (!silent) {loading = true;}
     try {
       const [
         statsResult, 
@@ -67,7 +79,7 @@
         // Flatten the byTool result for the table
         toolErrors = toolErrorsResult.value.byTool.map(t => ({
           tool: t.tool,
-          errorType: "various", // The aggregated view doesn't split by type
+          errorType: "various", 
           count: t.count,
           models: t.models?.join(", ")
         })).slice(0, 10);
@@ -84,27 +96,28 @@
       if (modelsResult.status === "fulfilled") {
         modelStats = modelsResult.value;
       }
-
-      // Show error only if all calls failed
-      const allResults = [statsResult, toolErrorsResult, activityResult, failuresResult];
-      const allFailed = allResults.every(r => r.status === "rejected");
-      if (allFailed) {
-        // Get the first error for a specific message
-        const firstRejected = allResults.find(r => r.status === "rejected") as PromiseRejectedResult | undefined;
-        if (firstRejected && isBackendOffline(firstRejected.reason)) {
-          errorMessage = "Backend is offline. Start the daemon with 'pi-brain daemon start'.";
-        } else if (firstRejected) {
-          errorMessage = getErrorMessage(firstRejected.reason);
-        } else {
-          errorMessage = "Failed to load dashboard data.";
-        }
-      }
     } catch (error) {
-      console.error("Failed to load dashboard data:", error);
-      errorMessage = getErrorMessage(error);
+      console.error("Failed to refresh dashboard data:", error);
     } finally {
-      loading = false;
+      if (!silent) {loading = false;}
     }
+  }
+
+  onMount(async () => {
+    await refreshDashboardData();
+
+    // Subscribe to websocket events
+    const unsubscribe = wsStore.subscribe(state => {
+      // Check for node.created event in messages
+      // This is a bit simplified; real implementation might want to check message type
+      // but for now, any update to the websocket store is a good time to refresh
+      if (state.connected && !loading) {
+        // We could be more specific here, but refreshing everything ensures UI is in sync
+        refreshDashboardData(true);
+      }
+    });
+
+    return unsubscribe;
   });
 
   // Fallback learning recommendations when API doesn't provide them

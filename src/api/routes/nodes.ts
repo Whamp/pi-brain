@@ -9,6 +9,7 @@ import type { EdgeType } from "../../storage/node-types.js";
 import { getConnectedNodes } from "../../storage/graph-repository.js";
 import { getAllNodeVersions, getNode } from "../../storage/index.js";
 import { getNodeLessons } from "../../storage/lesson-repository.js";
+import { nodeRowsToNodes } from "../../storage/node-conversion.js";
 import {
   getNodeTags,
   getNodeTopics,
@@ -107,9 +108,13 @@ export async function nodesRoutes(app: FastifyInstance): Promise<void> {
       };
 
       const result = listNodes(db, filters, options);
+      const transformedResult = {
+        ...result,
+        nodes: nodeRowsToNodes(result.nodes),
+      };
       const durationMs = Date.now() - startTime;
 
-      return reply.send(successResponse(result, durationMs));
+      return reply.send(successResponse(transformedResult, durationMs));
     }
   );
 
@@ -225,8 +230,13 @@ export async function nodesRoutes(app: FastifyInstance): Promise<void> {
         edgeTypes: parseArrayParam(edgeTypes) as EdgeType[] | undefined,
       });
 
+      const transformedResult = {
+        ...result,
+        nodes: nodeRowsToNodes(result.nodes),
+      };
+
       const durationMs = Date.now() - startTime;
-      return reply.send(successResponse(result, durationMs));
+      return reply.send(successResponse(transformedResult, durationMs));
     }
   );
 }

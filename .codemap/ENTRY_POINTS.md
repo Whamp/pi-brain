@@ -208,32 +208,33 @@ src/api/routes/lessons.ts [1-94]
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-233]
+src/api/routes/nodes.ts [1-243]
   function:
-    27-35: parseArrayParam(value: string | undefined): {}
+    28-36: parseArrayParam(value: string | undefined): {}
       /** Parse comma-separated string to array */
       refs out: 4 [call: 4]
-        - src/api/routes/nodes.ts:31: call filter -> external
-        - src/api/routes/nodes.ts:31: call map -> external
-        - src/api/routes/nodes.ts:31: call split -> external
-        - src/api/routes/nodes.ts:33: call trim -> external
-    40-45: parseBooleanParam(value: string | undefined): boolean
+        - src/api/routes/nodes.ts:32: call filter -> external
+        - src/api/routes/nodes.ts:32: call map -> external
+        - src/api/routes/nodes.ts:32: call split -> external
+        - src/api/routes/nodes.ts:34: call trim -> external
+    41-46: parseBooleanParam(value: string | undefined): boolean
       /** Parse boolean query param */
-    50-56: parseIntParam(value: string | undefined): number
+    51-57: parseIntParam(value: string | undefined): number
       /** Parse integer query param */
       refs out: 1 [call: 1]
-        - src/api/routes/nodes.ts:55: call isNaN -> external
-    58-232: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/nodes.ts:56: call isNaN -> external
+    59-242: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 43 [call: 35, type: 8]
-        - src/api/routes/nodes.ts:58: type FastifyInstance -> external
-        - src/api/routes/nodes.ts:58: type Promise -> external
-        - src/api/routes/nodes.ts:62: call get -> external
-        - src/api/routes/nodes.ts:65: type FastifyRequest -> external
-        - src/api/routes/nodes.ts:83: type FastifyReply -> external
+        - src/api/routes/nodes.ts:59: type FastifyInstance -> external
+        - src/api/routes/nodes.ts:59: type Promise -> external
+        - src/api/routes/nodes.ts:63: call get -> external
+        - src/api/routes/nodes.ts:66: type FastifyRequest -> external
+        - src/api/routes/nodes.ts:84: type FastifyReply -> external
   imports:
     - ../../storage/graph-repository.js
     - ../../storage/index.js
     - ../../storage/lesson-repository.js
+    - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
@@ -365,25 +366,26 @@ src/api/routes/search.ts [1-105]
     - ../responses.js
     - fastify
 
-src/api/routes/sessions.ts [1-272]
+src/api/routes/sessions.ts [1-273]
   interface:
-    30-44: interface SessionSummary
+    31-45: interface SessionSummary
       /** Session summary for the file browser */
-    49-54: interface ProjectSummary
+    50-55: interface ProjectSummary
       /** Project summary for the file browser */
   function:
-    19-25: parseIntParam(value: string | undefined): number
+    20-26: parseIntParam(value: string | undefined): number
       /** Parse integer query param */
       refs out: 1 [call: 1]
-        - src/api/routes/sessions.ts:24: call isNaN -> external
-    56-271: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/sessions.ts:25: call isNaN -> external
+    57-272: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 34 [call: 24, instantiate: 2, type: 8]
-        - src/api/routes/sessions.ts:56: type FastifyInstance -> external
-        - src/api/routes/sessions.ts:56: type Promise -> external
-        - src/api/routes/sessions.ts:60: call get -> external
-        - src/api/routes/sessions.ts:60: type FastifyRequest -> external
-        - src/api/routes/sessions.ts:60: type FastifyReply -> external
+        - src/api/routes/sessions.ts:57: type FastifyInstance -> external
+        - src/api/routes/sessions.ts:57: type Promise -> external
+        - src/api/routes/sessions.ts:61: call get -> external
+        - src/api/routes/sessions.ts:61: type FastifyRequest -> external
+        - src/api/routes/sessions.ts:61: type FastifyReply -> external
   imports:
+    - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
     - ../responses.js
     - fastify
@@ -586,9 +588,9 @@ src/api/websocket.test.ts [1-463]
     - vitest
     - ws
 
-src/api/websocket.ts [1-388]
+src/api/websocket.ts [1-404]
   class:
-    74-343: class WebSocketManager [exported]
+    74-359: class WebSocketManager [exported]
       /** Manages WebSocket connections and broadcasts events */
       75-75: clients
         refs out: 2 [instantiate: 1, type: 1]
@@ -655,38 +657,56 @@ src/api/websocket.ts [1-388]
         refs out: 2 [call: 2]
           - src/api/websocket.ts:243: call WebSocket.close -> external
           - src/api/websocket.ts:245: call clear -> external
-      255-265: broadcastDaemonStatus(status: {
+      255-281: broadcastDaemonStatus(status: {
     running: boolean;
-    workers?: { active: number; idle: number };
-    queue?: { pending: number; running: number };
+    pid?: number;
+    uptime?: number;
+    workers?: {
+      total: number;
+      active: number;
+      idle: number;
+    };
+    queue?: {
+      pending: number;
+      running: number;
+      completedToday: number;
+      failedToday: number;
+    };
+    lastAnalysis?: string;
+    nextScheduled?: {
+      reanalysis?: string;
+      connectionDiscovery?: string;
+    };
   }): void
         /** Broadcast daemon status update */
         refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:260: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:263: call toISOString -> external
-          - src/api/websocket.ts:263: instantiate Date -> external
-      270-280: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
+          - src/api/websocket.ts:276: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:279: call toISOString -> external
+          - src/api/websocket.ts:279: instantiate Date -> external
+      286-296: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
         /** Broadcast analysis started event */
-        refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:271: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:278: call toISOString -> external
-          - src/api/websocket.ts:278: instantiate Date -> external
-      285-307: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
-        /** Broadcast analysis completed event */
-        refs out: 7 [call: 4, instantiate: 2, type: 1]
-          - src/api/websocket.ts:285: type Node -> src/types/index.ts
-          - src/api/websocket.ts:286: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:293: call toISOString -> external
-          - src/api/websocket.ts:293: instantiate Date -> external
-          - src/api/websocket.ts:297: call WebSocketManager.broadcast -> src/api/websocket.ts
-      312-326: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
-        /** Broadcast analysis failed event */
         refs out: 4 [call: 2, instantiate: 1, type: 1]
-          - src/api/websocket.ts:314: type Error -> external
-          - src/api/websocket.ts:317: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:324: call toISOString -> external
-          - src/api/websocket.ts:324: instantiate Date -> external
-      331-342: broadcastQueueUpdate(stats: {
+          - src/api/websocket.ts:286: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:287: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:294: call toISOString -> external
+          - src/api/websocket.ts:294: instantiate Date -> external
+      301-323: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
+        /** Broadcast analysis completed event */
+        refs out: 8 [call: 4, instantiate: 2, type: 2]
+          - src/api/websocket.ts:301: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:301: type Node -> src/types/index.ts
+          - src/api/websocket.ts:302: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:309: call toISOString -> external
+          - src/api/websocket.ts:309: instantiate Date -> external
+      328-342: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
+        /** Broadcast analysis failed event */
+        refs out: 5 [call: 2, instantiate: 1, type: 2]
+          - src/api/websocket.ts:329: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:330: type Error -> external
+          - src/api/websocket.ts:333: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:340: call toISOString -> external
+          - src/api/websocket.ts:340: instantiate Date -> external
+      347-358: broadcastQueueUpdate(stats: {
     pending: number;
     running: number;
     completed: number;
@@ -694,9 +714,9 @@ src/api/websocket.ts [1-388]
   }): void
         /** Broadcast queue update event */
         refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:337: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:340: call toISOString -> external
-          - src/api/websocket.ts:340: instantiate Date -> external
+          - src/api/websocket.ts:353: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:356: call toISOString -> external
+          - src/api/websocket.ts:356: instantiate Date -> external
   interface:
     45-49: interface WSMessage [exported]
       /** Message format for WebSocket events */
@@ -730,38 +750,38 @@ src/api/websocket.ts [1-388]
       refs out: 1 [type: 1]
         - src/api/websocket.ts:58: type SubscribeMessage -> src/api/websocket.ts
   function:
-    352-364: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+    368-380: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
       /** Register the WebSocket route on a Fastify instance */
       refs out: 6 [call: 2, type: 4]
-        - src/api/websocket.ts:353: type FastifyInstance -> external
-        - src/api/websocket.ts:354: type WebSocketManager -> src/api/websocket.ts
-        - src/api/websocket.ts:357: call get -> external
-        - src/api/websocket.ts:360: type WebSocket -> external
-        - src/api/websocket.ts:360: type FastifyRequest -> external
-    375-380: getWebSocketManager(): WebSocketManager [exported]
+        - src/api/websocket.ts:369: type FastifyInstance -> external
+        - src/api/websocket.ts:370: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:373: call get -> external
+        - src/api/websocket.ts:376: type WebSocket -> external
+        - src/api/websocket.ts:376: type FastifyRequest -> external
+    391-396: getWebSocketManager(): WebSocketManager [exported]
       /** Get or create the global WebSocket manager */
       refs out: 2 [instantiate: 1, type: 1]
-        - src/api/websocket.ts:375: type WebSocketManager -> src/api/websocket.ts
-        - src/api/websocket.ts:377: instantiate WebSocketManager -> src/api/websocket.ts
-    385-387: setWebSocketManager(manager: WebSocketManager): void [exported]
+        - src/api/websocket.ts:391: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:393: instantiate WebSocketManager -> src/api/websocket.ts
+    401-403: setWebSocketManager(manager: WebSocketManager): void [exported]
       /** Set the global WebSocket manager (for testing or custom config) */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:385: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:401: type WebSocketManager -> src/api/websocket.ts
   variable:
     19-24: { readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }
       /** WebSocket ready state values (mirrors WebSocket.OPEN, etc.) */
       refs out: 1 [type: 1]
         - src/api/websocket.ts:24: type const -> external
-    370-370: WebSocketManager | null
+    386-386: WebSocketManager | null
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:370: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:386: type WebSocketManager -> src/api/websocket.ts
   imports:
     - ../daemon/queue.js
     - ../storage/node-types.js
     - fastify
     - ws
 
-src/cli.ts [1-1143]
+src/cli.ts [1-1148]
   variable:
     73-73: any
       refs out: 1 [instantiate: 1]
@@ -770,22 +790,22 @@ src/cli.ts [1-1143]
       refs out: 2 [call: 2]
         - src/cli.ts:200: call Command.description -> external
         - src/cli.ts:200: call Command.command -> external
-    384-386: any
+    389-391: any
       refs out: 2 [call: 2]
-        - src/cli.ts:384: call Command.description -> external
-        - src/cli.ts:384: call Command.command -> external
-    549-551: any
+        - src/cli.ts:389: call Command.description -> external
+        - src/cli.ts:389: call Command.command -> external
+    554-556: any
       refs out: 2 [call: 2]
-        - src/cli.ts:549: call Command.description -> external
-        - src/cli.ts:549: call Command.command -> external
-    936-938: any
+        - src/cli.ts:554: call Command.description -> external
+        - src/cli.ts:554: call Command.command -> external
+    941-943: any
       refs out: 2 [call: 2]
-        - src/cli.ts:936: call Command.description -> external
-        - src/cli.ts:936: call Command.command -> external
-    1087-1089: any
+        - src/cli.ts:941: call Command.description -> external
+        - src/cli.ts:941: call Command.command -> external
+    1092-1094: any
       refs out: 2 [call: 2]
-        - src/cli.ts:1087: call Command.description -> external
-        - src/cli.ts:1087: call Command.command -> external
+        - src/cli.ts:1092: call Command.description -> external
+        - src/cli.ts:1092: call Command.command -> external
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -809,4 +829,4 @@ src/cli.ts [1-1143]
 
 ---
 Files: 27
-Estimated tokens: 9,013 (codebase: ~1,054,586)
+Estimated tokens: 9,138 (codebase: ~1,067,156)

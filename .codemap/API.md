@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 90
-- Total symbols: 658
-  - function: 369
+- Total symbols: 662
+  - function: 373
   - interface: 207
   - type: 40
   - variable: 30
@@ -98,13 +98,14 @@ src/api/routes/lessons.ts [1-94]
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-233]
+src/api/routes/nodes.ts [1-243]
   function:
-    58-232: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+    59-242: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/graph-repository.js
     - ../../storage/index.js
     - ../../storage/lesson-repository.js
+    - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
@@ -159,10 +160,11 @@ src/api/routes/search.ts [1-105]
     - ../responses.js
     - fastify
 
-src/api/routes/sessions.ts [1-272]
+src/api/routes/sessions.ts [1-273]
   function:
-    56-271: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
+    57-272: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
+    - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
     - ../responses.js
     - fastify
@@ -231,9 +233,9 @@ src/api/server.ts [1-205]
     - better-sqlite3
     - fastify
 
-src/api/websocket.ts [1-388]
+src/api/websocket.ts [1-404]
   class:
-    74-343: class WebSocketManager [exported]
+    74-359: class WebSocketManager [exported]
       /** Manages WebSocket connections and broadcasts events */
   interface:
     45-49: interface WSMessage [exported]
@@ -251,11 +253,11 @@ src/api/websocket.ts [1-388]
   | "error" [exported]
       /** WebSocket message types from server to client */
   function:
-    352-364: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+    368-380: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
       /** Register the WebSocket route on a Fastify instance */
-    375-380: getWebSocketManager(): WebSocketManager [exported]
+    391-396: getWebSocketManager(): WebSocketManager [exported]
       /** Get or create the global WebSocket manager */
-    385-387: setWebSocketManager(manager: WebSocketManager): void [exported]
+    401-403: setWebSocketManager(manager: WebSocketManager): void [exported]
       /** Set the global WebSocket manager (for testing or custom config) */
   imports:
     - ../daemon/queue.js
@@ -263,7 +265,7 @@ src/api/websocket.ts [1-388]
     - fastify
     - ws
 
-src/cli.ts [1-1143]
+src/cli.ts [1-1148]
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -285,7 +287,7 @@ src/cli.ts [1-1143]
     - node:path
     - open
 
-src/config/config.ts [1-764]
+src/config/config.ts [1-773]
   class:
     509-517: class ConfigError extends Error [exported]
       /** Configuration loading errors */
@@ -304,23 +306,23 @@ src/config/config.ts [1-764]
       /** Get complete default configuration */
     326-504: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    522-568: loadConfig(configPath?: string): PiBrainConfig [exported]
+    522-577: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    573-578: ensureConfigDir(configDir?: string): void [exported]
+    582-587: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    583-618: ensureDirectories(config: PiBrainConfig): void [exported]
+    592-627: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    623-682: writeDefaultConfig(configPath?: string): void [exported]
+    632-691: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    687-695: getSessionDirs(config: PiBrainConfig): {} [exported]
+    696-704: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    700-702: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    709-711: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    707-711: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    716-720: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    716-723: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    725-732: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    734-763: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    743-772: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -361,63 +363,67 @@ src/config/types.ts [1-264]
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
       /** Configuration types for pi-brain Configuration is loaded from ~/.pi-brain/config.yaml All paths support ~ expansion for home directory Spoke sync method options */
 
-src/daemon/cli.ts [1-1149]
+src/daemon/cli.ts [1-1222]
   interface:
-    77-83: interface DaemonStatus [exported]
+    114-120: interface DaemonStatus [exported]
       /** Daemon status info */
-    86-91: interface QueueStatus [exported]
+    123-128: interface QueueStatus [exported]
       /** Queue status info */
-    94-99: interface HealthCheckResult [exported]
+    131-136: interface HealthCheckResult [exported]
       /** Health check result */
-    102-106: interface HealthStatus [exported]
+    139-143: interface HealthStatus [exported]
       /** Overall health status */
-    109-112: interface OutputOptions [exported]
+    146-149: interface OutputOptions [exported]
       /** CLI output options */
-    239-242: interface StartOptions [exported]
+    276-280: interface StartOptions [exported]
       /** Start options */
-    245-248: interface StopOptions [exported]
+    283-286: interface StopOptions [exported]
       /** Stop options */
   function:
-    121-132: readPidFile(): number [exported]
+    61-70: isPortAvailable(port: number): Promise<boolean> [exported]
+      /** Check if a port is available */
+    75-88: findProcessOnPort(port: number): number [exported]
+      /** Find process using a port (Linux/macOS) */
+    158-169: readPidFile(): number [exported]
       /** Read the daemon PID from the PID file */
-    137-143: writePidFile(pid: number): void [exported]
+    174-180: writePidFile(pid: number): void [exported]
       /** Write the daemon PID to the PID file */
-    148-156: removePidFile(): void [exported]
+    185-193: removePidFile(): void [exported]
       /** Remove the PID file */
-    161-169: isProcessRunning(pid: number): boolean [exported]
+    198-206: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
-    174-187: isDaemonRunning(): { running: boolean; pid: number; } [exported]
+    211-224: isDaemonRunning(): { running: boolean; pid: number; } [exported]
       /** Check if the daemon is currently running */
-    196-217: formatUptime(seconds: number): string [exported]
+    233-254: formatUptime(seconds: number): string [exported]
       /** Format uptime in a human-readable way */
-    222-232: getProcessUptime(): number [exported]
+    259-269: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
-    253-363: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
+    291-436: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-    368-430: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
+    441-503: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-    435-447: getDaemonStatus(configPath?: string): DaemonStatus [exported]
+    508-520: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-    456-485: getQueueStatus(configPath?: string): QueueStatus [exported]
+    529-558: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-    490-543: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
+    563-616: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-    763-793: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
+    836-866: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-    802-823: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
+    875-896: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-    828-878: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
+    901-951: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-    893-916: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
+    966-989: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-    931-1051: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
+    1004-1124: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-    1056-1138: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
+    1129-1211: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
   variable:
-    71-71: any [exported]
+    108-108: any [exported]
       /** PID file location */
-    74-74: any [exported]
+    111-111: any [exported]
       /** Log file location */
   imports:
     - ../config/config.js
@@ -431,6 +437,7 @@ src/daemon/cli.ts [1-1149]
     - ./queue.js
     - node:child_process
     - node:fs
+    - node:net
     - node:path
 
 src/daemon/connection-discovery.ts [1-620]
@@ -447,7 +454,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-275]
+src/daemon/daemon-process.ts [1-278]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -1465,16 +1472,22 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-260]
+src/storage/node-conversion.ts [1-343]
   interface:
-    23-42: interface NodeConversionContext [exported]
+    25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
-    52-259: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
+    54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
+    268-335: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+      /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
+    340-342: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+      /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
     - ../daemon/queue.js
+    - ./node-crud.js
+    - ./node-storage.js
     - ./node-types.js
 
 src/storage/node-crud.ts [1-751]
@@ -1737,7 +1750,7 @@ src/storage/search-repository.ts [1-549]
       /** Index a node for full-text search */
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    226-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
     361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
@@ -2131,4 +2144,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 26,799 (codebase: ~1,054,586)
+Estimated tokens: 26,990 (codebase: ~1,067,152)

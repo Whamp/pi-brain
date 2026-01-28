@@ -206,10 +206,15 @@ daemonCmd
   .description("Start the daemon")
   .option("-f, --foreground", "Run in foreground (for debugging)")
   .option("-c, --config <path>", "Config file path")
+  .option(
+    "--force",
+    "Force start by killing any process on the configured port"
+  )
   .action(async (options) => {
     const result = await startDaemon({
       foreground: options.foreground,
       configPath: options.config,
+      force: options.force,
     });
 
     if (result.success) {

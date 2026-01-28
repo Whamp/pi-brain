@@ -254,8 +254,24 @@ export class WebSocketManager {
    */
   broadcastDaemonStatus(status: {
     running: boolean;
-    workers?: { active: number; idle: number };
-    queue?: { pending: number; running: number };
+    pid?: number;
+    uptime?: number;
+    workers?: {
+      total: number;
+      active: number;
+      idle: number;
+    };
+    queue?: {
+      pending: number;
+      running: number;
+      completedToday: number;
+      failedToday: number;
+    };
+    lastAnalysis?: string;
+    nextScheduled?: {
+      reanalysis?: string;
+      connectionDiscovery?: string;
+    };
   }): void {
     this.broadcast("daemon", {
       type: "daemon.status",

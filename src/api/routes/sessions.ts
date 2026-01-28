@@ -6,6 +6,7 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
+import { nodeRowsToNodes } from "../../storage/node-conversion.js";
 import {
   getAllProjects,
   getSessionSummaries,
@@ -235,7 +236,7 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
         { sessionFile },
         { limit, offset, sort: "timestamp", order: "asc" }
       );
-      const sessionNodes = result.nodes;
+      const sessionNodes = nodeRowsToNodes(result.nodes);
       const { total } = result;
 
       if (sessionNodes.length === 0) {

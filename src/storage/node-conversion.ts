@@ -7,7 +7,9 @@
 
 import type { AgentNodeOutput } from "../daemon/processor.js";
 import type { AnalysisJob } from "../daemon/queue.js";
+import type { NodeRow } from "./node-crud.js";
 
+import { readNodeFromPath } from "./node-storage.js";
 import {
   generateDeterministicNodeId,
   type LessonsByLevel,
@@ -256,4 +258,85 @@ export function agentOutputToNode(
     // Include signals if provided in context
     ...(context.signals ? { signals: context.signals } : {}),
   };
+}
+
+/**
+ * Transform a NodeRow (flat SQLite row) to Node (nested structure).
+ * For listings, constructs Node from row data without reading JSON.
+ * For full details, reads the JSON file.
+ */
+export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
+  // If full data requested, read from JSON file
+  if (loadFull && row.data_file) {
+    try {
+      return readNodeFromPath(row.data_file);
+    } catch {
+      // Fall through to construct from row
+    }
+  }
+
+  // Construct minimal Node from row data for listings
+  return {
+    id: row.id,
+    version: row.version,
+    previousVersions: [],
+    source: {
+      sessionFile: row.session_file,
+      segment: {
+        startEntryId: row.segment_start ?? "",
+        endEntryId: row.segment_end ?? "",
+        entryCount: 0,
+      },
+      computer: row.computer ?? "",
+      sessionId: "",
+    },
+    classification: {
+      type: (row.type as Node["classification"]["type"]) ?? "other",
+      project: row.project ?? "",
+      isNewProject: Boolean(row.is_new_project),
+      hadClearGoal: Boolean(row.had_clear_goal),
+    },
+    content: {
+      summary: `Session from ${row.timestamp}`,
+      outcome: (row.outcome as Node["content"]["outcome"]) ?? "abandoned",
+      keyDecisions: [],
+      filesTouched: [],
+      toolsUsed: [],
+      errorsSeen: [],
+    },
+    lessons: {
+      project: [],
+      task: [],
+      user: [],
+      model: [],
+      tool: [],
+      skill: [],
+      subagent: [],
+    },
+    observations: {
+      modelsUsed: [],
+      promptingWins: [],
+      promptingFailures: [],
+      modelQuirks: [],
+      toolUseErrors: [],
+    },
+    metadata: {
+      tokensUsed: row.tokens_used ?? 0,
+      cost: row.cost ?? 0,
+      durationMinutes: row.duration_minutes ?? 0,
+      timestamp: row.timestamp ?? "",
+      analyzedAt: row.analyzed_at ?? "",
+      analyzerVersion: row.analyzer_version ?? "",
+    },
+    semantic: { tags: [], topics: [] },
+    daemonMeta: { decisions: [], rlmUsed: false },
+    ...(row.signals ? { signals: JSON.parse(row.signals) } : {}),
+  };
+}
+
+/**
+ * Transform array of NodeRows to Nodes
+ */
+export function nodeRowsToNodes(rows: NodeRow[], loadFull = false): Node[] {
+  return rows.map((row) => nodeRowToNode(row, loadFull));
 }

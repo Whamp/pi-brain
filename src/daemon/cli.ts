@@ -12,8 +12,9 @@
  * Based on specs/daemon.md CLI specification.
  */
 
-import { spawn, type ChildProcess } from "node:child_process";
+import { spawn, execSync, type ChildProcess } from "node:child_process";
 import * as fs from "node:fs";
+import { createServer } from "node:net";
 import * as path from "node:path";
 
 import type { PiBrainConfig } from "../config/types.js";
@@ -49,6 +50,42 @@ import {
   type QueueStats,
   type AnalysisJob,
 } from "./queue.js";
+
+// =============================================================================
+// Port Management
+// =============================================================================
+
+/**
+ * Check if a port is available
+ */
+export function isPortAvailable(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = createServer();
+    server.once("error", () => resolve(false));
+    server.once("listening", () => {
+      server.close(() => resolve(true));
+    });
+    server.listen(port, "127.0.0.1");
+  });
+}
+
+/**
+ * Find process using a port (Linux/macOS)
+ */
+export function findProcessOnPort(port: number): number | null {
+  try {
+    const result = execSync(
+      `lsof -t -i:${port} 2>/dev/null || fuser ${port}/tcp 2>/dev/null`,
+      {
+        encoding: "utf8",
+      }
+    ).trim();
+    const pid = Number.parseInt(result.split("\n")[0], 10);
+    return Number.isNaN(pid) ? null : pid;
+  } catch {
+    return null;
+  }
+}
 
 // =============================================================================
 // Helper function
@@ -239,6 +276,7 @@ export function getProcessUptime(): number | null {
 export interface StartOptions {
   foreground?: boolean;
   configPath?: string;
+  force?: boolean;
 }
 
 /** Stop options */
@@ -255,11 +293,11 @@ export async function startDaemon(options: StartOptions = {}): Promise<{
   message: string;
   pid?: number;
 }> {
-  const { foreground = false, configPath } = options;
+  const { foreground = false, configPath, force = false } = options;
 
   // Check if already running
   const status = isDaemonRunning();
-  if (status.running) {
+  if (status.running && !force) {
     return {
       success: false,
       message: `Daemon is already running with PID ${status.pid}`,
@@ -275,6 +313,41 @@ export async function startDaemon(options: StartOptions = {}): Promise<{
       success: false,
       message: `Failed to load config: ${(error as Error).message}`,
     };
+  }
+
+  // Check port availability
+  const portAvailable = await isPortAvailable(config.api.port);
+  if (!portAvailable) {
+    const existingPid = findProcessOnPort(config.api.port);
+    if (force && existingPid) {
+      console.log(
+        `Killing process ${existingPid} on port ${config.api.port}...`
+      );
+      try {
+        process.kill(existingPid, "SIGKILL");
+        await sleep(500); // Wait for cleanup
+      } catch (error) {
+        return {
+          success: false,
+          message: `Failed to kill process on port ${config.api.port}: ${(error as Error).message}`,
+        };
+      }
+    } else {
+      return {
+        success: false,
+        message: `Port ${config.api.port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`,
+      };
+    }
+  }
+
+  // If force was used and daemon was running according to PID file, kill it too
+  if (force && status.running && status.pid) {
+    try {
+      process.kill(status.pid, "SIGKILL");
+      removePidFile();
+    } catch {
+      // Ignore if already dead
+    }
   }
 
   // Ensure directories exist

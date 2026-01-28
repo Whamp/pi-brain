@@ -216,6 +216,9 @@ function buildFieldQuery(query: string, fields: SearchField[]): string {
     .join(" ");
 }
 
+const escapeRegExp = (str: string) =>
+  str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
 /**
  * Extract a highlight snippet from text containing a match
  * @internal
@@ -269,9 +272,6 @@ export function extractSnippet(
   }
 
   // Handle regex characters
-  const escapeRegExp = (str: string) =>
-    str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-
   const pattern = new RegExp(
     `(${queryWords.map(escapeRegExp).join("|")})`,
     "gi"

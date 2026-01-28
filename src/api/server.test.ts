@@ -282,7 +282,7 @@ describe("aPI Server", () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.data.nodes).toHaveLength(1);
-      expect(body.data.nodes[0].project).toContain("alpha");
+      expect(body.data.nodes[0].classification.project).toContain("alpha");
 
       await app.close();
       db.close();

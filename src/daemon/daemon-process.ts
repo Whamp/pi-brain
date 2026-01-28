@@ -114,14 +114,17 @@ async function main(): Promise<void> {
     onJobStarted: (job, workerId) => {
       // Broadcast analysis started via WebSocket
       wsManager.broadcastAnalysisStarted(job, workerId);
+      return Promise.resolve();
     },
     onNodeCreated: (job, node) => {
       // Broadcast analysis completed + node created via WebSocket
       wsManager.broadcastAnalysisCompleted(job, node);
+      return Promise.resolve();
     },
     onJobFailed: (job, error) => {
       // Broadcast analysis failed via WebSocket
       wsManager.broadcastAnalysisFailed(job, error, false);
+      return Promise.resolve();
     },
   });
   console.log("[daemon] Worker created");

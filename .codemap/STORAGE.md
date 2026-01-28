@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 17
-- Total symbols: 194
-  - function: 130
+- Total symbols: 196
+  - function: 132
   - interface: 50
   - type: 10
   - variable: 4
@@ -225,16 +225,22 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-260]
+src/storage/node-conversion.ts [1-343]
   interface:
-    23-42: interface NodeConversionContext [exported]
+    25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
-    52-259: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
+    54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
+    268-335: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+      /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
+    340-342: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+      /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
     - ../daemon/queue.js
+    - ./node-crud.js
+    - ./node-storage.js
     - ./node-types.js
 
 src/storage/node-crud.ts [1-751]
@@ -497,7 +503,7 @@ src/storage/search-repository.ts [1-549]
       /** Index a node for full-text search */
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    226-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
     361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
@@ -568,4 +574,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 17
-Estimated tokens: 8,794 (codebase: ~1,054,586)
+Estimated tokens: 8,902 (codebase: ~1,067,152)
