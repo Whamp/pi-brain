@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 39 files
+- typescript: 40 files
 
 ## Statistics
-- Total files: 39
-- Total symbols: 195
-  - function: 117
-  - interface: 46
+- Total files: 40
+- Total symbols: 197
+  - function: 118
+  - interface: 47
   - variable: 14
   - class: 10
   - type: 8
@@ -454,6 +454,26 @@ src/daemon/facet-discovery.ts [1-1734]
     - node:os
     - node:path
     - node:url
+
+src/daemon/graph-export.ts [1-131]
+  interface:
+    15-20: interface GraphExportOptions [exported]
+  function:
+    25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
+      /** Export knowledge graph to Graphviz DOT format */
+      refs out: 4 [call: 3, type: 1]
+        - src/daemon/graph-export.ts:28: type GraphExportOptions -> src/daemon/graph-export.ts
+        - src/daemon/graph-export.ts:33: call migrate -> src/storage/database.ts
+        - src/daemon/graph-export.ts:82: call writeFileSync -> external
+        - src/daemon/graph-export.ts:89: call close -> external
+  imports:
+    - ../config/index.js
+    - ../storage/database.js
+    - ../storage/edge-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
+    - node:fs
+    - node:path
 
 src/daemon/index.ts [1-181]
   variable:
@@ -1507,5 +1527,5 @@ src/parser/signals.ts [1-1095]
     - ../types/index.js
 
 ---
-Files: 39
-Estimated tokens: 19,809 (codebase: ~974,844)
+Files: 40
+Estimated tokens: 20,025 (codebase: ~977,679)

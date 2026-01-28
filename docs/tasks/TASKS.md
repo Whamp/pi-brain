@@ -214,7 +214,7 @@ Ref: docs/plans/integration-repair-plan.md
 
 ## Phase 15: Enhancements
 
-| ID   | Task                                            | Status  | Deps | Notes      |
-| ---- | ----------------------------------------------- | ------- | ---- | ---------- |
-| 15.1 | Implement fine-tuning data export (CLI command) | done    | -    | 2026-01-27 |
-| 15.2 | Implement Graphviz/DOT export (CLI command)     | pending | -    |            |
+| ID   | Task                                            | Status | Deps | Notes      |
+| ---- | ----------------------------------------------- | ------ | ---- | ---------- |
+| 15.1 | Implement fine-tuning data export (CLI command) | done   | -    | 2026-01-27 |
+| 15.2 | Implement Graphviz/DOT export (CLI command)     | done   | -    | 2026-01-27 |

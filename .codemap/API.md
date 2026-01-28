@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 85 files
+- typescript: 86 files
 
 ## Statistics
-- Total files: 85
-- Total symbols: 613
-  - function: 341
-  - interface: 197
+- Total files: 86
+- Total symbols: 616
+  - function: 343
+  - interface: 198
   - type: 37
   - variable: 27
   - class: 11
@@ -226,10 +226,11 @@ src/api/server.ts [1-183]
     - better-sqlite3
     - fastify
 
-src/cli.ts [1-1076]
+src/cli.ts [1-1102]
   imports:
     - ./config/index.js
     - ./daemon/export.js
+    - ./daemon/graph-export.js
     - ./daemon/index.js
     - ./parser/analyzer.js
     - ./prompt/agents-generator.js
@@ -517,6 +518,21 @@ src/daemon/facet-discovery.ts [1-1734]
     - node:os
     - node:path
     - node:url
+
+src/daemon/graph-export.ts [1-131]
+  interface:
+    15-20: interface GraphExportOptions [exported]
+  function:
+    25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
+      /** Export knowledge graph to Graphviz DOT format */
+  imports:
+    - ../config/index.js
+    - ../storage/database.js
+    - ../storage/edge-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
+    - node:fs
+    - node:path
 
 src/daemon/index.ts [1-181]
   variable:
@@ -1234,7 +1250,7 @@ src/storage/decision-repository.ts [1-143]
   imports:
     - better-sqlite3
 
-src/storage/edge-repository.ts [1-178]
+src/storage/edge-repository.ts [1-186]
   interface:
     19-27: interface EdgeRow [exported]
       /** Edge row from the database */
@@ -1252,13 +1268,15 @@ src/storage/edge-repository.ts [1-178]
       /** Get edges to a node (incoming) */
     112-119: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
-    124-127: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    124-127: getAllEdges(db: Database.Database): {} [exported]
+      /** Get all edges */
+    132-135: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-    132-135: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    140-143: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-    140-158: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    148-166: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
-    167-177: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    175-185: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
   imports:
     - ./node-types.js
@@ -1973,5 +1991,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 85
-Estimated tokens: 24,226 (codebase: ~973,469)
+Files: 86
+Estimated tokens: 24,386 (codebase: ~975,977)

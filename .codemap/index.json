@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 85,
-    "totalSymbols": 1033,
+    "totalFiles": 86,
+    "totalSymbols": 1040,
     "byLanguage": {
-      "typescript": 85
+      "typescript": 86
     },
     "bySymbolKind": {
-      "function": 464,
+      "function": 470,
       "type": 37,
-      "interface": 248,
+      "interface": 249,
       "variable": 102,
       "class": 11,
       "constructor": 10,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34557,
-  "codebase_tokens": 974844,
+  "total_tokens": 34765,
+  "codebase_tokens": 977679,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1448,10 +1448,10 @@
       "language": "typescript",
       "lines": [
         1,
-        1076
+        1102
       ],
       "detail_level": "full",
-      "token_estimate": 149,
+      "token_estimate": 157,
       "symbols": [
         {
           "name": "program",
@@ -1574,6 +1574,7 @@
       "imports": [
         "./config/index.js",
         "./daemon/export.js",
+        "./daemon/graph-export.js",
         "./daemon/index.js",
         "./parser/analyzer.js",
         "./prompt/agents-generator.js",
@@ -5114,6 +5115,144 @@
         "node:os",
         "node:path",
         "node:url"
+      ]
+    },
+    {
+      "path": "src/daemon/graph-export.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        131
+      ],
+      "detail_level": "full",
+      "token_estimate": 177,
+      "symbols": [
+        {
+          "name": "GraphExportOptions",
+          "kind": "interface",
+          "signature": "GraphExportOptions",
+          "lines": [
+            15,
+            20
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "exportGraphviz",
+          "kind": "function",
+          "signature": "exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; }",
+          "lines": [
+            25,
+            91
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Export knowledge graph to Graphviz DOT format",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "escapeString",
+          "kind": "function",
+          "signature": "escapeString(str: string): string",
+          "lines": [
+            93,
+            95
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "formatNodeLabel",
+          "kind": "function",
+          "signature": "formatNodeLabel(node: NodeRow): string",
+          "lines": [
+            97,
+            104
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNodeColor",
+          "kind": "function",
+          "signature": "getNodeColor(type: string): string",
+          "lines": [
+            106,
+            117
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getEdgeStyle",
+          "kind": "function",
+          "signature": "getEdgeStyle(type: string): string",
+          "lines": [
+            119,
+            130
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../config/index.js",
+        "../storage/database.js",
+        "../storage/edge-repository.js",
+        "../storage/node-crud.js",
+        "../storage/node-queries.js",
+        "node:fs",
+        "node:path"
       ]
     },
     {
@@ -14526,10 +14665,10 @@
       "language": "typescript",
       "lines": [
         1,
-        178
+        186
       ],
       "detail_level": "full",
-      "token_estimate": 370,
+      "token_estimate": 393,
       "symbols": [
         {
           "name": "EdgeRow",
@@ -14646,12 +14785,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "getAllEdges",
+          "kind": "function",
+          "signature": "getAllEdges(db: Database.Database): {}",
+          "lines": [
+            124,
+            127
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get all edges",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "getEdge",
           "kind": "function",
           "signature": "getEdge(db: Database.Database, edgeId: string): EdgeRow",
           "lines": [
-            124,
-            127
+            132,
+            135
           ],
           "exported": true,
           "is_default": false,
@@ -14669,8 +14827,8 @@
           "kind": "function",
           "signature": "deleteEdge(db: Database.Database, edgeId: string): boolean",
           "lines": [
-            132,
-            135
+            140,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -14688,8 +14846,8 @@
           "kind": "function",
           "signature": "edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean",
           "lines": [
-            140,
-            158
+            148,
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -14707,8 +14865,8 @@
           "kind": "function",
           "signature": "edgeRowToEdge(row: EdgeRow): Edge",
           "lines": [
-            167,
-            177
+            175,
+            185
           ],
           "exported": true,
           "is_default": false,

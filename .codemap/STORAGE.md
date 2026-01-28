@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 15
-- Total symbols: 164
-  - function: 107
+- Total symbols: 165
+  - function: 108
   - interface: 44
   - type: 10
   - variable: 3
@@ -60,7 +60,7 @@ src/storage/decision-repository.ts [1-143]
   imports:
     - better-sqlite3
 
-src/storage/edge-repository.ts [1-178]
+src/storage/edge-repository.ts [1-186]
   interface:
     19-27: interface EdgeRow [exported]
       /** Edge row from the database */
@@ -78,13 +78,15 @@ src/storage/edge-repository.ts [1-178]
       /** Get edges to a node (incoming) */
     112-119: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
-    124-127: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    124-127: getAllEdges(db: Database.Database): {} [exported]
+      /** Get all edges */
+    132-135: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-    132-135: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    140-143: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-    140-158: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    148-166: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
-    167-177: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    175-185: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
   imports:
     - ./node-types.js
@@ -489,4 +491,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 15
-Estimated tokens: 6,914 (codebase: ~973,469)
+Estimated tokens: 6,937 (codebase: ~975,977)

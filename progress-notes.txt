@@ -311,3 +311,17 @@ Functions still in node-repository.ts (CRUD operations: clearAllData, insertNode
 **Commit**: [pending]
 
 **Notes**: Added first enhancement task for Phase 15. Export format is JSONL with `input` (session segment) and `output` (node analysis).
+
+## 2026-01-27 18:50 - Task 15.2 (Graphviz Export)
+
+**Status**: pending → done
+**Validation**: 
+- Implemented `exportGraphviz` in `src/daemon/graph-export.ts`
+- Integrated into CLI via `pi-brain export dot`
+- Updated `edge-repository.ts` to expose `getAllEdges`
+- Verified with unit tests covering node/edge retrieval and DOT formatting
+- Ran full test suite to ensure no regressions
+
+**Commit**: [pending]
+
+**Notes**: Can now visualize the knowledge graph using external tools like Graphviz or Gephi via the exported DOT file.

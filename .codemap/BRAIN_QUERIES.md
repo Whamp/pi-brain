@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 48 files
+- typescript: 49 files
 
 ## Statistics
-- Total files: 48
-- Total symbols: 299
-  - function: 175
-  - interface: 82
+- Total files: 49
+- Total symbols: 302
+  - function: 177
+  - interface: 83
   - type: 17
   - variable: 16
   - class: 9
@@ -641,6 +641,23 @@ src/daemon/facet-discovery.ts [1-1734]
     - node:os
     - node:path
     - node:url
+
+src/daemon/graph-export.ts [1-131]
+  interface:
+    15-20: interface GraphExportOptions [exported]
+      refs in: 1 [type: 1]
+        - src/daemon/graph-export.ts:28: type exportGraphviz
+  function:
+    25-91: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
+      /** Export knowledge graph to Graphviz DOT format */
+  imports:
+    - ../config/index.js
+    - ../storage/database.js
+    - ../storage/edge-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
+    - node:fs
+    - node:path
 
 src/daemon/index.ts [1-181]
   variable:
@@ -1513,7 +1530,7 @@ src/storage/database.ts [1-155]
   function:
     38-63: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 83 [call: 71, import: 12]
+      refs in: 85 [call: 72, import: 13]
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:131: call db
         - src/api/server.test.ts:145: call db
@@ -1544,7 +1561,7 @@ src/storage/database.ts [1-155]
         - src/storage/database.ts:112: call currentVersion
     111-135: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 60 [call: 48, import: 12]
+      refs in: 62 [call: 49, import: 13]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
         - src/api/routes/query.test.ts:10: import (module)
@@ -1640,21 +1657,21 @@ src/storage/decision-repository.ts [1-143]
   imports:
     - better-sqlite3
 
-src/storage/edge-repository.ts [1-178]
+src/storage/edge-repository.ts [1-186]
   interface:
     19-27: interface EdgeRow [exported]
       /** Edge row from the database */
-      refs in: 13 [import: 1, type: 12]
+      refs in: 15 [import: 1, type: 14]
         - src/storage/edge-repository.ts:88: type getEdgesFrom
         - src/storage/edge-repository.ts:94: type getEdgesFrom
         - src/storage/edge-repository.ts:100: type getEdgesTo
         - src/storage/edge-repository.ts:106: type getEdgesTo
         - src/storage/edge-repository.ts:112: type getNodeEdges
         - src/storage/edge-repository.ts:118: type getNodeEdges
-        - src/storage/edge-repository.ts:124: type getEdge
-        - src/storage/edge-repository.ts:126: type getEdge
-        - src/storage/edge-repository.ts:167: type edgeRowToEdge
-        - src/storage/graph-repository.ts:20: import (module)
+        - src/storage/edge-repository.ts:124: type getAllEdges
+        - src/storage/edge-repository.ts:126: type getAllEdges
+        - src/storage/edge-repository.ts:132: type getEdge
+        - src/storage/edge-repository.ts:134: type getEdge
   function:
     36-38: generateEdgeId(): string [exported]
       /** Generate a unique edge ID with 'edg_' prefix */
@@ -1665,9 +1682,7 @@ src/storage/edge-repository.ts [1-178]
     createdBy?: "boundary" | "daemon" | "user";
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-      refs in: 61 [call: 56, import: 5]
-        - src/api/routes/edges.ts:10: import (module)
-        - src/api/routes/edges.ts:177: call edge
+      refs in: 59 [call: 55, import: 4]
         - src/daemon/connection-discovery.test.ts:4: import (module)
         - src/daemon/connection-discovery.test.ts:190: call (module)
         - src/daemon/connection-discovery.ts:13: import (module)
@@ -1676,11 +1691,11 @@ src/storage/edge-repository.ts [1-178]
         - src/daemon/connection-discovery.ts:484: call ConnectionDiscoverer.edge
         - src/storage/index.test.ts:20: import (module)
         - src/storage/index.test.ts:1237: call edge
+        - src/storage/index.test.ts:1254: call edge
+        - src/storage/index.test.ts:1275: call (module)
     88-95: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-      refs in: 8 [call: 5, import: 3]
-        - src/api/routes/edges.ts:13: import (module)
-        - src/api/routes/edges.ts:56: call outgoing
+      refs in: 6 [call: 4, import: 2]
         - src/storage/graph-repository.ts:17: import (module)
         - src/storage/graph-repository.ts:144: call outgoing
         - src/storage/index.test.ts:39: import (module)
@@ -1689,9 +1704,7 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/index.test.ts:2176: call (module)
     100-107: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
-      refs in: 8 [call: 5, import: 3]
-        - src/api/routes/edges.ts:14: import (module)
-        - src/api/routes/edges.ts:57: call incoming
+      refs in: 6 [call: 4, import: 2]
         - src/storage/graph-repository.ts:18: import (module)
         - src/storage/graph-repository.ts:151: call incoming
         - src/storage/index.test.ts:40: import (module)
@@ -1705,24 +1718,25 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/graph-repository.ts:312: call allEdges
         - src/storage/index.test.ts:44: import (module)
         - src/storage/index.test.ts:1324: call edges
-    124-127: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    124-127: getAllEdges(db: Database.Database): {} [exported]
+      /** Get all edges */
+      refs in: 2 [call: 1, import: 1]
+        - src/daemon/graph-export.ts:12: import (module)
+        - src/daemon/graph-export.ts:51: call allEdges
+    132-135: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-      refs in: 6 [call: 4, import: 2]
-        - src/api/routes/edges.ts:12: import (module)
-        - src/api/routes/edges.ts:133: call edge
+      refs in: 4 [call: 3, import: 1]
         - src/storage/index.test.ts:38: import (module)
         - src/storage/index.test.ts:1259: call retrieved
         - src/storage/index.test.ts:1371: call (module)
         - src/storage/index.test.ts:1391: call row
-    132-135: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    140-143: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-      refs in: 5 [call: 3, import: 2]
-        - src/api/routes/edges.ts:11: import (module)
-        - src/api/routes/edges.ts:208: call deleted
+      refs in: 3 [call: 2, import: 1]
         - src/storage/index.test.ts:22: import (module)
         - src/storage/index.test.ts:1369: call result
         - src/storage/index.test.ts:1375: call result
-    140-158: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    148-166: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
       refs in: 13 [call: 10, import: 3]
         - src/daemon/connection-discovery.ts:13: import (module)
@@ -1735,9 +1749,10 @@ src/storage/edge-repository.ts [1-178]
         - src/storage/index.test.ts:1356: call (module)
         - src/storage/index.test.ts:1357: call (module)
         - src/storage/index.test.ts:2175: call (module)
-    167-177: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    175-185: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
-      refs in: 2 [call: 1, import: 1]
+      refs in: 3 [call: 1, import: 2]
+        - src/daemon/graph-export.ts:12: import (module)
         - src/storage/index.test.ts:25: import (module)
         - src/storage/index.test.ts:1394: call converted
   imports:
@@ -1969,17 +1984,17 @@ src/storage/node-crud.ts [1-751]
         - src/storage/node-crud.ts:570: type getAllNodeVersions
     45-67: interface NodeRow [exported]
       /** Node row from the database */
-      refs in: 34 [import: 5, type: 29]
+      refs in: 36 [import: 6, type: 30]
         - src/daemon/connection-discovery.ts:10: import (module)
         - src/daemon/connection-discovery.ts:311: type ConnectionDiscoverer.findCandidates
         - src/daemon/connection-discovery.ts:332: type ConnectionDiscoverer.findCandidates
+        - src/daemon/graph-export.ts:8: import (module)
+        - src/daemon/graph-export.ts:97: type formatNodeLabel
         - src/daemon/query-processor.ts:16: import (module)
         - src/daemon/query-processor.ts:234: type nodeRowToRelevant
         - src/storage/graph-repository.ts:13: import (module)
         - src/storage/graph-repository.ts:72: type ConnectedNodesResult
         - src/storage/graph-repository.ts:199: type nodes
-        - src/storage/graph-repository.ts:207: type getConnectedNodes
-        - src/storage/graph-repository.ts:255: type nodes
   function:
     76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node */
@@ -2254,7 +2269,7 @@ src/storage/node-queries.ts [1-455]
         - src/storage/index.test.ts:1048: call results
     219-344: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-      refs in: 50 [call: 44, import: 6]
+      refs in: 52 [call: 45, import: 7]
         - src/api/routes/nodes.ts:15: import (module)
         - src/api/routes/nodes.ts:109: call result
         - src/api/routes/sessions.ts:12: import (module)
@@ -2925,5 +2940,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 48
-Estimated tokens: 37,601 (codebase: ~974,844)
+Files: 49
+Estimated tokens: 37,719 (codebase: ~977,679)

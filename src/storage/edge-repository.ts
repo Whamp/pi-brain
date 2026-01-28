@@ -119,6 +119,14 @@ export function getNodeEdges(db: Database.Database, nodeId: string): EdgeRow[] {
 }
 
 /**
+ * Get all edges
+ */
+export function getAllEdges(db: Database.Database): EdgeRow[] {
+  const stmt = db.prepare("SELECT * FROM edges");
+  return stmt.all() as EdgeRow[];
+}
+
+/**
  * Get edge by ID
  */
 export function getEdge(db: Database.Database, edgeId: string): EdgeRow | null {

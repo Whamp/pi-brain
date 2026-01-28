@@ -1068,6 +1068,32 @@ exportCmd
     }
   });
 
+exportCmd
+  .command("dot")
+  .description("Export knowledge graph to Graphviz DOT format")
+  .option("-c, --config <path>", "Config file path")
+  .option("-o, --output <path>", "Output file path", "graph.dot")
+  .option("-p, --project <path>", "Filter by project path")
+  .option("--limit <n>", "Maximum nodes to export", "1000")
+  .action(async (options) => {
+    try {
+      const { exportGraphviz } = await import("./daemon/graph-export.js");
+      const result = exportGraphviz(options.output, options.config, {
+        project: options.project,
+        limit: Number.parseInt(options.limit, 10),
+      });
+      if (result.success) {
+        console.log(result.message);
+      } else {
+        console.error(result.message);
+        process.exit(1);
+      }
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 // =============================================================================
 // Parse and run
 // =============================================================================

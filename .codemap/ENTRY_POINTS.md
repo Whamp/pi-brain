@@ -537,7 +537,7 @@ src/api/server.ts [1-183]
     - better-sqlite3
     - fastify
 
-src/cli.ts [1-1076]
+src/cli.ts [1-1102]
   variable:
     72-72: any
       refs out: 1 [instantiate: 1]
@@ -565,6 +565,7 @@ src/cli.ts [1-1076]
   imports:
     - ./config/index.js
     - ./daemon/export.js
+    - ./daemon/graph-export.js
     - ./daemon/index.js
     - ./parser/analyzer.js
     - ./prompt/agents-generator.js
@@ -584,4 +585,4 @@ src/cli.ts [1-1076]
 
 ---
 Files: 25
-Estimated tokens: 6,156 (codebase: ~973,469)
+Estimated tokens: 6,164 (codebase: ~975,977)
