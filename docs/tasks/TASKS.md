@@ -325,9 +325,9 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 ### 19.2 Query & API Config (Trivial)
 
 | ID     | Task                                      | Status  | Deps           | Notes      |
-| ------ | ----------------------------------------- | ------- | -------------- | ---------- |
-| 19.2.1 | Add GET/PUT /config/query routes          | active  | -              | 2026-01-28 |
-| 19.2.2 | Add GET/PUT /config/api routes            | pending | -              |            |
+| ------ | ----------------------------------------- | ------- | -------------- | ---------- | ------------------------------------------------- |
+| 19.2.1 | Add GET/PUT /config/query routes          | done    | -              | 2026-01-28 | 7 tests, GET/PUT /config/query routes implemented |
+| 19.2.2 | Add GET/PUT /config/api routes            | done    | -              | 2026-01-28 | 11 tests, GET/PUT /config/api routes implemented |
 | 19.2.3 | Create TagInput component for corsOrigins | pending | -              |            |
 | 19.2.4 | Add Query section to settings UI          | pending | 19.2.1         |            |
 | 19.2.5 | Add API Server section to settings UI     | pending | 19.2.2, 19.2.3 |            |

@@ -1,10 +1,43 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  beforeAll,
+  afterAll,
+} from "vitest";
 
 import brainExtension from "./index.js";
 
+// Config path for cleanup
+const CONFIG_PATH = path.join(os.homedir(), ".pi-brain", "config.yaml");
+let originalConfigContent: string | null = null;
+
 describe("brainExtension", () => {
+  // Save original config ONCE before all tests
+  beforeAll(() => {
+    if (fs.existsSync(CONFIG_PATH)) {
+      originalConfigContent = fs.readFileSync(CONFIG_PATH, "utf8");
+    } else {
+      originalConfigContent = null;
+    }
+  });
+
+  // Restore original config after all tests
+  afterAll(() => {
+    if (originalConfigContent !== null) {
+      fs.writeFileSync(CONFIG_PATH, originalConfigContent, "utf8");
+    } else if (fs.existsSync(CONFIG_PATH)) {
+      fs.unlinkSync(CONFIG_PATH);
+    }
+  });
+
   it("should register command and tool", () => {
     const pi = {
       registerCommand: vi.fn(),

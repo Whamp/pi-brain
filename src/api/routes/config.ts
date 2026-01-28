@@ -14,6 +14,7 @@ import {
   loadConfig,
   getDefaultDaemonConfig,
   getDefaultQueryConfig,
+  getDefaultApiConfig,
 } from "../../config/config.js";
 import { successResponse, errorResponse } from "../responses.js";
 
@@ -85,6 +86,15 @@ interface DaemonConfigUpdateBody {
 interface QueryConfigUpdateBody {
   provider?: string;
   model?: string;
+}
+
+/**
+ * API configuration update request body
+ */
+interface ApiConfigUpdateBody {
+  port?: number;
+  host?: string;
+  corsOrigins?: string[];
 }
 
 /**
@@ -252,6 +262,40 @@ function validateQueryUpdate(body: QueryConfigUpdateBody): ValidationResult {
 }
 
 /**
+ * Validate API configuration update fields
+ */
+function validateApiUpdate(body: ApiConfigUpdateBody): ValidationResult {
+  const { port, host, corsOrigins } = body;
+
+  // Validate port range
+  if (port !== undefined) {
+    const portError = validateIntRange(port, "port", 1024, 65_535);
+    if (portError !== null) {
+      return portError;
+    }
+  }
+
+  // Validate host is non-empty string
+  if (host !== undefined && (!host || typeof host !== "string")) {
+    return "host must be a non-empty string";
+  }
+
+  // Validate corsOrigins is array of strings
+  if (corsOrigins !== undefined) {
+    if (!Array.isArray(corsOrigins)) {
+      return "corsOrigins must be an array";
+    }
+    for (const origin of corsOrigins) {
+      if (typeof origin !== "string") {
+        return "corsOrigins must be an array of strings";
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
  * Apply query config updates to raw config object
  */
 function applyQueryUpdates(
@@ -271,6 +315,32 @@ function applyQueryUpdates(
   }
   if (model !== undefined) {
     rawConfig.query.model = model;
+  }
+}
+
+/**
+ * Apply API config updates to raw config object
+ */
+function applyApiUpdates(
+  rawConfig: RawConfig,
+  body: ApiConfigUpdateBody
+): void {
+  const { port, host, corsOrigins } = body;
+
+  // Initialize api section if needed
+  if (!rawConfig.api) {
+    rawConfig.api = {};
+  }
+
+  // Update provided fields
+  if (port !== undefined) {
+    rawConfig.api.port = port;
+  }
+  if (host !== undefined) {
+    rawConfig.api.host = host;
+  }
+  if (corsOrigins !== undefined) {
+    rawConfig.api.cors_origins = corsOrigins;
   }
 }
 
@@ -572,6 +642,108 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
 
       const durationMs = Date.now() - startTime;
       return reply.send(successResponse({ providers }, durationMs));
+    }
+  );
+
+  /**
+   * GET /config/api - Get API server configuration
+   */
+  app.get("/api", async (request: FastifyRequest, reply: FastifyReply) => {
+    const startTime = request.startTime ?? Date.now();
+
+    const config = loadConfig();
+    const defaults = getDefaultApiConfig();
+
+    const durationMs = Date.now() - startTime;
+    return reply.send(
+      successResponse(
+        {
+          port: config.api.port,
+          host: config.api.host,
+          corsOrigins: config.api.corsOrigins,
+          // Include defaults for UI reference
+          defaults: {
+            port: defaults.port,
+            host: defaults.host,
+            corsOrigins: defaults.corsOrigins,
+          },
+        },
+        durationMs
+      )
+    );
+  });
+
+  /**
+   * PUT /config/api - Update API server configuration
+   */
+  app.put(
+    "/api",
+    async (
+      request: FastifyRequest<{ Body: ApiConfigUpdateBody }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const body = request.body ?? {};
+      const { port, host, corsOrigins } = body;
+
+      // Validate at least one field is provided
+      const hasAnyField =
+        port !== undefined || host !== undefined || corsOrigins !== undefined;
+
+      if (!hasAnyField) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse(
+              "BAD_REQUEST",
+              "At least one configuration field is required"
+            )
+          );
+      }
+
+      // Validate fields
+      const validationError = validateApiUpdate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
+      }
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Apply updates
+      applyApiUpdates(rawConfig, body);
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      // Reload and return updated config
+      const updatedConfig = loadConfig();
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            port: updatedConfig.api.port,
+            host: updatedConfig.api.host,
+            corsOrigins: updatedConfig.api.corsOrigins,
+            message:
+              "Configuration updated. Restart API server to apply changes.",
+          },
+          durationMs
+        )
+      );
     }
   );
 }

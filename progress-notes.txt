@@ -298,3 +298,45 @@ the reactivity chain.
   - Manual inspection of code confirms fields match API spec
 **Commit**: (will be committed shortly)
 **Notes**: Updated Settings UI to include Analysis Execution, Queue & Limits, Connection Discovery, and Semantic Search sections. Updated API client to support new configuration fields.
+
+## 2026-01-28 13:44 - Task 19.2.1
+
+**Status**: pending → done
+**Validation**:
+  - Added GET /config/query route returning provider, model, and defaults
+  - Added PUT /config/query route with validation for non-empty strings
+  - Added QueryConfigUpdateBody interface for type safety
+  - Added validateQueryUpdate function to check provider and model
+  - Added applyQueryUpdates function to persist query config to YAML
+  - Added 7 new tests covering GET and PUT operations
+  - All 1362 tests pass (1362 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: 9fc080a1
+**Notes**: Extended configuration API with query settings. Follows existing pattern established by daemon config routes. Provider and model are validated as non-empty strings. Config persists to ~/.pi-brain/config.yaml with camelCase keys.
+
+---
+
+## 2026-01-28 14:03 - Task 19.2.2
+
+**Status**: pending → done
+**Validation**:
+  - Added GET /config/api route returning port, host, corsOrigins, and defaults
+  - Added PUT /config/api route with validation (port range, host non-empty, corsOrigins array)
+  - Added ApiConfigUpdateBody interface for type safety
+  - Added validateApiUpdate function with proper validation rules
+  - Added applyApiUpdates function to persist config to YAML
+  - Added 11 new tests covering:
+    - GET returns all fields
+    - PUT validates port range (1024-65535)
+    - PUT validates host is non-empty
+    - PUT validates corsOrigins is array of strings
+    - PUT accepts valid updates for all fields
+    - PUT accepts all fields together
+    - PUT returns restart message
+  - Fixed test isolation issue: moved beforeEach to beforeAll for config snapshot
+  - Fixed test dependencies: made tests self-contained (set then verify)
+  - All 1376 tests pass (1376 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+  - Config file properly restored/cleaned up after tests
+**Commit**: (will be committed shortly)
+**Notes**: Extended configuration API with API server settings. Follows existing pattern established by daemon and query config routes. Port validated as integer in range 1024-65535. Host validated as non-empty string. CORS origins validated as array of strings. Config persists to ~/.pi-brain/config.yaml. Tests now properly isolated using beforeAll/afterAll pattern.

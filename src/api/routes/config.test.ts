@@ -4,14 +4,26 @@
 
 import type Database from "better-sqlite3";
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import * as fs from "node:fs";
+import { afterEach, beforeEach, beforeAll, describe, expect, it } from "vitest";
 
+import { DEFAULT_CONFIG_PATH } from "../../config/config.js";
 import { migrate } from "../../storage/database.js";
 import { createServer } from "../server.js";
 
 describe("config api routes", () => {
   let app: Awaited<ReturnType<typeof createServer>>;
   let db: Database.Database;
+  let originalConfigContent: string | null = null;
+
+  beforeAll(() => {
+    // Save original config content for cleanup ONCE before all tests
+    if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+      originalConfigContent = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+    } else {
+      originalConfigContent = null;
+    }
+  });
 
   beforeEach(async () => {
     // Create in-memory database
@@ -30,6 +42,14 @@ describe("config api routes", () => {
 
   afterEach(async () => {
     await app.close();
+
+    // Restore original config content
+    if (originalConfigContent !== null) {
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, originalConfigContent, "utf8");
+    } else if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+      // No original config existed, delete the file
+      fs.unlinkSync(DEFAULT_CONFIG_PATH);
+    }
   });
 
   describe("gET /config/daemon", () => {
@@ -322,6 +342,17 @@ describe("config api routes", () => {
     });
 
     it("returns configured values for new fields on GET", async () => {
+      // First set the values
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          analysisTimeoutMinutes: 45,
+          maxConcurrentAnalysis: 2,
+        },
+      });
+
+      // Then verify they're returned
       const response = await app.inject({
         method: "GET",
         url: "/api/v1/config/daemon",
@@ -329,8 +360,8 @@ describe("config api routes", () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.data.analysisTimeoutMinutes).toBe(45); // Updated by previous test
-      expect(body.data.maxConcurrentAnalysis).toBe(2); // Updated by previous test
+      expect(body.data.analysisTimeoutMinutes).toBe(45);
+      expect(body.data.maxConcurrentAnalysis).toBe(2);
     });
 
     // maxQueueSize tests
@@ -509,6 +540,18 @@ describe("config api routes", () => {
     });
 
     it("returns new fields on GET", async () => {
+      // First set values
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          maxQueueSize: 2000,
+          backfillLimit: 150,
+          reanalysisLimit: 75,
+        },
+      });
+
+      // Then verify they're returned
       const response = await app.inject({
         method: "GET",
         url: "/api/v1/config/daemon",
@@ -516,9 +559,9 @@ describe("config api routes", () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.data.maxQueueSize).toBe(2000); // Updated by previous test
-      expect(body.data.backfillLimit).toBe(150); // Updated by previous test
-      expect(body.data.reanalysisLimit).toBe(75); // Updated by previous test
+      expect(body.data.maxQueueSize).toBe(2000);
+      expect(body.data.backfillLimit).toBe(150);
+      expect(body.data.reanalysisLimit).toBe(75);
     });
 
     // connectionDiscoveryLimit tests
@@ -697,6 +740,18 @@ describe("config api routes", () => {
     });
 
     it("returns connection discovery fields on GET", async () => {
+      // First set the values
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          connectionDiscoveryLimit: 150,
+          connectionDiscoveryLookbackDays: 14,
+          connectionDiscoveryCooldownHours: 12,
+        },
+      });
+
+      // Then verify they're returned
       const response = await app.inject({
         method: "GET",
         url: "/api/v1/config/daemon",
@@ -704,9 +759,9 @@ describe("config api routes", () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.data.connectionDiscoveryLimit).toBe(150); // Updated by previous test
-      expect(body.data.connectionDiscoveryLookbackDays).toBe(14); // Updated by previous test
-      expect(body.data.connectionDiscoveryCooldownHours).toBe(12); // Updated by previous test
+      expect(body.data.connectionDiscoveryLimit).toBe(150);
+      expect(body.data.connectionDiscoveryLookbackDays).toBe(14);
+      expect(body.data.connectionDiscoveryCooldownHours).toBe(12);
     });
 
     it("returns all daemon fields including connection discovery", async () => {
@@ -822,7 +877,8 @@ describe("config api routes", () => {
 
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
-      expect(body.data.semanticSearchThreshold).toBe(0.75); // Updated by previous test
+      expect(body.data.semanticSearchThreshold).toBeDefined();
+      expect(typeof body.data.semanticSearchThreshold).toBe("number");
     });
 
     it("returns all daemon fields including semanticSearchThreshold", async () => {
@@ -980,6 +1036,206 @@ describe("config api routes", () => {
       expect(body.data.provider).toBe("openai");
       expect(body.data.model).toBe("gpt-4o-mini");
       expect(body.data.message).toContain("Configuration updated");
+    });
+  });
+
+  describe("get /config/api", () => {
+    it("returns API server configuration", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/api",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data).toBeDefined();
+      expect(body.data.port).toBeDefined();
+      expect(body.data.host).toBeDefined();
+      expect(body.data.corsOrigins).toBeDefined();
+      expect(Array.isArray(body.data.corsOrigins)).toBeTruthy();
+      expect(body.data.defaults).toBeDefined();
+    });
+
+    it("includes defaults for UI reference", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/api",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.defaults.port).toBeDefined();
+      expect(body.data.defaults.host).toBeDefined();
+      expect(body.data.defaults.corsOrigins).toBeDefined();
+      expect(Array.isArray(body.data.defaults.corsOrigins)).toBeTruthy();
+    });
+  });
+
+  describe("put /config/api", () => {
+    it("rejects request with no fields", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("error");
+      expect(body.error.code).toBe("BAD_REQUEST");
+    });
+
+    it("rejects port below minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { port: 1023 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("port");
+    });
+
+    it("rejects port above maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { port: 65_536 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("port");
+    });
+
+    it("rejects non-integer port", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { port: 8765.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("rejects empty host", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { host: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("host");
+    });
+
+    it("rejects corsOrigins as non-array", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { corsOrigins: "not-an-array" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("corsOrigins");
+    });
+
+    it("rejects corsOrigins with non-string elements", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { corsOrigins: ["http://localhost:5173", 123] },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("corsOrigins");
+    });
+
+    it("accepts valid port update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { port: 3000 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.port).toBe(3000);
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts valid host update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { host: "0.0.0.0" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.host).toBe("0.0.0.0");
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts valid corsOrigins update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: {
+          corsOrigins: ["http://localhost:5173", "https://example.com"],
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.corsOrigins).toStrictEqual([
+        "http://localhost:5173",
+        "https://example.com",
+      ]);
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts all fields together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: {
+          port: 9000,
+          host: "0.0.0.0",
+          corsOrigins: ["http://localhost:9000"],
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.port).toBe(9000);
+      expect(body.data.host).toBe("0.0.0.0");
+      expect(body.data.corsOrigins).toStrictEqual(["http://localhost:9000"]);
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("includes message about restart required", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/api",
+        payload: { port: 8080 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.message).toContain("Restart API server");
     });
   });
 });

@@ -1599,8 +1599,8 @@ src/storage/database.ts [1-298]
       refs in: 55 [call: 43, import: 12]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
-        - src/api/routes/config.test.ts:9: import (module)
-        - src/api/routes/config.test.ts:21: call (module)
+        - src/api/routes/config.test.ts:11: import (module)
+        - src/api/routes/config.test.ts:33: call (module)
         - src/api/routes/query.test.ts:10: import (module)
         - src/api/routes/query.test.ts:19: call (module)
         - src/api/server.test.ts:13: import (module)
@@ -3264,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,797 (codebase: ~1,110,870)
+Estimated tokens: 42,798 (codebase: ~1,115,372)

@@ -51,9 +51,9 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-578]
+src/api/routes/config.ts [1-750]
   function:
-    277-577: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    347-749: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -2149,4 +2149,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 27,087 (codebase: ~1,109,803)
+Estimated tokens: 27,087 (codebase: ~1,111,951)
