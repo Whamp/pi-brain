@@ -212,3 +212,28 @@ The daemon gracefully degrades when skills are missing.
 - Reduced `node-repository.ts` from 1500 to 1091 lines (409 lines removed)
 
 **Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
+
+---
+
+## 2026-01-27 17:40 - Task 13.9 (Extract graph-repository.ts)
+
+**Status**: pending → done
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+- Verified exports work correctly via index.ts
+- All consumers import through storage/index.ts - backward compatible
+
+**Commit**: c2da61d
+
+**Changes**:
+- Created `src/storage/graph-repository.ts` (~365 lines)
+- Extracted graph traversal functions: `getConnectedNodes`, `getSubgraph`,
+  `findPath`, `getAncestors`, `getDescendants`
+- Extracted types: `TraversalDirection`, `ConnectedNodesOptions`, `TraversalEdge`,
+  `ConnectedNodesResult`
+- Added re-exports in `node-repository.ts` for backward compatibility
+- Added export in `src/storage/index.ts`
+- Reduced `node-repository.ts` from 1091 to 768 lines (323 lines removed)
+
+**Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
