@@ -168,3 +168,40 @@ the reactivity chain.
   - Graph page: Shows guide when no nodes exist AND no filters applied
   - Used Svelte 5 runes properly ($state, $derived) for reactivity
   - Added hasLoadedOnce tracking to distinguish fresh vs filtered empty state
+
+## 2026-01-28 07:20 - Task 18.4
+
+**Status**: pending → done
+**Validation**: 
+  - Verified CSS logic for fixed sidebar with scrollable nav
+  - Added overflow-y: auto and min-height: 0 to navigation container
+  - Lint and check passed
+  - All 1272 backend tests passed
+**Commit**: 01694fd5
+**Notes**: Fixed potential sidebar overflow issue where navigation items could push the footer off-screen or become inaccessible on small viewports. Used standard flexbox scrolling pattern.
+
+## 2026-01-28 07:30 - Task 18.5
+
+**Status**: pending → done
+**Validation**: 
+  - Implemented QueueManager.getDailyStats() with unit test
+  - Added periodic status broadcast (2s) in daemon process
+  - Updated Dashboard UI to subscribe to daemonStore updates
+  - Verified backend tests pass (1273 tests)
+**Commit**: e53e776a
+**Notes**: The dashboard now updates in real-time without page refreshes. The status includes active worker count, queue depth, and daily completion/failure stats.
+
+## 2026-01-28 07:35 - Task 18.6
+
+**Status**: pending → done
+**Validation**: 
+  - Added unit test `src/storage/search-highlight.test.ts` verifying:
+    - Highlighting wraps matches in <mark> tags
+    - Case insensitivity works
+    - Multiple matches are handled
+  - Verified backend tests pass (1276 tests)
+  - Integration verified:
+    - Frontend `SafeHighlight` component parses <mark> tags
+    - Backend `extractSnippet` produces <mark> tags
+**Commit**: 35d24c44
+**Notes**: Improved search result UX by adding context-aware highlighting. The backend now performs regex-based replacement to wrap query terms in snippets, which the frontend safely renders.
