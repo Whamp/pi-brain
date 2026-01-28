@@ -151,6 +151,18 @@ export interface DaemonConfig {
 
   /** Maximum queue size before rejecting new jobs */
   maxQueueSize: number;
+
+  /** Cron schedule for memory decay (daily) - updates relevance scores and archives old nodes */
+  decaySchedule: string;
+
+  /** Cron schedule for creative association (weekly) - discovers non-obvious connections via vector similarity */
+  creativeSchedule: string;
+
+  /** Base decay rate for relevance calculation (0.0-1.0, higher = faster decay) */
+  baseDecayRate: number;
+
+  /** Minimum similarity threshold for creative association edges (0.0-1.0) */
+  creativeSimilarityThreshold: number;
 }
 
 /**
@@ -250,6 +262,10 @@ export interface RawConfig {
     max_concurrent_analysis?: number;
     analysis_timeout_minutes?: number;
     max_queue_size?: number;
+    decay_schedule?: string;
+    creative_schedule?: string;
+    base_decay_rate?: number;
+    creative_similarity_threshold?: number;
   };
   query?: {
     provider?: string;

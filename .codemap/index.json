@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 41235,
-  "codebase_tokens": 1129642,
+  "total_tokens": 41243,
+  "codebase_tokens": 1131009,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -2213,7 +2213,7 @@
       "language": "typescript",
       "lines": [
         1,
-        773
+        803
       ],
       "detail_level": "full",
       "token_estimate": 836,
@@ -2300,7 +2300,7 @@
           "signature": "getDefaultDaemonConfig(): DaemonConfig",
           "lines": [
             59,
-            93
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -2318,8 +2318,8 @@
           "kind": "function",
           "signature": "getDefaultQueryConfig(): QueryConfig",
           "lines": [
-            98,
-            103
+            102,
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -2337,8 +2337,8 @@
           "kind": "function",
           "signature": "getDefaultApiConfig(): ApiConfig",
           "lines": [
-            108,
-            118
+            112,
+            122
           ],
           "exported": true,
           "is_default": false,
@@ -2356,8 +2356,8 @@
           "kind": "function",
           "signature": "getDefaultConfig(): PiBrainConfig",
           "lines": [
-            123,
-            131
+            127,
+            135
           ],
           "exported": true,
           "is_default": false,
@@ -2375,8 +2375,8 @@
           "kind": "function",
           "signature": "validateSyncMethod(method: string, spokeName: string): SyncMethod",
           "lines": [
-            136,
-            153
+            140,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -2394,8 +2394,8 @@
           "kind": "function",
           "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
           "lines": [
-            160,
-            273
+            164,
+            277
           ],
           "exported": false,
           "is_default": false,
@@ -2413,8 +2413,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            278,
-            286
+            282,
+            290
           ],
           "exported": false,
           "is_default": false,
@@ -2432,8 +2432,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            291,
-            297
+            295,
+            301
           ],
           "exported": false,
           "is_default": false,
@@ -2451,8 +2451,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            302,
-            308
+            306,
+            312
           ],
           "exported": false,
           "is_default": false,
@@ -2470,8 +2470,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            313,
-            319
+            317,
+            323
           ],
           "exported": false,
           "is_default": false,
@@ -2489,8 +2489,8 @@
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            326,
-            504
+            330,
+            530
           ],
           "exported": true,
           "is_default": false,
@@ -2508,8 +2508,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            509,
-            517
+            535,
+            543
           ],
           "exported": true,
           "is_default": false,
@@ -2527,8 +2527,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            510,
-            516
+            536,
+            542
           ],
           "exported": false,
           "is_default": false,
@@ -2546,8 +2546,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            522,
-            577
+            548,
+            603
           ],
           "exported": true,
           "is_default": false,
@@ -2565,8 +2565,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            582,
-            587
+            608,
+            613
           ],
           "exported": true,
           "is_default": false,
@@ -2584,8 +2584,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            592,
-            627
+            618,
+            653
           ],
           "exported": true,
           "is_default": false,
@@ -2603,8 +2603,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            632,
-            691
+            658,
+            721
           ],
           "exported": true,
           "is_default": false,
@@ -2622,8 +2622,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            696,
-            704
+            726,
+            734
           ],
           "exported": true,
           "is_default": false,
@@ -2641,8 +2641,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            709,
-            711
+            739,
+            741
           ],
           "exported": true,
           "is_default": false,
@@ -2660,8 +2660,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            716,
-            720
+            746,
+            750
           ],
           "exported": true,
           "is_default": false,
@@ -2679,8 +2679,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            725,
-            732
+            755,
+            762
           ],
           "exported": true,
           "is_default": false,
@@ -2698,8 +2698,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            743,
-            772
+            773,
+            802
           ],
           "exported": true,
           "is_default": false,
@@ -2747,7 +2747,7 @@
       "language": "typescript",
       "lines": [
         1,
-        264
+        280
       ],
       "detail_level": "full",
       "token_estimate": 306,
@@ -2834,7 +2834,7 @@
           "signature": "DaemonConfig",
           "lines": [
             76,
-            154
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -2852,8 +2852,8 @@
           "kind": "interface",
           "signature": "QueryConfig",
           "lines": [
-            160,
-            166
+            172,
+            178
           ],
           "exported": true,
           "is_default": false,
@@ -2871,8 +2871,8 @@
           "kind": "interface",
           "signature": "ApiConfig",
           "lines": [
-            171,
-            180
+            183,
+            192
           ],
           "exported": true,
           "is_default": false,
@@ -2890,8 +2890,8 @@
           "kind": "interface",
           "signature": "PiBrainConfig",
           "lines": [
-            185,
-            200
+            197,
+            212
           ],
           "exported": true,
           "is_default": false,
@@ -2909,8 +2909,8 @@
           "kind": "interface",
           "signature": "RawConfig",
           "lines": [
-            206,
-            263
+            218,
+            279
           ],
           "exported": true,
           "is_default": false,
@@ -5346,18 +5346,18 @@
       "language": "typescript",
       "lines": [
         1,
-        312
+        339
       ],
       "detail_level": "full",
-      "token_estimate": 112,
+      "token_estimate": 120,
       "symbols": [
         {
           "name": "args",
           "kind": "variable",
           "signature": "any",
           "lines": [
-            30,
-            30
+            31,
+            31
           ],
           "exported": false,
           "is_default": false,
@@ -5375,8 +5375,8 @@
           "kind": "variable",
           "signature": "string | undefined",
           "lines": [
-            31,
-            31
+            32,
+            32
           ],
           "exported": false,
           "is_default": false,
@@ -5394,8 +5394,8 @@
           "kind": "variable",
           "signature": "boolean",
           "lines": [
-            32,
-            32
+            33,
+            33
           ],
           "exported": false,
           "is_default": false,
@@ -5413,8 +5413,8 @@
           "kind": "variable",
           "signature": "(event: Event): void",
           "lines": [
-            47,
-            50
+            48,
+            51
           ],
           "exported": false,
           "is_default": false,
@@ -5432,8 +5432,8 @@
           "kind": "variable",
           "signature": "(ms: number): any",
           "lines": [
-            52,
-            55
+            53,
+            56
           ],
           "exported": false,
           "is_default": false,
@@ -5451,8 +5451,8 @@
           "kind": "function",
           "signature": "async main(): Promise<void>",
           "lines": [
-            61,
-            300
+            62,
+            327
           ],
           "exported": false,
           "is_default": false,
@@ -5474,6 +5474,7 @@
         "../config/config.js",
         "../storage/database.js",
         "./cli.js",
+        "./consolidation/index.js",
         "./queue.js",
         "./scheduler.js",
         "./watcher-events.js",

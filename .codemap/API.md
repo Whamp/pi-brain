@@ -287,42 +287,42 @@ src/cli.ts [1-1148]
     - node:path
     - open
 
-src/config/config.ts [1-773]
+src/config/config.ts [1-803]
   class:
-    509-517: class ConfigError extends Error [exported]
+    535-543: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
       /** Expand ~ in paths to home directory */
     48-54: getDefaultHubConfig(): HubConfig [exported]
       /** Default hub configuration */
-    59-93: getDefaultDaemonConfig(): DaemonConfig [exported]
+    59-97: getDefaultDaemonConfig(): DaemonConfig [exported]
       /** Default daemon configuration */
-    98-103: getDefaultQueryConfig(): QueryConfig [exported]
+    102-107: getDefaultQueryConfig(): QueryConfig [exported]
       /** Default query configuration */
-    108-118: getDefaultApiConfig(): ApiConfig [exported]
+    112-122: getDefaultApiConfig(): ApiConfig [exported]
       /** Default API configuration */
-    123-131: getDefaultConfig(): PiBrainConfig [exported]
+    127-135: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    326-504: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    330-530: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    522-577: loadConfig(configPath?: string): PiBrainConfig [exported]
+    548-603: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    582-587: ensureConfigDir(configDir?: string): void [exported]
+    608-613: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    592-627: ensureDirectories(config: PiBrainConfig): void [exported]
+    618-653: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    632-691: writeDefaultConfig(configPath?: string): void [exported]
+    658-721: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    696-704: getSessionDirs(config: PiBrainConfig): {} [exported]
+    726-734: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    709-711: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    739-741: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    716-720: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    746-750: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    725-732: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    755-762: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    743-772: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    773-802: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -341,7 +341,7 @@ src/config/index.ts [1-36]
     - ./config.js
     - ./types.js
 
-src/config/types.ts [1-264]
+src/config/types.ts [1-280]
   interface:
     16-28: interface RsyncOptions [exported]
       /** Rsync-specific options for spoke configuration */
@@ -349,15 +349,15 @@ src/config/types.ts [1-264]
       /** Spoke machine configuration Spokes are secondary machines that sync sessions to the hub */
     61-70: interface HubConfig [exported]
       /** Hub configuration The hub is the primary computer where daemon runs */
-    76-154: interface DaemonConfig [exported]
+    76-166: interface DaemonConfig [exported]
       /** Daemon configuration Controls the background analysis process */
-    160-166: interface QueryConfig [exported]
+    172-178: interface QueryConfig [exported]
       /** Query configuration Controls the /brain query interface */
-    171-180: interface ApiConfig [exported]
+    183-192: interface ApiConfig [exported]
       /** API server configuration */
-    185-200: interface PiBrainConfig [exported]
+    197-212: interface PiBrainConfig [exported]
       /** Complete pi-brain configuration */
-    206-263: interface RawConfig [exported]
+    218-279: interface RawConfig [exported]
       /** Raw YAML configuration (snake_case, before transformation) This matches the YAML file structure */
   type:
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
@@ -505,12 +505,13 @@ src/daemon/consolidation/relevance.ts [1-346]
   imports:
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-312]
+src/daemon/daemon-process.ts [1-339]
   imports:
     - ../api/server.js
     - ../config/config.js
     - ../storage/database.js
     - ./cli.js
+    - ./consolidation/index.js
     - ./queue.js
     - ./scheduler.js
     - ./watcher-events.js
@@ -2229,4 +2230,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 95
-Estimated tokens: 28,030 (codebase: ~1,119,862)
+Estimated tokens: 28,037 (codebase: ~1,130,436)

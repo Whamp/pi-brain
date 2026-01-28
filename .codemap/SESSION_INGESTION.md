@@ -106,10 +106,9 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:265: call now -> external
     291-436: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs out: 26 [call: 20, type: 6]
+      refs out: 24 [call: 18, type: 6]
         - src/daemon/cli.ts:291: type StartOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:291: type Promise -> external
-        - src/daemon/cli.ts:310: call loadConfig -> src/config/config.ts
         - src/daemon/cli.ts:314: type Error -> external
         - src/daemon/cli.ts:323: call log -> external
         - src/daemon/cli.ts:327: call kill -> external
@@ -117,6 +116,7 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:332: type Error -> external
         - src/daemon/cli.ts:346: call kill -> external
         - src/daemon/cli.ts:347: call removePidFile -> src/daemon/cli.ts
+        - src/daemon/cli.ts:359: type Error -> external
     441-503: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 9 [call: 7, type: 2]
@@ -260,12 +260,13 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-312]
+src/daemon/daemon-process.ts [1-339]
   imports:
     - ../api/server.js
     - ../config/config.js
     - ../storage/database.js
     - ./cli.js
+    - ./consolidation/index.js
     - ./queue.js
     - ./scheduler.js
     - ./watcher-events.js
@@ -594,8 +595,7 @@ src/daemon/processor.ts [1-800]
       /** Result of environment validation */
     728-733: interface ProcessorConfig [exported]
       /** Processor configuration */
-      refs out: 2 [type: 2]
-        - src/daemon/processor.ts:730: type DaemonConfig -> src/config/types.ts
+      refs out: 1 [type: 1]
         - src/daemon/processor.ts:732: type ProcessorLogger -> src/daemon/processor.ts
   function:
     197-205: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
@@ -637,9 +637,8 @@ src/daemon/processor.ts [1-800]
         - src/daemon/processor.ts:306: call join -> external
     340-456: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-      refs out: 14 [call: 9, type: 5]
+      refs out: 13 [call: 9, type: 4]
         - src/daemon/processor.ts:341: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/processor.ts:342: type DaemonConfig -> src/config/types.ts
         - src/daemon/processor.ts:343: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/processor.ts:344: type Promise -> external
         - src/daemon/processor.ts:344: type AgentResult -> src/daemon/processor.ts
@@ -648,6 +647,7 @@ src/daemon/processor.ts [1-800]
         - src/daemon/processor.ts:362: call access -> external
         - src/daemon/processor.ts:369: call now -> external
         - src/daemon/processor.ts:381: call now -> external
+        - src/daemon/processor.ts:405: call debug -> src/daemon/processor.ts
     562-631: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
@@ -734,9 +734,8 @@ src/daemon/query-processor.ts [1-786]
     48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
     91-104: interface QueryProcessorConfig [exported]
-      refs out: 4 [type: 4]
+      refs out: 3 [type: 3]
         - src/daemon/query-processor.ts:93: type Database -> external
-        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
         - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/query-processor.ts:101: type EmbeddingProvider -> src/daemon/facet-discovery.ts
   function:
@@ -879,8 +878,7 @@ src/daemon/scheduler.ts [1-978]
   function:
     909-939: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-      refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:910: type DaemonConfig -> src/config/types.ts
+      refs out: 5 [instantiate: 1, type: 4]
         - src/daemon/scheduler.ts:911: type QueueManager -> src/daemon/queue.ts
         - src/daemon/scheduler.ts:912: type Database -> external
         - src/daemon/scheduler.ts:913: type SchedulerLogger -> src/daemon/scheduler.ts
@@ -1025,8 +1023,7 @@ src/daemon/watcher.ts [1-582]
   function:
     546-550: createWatcher(daemonConfig: DaemonConfig): SessionWatcher [exported]
       /** Create a watcher from daemon config */
-      refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/watcher.ts:546: type DaemonConfig -> src/config/types.ts
+      refs out: 2 [instantiate: 1, type: 1]
         - src/daemon/watcher.ts:546: type SessionWatcher -> src/daemon/watcher.ts
         - src/daemon/watcher.ts:547: instantiate SessionWatcher -> src/daemon/watcher.ts
     555-557: isSessionFile(filePath: string): boolean [exported]
@@ -1073,8 +1070,7 @@ src/daemon/worker.ts [1-741]
   interface:
     67-84: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 11 [type: 11]
-        - src/daemon/worker.ts:71: type PiBrainConfig -> src/config/types.ts
+      refs out: 10 [type: 10]
         - src/daemon/worker.ts:73: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:75: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:77: type AnalysisJob -> src/daemon/queue.ts
@@ -1084,6 +1080,7 @@ src/daemon/worker.ts [1-741]
         - src/daemon/worker.ts:79: type Promise -> external
         - src/daemon/worker.ts:81: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:81: type Error -> external
+        - src/daemon/worker.ts:81: type Promise -> external
     87-102: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1103,9 +1100,8 @@ src/daemon/worker.ts [1-741]
         - src/daemon/worker.ts:690: instantiate Worker -> src/daemon/worker.ts
     697-711: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-      refs out: 8 [call: 2, type: 6]
+      refs out: 7 [call: 2, type: 5]
         - src/daemon/worker.ts:698: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:699: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:700: type Database -> external
         - src/daemon/worker.ts:701: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:702: type Promise -> external
@@ -1594,4 +1590,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,717 (codebase: ~1,129,642)
+Estimated tokens: 20,614 (codebase: ~1,131,009)
