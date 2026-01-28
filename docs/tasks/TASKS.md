@@ -244,10 +244,10 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.2 Richer Embedding Format
 
-| ID     | Task                                           | Status  | Deps   | Notes      |
-| ------ | ---------------------------------------------- | ------- | ------ | ---------- |
-| 17.2.1 | Create buildEmbeddingText() in embedding-utils | active  | -      | 2026-01-27 |
-| 17.2.2 | Update facet-discovery to use new format       | pending | 17.2.1 |            |
+| ID     | Task                                           | Status  | Deps   | Notes                 |
+| ------ | ---------------------------------------------- | ------- | ------ | --------------------- |
+| 17.2.1 | Create buildEmbeddingText() in embedding-utils | done    | -      | 2026-01-27 - 14 tests |
+| 17.2.2 | Update facet-discovery to use new format       | pending | 17.2.1 |                       |
 
 ### 17.3 Embedding at Ingest Time
 

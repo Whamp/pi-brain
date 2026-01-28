@@ -28,3 +28,15 @@ for rowid in some configurations. The code later uses `BigInt(row.rowid)` which 
 but the test could be more robust by typing it as `number | bigint`.
 
 ---
+
+---
+
+## 2026-01-27 21:03 - Task 17.2.1
+
+**Status**: pending → done
+**Validation**: 14 unit tests covering:
+  - buildEmbeddingText: type+summary, decisions, lessons, combinations, empty cases
+  - buildSimpleEmbeddingText: type+summary, null handling
+  - isRichEmbeddingFormat: detection of Decisions/Lessons sections
+**Commit**: 734b319c
+**Notes**: Created src/storage/embedding-utils.ts with rich embedding format per semantic-search.md spec. Exported from storage/index.ts for use by facet-discovery and worker.
