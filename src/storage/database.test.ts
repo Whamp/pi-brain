@@ -323,6 +323,75 @@ describe("database", () => {
       }
     });
 
+    it("creates node_embeddings_vec virtual table for semantic search", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Check virtual table exists
+        const tables = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='node_embeddings_vec'"
+          )
+          .all();
+
+        expect(tables).toHaveLength(1);
+
+        // Verify we can insert and query vectors
+        // First insert a node (required for foreign key)
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "test-node-vec",
+          "/test/session.jsonl",
+          "2026-01-27T00:00:00Z",
+          "2026-01-27T00:00:00Z",
+          "/test/node.json"
+        );
+
+        // Insert an embedding into node_embeddings
+        const testEmbedding = new Float32Array(4096);
+        testEmbedding[0] = 0.1;
+        testEmbedding[1] = 0.2;
+
+        db.prepare(`
+          INSERT INTO node_embeddings (node_id, embedding, embedding_model, input_text)
+          VALUES (?, ?, ?, ?)
+        `).run("test-node-vec", testEmbedding, "test-model", "test input");
+
+        // Get the rowid
+        const row = db
+          .prepare("SELECT rowid FROM node_embeddings WHERE node_id = ?")
+          .get("test-node-vec") as { rowid: number };
+
+        // Insert into vec table - vec0 requires BigInt for rowid
+        db.prepare(`
+          INSERT INTO node_embeddings_vec (rowid, embedding)
+          VALUES (?, ?)
+        `).run(BigInt(row.rowid), testEmbedding);
+
+        // Query the vec table
+        const result = db
+          .prepare(`
+            SELECT rowid, distance 
+            FROM node_embeddings_vec 
+            WHERE embedding MATCH ? 
+            ORDER BY distance 
+            LIMIT 1
+          `)
+          .get(testEmbedding) as { rowid: bigint; distance: number };
+
+        expect(result).toBeDefined();
+        expect(Number(result.rowid)).toBe(row.rowid);
+        expect(result.distance).toBeCloseTo(0);
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
     it("creates query performance indexes", () => {
       const testDbPath = createTestDbPath();
       try {

@@ -134,8 +134,25 @@ export function migrate(db: Database.Database): number {
   const migrations = loadMigrations();
   let appliedCount = 0;
 
+  // Check if vec extension is loaded for vec-dependent migrations
+  const vecLoaded = isVecLoaded(db);
+
   for (const migration of migrations) {
     if (migration.version <= currentVersion) {
+      continue;
+    }
+
+    // Skip vec-dependent migrations if vec is not loaded
+    if (migration.filename.includes("semantic_search") && !vecLoaded) {
+      // Record migration as skipped so it doesn't retry every time,
+      // but with a note that it was skipped
+      db.prepare(
+        "INSERT INTO schema_version (version, description) VALUES (?, ?)"
+      ).run(
+        migration.version,
+        `${migration.description} (skipped: vec not loaded)`
+      );
+      appliedCount++;
       continue;
     }
 

@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 35905,
-  "codebase_tokens": 1004931,
+  "codebase_tokens": 1006475,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14895,7 +14895,7 @@
       "language": "typescript",
       "lines": [
         1,
-        205
+        222
       ],
       "detail_level": "full",
       "token_estimate": 334,
@@ -15058,7 +15058,7 @@
           "signature": "migrate(db: Database.Database): number",
           "lines": [
             132,
-            156
+            173
           ],
           "exported": true,
           "is_default": false,
@@ -15076,8 +15076,8 @@
           "kind": "function",
           "signature": "closeDatabase(db: Database.Database): void",
           "lines": [
-            161,
-            163
+            178,
+            180
           ],
           "exported": true,
           "is_default": false,
@@ -15095,8 +15095,8 @@
           "kind": "function",
           "signature": "isDatabaseHealthy(db: Database.Database): boolean",
           "lines": [
-            168,
-            175
+            185,
+            192
           ],
           "exported": true,
           "is_default": false,
@@ -15114,8 +15114,8 @@
           "kind": "function",
           "signature": "loadVecExtension(db: Database.Database): boolean",
           "lines": [
-            180,
-            188
+            197,
+            205
           ],
           "exported": true,
           "is_default": false,
@@ -15133,8 +15133,8 @@
           "kind": "function",
           "signature": "isVecLoaded(db: Database.Database): boolean",
           "lines": [
-            193,
-            204
+            210,
+            221
           ],
           "exported": true,
           "is_default": false,

@@ -1239,7 +1239,7 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
-src/storage/database.ts [1-205]
+src/storage/database.ts [1-222]
   interface:
     20-34: interface DatabaseOptions [exported]
     36-41: interface MigrationInfo [exported]
@@ -1250,15 +1250,15 @@ src/storage/database.ts [1-205]
       /** Load migrations from the migrations directory */
     117-127: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    132-156: migrate(db: Database.Database): number [exported]
+    132-173: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    161-163: closeDatabase(db: Database.Database): void [exported]
+    178-180: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    168-175: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    185-192: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
-    180-188: loadVecExtension(db: Database.Database): boolean [exported]
+    197-205: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
-    193-204: isVecLoaded(db: Database.Database): boolean [exported]
+    210-221: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
   variable:
     15-15: any [exported]
@@ -2033,4 +2033,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,782 (codebase: ~998,012)
+Estimated tokens: 24,782 (codebase: ~1,004,813)

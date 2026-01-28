@@ -236,11 +236,11 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.1 Foundation (sqlite-vec setup)
 
-| ID     | Task                                          | Status  | Deps   | Notes      |
-| ------ | --------------------------------------------- | ------- | ------ | ---------- |
-| 17.1.1 | Install sqlite-vec extension (npm or binary)  | done    | -      | 2026-01-27 |
-| 17.1.2 | Load extension in database.ts + isVecLoaded() | active  | 17.1.1 | 2026-01-27 |
-| 17.1.3 | Create 012_semantic_search.sql migration      | pending | 17.1.2 |            |
+| ID     | Task                                          | Status | Deps   | Notes      |
+| ------ | --------------------------------------------- | ------ | ------ | ---------- |
+| 17.1.1 | Install sqlite-vec extension (npm or binary)  | done   | -      | 2026-01-27 |
+| 17.1.2 | Load extension in database.ts + isVecLoaded() | done   | 17.1.1 | 2026-01-27 |
+| 17.1.3 | Create 012_semantic_search.sql migration      | active | 17.1.2 | 2026-01-27 |
 
 ### 17.2 Richer Embedding Format
 

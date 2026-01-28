@@ -1514,7 +1514,7 @@ src/storage/database-vec.test.ts [1-72]
     - node:path
     - vitest
 
-src/storage/database.test.ts [1-574]
+src/storage/database.test.ts [1-643]
   imports:
     - ./database.js
     - better-sqlite3
@@ -1523,7 +1523,7 @@ src/storage/database.test.ts [1-574]
     - node:path
     - vitest
 
-src/storage/database.ts [1-205]
+src/storage/database.ts [1-222]
   interface:
     20-34: interface DatabaseOptions [exported]
       refs in: 1 [type: 1]
@@ -1535,7 +1535,7 @@ src/storage/database.ts [1-205]
   function:
     46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 59 [call: 47, import: 12]
+      refs in: 60 [call: 48, import: 12]
         - src/daemon/cli.test.ts:12: import (module)
         - src/daemon/cli.test.ts:215: call db
         - src/daemon/cli.test.ts:594: call db
@@ -1564,7 +1564,7 @@ src/storage/database.ts [1-205]
         - src/storage/database.test.ts:159: call firstVersion
         - src/storage/database.test.ts:165: call (module)
         - src/storage/database.ts:133: call currentVersion
-    132-156: migrate(db: Database.Database): number [exported]
+    132-173: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
       refs in: 24 [call: 17, import: 7]
         - src/daemon/cli.test.ts:12: import (module)
@@ -1577,7 +1577,7 @@ src/storage/database.ts [1-205]
         - src/daemon/cli.ts:27: import (module)
         - src/daemon/cli.ts:476: call getQueueStatus
         - src/daemon/cli.ts:513: call queueAnalysis
-    161-163: closeDatabase(db: Database.Database): void [exported]
+    178-180: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
       refs in: 12 [call: 7, import: 5]
         - src/daemon/queue.test.ts:12: import (module)
@@ -1589,23 +1589,24 @@ src/storage/database.ts [1-205]
         - src/storage/database-vec.test.ts:8: import (module)
         - src/storage/database-vec.test.ts:17: call (module)
         - src/storage/database.test.ts:13: import (module)
-        - src/storage/database.test.ts:382: call (module)
-    168-175: isDatabaseHealthy(db: Database.Database): boolean [exported]
+        - src/storage/database.test.ts:451: call (module)
+    185-192: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
       refs in: 4 [call: 3, import: 1]
         - src/storage/database.test.ts:15: import (module)
-        - src/storage/database.test.ts:355: call (module)
-        - src/storage/database.test.ts:368: call (module)
-        - src/storage/database.test.ts:384: call (module)
-    180-188: loadVecExtension(db: Database.Database): boolean [exported]
+        - src/storage/database.test.ts:424: call (module)
+        - src/storage/database.test.ts:437: call (module)
+        - src/storage/database.test.ts:453: call (module)
+    197-205: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
       refs in: 1 [call: 1]
         - src/storage/database.ts:68: call loaded
-    193-204: isVecLoaded(db: Database.Database): boolean [exported]
+    210-221: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
-      refs in: 2 [call: 1, import: 1]
+      refs in: 3 [call: 2, import: 1]
         - src/storage/database-vec.test.ts:8: import (module)
         - src/storage/database-vec.test.ts:35: call (module)
+        - src/storage/database.ts:138: call vecLoaded
   variable:
     15-15: any [exported]
       /** Default pi-brain data directory */
@@ -2962,4 +2963,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 51
-Estimated tokens: 37,833 (codebase: ~1,004,931)
+Estimated tokens: 37,847 (codebase: ~1,006,475)

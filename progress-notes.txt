@@ -19,3 +19,64 @@ Missing database cleanup on test failure. If openDatabase() throws, tempDir is s
 
 ## Progress
 
+**Status**: pending → done
+**Validation**: 
+- svelte-check passes (0 errors, 0 warnings)
+- All 1217 tests pass
+- Lint/format checks pass
+- Dev server builds and serves correctly
+**Commit**: eca722fa
+**Notes**: Implemented undo window for News Feed confirm/dismiss actions:
+- Added 5-second undo delay before API call
+- Visual pending state with "Confirmed" or "Dismissed" label
+- Undo button to cancel pending action
+- Animated timer bar showing remaining time
+- Proper cleanup of timeouts on component destroy
+- Responsive mobile layout for undo UI
+
+---
+
+## 2026-01-27 20:28 - Task 17.1.1
+
+**Status**: pending → done
+**Validation**: 
+- sqlite-vec extension loads successfully via `sqliteVec.load(db)`
+- vec0 virtual table creation works
+- Vector insertion and cosine distance search verified
+- Dimension mismatch error handling confirmed
+- All 1221 tests pass (4 new tests added)
+- Lint/format checks pass
+**Commit**: b1d8693a
+**Notes**: 
+- Added sqlite-vec npm package (v0.1.7-alpha.2)
+- Package includes native binaries for Linux/macOS/Windows (x64/arm64)
+- Extension loaded via `sqliteVec.load(db)` function
+- vec0 virtual tables require BigInt for rowid values
+- Updated README with sqlite-vec dependency documentation
+
+## 2026-01-27 20:34 - Task 17.1.2
+
+**Status**: pending → done
+**Validation**:
+- loadVecExtension(db) successfully loads sqlite-vec
+- isVecLoaded(db) correctly reports true when loaded
+- openDatabase() now automatically loads the extension
+- New test src/storage/database-vec.test.ts verifies loading and basic vector operations
+- All 1222 tests pass
+**Commit**: d1da3409
+**Notes**:
+- Implemented graceful loading (logs warning if fails, though tests confirm it works)
+- Added verification of `vec_version()`
+- Verified basic vector operations (CREATE VIRTUAL TABLE, INSERT, SELECT) work in the test
+
+## 2026-01-27 19:42 - Code Review Fixes (P1/P2/P3)
+
+**Status**: pending → done
+**Validation**:
+- All 1222 tests pass
+- Lint/format checks pass
+**Commit**: b71065e9
+**Notes**:
+- [P1] Added loadVec option to DatabaseOptions (true/false/'optional')
+- [P2] Fixed isVecLoaded type assertion for null/undefined edge cases  
+- [P3] Improved test cleanup with afterEach handling
