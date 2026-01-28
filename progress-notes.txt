@@ -255,3 +255,27 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: 0557a7d3
 **Notes**: Complete AutoMem typed edge extraction pipeline. When analyzer produces relationships, they are stored as edges. Unresolved relationships (where targetNodeId is null) are stored with a placeholder and can be resolved later via semantic search. Next tasks in Phase 20.3 will implement the Consolidation Engine (decay, creative association).
+
+---
+
+## 2026-01-28 12:08 - Task 20.3.1
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/daemon/consolidation/ module with 5 files:
+    - index.ts: Module exports (RelevanceCalculator, ConsolidationScheduler, CreativeAssociator)
+    - relevance.ts: RelevanceCalculator implementing AutoMem decay formula
+    - creative-associator.ts: CreativeAssociator for vector-based edge discovery
+    - decay-scheduler.ts: ConsolidationScheduler with cron jobs for decay/creative cycles
+  - Implemented relevance scoring with:
+    - Exponential decay factor based on age
+    - Access recency factor (linear for first week, logarithmic after)
+    - Relationship density factor (edges boost relevance)
+    - Importance and confidence multipliers
+  - Archive threshold at 0.2, delete threshold at 0.05
+  - Touch nodes on access to prevent premature decay
+  - 31 unit tests covering all consolidation functionality
+  - All 1346 tests pass (31 new tests added)
+  - Lint/format checks pass
+**Commit**: f9c7da9d
+**Notes**: Consolidation module structure complete. DecayScheduler supports daily decay and weekly creative association cron jobs. CreativeAssociator uses vector similarity to find non-obvious connections between nodes. Next task 20.3.2 will implement the DecayScheduler cron integration.
