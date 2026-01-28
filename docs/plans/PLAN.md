@@ -1230,9 +1230,13 @@ When prompt changes:
 
 **Tasks:**
 
+- [ ] Web UI: Fix data structure mismatch between API rows and frontend components
 - [x] Refactor: Shared Type Library (extract to `src/types` or configure imports) ✅
 - [x] Architecture: Idempotent Ingestion (deterministic IDs or upsert logic) ✅
 - [x] Architecture: SQLite Rebuild CLI (restore DB from JSON) ✅
+- [ ] Build: Fix TypeScript type errors in daemon-process.ts
+- [ ] Config: Improve validation for non-YAML files
+- [ ] API: Implement port conflict detection and cleanup
 
 **Deliverables:**
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Graph from "$lib/components/graph.svelte";
+  import GettingStarted from "$lib/components/getting-started.svelte";
   import { nodesStore, selectedNode } from "$lib/stores/nodes";
   import type { Node, NodeFilters, NodeType } from "$lib/types";
   import { onMount } from "svelte";
@@ -7,10 +8,23 @@
   import { parseDate, formatDateShort } from "$lib/utils/date";
 
   // Filters state
-  let projectFilter = "";
-  let typeFilter: NodeType | "" = "";
-  let dateRangeFilter = "7"; // days
-  let depth = 2;
+  let projectFilter = $state("");
+  let typeFilter = $state<NodeType | "">("");
+  let dateRangeFilter = $state("7"); // days
+  let depth = $state(2);
+  
+  // Track if initial load has completed (to distinguish fresh state from filtered)
+  let hasLoadedOnce = $state(false);
+  
+  // Derived: are we showing the "getting started" guide?
+  const showGettingStarted = $derived(
+    hasLoadedOnce && 
+    !$nodesStore.loading && 
+    !$nodesStore.error && 
+    $nodesStore.nodes.length === 0 && 
+    !projectFilter && 
+    !typeFilter
+  );
 
   // Load connected graph from a node, or list nodes if no selection
   async function loadGraph(): Promise<void> {
@@ -18,6 +32,7 @@
 
     if (nodeId) {
       await nodesStore.loadConnected(nodeId, depth);
+      hasLoadedOnce = true;
       return;
     }
     // Load recent nodes when no selection
@@ -34,6 +49,7 @@
       filters.from = from.toISOString();
     }
     await nodesStore.loadNodes(filters, { limit: 100 });
+    hasLoadedOnce = true;
   }
 
   async function handleNodeClick(nodeId: string, _node: Node): Promise<void> {
@@ -78,6 +94,16 @@
 </svelte:head>
 
 <div class="graph-page">
+  {#if showGettingStarted}
+    <header class="page-header">
+      <div class="header-left">
+        <h1>Knowledge Graph</h1>
+      </div>
+    </header>
+    <div class="getting-started-container">
+      <GettingStarted variant="graph" />
+    </div>
+  {:else}
   <header class="page-header">
     <div class="header-left">
       <h1>Knowledge Graph</h1>
@@ -278,6 +304,7 @@
       </section>
     </aside>
   </div>
+  {/if}
 </div>
 
 <style>
@@ -307,6 +334,14 @@
   .btn-sm {
     padding: var(--space-1) var(--space-3);
     font-size: var(--text-sm);
+  }
+
+  .getting-started-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
   }
 
   .graph-layout {

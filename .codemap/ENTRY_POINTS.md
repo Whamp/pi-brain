@@ -667,23 +667,21 @@ src/api/websocket.ts [1-388]
           - src/api/websocket.ts:263: instantiate Date -> external
       270-280: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
         /** Broadcast analysis started event */
-        refs out: 4 [call: 2, instantiate: 1, type: 1]
-          - src/api/websocket.ts:270: type AnalysisJob -> src/daemon/queue.ts
+        refs out: 3 [call: 2, instantiate: 1]
           - src/api/websocket.ts:271: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:278: call toISOString -> external
           - src/api/websocket.ts:278: instantiate Date -> external
       285-307: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
         /** Broadcast analysis completed event */
-        refs out: 8 [call: 4, instantiate: 2, type: 2]
-          - src/api/websocket.ts:285: type AnalysisJob -> src/daemon/queue.ts
+        refs out: 7 [call: 4, instantiate: 2, type: 1]
           - src/api/websocket.ts:285: type Node -> src/types/index.ts
           - src/api/websocket.ts:286: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:293: call toISOString -> external
           - src/api/websocket.ts:293: instantiate Date -> external
+          - src/api/websocket.ts:297: call WebSocketManager.broadcast -> src/api/websocket.ts
       312-326: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
         /** Broadcast analysis failed event */
-        refs out: 5 [call: 2, instantiate: 1, type: 2]
-          - src/api/websocket.ts:313: type AnalysisJob -> src/daemon/queue.ts
+        refs out: 4 [call: 2, instantiate: 1, type: 1]
           - src/api/websocket.ts:314: type Error -> external
           - src/api/websocket.ts:317: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:324: call toISOString -> external
@@ -811,4 +809,4 @@ src/cli.ts [1-1143]
 
 ---
 Files: 27
-Estimated tokens: 9,050 (codebase: ~1,053,564)
+Estimated tokens: 9,013 (codebase: ~1,054,586)

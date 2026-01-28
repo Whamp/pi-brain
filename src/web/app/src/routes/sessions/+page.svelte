@@ -14,7 +14,6 @@
     Home,
     Clock,
     Hash,
-    Coins,
     AlertCircle,
     Loader2,
     CheckCircle2,
@@ -22,6 +21,7 @@
     MinusCircle,
   } from "lucide-svelte";
   import type { Node, ProjectSummary, SessionSummary } from "$lib/types";
+  import GettingStarted from "$lib/components/getting-started.svelte";
 
   // View state: "projects" | "sessions" | "nodes"
   let view = $state<"projects" | "sessions" | "nodes">("projects");
@@ -176,6 +176,7 @@
       class:active={view === "projects"}
       onclick={() => loadProjects()}
       aria-current={view === "projects" ? "page" : undefined}
+      disabled={view === "projects"}
     >
       <Home size={14} />
       <span>All Projects</span>
@@ -188,6 +189,7 @@
         class:active={view === "sessions"}
         onclick={() => loadSessions(currentProject!)}
         aria-current={view === "sessions" ? "page" : undefined}
+        disabled={view === "sessions"}
       >
         <Folder size={14} />
         <span>{getProjectName(currentProject)}</span>
@@ -226,11 +228,7 @@
     <!-- Projects List -->
     <div class="file-list" aria-label="Projects">
       {#if projects.length === 0}
-        <div class="empty-state">
-          <Folder size={48} />
-          <p>No projects found</p>
-          <p class="empty-hint">Sessions will appear here once the daemon analyzes them</p>
-        </div>
+        <GettingStarted variant="sessions" />
       {:else}
         {#each projects as project}
           <button

@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 55 files
+- typescript: 56 files
 
 ## Statistics
-- Total files: 55
-- Total symbols: 331
-  - function: 199
+- Total files: 56
+- Total symbols: 332
+  - function: 200
   - interface: 89
   - variable: 17
   - type: 17
@@ -98,8 +98,8 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/cli.ts:401: call stopDaemon
         - src/daemon/cli.ts:419: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:225: call shutdown
-        - src/daemon/daemon-process.ts:248: call (module)
+        - src/daemon/daemon-process.ts:248: call shutdown
+        - src/daemon/daemon-process.ts:271: call (module)
         - src/daemon/index.ts:118: reexport (module)
     161-169: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
@@ -255,7 +255,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-252]
+src/daemon/daemon-process.ts [1-275]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -960,7 +960,7 @@ src/daemon/query-processor.ts [1-779]
     - node:os
     - node:path
 
-src/daemon/queue.test.ts [1-790]
+src/daemon/queue.test.ts [1-837]
   imports:
     - ../storage/database.js
     - ./queue.js
@@ -970,17 +970,17 @@ src/daemon/queue.test.ts [1-790]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-766]
+src/daemon/queue.ts [1-787]
   class:
-    151-721: class QueueManager [exported]
+    151-742: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
       refs in: 14 [import: 4, instantiate: 2, reexport: 1, type: 7]
         - src/daemon/index.ts:42: reexport (module)
         - src/daemon/queue.test.ts:14: import (module)
         - src/daemon/queue.test.ts:23: type queue
-        - src/daemon/queue.ts:739: type createQueueManager
-        - src/daemon/queue.ts:740: instantiate createQueueManager
-        - src/daemon/queue.ts:753: instantiate queue
+        - src/daemon/queue.ts:760: type createQueueManager
+        - src/daemon/queue.ts:761: instantiate createQueueManager
+        - src/daemon/queue.ts:774: instantiate queue
         - src/daemon/scheduler.test.ts:9: import (module)
         - src/daemon/scheduler.test.ts:23: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
@@ -993,28 +993,28 @@ src/daemon/queue.ts [1-766]
         - src/daemon/errors.ts:253: type classifyError
         - src/daemon/index.ts:48: reexport (module)
         - src/daemon/queue.ts:67: type AnalysisJob
-        - src/daemon/queue.ts:707: type QueueManager.parseRow
+        - src/daemon/queue.ts:728: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 54 [import: 8, reexport: 1, type: 45]
-        - src/api/websocket.test.ts:9: import (module)
-        - src/api/websocket.test.ts:300: type mockJob
-        - src/api/websocket.test.ts:415: type mockJob
-        - src/api/websocket.ts:11: import (module)
-        - src/api/websocket.ts:270: type WebSocketManager.broadcastAnalysisStarted
-        - src/api/websocket.ts:285: type WebSocketManager.broadcastAnalysisCompleted
-        - src/api/websocket.ts:313: type WebSocketManager.broadcastAnalysisFailed
+      refs in: 47 [import: 6, reexport: 1, type: 40]
         - src/daemon/cli.ts:50: import (module)
         - src/daemon/cli.ts:88: type QueueStatus
         - src/daemon/cli.ts:89: type QueueStatus
+        - src/daemon/cli.ts:90: type QueueStatus
+        - src/daemon/index.ts:50: reexport (module)
+        - src/daemon/processor.test.ts:9: import (module)
+        - src/daemon/processor.test.ts:32: type createTestJob
+        - src/daemon/processor.test.ts:32: type createTestJob
+        - src/daemon/processor.ts:14: import (module)
+        - src/daemon/processor.ts:248: type buildAnalysisPrompt
     102-115: interface QueueStats [exported]
       /** Queue statistics */
       refs in: 5 [import: 1, reexport: 1, type: 3]
         - src/daemon/cli.ts:49: import (module)
         - src/daemon/cli.ts:87: type QueueStatus
         - src/daemon/index.ts:51: reexport (module)
-        - src/daemon/queue.ts:603: type QueueManager.getStats
-        - src/daemon/queue.ts:748: type getQueueStatusSummary
+        - src/daemon/queue.ts:624: type QueueManager.getStats
+        - src/daemon/queue.ts:769: type getQueueStatusSummary
   type:
     17-17: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
       /** Job type determines analysis behavior */
@@ -1023,7 +1023,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:35: type createTestJob
         - src/daemon/queue.ts:57: type AnalysisJob
-        - src/daemon/queue.ts:701: type QueueManager.parseRow
+        - src/daemon/queue.ts:722: type QueueManager.parseRow
     20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
       /** Job status tracks progress through the queue */
       refs in: 8 [import: 1, reexport: 1, type: 6]
@@ -1031,10 +1031,10 @@ src/daemon/queue.ts [1-766]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:39: type createTestJob
         - src/daemon/queue.ts:69: type AnalysisJob
-        - src/daemon/queue.ts:643: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:654: type QueueManager.counts
-        - src/daemon/queue.ts:663: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:709: type QueueManager.parseRow
+        - src/daemon/queue.ts:664: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:675: type QueueManager.counts
+        - src/daemon/queue.ts:684: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:730: type QueueManager.parseRow
     91-99: JobInput = Omit<
   AnalysisJob,
   "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
@@ -1055,7 +1055,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/scheduler.test.ts:27: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
   function:
-    732-734: generateJobId(): string [exported]
+    753-755: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:44: reexport (module)
@@ -1064,7 +1064,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/queue.test.ts:47: call (module)
         - src/daemon/queue.ts:161: call QueueManager.id
         - src/daemon/queue.ts:206: call QueueManager.id
-    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
+    760-762: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs in: 11 [call: 5, import: 5, reexport: 1]
         - src/daemon/cli.ts:47: import (module)
@@ -1077,7 +1077,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/worker.test.ts:16: import (module)
         - src/daemon/worker.test.ts:275: call (module)
         - src/daemon/worker.ts:56: import (module)
-    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/cli.ts:46: import (module)
@@ -2925,40 +2925,45 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
-src/storage/search-repository.ts [1-532]
+src/storage/search-highlight.test.ts [1-39]
+  imports:
+    - ./search-repository.js
+    - vitest
+
+src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
       /** Highlight match for search results */
       refs in: 5 [import: 1, type: 4]
         - src/storage/search-repository.ts:50: type SearchResult
-        - src/storage/search-repository.ts:287: type findHighlights
-        - src/storage/search-repository.ts:288: type highlights
+        - src/storage/search-repository.ts:304: type findHighlights
+        - src/storage/search-repository.ts:305: type highlights
         - src/storage/semantic-search.ts:15: import (module)
         - src/storage/semantic-search.ts:125: type highlights
     44-51: interface SearchResult [exported]
       /** Enhanced search result with score and highlights */
       refs in: 4 [extends: 1, import: 1, type: 2]
         - src/storage/search-repository.ts:92: type SearchNodesResult
-        - src/storage/search-repository.ts:491: type results
+        - src/storage/search-repository.ts:508: type results
         - src/storage/semantic-search.ts:16: import (module)
         - src/storage/semantic-search.ts:25: extends SemanticSearchResult
     54-75: interface SearchFilters [exported]
       /** Filters for search queries (subset of node filters relevant to search) */
       refs in: 5 [import: 1, type: 4]
         - src/storage/search-repository.ts:86: type SearchOptions
-        - src/storage/search-repository.ts:344: type buildFilterClause
+        - src/storage/search-repository.ts:361: type buildFilterClause
         - src/storage/semantic-search.ts:18: import (module)
         - src/storage/semantic-search.ts:36: type SemanticSearchOptions
         - src/storage/semantic-search.ts:195: type filters
     78-87: interface SearchOptions [exported]
       /** Options for enhanced search */
       refs in: 2 [type: 2]
-        - src/storage/search-repository.ts:444: type searchNodesAdvanced
-        - src/storage/search-repository.ts:509: type countSearchResults
+        - src/storage/search-repository.ts:461: type searchNodesAdvanced
+        - src/storage/search-repository.ts:526: type countSearchResults
     90-99: interface SearchNodesResult [exported]
       /** Result from enhanced search with pagination metadata */
       refs in: 1 [type: 1]
-        - src/storage/search-repository.ts:445: type searchNodesAdvanced
+        - src/storage/search-repository.ts:462: type searchNodesAdvanced
   type:
     19-24: SearchField = | "summary"
   | "decisions"
@@ -2971,7 +2976,7 @@ src/storage/search-repository.ts [1-532]
         - src/storage/search-repository.ts:38: type SearchHighlight
         - src/storage/search-repository.ts:80: type SearchOptions
         - src/storage/search-repository.ts:195: type buildFieldQuery
-        - src/storage/search-repository.ts:286: type findHighlights
+        - src/storage/search-repository.ts:303: type findHighlights
   function:
     108-136: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
       /** Index a node for full-text search */
@@ -2995,14 +3000,22 @@ src/storage/search-repository.ts [1-532]
         - src/storage/index.test.ts:1500: call results
         - src/storage/index.test.ts:1505: call results
         - src/storage/index.test.ts:1510: call results
-    344-415: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
+    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+      /** Extract a highlight snippet from text containing a match */
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/search-highlight.test.ts:3: import (module)
+        - src/storage/search-highlight.test.ts:10: call snippet
+        - src/storage/search-highlight.test.ts:21: call snippet
+        - src/storage/search-highlight.test.ts:31: call snippet
+        - src/storage/search-repository.ts:345: call findHighlights
+    361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
       refs in: 4 [call: 3, import: 1]
-        - src/storage/search-repository.ts:463: call { clause: filterClause, params }
-        - src/storage/search-repository.ts:520: call { clause: filterClause, params }
+        - src/storage/search-repository.ts:480: call { clause: filterClause, params }
+        - src/storage/search-repository.ts:537: call { clause: filterClause, params }
         - src/storage/semantic-search.ts:17: import (module)
         - src/storage/semantic-search.ts:74: call { clause: filterClause, params: filterParams }
-    441-501: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    458-518: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
       refs in: 16 [call: 13, import: 3]
         - src/daemon/query-processor.test.ts:17: import (module)
@@ -3015,7 +3028,7 @@ src/storage/search-repository.ts [1-532]
         - src/storage/index.test.ts:1623: call page1
         - src/storage/index.test.ts:1633: call page2
         - src/storage/index.test.ts:1685: call results
-    506-531: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    523-548: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
       refs in: 5 [call: 4, import: 1]
         - src/storage/index.test.ts:19: import (module)
@@ -3192,5 +3205,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 55
-Estimated tokens: 41,928 (codebase: ~1,052,531)
+Files: 56
+Estimated tokens: 42,067 (codebase: ~1,065,755)

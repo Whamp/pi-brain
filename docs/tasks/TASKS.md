@@ -297,12 +297,12 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 Ref: docs/plans/Web-UI-Functionality-Report.md
 
-| ID   | Task                                                  | Status  | Deps | Notes |
-| ---- | ----------------------------------------------------- | ------- | ---- | ----- |
-| 18.1 | Settings Save Button State (disable after save)       | pending | -    |       |
-| 18.2 | Add toast/notification system for feedback            | pending | -    |       |
-| 18.3 | Empty state "Getting Started" guide (Sessions, Graph) | pending | -    |       |
-| 18.4 | Fix sidebar overflow on small viewports               | pending | -    |       |
-| 18.5 | Real-time Dashboard stats via WebSocket               | pending | 16.2 |       |
-| 18.6 | Search result FTS term highlighting                   | pending | -    |       |
-| 18.7 | Breadcrumb click on current page is no-op             | pending | -    |       |
+| ID   | Task                                                  | Status | Deps | Notes      |
+| ---- | ----------------------------------------------------- | ------ | ---- | ---------- |
+| 18.1 | Settings Save Button State (disable after save)       | done   | -    | 2026-01-28 |
+| 18.2 | Add toast/notification system for feedback            | done   | -    | 2026-01-28 |
+| 18.3 | Empty state "Getting Started" guide (Sessions, Graph) | done   | -    | 2026-01-28 |
+| 18.4 | Fix sidebar overflow on small viewports               | done   | -    | 2026-01-28 |
+| 18.5 | Real-time Dashboard stats via WebSocket               | done   | 16.2 | 2026-01-28 |
+| 18.6 | Search result FTS term highlighting                   | done   | -    | 2026-01-28 |
+| 18.7 | Breadcrumb click on current page is no-op             | done   | -    | 2026-01-28 |

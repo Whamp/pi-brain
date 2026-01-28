@@ -22,6 +22,92 @@ Main branch: major/pi-brain
 
 ---
 
+## 2026-01-27 13:25 - Task 17.5.1, 17.5.2
+
+**Status**: pending → done
+**Validation**: 
+  - semanticSearch() function was already implemented in src/storage/semantic-search.ts
+  - Added 11 new unit tests for comprehensive coverage:
+    - Empty results when DB returns no matches
+    - Distance ordering verification
+    - Highlights generation (includeHighlights option)
+    - Default and custom limit options
+    - Non-dimension error rethrow behavior
+    - getNodeEmbeddingVector function (3 tests)
+    - findSimilarNodes limit handling after self-filtering
+  - All 18 tests in semantic-search.test.ts pass
+  - All 1272 tests pass overall
+**Commit**: 523f677b
+**Notes**: Task 17.5.1 was already implemented; completed 17.5.2 by adding missing unit tests per spec requirements.
+
+## 2026-01-27 22:45 - Task 17.4.3
+
+**Status**: pending → done
+**Validation**: 
+  - Verified `pi-brain rebuild --embeddings` command implementation in src/cli.ts and src/daemon/cli.ts
+  - Fixed lint errors in src/daemon/cli.test.ts, src/daemon/query-processor.test.ts, and src/storage/semantic-search.test.ts
+  - Verified tests pass for daemon CLI: `npm test -- --run src/daemon/cli.test.ts`
+  - Command correctly initializes embedding provider and calls backfillEmbeddings with force option support
+**Commit**: a3553cbd
+**Notes**: The command was already largely implemented in previous commits but had lint issues in tests. Cleaned up tests and verified functionality.
+
+## 2026-01-28 05:57 - Task 18.1
+
+**Status**: pending → done
+**Validation**: 
+  - Browser-tested using agent-browser headless automation
+  - Verified initial state: both buttons disabled when no changes
+  - Made change (parallelWorkers 3→2): buttons became enabled
+  - Clicked Save Changes: buttons returned to disabled state
+  - Svelte type-check passes: `npm run check` in src/web/app
+  - All 1272 backend tests pass
+**Commit**: 04731fcf
+**Notes**: Fixed Svelte 5 reactivity bug. The `originalProvider`, `originalModel`, 
+`originalIdleTimeoutMinutes`, and `originalParallelWorkers` variables were plain 
+`let` declarations, not `$state()` runes. In Svelte 5 runes mode, `$derived()` 
+only tracks reactive `$state()` dependencies, so updating plain variables after 
+save didn't trigger `hasChanges` recomputation. Converting to `$state()` fixed 
+the reactivity chain.
+
+---
+
+## 2026-01-28 06:03 - Task 18.2
+
+**Status**: pending → done
+**Validation**: 
+  - Svelte type-check passes: `npm run check` in src/web/app
+  - All 1272 backend tests pass
+  - Lint and format checks pass
+  - Toast store exports success/error/warning/info methods with auto-dismiss
+  - Toast component uses Svelte transitions (fly/fade), accessible aria-live region
+  - Settings page updated to use toasts instead of inline messages
+**Commit**: 82e55332
+**Notes**: Implemented global toast notification system:
+  - `src/web/app/src/lib/stores/toast.ts`: Reactive store with toast methods
+  - `src/web/app/src/lib/components/toast.svelte`: Animated toast container
+  - Toast features: auto-dismiss with progress bar, manual dismiss via X button,
+    type-specific icons and colors (success/error/warning/info)
+  - Mobile responsive: toasts appear at bottom on small screens
+  - Integrated into root layout for app-wide availability
+
+## 2026-01-28 06:25 - Task 18.3
+
+**Status**: pending → done
+**Validation**: 
+  - Svelte type-check passes (0 errors, 0 warnings)
+  - All 1272 backend tests pass
+  - Lint and format checks pass
+  - Dev server verifies component loads on /sessions and /graph pages
+  - Component properly displays when no data exists
+**Commit**: c362defc
+**Notes**: Implemented reusable GettingStarted component with two variants:
+  - `getting-started.svelte`: Reusable component with `variant` prop ("sessions" | "graph")
+  - Features: 3-step Quick Start guide, copy-to-clipboard for commands, links to settings/docs
+  - Sessions page: Shows guide when no projects exist
+  - Graph page: Shows guide when no nodes exist AND no filters applied
+  - Used Svelte 5 runes properly ($state, $derived) for reactivity
+  - Added hasLoadedOnce tracking to distinguish fresh vs filtered empty state
+
 ## 2026-01-28 07:12 - Task 17.6.2
 
 **Status**: pending → done
@@ -36,3 +122,58 @@ Main branch: major/pi-brain
 - Added unit tests for default value, transform, and validation (range 0.0-1.0)
 - Configuration was already implemented in types.ts and config.ts with proper validation
 
+## 2026-01-28 07:20 - Task 18.4
+
+**Status**: pending → done
+**Validation**: 
+  - Verified CSS logic for fixed sidebar with scrollable nav
+  - Added overflow-y: auto and min-height: 0 to navigation container
+  - Lint and check passed
+  - All 1272 backend tests passed
+**Commit**: 01694fd5
+**Notes**: Fixed potential sidebar overflow issue where navigation items could push the footer off-screen or become inaccessible on small viewports. Used standard flexbox scrolling pattern.
+
+## 2026-01-28 07:30 - Task 18.5
+
+**Status**: pending → done
+**Validation**: 
+  - Implemented QueueManager.getDailyStats() with unit test
+  - Added periodic status broadcast (2s) in daemon process
+  - Updated Dashboard UI to subscribe to daemonStore updates
+  - Verified backend tests pass (1273 tests)
+**Commit**: e53e776a
+**Notes**: The dashboard now updates in real-time without page refreshes. The status includes active worker count, queue depth, and daily completion/failure stats.
+
+## 2026-01-28 07:35 - Task 18.6
+
+**Status**: pending → done
+**Validation**: 
+  - Added unit test `src/storage/search-highlight.test.ts` verifying:
+    - Highlighting wraps matches in <mark> tags
+    - Case insensitivity works
+    - Multiple matches are handled
+  - Verified backend tests pass (1276 tests)
+  - Integration verified:
+    - Frontend `SafeHighlight` component parses <mark> tags
+    - Backend `extractSnippet` produces <mark> tags
+**Commit**: 35d24c44
+**Notes**: Improved search result UX by adding context-aware highlighting. The backend now performs regex-based replacement to wrap query terms in snippets, which the frontend safely renders.
+
+## 2026-01-28 08:12 - Task 18.7
+
+**Status**: pending → done
+**Validation**: 
+  - Verified no click handler on current page breadcrumb
+  - Verified styling remains active but non-interactive
+  - Verified backend tests pass (1276 tests)
+**Commit**: 7b50d086
+**Notes**: Fixed UX issue where current page breadcrumb looked disabled. It is now styled as active but remains non-interactive as expected for a "current page" indicator.
+
+## 2026-01-28 08:30 - Task 18.7 (Refinement)
+
+**Status**: done
+**Validation**: 
+  - Verified `disabled` attribute added to active breadcrumbs
+  - Checked `npm run check` passes
+**Commit**: (will be committed shortly)
+**Notes**: Improved the implementation by explicitly disabling the active breadcrumb buttons to ensure no-op behavior and correct cursor styling.

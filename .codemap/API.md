@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 89 files
+- typescript: 90 files
 
 ## Statistics
-- Total files: 89
-- Total symbols: 653
-  - function: 368
-  - interface: 206
-  - type: 39
-  - variable: 28
+- Total files: 90
+- Total symbols: 658
+  - function: 369
+  - interface: 207
+  - type: 40
+  - variable: 30
   - class: 12
 
 ---
@@ -447,7 +447,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-252]
+src/daemon/daemon-process.ts [1-275]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -691,9 +691,9 @@ src/daemon/query-processor.ts [1-779]
     - node:os
     - node:path
 
-src/daemon/queue.ts [1-766]
+src/daemon/queue.ts [1-787]
   class:
-    151-721: class QueueManager [exported]
+    151-742: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -716,11 +716,11 @@ src/daemon/queue.ts [1-766]
   /** Override default max re... [exported]
       /** Job creation input (id, status, queuedAt are auto-generated) */
   function:
-    732-734: generateJobId(): string [exported]
+    753-755: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
-    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
+    760-762: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
   variable:
     23-34: PRIORITY [exported]
@@ -1713,7 +1713,7 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
-src/storage/search-repository.ts [1-532]
+src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
       /** Highlight match for search results */
@@ -1737,11 +1737,13 @@ src/storage/search-repository.ts [1-532]
       /** Index a node for full-text search */
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    344-415: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
+    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+      /** Extract a highlight snippet from text containing a match */
+    361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
-    441-501: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    458-518: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    506-531: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    523-548: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
   imports:
     - ./node-crud.js
@@ -2029,11 +2031,12 @@ src/web/app/src/lib/api/client.ts [1-537]
   imports:
     - $lib/types
 
-src/web/app/src/lib/index.ts [1-17]
+src/web/app/src/lib/index.ts [1-18]
   imports:
     - ./api/client
     - ./stores/daemon
     - ./stores/nodes
+    - ./stores/toast
     - ./stores/websocket
     - ./types
 
@@ -2052,6 +2055,17 @@ src/web/app/src/lib/stores/nodes.ts [1-112]
   imports:
     - $lib/api/client
     - $lib/types
+    - svelte/store
+
+src/web/app/src/lib/stores/toast.ts [1-114]
+  interface:
+    9-15: interface Toast [exported]
+  type:
+    7-7: ToastType = "success" | "error" | "warning" | "info" [exported]
+  variable:
+    110-110: toastStore [exported]
+    113-113: any [exported]
+  imports:
     - svelte/store
 
 src/web/app/src/lib/stores/websocket.ts [1-179]
@@ -2116,5 +2130,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 89
-Estimated tokens: 26,683 (codebase: ~1,053,564)
+Files: 90
+Estimated tokens: 26,799 (codebase: ~1,054,586)

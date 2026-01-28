@@ -1,24 +1,24 @@
 {
   "stats": {
-    "totalFiles": 89,
-    "totalSymbols": 1114,
+    "totalFiles": 90,
+    "totalSymbols": 1123,
     "byLanguage": {
-      "typescript": 89
+      "typescript": 90
     },
     "bySymbolKind": {
-      "function": 496,
-      "type": 40,
-      "interface": 260,
-      "variable": 110,
+      "function": 497,
+      "type": 41,
+      "interface": 262,
+      "variable": 114,
       "class": 12,
       "property": 51,
       "constructor": 11,
-      "method": 132,
+      "method": 133,
       "getter": 2
     }
   },
-  "total_tokens": 38398,
-  "codebase_tokens": 1052531,
+  "total_tokens": 38605,
+  "codebase_tokens": 1065755,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -4010,7 +4010,7 @@
       "language": "typescript",
       "lines": [
         1,
-        252
+        275
       ],
       "detail_level": "full",
       "token_estimate": 100,
@@ -4078,7 +4078,7 @@
           "signature": "async main(): Promise<void>",
           "lines": [
             53,
-            240
+            263
           ],
           "exported": false,
           "is_default": false,
@@ -7652,10 +7652,10 @@
       "language": "typescript",
       "lines": [
         1,
-        766
+        787
       ],
       "detail_level": "full",
-      "token_estimate": 1241,
+      "token_estimate": 1273,
       "symbols": [
         {
           "name": "JobType",
@@ -7853,7 +7853,7 @@
           "signature": "QueueManager",
           "lines": [
             151,
-            721
+            742
           ],
           "exported": true,
           "is_default": false,
@@ -8209,12 +8209,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "getDailyStats",
+          "kind": "method",
+          "signature": "getDailyStats(): { completedToday: number; failedToday: number; }",
+          "lines": [
+            603,
+            619
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "QueueManager",
+          "annotation": null,
+          "comment": "Get queue statistics for today",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "getStats",
           "kind": "method",
           "signature": "getStats(): QueueStats",
           "lines": [
-            603,
-            638
+            624,
+            659
           ],
           "exported": false,
           "is_default": false,
@@ -8232,8 +8251,8 @@
           "kind": "method",
           "signature": "getJobCounts(): Record<JobStatus, number>",
           "lines": [
-            643,
-            668
+            664,
+            689
           ],
           "exported": false,
           "is_default": false,
@@ -8251,8 +8270,8 @@
           "kind": "method",
           "signature": "clearOldCompleted(daysOld: number): number",
           "lines": [
-            673,
-            685
+            694,
+            706
           ],
           "exported": false,
           "is_default": false,
@@ -8270,8 +8289,8 @@
           "kind": "method",
           "signature": "clearAll(): number",
           "lines": [
-            690,
-            693
+            711,
+            714
           ],
           "exported": false,
           "is_default": false,
@@ -8289,8 +8308,8 @@
           "kind": "method",
           "signature": "parseRow(row: QueueRow): AnalysisJob",
           "lines": [
-            698,
-            720
+            719,
+            741
           ],
           "exported": false,
           "is_default": false,
@@ -8308,8 +8327,8 @@
           "kind": "function",
           "signature": "generateJobId(): string",
           "lines": [
-            732,
-            734
+            753,
+            755
           ],
           "exported": true,
           "is_default": false,
@@ -8327,8 +8346,8 @@
           "kind": "function",
           "signature": "createQueueManager(db: Database.Database): QueueManager",
           "lines": [
-            739,
-            741
+            760,
+            762
           ],
           "exported": true,
           "is_default": false,
@@ -8346,8 +8365,8 @@
           "kind": "function",
           "signature": "getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; }",
           "lines": [
-            747,
-            765
+            768,
+            786
           ],
           "exported": true,
           "is_default": false,
@@ -18764,10 +18783,10 @@
       "language": "typescript",
       "lines": [
         1,
-        532
+        549
       ],
       "detail_level": "full",
-      "token_estimate": 624,
+      "token_estimate": 626,
       "symbols": [
         {
           "name": "SearchField",
@@ -18984,9 +19003,9 @@
           "signature": "extractSnippet(text: string, query: string, maxLength = 100): string",
           "lines": [
             223,
-            276
+            293
           ],
-          "exported": false,
+          "exported": true,
           "is_default": false,
           "is_async": false,
           "is_static": false,
@@ -19002,8 +19021,8 @@
           "kind": "function",
           "signature": "findHighlights(db: Database.Database, nodeId: string, query: string, fields: SearchField[]): {}",
           "lines": [
-            282,
-            334
+            299,
+            351
           ],
           "exported": false,
           "is_default": false,
@@ -19021,8 +19040,8 @@
           "kind": "function",
           "signature": "buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; }",
           "lines": [
-            344,
-            415
+            361,
+            432
           ],
           "exported": true,
           "is_default": false,
@@ -19040,8 +19059,8 @@
           "kind": "function",
           "signature": "searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult",
           "lines": [
-            441,
-            501
+            458,
+            518
           ],
           "exported": true,
           "is_default": false,
@@ -19059,8 +19078,8 @@
           "kind": "function",
           "signature": "countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, \"fields\" | \"filters\"> = {}): number",
           "lines": [
-            506,
-            531
+            523,
+            548
           ],
           "exported": true,
           "is_default": false,
@@ -21895,10 +21914,10 @@
       "language": "typescript",
       "lines": [
         1,
-        17
+        18
       ],
       "detail_level": "full",
-      "token_estimate": 37,
+      "token_estimate": 42,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -21907,6 +21926,7 @@
         "./api/client",
         "./stores/daemon",
         "./stores/nodes",
+        "./stores/toast",
         "./stores/websocket",
         "./types"
       ]
@@ -22138,6 +22158,176 @@
       "imports": [
         "$lib/api/client",
         "$lib/types",
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/toast.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        114
+      ],
+      "detail_level": "full",
+      "token_estimate": 168,
+      "symbols": [
+        {
+          "name": "ToastType",
+          "kind": "type",
+          "signature": "ToastType = \"success\" | \"error\" | \"warning\" | \"info\"",
+          "lines": [
+            7,
+            7
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "Toast",
+          "kind": "interface",
+          "signature": "Toast",
+          "lines": [
+            9,
+            15
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ToastState",
+          "kind": "interface",
+          "signature": "ToastState",
+          "lines": [
+            17,
+            19
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "initialState",
+          "kind": "variable",
+          "signature": "ToastState",
+          "lines": [
+            21,
+            23
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toastIdCounter",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            25,
+            25
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createToastStore",
+          "kind": "function",
+          "signature": "createToastStore(): { subscribe: any; success(message: string, duration?: number): string; error(message: string, duration?: number): string; warning(message: string, duration?: number): string; info(message: string, duration?: number): string; dismiss(id: string): void; dismissAll(): void; }",
+          "lines": [
+            27,
+            108
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toastStore",
+          "kind": "variable",
+          "signature": "toastStore",
+          "lines": [
+            110,
+            110
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toasts",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            113,
+            113
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "svelte/store"
       ]
     },
