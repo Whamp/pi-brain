@@ -354,3 +354,31 @@ Main branch: major/pi-brain
 - [P2] Deviation from Repair Plan Guidance: Reconcile releaseAllRunning vs releaseStale.
 
 ---
+
+## 2026-01-27 19:08 - Task 16.2 (WebSocket Route Implementation)
+
+**Status**: pending → done
+**Validation**: 
+- Created `src/api/websocket.ts` with WebSocketManager class
+- Added `/ws` route registration in server.ts when manager provided
+- Updated daemon-process.ts to create WebSocketManager and wire to worker callbacks
+- 15 unit tests for WebSocketManager (connection, subscription, broadcasting)
+- 1 integration test verifying route registration
+- All 1216 tests passed (`npm test -- --run`)
+- `npm run check` passed (lint + format)
+
+**Commit**: f8d7d7ce
+
+**Changes**:
+- `src/api/websocket.ts`: New WebSocketManager class with:
+  - Client connection/disconnection tracking
+  - Subscribe message handling (daemon, analysis, node, queue channels)
+  - Broadcast to subscribed clients
+  - Helper methods: broadcastDaemonStatus, broadcastAnalysisCompleted, broadcastAnalysisFailed, broadcastQueueUpdate
+- `src/api/server.ts`: Updated createServer/startServer to accept optional WebSocketManager
+- `src/api/index.ts`: Export WebSocketManager and related types
+- `src/daemon/daemon-process.ts`: Create WebSocketManager, wire to worker.onNodeCreated/onJobFailed callbacks
+- `src/api/websocket.test.ts`: 15 tests covering connection, subscription, broadcasting
+- `src/api/server.test.ts`: Added test for WebSocket route registration
+
+**Notes**: Frontend wsStore already expects `/ws` endpoint. This enables real-time dashboard updates without page refresh.
