@@ -279,3 +279,26 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: f9c7da9d
 **Notes**: Consolidation module structure complete. DecayScheduler supports daily decay and weekly creative association cron jobs. CreativeAssociator uses vector similarity to find non-obvious connections between nodes. Next task 20.3.2 will implement the DecayScheduler cron integration.
+
+---
+
+## 2026-01-28 12:14 - Task 20.3.2
+
+**Status**: pending → done
+**Validation**: 
+  - Added consolidation config fields to DaemonConfig type:
+    - decaySchedule: cron for daily memory decay (default: "0 3 * * *")
+    - creativeSchedule: cron for weekly creative association (default: "0 4 * * 0")
+    - baseDecayRate: 0.0-1.0 decay rate (default: 0.1)
+    - creativeSimilarityThreshold: 0.0-1.0 min similarity (default: 0.75)
+  - Updated RawConfig to parse snake_case fields from YAML
+  - Added validation for new fields in transformConfig()
+  - Integrated ConsolidationScheduler into daemon-process.ts:
+    - Creates scheduler with config from daemon settings
+    - Starts scheduler after main scheduler
+    - Stops scheduler during graceful shutdown
+  - Added 10 new config tests
+  - All 1356 tests pass (10 new tests added)
+  - Lint/format checks pass
+**Commit**: 84545a45
+**Notes**: The ConsolidationScheduler was already fully implemented in 20.3.1. This task focused on integrating it into the daemon process lifecycle and adding the necessary configuration. The daemon now runs both the main Scheduler (for reanalysis, connection discovery, etc.) and the ConsolidationScheduler (for memory decay and creative association).
