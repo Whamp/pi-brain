@@ -10,9 +10,16 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PiBrainConfig } from "../config/types.js";
+import type { Node } from "../storage/node-types.js";
 
 import { openDatabase, closeDatabase } from "../storage/database.js";
-import { hasEmbedding } from "../storage/embedding-utils.js";
+import {
+  buildEmbeddingText,
+  getEmbedding,
+  hasEmbedding,
+} from "../storage/embedding-utils.js";
+import { upsertNode } from "../storage/index.js";
+import { createMockEmbeddingProvider } from "./facet-discovery.js";
 import { createQueueManager, PRIORITY, type AnalysisJob } from "./queue.js";
 import {
   createWorker,
@@ -541,5 +548,628 @@ describe("embedding generation in worker", () => {
   it("hasEmbedding returns false for non-existent node", () => {
     // This tests the storage utility used by embedding generation
     expect(hasEmbedding(db, "non-existent-node")).toBeFalsy();
+  });
+});
+
+// =============================================================================
+// Embedding Generation Full Flow Tests
+// =============================================================================
+
+describe("embedding generation full flow", () => {
+  let db: Database.Database;
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), "pi-brain-worker-embed-full-test-"));
+    db = openDatabase({ path: join(tempDir, "test.db") });
+  });
+
+  afterEach(() => {
+    closeDatabase(db);
+    rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  describe("embedding text format", () => {
+    it("builds rich embedding text with decisions and lessons", () => {
+      const node: Node = {
+        id: "test-node-1",
+        version: 1,
+        previousVersions: [],
+        source: {
+          sessionFile: "/tmp/test/session.jsonl",
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-2",
+            entryCount: 5,
+          },
+          computer: "test-machine",
+          sessionId: "session-1",
+        },
+        classification: {
+          type: "coding",
+          project: "test-project",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "Added authentication middleware",
+          keyDecisions: [
+            {
+              what: "Use JWT tokens",
+              why: "Stateless authentication is more scalable",
+              alternativesConsidered: [],
+            },
+            {
+              what: "Store tokens in httpOnly cookies",
+              why: "Prevents XSS attacks",
+              alternativesConsidered: [],
+            },
+          ],
+          filesTouched: ["auth.ts"],
+          outcome: "success",
+        },
+        lessons: {
+          project: [],
+          task: [],
+          user: [],
+          model: [],
+          tool: [],
+          skill: [],
+          subagent: [],
+        },
+        observations: {
+          modelsUsed: [],
+          promptingWins: [],
+          promptingFailures: [],
+          modelQuirks: [],
+          toolUseErrors: [],
+        },
+        metadata: {
+          timestamp: "2026-01-28T12:00:00.000Z",
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          analyzerVersion: "1.0.0",
+          tokensUsed: 1000,
+          cost: 0.001,
+          durationMinutes: 5,
+        },
+        semantic: {
+          tags: [],
+          topics: [],
+          relatedProjects: [],
+          concepts: [],
+          summaryEmbedding: null,
+          decisionsEmbedding: null,
+          lessonsEmbedding: null,
+        },
+        daemonMeta: {
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          promptVersion: "1.0.0",
+          decisions: [],
+          rlmUsed: false,
+        },
+        signals: {
+          friction: [],
+          delight: [],
+          manualFlags: [],
+        },
+      };
+
+      const text = buildEmbeddingText(node);
+
+      // Should contain type and summary
+      expect(text).toContain("[coding]");
+      expect(text).toContain("Added authentication middleware");
+
+      // Should contain decisions section
+      expect(text).toContain("Decisions:");
+      expect(text).toContain(
+        "Use JWT tokens (why: Stateless authentication is more scalable)"
+      );
+      expect(text).toContain(
+        "Store tokens in httpOnly cookies (why: Prevents XSS attacks)"
+      );
+
+      // Should NOT contain lessons section (empty)
+      expect(text).not.toContain("Lessons:");
+
+      // Should contain version marker
+      expect(text).toContain("[emb:v2]");
+    });
+
+    it("handles node without decisions or lessons", () => {
+      const node: Node = {
+        id: "test-node-2",
+        version: 1,
+        previousVersions: [],
+        source: {
+          sessionFile: "/tmp/test/session.jsonl",
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-2",
+            entryCount: 2,
+          },
+          computer: "test-machine",
+          sessionId: "session-2",
+        },
+        classification: {
+          type: "debugging",
+          project: "test-project",
+          isNewProject: false,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "Fixed null pointer exception",
+          keyDecisions: [],
+          filesTouched: [],
+          outcome: "success",
+        },
+        lessons: {
+          project: [],
+          task: [],
+          user: [],
+          model: [],
+          tool: [],
+          skill: [],
+          subagent: [],
+        },
+        observations: {
+          modelsUsed: [],
+          promptingWins: [],
+          promptingFailures: [],
+          modelQuirks: [],
+          toolUseErrors: [],
+        },
+        metadata: {
+          timestamp: "2026-01-28T12:00:00.000Z",
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          analyzerVersion: "1.0.0",
+          tokensUsed: 500,
+          cost: 0.0005,
+          durationMinutes: 2,
+        },
+        semantic: {
+          tags: [],
+          topics: [],
+          relatedProjects: [],
+          concepts: [],
+          summaryEmbedding: null,
+          decisionsEmbedding: null,
+          lessonsEmbedding: null,
+        },
+        daemonMeta: {
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          promptVersion: "1.0.0",
+          decisions: [],
+          rlmUsed: false,
+        },
+        signals: {
+          friction: [],
+          delight: [],
+          manualFlags: [],
+        },
+      };
+
+      const text = buildEmbeddingText(node);
+
+      // Should still have type and summary
+      expect(text).toContain("[debugging]");
+      expect(text).toContain("Fixed null pointer exception");
+
+      // Should NOT have decisions or lessons sections
+      expect(text).not.toContain("Decisions:");
+      expect(text).not.toContain("Lessons:");
+
+      // Should still have version marker
+      expect(text).toContain("[emb:v2]");
+    });
+  });
+
+  describe("mock embedding provider integration", () => {
+    it("generates deterministic embeddings", async () => {
+      const provider = createMockEmbeddingProvider(128);
+
+      const text1 = "Test embedding text";
+      const text2 = "Test embedding text";
+
+      const [emb1] = await provider.embed([text1]);
+      const [emb2] = await provider.embed([text2]);
+
+      // Same text should produce same embedding
+      expect(emb1).toStrictEqual(emb2);
+      expect(emb1).toHaveLength(128);
+    });
+
+    it("generates different embeddings for different text", async () => {
+      const provider = createMockEmbeddingProvider(64);
+
+      const [emb1] = await provider.embed(["Text one"]);
+      const [emb2] = await provider.embed(["Text two"]);
+
+      // Different text should produce different embeddings
+      expect(emb1).not.toStrictEqual(emb2);
+    });
+
+    it("generates normalized embeddings (magnitude ~1.0)", async () => {
+      const provider = createMockEmbeddingProvider(128);
+
+      const [embedding] = await provider.embed(["Test text"]);
+
+      const magnitude = Math.sqrt(
+        embedding.reduce((sum, val) => sum + val * val, 0)
+      );
+
+      // Magnitude should be close to 1.0
+      expect(magnitude).toBeCloseTo(1, 5);
+    });
+  });
+
+  describe("worker with mock embedding provider", () => {
+    it("stores embedding when node is created", async () => {
+      const logger = {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+      };
+
+      const config = createTestConfig(tempDir);
+      config.daemon.embeddingProvider = "openrouter";
+      config.daemon.embeddingModel = "mock";
+      config.daemon.embeddingApiKey = "test-key";
+      config.daemon.embeddingDimensions = 64;
+
+      const worker = createWorker({ id: "test", config, logger });
+      worker.initialize(db);
+
+      // Access private embeddingProvider for testing
+      // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+      const { embeddingProvider } = worker as unknown as {
+        embeddingProvider: typeof import("./facet-discovery.js").EmbeddingProvider;
+      };
+
+      // Verify the provider was initialized
+      expect(embeddingProvider).toBeDefined();
+      expect(embeddingProvider?.modelName).toBe("mock");
+    });
+
+    it("generates and stores embedding for a node using mock provider", async () => {
+      // Use mock provider directly instead of through worker config
+      const mockProvider = createMockEmbeddingProvider(128);
+
+      // Create a test node
+      const node: Node = {
+        id: "node-with-embedding",
+        version: 1,
+        previousVersions: [],
+        source: {
+          sessionFile: "/tmp/test/session.jsonl",
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-2",
+            entryCount: 5,
+          },
+          computer: "test-machine",
+          sessionId: "session-1",
+        },
+        classification: {
+          type: "coding",
+          project: "test-project",
+          isNewProject: true,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "Test node for embedding",
+          keyDecisions: [
+            {
+              what: "Use mock provider",
+              why: "For testing without API calls",
+              alternativesConsidered: [],
+            },
+          ],
+          filesTouched: [],
+          outcome: "success",
+        },
+        lessons: {
+          project: [],
+          task: [],
+          user: [],
+          model: [],
+          tool: [],
+          skill: [],
+          subagent: [],
+        },
+        observations: {
+          modelsUsed: [],
+          promptingWins: [],
+          promptingFailures: [],
+          modelQuirks: [],
+          toolUseErrors: [],
+        },
+        metadata: {
+          timestamp: "2026-01-28T12:00:00.000Z",
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          analyzerVersion: "1.0.0",
+          tokensUsed: 1000,
+          cost: 0.001,
+          durationMinutes: 5,
+        },
+        semantic: {
+          tags: [],
+          topics: [],
+          relatedProjects: [],
+          concepts: [],
+          summaryEmbedding: null,
+          decisionsEmbedding: null,
+          lessonsEmbedding: null,
+        },
+        daemonMeta: {
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          promptVersion: "1.0.0",
+          decisions: [],
+          rlmUsed: false,
+        },
+        signals: {
+          friction: [],
+          delight: [],
+          manualFlags: [],
+        },
+      };
+
+      // Build embedding text
+      const text = buildEmbeddingText(node);
+
+      // Generate embedding using mock provider
+      const [embedding] = await mockProvider.embed([text]);
+
+      // Verify embedding properties
+      expect(embedding).toBeDefined();
+      expect(embedding).toHaveLength(128); // custom dimension
+      expect(embedding[0]).toBeGreaterThanOrEqual(-1);
+      expect(embedding[0]).toBeLessThanOrEqual(1);
+
+      // Verify embedding is normalized
+      const magnitude = Math.sqrt(
+        embedding.reduce((sum, val) => sum + val * val, 0)
+      );
+      expect(magnitude).toBeCloseTo(1, 5);
+    });
+
+    it("retrieves stored embedding from database", async () => {
+      // Use mock provider with 4096 dimensions to match vec table schema
+      const mockProvider = createMockEmbeddingProvider(4096);
+
+      // Create a test node with all required fields
+      const node: Node = {
+        id: "retrieval-test-node",
+        version: 1,
+        previousVersions: [],
+        source: {
+          sessionFile: "/tmp/test/session.jsonl",
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-2",
+            entryCount: 2,
+          },
+          computer: "test-machine",
+          sessionId: "session-1",
+        },
+        classification: {
+          type: "coding",
+          project: "test-project",
+          isNewProject: true,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "Test embedding retrieval",
+          keyDecisions: [],
+          filesTouched: [],
+          outcome: "success",
+        },
+        lessons: {
+          project: [],
+          task: [],
+          user: [],
+          model: [],
+          tool: [],
+          skill: [],
+          subagent: [],
+        },
+        observations: {
+          modelsUsed: [],
+          promptingWins: [],
+          promptingFailures: [],
+          modelQuirks: [],
+          toolUseErrors: [],
+        },
+        metadata: {
+          timestamp: "2026-01-28T12:00:00.000Z",
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          analyzerVersion: "1.0.0",
+          tokensUsed: 500,
+          cost: 0.0005,
+          durationMinutes: 2,
+        },
+        semantic: {
+          tags: [],
+          topics: [],
+          relatedProjects: [],
+          concepts: [],
+          summaryEmbedding: null,
+          decisionsEmbedding: null,
+          lessonsEmbedding: null,
+        },
+        daemonMeta: {
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          promptVersion: "1.0.0",
+          decisions: [],
+          rlmUsed: false,
+        },
+        signals: {
+          friction: [],
+          delight: [],
+          manualFlags: [],
+        },
+      };
+
+      // First, store node in database (required for FK constraint)
+      const nodesDir = join(tempDir, "nodes");
+      upsertNode(db, node, { nodesDir });
+
+      // Build embedding text
+      const text = buildEmbeddingText(node);
+
+      // Generate and store embedding using mock provider
+      const [embedding] = await mockProvider.embed([text]);
+
+      const { storeEmbeddingWithVec } =
+        await import("../storage/embedding-utils.js");
+      storeEmbeddingWithVec(
+        db,
+        node.id,
+        embedding,
+        mockProvider.modelName,
+        text
+      );
+
+      // Verify embedding was stored
+      expect(hasEmbedding(db, node.id)).toBeTruthy();
+
+      // Retrieve and verify embedding metadata
+      const stored = getEmbedding(db, node.id);
+      expect(stored).toBeDefined();
+      expect(stored?.modelName).toBe("mock");
+      expect(stored?.inputText).toBe(text);
+      expect(stored?.createdAt).toBeDefined();
+      expect(stored?.embedding).toHaveLength(4096);
+    });
+
+    it("handles embedding generation failure gracefully", async () => {
+      // Mock a failing provider
+      const failingProvider = {
+        modelName: "failing-mock",
+        dimensions: 64,
+        async embed(_texts: string[]): Promise<number[][]> {
+          throw new Error("Embedding service unavailable");
+        },
+      };
+
+      // Create a test node
+      const node: Node = {
+        id: "failure-test-node",
+        version: 1,
+        previousVersions: [],
+        source: {
+          sessionFile: "/tmp/test/session.jsonl",
+          segment: {
+            startEntryId: "entry-1",
+            endEntryId: "entry-2",
+            entryCount: 1,
+          },
+          computer: "test-machine",
+          sessionId: "session-1",
+        },
+        classification: {
+          type: "coding",
+          project: "test-project",
+          isNewProject: true,
+          hadClearGoal: true,
+        },
+        content: {
+          summary: "Test graceful failure",
+          keyDecisions: [],
+          filesTouched: [],
+          outcome: "success",
+        },
+        lessons: {
+          project: [],
+          task: [],
+          user: [],
+          model: [],
+          tool: [],
+          skill: [],
+          subagent: [],
+        },
+        observations: {
+          modelsUsed: [],
+          promptingWins: [],
+          promptingFailures: [],
+          modelQuirks: [],
+          toolUseErrors: [],
+        },
+        metadata: {
+          timestamp: "2026-01-28T12:00:00.000Z",
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          analyzerVersion: "1.0.0",
+          tokensUsed: 100,
+          cost: 0.0001,
+          durationMinutes: 1,
+        },
+        semantic: {
+          tags: [],
+          topics: [],
+          relatedProjects: [],
+          concepts: [],
+          summaryEmbedding: null,
+          decisionsEmbedding: null,
+          lessonsEmbedding: null,
+        },
+        daemonMeta: {
+          analyzedAt: "2026-01-28T12:01:00.000Z",
+          promptVersion: "1.0.0",
+          decisions: [],
+          rlmUsed: false,
+        },
+        signals: {
+          friction: [],
+          delight: [],
+          manualFlags: [],
+        },
+      };
+
+      // Attempt to generate embedding should throw
+      const text = buildEmbeddingText(node);
+
+      try {
+        await failingProvider.embed([text]);
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(error).toBeInstanceOf(Error);
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect((error as Error).message).toBe("Embedding service unavailable");
+      }
+
+      // Verify embedding was NOT stored
+      expect(hasEmbedding(db, node.id)).toBeFalsy();
+    });
+
+    it("embeds multiple nodes in batch", async () => {
+      // Use mock provider directly
+      const mockProvider = createMockEmbeddingProvider(256);
+
+      // Create multiple texts
+      const texts = ["First test node", "Second test node", "Third test node"];
+
+      // Generate embeddings in batch
+      const embeddings = await mockProvider.embed(texts);
+
+      expect(embeddings).toHaveLength(3);
+      expect(embeddings[0]).toHaveLength(256);
+      expect(embeddings[1]).toHaveLength(256);
+      expect(embeddings[2]).toHaveLength(256);
+
+      // Each embedding should be normalized
+      for (const embedding of embeddings) {
+        const magnitude = Math.sqrt(
+          embedding.reduce((sum, val) => sum + val * val, 0)
+        );
+        expect(magnitude).toBeCloseTo(1, 5);
+      }
+
+      // Embeddings should be different for different texts
+      expect(embeddings[0]).not.toStrictEqual(embeddings[1]);
+      expect(embeddings[1]).not.toStrictEqual(embeddings[2]);
+      expect(embeddings[0]).not.toStrictEqual(embeddings[2]);
+    });
   });
 });

@@ -133,27 +133,14 @@ function parseRsyncError(
 }
 
 /**
- * Run rsync for a spoke with rsync sync method
-
+ * Validate that a spoke is configured for rsync
+ *
+ * Returns a failed result if validation fails, undefined if valid.
  */
-// oxlint-disable-next-line complexity
-export async function runRsync(
+function validateRsyncSpoke(
   spoke: SpokeConfig,
-  options: RsyncOptions = {}
-): Promise<RsyncResult> {
-  const startTime = Date.now();
-
-  // Merge spoke's rsyncOptions with passed options (passed options take precedence)
-  const spokeOpts = spoke.rsyncOptions ?? {};
-  const bwLimit = options.bwLimit ?? spokeOpts.bwLimit ?? 0;
-  const dryRun = options.dryRun ?? false;
-  const doDelete = options.delete ?? spokeOpts.delete ?? false;
-  const extraArgs = options.extraArgs ?? spokeOpts.extraArgs ?? [];
-  const timeoutMs =
-    options.timeoutMs ??
-    (spokeOpts.timeoutSeconds ? spokeOpts.timeoutSeconds * 1000 : 300_000);
-
-  // Validate spoke has rsync method and source
+  startTime: number
+): RsyncResult | undefined {
   if (spoke.syncMethod !== "rsync") {
     return createFailedResult(
       spoke.name,
@@ -170,12 +157,32 @@ export async function runRsync(
     );
   }
 
-  // Ensure destination directory exists
+  return undefined;
+}
+
+/**
+ * Ensure the destination directory exists for a spoke
+ */
+function ensureDestinationExists(spoke: SpokeConfig): void {
   if (!fs.existsSync(spoke.path)) {
     fs.mkdirSync(spoke.path, { recursive: true });
   }
+}
 
-  // Build rsync arguments
+/**
+ * Build rsync command arguments from options
+ */
+function buildRsyncArgs(
+  spoke: SpokeConfig,
+  options: RsyncOptions
+): { args: string[]; source: string; dest: string } {
+  // Merge spoke's rsyncOptions with passed options (passed options take precedence)
+  const spokeOpts = spoke.rsyncOptions ?? {};
+  const bwLimit = options.bwLimit ?? spokeOpts.bwLimit ?? 0;
+  const dryRun = options.dryRun ?? false;
+  const doDelete = options.delete ?? spokeOpts.delete ?? false;
+  const extraArgs = options.extraArgs ?? spokeOpts.extraArgs ?? [];
+
   const args: string[] = [
     "-avz", // archive, verbose, compress
     "--stats", // show transfer statistics
@@ -197,7 +204,7 @@ export async function runRsync(
   args.push(...extraArgs);
 
   // Ensure source ends with / to sync contents, not the directory itself
-  let { source } = spoke;
+  let source = spoke.source ?? "";
   if (!source.endsWith("/")) {
     source = `${source}/`;
   }
@@ -209,6 +216,83 @@ export async function runRsync(
   }
 
   args.push(source, dest);
+
+  return { args, source, dest };
+}
+
+/**
+ * Handle errors from rsync execution
+ */
+function handleRsyncError(
+  execError: ExecFileException,
+  spoke: SpokeConfig,
+  timeoutMs: number,
+  startTime: number
+): RsyncResult {
+  const durationMs = Date.now() - startTime;
+
+  // Check for timeout
+  if (execError.killed && execError.signal === "SIGTERM") {
+    return createFailedResult(
+      spoke.name,
+      `Rsync timed out after ${timeoutMs / 1000}s`,
+      durationMs,
+      "Timeout"
+    );
+  }
+
+  // Check for command not found
+  if (execError.code === "ENOENT") {
+    return createFailedResult(
+      spoke.name,
+      `Failed to run rsync for "${spoke.name}"`,
+      durationMs,
+      "rsync command not found. Install rsync on this system."
+    );
+  }
+
+  // Parse rsync error
+  const stderr = execError.stderr ?? "";
+  const exitCode = typeof execError.code === "number" ? execError.code : null;
+  const parsedError = parseRsyncError(stderr, spoke.source, exitCode);
+
+  return createFailedResult(
+    spoke.name,
+    `Rsync failed for "${spoke.name}"`,
+    durationMs,
+    parsedError
+  );
+}
+
+/**
+ * Run rsync for a spoke with rsync sync method
+ */
+export async function runRsync(
+  spoke: SpokeConfig,
+  options: RsyncOptions = {}
+): Promise<RsyncResult> {
+  const startTime = Date.now();
+
+  // Validate spoke configuration
+  const validationResult = validateRsyncSpoke(spoke, startTime);
+  if (validationResult) {
+    return validationResult;
+  }
+
+  // Ensure destination directory exists
+  ensureDestinationExists(spoke);
+
+  // Build rsync arguments
+  const { args } = buildRsyncArgs(spoke, options);
+
+  // Get timeout option
+  const spokeOpts = spoke.rsyncOptions ?? {};
+  const timeoutMs =
+    options.timeoutMs ??
+    (spokeOpts.timeoutSeconds ? spokeOpts.timeoutSeconds * 1000 : 300_000);
+
+  // Check if dry run
+  const isDryRun = options.dryRun ?? false;
 
   // Execute rsync
   try {
@@ -225,46 +309,14 @@ export async function runRsync(
       spokeName: spoke.name,
       filesTransferred: stats.filesTransferred,
       bytesTransferred: stats.bytesTransferred,
-      message: dryRun
+      message: isDryRun
         ? `Dry run: would transfer ${stats.filesTransferred} files`
         : `Synced ${stats.filesTransferred} files (${formatBytes(stats.bytesTransferred)})`,
       durationMs,
     };
   } catch (error) {
-    const durationMs = Date.now() - startTime;
     const execError = error as ExecFileException;
-
-    // Check for timeout
-    if (execError.killed && execError.signal === "SIGTERM") {
-      return createFailedResult(
-        spoke.name,
-        `Rsync timed out after ${timeoutMs / 1000}s`,
-        durationMs,
-        "Timeout"
-      );
-    }
-
-    // Check for command not found
-    if (execError.code === "ENOENT") {
-      return createFailedResult(
-        spoke.name,
-        `Failed to run rsync for "${spoke.name}"`,
-        durationMs,
-        "rsync command not found. Install rsync on this system."
-      );
-    }
-
-    // Parse rsync error
-    const stderr = execError.stderr ?? "";
-    const exitCode = typeof execError.code === "number" ? execError.code : null;
-    const parsedError = parseRsyncError(stderr, spoke.source, exitCode);
-
-    return createFailedResult(
-      spoke.name,
-      `Rsync failed for "${spoke.name}"`,
-      durationMs,
-      parsedError
-    );
+    return handleRsyncError(execError, spoke, timeoutMs, startTime);
   }
 }
 

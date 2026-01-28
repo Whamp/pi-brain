@@ -25,6 +25,7 @@
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
+  import JobErrors from "$lib/components/dashboard/job-errors.svelte";
   import Spinner from "$lib/components/spinner.svelte";
 
   // State
@@ -369,6 +370,9 @@
         {/if}
       </section>
     </div>
+
+    <!-- Job Errors -->
+    <JobErrors />
 
     <!-- Patterns & Insights -->
     <div class="patterns-grid">

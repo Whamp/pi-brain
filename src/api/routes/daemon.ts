@@ -12,10 +12,12 @@ import {
   getProcessUptime,
   readPidFile,
 } from "../../daemon/cli.js";
+import { parseStoredError } from "../../daemon/errors.js";
 import {
   getQueueStatusSummary,
   createQueueManager,
   PRIORITY,
+  type AnalysisJob,
 } from "../../daemon/queue.js";
 import { successResponse, errorResponse } from "../responses.js";
 
@@ -151,6 +153,61 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
 
       const durationMs = Date.now() - startTime;
       return reply.send(successResponse({ jobId }, durationMs));
+    }
+  );
+
+  /**
+   * GET /daemon/jobs/failed - Get failed jobs with parsed error details
+   */
+  app.get(
+    "/jobs/failed",
+    async (
+      request: FastifyRequest<{
+        Querystring: {
+          limit?: string;
+        };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
+      const limit = request.query.limit
+        ? Number.parseInt(request.query.limit, 10)
+        : 50;
+
+      const queue = createQueueManager(db);
+      const failedJobs = queue.getFailedJobs(limit);
+
+      // Parse error JSON into structured objects
+      const jobsWithParsedErrors = failedJobs
+        .map((job: AnalysisJob) => {
+          if (!job.error) {
+            return null;
+          }
+
+          const parsedError = parseStoredError(job.error);
+
+          return {
+            id: job.id,
+            sessionFile: job.sessionFile,
+            type: job.type,
+            completedAt: job.completedAt,
+            error: parsedError ?? {
+              timestamp: job.completedAt ?? "",
+              type: "unknown",
+              reason: "Failed to parse error",
+              message: job.error ?? "Unknown error",
+            },
+            retryCount: job.retryCount,
+            maxRetries: job.maxRetries,
+          };
+        })
+        .filter((job): job is NonNullable<typeof job> => job !== null);
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse({ jobs: jobsWithParsedErrors }, durationMs)
+      );
     }
   );
 }
