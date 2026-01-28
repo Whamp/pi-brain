@@ -13,10 +13,27 @@ import {
 } from "./embedding-utils.js";
 
 /**
- * Create a minimal Node for testing
+ * Create a minimal Node for testing.
+ *
+ * Accepts only top-level overrides that replace entire sub-objects.
+ * This ensures nested required fields aren't accidentally omitted.
  */
-function createTestNode(overrides: Partial<Node> = {}): Node {
-  return {
+function createTestNode(
+  overrides: {
+    id?: string;
+    version?: number;
+    previousVersions?: string[];
+    source?: Node["source"];
+    classification?: Node["classification"];
+    content?: Node["content"];
+    lessons?: Node["lessons"];
+    observations?: Node["observations"];
+    metadata?: Node["metadata"];
+    semantic?: Node["semantic"];
+    daemonMeta?: Node["daemonMeta"];
+  } = {}
+): Node {
+  const defaults: Node = {
     id: "test-node-id",
     version: 1,
     previousVersions: [],
@@ -35,7 +52,6 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
       project: "/test/project",
       isNewProject: false,
       hadClearGoal: true,
-      ...overrides.classification,
     },
     content: {
       summary: "Test summary",
@@ -44,7 +60,6 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
       filesTouched: [],
       toolsUsed: [],
       errorsSeen: [],
-      ...overrides.content,
     },
     lessons: {
       project: [],
@@ -54,7 +69,6 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
       tool: [],
       skill: [],
       subagent: [],
-      ...overrides.lessons,
     },
     observations: {
       modelsUsed: [],
@@ -79,6 +93,10 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
       decisions: [],
       rlmUsed: false,
     },
+  };
+
+  return {
+    ...defaults,
     ...overrides,
   };
 }
@@ -327,6 +345,17 @@ describe("isRichEmbeddingFormat", () => {
 
   it("should return false for text mentioning decisions without section", () => {
     const text = "[coding] Made some decisions about the architecture";
+    expect(isRichEmbeddingFormat(text)).toBeFalsy();
+  });
+
+  it("should return false for text without [type] prefix", () => {
+    const text = "Summary\n\nDecisions:\n- Decision 1";
+    expect(isRichEmbeddingFormat(text)).toBeFalsy();
+  });
+
+  it("should return false for user content containing Decisions: text", () => {
+    // Edge case: user summary that happens to contain "\nDecisions:" text
+    const text = "[coding] User wrote about\nDecisions: what to do next";
     expect(isRichEmbeddingFormat(text)).toBeFalsy();
   });
 });

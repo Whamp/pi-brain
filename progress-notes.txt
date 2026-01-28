@@ -1,42 +1,17 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-205601
-Created: 2026-01-27 19:56
+Branch: fix/code-review-20260127-210928
+Created: 2026-01-27 21:09
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-### [P1] src/storage/database.ts:150-157 - Skipped migration is permanently disabled
-The skipped migration is recorded with the same version number as if it were successfully applied.
-If the user later installs sqlite-vec, the migration will never retry because currentVersion will be >= 12.
-This silently degrades semantic search permanently.
-
-### [P2] src/storage/database.ts:151 - Brittle filename-based migration filtering
-Using migration.filename.includes('semantic_search') is fragile. Future vec-dependent migrations
-would need to match this pattern, and there's no discoverability that this convention exists.
-Suggestion: Parse a SQL comment directive like `-- REQUIRES: sqlite-vec` from migration.sql,
-or catch the specific "no such module: vec0" error at runtime and handle gracefully.
-
-### [P3] src/storage/migrations/012_semantic_search.sql:22 - "fail silently" comment is misleading
-The comment says "This will fail silently if dimensions don't match" but INSERT OR IGNORE only
-ignores constraint violations (like duplicate keys), not dimension mismatches. A dimension mismatch
-will throw an error, not silently ignore.
-
-### [P3] src/storage/database.test.ts:357 - Type assertion on rowid could fail
-The `as { rowid: number }` assertion doesn't account for SQLite potentially returning a BigInt
-for rowid in some configurations. The code later uses `BigInt(row.rowid)` which would work,
-but the test could be more robust by typing it as `number | bigint`.
+1. [P2] isRichEmbeddingFormat false positive - check `\nDecisions:` could match user text
+2. [P3] Lesson ordering depends on spread order - add documentation  
+3. [P3] buildSimpleEmbeddingText returns "[type]" when summary is null
+4. [P3] createTestNode helper allows partial nested objects that miss required fields
 
 ---
 
----
+## Progress Log
 
-## 2026-01-27 21:03 - Task 17.2.1
-
-**Status**: pending → done
-**Validation**: 14 unit tests covering:
-  - buildEmbeddingText: type+summary, decisions, lessons, combinations, empty cases
-  - buildSimpleEmbeddingText: type+summary, null handling
-  - isRichEmbeddingFormat: detection of Decisions/Lessons sections
-**Commit**: 734b319c
-**Notes**: Created src/storage/embedding-utils.ts with rich embedding format per semantic-search.md spec. Exported from storage/index.ts for use by facet-discovery and worker.
