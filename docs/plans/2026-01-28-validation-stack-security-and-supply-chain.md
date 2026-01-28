@@ -133,56 +133,7 @@ Add to pre-commit hook after tests:
 npm audit --audit-level=moderate
 ```
 
-### 3. License Compliance
-
-#### Tool
-
-**license-checker** (MIT License)
-
-- Scans `node_modules` for license information
-- Supports allowlists and blocklists
-- Outputs JSON, CSV, or text
-- Can fail on disallowed licenses
-- Installation: `npm install -g license-checker`
-
-#### Configuration
-
-Create a `.license-checker.json` or use command-line flags:
-
-```bash
-# Only allow permissive licenses
-license-checker --onlyAllow 'MIT;Apache-2.0;BSD;ISC'
-
-# Block copyleft licenses
-license-checker --failOn 'GPL;AGPL;LGPL'
-
-# Check only production dependencies
-license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD;ISC'
-
-# Output JSON for CI integration
-license-checker --json > licenses.json
-```
-
-#### Recommended License Policy (Example)
-
-For pi-brain (MIT-licensed project):
-
-- **Allowed**: MIT, Apache-2.0, BSD (2-clause, 3-clause), ISC
-- **Blocked**: GPL, AGPL, LGPL, MPL, CDDL
-
-#### npm Scripts
-
-```json
-{
-  "scripts": {
-    "check:licenses": "license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'",
-    "check:licenses:all": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'",
-    "check:licenses:report": "license-checker --json > reports/licenses.json"
-  }
-}
-```
-
-### 4. Static Application Security Testing (SAST)
+### 3. Static Application Security Testing (SAST)
 
 #### Tool
 
@@ -250,7 +201,7 @@ rules:
 }
 ```
 
-### 5. ESLint Security Plugins
+### 4. ESLint Security Plugins
 
 #### Tools
 
@@ -293,7 +244,7 @@ The oxlintrc should be updated to include security rules:
 }
 ```
 
-### 6. Enhanced TypeScript Strict Mode
+### 5. Enhanced TypeScript Strict Mode
 
 #### What to Enable
 
@@ -345,9 +296,6 @@ gitleaks protect --staged
 # Dependency vulnerabilities (fast check)
 npm audit --audit-level=high
 
-# License check (production only, fast)
-license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'
-
 # Tests
 npm test -- --run
 
@@ -371,9 +319,6 @@ trufflehog filesystem . --results=verified,unknown --fail
 # Dependency vulnerabilities (all levels)
 npm audit
 
-# Full license check
-license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'
-
 # SAST scanning
 semgrep scan --config p/typescript --config p/javascript --config p/nodejs
 
@@ -395,12 +340,11 @@ eslint . --ext .ts,.js --plugin security
     "check:secrets": "gitleaks detect --source . && trufflehog filesystem . --results=verified,unknown",
     "check:secrets:staged": "gitleaks protect --staged",
     "check:vulnerabilities": "npm audit --audit-level=moderate",
-    "check:licenses": "license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'",
     "check:sast": "semgrep scan --config p/typescript --config p/javascript --config p/nodejs",
 
     // New: Combined
-    "check:security": "npm run check:secrets:staged && npm run check:vulnerabilities && npm run check:licenses",
-    "check:security:full": "npm run check:secrets && npm audit && npm run check:licenses:all && npm run check:sast",
+    "check:security": "npm run check:secrets:staged && npm run check:vulnerabilities",
+    "check:security:full": "npm run check:secrets && npm audit && npm run check:sast",
 
     // New: All checks (full validation stack)
     "check:all": "npm run check && npm run check:security && npm test -- --run",
@@ -428,16 +372,7 @@ eslint . --ext .ts,.js --plugin security
 4. Add to pre-commit hook
 5. Document fix process
 
-### Phase 3: License Compliance
-
-1. Install license-checker
-2. Define license policy (allowed/blocked)
-3. Run initial scan and document current state
-4. Create npm scripts for license checking
-5. Add to pre-commit hook (production only)
-6. Generate initial license report
-
-### Phase 4: SAST (Semgrep)
+### Phase 3: SAST (Semgrep)
 
 1. Install Semgrep CLI
 2. Run initial scan with recommended rulesets
@@ -447,7 +382,7 @@ eslint . --ext .ts,.js --plugin security
 6. Document custom rules
 7. Add to CI (too slow for pre-commit)
 
-### Phase 5: ESLint Security
+### Phase 4: ESLint Security
 
 1. Evaluate oxlint's external plugin support
 2. Install eslint-plugin-security if needed
@@ -456,7 +391,7 @@ eslint . --ext .ts,.js --plugin security
 5. Add to validation stack
 6. Update oxlintrc.json
 
-### Phase 6: Documentation and Training
+### Phase 5: Documentation and Training
 
 1. Update CONTRIBUTING.md with validation stack overview
 2. Document each tool's purpose and usage
@@ -469,7 +404,6 @@ eslint . --ext .ts,.js --plugin security
 1. `.gitleaks.toml` - Gitleaks configuration
 2. `.semgrep.yaml` - Semgrep custom rules (optional)
 3. `.eslintrc.security.json` - ESLint security config (if needed)
-4. `reports/licenses.json` - Generated license report
 
 ## Performance Considerations
 
@@ -478,8 +412,7 @@ eslint . --ext .ts,.js --plugin security
 - Ultracite: ~5-10 seconds
 - Gitleaks (staged only): ~1-3 seconds
 - npm audit: ~2-5 seconds
-- license-checker (production only): ~2-5 seconds
-- **Total pre-commit: ~10-25 seconds**
+- **Total pre-commit: ~8-18 seconds**
 
 ### Slower Checks (CI/Manual)
 
@@ -487,8 +420,7 @@ eslint . --ext .ts,.js --plugin security
 - TruffleHog: ~10-30 seconds
 - Semgrep: ~30-60 seconds
 - npm audit (full): ~5-10 seconds
-- license-checker (all): ~5-10 seconds
-- **Total CI: ~80-170 seconds**
+- **Total CI: ~75-160 seconds**
 
 ## Trade-offs and Decisions
 
@@ -515,25 +447,21 @@ eslint . --ext .ts,.js --plugin security
 ## Success Criteria
 
 - All tools installed and configured
-- Pre-commit hook runs in under 30 seconds
+- Pre-commit hook runs in under 20 seconds
 - Zero false positives in default configuration (after tuning)
 - Documentation covers all edge cases
 - AI agents can successfully pass all validation gates
 - Security findings are actionable and clear
-- License compliance is automated
 
 ## Open Questions
 
 1. Should Semgrep run in pre-commit or only CI?
    - **Recommendation:** CI only due to speed
 
-2. Should license checking include devDependencies?
-   - **Recommendation:** Pre-commit: production only; CI: all dependencies
-
-3. Should npm audit auto-fix in pre-commit?
+2. Should npm audit auto-fix in pre-commit?
    - **Recommendation:** No, manual review required
 
-4. How to handle baseline for existing secrets in git history?
+3. How to handle baseline for existing secrets in git history?
    - **Recommendation:** Create baseline with `gitleaks --baseline-path`
 
 ## Next Steps

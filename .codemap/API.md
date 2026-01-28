@@ -5,11 +5,11 @@
 
 ## Statistics
 - Total files: 90
-- Total symbols: 662
+- Total symbols: 664
   - function: 373
   - interface: 207
   - type: 40
-  - variable: 30
+  - variable: 32
   - class: 12
 
 ---
@@ -617,9 +617,9 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-773]
+src/daemon/processor.ts [1-809]
   class:
-    711-765: class JobProcessor [exported]
+    747-801: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
@@ -630,39 +630,43 @@ src/daemon/processor.ts [1-773]
       /** Skill availability information */
     135-140: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    202-209: interface EnvironmentValidationResult [exported]
+    212-219: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    701-706: interface ProcessorConfig [exported]
+    737-742: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
-    170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    176-184: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-    183-199: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+    189-209: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    225-237: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    233-239: async buildSkillsArg(): Promise<string> [exported]
-      /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
-    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    246-283: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+      /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
+    292-324: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    357-465: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    571-640: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    646-679: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
+    684-730: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    806-808: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
     143-148: ProcessorLogger [exported]
       /** Default console logger */
-    155-155: readonly ["rlm"] [exported]
+    155-155: readonly [] [exported]
       /** Required skills for analysis - must be available */
     158-158: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
-    161-161: any [exported]
+    161-161: readonly ["rlm"] [exported]
+      /** Skills that are conditionally included based on file size */
+    164-164: number [exported]
+      /** File size threshold (in bytes) for including RLM skill */
+    167-167: any [exported]
       /** Skills directory location */
   imports:
     - ../config/types.js
@@ -2145,4 +2149,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 26,998 (codebase: ~1,075,759)
+Estimated tokens: 27,086 (codebase: ~1,090,677)

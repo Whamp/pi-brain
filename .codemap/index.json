@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1130,
+    "totalSymbols": 1132,
     "byLanguage": {
       "typescript": 90
     },
@@ -9,7 +9,7 @@
       "function": 501,
       "type": 41,
       "interface": 262,
-      "variable": 117,
+      "variable": 119,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38889,
-  "codebase_tokens": 1090387,
+  "total_tokens": 38977,
+  "codebase_tokens": 1090736,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -6632,10 +6632,10 @@
       "language": "typescript",
       "lines": [
         1,
-        773
+        809
       ],
       "detail_level": "full",
-      "token_estimate": 972,
+      "token_estimate": 1060,
       "symbols": [
         {
           "name": "AgentResult",
@@ -6754,7 +6754,7 @@
         {
           "name": "REQUIRED_SKILLS",
           "kind": "variable",
-          "signature": "readonly [\"rlm\"]",
+          "signature": "readonly []",
           "lines": [
             155,
             155
@@ -6790,12 +6790,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "CONDITIONAL_SKILLS",
+          "kind": "variable",
+          "signature": "readonly [\"rlm\"]",
+          "lines": [
+            161,
+            161
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Skills that are conditionally included based on file size",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RLM_SIZE_THRESHOLD",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            164,
+            164
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "File size threshold (in bytes) for including RLM skill",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "SKILLS_DIR",
           "kind": "variable",
           "signature": "any",
           "lines": [
-            161,
-            161
+            167,
+            167
           ],
           "exported": true,
           "is_default": false,
@@ -6813,8 +6851,8 @@
           "kind": "function",
           "signature": "async checkSkillAvailable(skillName: string): Promise<boolean>",
           "lines": [
-            170,
-            178
+            176,
+            184
           ],
           "exported": true,
           "is_default": false,
@@ -6832,8 +6870,8 @@
           "kind": "function",
           "signature": "async getSkillAvailability(): Promise<Map<string, SkillInfo>>",
           "lines": [
-            183,
-            199
+            189,
+            209
           ],
           "exported": true,
           "is_default": false,
@@ -6851,8 +6889,8 @@
           "kind": "interface",
           "signature": "EnvironmentValidationResult",
           "lines": [
-            202,
-            209
+            212,
+            219
           ],
           "exported": true,
           "is_default": false,
@@ -6870,8 +6908,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            215,
-            227
+            225,
+            237
           ],
           "exported": true,
           "is_default": false,
@@ -6887,10 +6925,10 @@
         {
           "name": "buildSkillsArg",
           "kind": "function",
-          "signature": "async buildSkillsArg(): Promise<string>",
+          "signature": "async buildSkillsArg(sessionFile?: string): Promise<string>",
           "lines": [
-            233,
-            239
+            246,
+            283
           ],
           "exported": true,
           "is_default": false,
@@ -6899,7 +6937,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Build the skills argument for pi invocation\nReturns comma-separated list of available skills",
+          "comment": "Build the skills argument for pi invocation\nReturns comma-separated list of available skills\n\nRLM skill is only included for files larger than RLM_SIZE_THRESHOLD\nto avoid confusing smaller models with RLM instructions.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -6908,8 +6946,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            248,
-            280
+            292,
+            324
           ],
           "exported": true,
           "is_default": false,
@@ -6927,8 +6965,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            285,
-            304
+            329,
+            348
           ],
           "exported": false,
           "is_default": false,
@@ -6946,8 +6984,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            313,
-            429
+            357,
+            465
           ],
           "exported": true,
           "is_default": false,
@@ -6965,8 +7003,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            432,
-            438
+            468,
+            474
           ],
           "exported": false,
           "is_default": false,
@@ -6984,8 +7022,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            443,
-            507
+            479,
+            543
           ],
           "exported": false,
           "is_default": false,
@@ -7003,8 +7041,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            514,
-            519
+            550,
+            555
           ],
           "exported": false,
           "is_default": false,
@@ -7022,8 +7060,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            521,
-            524
+            557,
+            560
           ],
           "exported": false,
           "is_default": false,
@@ -7041,8 +7079,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            526,
-            530
+            562,
+            566
           ],
           "exported": false,
           "is_default": false,
@@ -7060,8 +7098,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            535,
-            604
+            571,
+            640
           ],
           "exported": true,
           "is_default": false,
@@ -7079,8 +7117,8 @@
           "kind": "function",
           "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput",
           "lines": [
-            610,
-            643
+            646,
+            679
           ],
           "exported": true,
           "is_default": false,
@@ -7098,8 +7136,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            648,
-            694
+            684,
+            730
           ],
           "exported": true,
           "is_default": false,
@@ -7117,8 +7155,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            701,
-            706
+            737,
+            742
           ],
           "exported": true,
           "is_default": false,
@@ -7136,8 +7174,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            711,
-            765
+            747,
+            801
           ],
           "exported": true,
           "is_default": false,
@@ -7155,8 +7193,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            712,
-            712
+            748,
+            748
           ],
           "exported": false,
           "is_default": false,
@@ -7174,8 +7212,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            713,
-            713
+            749,
+            749
           ],
           "exported": false,
           "is_default": false,
@@ -7193,8 +7231,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            715,
-            718
+            751,
+            754
           ],
           "exported": false,
           "is_default": false,
@@ -7212,8 +7250,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            723,
-            739
+            759,
+            775
           ],
           "exported": false,
           "is_default": false,
@@ -7231,8 +7269,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            745,
-            764
+            781,
+            800
           ],
           "exported": false,
           "is_default": false,
@@ -7250,8 +7288,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            770,
-            772
+            806,
+            808
           ],
           "exported": true,
           "is_default": false,

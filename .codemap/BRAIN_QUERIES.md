@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 57
-- Total symbols: 336
+- Total symbols: 338
   - function: 204
   - interface: 89
-  - variable: 17
+  - variable: 19
   - type: 17
   - class: 9
 
@@ -700,22 +700,23 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-668]
+src/daemon/processor.test.ts [1-723]
   imports:
     - ./processor.js
     - ./queue.js
+    - node:fs/promises
     - node:os
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-773]
+src/daemon/processor.ts [1-809]
   class:
-    711-765: class JobProcessor [exported]
+    747-801: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
       refs in: 5 [import: 1, instantiate: 1, reexport: 1, type: 2]
         - src/daemon/index.ts:56: reexport (module)
-        - src/daemon/processor.ts:770: type createProcessor
-        - src/daemon/processor.ts:771: instantiate createProcessor
+        - src/daemon/processor.ts:806: type createProcessor
+        - src/daemon/processor.ts:807: instantiate createProcessor
         - src/daemon/worker.ts:52: import (module)
         - src/daemon/worker.ts:146: type Worker.processor
   interface:
@@ -723,149 +724,150 @@ src/daemon/processor.ts [1-773]
       /** Result from invoking the pi agent */
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:71: reexport (module)
-        - src/daemon/processor.ts:317: type invokeAgent
-        - src/daemon/processor.ts:538: type parseAgentOutput
-        - src/daemon/processor.ts:723: type JobProcessor.process
+        - src/daemon/processor.ts:361: type invokeAgent
+        - src/daemon/processor.ts:574: type parseAgentOutput
+        - src/daemon/processor.ts:759: type JobProcessor.process
     37-116: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs in: 12 [import: 3, reexport: 1, type: 8]
+      refs in: 8 [import: 1, reexport: 1, type: 6]
         - src/daemon/index.ts:72: reexport (module)
-        - src/daemon/processor.test.ts:24: import (module)
-        - src/daemon/processor.test.ts:47: type createValidNodeOutput
+        - src/daemon/processor.test.ts:26: import (module)
+        - src/daemon/processor.test.ts:49: type createValidNodeOutput
         - src/daemon/processor.ts:27: type AgentResult
-        - src/daemon/processor.ts:613: type extractNodeFromText
-        - src/daemon/processor.ts:618: type parsed
-        - src/daemon/processor.ts:632: type parsed
-        - src/daemon/processor.ts:648: type isValidNodeOutput
-        - src/storage/index.test.ts:11: import (module)
-        - src/storage/index.test.ts:168: type createTestAgentOutput
+        - src/daemon/processor.ts:649: type extractNodeFromText
+        - src/daemon/processor.ts:654: type parsed
+        - src/daemon/processor.ts:668: type parsed
+        - src/daemon/processor.ts:684: type isValidNodeOutput
     128-132: interface SkillInfo [exported]
       /** Skill availability information */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:73: reexport (module)
-        - src/daemon/processor.ts:183: type getSkillAvailability
-        - src/daemon/processor.ts:184: type availability
+        - src/daemon/processor.ts:189: type getSkillAvailability
+        - src/daemon/processor.ts:190: type availability
     135-140: interface ProcessorLogger [exported]
       /** Logger interface for processor */
       refs in: 22 [import: 3, reexport: 1, type: 18]
         - src/daemon/index.ts:74: reexport (module)
-        - src/daemon/processor.test.ts:25: import (module)
-        - src/daemon/processor.test.ts:105: type silentLogger
+        - src/daemon/processor.test.ts:27: import (module)
+        - src/daemon/processor.test.ts:107: type silentLogger
         - src/daemon/processor.ts:143: type consoleLogger
-        - src/daemon/processor.ts:316: type invokeAgent
-        - src/daemon/processor.ts:446: type spawnPiProcess
-        - src/daemon/processor.ts:537: type parseAgentOutput
-        - src/daemon/processor.ts:612: type extractNodeFromText
-        - src/daemon/processor.ts:705: type ProcessorConfig
-        - src/daemon/processor.ts:713: type JobProcessor.logger
-    202-209: interface EnvironmentValidationResult [exported]
+        - src/daemon/processor.ts:360: type invokeAgent
+        - src/daemon/processor.ts:482: type spawnPiProcess
+        - src/daemon/processor.ts:573: type parseAgentOutput
+        - src/daemon/processor.ts:648: type extractNodeFromText
+        - src/daemon/processor.ts:741: type ProcessorConfig
+        - src/daemon/processor.ts:749: type JobProcessor.logger
+    212-219: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
       refs in: 2 [type: 2]
-        - src/daemon/processor.ts:215: type validateRequiredSkills
-        - src/daemon/processor.ts:745: type JobProcessor.validateEnvironment
-    701-706: interface ProcessorConfig [exported]
+        - src/daemon/processor.ts:225: type validateRequiredSkills
+        - src/daemon/processor.ts:781: type JobProcessor.validateEnvironment
+    737-742: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs in: 3 [reexport: 1, type: 2]
         - src/daemon/index.ts:75: reexport (module)
-        - src/daemon/processor.ts:715: type JobProcessor.constructor
-        - src/daemon/processor.ts:770: type createProcessor
+        - src/daemon/processor.ts:751: type JobProcessor.constructor
+        - src/daemon/processor.ts:806: type createProcessor
   function:
-    170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    176-184: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-      refs in: 8 [call: 5, import: 2, reexport: 1]
+      refs in: 9 [call: 6, import: 2, reexport: 1]
         - src/daemon/cli.ts:42: import (module)
         - src/daemon/cli.ts:671: call available
         - src/daemon/cli.ts:701: call available
         - src/daemon/index.ts:65: reexport (module)
         - src/daemon/processor.test.ts:14: import (module)
-        - src/daemon/processor.test.ts:549: call available
         - src/daemon/processor.test.ts:555: call available
-        - src/daemon/processor.ts:189: call available
-    183-199: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+        - src/daemon/processor.test.ts:561: call available
+        - src/daemon/processor.test.ts:658: call rlmAvailable
+        - src/daemon/processor.ts:199: call available
+    189-209: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
       refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:64: reexport (module)
-        - src/daemon/processor.test.ts:18: import (module)
-        - src/daemon/processor.test.ts:564: call availability
-        - src/daemon/processor.test.ts:580: call availability
-        - src/daemon/processor.ts:216: call skills
-        - src/daemon/processor.ts:234: call skills
-    215-227: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+        - src/daemon/processor.test.ts:19: import (module)
+        - src/daemon/processor.test.ts:570: call availability
+        - src/daemon/processor.test.ts:592: call availability
+        - src/daemon/processor.ts:226: call skills
+        - src/daemon/processor.ts:247: call skills
+    225-237: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:66: reexport (module)
-        - src/daemon/processor.ts:747: call JobProcessor.skillsResult
-    233-239: async buildSkillsArg(): Promise<string> [exported]
-      /** Build the skills argument for pi invocation Returns comma-separated list of available skills */
-      refs in: 5 [call: 3, import: 1, reexport: 1]
+        - src/daemon/processor.ts:783: call JobProcessor.skillsResult
+    246-283: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+      /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
+      refs in: 7 [call: 5, import: 1, reexport: 1]
         - src/daemon/index.ts:63: reexport (module)
         - src/daemon/processor.test.ts:13: import (module)
-        - src/daemon/processor.test.ts:594: call skills
-        - src/daemon/processor.test.ts:599: call skills
-        - src/daemon/processor.ts:347: call skills
-    248-280: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.test.ts:606: call skills
+        - src/daemon/processor.test.ts:611: call skills
+        - src/daemon/processor.test.ts:638: call skills
+        - src/daemon/processor.test.ts:656: call skills
+        - src/daemon/processor.ts:391: call skills
+    292-324: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:62: reexport (module)
         - src/daemon/processor.test.ts:12: import (module)
-        - src/daemon/processor.test.ts:119: call prompt
-        - src/daemon/processor.test.ts:131: call prompt
-        - src/daemon/processor.test.ts:140: call prompt
-        - src/daemon/processor.test.ts:149: call prompt
-        - src/daemon/processor.test.ts:162: call prompt
-        - src/daemon/processor.test.ts:175: call prompt
-        - src/daemon/processor.test.ts:187: call prompt
-        - src/daemon/processor.ts:359: call prompt
-    313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.test.ts:121: call prompt
+        - src/daemon/processor.test.ts:133: call prompt
+        - src/daemon/processor.test.ts:142: call prompt
+        - src/daemon/processor.test.ts:151: call prompt
+        - src/daemon/processor.test.ts:164: call prompt
+        - src/daemon/processor.test.ts:177: call prompt
+        - src/daemon/processor.test.ts:189: call prompt
+        - src/daemon/processor.ts:395: call prompt
+    357-465: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:58: reexport (module)
-        - src/daemon/processor.ts:728: call JobProcessor.result
-    535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:764: call JobProcessor.result
+    571-640: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs in: 12 [call: 10, import: 1, reexport: 1]
         - src/daemon/index.ts:59: reexport (module)
-        - src/daemon/processor.test.ts:20: import (module)
-        - src/daemon/processor.test.ts:395: call result
-        - src/daemon/processor.test.ts:419: call result
-        - src/daemon/processor.test.ts:427: call result
-        - src/daemon/processor.test.ts:435: call result
-        - src/daemon/processor.test.ts:446: call result
-        - src/daemon/processor.test.ts:462: call result
-        - src/daemon/processor.test.ts:486: call result
-        - src/daemon/processor.test.ts:514: call result
-    610-643: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+        - src/daemon/processor.test.ts:22: import (module)
+        - src/daemon/processor.test.ts:397: call result
+        - src/daemon/processor.test.ts:421: call result
+        - src/daemon/processor.test.ts:429: call result
+        - src/daemon/processor.test.ts:437: call result
+        - src/daemon/processor.test.ts:448: call result
+        - src/daemon/processor.test.ts:464: call result
+        - src/daemon/processor.test.ts:488: call result
+        - src/daemon/processor.test.ts:516: call result
+    646-679: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs in: 10 [call: 8, import: 1, reexport: 1]
         - src/daemon/index.ts:60: reexport (module)
-        - src/daemon/processor.test.ts:17: import (module)
-        - src/daemon/processor.test.ts:304: call result
-        - src/daemon/processor.test.ts:316: call result
-        - src/daemon/processor.test.ts:325: call result
-        - src/daemon/processor.test.ts:332: call result
-        - src/daemon/processor.test.ts:341: call result
-        - src/daemon/processor.test.ts:346: call result
-        - src/daemon/processor.test.ts:363: call result
-        - src/daemon/processor.ts:589: call nodeData
-    648-694: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.test.ts:18: import (module)
+        - src/daemon/processor.test.ts:306: call result
+        - src/daemon/processor.test.ts:318: call result
+        - src/daemon/processor.test.ts:327: call result
+        - src/daemon/processor.test.ts:334: call result
+        - src/daemon/processor.test.ts:343: call result
+        - src/daemon/processor.test.ts:348: call result
+        - src/daemon/processor.test.ts:365: call result
+        - src/daemon/processor.ts:625: call nodeData
+    684-730: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs in: 19 [call: 17, import: 1, reexport: 1]
         - src/daemon/index.ts:61: reexport (module)
-        - src/daemon/processor.test.ts:19: import (module)
-        - src/daemon/processor.test.ts:201: call (module)
-        - src/daemon/processor.test.ts:205: call (module)
-        - src/daemon/processor.test.ts:209: call (module)
-        - src/daemon/processor.test.ts:210: call (module)
-        - src/daemon/processor.test.ts:217: call (module)
-        - src/daemon/processor.test.ts:224: call (module)
-        - src/daemon/processor.test.ts:231: call (module)
-        - src/daemon/processor.test.ts:238: call (module)
-    770-772: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+        - src/daemon/processor.test.ts:20: import (module)
+        - src/daemon/processor.test.ts:203: call (module)
+        - src/daemon/processor.test.ts:207: call (module)
+        - src/daemon/processor.test.ts:211: call (module)
+        - src/daemon/processor.test.ts:212: call (module)
+        - src/daemon/processor.test.ts:219: call (module)
+        - src/daemon/processor.test.ts:226: call (module)
+        - src/daemon/processor.test.ts:233: call (module)
+        - src/daemon/processor.test.ts:240: call (module)
+    806-808: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/index.ts:57: reexport (module)
-        - src/daemon/processor.test.ts:16: import (module)
-        - src/daemon/processor.test.ts:622: call processor
+        - src/daemon/processor.test.ts:17: import (module)
+        - src/daemon/processor.test.ts:677: call processor
         - src/daemon/worker.ts:51: import (module)
         - src/daemon/worker.ts:176: call Worker.initialize
   variable:
@@ -873,26 +875,34 @@ src/daemon/processor.ts [1-773]
       /** Default console logger */
       refs in: 4 [import: 3, reexport: 1]
         - src/daemon/index.ts:67: reexport (module)
-        - src/daemon/processor.test.ts:15: import (module)
+        - src/daemon/processor.test.ts:16: import (module)
         - src/daemon/query-processor.ts:25: import (module)
         - src/daemon/worker.ts:50: import (module)
-    155-155: readonly ["rlm"] [exported]
+    155-155: readonly [] [exported]
       /** Required skills for analysis - must be available */
       refs in: 3 [import: 2, reexport: 1]
         - src/daemon/cli.ts:43: import (module)
         - src/daemon/index.ts:68: reexport (module)
-        - src/daemon/processor.test.ts:21: import (module)
+        - src/daemon/processor.test.ts:23: import (module)
     158-158: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
       refs in: 3 [import: 2, reexport: 1]
         - src/daemon/cli.ts:44: import (module)
         - src/daemon/index.ts:69: reexport (module)
-        - src/daemon/processor.test.ts:22: import (module)
-    161-161: any [exported]
+        - src/daemon/processor.test.ts:21: import (module)
+    161-161: readonly ["rlm"] [exported]
+      /** Skills that are conditionally included based on file size */
+      refs in: 1 [import: 1]
+        - src/daemon/processor.test.ts:15: import (module)
+    164-164: number [exported]
+      /** File size threshold (in bytes) for including RLM skill */
+      refs in: 1 [import: 1]
+        - src/daemon/processor.test.ts:24: import (module)
+    167-167: any [exported]
       /** Skills directory location */
       refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:70: reexport (module)
-        - src/daemon/processor.test.ts:23: import (module)
+        - src/daemon/processor.test.ts:25: import (module)
   imports:
     - ../config/types.js
     - ./queue.js
@@ -1034,7 +1044,7 @@ src/daemon/queue.ts [1-787]
       refs in: 5 [import: 1, reexport: 1, type: 3]
         - src/daemon/index.ts:46: reexport (module)
         - src/daemon/processor.test.ts:9: import (module)
-        - src/daemon/processor.test.ts:35: type createTestJob
+        - src/daemon/processor.test.ts:37: type createTestJob
         - src/daemon/queue.ts:57: type AnalysisJob
         - src/daemon/queue.ts:722: type QueueManager.parseRow
     20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
@@ -1042,7 +1052,7 @@ src/daemon/queue.ts [1-787]
       refs in: 8 [import: 1, reexport: 1, type: 6]
         - src/daemon/index.ts:47: reexport (module)
         - src/daemon/processor.test.ts:9: import (module)
-        - src/daemon/processor.test.ts:39: type createTestJob
+        - src/daemon/processor.test.ts:41: type createTestJob
         - src/daemon/queue.ts:69: type AnalysisJob
         - src/daemon/queue.ts:664: type QueueManager.getJobCounts
         - src/daemon/queue.ts:675: type QueueManager.counts
@@ -3249,4 +3259,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,597 (codebase: ~1,090,387)
+Estimated tokens: 42,747 (codebase: ~1,090,736)

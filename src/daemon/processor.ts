@@ -152,10 +152,16 @@ export const consoleLogger: ProcessorLogger = {
 // =============================================================================
 
 /** Required skills for analysis - must be available */
-export const REQUIRED_SKILLS = ["rlm"] as const;
+export const REQUIRED_SKILLS = [] as const;
 
 /** Optional skills - enhance analysis but not required */
 export const OPTIONAL_SKILLS = ["codemap"] as const;
+
+/** Skills that are conditionally included based on file size */
+export const CONDITIONAL_SKILLS = ["rlm"] as const;
+
+/** File size threshold (in bytes) for including RLM skill */
+export const RLM_SIZE_THRESHOLD = 500 * 1024; // 500KB
 
 /** Skills directory location */
 export const SKILLS_DIR = path.join(os.homedir(), "skills");
@@ -182,7 +188,11 @@ export async function checkSkillAvailable(skillName: string): Promise<boolean> {
  */
 export async function getSkillAvailability(): Promise<Map<string, SkillInfo>> {
   const availability = new Map<string, SkillInfo>();
-  const allSkills = [...REQUIRED_SKILLS, ...OPTIONAL_SKILLS];
+  const allSkills = [
+    ...REQUIRED_SKILLS,
+    ...OPTIONAL_SKILLS,
+    ...CONDITIONAL_SKILLS,
+  ];
 
   for (const skill of allSkills) {
     const skillPath = path.join(SKILLS_DIR, skill, "SKILL.md");
@@ -229,13 +239,47 @@ export async function validateRequiredSkills(): Promise<EnvironmentValidationRes
 /**
  * Build the skills argument for pi invocation
  * Returns comma-separated list of available skills
+ *
+ * RLM skill is only included for files larger than RLM_SIZE_THRESHOLD
+ * to avoid confusing smaller models with RLM instructions.
  */
-export async function buildSkillsArg(): Promise<string> {
+export async function buildSkillsArg(sessionFile?: string): Promise<string> {
   const skills = await getSkillAvailability();
 
-  return [...REQUIRED_SKILLS, ...OPTIONAL_SKILLS]
-    .filter((s) => skills.get(s)?.available)
-    .join(",");
+  // Check if we should include RLM (only for large files)
+  let includeRlm = false;
+  if (sessionFile) {
+    try {
+      const stat = await fs.stat(sessionFile);
+      includeRlm = stat.size >= RLM_SIZE_THRESHOLD;
+    } catch {
+      // If we can't stat the file, don't include RLM
+      includeRlm = false;
+    }
+  }
+
+  const skillsToInclude: string[] = [];
+
+  // Add required skills
+  for (const skill of REQUIRED_SKILLS) {
+    if (skills.get(skill)?.available) {
+      skillsToInclude.push(skill);
+    }
+  }
+
+  // Add optional skills
+  for (const skill of OPTIONAL_SKILLS) {
+    if (skills.get(skill)?.available) {
+      skillsToInclude.push(skill);
+    }
+  }
+
+  // Add conditional skills (RLM) only for large files
+  if (includeRlm && skills.get("rlm")?.available) {
+    skillsToInclude.push("rlm");
+  }
+
+  return skillsToInclude.join(",");
 }
 
 // =============================================================================
@@ -343,17 +387,9 @@ export async function invokeAgent(
     };
   }
 
-  // Build skills arg
-  const skills = await buildSkillsArg();
-  if (!skills) {
-    return {
-      success: false,
-      rawOutput: "",
-      error: "No skills available for analysis",
-      exitCode: null,
-      durationMs: Date.now() - startTime,
-    };
-  }
+  // Build skills arg (includes RLM only for large files)
+  const skills = await buildSkillsArg(job.sessionFile);
+  // Note: empty skills string is now allowed since RLM is conditional
 
   // Build prompt
   const prompt = buildAnalysisPrompt(job);
@@ -366,8 +402,8 @@ export async function invokeAgent(
     config.model,
     "--system-prompt",
     config.promptFile,
-    "--skills",
-    skills,
+    // Only include --skills if we have skills to include
+    ...(skills ? ["--skills", skills] : []),
     "--no-session",
     "--mode",
     "json",

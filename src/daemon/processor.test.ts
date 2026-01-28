@@ -12,14 +12,16 @@ import {
   buildAnalysisPrompt,
   buildSkillsArg,
   checkSkillAvailable,
+  CONDITIONAL_SKILLS,
   consoleLogger,
   createProcessor,
   extractNodeFromText,
   getSkillAvailability,
   isValidNodeOutput,
+  OPTIONAL_SKILLS,
   parseAgentOutput,
   REQUIRED_SKILLS,
-  OPTIONAL_SKILLS,
+  RLM_SIZE_THRESHOLD,
   SKILLS_DIR,
   type AgentNodeOutput,
   type ProcessorLogger,
@@ -529,8 +531,8 @@ describe("parseAgentOutput", () => {
 
 describe("skill management", () => {
   describe("constants", () => {
-    it("should have rlm as required skill", () => {
-      expect(REQUIRED_SKILLS).toContain("rlm");
+    it("should have rlm as conditional skill", () => {
+      expect(CONDITIONAL_SKILLS).toContain("rlm");
     });
 
     it("should have codemap as optional skill", () => {
@@ -539,6 +541,10 @@ describe("skill management", () => {
 
     it("should use correct skills directory", () => {
       expect(SKILLS_DIR).toBe(path.join(os.homedir(), "skills"));
+    });
+
+    it("should have RLM size threshold set to 500KB", () => {
+      expect(RLM_SIZE_THRESHOLD).toBe(500 * 1024);
     });
   });
 
@@ -560,7 +566,7 @@ describe("skill management", () => {
   });
 
   describe("getSkillAvailability", () => {
-    it("should return a map with all required and optional skills", async () => {
+    it("should return a map with all required, optional, and conditional skills", async () => {
       const availability = await getSkillAvailability();
 
       // Check all required skills are in the map
@@ -571,6 +577,12 @@ describe("skill management", () => {
 
       // Check all optional skills are in the map
       for (const skill of OPTIONAL_SKILLS) {
+        expect(availability.has(skill)).toBeTruthy();
+        expect(availability.get(skill)?.name).toBe(skill);
+      }
+
+      // Check all conditional skills are in the map
+      for (const skill of CONDITIONAL_SKILLS) {
         expect(availability.has(skill)).toBeTruthy();
         expect(availability.get(skill)?.name).toBe(skill);
       }
@@ -595,11 +607,12 @@ describe("skill management", () => {
       expect(typeof skills).toBe("string");
     });
 
-    it("should return a properly formatted skills string", async () => {
+    it("should return a properly formatted skills string without RLM for no file", async () => {
       const skills = await buildSkillsArg();
       const allKnownSkills = [
         ...REQUIRED_SKILLS,
         ...OPTIONAL_SKILLS,
+        // RLM should NOT be included when no file is provided
       ] as string[];
 
       // Empty is valid, or comma-separated known skills
@@ -608,6 +621,48 @@ describe("skill management", () => {
         allKnownSkills.includes(skill)
       );
       expect(allKnown).toBeTruthy();
+      // RLM should not be included without a file
+      expect(skillList).not.toContain("rlm");
+    });
+
+    it("should not include RLM for small files", async () => {
+      // Create a small temp file
+      const { tmpdir } = await import("node:os");
+      const { writeFile, unlink } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+
+      const tempFile = join(tmpdir(), "test-small-session.jsonl");
+      await writeFile(tempFile, '{"type":"test"}\n'.repeat(100)); // ~1.6KB
+
+      try {
+        const skills = await buildSkillsArg(tempFile);
+        expect(skills).not.toContain("rlm");
+      } finally {
+        await unlink(tempFile);
+      }
+    });
+
+    it("should include RLM for large files", async () => {
+      // Create a large temp file (> 500KB)
+      const { tmpdir } = await import("node:os");
+      const { writeFile, unlink } = await import("node:fs/promises");
+      const { join } = await import("node:path");
+
+      const tempFile = join(tmpdir(), "test-large-session.jsonl");
+      // Create a file larger than RLM_SIZE_THRESHOLD (500KB)
+      await writeFile(tempFile, '{"type":"test","data":"x"}\n'.repeat(25_000)); // ~650KB
+
+      try {
+        const skills = await buildSkillsArg(tempFile);
+        // Only include RLM if the skill is available
+        const rlmAvailable = await checkSkillAvailable("rlm");
+        if (rlmAvailable) {
+          // eslint-disable-next-line eslint-plugin-jest/no-conditional-expect
+          expect(skills).toContain("rlm");
+        }
+      } finally {
+        await unlink(tempFile);
+      }
     });
   });
 });
