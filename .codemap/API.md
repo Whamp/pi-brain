@@ -2117,4 +2117,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 89
-Estimated tokens: 26,684 (codebase: ~1,050,715)
+Estimated tokens: 26,684 (codebase: ~1,050,573)
