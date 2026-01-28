@@ -20,7 +20,6 @@ import {
   generateDecisionId,
   generateErrorId,
   generateLessonId,
-  generateNodeId,
   generateQuirkId,
   type DaemonDecision,
   type Edge,
@@ -65,28 +64,6 @@ export interface NodeRow {
   signals: string | null;
   created_at: string;
   updated_at: string;
-}
-
-// =============================================================================
-// ID Generators
-// =============================================================================
-
-export { generateNodeId };
-
-export function generateLessonId(): string {
-  return `les_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-export function generateQuirkId(): string {
-  return `qrk_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-export function generateErrorId(): string {
-  return `err_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
-}
-
-export function generateDecisionId(): string {
-  return `dec_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
 }
 
 // =============================================================================

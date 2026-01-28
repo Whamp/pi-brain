@@ -26,6 +26,22 @@ export function generateNodeId(): string {
   return crypto.randomUUID().replaceAll("-", "").slice(0, 16);
 }
 
+export function generateLessonId(): string {
+  return `les_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
+}
+
+export function generateQuirkId(): string {
+  return `qrk_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
+}
+
+export function generateErrorId(): string {
+  return `err_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
+}
+
+export function generateDecisionId(): string {
+  return `dec_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`;
+}
+
 /**
  * Generate a deterministic 16-character hex node ID based on session and segment.
  * This ensures idempotent ingestion - re-running the same job produces the same ID.

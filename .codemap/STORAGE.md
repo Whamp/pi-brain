@@ -180,54 +180,50 @@ src/storage/node-conversion.ts [1-260]
     - ../daemon/queue.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-774]
+src/storage/node-crud.ts [1-751]
   interface:
-    40-43: interface RepositoryOptions extends NodeStorageOptions [exported]
+    39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    46-68: interface NodeRow [exported]
+    45-67: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    76-78: generateLessonId(): string [exported]
-    80-82: generateQuirkId(): string [exported]
-    84-86: generateErrorId(): string [exported]
-    88-90: generateDecisionId(): string [exported]
-    99-130: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node */
-    135-155: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    112-132: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node */
-    160-180: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    137-157: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node */
-    185-204: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    162-181: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    214-243: clearAllData(db: Database.Database): void [exported]
+    191-220: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    249-315: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    226-292: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    321-335: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    346-453: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    460-550: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    437-527: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    555-561: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    532-538: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    568-578: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    545-555: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    583-586: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    560-563: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    591-597: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    568-574: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    603-609: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    580-586: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    614-626: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    591-603: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    631-642: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    608-619: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    647-658: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    667-692: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    719-757: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -343,21 +339,25 @@ src/storage/node-storage.ts [1-292]
     - node:os
     - node:path
 
-src/storage/node-types.ts [1-113]
+src/storage/node-types.ts [1-129]
   function:
     25-27: generateNodeId(): string [exported]
       /** Generate a unique 16-character hex node ID Uses first 16 chars of UUID (64 bits of entropy) */
-    43-53: generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string [exported]
+    29-31: generateLessonId(): string [exported]
+    33-35: generateQuirkId(): string [exported]
+    37-39: generateErrorId(): string [exported]
+    41-43: generateDecisionId(): string [exported]
+    59-69: generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string [exported]
       /** Generate a deterministic 16-character hex node ID based on session and segment. This ensures idempotent ingestion - re-running the same job produces the same ID. The ID is derived from: - Session file path - Segment start entry ID - Segment end entry ID Uses length-prefix encoding to prevent collisions from inputs containing delimiter characters (e.g., "a:b" + "c" vs "a" + "b:c"). Two jobs with the same inputs will always produce the same node ID. */
-    58-60: nodeRef(nodeId: string, version: number): string [exported]
+    74-76: nodeRef(nodeId: string, version: number): string [exported]
       /** Create a full node reference with version */
-    65-74: parseNodeRef(ref: string): { nodeId: string; version: number; } [exported]
+    81-90: parseNodeRef(ref: string): { nodeId: string; version: number; } [exported]
       /** Parse a node reference into id and version */
-    79-89: emptyLessons(): LessonsByLevel [exported]
+    95-105: emptyLessons(): LessonsByLevel [exported]
       /** Create an empty lessons structure */
-    94-102: emptyObservations(): ModelObservations [exported]
+    110-118: emptyObservations(): ModelObservations [exported]
       /** Create an empty observations structure */
-    107-112: emptyDaemonMeta(): DaemonMeta [exported]
+    123-128: emptyDaemonMeta(): DaemonMeta [exported]
       /** Create an empty daemon meta structure */
   imports:
     - ../types/index.js
@@ -489,4 +489,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 15
-Estimated tokens: 6,913 (codebase: ~971,376)
+Estimated tokens: 6,914 (codebase: ~974,748)

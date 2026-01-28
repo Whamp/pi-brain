@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34387,
-  "codebase_tokens": 974805,
+  "total_tokens": 34388,
+  "codebase_tokens": 972448,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15121,18 +15121,18 @@
       "language": "typescript",
       "lines": [
         1,
-        774
+        751
       ],
       "detail_level": "full",
-      "token_estimate": 1295,
+      "token_estimate": 1246,
       "symbols": [
         {
           "name": "RepositoryOptions",
           "kind": "interface",
           "signature": "RepositoryOptions extends NodeStorageOptions",
           "lines": [
-            40,
-            43
+            39,
+            42
           ],
           "exported": true,
           "is_default": false,
@@ -15150,8 +15150,8 @@
           "kind": "interface",
           "signature": "NodeRow",
           "lines": [
-            46,
-            68
+            45,
+            67
           ],
           "exported": true,
           "is_default": false,
@@ -15165,88 +15165,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "generateLessonId",
-          "kind": "function",
-          "signature": "generateLessonId(): string",
-          "lines": [
-            76,
-            78
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": null,
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "generateQuirkId",
-          "kind": "function",
-          "signature": "generateQuirkId(): string",
-          "lines": [
-            80,
-            82
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": null,
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "generateErrorId",
-          "kind": "function",
-          "signature": "generateErrorId(): string",
-          "lines": [
-            84,
-            86
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": null,
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "generateDecisionId",
-          "kind": "function",
-          "signature": "generateDecisionId(): string",
-          "lines": [
-            88,
-            90
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": null,
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "insertLessons",
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            99,
-            130
+            76,
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -15264,8 +15188,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            135,
-            155
+            112,
+            132
           ],
           "exported": true,
           "is_default": false,
@@ -15283,8 +15207,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            160,
-            180
+            137,
+            157
           ],
           "exported": true,
           "is_default": false,
@@ -15302,8 +15226,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            185,
-            204
+            162,
+            181
           ],
           "exported": true,
           "is_default": false,
@@ -15321,8 +15245,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            214,
-            243
+            191,
+            220
           ],
           "exported": true,
           "is_default": false,
@@ -15340,8 +15264,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            249,
-            315
+            226,
+            292
           ],
           "exported": true,
           "is_default": false,
@@ -15359,8 +15283,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            321,
-            335
+            298,
+            312
           ],
           "exported": true,
           "is_default": false,
@@ -15378,8 +15302,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            346,
-            453
+            323,
+            430
           ],
           "exported": true,
           "is_default": false,
@@ -15397,8 +15321,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            460,
-            550
+            437,
+            527
           ],
           "exported": true,
           "is_default": false,
@@ -15416,8 +15340,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
           "lines": [
-            555,
-            561
+            532,
+            538
           ],
           "exported": true,
           "is_default": false,
@@ -15435,8 +15359,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
           "lines": [
-            568,
-            578
+            545,
+            555
           ],
           "exported": true,
           "is_default": false,
@@ -15454,8 +15378,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            583,
-            586
+            560,
+            563
           ],
           "exported": true,
           "is_default": false,
@@ -15473,8 +15397,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            591,
-            597
+            568,
+            574
           ],
           "exported": true,
           "is_default": false,
@@ -15492,8 +15416,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            603,
-            609
+            580,
+            586
           ],
           "exported": true,
           "is_default": false,
@@ -15511,8 +15435,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
           "lines": [
-            614,
-            626
+            591,
+            603
           ],
           "exported": true,
           "is_default": false,
@@ -15530,8 +15454,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            631,
-            642
+            608,
+            619
           ],
           "exported": true,
           "is_default": false,
@@ -15549,8 +15473,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            647,
-            658
+            624,
+            635
           ],
           "exported": true,
           "is_default": false,
@@ -15568,8 +15492,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            667,
-            692
+            644,
+            669
           ],
           "exported": true,
           "is_default": false,
@@ -15587,8 +15511,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            695,
-            702
+            672,
+            679
           ],
           "exported": false,
           "is_default": false,
@@ -15606,8 +15530,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            707,
-            712
+            684,
+            689
           ],
           "exported": false,
           "is_default": false,
@@ -15625,8 +15549,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            719,
-            757
+            696,
+            734
           ],
           "exported": true,
           "is_default": false,
@@ -15644,8 +15568,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            762,
-            773
+            739,
+            750
           ],
           "exported": false,
           "is_default": false,
@@ -16399,10 +16323,10 @@
       "language": "typescript",
       "lines": [
         1,
-        113
+        129
       ],
       "detail_level": "full",
-      "token_estimate": 356,
+      "token_estimate": 406,
       "symbols": [
         {
           "name": "generateNodeId",
@@ -16424,12 +16348,88 @@
           "outgoing_refs": null
         },
         {
+          "name": "generateLessonId",
+          "kind": "function",
+          "signature": "generateLessonId(): string",
+          "lines": [
+            29,
+            31
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generateQuirkId",
+          "kind": "function",
+          "signature": "generateQuirkId(): string",
+          "lines": [
+            33,
+            35
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generateErrorId",
+          "kind": "function",
+          "signature": "generateErrorId(): string",
+          "lines": [
+            37,
+            39
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generateDecisionId",
+          "kind": "function",
+          "signature": "generateDecisionId(): string",
+          "lines": [
+            41,
+            43
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "generateDeterministicNodeId",
           "kind": "function",
           "signature": "generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string",
           "lines": [
-            43,
-            53
+            59,
+            69
           ],
           "exported": true,
           "is_default": false,
@@ -16447,8 +16447,8 @@
           "kind": "function",
           "signature": "nodeRef(nodeId: string, version: number): string",
           "lines": [
-            58,
-            60
+            74,
+            76
           ],
           "exported": true,
           "is_default": false,
@@ -16466,8 +16466,8 @@
           "kind": "function",
           "signature": "parseNodeRef(ref: string): { nodeId: string; version: number; }",
           "lines": [
-            65,
-            74
+            81,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -16485,8 +16485,8 @@
           "kind": "function",
           "signature": "emptyLessons(): LessonsByLevel",
           "lines": [
-            79,
-            89
+            95,
+            105
           ],
           "exported": true,
           "is_default": false,
@@ -16504,8 +16504,8 @@
           "kind": "function",
           "signature": "emptyObservations(): ModelObservations",
           "lines": [
-            94,
-            102
+            110,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -16523,8 +16523,8 @@
           "kind": "function",
           "signature": "emptyDaemonMeta(): DaemonMeta",
           "lines": [
-            107,
-            112
+            123,
+            128
           ],
           "exported": true,
           "is_default": false,
