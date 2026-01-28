@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 35841,
-  "codebase_tokens": 972926,
+  "codebase_tokens": 993524,
   "files": [
     {
       "path": "src/api/index.ts",

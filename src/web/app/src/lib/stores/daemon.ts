@@ -46,7 +46,6 @@ function createDaemonStore() {
       update((s) => ({
         ...s,
         status,
-        loading: false,
         lastUpdated: new Date().toISOString(),
         backendOffline: false,
       }));
@@ -54,13 +53,14 @@ function createDaemonStore() {
       const offline = isBackendOffline(error);
       update((s) => ({
         ...s,
-        loading: false,
         backendOffline: offline,
         error:
           error instanceof Error
             ? error.message
             : "Failed to load daemon status",
       }));
+    } finally {
+      update((s) => ({ ...s, loading: false }));
     }
   }
 
