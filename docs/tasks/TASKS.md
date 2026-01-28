@@ -254,7 +254,7 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 | ID     | Task                                      | Status | Deps          | Notes      |
 | ------ | ----------------------------------------- | ------ | ------------- | ---------- |
 | 17.3.1 | Add storeEmbeddingWithVec helper function | done   | 17.1.3        | 2026-01-27 |
-| 17.3.2 | Add embedding generation in worker.ts     | active | 17.3.1,17.2.1 | 2026-01-27 |
+| 17.3.2 | Add embedding generation in worker.ts     | done   | 17.3.1,17.2.1 | 2026-01-27 |
 
 ### 17.4 Backfill Job
 

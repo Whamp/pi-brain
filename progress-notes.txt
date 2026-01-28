@@ -32,3 +32,20 @@ Main branch: major/pi-brain
   - Uses BigInt for vec table rowid as required by sqlite-vec
   - Also added getEmbedding, hasEmbedding, deleteEmbedding helper functions
   - Added serializeEmbedding/deserializeEmbedding for binary blob conversion
+
+---
+
+## 2026-01-27 21:38 - Task 17.3.2
+
+**Status**: pending → done
+**Validation**: 
+  - 4 new unit tests for embedding provider initialization in worker
+  - Tests cover: missing API key warning, successful initialization log, skipped initialization when not configured, hasEmbedding utility
+  - All 1259 tests pass
+**Commit**: ba8bf99f
+**Notes**: Added embedding generation at node ingest time in worker.ts:
+  - Initialize embedding provider during worker startup (if configured)
+  - Generate embeddings after node creation using buildEmbeddingText (rich format with summary + decisions + lessons)
+  - Store using storeEmbeddingWithVec (both node_embeddings table and vec0 virtual table)
+  - Handle failures gracefully (log warning, don't fail job) - backfill job will catch gaps
+  - API key validation on startup with appropriate warning messages
