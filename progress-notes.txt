@@ -284,3 +284,17 @@ Functions still in node-repository.ts (CRUD operations: clearAllData, insertNode
 - Deleted the now redundant monolithic file
 **Commit**: f18663b
 **Notes**: Completed Phase 13 refactoring. The node repository monolith is fully decomposed into modular components.
+
+## 2026-01-27 18:35 - Task 14.6 (RLM Skill Installation)
+
+**Status**: pending → done
+**Validation**: 
+- Verified `~/skills/rlm` is a valid symlink to `~/projects/pi-rlm/skills/rlm`
+- Verified `rlm_repl.py` exists and is executable
+- Verified `pi-brain` processor detects the skill (via `validateRequiredSkills`)
+- Tested RLM REPL initialization manually
+- `npm run check` and `npm test -- --run` pass
+
+**Commit**: [no code changes]
+
+**Notes**: Confirmed RLM skill is correctly installed and detected by the daemon.

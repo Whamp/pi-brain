@@ -203,11 +203,11 @@ Ref: docs/plans/refactor-monolith-node-repository.md
 
 Ref: docs/plans/integration-repair-plan.md
 
-| ID   | Task                                        | Status  | Deps | Notes      |
-| ---- | ------------------------------------------- | ------- | ---- | ---------- |
-| 14.1 | Fix Build Pipeline for Migrations           | done    | -    | 2026-01-27 |
-| 14.2 | Fix Worker Initialization                   | done    | -    | 2026-01-27 |
-| 14.3 | Non-Fatal Environment Validation            | done    | -    | 2026-01-27 |
-| 14.4 | Configure Vite Proxy                        | done    | -    | 2026-01-27 |
-| 14.5 | Frontend Graceful API Failure Handling      | done    | -    | 2026-01-27 |
-| 14.6 | RLM Skill Installation (optional, see 14.3) | pending | -    |            |
+| ID   | Task                                        | Status | Deps | Notes                                                         |
+| ---- | ------------------------------------------- | ------ | ---- | ------------------------------------------------------------- |
+| 14.1 | Fix Build Pipeline for Migrations           | done   | -    | 2026-01-27                                                    |
+| 14.2 | Fix Worker Initialization                   | done   | -    | 2026-01-27                                                    |
+| 14.3 | Non-Fatal Environment Validation            | done   | -    | 2026-01-27                                                    |
+| 14.4 | Configure Vite Proxy                        | done   | -    | 2026-01-27                                                    |
+| 14.5 | Frontend Graceful API Failure Handling      | done   | -    | 2026-01-27                                                    |
+| 14.6 | RLM Skill Installation (optional, see 14.3) | done   | -    | 2026-01-27 - Verified symlink to ~/projects/pi-rlm/skills/rlm |
