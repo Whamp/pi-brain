@@ -129,3 +129,24 @@ Main branch: major/pi-brain
 only tracks reactive `$state()` dependencies, so updating plain variables after 
 save didn't trigger `hasChanges` recomputation. Converting to `$state()` fixed 
 the reactivity chain.
+
+---
+
+## 2026-01-28 06:03 - Task 18.2
+
+**Status**: pending → done
+**Validation**: 
+  - Svelte type-check passes: `npm run check` in src/web/app
+  - All 1272 backend tests pass
+  - Lint and format checks pass
+  - Toast store exports success/error/warning/info methods with auto-dismiss
+  - Toast component uses Svelte transitions (fly/fade), accessible aria-live region
+  - Settings page updated to use toasts instead of inline messages
+**Commit**: 82e55332
+**Notes**: Implemented global toast notification system:
+  - `src/web/app/src/lib/stores/toast.ts`: Reactive store with toast methods
+  - `src/web/app/src/lib/components/toast.svelte`: Animated toast container
+  - Toast features: auto-dismiss with progress bar, manual dismiss via X button,
+    type-specific icons and colors (success/error/warning/info)
+  - Mobile responsive: toasts appear at bottom on small screens
+  - Integrated into root layout for app-wide availability
