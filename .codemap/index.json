@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 87,
-    "totalSymbols": 1073,
+    "totalSymbols": 1076,
     "byLanguage": {
       "typescript": 87
     },
     "bySymbolKind": {
-      "function": 475,
+      "function": 478,
       "type": 40,
       "interface": 253,
       "variable": 105,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 35905,
-  "codebase_tokens": 1006708,
+  "total_tokens": 36084,
+  "codebase_tokens": 1007445,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -14895,10 +14895,10 @@
       "language": "typescript",
       "lines": [
         1,
-        222
+        298
       ],
       "detail_level": "full",
-      "token_estimate": 334,
+      "token_estimate": 513,
       "symbols": [
         {
           "name": "__dirname",
@@ -15053,12 +15053,69 @@
           "outgoing_refs": null
         },
         {
+          "name": "getMigrationSkippedReason",
+          "kind": "function",
+          "signature": "getMigrationSkippedReason(db: Database.Database, version: number): string",
+          "lines": [
+            133,
+            154
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a specific migration was skipped due to missing dependencies.\nReturns the requirement that caused it to be skipped, or null if not skipped.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "parseMigrationRequirements",
+          "kind": "function",
+          "signature": "parseMigrationRequirements(sql: string): {}",
+          "lines": [
+            161,
+            170
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Parse a migration SQL file for REQUIRES directives.\nFormat: -- REQUIRES: requirement1, requirement2\nReturns array of requirements (e.g., ['sqlite-vec'])",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "checkMigrationRequirements",
+          "kind": "function",
+          "signature": "checkMigrationRequirements(db: Database.Database, requirements: string[]): string",
+          "lines": [
+            176,
+            187
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if migration requirements are satisfied.\nReturns unsatisfied requirement, or null if all satisfied.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "migrate",
           "kind": "function",
           "signature": "migrate(db: Database.Database): number",
           "lines": [
-            132,
-            173
+            192,
+            249
           ],
           "exported": true,
           "is_default": false,
@@ -15076,8 +15133,8 @@
           "kind": "function",
           "signature": "closeDatabase(db: Database.Database): void",
           "lines": [
-            178,
-            180
+            254,
+            256
           ],
           "exported": true,
           "is_default": false,
@@ -15095,8 +15152,8 @@
           "kind": "function",
           "signature": "isDatabaseHealthy(db: Database.Database): boolean",
           "lines": [
-            185,
-            192
+            261,
+            268
           ],
           "exported": true,
           "is_default": false,
@@ -15114,8 +15171,8 @@
           "kind": "function",
           "signature": "loadVecExtension(db: Database.Database): boolean",
           "lines": [
-            197,
-            205
+            273,
+            281
           ],
           "exported": true,
           "is_default": false,
@@ -15133,8 +15190,8 @@
           "kind": "function",
           "signature": "isVecLoaded(db: Database.Database): boolean",
           "lines": [
-            210,
-            221
+            286,
+            297
           ],
           "exported": true,
           "is_default": false,

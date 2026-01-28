@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 51
-- Total symbols: 304
-  - function: 179
+- Total symbols: 307
+  - function: 182
   - interface: 83
   - type: 17
   - variable: 16
@@ -1523,7 +1523,7 @@ src/storage/database.test.ts [1-643]
     - node:path
     - vitest
 
-src/storage/database.ts [1-222]
+src/storage/database.ts [1-298]
   interface:
     20-34: interface DatabaseOptions [exported]
       refs in: 1 [type: 1]
@@ -1553,7 +1553,7 @@ src/storage/database.ts [1-222]
         - src/storage/database.test.ts:50: call migrations
         - src/storage/database.test.ts:58: call migrations
         - src/storage/database.test.ts:143: call migrations
-        - src/storage/database.ts:134: call migrations
+        - src/storage/database.ts:194: call migrations
     117-127: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
       refs in: 7 [call: 6, import: 1]
@@ -1563,8 +1563,22 @@ src/storage/database.ts [1-222]
         - src/storage/database.test.ts:148: call (module)
         - src/storage/database.test.ts:159: call firstVersion
         - src/storage/database.test.ts:165: call (module)
-        - src/storage/database.ts:133: call currentVersion
-    132-173: migrate(db: Database.Database): number [exported]
+        - src/storage/database.ts:193: call currentVersion
+    133-154: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
+      /** Check if a specific migration was skipped due to missing dependencies. Returns the requirement that caused it to be skipped, or null if not skipped. */
+      refs in: 1 [call: 1]
+        - src/storage/database.ts:199: call skippedReason
+    161-170: parseMigrationRequirements(sql: string): {} [exported]
+      /** Parse a migration SQL file for REQUIRES directives. Format: -- REQUIRES: requirement1, requirement2 Returns array of requirements (e.g., ['sqlite-vec']) */
+      refs in: 2 [call: 2]
+        - src/storage/database.ts:202: call requirements
+        - src/storage/database.ts:220: call requirements
+    176-187: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
+      /** Check if migration requirements are satisfied. Returns unsatisfied requirement, or null if all satisfied. */
+      refs in: 2 [call: 2]
+        - src/storage/database.ts:203: call unsatisfied
+        - src/storage/database.ts:221: call unsatisfied
+    192-249: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
       refs in: 24 [call: 17, import: 7]
         - src/daemon/cli.test.ts:12: import (module)
@@ -1577,7 +1591,7 @@ src/storage/database.ts [1-222]
         - src/daemon/cli.ts:27: import (module)
         - src/daemon/cli.ts:476: call getQueueStatus
         - src/daemon/cli.ts:513: call queueAnalysis
-    178-180: closeDatabase(db: Database.Database): void [exported]
+    254-256: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
       refs in: 12 [call: 7, import: 5]
         - src/daemon/queue.test.ts:12: import (module)
@@ -1590,23 +1604,23 @@ src/storage/database.ts [1-222]
         - src/storage/database-vec.test.ts:17: call (module)
         - src/storage/database.test.ts:13: import (module)
         - src/storage/database.test.ts:451: call (module)
-    185-192: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    261-268: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
       refs in: 4 [call: 3, import: 1]
         - src/storage/database.test.ts:15: import (module)
         - src/storage/database.test.ts:424: call (module)
         - src/storage/database.test.ts:437: call (module)
         - src/storage/database.test.ts:453: call (module)
-    197-205: loadVecExtension(db: Database.Database): boolean [exported]
+    273-281: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
       refs in: 1 [call: 1]
         - src/storage/database.ts:68: call loaded
-    210-221: isVecLoaded(db: Database.Database): boolean [exported]
+    286-297: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
       refs in: 3 [call: 2, import: 1]
         - src/storage/database-vec.test.ts:8: import (module)
         - src/storage/database-vec.test.ts:35: call (module)
-        - src/storage/database.ts:138: call vecLoaded
+        - src/storage/database.ts:181: call checkMigrationRequirements
   variable:
     15-15: any [exported]
       /** Default pi-brain data directory */
@@ -2963,4 +2977,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 51
-Estimated tokens: 37,847 (codebase: ~1,006,708)
+Estimated tokens: 38,122 (codebase: ~1,007,445)

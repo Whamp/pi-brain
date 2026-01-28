@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 87
-- Total symbols: 626
-  - function: 348
+- Total symbols: 629
+  - function: 351
   - interface: 200
   - type: 39
   - variable: 27
@@ -1239,7 +1239,7 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
-src/storage/database.ts [1-222]
+src/storage/database.ts [1-298]
   interface:
     20-34: interface DatabaseOptions [exported]
     36-41: interface MigrationInfo [exported]
@@ -1250,15 +1250,21 @@ src/storage/database.ts [1-222]
       /** Load migrations from the migrations directory */
     117-127: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    132-173: migrate(db: Database.Database): number [exported]
+    133-154: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
+      /** Check if a specific migration was skipped due to missing dependencies. Returns the requirement that caused it to be skipped, or null if not skipped. */
+    161-170: parseMigrationRequirements(sql: string): {} [exported]
+      /** Parse a migration SQL file for REQUIRES directives. Format: -- REQUIRES: requirement1, requirement2 Returns array of requirements (e.g., ['sqlite-vec']) */
+    176-187: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
+      /** Check if migration requirements are satisfied. Returns unsatisfied requirement, or null if all satisfied. */
+    192-249: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    178-180: closeDatabase(db: Database.Database): void [exported]
+    254-256: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    185-192: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    261-268: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
-    197-205: loadVecExtension(db: Database.Database): boolean [exported]
+    273-281: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
-    210-221: isVecLoaded(db: Database.Database): boolean [exported]
+    286-297: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
   variable:
     15-15: any [exported]
@@ -2033,4 +2039,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 87
-Estimated tokens: 24,782 (codebase: ~1,006,475)
+Estimated tokens: 24,962 (codebase: ~1,005,395)

@@ -1,6 +1,6 @@
 -- Migration 012: Semantic search with sqlite-vec
 -- Creates virtual table for vector similarity search
--- Requires sqlite-vec extension to be loaded
+-- REQUIRES: sqlite-vec
 
 -- Create the vector index virtual table
 -- Default dimension 4096 matches qwen/qwen3-embedding-8b (default embedding model)
@@ -19,8 +19,9 @@ CREATE VIRTUAL TABLE IF NOT EXISTS node_embeddings_vec USING vec0(
 );
 
 -- Populate from existing embeddings (if any)
--- This will fail silently if dimensions don't match (4096 expected)
--- Run `pi-brain rebuild --embeddings` to regenerate if needed
+-- INSERT OR IGNORE skips rows with duplicate rowids (constraint violations).
+-- NOTE: Dimension mismatches (e.g., 768 vs 4096) will throw an error, not be ignored.
+-- Run `pi-brain rebuild --embeddings` to regenerate if you change embedding models.
 INSERT OR IGNORE INTO node_embeddings_vec (rowid, embedding)
 SELECT ne.rowid, ne.embedding 
 FROM node_embeddings ne

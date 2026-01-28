@@ -127,6 +127,66 @@ export function getSchemaVersion(db: Database.Database): number {
 }
 
 /**
+ * Check if a specific migration was skipped due to missing dependencies.
+ * Returns the requirement that caused it to be skipped, or null if not skipped.
+ */
+export function getMigrationSkippedReason(
+  db: Database.Database,
+  version: number
+): string | null {
+  try {
+    const result = db
+      .prepare(
+        "SELECT description FROM schema_version WHERE version = ? AND description LIKE '%skipped:%'"
+      )
+      .get(version) as { description: string } | undefined;
+
+    if (!result) {
+      return null;
+    }
+
+    // Extract requirement from description like "semantic search (skipped: sqlite-vec not available)"
+    const match = /\(skipped: (.+?)\)/.exec(result.description);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Parse a migration SQL file for REQUIRES directives.
+ * Format: -- REQUIRES: requirement1, requirement2
+ * Returns array of requirements (e.g., ['sqlite-vec'])
+ */
+export function parseMigrationRequirements(sql: string): string[] {
+  const lines = sql.split("\n");
+  for (const line of lines) {
+    const match = /^--\s*REQUIRES:\s*(.+)$/i.exec(line.trim());
+    if (match) {
+      return match[1].split(",").map((r) => r.trim());
+    }
+  }
+  return [];
+}
+
+/**
+ * Check if migration requirements are satisfied.
+ * Returns unsatisfied requirement, or null if all satisfied.
+ */
+export function checkMigrationRequirements(
+  db: Database.Database,
+  requirements: string[]
+): string | null {
+  for (const req of requirements) {
+    if (req === "sqlite-vec" && !isVecLoaded(db)) {
+      return "sqlite-vec not available";
+    }
+    // Add more requirement checks here as needed
+  }
+  return null;
+}
+
+/**
  * Run pending migrations
  */
 export function migrate(db: Database.Database): number {
@@ -134,23 +194,39 @@ export function migrate(db: Database.Database): number {
   const migrations = loadMigrations();
   let appliedCount = 0;
 
-  // Check if vec extension is loaded for vec-dependent migrations
-  const vecLoaded = isVecLoaded(db);
-
   for (const migration of migrations) {
-    if (migration.version <= currentVersion) {
+    // Check if this migration was previously skipped and can now be retried
+    const skippedReason = getMigrationSkippedReason(db, migration.version);
+    if (skippedReason) {
+      // Migration was skipped before - check if dependency is now available
+      const requirements = parseMigrationRequirements(migration.sql);
+      const unsatisfied = checkMigrationRequirements(db, requirements);
+
+      if (unsatisfied) {
+        // Still can't run this migration
+        continue;
+      }
+
+      // Dependency is now available! Remove the skipped record and apply
+      db.prepare("DELETE FROM schema_version WHERE version = ?").run(
+        migration.version
+      );
+    } else if (migration.version <= currentVersion) {
+      // Already applied and not skipped
       continue;
     }
 
-    // Skip vec-dependent migrations if vec is not loaded
-    if (migration.filename.includes("semantic_search") && !vecLoaded) {
-      // Record migration as skipped so it doesn't retry every time,
-      // but with a note that it was skipped
+    // Check requirements from SQL directive (-- REQUIRES: sqlite-vec)
+    const requirements = parseMigrationRequirements(migration.sql);
+    const unsatisfied = checkMigrationRequirements(db, requirements);
+
+    if (unsatisfied) {
+      // Record migration as skipped with the reason
       db.prepare(
         "INSERT INTO schema_version (version, description) VALUES (?, ?)"
       ).run(
         migration.version,
-        `${migration.description} (skipped: vec not loaded)`
+        `${migration.description} (skipped: ${unsatisfied})`
       );
       appliedCount++;
       continue;
