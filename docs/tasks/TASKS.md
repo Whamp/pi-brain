@@ -425,7 +425,7 @@ Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.m
 
 | ID     | Task                                                     | Status  | Deps   | Notes      |
 | ------ | -------------------------------------------------------- | ------- | ------ | ---------- |
-| 20.4.1 | Update search-repository.ts for Hybrid Scoring           | active  | 20.1.1 | 2026-01-28 |
+| 20.4.1 | Update search-repository.ts for Hybrid Scoring           | done    | 20.1.1 | 2026-01-28 |
 | 20.4.2 | Create bridge-discovery.ts for multi-hop graph traversal | pending | 20.4.1 |            |
 | 20.4.3 | Expose new query capabilities via /api/v1/query          | pending | 20.4.2 |            |
 

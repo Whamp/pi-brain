@@ -302,3 +302,30 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: 84545a45
 **Notes**: The ConsolidationScheduler was already fully implemented in 20.3.1. This task focused on integrating it into the daemon process lifecycle and adding the necessary configuration. The daemon now runs both the main Scheduler (for reanalysis, connection discovery, etc.) and the ConsolidationScheduler (for memory decay and creative association).
+
+---
+
+## 2026-01-28 12:29 - Task 20.4.1
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/storage/hybrid-search.ts with weighted 9-component scoring:
+    - Vector similarity (0.25): semantic distance from embeddings  
+    - Keyword match (0.15): FTS5 rank score
+    - Relation density (0.25): edge count/graph centrality
+    - Content overlap (0.25): token matching in summary
+    - Temporal proximity (0.15): distance from reference time
+    - Tag boost (0.10): matching boost tags
+    - Importance (0.05): node importance field
+    - Recency (0.10): node age decay
+  - hybridSearch() merges FTS and vector candidates, enriches with
+    edge counts/tag matches, calculates composite score, returns
+    paginated results with score breakdowns
+  - calculateNodeHybridScore() for single-node re-ranking
+  - 18 unit tests covering all scoring components
+  - Exported hybrid search from storage index
+  - Fixed null-safety in tag count query
+  - All 1374 tests pass (18 new tests added)
+  - Lint/format checks pass
+**Commit**: 6525ed34
+**Notes**: Hybrid search enables multi-signal ranking for brain queries. Next task 20.4.2 will implement bridge discovery for multi-hop graph traversal to explain context between nodes.
