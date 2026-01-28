@@ -220,7 +220,11 @@ function buildFieldQuery(query: string, fields: SearchField[]): string {
  * Extract a highlight snippet from text containing a match
  * @internal
  */
-function extractSnippet(text: string, query: string, maxLength = 100): string {
+export function extractSnippet(
+  text: string,
+  query: string,
+  maxLength = 100
+): string {
   if (!text) {
     return "";
   }
@@ -264,7 +268,20 @@ function extractSnippet(text: string, query: string, maxLength = 100): string {
     }
   }
 
+  // Handle regex characters
+  const escapeRegExp = (str: string) =>
+    str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
+  const pattern = new RegExp(
+    `(${queryWords.map(escapeRegExp).join("|")})`,
+    "gi"
+  );
+
   let snippet = text.slice(start, end);
+
+  // Highlight terms within the snippet
+  snippet = snippet.replace(pattern, "<mark>$1</mark>");
+
   if (start > 0) {
     snippet = `...${snippet}`;
   }

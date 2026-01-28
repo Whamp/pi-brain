@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 90
-- Total symbols: 657
-  - function: 368
+- Total symbols: 658
+  - function: 369
   - interface: 207
   - type: 40
   - variable: 30
@@ -1710,7 +1710,7 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
-src/storage/search-repository.ts [1-532]
+src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
       /** Highlight match for search results */
@@ -1734,11 +1734,13 @@ src/storage/search-repository.ts [1-532]
       /** Index a node for full-text search */
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    344-415: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
+    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+      /** Extract a highlight snippet from text containing a match */
+    361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
-    441-501: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    458-518: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    506-531: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    523-548: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
   imports:
     - ./node-crud.js
@@ -2126,4 +2128,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 26,734 (codebase: ~1,051,408)
+Estimated tokens: 26,775 (codebase: ~1,051,996)

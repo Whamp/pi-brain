@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 55 files
+- typescript: 56 files
 
 ## Statistics
-- Total files: 55
-- Total symbols: 331
-  - function: 199
+- Total files: 56
+- Total symbols: 332
+  - function: 200
   - interface: 89
   - variable: 17
   - type: 17
@@ -982,7 +982,7 @@ src/daemon/queue.ts [1-787]
         - src/daemon/queue.ts:728: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 44 [import: 5, reexport: 1, type: 38]
+      refs in: 47 [import: 6, reexport: 1, type: 40]
         - src/daemon/cli.ts:50: import (module)
         - src/daemon/cli.ts:88: type QueueStatus
         - src/daemon/cli.ts:89: type QueueStatus
@@ -2928,40 +2928,45 @@ src/storage/quirk-repository.ts [1-315]
   imports:
     - better-sqlite3
 
-src/storage/search-repository.ts [1-532]
+src/storage/search-highlight.test.ts [1-39]
+  imports:
+    - ./search-repository.js
+    - vitest
+
+src/storage/search-repository.ts [1-549]
   interface:
     36-41: interface SearchHighlight [exported]
       /** Highlight match for search results */
       refs in: 5 [import: 1, type: 4]
         - src/storage/search-repository.ts:50: type SearchResult
-        - src/storage/search-repository.ts:287: type findHighlights
-        - src/storage/search-repository.ts:288: type highlights
+        - src/storage/search-repository.ts:304: type findHighlights
+        - src/storage/search-repository.ts:305: type highlights
         - src/storage/semantic-search.ts:15: import (module)
         - src/storage/semantic-search.ts:125: type highlights
     44-51: interface SearchResult [exported]
       /** Enhanced search result with score and highlights */
       refs in: 4 [extends: 1, import: 1, type: 2]
         - src/storage/search-repository.ts:92: type SearchNodesResult
-        - src/storage/search-repository.ts:491: type results
+        - src/storage/search-repository.ts:508: type results
         - src/storage/semantic-search.ts:16: import (module)
         - src/storage/semantic-search.ts:25: extends SemanticSearchResult
     54-75: interface SearchFilters [exported]
       /** Filters for search queries (subset of node filters relevant to search) */
       refs in: 5 [import: 1, type: 4]
         - src/storage/search-repository.ts:86: type SearchOptions
-        - src/storage/search-repository.ts:344: type buildFilterClause
+        - src/storage/search-repository.ts:361: type buildFilterClause
         - src/storage/semantic-search.ts:18: import (module)
         - src/storage/semantic-search.ts:36: type SemanticSearchOptions
         - src/storage/semantic-search.ts:195: type filters
     78-87: interface SearchOptions [exported]
       /** Options for enhanced search */
       refs in: 2 [type: 2]
-        - src/storage/search-repository.ts:444: type searchNodesAdvanced
-        - src/storage/search-repository.ts:509: type countSearchResults
+        - src/storage/search-repository.ts:461: type searchNodesAdvanced
+        - src/storage/search-repository.ts:526: type countSearchResults
     90-99: interface SearchNodesResult [exported]
       /** Result from enhanced search with pagination metadata */
       refs in: 1 [type: 1]
-        - src/storage/search-repository.ts:445: type searchNodesAdvanced
+        - src/storage/search-repository.ts:462: type searchNodesAdvanced
   type:
     19-24: SearchField = | "summary"
   | "decisions"
@@ -2974,7 +2979,7 @@ src/storage/search-repository.ts [1-532]
         - src/storage/search-repository.ts:38: type SearchHighlight
         - src/storage/search-repository.ts:80: type SearchOptions
         - src/storage/search-repository.ts:195: type buildFieldQuery
-        - src/storage/search-repository.ts:286: type findHighlights
+        - src/storage/search-repository.ts:303: type findHighlights
   function:
     108-136: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
       /** Index a node for full-text search */
@@ -2998,14 +3003,22 @@ src/storage/search-repository.ts [1-532]
         - src/storage/index.test.ts:1500: call results
         - src/storage/index.test.ts:1505: call results
         - src/storage/index.test.ts:1510: call results
-    344-415: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
+    223-293: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+      /** Extract a highlight snippet from text containing a match */
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/search-highlight.test.ts:3: import (module)
+        - src/storage/search-highlight.test.ts:10: call snippet
+        - src/storage/search-highlight.test.ts:21: call snippet
+        - src/storage/search-highlight.test.ts:31: call snippet
+        - src/storage/search-repository.ts:345: call findHighlights
+    361-432: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
       /** Build WHERE clause conditions and params from search filters */
       refs in: 4 [call: 3, import: 1]
-        - src/storage/search-repository.ts:463: call { clause: filterClause, params }
-        - src/storage/search-repository.ts:520: call { clause: filterClause, params }
+        - src/storage/search-repository.ts:480: call { clause: filterClause, params }
+        - src/storage/search-repository.ts:537: call { clause: filterClause, params }
         - src/storage/semantic-search.ts:17: import (module)
         - src/storage/semantic-search.ts:74: call { clause: filterClause, params: filterParams }
-    441-501: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    458-518: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
       refs in: 16 [call: 13, import: 3]
         - src/daemon/query-processor.test.ts:15: import (module)
@@ -3018,7 +3031,7 @@ src/storage/search-repository.ts [1-532]
         - src/storage/index.test.ts:1623: call page1
         - src/storage/index.test.ts:1633: call page2
         - src/storage/index.test.ts:1685: call results
-    506-531: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    523-548: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
       refs in: 5 [call: 4, import: 1]
         - src/storage/index.test.ts:19: import (module)
@@ -3195,5 +3208,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 55
-Estimated tokens: 41,848 (codebase: ~1,051,911)
+Files: 56
+Estimated tokens: 42,003 (codebase: ~1,052,692)

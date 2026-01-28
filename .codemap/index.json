@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38313,
-  "codebase_tokens": 1051911,
+  "total_tokens": 38315,
+  "codebase_tokens": 1052692,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -18685,10 +18685,10 @@
       "language": "typescript",
       "lines": [
         1,
-        532
+        549
       ],
       "detail_level": "full",
-      "token_estimate": 624,
+      "token_estimate": 626,
       "symbols": [
         {
           "name": "SearchField",
@@ -18905,9 +18905,9 @@
           "signature": "extractSnippet(text: string, query: string, maxLength = 100): string",
           "lines": [
             223,
-            276
+            293
           ],
-          "exported": false,
+          "exported": true,
           "is_default": false,
           "is_async": false,
           "is_static": false,
@@ -18923,8 +18923,8 @@
           "kind": "function",
           "signature": "findHighlights(db: Database.Database, nodeId: string, query: string, fields: SearchField[]): {}",
           "lines": [
-            282,
-            334
+            299,
+            351
           ],
           "exported": false,
           "is_default": false,
@@ -18942,8 +18942,8 @@
           "kind": "function",
           "signature": "buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; }",
           "lines": [
-            344,
-            415
+            361,
+            432
           ],
           "exported": true,
           "is_default": false,
@@ -18961,8 +18961,8 @@
           "kind": "function",
           "signature": "searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult",
           "lines": [
-            441,
-            501
+            458,
+            518
           ],
           "exported": true,
           "is_default": false,
@@ -18980,8 +18980,8 @@
           "kind": "function",
           "signature": "countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, \"fields\" | \"filters\"> = {}): number",
           "lines": [
-            506,
-            531
+            523,
+            548
           ],
           "exported": true,
           "is_default": false,
