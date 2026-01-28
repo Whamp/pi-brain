@@ -72,6 +72,7 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     connectionDiscoveryLimit: 100,
     connectionDiscoveryLookbackDays: 7,
     connectionDiscoveryCooldownHours: 24,
+    semanticSearchThreshold: 0.5,
     embeddingProvider: "openrouter" as const,
     embeddingModel: "qwen/qwen3-embedding-8b",
     embeddingApiKey: undefined,
@@ -385,6 +386,9 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     connectionDiscoveryCooldownHours:
       raw.daemon?.connection_discovery_cooldown_hours ??
       defaults.daemon.connectionDiscoveryCooldownHours,
+    semanticSearchThreshold:
+      raw.daemon?.semantic_search_threshold ??
+      defaults.daemon.semanticSearchThreshold,
     embeddingProvider:
       raw.daemon?.embedding_provider ?? defaults.daemon.embeddingProvider,
     embeddingModel:
@@ -462,10 +466,20 @@ export function transformConfig(raw: RawConfig): PiBrainConfig {
     daemon.connectionDiscoveryLookbackDays,
     "daemon.connection_discovery_lookback_days"
   );
-  validatePositiveInt(
-    daemon.connectionDiscoveryCooldownHours,
-    "daemon.connection_discovery_cooldown_hours"
-  );
+  if (daemon.connectionDiscoveryCooldownHours) {
+    validatePositiveInt(
+      daemon.connectionDiscoveryCooldownHours,
+      "daemon.connection_discovery_cooldown_hours"
+    );
+  }
+  if (
+    daemon.semanticSearchThreshold !== undefined &&
+    (daemon.semanticSearchThreshold < 0 || daemon.semanticSearchThreshold > 1)
+  ) {
+    throw new Error(
+      `Invalid value for daemon.semantic_search_threshold: ${daemon.semanticSearchThreshold}. Must be between 0.0 and 1.0.`
+    );
+  }
 
   // Transform query config
   const query: QueryConfig = {

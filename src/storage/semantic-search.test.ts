@@ -7,7 +7,11 @@ import type * as EmbeddingUtilsModule from "./embedding-utils.js";
 
 import { isVecLoaded } from "./database.js";
 import { deserializeEmbedding } from "./embedding-utils.js";
-import { semanticSearch, findSimilarNodes } from "./semantic-search.js";
+import {
+  semanticSearch,
+  findSimilarNodes,
+  getNodeEmbeddingVector,
+} from "./semantic-search.js";
 
 // Mocks
 vi.mock<typeof DatabaseModule>("./database.js", () => ({
@@ -128,6 +132,129 @@ describe("semantic Search", () => {
       const result = semanticSearch(mockDb, [1, 2]); // Too few dims maybe?
       expect(result).toStrictEqual([]);
     });
+
+    it("should return empty array when database has no matching nodes", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      mockPrepare.mockReturnValue({
+        all: vi.fn().mockReturnValue([]),
+      });
+
+      const result = semanticSearch(mockDb, [0.5, 0.5, 0.5]);
+      expect(result).toStrictEqual([]);
+    });
+
+    it("should preserve distance ordering from database", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      // Return results in order: closest first
+      mockPrepare.mockReturnValue({
+        all: vi.fn().mockReturnValue([
+          {
+            ...createMockNode("closest", "Closest Node"),
+            distance: 0.05,
+            input_text: "Very close",
+          },
+          {
+            ...createMockNode("mid", "Middle Node"),
+            distance: 0.3,
+            input_text: "Middle distance",
+          },
+          {
+            ...createMockNode("far", "Far Node"),
+            distance: 0.7,
+            input_text: "Far away",
+          },
+        ]),
+      });
+
+      const result = semanticSearch(mockDb, [1, 0, 0]);
+
+      expect(result).toHaveLength(3);
+      // Verify ordering by distance (ascending)
+      expect(result[0].distance).toBe(0.05);
+      expect(result[1].distance).toBe(0.3);
+      expect(result[2].distance).toBe(0.7);
+      // Verify scores are inverse of distance (higher is better)
+      expect(result[0].score).toBeGreaterThan(result[1].score);
+      expect(result[1].score).toBeGreaterThan(result[2].score);
+    });
+
+    it("should generate highlights when includeHighlights is true", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      mockPrepare.mockReturnValue({
+        all: vi.fn().mockReturnValue([
+          {
+            ...createMockNode("1", "Node with highlights"),
+            distance: 0.2,
+            input_text:
+              "[coding] Implemented caching layer\n\nDecisions:\n- Used Redis",
+          },
+        ]),
+      });
+
+      const result = semanticSearch(mockDb, [1, 0], {
+        includeHighlights: true,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].highlights).toHaveLength(1);
+      expect(result[0].highlights[0].field).toBe("summary");
+      expect(result[0].highlights[0].snippet).toBe(
+        "[coding] Implemented caching layer"
+      );
+    });
+
+    it("should not generate highlights when includeHighlights is false", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      mockPrepare.mockReturnValue({
+        all: vi.fn().mockReturnValue([
+          {
+            ...createMockNode("1", "Node without highlights"),
+            distance: 0.2,
+            input_text: "[coding] Some summary text",
+          },
+        ]),
+      });
+
+      const result = semanticSearch(mockDb, [1, 0], {
+        includeHighlights: false,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].highlights).toHaveLength(0);
+    });
+
+    it("should use default limit of 20", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      const mockAll = vi.fn().mockReturnValue([]);
+      mockPrepare.mockReturnValue({ all: mockAll });
+
+      semanticSearch(mockDb, [1, 0]);
+
+      // The query should use LIMIT 20 (default)
+      const [, ...params] = mockAll.mock.calls[0] as unknown[];
+      // Last param is the limit
+      expect(params.at(-1)).toBe(20);
+    });
+
+    it("should respect custom limit option", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      const mockAll = vi.fn().mockReturnValue([]);
+      mockPrepare.mockReturnValue({ all: mockAll });
+
+      semanticSearch(mockDb, [1, 0], { limit: 5 });
+
+      const [, ...params] = mockAll.mock.calls[0] as unknown[];
+      expect(params.at(-1)).toBe(5);
+    });
+
+    it("should rethrow non-dimension errors", () => {
+      (isVecLoaded as Mock).mockReturnValue(true);
+      mockPrepare.mockImplementation(() => {
+        throw new Error("SQLITE_ERROR: no such table: node_embeddings_vec");
+      });
+
+      expect(() => semanticSearch(mockDb, [1, 2, 3])).toThrow("no such table");
+    });
   });
 
   describe("findSimilarNodes", () => {
@@ -174,6 +301,87 @@ describe("semantic Search", () => {
       expect(mockPrepare).toHaveBeenNthCalledWith(
         1,
         expect.stringContaining("SELECT embedding FROM node_embeddings")
+      );
+    });
+
+    it("should respect limit option when filtering out self", () => {
+      // Mock getting node embedding
+      mockPrepare.mockReturnValueOnce({
+        get: vi.fn().mockReturnValue({ embedding: Buffer.from("fake") }),
+      });
+      (deserializeEmbedding as Mock).mockReturnValue([1, 0, 0]);
+      (isVecLoaded as Mock).mockReturnValue(true);
+
+      // Return 4 results including self
+      mockPrepare.mockReturnValueOnce({
+        all: vi.fn().mockReturnValue([
+          {
+            ...createMockNode("self", "Self"),
+            distance: 0,
+            input_text: "Self",
+          },
+          {
+            ...createMockNode("a", "A"),
+            distance: 0.1,
+            input_text: "A",
+          },
+          {
+            ...createMockNode("b", "B"),
+            distance: 0.2,
+            input_text: "B",
+          },
+          {
+            ...createMockNode("c", "C"),
+            distance: 0.3,
+            input_text: "C",
+          },
+        ]),
+      });
+
+      // Request limit: 2
+      const result = findSimilarNodes(mockDb, "self", { limit: 2 });
+
+      // Should return exactly 2 after filtering out self
+      expect(result).toHaveLength(2);
+      expect(result.map((r) => r.node.id)).toStrictEqual(["a", "b"]);
+    });
+  });
+
+  describe("getNodeEmbeddingVector", () => {
+    it("should return null if node has no embedding", () => {
+      mockPrepare.mockReturnValue({
+        get: vi.fn().mockReturnValue(),
+      });
+
+      const result = getNodeEmbeddingVector(mockDb, "missing-node");
+      expect(result).toBeNull();
+    });
+
+    it("should deserialize and return embedding vector", () => {
+      const mockEmbedding = Buffer.from("test-embedding");
+      mockPrepare.mockReturnValue({
+        get: vi.fn().mockReturnValue({ embedding: mockEmbedding }),
+      });
+      (deserializeEmbedding as Mock).mockReturnValue([0.1, 0.2, 0.3]);
+
+      const result = getNodeEmbeddingVector(mockDb, "node-123");
+
+      expect(result).toStrictEqual([0.1, 0.2, 0.3]);
+      expect(deserializeEmbedding).toHaveBeenCalledWith(mockEmbedding);
+    });
+
+    it("should query correct table with node_id", () => {
+      mockPrepare.mockReturnValue({
+        get: vi.fn().mockReturnValue(),
+      });
+
+      getNodeEmbeddingVector(mockDb, "test-node-id");
+
+      expect(mockPrepare).toHaveBeenCalledWith(
+        expect.stringContaining("SELECT embedding FROM node_embeddings")
+      );
+      expect(mockPrepare).toHaveBeenCalledWith(
+        expect.stringContaining("WHERE node_id = ?")
       );
     });
   });

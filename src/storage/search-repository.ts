@@ -341,7 +341,7 @@ function findHighlights(
  * Build WHERE clause conditions and params from search filters
  * @internal
  */
-function buildFilterClause(filters: SearchFilters | undefined): {
+export function buildFilterClause(filters: SearchFilters | undefined): {
   clause: string;
   params: (string | number)[];
 } {

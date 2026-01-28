@@ -130,6 +130,7 @@ export {
   formatQueueStatus,
   formatHealthStatus,
   rebuildIndex,
+  rebuildEmbeddings,
   type DaemonStatus,
   type QueueStatus,
   type HealthCheckResult,

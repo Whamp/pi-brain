@@ -25,6 +25,7 @@ import {
   getSessionDirs,
 } from "../config/config.js";
 import { openDatabase, migrate } from "../storage/database.js";
+import { backfillEmbeddings } from "../storage/embedding-utils.js";
 import {
   clearAllData,
   insertNodeToDb,
@@ -35,6 +36,7 @@ import {
   parseNodePath,
   readNodeFromPath,
 } from "../storage/node-storage.js";
+import { createEmbeddingProvider } from "./facet-discovery.js";
 import {
   checkSkillAvailable,
   REQUIRED_SKILLS,
@@ -1036,6 +1038,93 @@ export function rebuildIndex(configPath?: string): {
       success: true,
       message: `Index rebuilt successfully. Processed ${insertCount} nodes.`,
       count: insertCount,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Rebuild failed: ${(error as Error).message}`,
+      count: 0,
+    };
+  } finally {
+    db.close();
+  }
+}
+
+/**
+ * Rebuild embeddings for all nodes
+ */
+export async function rebuildEmbeddings(
+  configPath?: string,
+  options: { force?: boolean } = {}
+): Promise<{
+  success: boolean;
+  message: string;
+  count: number;
+}> {
+  const config = loadConfig(configPath);
+  const dbPath = path.join(config.hub.databaseDir, "brain.db");
+
+  // Check if daemon is running
+  const { running } = isDaemonRunning();
+  if (running) {
+    return {
+      success: false,
+      message:
+        "Daemon is running. Please stop it before rebuilding embeddings.",
+      count: 0,
+    };
+  }
+
+  // Ensure database exists
+  const db = openDatabase({ path: dbPath });
+  migrate(db);
+
+  try {
+    const provider = createEmbeddingProvider({
+      provider: config.daemon.embeddingProvider,
+      model: config.daemon.embeddingModel,
+      apiKey: config.daemon.embeddingApiKey,
+      baseUrl: config.daemon.embeddingBaseUrl,
+      dimensions: config.daemon.embeddingDimensions,
+    });
+    if (!provider) {
+      return {
+        success: false,
+        message:
+          "No embedding provider configured. Please check your config.yaml.",
+        count: 0,
+      };
+    }
+
+    console.log(`Using embedding provider: ${provider.modelName}`);
+    console.log("Starting embedding backfill...");
+
+    const result = await backfillEmbeddings(db, provider, readNodeFromPath, {
+      force: options.force,
+      limit: 1_000_000, // Process all
+      batchSize: 10,
+      logger: console,
+      onProgress: (processed, total) => {
+        process.stdout.write(`\rProcessed ${processed} / ${total} nodes...`);
+      },
+    });
+
+    console.log(`\nBackfill complete.`);
+    console.log(`Success: ${result.successCount}`);
+    console.log(`Failed: ${result.failureCount}`);
+
+    if (result.failureCount > 0) {
+      console.log(
+        "Failed Node IDs:",
+        result.failedNodeIds.slice(0, 10).join(", ") +
+          (result.failedNodeIds.length > 10 ? "..." : "")
+      );
+    }
+
+    return {
+      success: true,
+      message: `Embeddings rebuilt successfully. Processed ${result.successCount} nodes.`,
+      count: result.successCount,
     };
   } catch (error) {
     return {
