@@ -6,17 +6,17 @@ import { spawn } from "node:child_process";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import type { DaemonConfig } from "../config/types.js";
+import type * as BridgeDiscoveryMod from "../storage/bridge-discovery.js";
 import type * as DatabaseModule from "../storage/database.js";
+import type * as HybridSearchMod from "../storage/hybrid-search.js";
 import type * as NodeQueries from "../storage/node-queries.js";
 import type * as QuirkRepo from "../storage/quirk-repository.js";
-import type * as SearchRepo from "../storage/search-repository.js";
-import type * as SemanticSearchMod from "../storage/semantic-search.js";
 import type * as ToolErrorRepo from "../storage/tool-error-repository.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
+import { findBridgePaths } from "../storage/bridge-discovery.js";
+import { hybridSearch } from "../storage/hybrid-search.js";
 import { listNodes } from "../storage/node-queries.js";
-import { searchNodesAdvanced } from "../storage/search-repository.js";
-import { semanticSearch } from "../storage/semantic-search.js";
 import { processQuery, type QueryRequest } from "./query-processor.js";
 
 // Mocks
@@ -24,12 +24,12 @@ vi.mock<typeof DatabaseModule>("../storage/database.js", () => ({
   isVecLoaded: vi.fn(() => true),
 }));
 
-vi.mock<typeof SearchRepo>("../storage/search-repository.js", () => ({
-  searchNodesAdvanced: vi.fn(),
+vi.mock<typeof HybridSearchMod>("../storage/hybrid-search.js", () => ({
+  hybridSearch: vi.fn(),
 }));
 
-vi.mock<typeof SemanticSearchMod>("../storage/semantic-search.js", () => ({
-  semanticSearch: vi.fn(),
+vi.mock<typeof BridgeDiscoveryMod>("../storage/bridge-discovery.js", () => ({
+  findBridgePaths: vi.fn(() => []),
 }));
 
 vi.mock<typeof NodeQueries>("../storage/node-queries.js", () => ({
@@ -86,7 +86,7 @@ describe("query Processor", () => {
 
   describe("processQuery", () => {
     it("should return early if no nodes found", async () => {
-      (searchNodesAdvanced as Mock).mockReturnValue({ results: [] });
+      (hybridSearch as Mock).mockReturnValue({ results: [] });
       (listNodes as Mock).mockReturnValue({ nodes: [] });
 
       const request: QueryRequest = { query: "nothing here" };
@@ -101,9 +101,9 @@ describe("query Processor", () => {
       expect(response.relatedNodes).toHaveLength(0);
     });
 
-    it("should process query with relevant nodes", async () => {
+    it("should process query with relevant nodes and bridge paths", async () => {
       // Mock search results
-      (searchNodesAdvanced as Mock).mockReturnValue({
+      (hybridSearch as Mock).mockReturnValue({
         results: [
           {
             node: {
@@ -111,11 +111,25 @@ describe("query Processor", () => {
               summary: "Node 1",
               session_file: "s1.jsonl",
               timestamp: "2023-01-01",
+              type: "coding",
+              project: "/test",
+              outcome: "success",
             },
             score: 0.9,
+            breakdown: {},
           },
         ],
       });
+
+      // Mock bridge paths
+      (findBridgePaths as Mock).mockReturnValue([
+        {
+          nodes: [],
+          edges: [],
+          score: 0.8,
+          description: "Node 1 leads to Node 2",
+        },
+      ]);
 
       // Mock pi agent spawning
       const mockProc = {
@@ -173,11 +187,12 @@ describe("query Processor", () => {
       expect(response.answer).toBe("This is the answer");
       expect(response.relatedNodes).toHaveLength(1);
       expect(response.relatedNodes[0].id).toBe("1");
+      expect(findBridgePaths).toHaveBeenCalled();
     });
 
     it("should handle pi agent errors", async () => {
       // Mock search results
-      (searchNodesAdvanced as Mock).mockReturnValue({
+      (hybridSearch as Mock).mockReturnValue({
         results: [
           {
             node: {
@@ -185,8 +200,12 @@ describe("query Processor", () => {
               summary: "Node 1",
               session_file: "s1.jsonl",
               timestamp: "2023-01-01",
+              type: "coding",
+              project: "/test",
+              outcome: "success",
             },
             score: 0.9,
+            breakdown: {},
           },
         ],
       });
@@ -223,31 +242,28 @@ describe("query Processor", () => {
     });
   });
 
-  describe("semantic search integration", () => {
-    it("should use semantic search when embedding provider is configured", async () => {
+  describe("hybrid search integration", () => {
+    it("should use hybrid search with embedding when provider is configured", async () => {
       const mockEmbeddingProvider = createMockEmbeddingProvider();
 
-      // Mock semantic search returning results
-      (semanticSearch as Mock).mockReturnValue([
-        {
-          node: {
-            id: "sem-1",
-            summary: "Semantic result",
-            session_file: "s1.jsonl",
-            timestamp: "2023-01-01",
-            type: "coding",
-            project: "/test",
-            outcome: "success",
+      // Mock hybrid search returning results
+      (hybridSearch as Mock).mockReturnValue({
+        results: [
+          {
+            node: {
+              id: "sem-1",
+              summary: "Hybrid result",
+              session_file: "s1.jsonl",
+              timestamp: "2023-01-01",
+              type: "coding",
+              project: "/test",
+              outcome: "success",
+            },
+            score: 0.95,
+            breakdown: { vector: 0.9, keyword: 0.8 },
           },
-          score: 0.95,
-          distance: 0.1,
-          highlights: [],
-        },
-      ]);
-
-      // FTS should not be called since semantic search found results
-      (searchNodesAdvanced as Mock).mockReturnValue({ results: [] });
-      (listNodes as Mock).mockReturnValue({ nodes: [] });
+        ],
+      });
 
       const request: QueryRequest = { query: "test query" };
       const response = await processQuery(request, {
@@ -261,85 +277,65 @@ describe("query Processor", () => {
       // Verify embedding was generated
       expect(mockEmbeddingProvider.embed).toHaveBeenCalledWith(["test query"]);
 
-      // Verify semantic search was called
-      expect(semanticSearch).toHaveBeenCalledWith(
+      // Verify hybrid search was called with embedding
+      expect(hybridSearch).toHaveBeenCalledWith(
         mockDb,
-        [0.1, 0.2, 0.3],
+        "test query",
         expect.objectContaining({
           limit: 10,
-          maxDistance: 0.5,
+          queryEmbedding: [0.1, 0.2, 0.3],
         })
       );
 
-      // Verify FTS was NOT called since semantic found results
-      expect(searchNodesAdvanced).not.toHaveBeenCalled();
-
-      // Check the response uses semantic results
+      // Check the response uses hybrid results
       expect(response.relatedNodes).toHaveLength(1);
       expect(response.relatedNodes[0].id).toBe("sem-1");
     });
 
-    it("should fall back to FTS when semantic search returns no results", async () => {
-      const mockEmbeddingProvider = createMockEmbeddingProvider();
+    it("should fall back to recent nodes when hybrid search returns no results and no query/embedding", async () => {
+      // Mock hybrid search returning empty
+      (hybridSearch as Mock).mockReturnValue({ results: [] });
 
-      // Mock semantic search returning empty
-      (semanticSearch as Mock).mockReturnValue([]);
-
-      // FTS returns results
-      (searchNodesAdvanced as Mock).mockReturnValue({
-        results: [
+      (listNodes as Mock).mockReturnValue({
+        nodes: [
           {
-            node: {
-              id: "fts-1",
-              summary: "FTS result",
-              session_file: "s2.jsonl",
-              timestamp: "2023-01-02",
-              type: "debugging",
-              project: "/test",
-              outcome: "success",
-            },
-            score: 0.8,
+            id: "recent-1",
+            summary: "Recent node",
+            timestamp: "2023-01-02",
+            type: "coding",
+            session_file: "s2.jsonl",
           },
         ],
       });
 
-      (listNodes as Mock).mockReturnValue({ nodes: [] });
-
-      const request: QueryRequest = { query: "fallback query" };
+      // Note: processQuery calls findRelevantNodes which checks if query/embedding exists before fallback
+      // So pass empty query and undefined embedding provider
+      const request: QueryRequest = { query: "" };
       const response = await processQuery(request, {
         db: mockDb,
         daemonConfig: mockDaemonConfig,
         logger: mockLogger,
-        embeddingProvider: mockEmbeddingProvider,
       });
 
-      // Verify both searches were called
-      expect(semanticSearch).toHaveBeenCalled();
-      expect(searchNodesAdvanced).toHaveBeenCalled();
-
-      // Verify logger was informed about fallback
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        expect.stringContaining("falling back to FTS")
-      );
-
-      // Response uses FTS results
+      // Verify fallback to listNodes
+      expect(listNodes).toHaveBeenCalled();
       expect(response.relatedNodes).toHaveLength(1);
-      expect(response.relatedNodes[0].id).toBe("fts-1");
+      expect(response.relatedNodes[0].id).toBe("recent-1");
     });
 
-    it("should fall back to FTS when semantic search throws an error", async () => {
+    it("should handle embedding generation errors gracefully", async () => {
       const mockEmbeddingProvider = createMockEmbeddingProvider();
       (mockEmbeddingProvider.embed as Mock).mockRejectedValue(
         new Error("API rate limit exceeded")
       );
 
-      // FTS returns results
-      (searchNodesAdvanced as Mock).mockReturnValue({
+      // Hybrid search still called but without embedding
+      (hybridSearch as Mock).mockReturnValue({
         results: [
           {
             node: {
-              id: "fts-error-fallback",
-              summary: "FTS after error",
+              id: "hybrid-no-embed",
+              summary: "Result without embedding",
               session_file: "s3.jsonl",
               timestamp: "2023-01-03",
               type: "coding",
@@ -347,11 +343,10 @@ describe("query Processor", () => {
               outcome: "success",
             },
             score: 0.7,
+            breakdown: {},
           },
         ],
       });
-
-      (listNodes as Mock).mockReturnValue({ nodes: [] });
 
       const request: QueryRequest = { query: "error test" };
       const response = await processQuery(request, {
@@ -363,100 +358,53 @@ describe("query Processor", () => {
 
       // Verify warning was logged
       expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Semantic search failed")
-      );
-      expect(mockLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("API rate limit exceeded")
+        expect.stringContaining("Embedding generation failed")
       );
 
-      // FTS was called as fallback
-      expect(searchNodesAdvanced).toHaveBeenCalled();
+      // Hybrid search was called (without embedding)
+      expect(hybridSearch).toHaveBeenCalledWith(
+        mockDb,
+        "error test",
+        expect.objectContaining({
+          queryEmbedding: undefined,
+        })
+      );
 
-      // Response uses FTS results
+      // Response uses results
       expect(response.relatedNodes).toHaveLength(1);
-      expect(response.relatedNodes[0].id).toBe("fts-error-fallback");
+      expect(response.relatedNodes[0].id).toBe("hybrid-no-embed");
     });
 
-    it("should skip semantic search when no embedding provider configured", async () => {
-      // No embedding provider
-      (searchNodesAdvanced as Mock).mockReturnValue({
+    it("should disable bridge discovery if requested", async () => {
+      // Mock search results
+      (hybridSearch as Mock).mockReturnValue({
         results: [
           {
             node: {
-              id: "fts-only",
-              summary: "FTS only result",
-              session_file: "s4.jsonl",
-              timestamp: "2023-01-04",
-              type: "coding",
-              project: "/test",
-              outcome: "success",
+              id: "1",
+              summary: "Node 1",
+              session_file: "s1.jsonl",
+              timestamp: "2023-01-01",
             },
             score: 0.9,
+            breakdown: {},
           },
         ],
       });
 
-      (listNodes as Mock).mockReturnValue({ nodes: [] });
-
-      const request: QueryRequest = { query: "no embedding" };
-      const response = await processQuery(request, {
-        db: mockDb,
-        daemonConfig: mockDaemonConfig,
-        logger: mockLogger,
-        // No embeddingProvider
-      });
-
-      // Semantic search should not be called
-      expect(semanticSearch).not.toHaveBeenCalled();
-
-      // FTS was used directly
-      expect(searchNodesAdvanced).toHaveBeenCalled();
-
-      expect(response.relatedNodes).toHaveLength(1);
-      expect(response.relatedNodes[0].id).toBe("fts-only");
-    });
-
-    it("should pass project filter to semantic search", async () => {
-      const mockEmbeddingProvider = createMockEmbeddingProvider();
-
-      (semanticSearch as Mock).mockReturnValue([
-        {
-          node: {
-            id: "project-filtered",
-            summary: "Project result",
-            session_file: "s5.jsonl",
-            timestamp: "2023-01-05",
-            type: "coding",
-            project: "/my-project",
-            outcome: "success",
-          },
-          score: 0.9,
-          distance: 0.15,
-          highlights: [],
-        },
-      ]);
-
-      (listNodes as Mock).mockReturnValue({ nodes: [] });
+      (findBridgePaths as Mock).mockReturnValue([]);
 
       const request: QueryRequest = {
-        query: "project specific",
-        context: { project: "/my-project" },
+        query: "test query",
+        options: { enableBridgeDiscovery: false },
       };
       await processQuery(request, {
         db: mockDb,
         daemonConfig: mockDaemonConfig,
         logger: mockLogger,
-        embeddingProvider: mockEmbeddingProvider,
       });
 
-      // Verify semantic search was called with project filter
-      expect(semanticSearch).toHaveBeenCalledWith(
-        mockDb,
-        expect.any(Array),
-        expect.objectContaining({
-          filters: { project: "/my-project" },
-        })
-      );
+      expect(findBridgePaths).not.toHaveBeenCalled();
     });
   });
 });

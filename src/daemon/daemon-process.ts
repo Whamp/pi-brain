@@ -17,6 +17,7 @@ import { startServer, WebSocketManager } from "../api/server.js";
 import { loadConfig, ensureDirectories } from "../config/config.js";
 import { openDatabase, migrate } from "../storage/database.js";
 import { writePidFile, removePidFile } from "./cli.js";
+import { createConsolidationScheduler } from "./consolidation/index.js";
 import { createQueueManager, PRIORITY } from "./queue.js";
 import { createScheduler } from "./scheduler.js";
 import { SESSION_EVENTS, getSessionPath } from "./watcher-events.js";
@@ -175,6 +176,26 @@ async function main(): Promise<void> {
   });
   console.log("[daemon] Scheduler created");
 
+  // Create consolidation scheduler for memory decay and creative association
+  const consolidationScheduler = createConsolidationScheduler(
+    db,
+    {
+      decaySchedule: config.daemon.decaySchedule,
+      creativeSchedule: config.daemon.creativeSchedule,
+      baseDecayRate: config.daemon.baseDecayRate,
+      creativeConfig: {
+        similarityThreshold: config.daemon.creativeSimilarityThreshold,
+      },
+    },
+    {
+      info: (msg: string) => console.log(`[consolidation] ${msg}`),
+      warn: (msg: string) => console.warn(`[consolidation] ${msg}`),
+      error: (msg: string) => console.error(`[consolidation] ${msg}`),
+      debug: (msg: string) => console.debug(`[consolidation] ${msg}`),
+    }
+  );
+  console.log("[daemon] Consolidation scheduler created");
+
   // Create session watcher
   const watcher = new SessionWatcher({
     idleTimeoutMinutes: config.daemon.idleTimeoutMinutes,
@@ -217,6 +238,9 @@ async function main(): Promise<void> {
 
   scheduler.start();
   console.log("[daemon] Scheduler started");
+
+  consolidationScheduler.start();
+  console.log("[daemon] Consolidation scheduler started");
 
   worker.start();
   console.log("[daemon] Worker started");
@@ -269,6 +293,9 @@ async function main(): Promise<void> {
 
     scheduler.stop();
     console.log("[daemon] Scheduler stopped");
+
+    consolidationScheduler.stop();
+    console.log("[daemon] Consolidation scheduler stopped");
 
     await watcher.stop();
     console.log("[daemon] Watcher stopped");

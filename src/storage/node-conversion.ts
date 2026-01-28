@@ -269,7 +269,15 @@ export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
   // If full data requested, read from JSON file
   if (loadFull && row.data_file) {
     try {
-      return readNodeFromPath(row.data_file);
+      const fullNode = readNodeFromPath(row.data_file);
+      // Merge in database-only fields that may be more up-to-date
+      return {
+        ...fullNode,
+        relevanceScore: row.relevance_score ?? fullNode.relevanceScore,
+        lastAccessed: row.last_accessed ?? fullNode.lastAccessed,
+        archived: row.archived === 1 ? true : fullNode.archived,
+        importance: row.importance ?? fullNode.importance,
+      };
     } catch {
       // Fall through to construct from row
     }
@@ -331,6 +339,11 @@ export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
     semantic: { tags: [], topics: [] },
     daemonMeta: { decisions: [], rlmUsed: false },
     ...(row.signals ? { signals: JSON.parse(row.signals) } : {}),
+    // AutoMem consolidation fields
+    relevanceScore: row.relevance_score ?? 1,
+    lastAccessed: row.last_accessed ?? undefined,
+    archived: row.archived === 1,
+    importance: row.importance ?? 0.5,
   };
 }
 

@@ -639,4 +639,176 @@ describe("database", () => {
       }
     });
   });
+
+  describe("autoMem consolidation schema", () => {
+    it("creates nodes table with memory consolidation columns", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const columns = db.prepare("PRAGMA table_info(nodes)").all() as {
+          name: string;
+          type: string;
+          dflt_value: string | null;
+        }[];
+        const columnMap = new Map(columns.map((c) => [c.name, c]));
+
+        // AutoMem consolidation columns
+        expect(columnMap.has("relevance_score")).toBeTruthy();
+        expect(columnMap.get("relevance_score")?.type).toBe("REAL");
+        expect(columnMap.get("relevance_score")?.dflt_value).toBe("1.0");
+
+        expect(columnMap.has("last_accessed")).toBeTruthy();
+        expect(columnMap.get("last_accessed")?.type).toBe("TEXT");
+
+        expect(columnMap.has("archived")).toBeTruthy();
+        expect(columnMap.get("archived")?.dflt_value).toBe("0");
+
+        expect(columnMap.has("importance")).toBeTruthy();
+        expect(columnMap.get("importance")?.type).toBe("REAL");
+        expect(columnMap.get("importance")?.dflt_value).toBe("0.5");
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates edges table with confidence and similarity columns", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const columns = db.prepare("PRAGMA table_info(edges)").all() as {
+          name: string;
+          type: string;
+          dflt_value: string | null;
+        }[];
+        const columnMap = new Map(columns.map((c) => [c.name, c]));
+
+        // AutoMem edge columns
+        expect(columnMap.has("confidence")).toBeTruthy();
+        expect(columnMap.get("confidence")?.type).toBe("REAL");
+        expect(columnMap.get("confidence")?.dflt_value).toBe("1.0");
+
+        expect(columnMap.has("similarity")).toBeTruthy();
+        expect(columnMap.get("similarity")?.type).toBe("REAL");
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("creates indexes for consolidation queries", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        const indexes = db
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='index' ORDER BY name"
+          )
+          .all() as { name: string }[];
+        const indexNames = new Set(indexes.map((i) => i.name));
+
+        // AutoMem indexes
+        expect(indexNames.has("idx_nodes_relevance_score")).toBeTruthy();
+        expect(indexNames.has("idx_nodes_archived")).toBeTruthy();
+        expect(indexNames.has("idx_nodes_last_accessed")).toBeTruthy();
+        expect(indexNames.has("idx_edges_confidence")).toBeTruthy();
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("inserts nodes with default AutoMem values", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert a node without specifying AutoMem fields
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "test-node-automem",
+          "/test/session.jsonl",
+          "2026-01-28T00:00:00Z",
+          "2026-01-28T00:00:00Z",
+          "/test/node.json"
+        );
+
+        const row = db
+          .prepare(
+            "SELECT relevance_score, archived, importance FROM nodes WHERE id = ?"
+          )
+          .get("test-node-automem") as {
+          relevance_score: number;
+          archived: number;
+          importance: number;
+        };
+
+        // Check defaults are applied
+        expect(row.relevance_score).toBe(1);
+        expect(row.archived).toBe(0);
+        expect(row.importance).toBe(0.5);
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+
+    it("inserts edges with default confidence", () => {
+      const testDbPath = createTestDbPath();
+      try {
+        const db = openDatabase({ path: testDbPath });
+
+        // Insert two nodes for edge relationship
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "node-1",
+          "/test/session.jsonl",
+          "2026-01-28T00:00:00Z",
+          "2026-01-28T00:00:00Z",
+          "/test/node1.json"
+        );
+        db.prepare(`
+          INSERT INTO nodes (id, session_file, timestamp, analyzed_at, data_file)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          "node-2",
+          "/test/session.jsonl",
+          "2026-01-28T00:00:00Z",
+          "2026-01-28T00:00:00Z",
+          "/test/node2.json"
+        );
+
+        // Insert edge without specifying confidence/similarity
+        db.prepare(`
+          INSERT INTO edges (id, source_node_id, target_node_id, type)
+          VALUES (?, ?, ?, ?)
+        `).run("edge-1", "node-1", "node-2", "LEADS_TO");
+
+        const row = db
+          .prepare("SELECT confidence, similarity FROM edges WHERE id = ?")
+          .get("edge-1") as {
+          confidence: number | null;
+          similarity: number | null;
+        };
+
+        expect(row.confidence).toBe(1);
+        expect(row.similarity).toBeNull();
+
+        cleanupTestDb(testDbPath, db);
+      } finally {
+        cleanupTestDb(testDbPath);
+      }
+    });
+  });
 });

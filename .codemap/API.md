@@ -1,16 +1,16 @@
 # Project Overview
 
 ## Languages
-- typescript: 90 files
+- typescript: 97 files
 
 ## Statistics
-- Total files: 90
-- Total symbols: 664
-  - function: 373
-  - interface: 207
-  - type: 40
-  - variable: 32
-  - class: 12
+- Total files: 97
+- Total symbols: 694
+  - function: 382
+  - interface: 222
+  - type: 41
+  - variable: 34
+  - class: 15
 
 ---
 
@@ -131,9 +131,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-281]
+src/api/routes/query.ts [1-282]
   function:
-    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -287,42 +287,42 @@ src/cli.ts [1-1148]
     - node:path
     - open
 
-src/config/config.ts [1-773]
+src/config/config.ts [1-803]
   class:
-    509-517: class ConfigError extends Error [exported]
+    535-543: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
       /** Expand ~ in paths to home directory */
     48-54: getDefaultHubConfig(): HubConfig [exported]
       /** Default hub configuration */
-    59-93: getDefaultDaemonConfig(): DaemonConfig [exported]
+    59-97: getDefaultDaemonConfig(): DaemonConfig [exported]
       /** Default daemon configuration */
-    98-103: getDefaultQueryConfig(): QueryConfig [exported]
+    102-107: getDefaultQueryConfig(): QueryConfig [exported]
       /** Default query configuration */
-    108-118: getDefaultApiConfig(): ApiConfig [exported]
+    112-122: getDefaultApiConfig(): ApiConfig [exported]
       /** Default API configuration */
-    123-131: getDefaultConfig(): PiBrainConfig [exported]
+    127-135: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    326-504: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    330-530: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    522-577: loadConfig(configPath?: string): PiBrainConfig [exported]
+    548-603: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    582-587: ensureConfigDir(configDir?: string): void [exported]
+    608-613: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    592-627: ensureDirectories(config: PiBrainConfig): void [exported]
+    618-653: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    632-691: writeDefaultConfig(configPath?: string): void [exported]
+    658-721: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    696-704: getSessionDirs(config: PiBrainConfig): {} [exported]
+    726-734: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    709-711: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    739-741: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    716-720: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    746-750: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    725-732: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    755-762: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    743-772: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    773-802: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -341,7 +341,7 @@ src/config/index.ts [1-36]
     - ./config.js
     - ./types.js
 
-src/config/types.ts [1-264]
+src/config/types.ts [1-280]
   interface:
     16-28: interface RsyncOptions [exported]
       /** Rsync-specific options for spoke configuration */
@@ -349,15 +349,15 @@ src/config/types.ts [1-264]
       /** Spoke machine configuration Spokes are secondary machines that sync sessions to the hub */
     61-70: interface HubConfig [exported]
       /** Hub configuration The hub is the primary computer where daemon runs */
-    76-154: interface DaemonConfig [exported]
+    76-166: interface DaemonConfig [exported]
       /** Daemon configuration Controls the background analysis process */
-    160-166: interface QueryConfig [exported]
+    172-178: interface QueryConfig [exported]
       /** Query configuration Controls the /brain query interface */
-    171-180: interface ApiConfig [exported]
+    183-192: interface ApiConfig [exported]
       /** API server configuration */
-    185-200: interface PiBrainConfig [exported]
+    197-212: interface PiBrainConfig [exported]
       /** Complete pi-brain configuration */
-    206-263: interface RawConfig [exported]
+    218-279: interface RawConfig [exported]
       /** Raw YAML configuration (snake_case, before transformation) This matches the YAML file structure */
   type:
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
@@ -454,12 +454,64 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-312]
+src/daemon/consolidation/creative-associator.ts [1-245]
+  class:
+    82-244: class CreativeAssociator [exported]
+      /** Discovers and creates non-obvious connections between nodes */
+  interface:
+    41-50: interface CreativeAssociatorConfig [exported]
+      /** Configuration for the creative associator */
+    55-64: interface CreativeAssociatorResult [exported]
+      /** Result of a creative association run */
+  imports:
+    - ../../storage/database.js
+    - ../../storage/edge-repository.js
+    - ../../storage/embedding-utils.js
+    - better-sqlite3
+
+src/daemon/consolidation/decay-scheduler.ts [1-351]
+  class:
+    91-339: class ConsolidationScheduler [exported]
+      /** Scheduler for memory consolidation jobs */
+  interface:
+    31-40: interface ConsolidationConfig [exported]
+      /** Configuration for consolidation jobs */
+    45-52: interface ConsolidationResult [exported]
+      /** Result of a consolidation job */
+  function:
+    344-350: createConsolidationScheduler(db: Database.Database, config?: ConsolidationConfig, logger?: ConsolidationLogger): ConsolidationScheduler [exported]
+      /** Create a consolidation scheduler with default configuration */
+  imports:
+    - ./creative-associator.js
+    - ./relevance.js
+    - better-sqlite3
+    - croner
+
+src/daemon/consolidation/index.ts [1-25]
+  imports:
+    - ./creative-associator.js
+    - ./decay-scheduler.js
+    - ./relevance.js
+
+src/daemon/consolidation/relevance.ts [1-346]
+  class:
+    83-345: class RelevanceCalculator [exported]
+      /** Calculates and updates node relevance scores */
+  interface:
+    39-50: interface RelevanceFactors [exported]
+      /** Factors used in relevance calculation */
+    55-62: interface RelevanceResult [exported]
+      /** Result of calculating relevance for a single node */
+  imports:
+    - better-sqlite3
+
+src/daemon/daemon-process.ts [1-339]
   imports:
     - ../api/server.js
     - ../config/config.js
     - ../storage/database.js
     - ./cli.js
+    - ./consolidation/index.js
     - ./queue.js
     - ./scheduler.js
     - ./watcher-events.js
@@ -617,56 +669,58 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-809]
+src/daemon/processor.ts [1-836]
   class:
-    747-801: class JobProcessor [exported]
+    774-828: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
       /** Result from invoking the pi agent */
-    37-116: interface AgentNodeOutput [exported]
+    37-118: interface AgentNodeOutput [exported]
       /** Output schema from the session analyzer (matches session-analyzer.md) */
-    128-132: interface SkillInfo [exported]
+    121-143: interface RelationshipOutput [exported]
+      /** Output schema for relationships extracted by the session analyzer */
+    155-159: interface SkillInfo [exported]
       /** Skill availability information */
-    135-140: interface ProcessorLogger [exported]
+    162-167: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    212-219: interface EnvironmentValidationResult [exported]
+    239-246: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    737-742: interface ProcessorConfig [exported]
+    764-769: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
-    176-184: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    203-211: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-    189-209: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+    216-236: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    225-237: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    252-264: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    246-283: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+    273-310: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
-    292-324: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    319-351: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    357-465: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    384-492: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    571-640: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    598-667: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    646-679: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    673-706: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    684-730: isValidNodeOutput(obj: unknown): boolean [exported]
+    711-757: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    806-808: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    833-835: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
-    143-148: ProcessorLogger [exported]
+    170-175: ProcessorLogger [exported]
       /** Default console logger */
-    155-155: readonly [] [exported]
+    182-182: readonly [] [exported]
       /** Required skills for analysis - must be available */
-    158-158: readonly ["codemap"] [exported]
+    185-185: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
-    161-161: readonly ["rlm"] [exported]
+    188-188: readonly ["rlm"] [exported]
       /** Skills that are conditionally included based on file size */
-    164-164: number [exported]
+    191-191: number [exported]
       /** File size threshold (in bytes) for including RLM skill */
-    167-167: any [exported]
+    194-194: any [exported]
       /** Skills directory location */
   imports:
     - ../config/types.js
@@ -676,24 +730,24 @@ src/daemon/processor.ts [1-809]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-786]
+src/daemon/query-processor.ts [1-823]
   interface:
-    32-45: interface QueryRequest [exported]
+    38-52: interface QueryRequest [exported]
       /** Query request from the API */
-    48-66: interface QueryResponse [exported]
+    55-73: interface QueryResponse [exported]
       /** Query response to return to the client */
-    91-104: interface QueryProcessorConfig [exported]
+    98-111: interface QueryProcessorConfig [exported]
   function:
-    109-188: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    116-211: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
+    - ../storage/bridge-discovery.js
     - ../storage/database.js
+    - ../storage/hybrid-search.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
-    - ../storage/search-repository.js
-    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./processor.js
@@ -843,23 +897,23 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-717]
+src/daemon/worker.ts [1-741]
   class:
-    126-656: class Worker [exported]
+    127-680: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    66-83: interface WorkerConfig [exported]
+    67-84: interface WorkerConfig [exported]
       /** Worker configuration */
-    86-101: interface WorkerStatus [exported]
+    87-102: interface WorkerStatus [exported]
       /** Worker status */
-    104-117: interface JobProcessingResult [exported]
+    105-118: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    665-667: createWorker(config: WorkerConfig): Worker [exported]
+    689-691: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    673-687: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    697-711: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    692-716: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    716-740: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -870,6 +924,7 @@ src/daemon/worker.ts [1-717]
     - ../storage/index.js
     - ../storage/node-conversion.js
     - ../storage/node-types.js
+    - ../storage/relationship-edges.js
     - ./connection-discovery.js
     - ./errors.js
     - ./facet-discovery.js
@@ -1265,6 +1320,20 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
+src/storage/bridge-discovery.ts [1-260]
+  interface:
+    23-32: interface BridgePath [exported]
+      /** A discovered path in the graph */
+    34-41: interface BridgeDiscoveryOptions [exported]
+  function:
+    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+      /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-storage.js
+    - better-sqlite3
+
 src/storage/database.ts [1-298]
   interface:
     20-34: interface DatabaseOptions [exported]
@@ -1323,33 +1392,35 @@ src/storage/decision-repository.ts [1-143]
   imports:
     - better-sqlite3
 
-src/storage/edge-repository.ts [1-186]
+src/storage/edge-repository.ts [1-197]
   interface:
-    19-27: interface EdgeRow [exported]
+    19-30: interface EdgeRow [exported]
       /** Edge row from the database */
   function:
-    36-38: generateEdgeId(): string [exported]
+    39-41: generateEdgeId(): string [exported]
       /** Generate a unique edge ID with 'edg_' prefix */
-    47-83: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
+    50-92: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
     metadata?: EdgeMetadata;
     createdBy?: "boundary" | "daemon" | "user";
+    confidence?: number;
+    similarity?: number;
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-    88-95: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
+    97-104: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-    100-107: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
+    109-116: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
-    112-119: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
+    121-128: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
-    124-127: getAllEdges(db: Database.Database): {} [exported]
+    133-136: getAllEdges(db: Database.Database): {} [exported]
       /** Get all edges */
-    132-135: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    141-144: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-    140-143: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    149-152: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-    148-166: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    157-175: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
-    175-185: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    184-196: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
   imports:
     - ./node-types.js
@@ -1426,12 +1497,39 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-18]
+src/storage/hybrid-search.ts [1-609]
+  interface:
+    60-79: interface HybridScoreBreakdown [exported]
+      /** Breakdown of scores for transparency and debugging. */
+    84-95: interface HybridSearchResult [exported]
+      /** Enhanced search result with hybrid scoring. */
+    100-117: interface HybridSearchOptions [exported]
+      /** Options for hybrid search. */
+    122-133: interface HybridSearchResponse [exported]
+      /** Result from hybrid search with pagination metadata. */
+  function:
+    351-553: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+      /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
+    562-608: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+      /** Calculate hybrid score for a single node (useful for re-ranking). */
+  variable:
+    33-42: HYBRID_WEIGHTS [exported]
+      /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
+    - ./database.js
+    - ./node-crud.js
+    - ./search-repository.js
+    - ./semantic-search.js
+    - better-sqlite3
+
+src/storage/index.ts [1-22]
+  imports:
+    - ./bridge-discovery.js
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
     - ./graph-repository.js
+    - ./hybrid-search.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -1439,7 +1537,9 @@ src/storage/index.ts [1-18]
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
+    - ./relationship-edges.js
     - ./search-repository.js
+    - ./semantic-search.js
     - ./tool-error-repository.js
 
 src/storage/lesson-repository.ts [1-284]
@@ -1477,16 +1577,16 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-343]
+src/storage/node-conversion.ts [1-356]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-335: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    268-348: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    340-342: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    353-355: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -1495,50 +1595,50 @@ src/storage/node-conversion.ts [1-343]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-751]
+src/storage/node-crud.ts [1-763]
   interface:
     39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    45-67: interface NodeRow [exported]
+    45-72: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    81-112: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node */
-    112-132: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    117-137: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node */
-    137-157: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    142-162: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node */
-    162-181: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    167-186: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    191-220: clearAllData(db: Database.Database): void [exported]
+    196-225: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    226-292: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    231-304: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    310-324: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    335-442: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    437-527: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    449-539: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    532-538: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    544-550: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    545-555: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    557-567: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    560-563: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    572-575: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    568-574: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    580-586: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    580-586: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    592-598: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    591-603: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    603-615: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    608-619: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    620-631: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    636-647: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    656-681: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    708-746: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -1729,6 +1829,29 @@ src/storage/quirk-repository.ts [1-315]
     291-314: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
   imports:
+    - better-sqlite3
+
+src/storage/relationship-edges.ts [1-290]
+  interface:
+    28-37: interface StoreRelationshipsResult [exported]
+      /** Result of storing relationships for a node */
+    49-56: interface UnresolvedRelationship [exported]
+      /** Result type for unresolved relationships */
+  function:
+    65-67: isAutoMemEdgeType(type: string): boolean [exported]
+      /** Check if a type is a valid AutoMem edge type */
+    72-105: validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; } [exported]
+      /** Validate a relationship output from the analyzer */
+    118-185: storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult [exported]
+      /** Store relationships extracted by the analyzer as edges For resolved relationships (with targetNodeId), creates an edge directly. For unresolved relationships (targetNodeId is null), stores the description in metadata for potential future resolution via semantic search. */
+    194-234: findUnresolvedRelationships(db: Database.Database, nodeId?: string): {} [exported]
+      /** Find unresolved relationships (edges with unresolvedTarget in metadata) These are relationships where the analyzer identified a connection but couldn't determine the target node ID. They can be resolved later via semantic search. */
+    242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
+      /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
+  imports:
+    - ../daemon/processor.js
+    - ../types/index.js
+    - ./edge-repository.js
     - better-sqlite3
 
 src/storage/search-repository.ts [1-549]
@@ -1924,63 +2047,63 @@ src/types.ts [1-298]
   | ToolCallContent
   | ImageContent [exported]
 
-src/types/index.ts [1-661]
+src/types/index.ts [1-707]
   interface:
-    12-30: interface Node [exported]
+    12-40: interface Node [exported]
       /** Shared type definitions for pi-brain This file contains pure type definitions (no runtime code) shared between the daemon/storage backend and the web frontend. */
-    32-49: interface NodeSource [exported]
-    66-78: interface NodeClassification [exported]
-    82-86: interface Decision [exported]
-    88-92: interface ErrorSummary [exported]
-    94-105: interface NodeContent [exported]
-    122-133: interface Lesson [exported]
-    135-143: interface LessonsByLevel [exported]
-    149-157: interface ModelUsage [exported]
-    161-168: interface ModelQuirk [exported]
-    170-176: interface ToolError [exported]
-    178-186: interface ModelObservations [exported]
-    192-205: interface NodeMetadata [exported]
-    207-216: interface SemanticData [exported]
-    218-225: interface DaemonDecision [exported]
-    227-237: interface DaemonMeta [exported]
-    262-275: interface EdgeMetadata [exported]
-    277-286: interface Edge [exported]
-    299-306: interface NodeVersion [exported]
-    312-322: interface AggregatedFailurePattern [exported]
-    324-333: interface AggregatedModelStats [exported]
-    335-344: interface AggregatedLessonPattern [exported]
-    353-380: interface AggregatedInsight [exported]
-    386-397: interface PromptAddition [exported]
-    406-411: interface DateRange [exported]
+    42-59: interface NodeSource [exported]
+    76-88: interface NodeClassification [exported]
+    92-96: interface Decision [exported]
+    98-102: interface ErrorSummary [exported]
+    104-115: interface NodeContent [exported]
+    132-143: interface Lesson [exported]
+    145-153: interface LessonsByLevel [exported]
+    159-167: interface ModelUsage [exported]
+    171-178: interface ModelQuirk [exported]
+    180-186: interface ToolError [exported]
+    188-196: interface ModelObservations [exported]
+    202-215: interface NodeMetadata [exported]
+    217-226: interface SemanticData [exported]
+    228-235: interface DaemonDecision [exported]
+    237-247: interface DaemonMeta [exported]
+    284-297: interface EdgeMetadata [exported]
+    299-312: interface Edge [exported]
+    345-352: interface NodeVersion [exported]
+    358-368: interface AggregatedFailurePattern [exported]
+    370-379: interface AggregatedModelStats [exported]
+    381-390: interface AggregatedLessonPattern [exported]
+    399-426: interface AggregatedInsight [exported]
+    432-443: interface PromptAddition [exported]
+    452-457: interface DateRange [exported]
       /** Date range for measuring effectiveness before/after prompt addition */
-    416-434: interface EffectivenessResult [exported]
+    462-480: interface EffectivenessResult [exported]
       /** Result of measuring prompt effectiveness for a single insight */
-    439-475: interface PromptEffectiveness [exported]
+    485-521: interface PromptEffectiveness [exported]
       /** Full effectiveness measurement record stored in database */
-    484-491: interface ManualFlag [exported]
+    530-537: interface ManualFlag [exported]
       /** Manual flag recorded by user via /brain --flag command */
-    496-511: interface FrictionSignals [exported]
+    542-557: interface FrictionSignals [exported]
       /** Friction signals detected in a session segment */
-    516-525: interface DelightSignals [exported]
+    562-571: interface DelightSignals [exported]
       /** Delight signals detected in a session segment */
-    530-534: interface NodeSignals [exported]
+    576-580: interface NodeSignals [exported]
       /** Combined signals for a node */
-    553-575: interface Cluster [exported]
+    599-621: interface Cluster [exported]
       /** A discovered cluster from facet discovery */
-    580-587: interface ClusterNode [exported]
+    626-633: interface ClusterNode [exported]
       /** Node membership in a cluster */
-    592-602: interface NodeEmbedding [exported]
+    638-648: interface NodeEmbedding [exported]
       /** Cached embedding for a node */
-    607-620: interface ClusteringRun [exported]
+    653-666: interface ClusteringRun [exported]
       /** Record of a clustering run */
-    625-636: interface EmbeddingConfig [exported]
+    671-682: interface EmbeddingConfig [exported]
       /** Configuration for the embedding provider */
-    641-652: interface ClusteringConfig [exported]
+    687-698: interface ClusteringConfig [exported]
       /** Configuration for clustering algorithm */
-    657-660: interface FacetDiscoveryResult [exported]
+    703-706: interface FacetDiscoveryResult [exported]
       /** Result of facet discovery pipeline */
   type:
-    51-64: NodeType = | "coding"
+    61-74: NodeType = | "coding"
   | "debugging"
   | "refactoring"
   | "sysadmin"
@@ -1993,17 +2116,17 @@ src/types/index.ts [1-661]
   | "configuration"
   | "data"
   | "other" [exported]
-    80-80: Outcome = "success" | "partial" | "failed" | "abandoned" [exported]
-    111-118: LessonLevel = | "project"
+    90-90: Outcome = "success" | "partial" | "failed" | "abandoned" [exported]
+    121-128: LessonLevel = | "project"
   | "task"
   | "user"
   | "model"
   | "tool"
   | "skill"
   | "subagent" [exported]
-    120-120: Confidence = "high" | "medium" | "low" [exported]
-    159-159: Frequency = "once" | "sometimes" | "often" | "always" [exported]
-    243-258: EdgeType = | "fork"
+    130-130: Confidence = "high" | "medium" | "low" [exported]
+    169-169: Frequency = "once" | "sometimes" | "often" | "always" [exported]
+    253-280: EdgeType = | "fork"
   | "branch"
   | "tree_jump"
   | "resume"
@@ -2015,18 +2138,22 @@ src/types/index.ts [1-661]
   | "reference"
   | "lesson_application"
   | ... [exported]
-    260-260: EdgeCreator = "boundary" | "daemon" | "user" [exported]
-    292-297: VersionTrigger = | "initial"
+    282-282: EdgeCreator = "boundary" | "daemon" | "user" [exported]
+    332-332: AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number] [exported]
+    338-343: VersionTrigger = | "initial"
   | "prompt_update"
   | "connection_found"
   | "user_feedback"
   | "schema_migration" [exported]
-    350-350: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
-    351-351: InsightSeverity = "low" | "medium" | "high" [exported]
-    543-543: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
+    396-396: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
+    397-397: InsightSeverity = "low" | "medium" | "high" [exported]
+    589-589: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
       /** Cluster status for user feedback */
-    548-548: ClusterSignalType = "friction" | "delight" | null [exported]
+    594-594: ClusterSignalType = "friction" | "delight" | null [exported]
       /** Signal type a cluster relates to */
+  variable:
+    318-330: AUTOMEM_EDGE_TYPES [exported]
+      /** AutoMem typed relationship edge types (per automem-features.md) These enable semantic reasoning ("why" queries, causal chains) */
 
 src/web/app/src/app.d.ts [1-12]
 
@@ -2148,5 +2275,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 90
-Estimated tokens: 27,087 (codebase: ~1,090,953)
+Files: 97
+Estimated tokens: 28,707 (codebase: ~1,160,177)

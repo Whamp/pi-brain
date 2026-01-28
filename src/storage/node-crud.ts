@@ -64,6 +64,11 @@ export interface NodeRow {
   signals: string | null;
   created_at: string;
   updated_at: string;
+  // AutoMem consolidation fields
+  relevance_score: number | null;
+  last_accessed: string | null;
+  archived: number | null;
+  importance: number | null;
 }
 
 // =============================================================================
@@ -234,12 +239,14 @@ export function insertNodeToDb(
       id, version, session_file, segment_start, segment_end, computer,
       type, project, is_new_project, had_clear_goal, outcome,
       tokens_used, cost, duration_minutes,
-      timestamp, analyzed_at, analyzer_version, data_file, signals
+      timestamp, analyzed_at, analyzer_version, data_file, signals,
+      relevance_score, last_accessed, archived, importance
     ) VALUES (
       ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?,
       ?, ?, ?,
-      ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?,
+      ?, ?, ?, ?
     )
   `);
 
@@ -262,7 +269,12 @@ export function insertNodeToDb(
     node.metadata.analyzedAt,
     node.metadata.analyzerVersion,
     dataFile,
-    node.signals ? JSON.stringify(node.signals) : null
+    node.signals ? JSON.stringify(node.signals) : null,
+    // AutoMem consolidation fields - default values for new nodes
+    node.relevanceScore ?? 1, // New nodes start at max relevance
+    node.lastAccessed ?? null,
+    node.archived ? 1 : 0,
+    node.importance ?? 0.5 // Default importance
   );
 
   // Insert related data

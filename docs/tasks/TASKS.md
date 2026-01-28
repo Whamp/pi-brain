@@ -392,3 +392,46 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 | 19.8.2 | Add E2E tests for settings UI             | pending | 19.7      |       |
 | 19.8.3 | Update README with settings capabilities  | pending | 19.8.1    |       |
 | 19.8.4 | Add tooltips/help text for complex fields | pending | 19.7      |       |
+
+## Phase 20: AutoMem Native Port
+
+Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.md
+
+### 20.1 Schema & Data Model
+
+| ID     | Task                                                                            | Status | Deps | Notes      |
+| ------ | ------------------------------------------------------------------------------- | ------ | ---- | ---------- |
+| 20.1.1 | Create migration for nodes table (add relevance_score, last_accessed, archived) | done   | -    | 2026-01-28 |
+| 20.1.2 | Create migration for edges table (add confidence, similarity columns)           | done   | -    | 2026-01-28 |
+| 20.1.3 | Define 11 AutoMem relationship types in src/types/index.ts                      | done   | -    | 2026-01-28 |
+
+### 20.2 Analyzer Upgrade
+
+| ID     | Task                                                      | Status | Deps   | Notes                              |
+| ------ | --------------------------------------------------------- | ------ | ------ | ---------------------------------- |
+| 20.2.1 | Update session-analyzer prompt to use specific edge types | done   | 20.1.3 | 2026-01-28 - relationships section |
+| 20.2.2 | Update processor.ts to parse and store typed edges        | done   | 20.2.1 | 2026-01-28 - relationship-edges.ts |
+
+### 20.3 Consolidation Engine
+
+| ID     | Task                                                    | Status | Deps   | Notes                         |
+| ------ | ------------------------------------------------------- | ------ | ------ | ----------------------------- |
+| 20.3.1 | Create src/daemon/consolidation/ module structure       | done   | 20.1.1 | 2026-01-28                    |
+| 20.3.2 | Implement DecayScheduler (cron job)                     | done   | 20.3.1 | 2026-01-28                    |
+| 20.3.3 | Implement RelevanceCalculator (decay formula)           | done   | 20.3.2 | 2026-01-28 (impl'd in 20.3.1) |
+| 20.3.4 | Implement CreativeAssociator (vector similarity search) | done   | 20.3.2 | 2026-01-28 (impl'd in 20.3.1) |
+
+### 20.4 Query Engine Upgrade
+
+| ID     | Task                                                     | Status | Deps   | Notes      |
+| ------ | -------------------------------------------------------- | ------ | ------ | ---------- |
+| 20.4.1 | Update search-repository.ts for Hybrid Scoring           | done   | 20.1.1 | 2026-01-28 |
+| 20.4.2 | Create bridge-discovery.ts for multi-hop graph traversal | done   | 20.4.1 | 2026-01-28 |
+| 20.4.3 | Expose new query capabilities via /api/v1/query          | done   | 20.4.2 | 2026-01-28 |
+
+### 20.5 UI & Visualization
+
+| ID     | Task                                                           | Status | Deps   | Notes                                     |
+| ------ | -------------------------------------------------------------- | ------ | ------ | ----------------------------------------- |
+| 20.5.1 | Update Web UI graph view to color-code edge types              | done   | 20.1.3 | 2026-01-28 - Colored edges & legend added |
+| 20.5.2 | Add "Relevance" visualization (fade out old/unimportant nodes) | done   | 20.1.1 | 2026-01-28 - Opacity & Legend             |

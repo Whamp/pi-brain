@@ -61,7 +61,9 @@ describe("connectionDiscoverer", () => {
         type TEXT,
         metadata TEXT,
         created_at TEXT,
-        created_by TEXT
+        created_by TEXT,
+        confidence REAL,
+        similarity REAL
       );
       CREATE TABLE lessons (
         id TEXT PRIMARY KEY,
