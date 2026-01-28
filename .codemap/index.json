@@ -1,40 +1,41 @@
 {
   "stats": {
-    "totalFiles": 86,
-    "totalSymbols": 1041,
+    "totalFiles": 87,
+    "totalSymbols": 1068,
     "byLanguage": {
-      "typescript": 86
+      "typescript": 87
     },
     "bySymbolKind": {
-      "function": 470,
-      "type": 37,
-      "interface": 249,
-      "variable": 102,
-      "class": 11,
-      "constructor": 10,
-      "method": 115,
-      "property": 45,
+      "function": 473,
+      "type": 40,
+      "interface": 253,
+      "variable": 103,
+      "class": 12,
+      "property": 47,
+      "constructor": 11,
+      "method": 127,
       "getter": 2
     }
   },
-  "total_tokens": 34803,
-  "codebase_tokens": 979858,
+  "total_tokens": 35761,
+  "codebase_tokens": 990245,
   "files": [
     {
       "path": "src/api/index.ts",
       "language": "typescript",
       "lines": [
         1,
-        14
+        22
       ],
       "detail_level": "full",
-      "token_estimate": 13,
+      "token_estimate": 19,
       "symbols": [],
       "annotation": null,
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "./server.js"
+        "./server.js",
+        "./websocket.js"
       ]
     },
     {
@@ -1351,18 +1352,18 @@
       "language": "typescript",
       "lines": [
         1,
-        183
+        201
       ],
       "detail_level": "full",
-      "token_estimate": 270,
+      "token_estimate": 321,
       "symbols": [
         {
           "name": "ServerContext",
           "kind": "interface",
           "signature": "ServerContext",
           "lines": [
-            46,
-            51
+            47,
+            52
           ],
           "exported": true,
           "is_default": false,
@@ -1378,10 +1379,10 @@
         {
           "name": "createServer",
           "kind": "function",
-          "signature": "async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance>",
+          "signature": "async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance>",
           "lines": [
-            65,
-            155
+            66,
+            162
           ],
           "exported": true,
           "is_default": false,
@@ -1395,12 +1396,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "ServerResult",
+          "kind": "interface",
+          "signature": "ServerResult",
+          "lines": [
+            167,
+            170
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Server result including the Fastify instance and WebSocket manager",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "startServer",
           "kind": "function",
-          "signature": "async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance>",
+          "signature": "async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult>",
           "lines": [
-            160,
-            175
+            175,
+            193
           ],
           "exported": true,
           "is_default": false,
@@ -1437,10 +1457,526 @@
         "./routes/signals.js",
         "./routes/stats.js",
         "./routes/tool-errors.js",
+        "./websocket.js",
         "@fastify/cors",
         "@fastify/websocket",
         "better-sqlite3",
         "fastify"
+      ]
+    },
+    {
+      "path": "src/api/websocket.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        367
+      ],
+      "detail_level": "full",
+      "token_estimate": 832,
+      "symbols": [
+        {
+          "name": "WSChannel",
+          "kind": "type",
+          "signature": "WSChannel = \"daemon\" | \"analysis\" | \"node\" | \"queue\"",
+          "lines": [
+            19,
+            19
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Available subscription channels",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "WSEventType",
+          "kind": "type",
+          "signature": "WSEventType = | \"daemon.status\"\n  | \"analysis.started\"\n  | \"analysis.completed\"\n  | \"analysis.failed\"\n  | \"node.created\"\n  | \"queue.updated\"\n  | \"subscribed\"\n  | \"error\"",
+          "lines": [
+            22,
+            30
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "WebSocket message types from server to client",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "WSMessage",
+          "kind": "interface",
+          "signature": "WSMessage",
+          "lines": [
+            33,
+            37
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Message format for WebSocket events",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SubscribeMessage",
+          "kind": "interface",
+          "signature": "SubscribeMessage",
+          "lines": [
+            40,
+            43
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Client subscription request",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ClientMessage",
+          "kind": "type",
+          "signature": "ClientMessage = SubscribeMessage",
+          "lines": [
+            46,
+            46
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Client message union type",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "WSClient",
+          "kind": "interface",
+          "signature": "WSClient",
+          "lines": [
+            49,
+            53
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Connected client with subscriptions",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "WebSocketManager",
+          "kind": "class",
+          "signature": "WebSocketManager",
+          "lines": [
+            62,
+            322
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Manages WebSocket connections and broadcasts events",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "clients",
+          "kind": "property",
+          "signature": "clients",
+          "lines": [
+            63,
+            63
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "logger",
+          "kind": "property",
+          "signature": "logger: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  }",
+          "lines": [
+            64,
+            68
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(logger?: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  })",
+          "lines": [
+            70,
+            80
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "handleConnection",
+          "kind": "method",
+          "signature": "handleConnection(socket: WebSocket): void",
+          "lines": [
+            85,
+            112
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Handle a new WebSocket connection",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "handleMessage",
+          "kind": "method",
+          "signature": "handleMessage(client: WSClient, data: Buffer | string): void",
+          "lines": [
+            117,
+            146
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Handle incoming message from client",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "handleSubscribe",
+          "kind": "method",
+          "signature": "handleSubscribe(client: WSClient, message: SubscribeMessage): void",
+          "lines": [
+            151,
+            174
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Handle subscription request",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sendToClient",
+          "kind": "method",
+          "signature": "sendToClient(client: WSClient, message: WSMessage): void",
+          "lines": [
+            179,
+            190
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Send message to a specific client",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcast",
+          "kind": "method",
+          "signature": "broadcast(channel: WSChannel, message: WSMessage): void",
+          "lines": [
+            195,
+            208
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast message to all subscribed clients",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getClientCount",
+          "kind": "method",
+          "signature": "getClientCount(): number",
+          "lines": [
+            213,
+            215
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Get connected client count",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "closeAll",
+          "kind": "method",
+          "signature": "closeAll(): void",
+          "lines": [
+            220,
+            225
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Close all connections",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcastDaemonStatus",
+          "kind": "method",
+          "signature": "broadcastDaemonStatus(status: {\n    running: boolean;\n    workers?: { active: number; idle: number };\n    queue?: { pending: number; running: number };\n  }): void",
+          "lines": [
+            234,
+            244
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast daemon status update",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcastAnalysisStarted",
+          "kind": "method",
+          "signature": "broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void",
+          "lines": [
+            249,
+            259
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast analysis started event",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcastAnalysisCompleted",
+          "kind": "method",
+          "signature": "broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void",
+          "lines": [
+            264,
+            286
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast analysis completed event",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcastAnalysisFailed",
+          "kind": "method",
+          "signature": "broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void",
+          "lines": [
+            291,
+            305
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast analysis failed event",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "broadcastQueueUpdate",
+          "kind": "method",
+          "signature": "broadcastQueueUpdate(stats: {\n    pending: number;\n    running: number;\n    completed: number;\n    failed: number;\n  }): void",
+          "lines": [
+            310,
+            321
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "WebSocketManager",
+          "annotation": null,
+          "comment": "Broadcast queue update event",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "registerWebSocketRoute",
+          "kind": "function",
+          "signature": "registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void",
+          "lines": [
+            331,
+            343
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Register the WebSocket route on a Fastify instance",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "globalWSManager",
+          "kind": "variable",
+          "signature": "WebSocketManager | null",
+          "lines": [
+            349,
+            349
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getWebSocketManager",
+          "kind": "function",
+          "signature": "getWebSocketManager(): WebSocketManager",
+          "lines": [
+            354,
+            359
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get or create the global WebSocket manager",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "setWebSocketManager",
+          "kind": "function",
+          "signature": "setWebSocketManager(manager: WebSocketManager): void",
+          "lines": [
+            364,
+            366
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Set the global WebSocket manager (for testing or custom config)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../daemon/queue.js",
+        "../storage/node-types.js",
+        "fastify",
+        "ws"
       ]
     },
     {
@@ -3376,7 +3912,7 @@
       "language": "typescript",
       "lines": [
         1,
-        203
+        244
       ],
       "detail_level": "full",
       "token_estimate": 92,
@@ -3425,7 +3961,7 @@
           "signature": "async main(): Promise<void>",
           "lines": [
             44,
-            191
+            232
           ],
           "exported": false,
           "is_default": false,
@@ -6995,10 +7531,10 @@
       "language": "typescript",
       "lines": [
         1,
-        754
+        766
       ],
       "detail_level": "full",
-      "token_estimate": 1172,
+      "token_estimate": 1241,
       "symbols": [
         {
           "name": "JobType",
@@ -7196,7 +7732,7 @@
           "signature": "QueueManager",
           "lines": [
             151,
-            709
+            721
           ],
           "exported": true,
           "is_default": false,
@@ -7518,8 +8054,8 @@
           "kind": "method",
           "signature": "releaseStale(): number",
           "lines": [
-            550,
-            565
+            552,
+            571
           ],
           "exported": false,
           "is_default": false,
@@ -7528,7 +8064,7 @@
           "is_abstract": false,
           "parent_name": "QueueManager",
           "annotation": null,
-          "comment": "Release stale locks (jobs that were running but never completed)\n\nCall this periodically to recover from worker crashes.",
+          "comment": "Release stale locks (jobs that were running but never completed)\n\nCall this periodically to recover from worker crashes.\nNote: We clear the error field on retry to give jobs a clean slate.\nThe stale lock condition itself is logged by the daemon when this returns > 0.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -7537,8 +8073,8 @@
           "kind": "method",
           "signature": "releaseAllRunning(): number",
           "lines": [
-            572,
-            586
+            580,
+            598
           ],
           "exported": false,
           "is_default": false,
@@ -7547,7 +8083,7 @@
           "is_abstract": false,
           "parent_name": "QueueManager",
           "annotation": null,
-          "comment": "Release ALL running jobs back to pending\n\nUse this on daemon startup to recover from a crash.",
+          "comment": "Release ALL running jobs back to pending\n\nUse this on daemon startup to recover from a crash.\nNote: We clear the error field on retry to give jobs a clean slate.\nThe daemon logs the count of released jobs for observability.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -7556,8 +8092,8 @@
           "kind": "method",
           "signature": "getStats(): QueueStats",
           "lines": [
-            591,
-            626
+            603,
+            638
           ],
           "exported": false,
           "is_default": false,
@@ -7575,8 +8111,8 @@
           "kind": "method",
           "signature": "getJobCounts(): Record<JobStatus, number>",
           "lines": [
-            631,
-            656
+            643,
+            668
           ],
           "exported": false,
           "is_default": false,
@@ -7594,8 +8130,8 @@
           "kind": "method",
           "signature": "clearOldCompleted(daysOld: number): number",
           "lines": [
-            661,
-            673
+            673,
+            685
           ],
           "exported": false,
           "is_default": false,
@@ -7613,8 +8149,8 @@
           "kind": "method",
           "signature": "clearAll(): number",
           "lines": [
-            678,
-            681
+            690,
+            693
           ],
           "exported": false,
           "is_default": false,
@@ -7632,8 +8168,8 @@
           "kind": "method",
           "signature": "parseRow(row: QueueRow): AnalysisJob",
           "lines": [
-            686,
-            708
+            698,
+            720
           ],
           "exported": false,
           "is_default": false,
@@ -7651,8 +8187,8 @@
           "kind": "function",
           "signature": "generateJobId(): string",
           "lines": [
-            720,
-            722
+            732,
+            734
           ],
           "exported": true,
           "is_default": false,
@@ -7670,8 +8206,8 @@
           "kind": "function",
           "signature": "createQueueManager(db: Database.Database): QueueManager",
           "lines": [
-            727,
-            729
+            739,
+            741
           ],
           "exported": true,
           "is_default": false,
@@ -7689,8 +8225,8 @@
           "kind": "function",
           "signature": "getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; }",
           "lines": [
-            735,
-            753
+            747,
+            765
           ],
           "exported": true,
           "is_default": false,

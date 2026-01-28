@@ -1,22 +1,23 @@
 # Project Overview
 
 ## Languages
-- typescript: 86 files
+- typescript: 87 files
 
 ## Statistics
-- Total files: 86
-- Total symbols: 616
-  - function: 343
-  - interface: 198
-  - type: 37
+- Total files: 87
+- Total symbols: 624
+  - function: 346
+  - interface: 200
+  - type: 39
   - variable: 27
-  - class: 11
+  - class: 12
 
 ---
 
-src/api/index.ts [1-14]
+src/api/index.ts [1-22]
   imports:
     - ./server.js
+    - ./websocket.js
 
 src/api/responses.ts [1-52]
   type:
@@ -192,14 +193,16 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-183]
+src/api/server.ts [1-201]
   interface:
-    46-51: interface ServerContext [exported]
+    47-52: interface ServerContext [exported]
       /** Server context passed to route handlers */
+    167-170: interface ServerResult [exported]
+      /** Server result including the Fastify instance and WebSocket manager */
   function:
-    65-155: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
+    66-162: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    160-175: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
+    175-193: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -221,10 +224,43 @@ src/api/server.ts [1-183]
     - ./routes/signals.js
     - ./routes/stats.js
     - ./routes/tool-errors.js
+    - ./websocket.js
     - @fastify/cors
     - @fastify/websocket
     - better-sqlite3
     - fastify
+
+src/api/websocket.ts [1-367]
+  class:
+    62-322: class WebSocketManager [exported]
+      /** Manages WebSocket connections and broadcasts events */
+  interface:
+    33-37: interface WSMessage [exported]
+      /** Message format for WebSocket events */
+  type:
+    19-19: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
+      /** Available subscription channels */
+    22-30: WSEventType = | "daemon.status"
+  | "analysis.started"
+  | "analysis.completed"
+  | "analysis.failed"
+  | "node.created"
+  | "queue.updated"
+  | "subscribed"
+  | "error" [exported]
+      /** WebSocket message types from server to client */
+  function:
+    331-343: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+      /** Register the WebSocket route on a Fastify instance */
+    354-359: getWebSocketManager(): WebSocketManager [exported]
+      /** Get or create the global WebSocket manager */
+    364-366: setWebSocketManager(manager: WebSocketManager): void [exported]
+      /** Set the global WebSocket manager (for testing or custom config) */
+  imports:
+    - ../daemon/queue.js
+    - ../storage/node-types.js
+    - fastify
+    - ws
 
 src/cli.ts [1-1102]
   imports:
@@ -406,7 +442,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-203]
+src/daemon/daemon-process.ts [1-244]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -646,9 +682,9 @@ src/daemon/query-processor.ts [1-724]
     - node:os
     - node:path
 
-src/daemon/queue.ts [1-754]
+src/daemon/queue.ts [1-766]
   class:
-    151-709: class QueueManager [exported]
+    151-721: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -671,11 +707,11 @@ src/daemon/queue.ts [1-754]
   /** Override default max re... [exported]
       /** Job creation input (id, status, queuedAt are auto-generated) */
   function:
-    720-722: generateJobId(): string [exported]
+    732-734: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
-    727-729: createQueueManager(db: Database.Database): QueueManager [exported]
+    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-    735-753: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
   variable:
     23-34: PRIORITY [exported]
@@ -1991,5 +2027,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 86
-Estimated tokens: 24,386 (codebase: ~977,833)
+Files: 87
+Estimated tokens: 24,737 (codebase: ~982,965)

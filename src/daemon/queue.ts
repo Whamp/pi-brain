@@ -546,6 +546,8 @@ export class QueueManager {
    * Release stale locks (jobs that were running but never completed)
    *
    * Call this periodically to recover from worker crashes.
+   * Note: We clear the error field on retry to give jobs a clean slate.
+   * The stale lock condition itself is logged by the daemon when this returns > 0.
    */
   releaseStale(): number {
     const result = this.db
@@ -572,6 +574,8 @@ export class QueueManager {
    * Release ALL running jobs back to pending
    *
    * Use this on daemon startup to recover from a crash.
+   * Note: We clear the error field on retry to give jobs a clean slate.
+   * The daemon logs the count of released jobs for observability.
    */
   releaseAllRunning(): number {
     const result = this.db

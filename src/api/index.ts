@@ -10,4 +10,12 @@ export {
   successResponse,
   errorResponse,
 } from "./server.js";
-export type { ServerContext, ApiErrorCode } from "./server.js";
+export type { ServerContext, ApiErrorCode, ServerResult } from "./server.js";
+
+export {
+  WebSocketManager,
+  registerWebSocketRoute,
+  getWebSocketManager,
+  setWebSocketManager,
+} from "./websocket.js";
+export type { WSChannel, WSEventType, WSMessage } from "./websocket.js";

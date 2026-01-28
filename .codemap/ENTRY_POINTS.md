@@ -1,21 +1,26 @@
 # Project Overview
 
 ## Languages
-- typescript: 25 files
+- typescript: 27 files
 
 ## Statistics
-- Total files: 25
-- Total symbols: 63
-  - function: 46
-  - interface: 9
-  - variable: 7
-  - type: 1
+- Total files: 27
+- Total symbols: 93
+  - function: 51
+  - interface: 14
+  - method: 12
+  - variable: 8
+  - type: 4
+  - property: 2
+  - class: 1
+  - constructor: 1
 
 ---
 
-src/api/index.ts [1-14]
+src/api/index.ts [1-22]
   imports:
     - ./server.js
+    - ./websocket.js
 
 src/api/responses.ts [1-52]
   type:
@@ -457,7 +462,7 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.test.ts [1-683]
+src/api/server.test.ts [1-703]
   function:
     21-25: createTempDir(): string
       refs out: 1 [call: 1]
@@ -482,36 +487,42 @@ src/api/server.test.ts [1-683]
     - ../storage/index.js
     - ../storage/node-types.js
     - ./server.js
+    - ./websocket.js
     - node:fs
     - node:os
     - node:path
     - vitest
 
-src/api/server.ts [1-183]
+src/api/server.ts [1-201]
   interface:
-    46-51: interface ServerContext [exported]
+    47-52: interface ServerContext [exported]
       /** Server context passed to route handlers */
       refs out: 3 [type: 3]
-        - src/api/server.ts:47: type Database -> external
-        - src/api/server.ts:48: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:50: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:48: type Database -> external
+        - src/api/server.ts:49: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:51: type DaemonConfig -> src/config/types.ts
+    167-170: interface ServerResult [exported]
+      /** Server result including the Fastify instance and WebSocket manager */
+      refs out: 2 [type: 2]
+        - src/api/server.ts:168: type FastifyInstance -> external
+        - src/api/server.ts:169: type WebSocketManager -> src/api/websocket.ts
   function:
-    65-155: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
+    66-162: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-      refs out: 32 [call: 26, instantiate: 1, type: 5]
-        - src/api/server.ts:66: type Database -> external
-        - src/api/server.ts:67: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:68: type DaemonConfig -> src/config/types.ts
-        - src/api/server.ts:69: type Promise -> external
-        - src/api/server.ts:69: type FastifyInstance -> external
-    160-175: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig): Promise<FastifyInstance> [exported]
+      refs out: 34 [call: 27, instantiate: 1, type: 6]
+        - src/api/server.ts:67: type Database -> external
+        - src/api/server.ts:68: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:69: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:70: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:71: type Promise -> external
+    175-193: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
-      refs out: 7 [call: 2, type: 5]
-        - src/api/server.ts:161: type Database -> external
-        - src/api/server.ts:162: type ApiConfig -> src/config/types.ts
-        - src/api/server.ts:163: type DaemonConfig -> src/config/types.ts
-        - src/api/server.ts:164: type Promise -> external
-        - src/api/server.ts:164: type FastifyInstance -> external
+      refs out: 8 [call: 2, type: 6]
+        - src/api/server.ts:176: type Database -> external
+        - src/api/server.ts:177: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:178: type DaemonConfig -> src/config/types.ts
+        - src/api/server.ts:179: type WebSocketManager -> src/api/websocket.ts
+        - src/api/server.ts:180: type Promise -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -532,10 +543,211 @@ src/api/server.ts [1-183]
     - ./routes/signals.js
     - ./routes/stats.js
     - ./routes/tool-errors.js
+    - ./websocket.js
     - @fastify/cors
     - @fastify/websocket
     - better-sqlite3
     - fastify
+
+src/api/websocket.test.ts [1-430]
+  interface:
+    18-24: interface MockSocket
+      refs out: 4 [type: 4]
+        - src/api/websocket.test.ts:20: type ReturnType -> external
+        - src/api/websocket.test.ts:21: type ReturnType -> external
+        - src/api/websocket.test.ts:22: type ReturnType -> external
+        - src/api/websocket.test.ts:23: type Map -> external
+  function:
+    26-41: createMockSocket(): MockSocket
+      refs out: 8 [call: 7, type: 1]
+        - src/api/websocket.test.ts:26: type MockSocket -> src/api/websocket.test.ts
+        - src/api/websocket.test.ts:31: call fn -> external
+        - src/api/websocket.test.ts:32: call fn -> external
+        - src/api/websocket.test.ts:33: call fn -> external
+        - src/api/websocket.test.ts:34: call has -> external
+    43-48: emitEvent(socket: MockSocket, event: string, ...args: unknown[]): void
+      refs out: 2 [call: 1, type: 1]
+        - src/api/websocket.test.ts:43: type MockSocket -> src/api/websocket.test.ts
+        - src/api/websocket.test.ts:46: call handler -> src/api/websocket.test.ts
+  imports:
+    - ../daemon/queue.js
+    - ../storage/node-types.js
+    - ./websocket.js
+    - vitest
+    - ws
+
+src/api/websocket.ts [1-367]
+  class:
+    62-322: class WebSocketManager [exported]
+      /** Manages WebSocket connections and broadcasts events */
+      63-63: clients
+        refs out: 2 [instantiate: 1, type: 1]
+          - src/api/websocket.ts:63: instantiate Set -> external
+          - src/api/websocket.ts:63: type WSClient -> src/api/websocket.ts
+      64-68: logger: {
+    info: (msg: string) => void;
+    error: (msg: string) => void;
+    debug: (msg: string) => void;
+  }
+      70-80: constructor(logger?: {
+    info: (msg: string) => void;
+    error: (msg: string) => void;
+    debug: (msg: string) => void;
+  })
+        refs out: 3 [call: 3]
+          - src/api/websocket.ts:76: call log -> external
+          - src/api/websocket.ts:77: call error -> external
+          - src/api/websocket.ts:78: call debug -> external
+      85-112: handleConnection(socket: WebSocket): void
+        /** Handle a new WebSocket connection */
+        refs out: 12 [call: 10, type: 2]
+          - src/api/websocket.ts:85: type WebSocket -> external
+          - src/api/websocket.ts:92: call add -> external
+          - src/api/websocket.ts:93: call WebSocketManager.info -> src/api/websocket.ts
+          - src/api/websocket.ts:97: call WebSocket.on -> external
+          - src/api/websocket.ts:97: type Buffer -> external
+      117-146: handleMessage(client: WSClient, data: Buffer | string): void
+        /** Handle incoming message from client */
+        refs out: 11 [call: 7, instantiate: 2, type: 2]
+          - src/api/websocket.ts:117: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:117: type Buffer -> external
+          - src/api/websocket.ts:123: call WebSocketManager.handleSubscribe -> src/api/websocket.ts
+          - src/api/websocket.ts:127: call WebSocketManager.sendToClient -> src/api/websocket.ts
+          - src/api/websocket.ts:132: call toISOString -> external
+      151-174: handleSubscribe(client: WSClient, message: SubscribeMessage): void
+        /** Handle subscription request */
+        refs out: 8 [call: 5, instantiate: 1, type: 2]
+          - src/api/websocket.ts:151: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:151: type SubscribeMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:161: call add -> external
+          - src/api/websocket.ts:165: call WebSocketManager.debug -> src/api/websocket.ts
+          - src/api/websocket.ts:166: call join -> external
+      179-190: sendToClient(client: WSClient, message: WSMessage): void
+        /** Send message to a specific client */
+        refs out: 6 [call: 4, type: 2]
+          - src/api/websocket.ts:179: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:179: type WSMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:183: call WebSocket.send -> external
+          - src/api/websocket.ts:183: call stringify -> external
+          - src/api/websocket.ts:185: call WebSocketManager.error -> src/api/websocket.ts
+      195-208: broadcast(channel: WSChannel, message: WSMessage): void
+        /** Broadcast message to all subscribed clients */
+        refs out: 5 [call: 3, type: 2]
+          - src/api/websocket.ts:195: type WSChannel -> src/api/websocket.ts
+          - src/api/websocket.ts:195: type WSMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:199: call has -> external
+          - src/api/websocket.ts:200: call WebSocketManager.sendToClient -> src/api/websocket.ts
+          - src/api/websocket.ts:205: call WebSocketManager.debug -> src/api/websocket.ts
+      213-215: getClientCount(): number
+        /** Get connected client count */
+      220-225: closeAll(): void
+        /** Close all connections */
+        refs out: 2 [call: 2]
+          - src/api/websocket.ts:222: call WebSocket.close -> external
+          - src/api/websocket.ts:224: call clear -> external
+      234-244: broadcastDaemonStatus(status: {
+    running: boolean;
+    workers?: { active: number; idle: number };
+    queue?: { pending: number; running: number };
+  }): void
+        /** Broadcast daemon status update */
+        refs out: 3 [call: 2, instantiate: 1]
+          - src/api/websocket.ts:239: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:242: call toISOString -> external
+          - src/api/websocket.ts:242: instantiate Date -> external
+      249-259: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
+        /** Broadcast analysis started event */
+        refs out: 4 [call: 2, instantiate: 1, type: 1]
+          - src/api/websocket.ts:249: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:250: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:257: call toISOString -> external
+          - src/api/websocket.ts:257: instantiate Date -> external
+      264-286: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
+        /** Broadcast analysis completed event */
+        refs out: 8 [call: 4, instantiate: 2, type: 2]
+          - src/api/websocket.ts:264: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:264: type Node -> src/types/index.ts
+          - src/api/websocket.ts:265: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:272: call toISOString -> external
+          - src/api/websocket.ts:272: instantiate Date -> external
+      291-305: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
+        /** Broadcast analysis failed event */
+        refs out: 5 [call: 2, instantiate: 1, type: 2]
+          - src/api/websocket.ts:292: type AnalysisJob -> src/daemon/queue.ts
+          - src/api/websocket.ts:293: type Error -> external
+          - src/api/websocket.ts:296: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:303: call toISOString -> external
+          - src/api/websocket.ts:303: instantiate Date -> external
+      310-321: broadcastQueueUpdate(stats: {
+    pending: number;
+    running: number;
+    completed: number;
+    failed: number;
+  }): void
+        /** Broadcast queue update event */
+        refs out: 3 [call: 2, instantiate: 1]
+          - src/api/websocket.ts:316: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:319: call toISOString -> external
+          - src/api/websocket.ts:319: instantiate Date -> external
+  interface:
+    33-37: interface WSMessage [exported]
+      /** Message format for WebSocket events */
+      refs out: 1 [type: 1]
+        - src/api/websocket.ts:34: type WSEventType -> src/api/websocket.ts
+    40-43: interface SubscribeMessage
+      /** Client subscription request */
+      refs out: 1 [type: 1]
+        - src/api/websocket.ts:42: type WSChannel -> src/api/websocket.ts
+    49-53: interface WSClient
+      /** Connected client with subscriptions */
+      refs out: 4 [type: 4]
+        - src/api/websocket.ts:50: type WebSocket -> external
+        - src/api/websocket.ts:51: type Set -> external
+        - src/api/websocket.ts:51: type WSChannel -> src/api/websocket.ts
+        - src/api/websocket.ts:52: type Date -> external
+  type:
+    19-19: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
+      /** Available subscription channels */
+    22-30: WSEventType = | "daemon.status"
+  | "analysis.started"
+  | "analysis.completed"
+  | "analysis.failed"
+  | "node.created"
+  | "queue.updated"
+  | "subscribed"
+  | "error" [exported]
+      /** WebSocket message types from server to client */
+    46-46: ClientMessage = SubscribeMessage
+      /** Client message union type */
+      refs out: 1 [type: 1]
+        - src/api/websocket.ts:46: type SubscribeMessage -> src/api/websocket.ts
+  function:
+    331-343: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+      /** Register the WebSocket route on a Fastify instance */
+      refs out: 6 [call: 2, type: 4]
+        - src/api/websocket.ts:332: type FastifyInstance -> external
+        - src/api/websocket.ts:333: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:336: call get -> external
+        - src/api/websocket.ts:339: type WebSocket -> external
+        - src/api/websocket.ts:339: type FastifyRequest -> external
+    354-359: getWebSocketManager(): WebSocketManager [exported]
+      /** Get or create the global WebSocket manager */
+      refs out: 2 [instantiate: 1, type: 1]
+        - src/api/websocket.ts:354: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:356: instantiate WebSocketManager -> src/api/websocket.ts
+    364-366: setWebSocketManager(manager: WebSocketManager): void [exported]
+      /** Set the global WebSocket manager (for testing or custom config) */
+      refs out: 1 [type: 1]
+        - src/api/websocket.ts:364: type WebSocketManager -> src/api/websocket.ts
+  variable:
+    349-349: WebSocketManager | null
+      refs out: 1 [type: 1]
+        - src/api/websocket.ts:349: type WebSocketManager -> src/api/websocket.ts
+  imports:
+    - ../daemon/queue.js
+    - ../storage/node-types.js
+    - fastify
+    - ws
 
 src/cli.ts [1-1102]
   variable:
@@ -584,5 +796,5 @@ src/cli.ts [1-1102]
     - open
 
 ---
-Files: 25
-Estimated tokens: 6,164 (codebase: ~977,833)
+Files: 27
+Estimated tokens: 8,863 (codebase: ~986,428)

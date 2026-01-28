@@ -35,6 +35,7 @@ import { sessionsRoutes } from "./routes/sessions.js";
 import { signalsRoutes } from "./routes/signals.js";
 import { statsRoutes } from "./routes/stats.js";
 import { toolErrorsRoutes } from "./routes/tool-errors.js";
+import { WebSocketManager, registerWebSocketRoute } from "./websocket.js";
 
 // Re-export response helpers for convenience
 export { successResponse, errorResponse } from "./responses.js";
@@ -65,7 +66,8 @@ declare module "fastify" {
 export async function createServer(
   db: Database,
   config: ApiConfig,
-  daemonConfig?: DaemonConfig
+  daemonConfig?: DaemonConfig,
+  wsManager?: WebSocketManager
 ): Promise<FastifyInstance> {
   const app = Fastify({
     logger: {
@@ -81,6 +83,11 @@ export async function createServer(
 
   // Register WebSocket support
   await app.register(websocket);
+
+  // Register WebSocket route if manager provided
+  if (wsManager) {
+    registerWebSocketRoute(app, wsManager);
+  }
 
   // Add timing hook
   app.addHook("onRequest", async (request) => {
@@ -155,14 +162,25 @@ export async function createServer(
 }
 
 /**
+ * Server result including the Fastify instance and WebSocket manager
+ */
+export interface ServerResult {
+  app: FastifyInstance;
+  wsManager: WebSocketManager;
+}
+
+/**
  * Start the API server
  */
 export async function startServer(
   db: Database,
   config: ApiConfig,
-  daemonConfig?: DaemonConfig
-): Promise<FastifyInstance> {
-  const app = await createServer(db, config, daemonConfig);
+  daemonConfig?: DaemonConfig,
+  wsManager?: WebSocketManager
+): Promise<ServerResult> {
+  // Create WebSocket manager if not provided
+  const manager = wsManager ?? new WebSocketManager();
+  const app = await createServer(db, config, daemonConfig, manager);
 
   await app.listen({
     port: config.port,
@@ -171,7 +189,7 @@ export async function startServer(
 
   app.log.info(`API server listening on http://${config.host}:${config.port}`);
 
-  return app;
+  return { app, wsManager: manager };
 }
 
 // Extend Fastify instance to include context

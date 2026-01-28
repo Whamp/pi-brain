@@ -13,7 +13,7 @@
 
 import * as path from "node:path";
 
-import { startServer } from "../api/server.js";
+import { startServer, WebSocketManager } from "../api/server.js";
 import { loadConfig, ensureDirectories } from "../config/config.js";
 import { openDatabase, migrate } from "../storage/database.js";
 import { writePidFile, removePidFile } from "./cli.js";
@@ -84,7 +84,15 @@ async function main(): Promise<void> {
     15 * 60 * 1000
   );
 
-  // Create worker
+  // Create WebSocket manager for real-time updates
+  const wsManager = new WebSocketManager({
+    info: (msg: string) => console.log(`[ws] ${msg}`),
+    error: (msg: string) => console.error(`[ws] ${msg}`),
+    debug: (msg: string) => console.debug(`[ws] ${msg}`),
+  });
+  console.log("[daemon] WebSocket manager created");
+
+  // Create worker with WebSocket event broadcasting
   const worker = createWorker({
     id: "worker-1",
     config,
@@ -93,6 +101,14 @@ async function main(): Promise<void> {
       warn: (msg: string) => console.warn(`[worker] ${msg}`),
       error: (msg: string) => console.error(`[worker] ${msg}`),
       debug: (msg: string) => console.debug(`[worker] ${msg}`),
+    },
+    onNodeCreated: async (job, node) => {
+      // Broadcast analysis completed + node created via WebSocket
+      wsManager.broadcastAnalysisCompleted(job, node);
+    },
+    onJobFailed: async (job, error) => {
+      // Broadcast analysis failed via WebSocket
+      wsManager.broadcastAnalysisFailed(job, error, false);
     },
   });
   console.log("[daemon] Worker created");
@@ -160,8 +176,13 @@ async function main(): Promise<void> {
   worker.start();
   console.log("[daemon] Worker started");
 
-  // Start API server
-  const server = await startServer(db, config.api, config.daemon);
+  // Start API server with WebSocket support
+  const { app: server } = await startServer(
+    db,
+    config.api,
+    config.daemon,
+    wsManager
+  );
   console.log(
     `[daemon] API server listening on http://${config.api.host}:${config.api.port}`
   );
@@ -186,6 +207,9 @@ async function main(): Promise<void> {
 
     await server.close();
     console.log("[daemon] API server stopped");
+
+    wsManager.closeAll();
+    console.log("[daemon] WebSocket connections closed");
 
     db.close();
     console.log("[daemon] Database closed");

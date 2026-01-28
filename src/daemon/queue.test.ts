@@ -616,6 +616,37 @@ describe("queueManager", () => {
       const runningJobs = queue.getRunningJobs();
       expect(runningJobs).toHaveLength(0);
     });
+
+    it("should mark as failed if max retries reached during release", () => {
+      // Manually insert a job that will hit max retries (current 2 + 1 >= 3)
+      db.prepare(
+        `
+        INSERT INTO analysis_queue (
+          id, type, priority, session_file, status, queued_at,
+          started_at, worker_id, locked_until, max_retries, retry_count
+        ) VALUES (
+          'running-job-max',
+          'initial',
+          100,
+          '/path/running.jsonl',
+          'running',
+          datetime('now', '-1 hour'),
+          datetime('now', '-1 hour'),
+          'worker-dead',
+          datetime('now', '+30 minutes'),
+          3,
+          2
+        )
+      `
+      ).run();
+
+      queue.releaseAllRunning();
+
+      const job = queue.getJob("running-job-max");
+      expect(job?.status).toBe("failed");
+      expect(job?.retryCount).toBe(3);
+      expect(job?.error).toContain("max retries exceeded");
+    });
   });
 
   describe("getStats", () => {

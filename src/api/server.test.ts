@@ -161,6 +161,26 @@ describe("aPI Server", () => {
       await app.close();
       db.close();
     });
+
+    it("should register WebSocket route when manager provided", async () => {
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+
+      // Import WebSocketManager
+      const { WebSocketManager } = await import("./websocket.js");
+      const wsManager = new WebSocketManager();
+
+      const app = await createServer(db, config, undefined, wsManager);
+
+      // Check that the /ws route exists by looking at routes
+      // Routes are printed without leading slash in Fastify
+      const routes = app.printRoutes();
+      expect(routes).toContain("ws (GET");
+
+      await app.close();
+      db.close();
+    });
   });
 
   describe("gET /api/v1/nodes", () => {

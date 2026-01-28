@@ -120,8 +120,8 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:399: call stopDaemon
         - src/daemon/cli.ts:417: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:176: call shutdown
-        - src/daemon/daemon-process.ts:199: call (module)
+        - src/daemon/daemon-process.ts:217: call shutdown
+        - src/daemon/daemon-process.ts:240: call (module)
     159-167: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
       refs in: 7 [call: 5, import: 1, reexport: 1]
@@ -301,7 +301,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-203]
+src/daemon/daemon-process.ts [1-244]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -968,7 +968,7 @@ src/daemon/query-processor.ts [1-724]
     - node:os
     - node:path
 
-src/daemon/queue.test.ts [1-740]
+src/daemon/queue.test.ts [1-790]
   imports:
     - ../storage/database.js
     - ./queue.js
@@ -978,17 +978,17 @@ src/daemon/queue.test.ts [1-740]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-754]
+src/daemon/queue.ts [1-766]
   class:
-    151-709: class QueueManager [exported]
+    151-721: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
       refs in: 14 [import: 4, instantiate: 2, reexport: 1, type: 7]
         - src/daemon/index.ts:42: reexport (module)
         - src/daemon/queue.test.ts:14: import (module)
         - src/daemon/queue.test.ts:23: type queue
-        - src/daemon/queue.ts:727: type createQueueManager
-        - src/daemon/queue.ts:728: instantiate createQueueManager
-        - src/daemon/queue.ts:741: instantiate queue
+        - src/daemon/queue.ts:739: type createQueueManager
+        - src/daemon/queue.ts:740: instantiate createQueueManager
+        - src/daemon/queue.ts:753: instantiate queue
         - src/daemon/scheduler.test.ts:9: import (module)
         - src/daemon/scheduler.test.ts:23: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
@@ -1001,28 +1001,28 @@ src/daemon/queue.ts [1-754]
         - src/daemon/errors.ts:253: type classifyError
         - src/daemon/index.ts:48: reexport (module)
         - src/daemon/queue.ts:67: type AnalysisJob
-        - src/daemon/queue.ts:695: type QueueManager.parseRow
+        - src/daemon/queue.ts:707: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 42 [import: 5, reexport: 1, type: 36]
+      refs in: 49 [import: 7, reexport: 1, type: 41]
+        - src/api/websocket.test.ts:9: import (module)
+        - src/api/websocket.test.ts:287: type mockJob
+        - src/api/websocket.test.ts:382: type mockJob
+        - src/api/websocket.ts:11: import (module)
+        - src/api/websocket.ts:249: type WebSocketManager.broadcastAnalysisStarted
+        - src/api/websocket.ts:264: type WebSocketManager.broadcastAnalysisCompleted
+        - src/api/websocket.ts:292: type WebSocketManager.broadcastAnalysisFailed
         - src/daemon/cli.ts:48: import (module)
         - src/daemon/cli.ts:86: type QueueStatus
         - src/daemon/cli.ts:87: type QueueStatus
-        - src/daemon/cli.ts:88: type QueueStatus
-        - src/daemon/index.ts:50: reexport (module)
-        - src/daemon/processor.test.ts:9: import (module)
-        - src/daemon/processor.test.ts:32: type createTestJob
-        - src/daemon/processor.test.ts:32: type createTestJob
-        - src/daemon/processor.ts:14: import (module)
-        - src/daemon/processor.ts:248: type buildAnalysisPrompt
     102-115: interface QueueStats [exported]
       /** Queue statistics */
       refs in: 5 [import: 1, reexport: 1, type: 3]
         - src/daemon/cli.ts:47: import (module)
         - src/daemon/cli.ts:85: type QueueStatus
         - src/daemon/index.ts:51: reexport (module)
-        - src/daemon/queue.ts:591: type QueueManager.getStats
-        - src/daemon/queue.ts:736: type getQueueStatusSummary
+        - src/daemon/queue.ts:603: type QueueManager.getStats
+        - src/daemon/queue.ts:748: type getQueueStatusSummary
   type:
     17-17: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
       /** Job type determines analysis behavior */
@@ -1031,7 +1031,7 @@ src/daemon/queue.ts [1-754]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:35: type createTestJob
         - src/daemon/queue.ts:57: type AnalysisJob
-        - src/daemon/queue.ts:689: type QueueManager.parseRow
+        - src/daemon/queue.ts:701: type QueueManager.parseRow
     20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
       /** Job status tracks progress through the queue */
       refs in: 8 [import: 1, reexport: 1, type: 6]
@@ -1039,10 +1039,10 @@ src/daemon/queue.ts [1-754]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:39: type createTestJob
         - src/daemon/queue.ts:69: type AnalysisJob
-        - src/daemon/queue.ts:631: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:642: type QueueManager.counts
-        - src/daemon/queue.ts:651: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:697: type QueueManager.parseRow
+        - src/daemon/queue.ts:643: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:654: type QueueManager.counts
+        - src/daemon/queue.ts:663: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:709: type QueueManager.parseRow
     91-99: JobInput = Omit<
   AnalysisJob,
   "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
@@ -1063,7 +1063,7 @@ src/daemon/queue.ts [1-754]
         - src/daemon/scheduler.test.ts:27: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
   function:
-    720-722: generateJobId(): string [exported]
+    732-734: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:44: reexport (module)
@@ -1072,7 +1072,7 @@ src/daemon/queue.ts [1-754]
         - src/daemon/queue.test.ts:47: call (module)
         - src/daemon/queue.ts:161: call QueueManager.id
         - src/daemon/queue.ts:206: call QueueManager.id
-    727-729: createQueueManager(db: Database.Database): QueueManager [exported]
+    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs in: 13 [call: 6, import: 6, reexport: 1]
         - src/daemon/cli.test.ts:40: import (module)
@@ -1085,7 +1085,7 @@ src/daemon/queue.ts [1-754]
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
         - src/daemon/worker.test.ts:15: import (module)
-    735-753: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/cli.ts:44: import (module)
@@ -1183,7 +1183,7 @@ src/daemon/scheduler.ts [1-831]
       /** Create a scheduler from daemon config */
       refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:21: import (module)
-        - src/daemon/daemon-process.ts:89: call scheduler
+        - src/daemon/daemon-process.ts:120: call scheduler
         - src/daemon/index.ts:145: reexport (module)
         - src/daemon/scheduler.test.ts:13: import (module)
         - src/daemon/scheduler.test.ts:562: call scheduler
@@ -1297,8 +1297,8 @@ src/daemon/watcher-events.ts [1-117]
       /** Helper to get session path from a session event */
       refs in: 13 [call: 9, import: 2, reexport: 2]
         - src/daemon/daemon-process.ts:22: import (module)
-        - src/daemon/daemon-process.ts:104: call sessionPath
-        - src/daemon/daemon-process.ts:122: call sessionPath
+        - src/daemon/daemon-process.ts:135: call sessionPath
+        - src/daemon/daemon-process.ts:153: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
         - src/daemon/watcher.test.ts:228: call (module)
@@ -1337,7 +1337,7 @@ src/daemon/watcher.ts [1-582]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
       refs in: 22 [import: 2, instantiate: 14, reexport: 2, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
-        - src/daemon/daemon-process.ts:98: instantiate watcher
+        - src/daemon/daemon-process.ts:129: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
         - src/daemon/watcher.test.ts:53: type waitForEvent
@@ -1464,7 +1464,7 @@ src/daemon/worker.ts [1-594]
       /** Create a worker instance */
       refs in: 16 [call: 13, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:24: import (module)
-        - src/daemon/daemon-process.ts:73: call worker
+        - src/daemon/daemon-process.ts:96: call worker
         - src/daemon/index.ts:104: reexport (module)
         - src/daemon/worker.test.ts:17: import (module)
         - src/daemon/worker.test.ts:118: call worker
@@ -1526,17 +1526,17 @@ src/storage/database.ts [1-155]
   function:
     38-63: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 85 [call: 72, import: 13]
+      refs in: 86 [call: 73, import: 13]
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:131: call db
         - src/api/server.test.ts:145: call db
-        - src/api/server.test.ts:168: call db
-        - src/api/server.test.ts:190: call db
-        - src/api/server.test.ts:224: call db
-        - src/api/server.test.ts:274: call db
-        - src/api/server.test.ts:295: call db
-        - src/api/server.test.ts:322: call db
-        - src/api/server.test.ts:348: call db
+        - src/api/server.test.ts:166: call db
+        - src/api/server.test.ts:188: call db
+        - src/api/server.test.ts:210: call db
+        - src/api/server.test.ts:244: call db
+        - src/api/server.test.ts:294: call db
+        - src/api/server.test.ts:315: call db
+        - src/api/server.test.ts:342: call db
     68-91: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
       refs in: 5 [call: 4, import: 1]
@@ -1557,7 +1557,7 @@ src/storage/database.ts [1-155]
         - src/storage/database.ts:112: call currentVersion
     111-135: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 62 [call: 49, import: 13]
+      refs in: 63 [call: 50, import: 13]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
         - src/api/routes/query.test.ts:10: import (module)
@@ -1565,9 +1565,9 @@ src/storage/database.ts [1-155]
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:132: call (module)
         - src/api/server.test.ts:146: call (module)
-        - src/api/server.test.ts:169: call (module)
-        - src/api/server.test.ts:191: call (module)
-        - src/api/server.test.ts:225: call (module)
+        - src/api/server.test.ts:167: call (module)
+        - src/api/server.test.ts:189: call (module)
+        - src/api/server.test.ts:211: call (module)
     140-142: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
       refs in: 10 [call: 6, import: 4]
@@ -2030,17 +2030,17 @@ src/storage/node-crud.ts [1-751]
         - src/storage/node-crud.ts:336: call upsertNode
     298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-      refs in: 240 [call: 238, import: 2]
-        - src/storage/decision-repository.test.ts:13: import (module)
-        - src/storage/decision-repository.test.ts:96: call (module)
-        - src/storage/decision-repository.test.ts:107: call (module)
-        - src/storage/decision-repository.test.ts:170: call (module)
-        - src/storage/decision-repository.test.ts:243: call (module)
-        - src/storage/index.test.ts:21: import (module)
-        - src/storage/index.test.ts:299: call created
-        - src/storage/index.test.ts:319: call (module)
-        - src/storage/index.test.ts:335: call (module)
-        - src/storage/index.test.ts:367: call (module)
+      refs in: 251 [call: 248, import: 3]
+        - src/api/server.test.ts:14: import (module)
+        - src/api/server.test.ts:224: call (module)
+        - src/api/server.test.ts:272: call (module)
+        - src/api/server.test.ts:273: call (module)
+        - src/api/server.test.ts:320: call (module)
+        - src/api/server.test.ts:478: call (module)
+        - src/api/server.test.ts:479: call (module)
+        - src/api/server.test.ts:584: call (module)
+        - src/api/server.test.ts:585: call (module)
+        - src/api/server.test.ts:660: call (module)
     323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
@@ -2937,4 +2937,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 49
-Estimated tokens: 37,666 (codebase: ~979,858)
+Estimated tokens: 37,660 (codebase: ~990,245)
