@@ -13,26 +13,26 @@
 
 ---
 
-src/storage/database.ts [1-186]
+src/storage/database.ts [1-205]
   interface:
-    20-27: interface DatabaseOptions [exported]
-    29-34: interface MigrationInfo [exported]
+    20-34: interface DatabaseOptions [exported]
+    36-41: interface MigrationInfo [exported]
   function:
-    39-67: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
+    46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-    72-95: loadMigrations(): {} [exported]
+    89-112: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
-    100-110: getSchemaVersion(db: Database.Database): number [exported]
+    117-127: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    115-139: migrate(db: Database.Database): number [exported]
+    132-156: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    144-146: closeDatabase(db: Database.Database): void [exported]
+    161-163: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    151-158: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    168-175: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
-    163-171: loadVecExtension(db: Database.Database): boolean [exported]
+    180-188: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
-    176-185: isVecLoaded(db: Database.Database): boolean [exported]
+    193-204: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
   variable:
     15-15: any [exported]
@@ -496,4 +496,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 15
-Estimated tokens: 7,001 (codebase: ~1,003,851)
+Estimated tokens: 7,001 (codebase: ~998,012)

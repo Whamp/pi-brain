@@ -1,62 +1,21 @@
 # Code Review Fix Progress
 
-Branch: fix/code-review-20260127-192539
+Branch: fix/code-review-20260127-204245
 Created: 2026-01-27 19:25
 Main branch: major/pi-brain
 
 ## Issues to Fix
 
-### P1: Race condition on initial mount
-- File: src/web/app/src/routes/+layout.svelte:53-63
-- Problem: Subscription runs synchronously with initial state `{ connected: false, reconnecting: false }`, 
-  triggering `startPolling()` immediately before WebSocket has a chance to connect.
-- Fix: Skip the first emission from the subscription (initial state).
+### [P1] src/storage/database.ts line 55
+Silent failure on extension load breaks fail-fast expectations. The loadVecExtension(db) call inside openDatabase() logs a warning and returns false if the extension fails to load, but the return value is discarded. Downstream code will fail mysteriously.
 
-### P2: Redundant condition branches
-- File: src/web/app/src/routes/+layout.svelte:53-63  
-- Problem: Two branches both call `startPolling()` - confusing even if guarded.
-- Fix: Simplify to `if (connected) { stopPolling() } else { startPolling() }`.
+### [P2] src/storage/database.ts lines 147-149
+Incomplete type assertion on isVecLoaded result. If vec_version() returns null, current code returns true incorrectly.
 
-### P3: Missing finally block for loading cleanup
-- File: src/web/app/src/lib/stores/daemon.ts:38-53
-- Problem: If fetchStatus throws before catch, loading remains true.
-- Fix: Use finally block to ensure loading is always reset.
+### [P3] src/storage/database-vec.test.ts line 13
+Missing database cleanup on test failure. If openDatabase() throws, tempDir is set but db is never assigned, so the finally block won't run closeDatabase(db).
 
 ---
 
-## 2026-01-27 19:31 - Task 16.4
+## Progress
 
-**Status**: pending → done
-**Validation**: 
-- svelte-check passes (0 errors, 0 warnings)
-- All 1217 tests pass
-- Lint/format checks pass
-- Dev server builds and serves correctly
-**Commit**: eca722fa
-**Notes**: Implemented undo window for News Feed confirm/dismiss actions:
-- Added 5-second undo delay before API call
-- Visual pending state with "Confirmed" or "Dismissed" label
-- Undo button to cancel pending action
-- Animated timer bar showing remaining time
-- Proper cleanup of timeouts on component destroy
-- Responsive mobile layout for undo UI
-
----
-
-## 2026-01-27 20:28 - Task 17.1.1
-
-**Status**: pending → done
-**Validation**: 
-- sqlite-vec extension loads successfully via `sqliteVec.load(db)`
-- vec0 virtual table creation works
-- Vector insertion and cosine distance search verified
-- Dimension mismatch error handling confirmed
-- All 1221 tests pass (4 new tests added)
-- Lint/format checks pass
-**Commit**: b1d8693a
-**Notes**: 
-- Added sqlite-vec npm package (v0.1.7-alpha.2)
-- Package includes native binaries for Linux/macOS/Windows (x64/arm64)
-- Extension loaded via `sqliteVec.load(db)` function
-- vec0 virtual tables require BigInt for rowid values
-- Updated README with sqlite-vec dependency documentation
