@@ -360,10 +360,10 @@ describe("database", () => {
           VALUES (?, ?, ?, ?)
         `).run("test-node-vec", testEmbedding, "test-model", "test input");
 
-        // Get the rowid
+        // Get the rowid (SQLite may return number or bigint depending on configuration)
         const row = db
           .prepare("SELECT rowid FROM node_embeddings WHERE node_id = ?")
-          .get("test-node-vec") as { rowid: number };
+          .get("test-node-vec") as { rowid: number | bigint };
 
         // Insert into vec table - vec0 requires BigInt for rowid
         db.prepare(`
@@ -380,10 +380,10 @@ describe("database", () => {
             ORDER BY distance 
             LIMIT 1
           `)
-          .get(testEmbedding) as { rowid: bigint; distance: number };
+          .get(testEmbedding) as { rowid: number | bigint; distance: number };
 
         expect(result).toBeDefined();
-        expect(Number(result.rowid)).toBe(row.rowid);
+        expect(Number(result.rowid)).toBe(Number(row.rowid));
         expect(result.distance).toBeCloseTo(0);
 
         cleanupTestDb(testDbPath, db);
