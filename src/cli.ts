@@ -29,6 +29,7 @@ import {
   formatQueueStatus,
   formatHealthStatus,
   rebuildIndex,
+  rebuildEmbeddings,
 } from "./daemon/index.js";
 import {
   scanSessions,
@@ -309,6 +310,44 @@ daemonCmd
     } else {
       console.error(result.message);
       process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Rebuild command
+// =============================================================================
+
+program
+  .command("rebuild")
+  .description("Rebuild database artifacts")
+  .option("--index", "Rebuild SQLite index from JSON node files")
+  .option("--embeddings", "Backfill missing embeddings")
+  .option("-c, --config <path>", "Config file path")
+  .option("-f, --force", "Force regeneration (for embeddings)")
+  .action(async (options) => {
+    if (!options.index && !options.embeddings) {
+      console.error("Please specify what to rebuild: --index or --embeddings");
+      process.exit(1);
+    }
+
+    if (options.index) {
+      const result = rebuildIndex(options.config);
+      if (!result.success) {
+        console.error(result.message);
+        process.exit(1);
+      }
+      console.log(result.message);
+    }
+
+    if (options.embeddings) {
+      const result = await rebuildEmbeddings(options.config, {
+        force: options.force,
+      });
+      if (!result.success) {
+        console.error(result.message);
+        process.exit(1);
+      }
+      console.log(result.message);
     }
   });
 

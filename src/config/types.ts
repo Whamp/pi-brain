@@ -131,6 +131,9 @@ export interface DaemonConfig {
   /** Embedding dimensions (optional, defaults based on model) */
   embeddingDimensions?: number;
 
+  /** Semantic search threshold (0.0-1.0), distance above which FTS fallback triggers */
+  semanticSearchThreshold: number;
+
   /** Model provider for analysis (e.g., "zai", "anthropic") */
   provider: string;
 
@@ -240,6 +243,7 @@ export interface RawConfig {
     embedding_api_key?: string;
     embedding_base_url?: string;
     embedding_dimensions?: number;
+    semantic_search_threshold?: number;
     provider?: string;
     model?: string;
     prompt_file?: string;

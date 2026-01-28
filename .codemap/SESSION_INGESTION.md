@@ -1032,7 +1032,8 @@ src/daemon/worker.ts [1-715]
   interface:
     66-83: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 10 [type: 10]
+      refs out: 11 [type: 11]
+        - src/daemon/worker.ts:70: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:72: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:74: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:76: type AnalysisJob -> src/daemon/queue.ts
@@ -1042,7 +1043,6 @@ src/daemon/worker.ts [1-715]
         - src/daemon/worker.ts:78: type Promise -> external
         - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:80: type Error -> external
-        - src/daemon/worker.ts:80: type Promise -> external
     86-101: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1062,8 +1062,9 @@ src/daemon/worker.ts [1-715]
         - src/daemon/worker.ts:664: instantiate Worker -> src/daemon/worker.ts
     671-685: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-      refs out: 7 [call: 2, type: 5]
+      refs out: 8 [call: 2, type: 6]
         - src/daemon/worker.ts:672: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:673: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:674: type Database -> external
         - src/daemon/worker.ts:675: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:676: type Promise -> external
@@ -1557,4 +1558,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,341 (codebase: ~1,041,847)
+Estimated tokens: 20,365 (codebase: ~1,045,614)

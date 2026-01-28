@@ -3031,7 +3031,7 @@ src/storage/search-repository.ts [1-532]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/semantic-search.test.ts [1-181]
+src/storage/semantic-search.test.ts [1-388]
   imports:
     - ./database.js
     - ./embedding-utils.js
@@ -3052,24 +3052,32 @@ src/storage/semantic-search.ts [1-209]
   function:
     55-151: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
-      refs in: 7 [call: 6, import: 1]
-        - src/storage/semantic-search.test.ts:10: import (module)
-        - src/storage/semantic-search.test.ts:45: call result
-        - src/storage/semantic-search.test.ts:68: call result
-        - src/storage/semantic-search.test.ts:100: call result
-        - src/storage/semantic-search.test.ts:112: call (module)
-        - src/storage/semantic-search.test.ts:128: call result
-        - src/storage/semantic-search.ts:198: call results
+      refs in: 14 [call: 13, import: 1]
+        - src/storage/semantic-search.test.ts:11: import (module)
+        - src/storage/semantic-search.test.ts:49: call result
+        - src/storage/semantic-search.test.ts:72: call result
+        - src/storage/semantic-search.test.ts:104: call result
+        - src/storage/semantic-search.test.ts:116: call (module)
+        - src/storage/semantic-search.test.ts:132: call result
+        - src/storage/semantic-search.test.ts:142: call result
+        - src/storage/semantic-search.test.ts:169: call result
+        - src/storage/semantic-search.test.ts:194: call result
+        - src/storage/semantic-search.test.ts:218: call result
     161-174: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
-      refs in: 1 [call: 1]
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/semantic-search.test.ts:13: import (module)
+        - src/storage/semantic-search.test.ts:356: call result
+        - src/storage/semantic-search.test.ts:367: call result
+        - src/storage/semantic-search.test.ts:378: call (module)
         - src/storage/semantic-search.ts:189: call embedding
     184-208: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
       /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
-      refs in: 3 [call: 2, import: 1]
-        - src/storage/semantic-search.test.ts:10: import (module)
-        - src/storage/semantic-search.test.ts:139: call result
-        - src/storage/semantic-search.test.ts:168: call result
+      refs in: 4 [call: 3, import: 1]
+        - src/storage/semantic-search.test.ts:12: import (module)
+        - src/storage/semantic-search.test.ts:266: call result
+        - src/storage/semantic-search.test.ts:295: call result
+        - src/storage/semantic-search.test.ts:342: call result
   imports:
     - ./database.js
     - ./embedding-utils.js
@@ -3188,4 +3196,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 55
-Estimated tokens: 41,732 (codebase: ~1,041,847)
+Estimated tokens: 41,864 (codebase: ~1,045,614)

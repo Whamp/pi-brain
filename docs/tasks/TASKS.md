@@ -266,10 +266,10 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.5 Semantic Search Function
 
-| ID     | Task                               | Status  | Deps   | Notes |
-| ------ | ---------------------------------- | ------- | ------ | ----- |
-| 17.5.1 | Create semanticSearch() function   | pending | 17.1.3 |       |
-| 17.5.2 | Add unit tests for semantic search | pending | 17.5.1 |       |
+| ID     | Task                               | Status | Deps   | Notes                            |
+| ------ | ---------------------------------- | ------ | ------ | -------------------------------- |
+| 17.5.1 | Create semanticSearch() function   | done   | 17.1.3 | 2026-01-27 - already implemented |
+| 17.5.2 | Add unit tests for semantic search | done   | 17.5.1 | 2026-01-27 - 18 tests total      |
 
 ### 17.6 Query Processor Integration
 

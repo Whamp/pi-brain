@@ -200,10 +200,17 @@ function findRelevantNodes(
   project: string | undefined,
   maxNodes: number
 ): RelevantNode[] {
-  // First try full-text search
+  // First try full-text search (and semantic search if enabled)
   const filters: ListNodesFilters | undefined = project
     ? { project }
     : undefined;
+
+  // Get semantic search settings from config via the db if possible, or assume defaults
+  // For now, let's try semantic search first, then fall back to FTS if needed or combine results
+  // Note: We'd need to embed the query first.
+  // Since we don't have easy access to the embedding provider here without passing it in config,
+  // we will stick to FTS for this phase.
+
   const searchResults = searchNodesAdvanced(db, query, {
     limit: maxNodes,
     filters,

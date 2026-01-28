@@ -91,3 +91,23 @@ Main branch: major/pi-brain
   - Command correctly initializes embedding provider and calls backfillEmbeddings with force option support
 **Commit**: a3553cbd
 **Notes**: The command was already largely implemented in previous commits but had lint issues in tests. Cleaned up tests and verified functionality.
+
+---
+
+## 2026-01-27 13:25 - Task 17.5.1, 17.5.2
+
+**Status**: pending → done
+**Validation**: 
+  - semanticSearch() function was already implemented in src/storage/semantic-search.ts
+  - Added 11 new unit tests for comprehensive coverage:
+    - Empty results when DB returns no matches
+    - Distance ordering verification
+    - Highlights generation (includeHighlights option)
+    - Default and custom limit options
+    - Non-dimension error rethrow behavior
+    - getNodeEmbeddingVector function (3 tests)
+    - findSimilarNodes limit handling after self-filtering
+  - All 18 tests in semantic-search.test.ts pass
+  - All 1272 tests pass overall
+**Commit**: d807f469
+**Notes**: Task 17.5.1 was already implemented; completed 17.5.2 by adding missing unit tests per spec requirements.
