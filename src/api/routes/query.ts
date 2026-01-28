@@ -45,6 +45,63 @@ const DEFAULT_QUERY_CONFIG = {
   maxQueueSize: 100,
 };
 
+/**
+ * Cached embedding provider instance.
+ * Created once on first use to avoid HTTP client setup overhead per request.
+ */
+let cachedEmbeddingProvider: EmbeddingProvider | undefined;
+let cachedEmbeddingConfig: string | undefined;
+
+/**
+ * Get or create the embedding provider with caching.
+ * Cache is invalidated if the configuration changes.
+ */
+function getEmbeddingProvider(config: {
+  embeddingProvider?: "openrouter" | "ollama" | "openai";
+  embeddingModel?: string;
+  embeddingApiKey?: string;
+  embeddingBaseUrl?: string;
+  embeddingDimensions?: number;
+}): EmbeddingProvider | undefined {
+  if (!config.embeddingProvider || !config.embeddingModel) {
+    return undefined;
+  }
+
+  // Check if API key is required but missing
+  const needsApiKey =
+    config.embeddingProvider === "openrouter" ||
+    config.embeddingProvider === "openai";
+  if (needsApiKey && !config.embeddingApiKey) {
+    return undefined;
+  }
+
+  // Create cache key from config to detect changes
+  const configKey = JSON.stringify({
+    provider: config.embeddingProvider,
+    model: config.embeddingModel,
+    apiKey: config.embeddingApiKey,
+    baseUrl: config.embeddingBaseUrl,
+    dimensions: config.embeddingDimensions,
+  });
+
+  // Return cached instance if config hasn't changed
+  if (cachedEmbeddingProvider && cachedEmbeddingConfig === configKey) {
+    return cachedEmbeddingProvider;
+  }
+
+  // Create new provider and cache it
+  cachedEmbeddingProvider = createEmbeddingProvider({
+    provider: config.embeddingProvider,
+    model: config.embeddingModel,
+    apiKey: config.embeddingApiKey,
+    baseUrl: config.embeddingBaseUrl,
+    dimensions: config.embeddingDimensions,
+  });
+  cachedEmbeddingConfig = configKey;
+
+  return cachedEmbeddingProvider;
+}
+
 export async function queryRoutes(app: FastifyInstance): Promise<void> {
   /**
    * POST /query - Natural language query
@@ -104,33 +161,15 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
         // Use daemonConfig from context if available, otherwise fall back to defaults
         const effectiveConfig = daemonConfig ?? DEFAULT_QUERY_CONFIG;
 
-        // Create embedding provider for semantic search (if configured)
+        // Get cached embedding provider for semantic search (if configured)
         let embeddingProvider: EmbeddingProvider | undefined;
-        if (
-          effectiveConfig.embeddingProvider &&
-          effectiveConfig.embeddingModel
-        ) {
-          // Only create if we have an API key for providers that need it
-          const needsApiKey =
-            effectiveConfig.embeddingProvider === "openrouter" ||
-            effectiveConfig.embeddingProvider === "openai";
-
-          if (!needsApiKey || effectiveConfig.embeddingApiKey) {
-            try {
-              embeddingProvider = createEmbeddingProvider({
-                provider: effectiveConfig.embeddingProvider,
-                model: effectiveConfig.embeddingModel,
-                apiKey: effectiveConfig.embeddingApiKey,
-                baseUrl: effectiveConfig.embeddingBaseUrl,
-                dimensions: effectiveConfig.embeddingDimensions,
-              });
-            } catch (error) {
-              app.log.warn(
-                `Failed to create embedding provider: ${error instanceof Error ? error.message : "Unknown error"}`
-              );
-              // Continue without semantic search
-            }
-          }
+        try {
+          embeddingProvider = getEmbeddingProvider(effectiveConfig);
+        } catch (error) {
+          app.log.warn(
+            `Failed to create embedding provider: ${error instanceof Error ? error.message : "Unknown error"}`
+          );
+          // Continue without semantic search
         }
 
         const response: QueryResponse = await processQuery(queryRequest, {
