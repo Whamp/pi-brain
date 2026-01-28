@@ -54,6 +54,9 @@ interface DaemonConfigUpdateBody {
   maxQueueSize?: number;
   backfillLimit?: number;
   reanalysisLimit?: number;
+  connectionDiscoveryLimit?: number;
+  connectionDiscoveryLookbackDays?: number;
+  connectionDiscoveryCooldownHours?: number;
 }
 
 /**
@@ -70,6 +73,9 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     maxQueueSize,
     backfillLimit,
     reanalysisLimit,
+    connectionDiscoveryLimit,
+    connectionDiscoveryLookbackDays,
+    connectionDiscoveryCooldownHours,
   } = body;
 
   const validations: ValidationResult[] = [
@@ -82,6 +88,24 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     validateIntRange(maxQueueSize, "maxQueueSize", 10, 10_000),
     validateIntRange(backfillLimit, "backfillLimit", 1, 1000),
     validateIntRange(reanalysisLimit, "reanalysisLimit", 1, 1000),
+    validateIntRange(
+      connectionDiscoveryLimit,
+      "connectionDiscoveryLimit",
+      1,
+      1000
+    ),
+    validateIntRange(
+      connectionDiscoveryLookbackDays,
+      "connectionDiscoveryLookbackDays",
+      1,
+      365
+    ),
+    validateIntRange(
+      connectionDiscoveryCooldownHours,
+      "connectionDiscoveryCooldownHours",
+      1,
+      168
+    ),
   ];
 
   for (const error of validations) {
@@ -112,6 +136,9 @@ function applyDaemonUpdates(
     maxQueueSize,
     backfillLimit,
     reanalysisLimit,
+    connectionDiscoveryLimit,
+    connectionDiscoveryLookbackDays,
+    connectionDiscoveryCooldownHours,
   } = body;
 
   // Initialize daemon section if needed
@@ -153,6 +180,17 @@ function applyDaemonUpdates(
   if (reanalysisLimit !== undefined) {
     rawConfig.daemon.reanalysis_limit = reanalysisLimit;
   }
+  if (connectionDiscoveryLimit !== undefined) {
+    rawConfig.daemon.connection_discovery_limit = connectionDiscoveryLimit;
+  }
+  if (connectionDiscoveryLookbackDays !== undefined) {
+    rawConfig.daemon.connection_discovery_lookback_days =
+      connectionDiscoveryLookbackDays;
+  }
+  if (connectionDiscoveryCooldownHours !== undefined) {
+    rawConfig.daemon.connection_discovery_cooldown_hours =
+      connectionDiscoveryCooldownHours;
+  }
 }
 
 export async function configRoutes(app: FastifyInstance): Promise<void> {
@@ -180,6 +218,11 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           maxQueueSize: config.daemon.maxQueueSize,
           backfillLimit: config.daemon.backfillLimit,
           reanalysisLimit: config.daemon.reanalysisLimit,
+          connectionDiscoveryLimit: config.daemon.connectionDiscoveryLimit,
+          connectionDiscoveryLookbackDays:
+            config.daemon.connectionDiscoveryLookbackDays,
+          connectionDiscoveryCooldownHours:
+            config.daemon.connectionDiscoveryCooldownHours,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
@@ -214,6 +257,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         maxQueueSize,
         backfillLimit,
         reanalysisLimit,
+        connectionDiscoveryLimit,
+        connectionDiscoveryLookbackDays,
+        connectionDiscoveryCooldownHours,
       } = body;
 
       // Validate at least one field is provided
@@ -228,7 +274,10 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         maxConcurrentAnalysis !== undefined ||
         maxQueueSize !== undefined ||
         backfillLimit !== undefined ||
-        reanalysisLimit !== undefined;
+        reanalysisLimit !== undefined ||
+        connectionDiscoveryLimit !== undefined ||
+        connectionDiscoveryLookbackDays !== undefined ||
+        connectionDiscoveryCooldownHours !== undefined;
 
       if (!hasAnyField) {
         return reply
@@ -286,6 +335,12 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             maxQueueSize: updatedConfig.daemon.maxQueueSize,
             backfillLimit: updatedConfig.daemon.backfillLimit,
             reanalysisLimit: updatedConfig.daemon.reanalysisLimit,
+            connectionDiscoveryLimit:
+              updatedConfig.daemon.connectionDiscoveryLimit,
+            connectionDiscoveryLookbackDays:
+              updatedConfig.daemon.connectionDiscoveryLookbackDays,
+            connectionDiscoveryCooldownHours:
+              updatedConfig.daemon.connectionDiscoveryCooldownHours,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

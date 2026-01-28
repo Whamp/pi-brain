@@ -215,6 +215,27 @@ the reactivity chain.
 
 ---
 
+## 2026-01-28 13:19 - Task 19.1.4
+
+**Status**: pending → done
+**Validation**:
+  - Added connectionDiscoveryLimit (1-1000) to PUT /config/daemon API
+  - Added connectionDiscoveryLookbackDays (1-365) to PUT /config/daemon API
+  - Added connectionDiscoveryCooldownHours (1-168) to PUT /config/daemon API
+  - Added validation for all three fields in validateDaemonUpdate
+  - Updated applyDaemonUpdates to persist all three fields to config (snake_case to config file)
+  - Added all three fields to GET /config/daemon response
+  - Added all three fields to PUT /config/daemon response
+  - Added 15 new tests covering validation (min/max, integer) and update behavior for each field
+  - Added test for updating all three fields together
+  - Added test for GET returning all daemon fields including connection discovery
+  - All 1346 tests pass (1346 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: (will be committed shortly)
+**Notes**: Extended daemon configuration API with connection discovery settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality. Fields correspond to: connection_discovery_limit, connection_discovery_lookback_days, connection_discovery_cooldown_hours in config.yaml.
+
+---
+
 ## 2026-01-28 12:39 - Task 19.1.1
 
 **Status**: pending → done

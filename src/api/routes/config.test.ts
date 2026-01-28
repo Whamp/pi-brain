@@ -520,6 +520,220 @@ describe("config api routes", () => {
       expect(body.data.backfillLimit).toBe(150); // Updated by previous test
       expect(body.data.reanalysisLimit).toBe(75); // Updated by previous test
     });
+
+    // connectionDiscoveryLimit tests
+    it("validates connectionDiscoveryLimit minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLimit: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLimit");
+      expect(body.error.message).toContain("between 1 and 1000");
+    });
+
+    it("validates connectionDiscoveryLimit maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLimit: 1001 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLimit");
+    });
+
+    it("accepts valid connectionDiscoveryLimit", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLimit: 200 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.connectionDiscoveryLimit).toBe(200);
+    });
+
+    it("validates connectionDiscoveryLimit must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLimit: 50.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLimit");
+      expect(body.error.message).toContain("integer");
+    });
+
+    // connectionDiscoveryLookbackDays tests
+    it("validates connectionDiscoveryLookbackDays minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLookbackDays: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLookbackDays");
+      expect(body.error.message).toContain("between 1 and 365");
+    });
+
+    it("validates connectionDiscoveryLookbackDays maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLookbackDays: 366 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLookbackDays");
+    });
+
+    it("accepts valid connectionDiscoveryLookbackDays", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLookbackDays: 30 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.connectionDiscoveryLookbackDays).toBe(30);
+    });
+
+    it("validates connectionDiscoveryLookbackDays must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryLookbackDays: 7.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryLookbackDays");
+      expect(body.error.message).toContain("integer");
+    });
+
+    // connectionDiscoveryCooldownHours tests
+    it("validates connectionDiscoveryCooldownHours minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryCooldownHours: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryCooldownHours");
+      expect(body.error.message).toContain("between 1 and 168");
+    });
+
+    it("validates connectionDiscoveryCooldownHours maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryCooldownHours: 169 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryCooldownHours");
+    });
+
+    it("accepts valid connectionDiscoveryCooldownHours", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryCooldownHours: 12 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.connectionDiscoveryCooldownHours).toBe(12);
+    });
+
+    it("validates connectionDiscoveryCooldownHours must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoveryCooldownHours: 6.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoveryCooldownHours");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("updates all three connection discovery fields together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          connectionDiscoveryLimit: 150,
+          connectionDiscoveryLookbackDays: 14,
+          connectionDiscoveryCooldownHours: 12,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.connectionDiscoveryLimit).toBe(150);
+      expect(body.data.connectionDiscoveryLookbackDays).toBe(14);
+      expect(body.data.connectionDiscoveryCooldownHours).toBe(12);
+    });
+
+    it("returns connection discovery fields on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.connectionDiscoveryLimit).toBe(150); // Updated by previous test
+      expect(body.data.connectionDiscoveryLookbackDays).toBe(14); // Updated by previous test
+      expect(body.data.connectionDiscoveryCooldownHours).toBe(12); // Updated by previous test
+    });
+
+    it("returns all daemon fields including connection discovery", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data).toBeDefined();
+      expect(body.data.provider).toBeDefined();
+      expect(body.data.model).toBeDefined();
+      expect(body.data.idleTimeoutMinutes).toBeDefined();
+      expect(body.data.parallelWorkers).toBeDefined();
+      expect(body.data.maxRetries).toBeDefined();
+      expect(body.data.retryDelaySeconds).toBeDefined();
+      expect(body.data.analysisTimeoutMinutes).toBeDefined();
+      expect(body.data.maxConcurrentAnalysis).toBeDefined();
+      expect(body.data.maxQueueSize).toBeDefined();
+      expect(body.data.backfillLimit).toBeDefined();
+      expect(body.data.reanalysisLimit).toBeDefined();
+      expect(body.data.connectionDiscoveryLimit).toBeDefined();
+      expect(body.data.connectionDiscoveryLookbackDays).toBeDefined();
+      expect(body.data.connectionDiscoveryCooldownHours).toBeDefined();
+      expect(body.data.defaults).toBeDefined();
+    });
   });
 
   describe("gET /config/providers", () => {
