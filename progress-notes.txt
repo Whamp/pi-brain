@@ -23,3 +23,20 @@ Main branch: major/pi-brain
 - Fix: Use finally block to ensure loading is always reset.
 
 ---
+
+## 2026-01-27 19:31 - Task 16.4
+
+**Status**: pending → done
+**Validation**: 
+- svelte-check passes (0 errors, 0 warnings)
+- All 1217 tests pass
+- Lint/format checks pass
+- Dev server builds and serves correctly
+**Commit**: eca722fa
+**Notes**: Implemented undo window for News Feed confirm/dismiss actions:
+- Added 5-second undo delay before API call
+- Visual pending state with "Confirmed" or "Dismissed" label
+- Undo button to cancel pending action
+- Animated timer bar showing remaining time
+- Proper cleanup of timeouts on component destroy
+- Responsive mobile layout for undo UI
