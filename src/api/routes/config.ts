@@ -16,6 +16,106 @@ import {
 } from "../../config/config.js";
 import { successResponse, errorResponse } from "../responses.js";
 
+/**
+ * Validation result - either success (null) or error message
+ */
+type ValidationResult = string | null;
+
+/**
+ * Validate an integer field is within a range
+ */
+function validateIntRange(
+  value: number | undefined,
+  field: string,
+  min: number,
+  max: number
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  if (!Number.isInteger(value) || value < min || value > max) {
+    return `${field} must be an integer between ${min} and ${max}`;
+  }
+  return null;
+}
+
+/**
+ * Daemon configuration update request body
+ */
+interface DaemonConfigUpdateBody {
+  provider?: string;
+  model?: string;
+  idleTimeoutMinutes?: number;
+  parallelWorkers?: number;
+  maxRetries?: number;
+  retryDelaySeconds?: number;
+}
+
+/**
+ * Validate daemon configuration update fields
+ */
+function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
+  const { idleTimeoutMinutes, parallelWorkers, maxRetries, retryDelaySeconds } =
+    body;
+
+  const validations: ValidationResult[] = [
+    validateIntRange(idleTimeoutMinutes, "idleTimeoutMinutes", 1, 1440),
+    validateIntRange(parallelWorkers, "parallelWorkers", 1, 10),
+    validateIntRange(maxRetries, "maxRetries", 0, 10),
+    validateIntRange(retryDelaySeconds, "retryDelaySeconds", 1, 3600),
+  ];
+
+  for (const error of validations) {
+    if (error !== null) {
+      return error;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Apply daemon config updates to raw config object
+ */
+function applyDaemonUpdates(
+  rawConfig: RawConfig,
+  body: DaemonConfigUpdateBody
+): void {
+  const {
+    provider,
+    model,
+    idleTimeoutMinutes,
+    parallelWorkers,
+    maxRetries,
+    retryDelaySeconds,
+  } = body;
+
+  // Initialize daemon section if needed
+  if (!rawConfig.daemon) {
+    rawConfig.daemon = {};
+  }
+
+  // Update provided fields
+  if (provider !== undefined) {
+    rawConfig.daemon.provider = provider;
+  }
+  if (model !== undefined) {
+    rawConfig.daemon.model = model;
+  }
+  if (idleTimeoutMinutes !== undefined) {
+    rawConfig.daemon.idle_timeout_minutes = idleTimeoutMinutes;
+  }
+  if (parallelWorkers !== undefined) {
+    rawConfig.daemon.parallel_workers = parallelWorkers;
+  }
+  if (maxRetries !== undefined) {
+    rawConfig.daemon.max_retries = maxRetries;
+  }
+  if (retryDelaySeconds !== undefined) {
+    rawConfig.daemon.retry_delay_seconds = retryDelaySeconds;
+  }
+}
+
 export async function configRoutes(app: FastifyInstance): Promise<void> {
   /**
    * GET /config/daemon - Get daemon configuration
@@ -35,6 +135,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           idleTimeoutMinutes: config.daemon.idleTimeoutMinutes,
           parallelWorkers: config.daemon.parallelWorkers,
           maxRetries: config.daemon.maxRetries,
+          retryDelaySeconds: config.daemon.retryDelaySeconds,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
@@ -52,27 +153,30 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
   app.put(
     "/daemon",
     async (
-      request: FastifyRequest<{
-        Body: {
-          provider?: string;
-          model?: string;
-          idleTimeoutMinutes?: number;
-          parallelWorkers?: number;
-        };
-      }>,
+      request: FastifyRequest<{ Body: DaemonConfigUpdateBody }>,
       reply: FastifyReply
     ) => {
       const startTime = request.startTime ?? Date.now();
-      const { provider, model, idleTimeoutMinutes, parallelWorkers } =
-        request.body ?? {};
+      const body = request.body ?? {};
+      const {
+        provider,
+        model,
+        idleTimeoutMinutes,
+        parallelWorkers,
+        maxRetries,
+        retryDelaySeconds,
+      } = body;
 
       // Validate at least one field is provided
-      if (
-        provider === undefined &&
-        model === undefined &&
-        idleTimeoutMinutes === undefined &&
-        parallelWorkers === undefined
-      ) {
+      const hasAnyField =
+        provider !== undefined ||
+        model !== undefined ||
+        idleTimeoutMinutes !== undefined ||
+        parallelWorkers !== undefined ||
+        maxRetries !== undefined ||
+        retryDelaySeconds !== undefined;
+
+      if (!hasAnyField) {
         return reply
           .status(400)
           .send(
@@ -84,38 +188,11 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Validate numeric fields
-      if (idleTimeoutMinutes !== undefined) {
-        if (
-          !Number.isInteger(idleTimeoutMinutes) ||
-          idleTimeoutMinutes < 1 ||
-          idleTimeoutMinutes > 1440
-        ) {
-          return reply
-            .status(400)
-            .send(
-              errorResponse(
-                "BAD_REQUEST",
-                "idleTimeoutMinutes must be an integer between 1 and 1440"
-              )
-            );
-        }
-      }
-
-      if (parallelWorkers !== undefined) {
-        if (
-          !Number.isInteger(parallelWorkers) ||
-          parallelWorkers < 1 ||
-          parallelWorkers > 10
-        ) {
-          return reply
-            .status(400)
-            .send(
-              errorResponse(
-                "BAD_REQUEST",
-                "parallelWorkers must be an integer between 1 and 10"
-              )
-            );
-        }
+      const validationError = validateDaemonUpdate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
       }
 
       // Read existing config file
@@ -127,24 +204,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         }
       }
 
-      // Initialize daemon section if needed
-      if (!rawConfig.daemon) {
-        rawConfig.daemon = {};
-      }
-
-      // Update provided fields
-      if (provider !== undefined) {
-        rawConfig.daemon.provider = provider;
-      }
-      if (model !== undefined) {
-        rawConfig.daemon.model = model;
-      }
-      if (idleTimeoutMinutes !== undefined) {
-        rawConfig.daemon.idle_timeout_minutes = idleTimeoutMinutes;
-      }
-      if (parallelWorkers !== undefined) {
-        rawConfig.daemon.parallel_workers = parallelWorkers;
-      }
+      // Apply updates
+      applyDaemonUpdates(rawConfig, body);
 
       // Write updated config
       const yamlContent = yaml.stringify(rawConfig, {
@@ -164,6 +225,8 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             model: updatedConfig.daemon.model,
             idleTimeoutMinutes: updatedConfig.daemon.idleTimeoutMinutes,
             parallelWorkers: updatedConfig.daemon.parallelWorkers,
+            maxRetries: updatedConfig.daemon.maxRetries,
+            retryDelaySeconds: updatedConfig.daemon.retryDelaySeconds,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1132,
+    "totalSymbols": 1137,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 501,
-      "type": 41,
-      "interface": 262,
+      "function": 504,
+      "type": 42,
+      "interface": 263,
       "variable": 119,
       "class": 12,
       "property": 51,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38977,
-  "codebase_tokens": 1091604,
+  "total_tokens": 39146,
+  "codebase_tokens": 1096555,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,113 @@
       "language": "typescript",
       "lines": [
         1,
-        218
+        281
       ],
       "detail_level": "full",
-      "token_estimate": 63,
+      "token_estimate": 232,
       "symbols": [
+        {
+          "name": "ValidationResult",
+          "kind": "type",
+          "signature": "ValidationResult = string | null",
+          "lines": [
+            22,
+            22
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validation result - either success (null) or error message",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateIntRange",
+          "kind": "function",
+          "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
+          "lines": [
+            27,
+            40
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate an integer field is within a range",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DaemonConfigUpdateBody",
+          "kind": "interface",
+          "signature": "DaemonConfigUpdateBody",
+          "lines": [
+            45,
+            52
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Daemon configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateDaemonUpdate",
+          "kind": "function",
+          "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
+          "lines": [
+            57,
+            75
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate daemon configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyDaemonUpdates",
+          "kind": "function",
+          "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            80,
+            117
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply daemon config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "configRoutes",
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            19,
-            217
+            119,
+            280
           ],
           "exported": true,
           "is_default": false,
