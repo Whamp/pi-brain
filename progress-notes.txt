@@ -23,3 +23,42 @@ Main branch: major/pi-brain
 - vite.config.ts proxy only active in dev mode
 
 ---
+
+---
+
+## 2026-01-27 16:05 - Task 14.5 (Frontend Graceful API Failure Handling)
+
+**Status**: pending → done
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+- `svelte-check` passes (0 errors)
+- Frontend correctly handles: network errors, non-JSON responses, timeouts
+
+**Commit**: 17a82cc
+
+**Changes**:
+- `src/web/app/src/lib/api/client.ts`:
+  - Added content-type checking before JSON parsing
+  - Added `createNetworkError()` and `createContentTypeError()` factories
+  - Added `isBackendOffline()` and `getErrorMessage()` helpers
+  - Exported all new utilities
+
+- Updated all route pages to use new error utilities:
+  - `+page.svelte` (dashboard)
+  - `sessions/+page.svelte`
+  - `search/+page.svelte`
+  - `settings/+page.svelte`
+  - `decisions/+page.svelte`
+  - `prompt-learning/+page.svelte`
+  - `nodes/[id]/+page.svelte`
+
+- Updated stores and components:
+  - `lib/stores/nodes.ts`
+  - `lib/components/dashboard/abandoned-restarts.svelte`
+  - `lib/components/dashboard/daemon-decisions.svelte`
+  - `lib/components/dashboard/news-feed.svelte`
+
+**Result**: When backend is offline, users now see actionable messages like:
+  "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+  instead of cryptic JSON parsing errors.

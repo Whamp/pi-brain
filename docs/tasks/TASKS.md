@@ -209,5 +209,5 @@ Ref: docs/plans/integration-repair-plan.md
 | 14.2 | Fix Worker Initialization                   | done    | -    | 2026-01-27 |
 | 14.3 | Non-Fatal Environment Validation            | done    | -    | 2026-01-27 |
 | 14.4 | Configure Vite Proxy                        | done    | -    | 2026-01-27 |
-| 14.5 | Frontend Graceful API Failure Handling      | active  | -    | 2026-01-27 |
+| 14.5 | Frontend Graceful API Failure Handling      | done    | -    | 2026-01-27 |
 | 14.6 | RLM Skill Installation (optional, see 14.3) | pending | -    |            |
