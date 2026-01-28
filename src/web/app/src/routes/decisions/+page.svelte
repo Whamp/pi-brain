@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { BrainCircuit, ThumbsUp, ThumbsDown, Filter, X } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import type { DaemonDecisionEntity } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
 
@@ -53,7 +53,9 @@
       ({ total } = res);
     } catch (error) {
       console.error("Failed to load decisions:", error);
-      errorMessage = "Failed to load decisions";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

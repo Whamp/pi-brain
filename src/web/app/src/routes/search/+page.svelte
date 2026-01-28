@@ -3,7 +3,7 @@
   import { Search as SearchIcon, Filter, X, ChevronDown } from "lucide-svelte";
   import SearchResultCard from "$lib/components/search-result-card.svelte";
   import type { SearchResult, NodeType, Outcome } from "$lib/types";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
 
   let searchQuery = $state("");
   let results = $state<SearchResult[]>([]);
@@ -141,7 +141,9 @@
       ({ results } = response);
       ({ total } = response);
     } catch (error: unknown) {
-      errorMessage = error instanceof Error ? error.message : "Search failed";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
       results = [];
       total = 0;
     } finally {
@@ -207,7 +209,9 @@
 
       results = [...results, ...response.results];
     } catch (error: unknown) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load more results";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

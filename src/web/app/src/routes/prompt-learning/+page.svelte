@@ -4,7 +4,7 @@
 </svelte:head>
 
 <script lang="ts">
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDate, parseDate } from "$lib/utils/date";
   import {
     Lightbulb,
@@ -53,7 +53,9 @@
       activeInsights = activeData;
       pendingInsights = pendingData;
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load insights";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }
@@ -66,7 +68,9 @@
     try {
       effectivenessHistory = await api.getInsightHistory(insight.id);
     } catch (error) {
-      historyError = error instanceof Error ? error.message : "Failed to load history";
+      historyError = isBackendOffline(error)
+        ? "Backend is offline"
+        : getErrorMessage(error);
       effectivenessHistory = [];
     } finally {
       loadingHistory = false;
@@ -87,7 +91,7 @@
         }
       }
     } catch (error) {
-      alert("Failed to update insight: " + (error instanceof Error ? error.message : String(error)));
+      alert("Failed to update insight: " + getErrorMessage(error));
     } finally {
       togglingInsightId = null;
     }

@@ -11,7 +11,7 @@
     BookOpen,
     Lightbulb,
   } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { 
     DashboardStats, 
@@ -92,14 +92,26 @@
       }
 
       // Show error only if all calls failed
-      const allFailed = [statsResult, toolErrorsResult, activityResult, failuresResult, daemonResult]
-        .every(r => r.status === "rejected");
+      const allResults = [statsResult, toolErrorsResult, activityResult, failuresResult, daemonResult];
+      const allFailed = allResults.every(r => r.status === "rejected");
       if (allFailed) {
-        errorMessage = "Failed to load dashboard data. Is the server running?";
+        // Get the first error for a specific message
+        const firstRejected = allResults.find(r => r.status === "rejected") as PromiseRejectedResult | undefined;
+        if (firstRejected && isBackendOffline(firstRejected.reason)) {
+          errorMessage = "Backend is offline. Start the daemon with 'pi-brain daemon start'.";
+        } else if (firstRejected) {
+          errorMessage = getErrorMessage(firstRejected.reason);
+        } else {
+          errorMessage = "Failed to load dashboard data.";
+        }
       }
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
-      errorMessage = "Failed to load dashboard data. Is the server running?";
+      if (isBackendOffline(error)) {
+        errorMessage = "Backend is offline. Start the daemon with 'pi-brain daemon start'.";
+      } else {
+        errorMessage = getErrorMessage(error);
+      }
     } finally {
       loading = false;
     }

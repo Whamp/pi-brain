@@ -9,7 +9,7 @@
     ChevronRight,
     Layers,
   } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { ClusterWithNodes } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
@@ -41,7 +41,9 @@
       clusters = loadedClusters;
     } catch (error) {
       console.error("Failed to load clusters:", error);
-      errorMessage = "Failed to load discovered patterns";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline"
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

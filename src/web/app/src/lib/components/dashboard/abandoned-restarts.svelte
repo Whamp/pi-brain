@@ -6,7 +6,7 @@
     FileText,
     ChevronRight,
   } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { AbandonedRestartPattern, FrictionSummary } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
@@ -42,11 +42,16 @@
         patternsResult.status === "rejected" &&
         summaryResult.status === "rejected"
       ) {
-        errorMessage = "Failed to load friction data";
+        const firstError = patternsResult.reason;
+        errorMessage = isBackendOffline(firstError)
+          ? "Backend is offline"
+          : getErrorMessage(firstError);
       }
     } catch (error) {
       console.error("Failed to load friction data:", error);
-      errorMessage = "Failed to load friction data";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline"
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

@@ -79,6 +79,23 @@ function createTimeoutError(timeoutMs: number): Error {
   return error;
 }
 
+function createNetworkError(message: string): Error {
+  const error = new Error(message);
+  error.name = "NetworkError";
+  return error;
+}
+
+function createContentTypeError(status: number, contentType: string): Error {
+  const error = new Error(
+    `API returned non-JSON response (${status}). Is the backend running?`
+  );
+  error.name = "ContentTypeError";
+  (error as Error & { status: number; contentType: string }).status = status;
+  (error as Error & { status: number; contentType: string }).contentType =
+    contentType;
+  return error;
+}
+
 function isApiError(
   error: unknown
 ): error is Error & { code: string; details?: Record<string, unknown> } {
@@ -87,6 +104,48 @@ function isApiError(
 
 function isTimeoutError(error: unknown): error is Error {
   return error instanceof Error && error.name === "TimeoutError";
+}
+
+function isNetworkError(error: unknown): error is Error {
+  return error instanceof Error && error.name === "NetworkError";
+}
+
+function isContentTypeError(
+  error: unknown
+): error is Error & { status: number; contentType: string } {
+  return error instanceof Error && error.name === "ContentTypeError";
+}
+
+/**
+ * Check if an error indicates the backend is unreachable
+ * (network error, timeout, or non-JSON response like 404 HTML page)
+ */
+function isBackendOffline(error: unknown): boolean {
+  return (
+    isNetworkError(error) || isTimeoutError(error) || isContentTypeError(error)
+  );
+}
+
+/**
+ * Get a user-friendly message for API errors
+ */
+function getErrorMessage(error: unknown): string {
+  if (isNetworkError(error)) {
+    return "Cannot connect to the server. Is the backend running?";
+  }
+  if (isTimeoutError(error)) {
+    return "Request timed out. The server may be overloaded.";
+  }
+  if (isContentTypeError(error)) {
+    return "Backend returned an unexpected response. Is the API server running?";
+  }
+  if (isApiError(error)) {
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "An unknown error occurred";
 }
 
 function toQueryString(params: Record<string, unknown>): string {
@@ -127,6 +186,12 @@ async function request<T>(
       },
     });
 
+    // Check content-type before parsing JSON
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      throw createContentTypeError(response.status, contentType);
+    }
+
     const json: ApiResponse<T> = await response.json();
 
     if (json.status === "error" && json.error) {
@@ -141,6 +206,10 @@ async function request<T>(
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw createTimeoutError(timeoutMs);
+    }
+    // Handle network errors (e.g., server unreachable)
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw createNetworkError("Unable to connect to the server");
     }
     throw error;
   } finally {
@@ -453,4 +522,15 @@ export const api = {
     request<FrictionSummary>("/signals/friction-summary"),
 };
 
-export { createApiError, createTimeoutError, isApiError, isTimeoutError };
+export {
+  createApiError,
+  createTimeoutError,
+  createNetworkError,
+  createContentTypeError,
+  isApiError,
+  isTimeoutError,
+  isNetworkError,
+  isContentTypeError,
+  isBackendOffline,
+  getErrorMessage,
+};

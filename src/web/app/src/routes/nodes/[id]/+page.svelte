@@ -19,7 +19,7 @@
     History,
     ExternalLink,
   } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { parseDate } from "$lib/utils/date";
   import type { Node, Edge, LessonLevel } from "$lib/types";
 
@@ -57,7 +57,9 @@
         versions: result.versions ?? [],
       });
     } catch (error: unknown) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load node";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

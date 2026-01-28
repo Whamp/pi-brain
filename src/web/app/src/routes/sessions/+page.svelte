@@ -4,7 +4,7 @@
 </svelte:head>
 
 <script lang="ts">
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, formatDate, parseDate } from "$lib/utils/date";
   import {
     FolderTree,
@@ -48,7 +48,9 @@
       currentProject = null;
       currentSession = null;
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load projects";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }
@@ -65,7 +67,9 @@
       currentSession = null;
       view = "sessions";
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load sessions";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }
@@ -81,7 +85,9 @@
       currentSession = sessionFile;
       view = "nodes";
     } catch (error) {
-      errorMessage = error instanceof Error ? error.message : "Failed to load nodes";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

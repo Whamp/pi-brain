@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { BrainCircuit, ThumbsUp, ThumbsDown } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import type { DaemonDecisionEntity } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
 
@@ -16,7 +16,9 @@
       ({ decisions } = res);
     } catch (error) {
       console.error("Failed to load decisions:", error);
-      errorMessage = "Failed to load decisions";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline"
+        : getErrorMessage(error);
     } finally {
       loading = false;
     }

@@ -4,7 +4,7 @@
 
 import type { Node, Edge, NodeFilters } from "$lib/types";
 
-import { api } from "$lib/api/client";
+import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
 import { writable, derived } from "svelte/store";
 
 interface NodesState {
@@ -59,8 +59,9 @@ function createNodesStore() {
         update((s) => ({
           ...s,
           loading: false,
-          error:
-            error instanceof Error ? error.message : "Failed to load nodes",
+          error: isBackendOffline(error)
+            ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+            : getErrorMessage(error),
         }));
       }
     },
@@ -80,10 +81,9 @@ function createNodesStore() {
         update((s) => ({
           ...s,
           loading: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : "Failed to load connected nodes",
+          error: isBackendOffline(error)
+            ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+            : getErrorMessage(error),
         }));
       }
     },

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { Settings, Save, RotateCcw, AlertCircle, CheckCircle } from "lucide-svelte";
-  import { api } from "$lib/api/client";
+  import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
 
   interface Provider {
     id: string;
@@ -63,7 +63,9 @@
       originalParallelWorkers = config.parallelWorkers;
     } catch (error) {
       console.error("Failed to load config:", error);
-      errorMessage = "Failed to load configuration";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     }
   }
 
@@ -109,7 +111,9 @@
       }, 5000);
     } catch (error) {
       console.error("Failed to save config:", error);
-      errorMessage = error instanceof Error ? error.message : "Failed to save configuration";
+      errorMessage = isBackendOffline(error)
+        ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+        : getErrorMessage(error);
     } finally {
       saving = false;
     }
