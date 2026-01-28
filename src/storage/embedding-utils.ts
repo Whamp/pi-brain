@@ -148,6 +148,8 @@ export function isRichEmbeddingFormat(inputText: string): boolean {
  *
  * Handles upsert semantics - if an embedding already exists for the node, it will be
  * replaced. The vec table is only updated if sqlite-vec is loaded.
+ *
+ * Uses a transaction to ensure atomicity - either both tables are updated or neither.
  */
 export function storeEmbeddingWithVec(
   db: Database.Database,
@@ -156,53 +158,76 @@ export function storeEmbeddingWithVec(
   modelName: string,
   inputText: string
 ): { rowid: bigint; vecUpdated: boolean } {
-  // Serialize embedding to binary blob for node_embeddings table
-  const embeddingBlob = serializeEmbedding(embedding);
+  // Wrap in transaction for atomicity
+  const txn = db.transaction(() => {
+    // Serialize embedding to binary blob for node_embeddings table
+    const embeddingBlob = serializeEmbedding(embedding);
 
-  // Insert or replace in node_embeddings table
-  // Using INSERT OR REPLACE handles the upsert case
-  db.prepare(
-    `INSERT OR REPLACE INTO node_embeddings (node_id, embedding, embedding_model, input_text)
-     VALUES (?, ?, ?, ?)`
-  ).run(nodeId, embeddingBlob, modelName, inputText);
+    // Query old rowid BEFORE INSERT OR REPLACE
+    // INSERT OR REPLACE deletes then inserts, which can change the rowid
+    // We need the old rowid to delete any existing vec table entry
+    const oldRow = db
+      .prepare(`SELECT rowid FROM node_embeddings WHERE node_id = ?`)
+      .get(nodeId) as { rowid: number | bigint } | undefined;
 
-  // Get the rowid for the embedding (needed for vec table)
-  const row = db
-    .prepare(`SELECT rowid FROM node_embeddings WHERE node_id = ?`)
-    .get(nodeId) as { rowid: number | bigint } | undefined;
-
-  if (!row) {
-    throw new Error(`Failed to get rowid for node embedding: ${nodeId}`);
-  }
-
-  // Convert to BigInt for vec table (sqlite-vec requires BigInt for rowid)
-  const rowid = typeof row.rowid === "bigint" ? row.rowid : BigInt(row.rowid);
-
-  // Update vec table if sqlite-vec is loaded
-  let vecUpdated = false;
-  if (isVecLoaded(db)) {
-    try {
-      // Delete any existing entry (for upsert semantics)
-      db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(rowid);
-
-      // Insert into vec table with JSON array format
-      db.prepare(
-        `INSERT INTO node_embeddings_vec (rowid, embedding) VALUES (?, vec_f32(?))`
-      ).run(rowid, JSON.stringify(embedding));
-
-      vecUpdated = true;
-    } catch (error) {
-      // Dimension mismatch or other vec table error - log but don't fail
-      // This can happen if the embedding dimension doesn't match the table schema
-      const message = error instanceof Error ? error.message : String(error);
-      if (!message.includes("Dimension mismatch")) {
-        throw error; // Re-throw non-dimension errors
-      }
-      // Dimension mismatch is expected when model changes - backfill job will fix
+    let oldRowid: bigint | null = null;
+    if (oldRow) {
+      oldRowid =
+        typeof oldRow.rowid === "bigint" ? oldRow.rowid : BigInt(oldRow.rowid);
     }
-  }
 
-  return { rowid, vecUpdated };
+    // Insert or replace in node_embeddings table
+    // Using INSERT OR REPLACE handles the upsert case
+    db.prepare(
+      `INSERT OR REPLACE INTO node_embeddings (node_id, embedding, embedding_model, input_text)
+       VALUES (?, ?, ?, ?)`
+    ).run(nodeId, embeddingBlob, modelName, inputText);
+
+    // Get the new rowid for the embedding (needed for vec table)
+    const newRow = db
+      .prepare(`SELECT rowid FROM node_embeddings WHERE node_id = ?`)
+      .get(nodeId) as { rowid: number | bigint } | undefined;
+
+    if (!newRow) {
+      throw new Error(`Failed to get rowid for node embedding: ${nodeId}`);
+    }
+
+    // Convert to BigInt for vec table (sqlite-vec requires BigInt for rowid)
+    const rowid =
+      typeof newRow.rowid === "bigint" ? newRow.rowid : BigInt(newRow.rowid);
+
+    // Update vec table if sqlite-vec is loaded
+    let vecUpdated = false;
+    if (isVecLoaded(db)) {
+      try {
+        // Delete old entry using the OLD rowid (may differ from new rowid)
+        if (oldRowid !== null) {
+          db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(
+            oldRowid
+          );
+        }
+
+        // Insert into vec table with JSON array format using the NEW rowid
+        db.prepare(
+          `INSERT INTO node_embeddings_vec (rowid, embedding) VALUES (?, vec_f32(?))`
+        ).run(rowid, JSON.stringify(embedding));
+
+        vecUpdated = true;
+      } catch (error) {
+        // Dimension mismatch or other vec table error - log but don't fail
+        // This can happen if the embedding dimension doesn't match the table schema
+        const message = error instanceof Error ? error.message : String(error);
+        if (!message.includes("Dimension mismatch")) {
+          throw error; // Re-throw non-dimension errors
+        }
+        // Dimension mismatch is expected when model changes - backfill job will fix
+      }
+    }
+
+    return { rowid, vecUpdated };
+  });
+
+  return txn();
 }
 
 /**
@@ -215,17 +240,18 @@ export function deleteEmbedding(
   // Get the rowid first (needed for vec table)
   const row = db
     .prepare(`SELECT rowid FROM node_embeddings WHERE node_id = ?`)
-    .get(nodeId) as { rowid: bigint } | undefined;
+    .get(nodeId) as { rowid: number | bigint } | undefined;
 
   if (!row) {
     return false;
   }
 
+  // Convert to BigInt for vec table consistency
+  const rowid = typeof row.rowid === "bigint" ? row.rowid : BigInt(row.rowid);
+
   // Delete from vec table if loaded
   if (isVecLoaded(db)) {
-    db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(
-      row.rowid
-    );
+    db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(rowid);
   }
 
   // Delete from embeddings table

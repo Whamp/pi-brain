@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 36951,
-  "codebase_tokens": 1022967,
+  "total_tokens": 36972,
+  "codebase_tokens": 1023621,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15584,10 +15584,10 @@
       "language": "typescript",
       "lines": [
         1,
-        316
+        342
       ],
       "detail_level": "full",
-      "token_estimate": 784,
+      "token_estimate": 805,
       "symbols": [
         {
           "name": "EMBEDDING_FORMAT_VERSION",
@@ -15670,8 +15670,8 @@
           "kind": "function",
           "signature": "storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; }",
           "lines": [
-            152,
-            206
+            154,
+            231
           ],
           "exported": true,
           "is_default": false,
@@ -15680,7 +15680,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Store an embedding for a node in both node_embeddings and node_embeddings_vec tables.\n\nHandles upsert semantics - if an embedding already exists for the node, it will be\nreplaced. The vec table is only updated if sqlite-vec is loaded.",
+          "comment": "Store an embedding for a node in both node_embeddings and node_embeddings_vec tables.\n\nHandles upsert semantics - if an embedding already exists for the node, it will be\nreplaced. The vec table is only updated if sqlite-vec is loaded.\n\nUses a transaction to ensure atomicity - either both tables are updated or neither.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -15689,8 +15689,8 @@
           "kind": "function",
           "signature": "deleteEmbedding(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            211,
-            237
+            236,
+            263
           ],
           "exported": true,
           "is_default": false,
@@ -15708,8 +15708,8 @@
           "kind": "function",
           "signature": "getEmbedding(db: Database.Database, nodeId: string): { embedding: {}; modelName: string; inputText: string; createdAt: string; }",
           "lines": [
-            242,
-            275
+            268,
+            301
           ],
           "exported": true,
           "is_default": false,
@@ -15727,8 +15727,8 @@
           "kind": "function",
           "signature": "hasEmbedding(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            280,
-            285
+            306,
+            311
           ],
           "exported": true,
           "is_default": false,
@@ -15746,8 +15746,8 @@
           "kind": "function",
           "signature": "serializeEmbedding(embedding: number[]): Buffer",
           "lines": [
-            296,
-            302
+            322,
+            328
           ],
           "exported": true,
           "is_default": false,
@@ -15765,8 +15765,8 @@
           "kind": "function",
           "signature": "deserializeEmbedding(buffer: Buffer): {}",
           "lines": [
-            309,
-            315
+            335,
+            341
           ],
           "exported": true,
           "is_default": false,
