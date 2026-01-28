@@ -692,51 +692,56 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.test.ts [1-205]
+src/daemon/query-processor.test.ts [1-458]
   imports:
     - ../config/types.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
     - ../storage/search-repository.js
+    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
+    - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
     - node:child_process
     - node:fs/promises
     - vitest
 
-src/daemon/query-processor.ts [1-731]
+src/daemon/query-processor.ts [1-774]
   interface:
-    29-42: interface QueryRequest [exported]
+    31-44: interface QueryRequest [exported]
       /** Query request from the API */
-    45-63: interface QueryResponse [exported]
+    47-65: interface QueryResponse [exported]
       /** Query response to return to the client */
-    88-97: interface QueryProcessorConfig [exported]
-      refs out: 3 [type: 3]
-        - src/daemon/query-processor.ts:90: type Database -> external
-        - src/daemon/query-processor.ts:92: type DaemonConfig -> src/config/types.ts
-        - src/daemon/query-processor.ts:94: type ProcessorLogger -> src/daemon/processor.ts
+    90-103: interface QueryProcessorConfig [exported]
+      refs out: 4 [type: 4]
+        - src/daemon/query-processor.ts:92: type Database -> external
+        - src/daemon/query-processor.ts:94: type DaemonConfig -> src/config/types.ts
+        - src/daemon/query-processor.ts:96: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:100: type EmbeddingProvider -> src/daemon/facet-discovery.ts
   function:
-    102-178: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    108-187: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
       refs out: 12 [call: 8, type: 4]
-        - src/daemon/query-processor.ts:103: type QueryRequest -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:104: type QueryProcessorConfig -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:105: type Promise -> external
-        - src/daemon/query-processor.ts:105: type QueryResponse -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:109: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:109: call slice -> external
-        - src/daemon/query-processor.ts:119: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:154: call error -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:159: call map -> external
-        - src/daemon/query-processor.ts:170: call map -> external
+        - src/daemon/query-processor.ts:109: type QueryRequest -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:110: type QueryProcessorConfig -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:111: type Promise -> external
+        - src/daemon/query-processor.ts:111: type QueryResponse -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:115: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:115: call slice -> external
+        - src/daemon/query-processor.ts:128: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:163: call error -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:168: call map -> external
+        - src/daemon/query-processor.ts:179: call map -> external
   imports:
     - ../config/types.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
     - ../storage/search-repository.js
+    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
+    - ./facet-discovery.js
     - ./processor.js
     - better-sqlite3
     - node:child_process
@@ -1558,4 +1563,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,365 (codebase: ~1,045,614)
+Estimated tokens: 20,421 (codebase: ~1,050,447)

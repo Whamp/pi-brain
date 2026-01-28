@@ -273,11 +273,11 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.6 Query Processor Integration
 
-| ID     | Task                                         | Status  | Deps   | Notes |
-| ------ | -------------------------------------------- | ------- | ------ | ----- |
-| 17.6.1 | Update findRelevantNodes with semantic + FTS | pending | 17.5.1 |       |
-| 17.6.2 | Add semantic_search_threshold config option  | pending | -      |       |
-| 17.6.3 | Integration tests for semantic search        | pending | 17.6.1 |       |
+| ID     | Task                                         | Status  | Deps   | Notes      |
+| ------ | -------------------------------------------- | ------- | ------ | ---------- |
+| 17.6.1 | Update findRelevantNodes with semantic + FTS | active  | 17.5.1 | 2026-01-27 |
+| 17.6.2 | Add semantic_search_threshold config option  | pending | -      |            |
+| 17.6.3 | Integration tests for semantic search        | pending | 17.6.1 |            |
 
 ### 17.7 Error Handling & Polish
 

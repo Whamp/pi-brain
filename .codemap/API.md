@@ -130,10 +130,11 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-205]
+src/api/routes/query.ts [1-241]
   function:
-    44-204: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    48-240: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
+    - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
     - ../responses.js
     - fastify
@@ -664,15 +665,15 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-731]
+src/daemon/query-processor.ts [1-774]
   interface:
-    29-42: interface QueryRequest [exported]
+    31-44: interface QueryRequest [exported]
       /** Query request from the API */
-    45-63: interface QueryResponse [exported]
+    47-65: interface QueryResponse [exported]
       /** Query response to return to the client */
-    88-97: interface QueryProcessorConfig [exported]
+    90-103: interface QueryProcessorConfig [exported]
   function:
-    102-178: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    108-187: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
@@ -680,7 +681,9 @@ src/daemon/query-processor.ts [1-731]
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
     - ../storage/search-repository.js
+    - ../storage/semantic-search.js
     - ../storage/tool-error-repository.js
+    - ./facet-discovery.js
     - ./processor.js
     - better-sqlite3
     - node:child_process
@@ -2114,4 +2117,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 89
-Estimated tokens: 26,659 (codebase: ~1,045,614)
+Estimated tokens: 26,684 (codebase: ~1,046,372)

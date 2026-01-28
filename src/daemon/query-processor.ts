@@ -14,10 +14,12 @@ import * as path from "node:path";
 
 import type { DaemonConfig } from "../config/types.js";
 import type { NodeRow } from "../storage/node-crud.js";
+import type { EmbeddingProvider } from "./facet-discovery.js";
 
 import { listNodes, type ListNodesFilters } from "../storage/node-queries.js";
 import { getAggregatedQuirks } from "../storage/quirk-repository.js";
 import { searchNodesAdvanced } from "../storage/search-repository.js";
+import { semanticSearch } from "../storage/semantic-search.js";
 import { getAggregatedToolErrors } from "../storage/tool-error-repository.js";
 import { consoleLogger, type ProcessorLogger } from "./processor.js";
 
@@ -94,6 +96,10 @@ export interface QueryProcessorConfig {
   logger?: ProcessorLogger;
   /** Path to query prompt file */
   queryPromptFile?: string;
+  /** Embedding provider for semantic search (optional) */
+  embeddingProvider?: EmbeddingProvider;
+  /** Semantic search threshold (0.0-1.0), distance above which FTS fallback triggers */
+  semanticSearchThreshold?: number;
 }
 
 /**
@@ -108,12 +114,15 @@ export async function processQuery(
 
   logger.info(`Processing query: "${request.query.slice(0, 100)}..."`);
 
-  // Step 1: Search for relevant nodes
-  const relevantNodes = findRelevantNodes(
+  // Step 1: Search for relevant nodes (semantic + FTS)
+  const relevantNodes = await findRelevantNodes(
     config.db,
     request.query,
     request.context?.project,
-    maxNodes
+    maxNodes,
+    config.embeddingProvider,
+    config.semanticSearchThreshold,
+    logger
   );
 
   logger.info(`Found ${relevantNodes.length} relevant nodes`);
@@ -192,35 +201,69 @@ interface RelevantNode {
 }
 
 /**
- * Find nodes relevant to the query
+ * Find nodes relevant to the query.
+ *
+ * Uses a two-phase search strategy:
+ * 1. Semantic search (if embedding provider configured) - finds nodes by meaning
+ * 2. FTS fallback - finds nodes by keyword match
+ *
+ * Falls back to listing recent nodes if both searches return no results.
  */
-function findRelevantNodes(
+async function findRelevantNodes(
   db: Database,
   query: string,
   project: string | undefined,
-  maxNodes: number
-): RelevantNode[] {
-  // First try full-text search (and semantic search if enabled)
+  maxNodes: number,
+  embeddingProvider: EmbeddingProvider | undefined,
+  semanticSearchThreshold: number | undefined,
+  logger: ProcessorLogger
+): Promise<RelevantNode[]> {
   const filters: ListNodesFilters | undefined = project
     ? { project }
     : undefined;
 
-  // Get semantic search settings from config via the db if possible, or assume defaults
-  // For now, let's try semantic search first, then fall back to FTS if needed or combine results
-  // Note: We'd need to embed the query first.
-  // Since we don't have easy access to the embedding provider here without passing it in config,
-  // we will stick to FTS for this phase.
+  // Phase 1: Try semantic search if embedding provider is configured
+  if (embeddingProvider) {
+    try {
+      // Embed the query
+      const [queryEmbedding] = await embeddingProvider.embed([query]);
 
+      // Perform semantic search
+      const semanticResults = semanticSearch(db, queryEmbedding, {
+        limit: maxNodes,
+        maxDistance: semanticSearchThreshold,
+        filters: filters ? { project: filters.project } : undefined,
+      });
+
+      if (semanticResults.length > 0) {
+        logger.info(
+          `Semantic search found ${semanticResults.length} results (closest distance: ${semanticResults[0].distance.toFixed(3)})`
+        );
+        return semanticResults.map((r) => nodeRowToRelevant(r.node));
+      }
+
+      logger.info("Semantic search returned no results, falling back to FTS");
+    } catch (error) {
+      // Log and fall through to FTS
+      logger.warn(
+        `Semantic search failed: ${error instanceof Error ? error.message : String(error)}, falling back to FTS`
+      );
+    }
+  }
+
+  // Phase 2: Full-text search
   const searchResults = searchNodesAdvanced(db, query, {
     limit: maxNodes,
     filters,
   });
 
   if (searchResults.results.length > 0) {
+    logger.info(`FTS found ${searchResults.results.length} results`);
     return searchResults.results.map((r) => nodeRowToRelevant(r.node));
   }
 
-  // Fallback: list recent nodes from the project
+  // Phase 3: Fallback to listing recent nodes from the project
+  logger.info("No search results, returning recent nodes");
   const listFilters: ListNodesFilters = {};
   if (project) {
     listFilters.project = project;

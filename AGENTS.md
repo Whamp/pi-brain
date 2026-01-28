@@ -4,7 +4,7 @@ This project uses **Ultracite**, a zero-config preset that enforces strict code 
 
 ## Important Writing Standards
 
-@~/.pi/agent/skills/writing-clearly-and-concisely/SKILL.md
+**available skill** `writing-clearly-and-concisely`
 
 ## Toolchain
 
@@ -15,22 +15,74 @@ Ultracite wraps two tools:
 
 ## Commands
 
-| Command                | What it does                                         |
-| ---------------------- | ---------------------------------------------------- |
-| `npm run check`        | Run linter + formatter check (fails if issues found) |
-| `npm run fix`          | Run linter fixes only (does NOT format)              |
-| `npx oxfmt --write .`  | Run formatter to fix formatting                      |
-| `npx ultracite doctor` | Diagnose setup issues                                |
+**Critical Principle:** Always run read-only checks before applying any auto-fixes. Never skip exploration by running fix commands directly.
 
-### Full Fix Workflow
+### 📖 Read-Only Commands (No file changes)
+
+Use these for exploration and understanding. They report issues without modifying files.
+
+| Command                | What it does                                                         |
+| ---------------------- | -------------------------------------------------------------------- |
+| `npm run check`        | **Read-only.** Runs linter + formatter check. Fails if issues found. |
+| `npx ultracite doctor` | **Read-only.** Diagnoses Ultracite setup issues.                     |
+
+### ✏️ Auto-Modify Commands (Will change your files)
+
+Use these only when you understand what changes will be made and have reviewed the issues first.
+
+| Command               | What it does                                                       |
+| --------------------- | ------------------------------------------------------------------ |
+| `npm run fix`         | **MODIFIES FILES.** Auto-fixes lint issues (does NOT format).      |
+| `npx oxfmt --write .` | **MODIFIES FILES.** Auto-fixes formatting issues across all files. |
+
+### 🔄 Blocking Commands (Will hang until interrupted)
+
+Use tmux for these commands to avoid getting blocked.
+
+| Command           | What it does                                                                                          |
+| ----------------- | ----------------------------------------------------------------------------------------------------- |
+| `npm test`        | **BLOCKING.** Runs Vitest in watch mode. Never use directly - use `npm test -- --run` or run in tmux. |
+| `npm run dev`     | **BLOCKING.** Runs tsup in watch mode for this project. Run in tmux for development.                  |
+| `npm run web:dev` | **BLOCKING.** Runs web app dev server. Run in tmux.                                                   |
+
+### 🏗️ Build Commands (Run once, then exit)
+
+These commands complete their work and exit. Safe to run directly.
+
+| Command             | What it does                                             |
+| ------------------- | -------------------------------------------------------- |
+| `npm run build`     | Builds the project with tsup. Generates dist/ directory. |
+| `npm run web:build` | Builds the web app.                                      |
+
+### Recommended Exploration Workflow
 
 ```bash
-# Fix all issues (lint + format)
+# Step 1: Check what issues exist (no changes)
+npm run check
+
+# Step 2: Review and understand the issues manually
+# (Read the files, understand what needs fixing)
+
+# Step 3: Only when ready, apply fixes
 npm run fix && npx oxfmt --write .
 
-# Verify clean
+# Step 4: Verify fixes worked
 npm run check
+
+# Step 5: Run tests in non-blocking mode
+npm test -- --run
 ```
+
+### When to Use tmux
+
+Always use tmux for commands that **never exit** and will block your session:
+
+- Dev servers: `npm run dev`, `yarn dev`, `vite`, `next dev`, `rails server`, `flask run`, `uvicorn`
+- Watch modes: `tsc --watch`, `cargo watch`, `nodemon`, `npm test` (without `--run`)
+- Log streaming: `tail -f`, `docker logs -f`, `journalctl -f`
+- Interactive REPLs: `python3`, `node`, `psql`, `mysql`, `gdb`, `lldb`, `ipdb`, `pdb`
+
+**Pattern:** If the command expects continuous input/output and doesn't have a natural exit, use tmux.
 
 ### Pre-commit Hook
 
@@ -180,8 +232,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 
 ## Testing
 
-**Warning**: `npm test` runs Vitest in watch mode and will block. Always use `npm test -- --run` for single-run execution, or use tmux if watch mode is needed.
-
+- **Never run `npm test` directly** - it blocks in watch mode. Use `npm test -- --run` for single-run execution, or run in tmux.
 - Write assertions inside `it()` or `test()` blocks
 - Avoid done callbacks in async tests - use async/await instead
 - Don't use `.only` or `.skip` in committed code

@@ -285,23 +285,24 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-205]
+src/api/routes/query.ts [1-241]
   function:
-    44-204: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 35 [call: 28, instantiate: 1, type: 6]
-        - src/api/routes/query.ts:44: type FastifyInstance -> external
-        - src/api/routes/query.ts:44: type Promise -> external
-        - src/api/routes/query.ts:55: call post -> external
-        - src/api/routes/query.ts:58: type FastifyRequest -> external
-        - src/api/routes/query.ts:71: type FastifyReply -> external
+    48-240: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 37 [call: 30, instantiate: 1, type: 6]
+        - src/api/routes/query.ts:48: type FastifyInstance -> external
+        - src/api/routes/query.ts:48: type Promise -> external
+        - src/api/routes/query.ts:59: call post -> external
+        - src/api/routes/query.ts:62: type FastifyRequest -> external
+        - src/api/routes/query.ts:75: type FastifyReply -> external
   variable:
-    20-42: DEFAULT_QUERY_CONFIG
+    24-46: DEFAULT_QUERY_CONFIG
       /** Default daemon config for query processing */
       refs out: 3 [call: 2, type: 1]
-        - src/api/routes/query.ts:23: call join -> external
-        - src/api/routes/query.ts:24: call homedir -> external
-        - src/api/routes/query.ts:38: type const -> external
+        - src/api/routes/query.ts:27: call join -> external
+        - src/api/routes/query.ts:28: call homedir -> external
+        - src/api/routes/query.ts:42: type const -> external
   imports:
+    - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
     - ../responses.js
     - fastify
@@ -470,6 +471,8 @@ src/api/server.test.ts [1-703]
         - src/api/server.test.ts:28: call existsSync -> external
         - src/api/server.test.ts:29: call rmSync -> external
     33-39: createTestApiConfig(): ApiConfig
+      refs out: 1 [type: 1]
+        - src/api/server.test.ts:33: type ApiConfig -> src/config/types.ts
     41-111: createTestNode(overrides: Partial<Node> = {}): Node
       refs out: 8 [call: 3, instantiate: 2, type: 3]
         - src/api/server.test.ts:41: type Partial -> external
@@ -493,8 +496,10 @@ src/api/server.ts [1-203]
   interface:
     49-54: interface ServerContext [exported]
       /** Server context passed to route handlers */
-      refs out: 1 [type: 1]
+      refs out: 3 [type: 3]
         - src/api/server.ts:50: type Database -> external
+        - src/api/server.ts:51: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:53: type DaemonConfig -> src/config/types.ts
     169-172: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
       refs out: 2 [type: 2]
@@ -503,20 +508,20 @@ src/api/server.ts [1-203]
   function:
     68-164: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-      refs out: 32 [call: 27, instantiate: 1, type: 4]
+      refs out: 34 [call: 27, instantiate: 1, type: 6]
         - src/api/server.ts:69: type Database -> external
+        - src/api/server.ts:70: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:71: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:72: type WebSocketManager -> src/api/websocket.ts
         - src/api/server.ts:73: type Promise -> external
-        - src/api/server.ts:73: type FastifyInstance -> external
-        - src/api/server.ts:81: call register -> external
     177-195: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
-      refs out: 6 [call: 2, type: 4]
+      refs out: 8 [call: 2, type: 6]
         - src/api/server.ts:178: type Database -> external
+        - src/api/server.ts:179: type ApiConfig -> src/config/types.ts
+        - src/api/server.ts:180: type DaemonConfig -> src/config/types.ts
         - src/api/server.ts:181: type WebSocketManager -> src/api/websocket.ts
         - src/api/server.ts:182: type Promise -> external
-        - src/api/server.ts:182: type ServerResult -> src/api/server.ts
-        - src/api/server.ts:187: call listen -> external
   imports:
     - ../config/types.js
     - ./responses.js
@@ -795,4 +800,4 @@ src/cli.ts [1-1141]
 
 ---
 Files: 27
-Estimated tokens: 8,835 (codebase: ~1,045,614)
+Estimated tokens: 8,915 (codebase: ~1,046,372)

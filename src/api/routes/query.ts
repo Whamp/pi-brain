@@ -10,6 +10,10 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 import {
+  createEmbeddingProvider,
+  type EmbeddingProvider,
+} from "../../daemon/facet-discovery.js";
+import {
   processQuery,
   type QueryRequest,
   type QueryResponse,
@@ -99,6 +103,36 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
       try {
         // Use daemonConfig from context if available, otherwise fall back to defaults
         const effectiveConfig = daemonConfig ?? DEFAULT_QUERY_CONFIG;
+
+        // Create embedding provider for semantic search (if configured)
+        let embeddingProvider: EmbeddingProvider | undefined;
+        if (
+          effectiveConfig.embeddingProvider &&
+          effectiveConfig.embeddingModel
+        ) {
+          // Only create if we have an API key for providers that need it
+          const needsApiKey =
+            effectiveConfig.embeddingProvider === "openrouter" ||
+            effectiveConfig.embeddingProvider === "openai";
+
+          if (!needsApiKey || effectiveConfig.embeddingApiKey) {
+            try {
+              embeddingProvider = createEmbeddingProvider({
+                provider: effectiveConfig.embeddingProvider,
+                model: effectiveConfig.embeddingModel,
+                apiKey: effectiveConfig.embeddingApiKey,
+                baseUrl: effectiveConfig.embeddingBaseUrl,
+                dimensions: effectiveConfig.embeddingDimensions,
+              });
+            } catch (error) {
+              app.log.warn(
+                `Failed to create embedding provider: ${error instanceof Error ? error.message : "Unknown error"}`
+              );
+              // Continue without semantic search
+            }
+          }
+        }
+
         const response: QueryResponse = await processQuery(queryRequest, {
           db,
           daemonConfig: effectiveConfig,
@@ -108,6 +142,8 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
             "prompts",
             "brain-query.md"
           ),
+          embeddingProvider,
+          semanticSearchThreshold: effectiveConfig.semanticSearchThreshold,
         });
 
         const durationMs = Date.now() - startTime;
