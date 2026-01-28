@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 40 files
+- typescript: 41 files
 
 ## Statistics
-- Total files: 40
+- Total files: 41
 - Total symbols: 200
   - function: 121
   - interface: 47
@@ -709,9 +709,10 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.test.ts [1-458]
+src/daemon/query-processor.test.ts [1-463]
   imports:
     - ../config/types.js
+    - ../storage/database.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
     - ../storage/search-repository.js
@@ -724,34 +725,35 @@ src/daemon/query-processor.test.ts [1-458]
     - node:fs/promises
     - vitest
 
-src/daemon/query-processor.ts [1-779]
+src/daemon/query-processor.ts [1-786]
   interface:
-    31-44: interface QueryRequest [exported]
+    32-45: interface QueryRequest [exported]
       /** Query request from the API */
-    47-65: interface QueryResponse [exported]
+    48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
-    90-103: interface QueryProcessorConfig [exported]
+    91-104: interface QueryProcessorConfig [exported]
       refs out: 4 [type: 4]
-        - src/daemon/query-processor.ts:92: type Database -> external
-        - src/daemon/query-processor.ts:94: type DaemonConfig -> src/config/types.ts
-        - src/daemon/query-processor.ts:96: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:100: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/daemon/query-processor.ts:93: type Database -> external
+        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
+        - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:101: type EmbeddingProvider -> src/daemon/facet-discovery.ts
   function:
-    108-187: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    109-188: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
       refs out: 12 [call: 8, type: 4]
-        - src/daemon/query-processor.ts:109: type QueryRequest -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:110: type QueryProcessorConfig -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:111: type Promise -> external
-        - src/daemon/query-processor.ts:111: type QueryResponse -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:115: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:115: call slice -> external
-        - src/daemon/query-processor.ts:128: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:163: call error -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:168: call map -> external
-        - src/daemon/query-processor.ts:179: call map -> external
+        - src/daemon/query-processor.ts:110: type QueryRequest -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:111: type QueryProcessorConfig -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:112: type Promise -> external
+        - src/daemon/query-processor.ts:112: type QueryResponse -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:116: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:116: call slice -> external
+        - src/daemon/query-processor.ts:129: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:164: call error -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:169: call map -> external
+        - src/daemon/query-processor.ts:180: call map -> external
   imports:
     - ../config/types.js
+    - ../storage/database.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
@@ -918,6 +920,19 @@ src/daemon/scheduler.ts [1-978]
     - ./queue.js
     - better-sqlite3
     - croner
+
+src/daemon/semantic-search.integration.test.ts [1-323]
+  imports:
+    - ../config/types.js
+    - ../storage/database.js
+    - ../storage/embedding-utils.js
+    - ../storage/node-crud.js
+    - ../types/index.js
+    - ./facet-discovery.js
+    - ./query-processor.js
+    - better-sqlite3
+    - node:child_process
+    - vitest
 
 src/daemon/watcher-events.ts [1-117]
   interface:
@@ -1581,5 +1596,5 @@ src/parser/signals.ts [1-1095]
     - ../types/index.js
 
 ---
-Files: 40
-Estimated tokens: 20,700 (codebase: ~1,070,993)
+Files: 41
+Estimated tokens: 20,797 (codebase: ~1,074,110)

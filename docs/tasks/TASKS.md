@@ -273,25 +273,25 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.6 Query Processor Integration
 
-| ID     | Task                                         | Status  | Deps   | Notes      |
-| ------ | -------------------------------------------- | ------- | ------ | ---------- |
-| 17.6.1 | Update findRelevantNodes with semantic + FTS | done    | 17.5.1 | 2026-01-28 |
-| 17.6.2 | Add semantic_search_threshold config option  | done    | -      | 2026-01-28 |
-| 17.6.3 | Integration tests for semantic search        | pending | 17.6.1 |            |
+| ID     | Task                                         | Status | Deps   | Notes      |
+| ------ | -------------------------------------------- | ------ | ------ | ---------- |
+| 17.6.1 | Update findRelevantNodes with semantic + FTS | done   | 17.5.1 | 2026-01-28 |
+| 17.6.2 | Add semantic_search_threshold config option  | done   | -      | 2026-01-28 |
+| 17.6.3 | Integration tests for semantic search        | done   | 17.6.1 | 2026-01-28 |
 
 ### 17.7 Error Handling & Polish
 
-| ID     | Task                                          | Status  | Deps   | Notes |
-| ------ | --------------------------------------------- | ------- | ------ | ----- |
-| 17.7.1 | Implement graceful degradation (no vec/embed) | pending | 17.6.1 |       |
-| 17.7.2 | Handle embedding dimension mismatches         | pending | 17.5.1 |       |
-| 17.7.3 | Document semantic search configuration        | pending | 17.6.2 |       |
+| ID     | Task                                          | Status | Deps   | Notes      |
+| ------ | --------------------------------------------- | ------ | ------ | ---------- |
+| 17.7.1 | Implement graceful degradation (no vec/embed) | done   | 17.6.1 | 2026-01-28 |
+| 17.7.2 | Handle embedding dimension mismatches         | done   | 17.5.1 | 2026-01-28 |
+| 17.7.3 | Document semantic search configuration        | done   | 17.6.2 | 2026-01-28 |
 
 ### 17.8 Migration & Rollout
 
-| ID     | Task                                     | Status  | Deps      | Notes |
-| ------ | ---------------------------------------- | ------- | --------- | ----- |
-| 17.8.1 | Run backfill on existing data and verify | pending | 17.1-17.7 |       |
+| ID     | Task                                     | Status | Deps      | Notes      |
+| ------ | ---------------------------------------- | ------ | --------- | ---------- |
+| 17.8.1 | Run backfill on existing data and verify | active | 17.1-17.7 | 2026-01-28 |
 
 ## Phase 18: Web UI Polish
 

@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import type { DaemonConfig } from "../config/types.js";
+import type * as DatabaseModule from "../storage/database.js";
 import type * as NodeQueries from "../storage/node-queries.js";
 import type * as QuirkRepo from "../storage/quirk-repository.js";
 import type * as SearchRepo from "../storage/search-repository.js";
@@ -19,6 +20,10 @@ import { semanticSearch } from "../storage/semantic-search.js";
 import { processQuery, type QueryRequest } from "./query-processor.js";
 
 // Mocks
+vi.mock<typeof DatabaseModule>("../storage/database.js", () => ({
+  isVecLoaded: vi.fn(() => true),
+}));
+
 vi.mock<typeof SearchRepo>("../storage/search-repository.js", () => ({
   searchNodesAdvanced: vi.fn(),
 }));

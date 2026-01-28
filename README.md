@@ -89,6 +89,38 @@ Then in pi, you can use:
 - `/brain` command to see status
 - Natural language queries like: "Have we seen this error before?" (uses `brain_query` tool)
 
+## Configuration
+
+pi-brain is configured via `~/.pi-brain/config.yaml`.
+
+```yaml
+daemon:
+  # LLM for session analysis
+  provider: anthropic
+  model: claude-3-5-sonnet-20240620
+
+  # Semantic Search (Vector embeddings)
+  embedding_provider: openrouter # options: openrouter, ollama, openai
+  embedding_model: qwen/qwen3-embedding-8b
+  embedding_api_key: sk-or-v1-...
+  embedding_dimensions: 4096
+  semantic_search_threshold: 0.5 # 0.0 to 1.0 (lower = stricter)
+```
+
+### Semantic Search
+
+pi-brain uses `sqlite-vec` to enable semantic queries. Instead of just keyword matching, it finds sessions with similar meanings.
+
+- **Threshold**: Control how strict the semantic matching is. If no semantic results are found within the threshold, it falls back to keyword search (FTS).
+- **Models**: We recommend `qwen/qwen3-embedding-8b` (4096 dimensions) for high-quality semantic understanding.
+- **Local Search**: Set `embedding_provider: ollama` and `embedding_model: nomic-embed-text` for fully local vector search.
+
+If you change your embedding model, you should re-index your knowledge graph:
+
+```bash
+pi-brain rebuild --embeddings
+```
+
 ## Documentation
 
 - [docs/specs/](docs/specs/) - Detailed system specifications

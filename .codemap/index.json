@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 38882,
-  "codebase_tokens": 1070993,
+  "total_tokens": 38889,
+  "codebase_tokens": 1074110,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -7282,18 +7282,18 @@
       "language": "typescript",
       "lines": [
         1,
-        779
+        786
       ],
       "detail_level": "full",
-      "token_estimate": 720,
+      "token_estimate": 727,
       "symbols": [
         {
           "name": "QueryRequest",
           "kind": "interface",
           "signature": "QueryRequest",
           "lines": [
-            31,
-            44
+            32,
+            45
           ],
           "exported": true,
           "is_default": false,
@@ -7311,8 +7311,8 @@
           "kind": "interface",
           "signature": "QueryResponse",
           "lines": [
-            47,
-            65
+            48,
+            66
           ],
           "exported": true,
           "is_default": false,
@@ -7330,8 +7330,8 @@
           "kind": "interface",
           "signature": "AgentQueryResult",
           "lines": [
-            68,
-            73
+            69,
+            74
           ],
           "exported": false,
           "is_default": false,
@@ -7349,8 +7349,8 @@
           "kind": "interface",
           "signature": "AgentQueryOutput",
           "lines": [
-            76,
-            84
+            77,
+            85
           ],
           "exported": false,
           "is_default": false,
@@ -7368,8 +7368,8 @@
           "kind": "interface",
           "signature": "QueryProcessorConfig",
           "lines": [
-            90,
-            103
+            91,
+            104
           ],
           "exported": true,
           "is_default": false,
@@ -7387,8 +7387,8 @@
           "kind": "function",
           "signature": "async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse>",
           "lines": [
-            108,
-            187
+            109,
+            188
           ],
           "exported": true,
           "is_default": false,
@@ -7406,8 +7406,8 @@
           "kind": "interface",
           "signature": "RelevantNode",
           "lines": [
-            193,
-            201
+            194,
+            202
           ],
           "exported": false,
           "is_default": false,
@@ -7425,8 +7425,8 @@
           "kind": "function",
           "signature": "async findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number, embeddingProvider: EmbeddingProvider | undefined, semanticSearchThreshold: number | undefined, logger: ProcessorLogger): Promise<{}>",
           "lines": [
-            212,
-            284
+            213,
+            291
           ],
           "exported": false,
           "is_default": false,
@@ -7444,8 +7444,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            289,
-            299
+            296,
+            306
           ],
           "exported": false,
           "is_default": false,
@@ -7463,8 +7463,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            305,
-            308
+            312,
+            315
           ],
           "exported": false,
           "is_default": false,
@@ -7482,8 +7482,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            313,
-            363
+            320,
+            370
           ],
           "exported": false,
           "is_default": false,
@@ -7501,8 +7501,8 @@
           "kind": "function",
           "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            372,
-            473
+            379,
+            480
           ],
           "exported": false,
           "is_default": false,
@@ -7520,8 +7520,8 @@
           "kind": "function",
           "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
           "lines": [
-            478,
-            540
+            485,
+            547
           ],
           "exported": false,
           "is_default": false,
@@ -7539,8 +7539,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            546,
-            552
+            553,
+            559
           ],
           "exported": false,
           "is_default": false,
@@ -7558,8 +7558,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            554,
-            616
+            561,
+            623
           ],
           "exported": false,
           "is_default": false,
@@ -7577,8 +7577,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            622,
-            626
+            629,
+            633
           ],
           "exported": false,
           "is_default": false,
@@ -7596,8 +7596,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            628,
-            631
+            635,
+            638
           ],
           "exported": false,
           "is_default": false,
@@ -7615,8 +7615,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            633,
-            636
+            640,
+            643
           ],
           "exported": false,
           "is_default": false,
@@ -7634,8 +7634,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            638,
-            642
+            645,
+            649
           ],
           "exported": false,
           "is_default": false,
@@ -7653,8 +7653,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            644,
-            720
+            651,
+            727
           ],
           "exported": false,
           "is_default": false,
@@ -7672,8 +7672,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            722,
-            755
+            729,
+            762
           ],
           "exported": false,
           "is_default": false,
@@ -7691,8 +7691,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            757,
-            778
+            764,
+            785
           ],
           "exported": false,
           "is_default": false,
@@ -7711,6 +7711,7 @@
       "code_blocks": null,
       "imports": [
         "../config/types.js",
+        "../storage/database.js",
         "../storage/node-crud.js",
         "../storage/node-queries.js",
         "../storage/quirk-repository.js",
@@ -19245,7 +19246,7 @@
       "language": "typescript",
       "lines": [
         1,
-        209
+        212
       ],
       "detail_level": "full",
       "token_estimate": 253,
@@ -19294,7 +19295,7 @@
           "signature": "semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {}",
           "lines": [
             55,
-            151
+            154
           ],
           "exported": true,
           "is_default": false,
@@ -19312,8 +19313,8 @@
           "kind": "function",
           "signature": "getNodeEmbeddingVector(db: Database.Database, nodeId: string): {}",
           "lines": [
-            161,
-            174
+            164,
+            177
           ],
           "exported": true,
           "is_default": false,
@@ -19331,8 +19332,8 @@
           "kind": "function",
           "signature": "findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {}",
           "lines": [
-            184,
-            208
+            187,
+            211
           ],
           "exported": true,
           "is_default": false,

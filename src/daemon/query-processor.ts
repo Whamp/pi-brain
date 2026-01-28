@@ -16,6 +16,7 @@ import type { DaemonConfig } from "../config/types.js";
 import type { NodeRow } from "../storage/node-crud.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
+import { isVecLoaded } from "../storage/database.js";
 import { listNodes, type ListNodesFilters } from "../storage/node-queries.js";
 import { getAggregatedQuirks } from "../storage/quirk-repository.js";
 import { searchNodesAdvanced } from "../storage/search-repository.js";
@@ -224,34 +225,40 @@ async function findRelevantNodes(
 
   // Phase 1: Try semantic search if embedding provider is configured
   if (embeddingProvider) {
-    try {
-      // Embed the query
-      const [queryEmbedding] = await embeddingProvider.embed([query]);
+    if (isVecLoaded(db)) {
+      try {
+        // Embed the query
+        const [queryEmbedding] = await embeddingProvider.embed([query]);
 
-      // Guard against empty embedding result
-      if (!queryEmbedding) {
-        throw new Error("Embedding returned empty result");
-      }
+        // Guard against empty embedding result
+        if (!queryEmbedding) {
+          throw new Error("Embedding returned empty result");
+        }
 
-      // Perform semantic search
-      const semanticResults = semanticSearch(db, queryEmbedding, {
-        limit: maxNodes,
-        maxDistance: semanticSearchThreshold,
-        filters,
-      });
+        // Perform semantic search
+        const semanticResults = semanticSearch(db, queryEmbedding, {
+          limit: maxNodes,
+          maxDistance: semanticSearchThreshold,
+          filters,
+        });
 
-      if (semanticResults.length > 0) {
-        logger.info(
-          `Semantic search found ${semanticResults.length} results (closest distance: ${semanticResults[0].distance.toFixed(3)})`
+        if (semanticResults.length > 0) {
+          logger.info(
+            `Semantic search found ${semanticResults.length} results (closest distance: ${semanticResults[0].distance.toFixed(3)})`
+          );
+          return semanticResults.map((r) => nodeRowToRelevant(r.node));
+        }
+
+        logger.info("Semantic search returned no results, falling back to FTS");
+      } catch (error) {
+        // Log and fall through to FTS
+        logger.warn(
+          `Semantic search failed: ${error instanceof Error ? error.message : String(error)}, falling back to FTS`
         );
-        return semanticResults.map((r) => nodeRowToRelevant(r.node));
       }
-
-      logger.info("Semantic search returned no results, falling back to FTS");
-    } catch (error) {
-      // Log and fall through to FTS
+    } else {
       logger.warn(
-        `Semantic search failed: ${error instanceof Error ? error.message : String(error)}, falling back to FTS`
+        "Semantic search skipped: sqlite-vec extension not loaded. Falling back to FTS."
       );
     }
   }

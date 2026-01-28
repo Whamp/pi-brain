@@ -672,18 +672,19 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-779]
+src/daemon/query-processor.ts [1-786]
   interface:
-    31-44: interface QueryRequest [exported]
+    32-45: interface QueryRequest [exported]
       /** Query request from the API */
-    47-65: interface QueryResponse [exported]
+    48-66: interface QueryResponse [exported]
       /** Query response to return to the client */
-    90-103: interface QueryProcessorConfig [exported]
+    91-104: interface QueryProcessorConfig [exported]
   function:
-    108-187: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    109-188: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
+    - ../storage/database.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../storage/quirk-repository.js
@@ -1763,16 +1764,16 @@ src/storage/search-repository.ts [1-549]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/semantic-search.ts [1-209]
+src/storage/semantic-search.ts [1-212]
   interface:
     25-28: interface SemanticSearchResult extends SearchResult [exported]
     30-39: interface SemanticSearchOptions [exported]
   function:
-    55-151: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
+    55-154: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
-    161-174: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
+    164-177: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
-    184-208: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
+    187-211: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
       /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
   imports:
     - ./database.js
@@ -2144,4 +2145,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 26,990 (codebase: ~1,069,322)
+Estimated tokens: 26,998 (codebase: ~1,071,096)

@@ -142,8 +142,11 @@ export function semanticSearch(
   } catch (error) {
     // Check for dimension mismatch error
     if (error instanceof Error && error.message.includes("dimensions")) {
-      // Log or handle dimension mismatch (e.g. old embeddings)
-      // For now, return empty result to be safe
+      // Log dimension mismatch (e.g. old embeddings)
+      console.warn(
+        `[semantic-search] Vector dimension mismatch. You may need to run 'pi-brain rebuild --embeddings'. Error: ${error.message}`
+      );
+      // Return empty result to be safe
       return [];
     }
     throw error;

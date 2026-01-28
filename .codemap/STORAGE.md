@@ -516,16 +516,16 @@ src/storage/search-repository.ts [1-549]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/semantic-search.ts [1-209]
+src/storage/semantic-search.ts [1-212]
   interface:
     25-28: interface SemanticSearchResult extends SearchResult [exported]
     30-39: interface SemanticSearchOptions [exported]
   function:
-    55-151: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
+    55-154: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
-    161-174: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
+    164-177: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
-    184-208: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
+    187-211: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
       /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
   imports:
     - ./database.js
@@ -574,4 +574,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 17
-Estimated tokens: 8,902 (codebase: ~1,069,322)
+Estimated tokens: 8,902 (codebase: ~1,071,096)
