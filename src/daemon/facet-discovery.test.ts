@@ -50,7 +50,7 @@ function insertTestNodes(
     INSERT INTO nodes (
       id, version, type, project, outcome,
       session_file, data_file, timestamp, analyzed_at, analyzer_version
-    ) VALUES (?, 1, ?, ?, ?, 'test.jsonl', 'test.json', datetime('now'), datetime('now'), 'v1')
+    ) VALUES (?, 1, ?, ?, ?, 'test.jsonl', '/nonexistent/test-node-data.json', datetime('now'), datetime('now'), 'v1')
   `);
 
   const insertFts = db.prepare(`
@@ -387,7 +387,7 @@ describe("facetDiscovery", () => {
     it("should re-embed nodes with old simple format (not rich format)", async () => {
       insertTestNodes(db, [{ id: "node1", summary: "Test summary" }]);
 
-      // Insert old-format embedding directly (simple format without Decisions/Lessons)
+      // Insert old-format embedding directly (simple format without version marker)
       const mockEmbedding = Buffer.alloc(provider.dimensions * 4);
       for (let i = 0; i < provider.dimensions; i++) {
         mockEmbedding.writeFloatLE(Math.random(), i * 4);
@@ -398,30 +398,30 @@ describe("facetDiscovery", () => {
          VALUES (?, ?, ?, ?)`
       ).run("node1", mockEmbedding, "mock", oldInputText);
 
-      // Verify old format is cached
-      const oldRow = db
-        .prepare("SELECT input_text FROM node_embeddings WHERE node_id = ?")
-        .get("node1") as { input_text: string };
-      expect(oldRow.input_text).toBe(oldInputText);
+      // Capture the old embedding bytes
+      const oldEmbeddingBytes = Buffer.from(mockEmbedding);
 
       // Run discovery - should detect old format and re-embed
       await discovery.run();
 
       // Get the updated row - should have been regenerated
       const newRow = db
-        .prepare("SELECT input_text FROM node_embeddings WHERE node_id = ?")
-        .get("node1") as { input_text: string };
+        .prepare(
+          "SELECT embedding, input_text FROM node_embeddings WHERE node_id = ?"
+        )
+        .get("node1") as { embedding: Buffer; input_text: string };
 
-      // Since test.json doesn't exist, falls back to buildSimpleEmbeddingText
-      // which produces the same format, but the embedding was regenerated
-      // (INSERT OR REPLACE was called, updating the row)
-      expect(newRow.input_text).toBeDefined();
+      // Verify the embedding was regenerated (bytes should differ from random values)
+      expect(Buffer.compare(newRow.embedding, oldEmbeddingBytes)).not.toBe(0);
+
+      // Verify fallback to simple format (since node JSON doesn't exist)
+      expect(newRow.input_text).toBe("[coding] Test summary");
     });
 
     it("should use cached embedding when already in rich format", async () => {
       insertTestNodes(db, [{ id: "node1", summary: "Test summary" }]);
 
-      // Insert rich-format embedding (has Decisions: or Lessons: section)
+      // Insert rich-format embedding (has Decisions section)
       const mockEmbedding = Buffer.alloc(provider.dimensions * 4);
       for (let i = 0; i < provider.dimensions; i++) {
         mockEmbedding.writeFloatLE(0.5, i * 4);
@@ -441,6 +441,30 @@ describe("facetDiscovery", () => {
         .prepare("SELECT input_text FROM node_embeddings WHERE node_id = ?")
         .get("node1") as { input_text: string };
       expect(row.input_text).toBe(richInputText);
+    });
+
+    it("should use cached embedding when it has version marker", async () => {
+      insertTestNodes(db, [{ id: "node1", summary: "Test summary" }]);
+
+      // Insert embedding with version marker (no Decisions/Lessons but marked as v2)
+      const mockEmbedding = Buffer.alloc(provider.dimensions * 4);
+      for (let i = 0; i < provider.dimensions; i++) {
+        mockEmbedding.writeFloatLE(0.5, i * 4);
+      }
+      const versionedInputText = "[coding] Test summary\n\n[emb:v2]";
+      db.prepare(
+        `INSERT INTO node_embeddings (node_id, embedding, embedding_model, input_text)
+         VALUES (?, ?, ?, ?)`
+      ).run("node1", mockEmbedding, "mock", versionedInputText);
+
+      // Run discovery - should use cached embedding (recognized as v2 format)
+      await discovery.run();
+
+      // Verify the input_text was NOT changed (used cache)
+      const row = db
+        .prepare("SELECT input_text FROM node_embeddings WHERE node_id = ?")
+        .get("node1") as { input_text: string };
+      expect(row.input_text).toBe(versionedInputText);
     });
 
     it("should track clustering run", async () => {

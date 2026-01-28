@@ -524,7 +524,7 @@ src/daemon/export.ts [1-148]
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.test.ts [1-888]
+src/daemon/facet-discovery.test.ts [1-912]
   imports:
     - ../storage/database.js
     - ./facet-discovery.js
@@ -541,11 +541,11 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:16: import (module)
         - src/daemon/facet-discovery.test.ts:300: type discovery
         - src/daemon/facet-discovery.test.ts:309: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:672: type discovery
-        - src/daemon/facet-discovery.test.ts:679: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:722: type discovery
-        - src/daemon/facet-discovery.test.ts:729: instantiate (module)
-        - src/daemon/facet-discovery.test.ts:827: instantiate discoveryWithMore
+        - src/daemon/facet-discovery.test.ts:696: type discovery
+        - src/daemon/facet-discovery.test.ts:703: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:746: type discovery
+        - src/daemon/facet-discovery.test.ts:753: instantiate (module)
+        - src/daemon/facet-discovery.test.ts:851: instantiate discoveryWithMore
         - src/daemon/index.ts:168: reexport (module)
         - src/daemon/scheduler.ts:24: import (module)
   interface:
@@ -605,9 +605,9 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:116: call provider
         - src/daemon/facet-discovery.test.ts:126: call provider
         - src/daemon/facet-discovery.test.ts:308: call (module)
-        - src/daemon/facet-discovery.test.ts:679: call (module)
-        - src/daemon/facet-discovery.test.ts:729: call (module)
-        - src/daemon/facet-discovery.test.ts:829: call discoveryWithMore
+        - src/daemon/facet-discovery.test.ts:703: call (module)
+        - src/daemon/facet-discovery.test.ts:753: call (module)
+        - src/daemon/facet-discovery.test.ts:853: call discoveryWithMore
     383-450: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
       refs in: 8 [call: 6, import: 1, reexport: 1]
@@ -628,8 +628,8 @@ src/daemon/facet-discovery.ts [1-1757]
         - src/daemon/facet-discovery.test.ts:243: call labels
         - src/daemon/facet-discovery.test.ts:269: call labels
         - src/daemon/facet-discovery.test.ts:289: call labels6
-        - src/daemon/facet-discovery.test.ts:645: call labels
-        - src/daemon/facet-discovery.test.ts:661: call labels
+        - src/daemon/facet-discovery.test.ts:669: call labels
+        - src/daemon/facet-discovery.test.ts:685: call labels
         - src/daemon/facet-discovery.ts:933: call FacetDiscovery.clusterEmbeddings
         - src/daemon/index.ts:171: reexport (module)
   imports:
@@ -3030,4 +3030,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 39,081 (codebase: ~1,016,095)
+Estimated tokens: 39,081 (codebase: ~1,016,621)
