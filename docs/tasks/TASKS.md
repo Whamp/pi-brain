@@ -306,3 +306,89 @@ Ref: docs/plans/Web-UI-Functionality-Report.md
 | 18.5 | Real-time Dashboard stats via WebSocket               | done   | 16.2 | 2026-01-28 |
 | 18.6 | Search result FTS term highlighting                   | done   | -    | 2026-01-28 |
 | 18.7 | Breadcrumb click on current page is no-op             | done   | -    | 2026-01-28 |
+
+## Phase 19: Complete Settings UI
+
+Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
+
+### 19.1 Extend Daemon Settings (Trivial)
+
+| ID     | Task                                              | Status  | Deps          | Notes |
+| ------ | ------------------------------------------------- | ------- | ------------- | ----- |
+| 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | pending | -             |       |
+| 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | pending | -             |       |
+| 19.1.3 | Add maxQueueSize, backfillLimit, reanalysisLimit  | pending | -             |       |
+| 19.1.4 | Add connectionDiscovery limits (3 fields)         | pending | -             |       |
+| 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | pending | -             |       |
+| 19.1.6 | Update settings UI with new daemon form sections  | pending | 19.1.1-19.1.5 |       |
+
+### 19.2 Query & API Config (Trivial)
+
+| ID     | Task                                      | Status  | Deps           | Notes |
+| ------ | ----------------------------------------- | ------- | -------------- | ----- |
+| 19.2.1 | Add GET/PUT /config/query routes          | pending | -              |       |
+| 19.2.2 | Add GET/PUT /config/api routes            | pending | -              |       |
+| 19.2.3 | Create TagInput component for corsOrigins | pending | -              |       |
+| 19.2.4 | Add Query section to settings UI          | pending | 19.2.1         |       |
+| 19.2.5 | Add API Server section to settings UI     | pending | 19.2.2, 19.2.3 |       |
+
+### 19.3 Hub Config (Moderate)
+
+| ID     | Task                             | Status  | Deps   | Notes |
+| ------ | -------------------------------- | ------- | ------ | ----- |
+| 19.3.1 | Add GET/PUT /config/hub routes   | pending | -      |       |
+| 19.3.2 | Implement path validation helper | pending | -      |       |
+| 19.3.3 | Add Hub section to settings UI   | pending | 19.3.1 |       |
+| 19.3.4 | Add warning about data migration | pending | 19.3.3 |       |
+
+### 19.4 Embedding Config (Moderate)
+
+| ID     | Task                                           | Status  | Deps          | Notes |
+| ------ | ---------------------------------------------- | ------- | ------------- | ----- |
+| 19.4.1 | Add embedding fields to daemon routes          | pending | -             |       |
+| 19.4.2 | Implement secure API key handling (write-only) | pending | 19.4.1        |       |
+| 19.4.3 | Create PasswordInput component                 | pending | -             |       |
+| 19.4.4 | Add Embeddings section to settings UI          | pending | 19.4.1-19.4.3 |       |
+| 19.4.5 | Conditional field visibility by provider       | pending | 19.4.4        |       |
+
+### 19.5 Cron Schedules (Moderate)
+
+| ID     | Task                                            | Status  | Deps           | Notes |
+| ------ | ----------------------------------------------- | ------- | -------------- | ----- |
+| 19.5.1 | Add schedule fields to daemon routes            | pending | -              |       |
+| 19.5.2 | Add cron validation using isValidCronExpression | pending | 19.5.1         |       |
+| 19.5.3 | Create CronInput component with presets         | pending | -              |       |
+| 19.5.4 | Add Schedules section to settings UI            | pending | 19.5.1, 19.5.3 |       |
+
+### 19.6 Spokes Configuration (Major)
+
+| ID      | Task                                                       | Status  | Deps           | Notes |
+| ------- | ---------------------------------------------------------- | ------- | -------------- | ----- |
+| 19.6.1  | Add GET /config/spokes route                               | pending | -              |       |
+| 19.6.2  | Add POST /config/spokes route                              | pending | -              |       |
+| 19.6.3  | Add PUT /config/spokes/:name route                         | pending | -              |       |
+| 19.6.4  | Add DELETE /config/spokes/:name route                      | pending | -              |       |
+| 19.6.5  | Implement spoke validation (unique names, required fields) | pending | 19.6.2         |       |
+| 19.6.6  | Create SpokeList component                                 | pending | 19.6.1         |       |
+| 19.6.7  | Create SpokeModal component                                | pending | 19.5.3         |       |
+| 19.6.8  | Handle rsync options nested object                         | pending | 19.6.7         |       |
+| 19.6.9  | Add confirmation dialog for delete                         | pending | 19.6.4         |       |
+| 19.6.10 | Add Spokes tab to settings UI                              | pending | 19.6.6, 19.6.7 |       |
+
+### 19.7 UI Polish & Tabs (Trivial)
+
+| ID     | Task                                            | Status  | Deps      | Notes |
+| ------ | ----------------------------------------------- | ------- | --------- | ----- |
+| 19.7.1 | Create tab navigation component                 | pending | -         |       |
+| 19.7.2 | Extract settings sections into components       | pending | 19.1-19.6 |       |
+| 19.7.3 | Add URL hash support for direct tab linking     | pending | 19.7.1    |       |
+| 19.7.4 | Add unsaved changes warning when switching tabs | pending | 19.7.1    |       |
+
+### 19.8 Testing & Documentation
+
+| ID     | Task                                      | Status  | Deps      | Notes |
+| ------ | ----------------------------------------- | ------- | --------- | ----- |
+| 19.8.1 | Add API tests for all config routes       | pending | 19.1-19.6 |       |
+| 19.8.2 | Add E2E tests for settings UI             | pending | 19.7      |       |
+| 19.8.3 | Update README with settings capabilities  | pending | 19.8.1    |       |
+| 19.8.4 | Add tooltips/help text for complex fields | pending | 19.7      |       |

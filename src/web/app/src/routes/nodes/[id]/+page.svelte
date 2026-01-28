@@ -406,23 +406,6 @@
                         </div>
                       {/if}
                     </div>
-                  {#if expandedDecisions[index]}
-                    <div class="decision-details">
-                      <div class="decision-why">
-                        <strong>Why:</strong>
-                        {decision.why}
-                      </div>
-                      {#if decision.alternativesConsidered?.length > 0}
-                        <div class="decision-alternatives">
-                          <strong>Alternatives considered:</strong>
-                          <ul>
-                            {#each decision.alternativesConsidered as alt}
-                              <li>{alt}</li>
-                            {/each}
-                          </ul>
-                        </div>
-                      {/if}
-                    </div>
                   {/if}
                 </div>
               {/each}

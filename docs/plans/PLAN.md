@@ -1228,6 +1228,30 @@ When prompt changes:
 
 **Goal**: Refactoring, robustness, and performance.
 
+### Phase 19: Complete Settings UI
+
+**Goal**: Make all config.yaml options editable through the web UI.
+
+See [settings-ui-complete.md](settings-ui-complete.md) for full plan.
+
+**Tasks:**
+
+- [ ] Extend daemon settings (11 additional fields)
+- [ ] Add Query & API config routes and UI
+- [ ] Add Hub config with path validation
+- [ ] Add Embedding config with secure API key handling
+- [ ] Add Cron schedule editor with presets
+- [ ] Implement Spokes CRUD (dynamic list management)
+- [ ] Convert settings to tabbed layout
+- [ ] Testing and documentation
+
+**Deliverables:**
+
+- All 38+ config fields editable via web UI
+- Tabbed settings page (Daemon, Embeddings, Schedules, Query, Hub, API, Spokes)
+- Reusable components: CronInput, TagInput, SpokeModal
+- API routes for all config sections
+
 **Tasks:**
 
 - [ ] Web UI: Fix data structure mismatch between API rows and frontend components
