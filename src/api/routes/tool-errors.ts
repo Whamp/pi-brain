@@ -10,7 +10,7 @@ import {
   getToolErrorStats,
   type ListToolErrorsFilters,
   type ListToolErrorsOptions,
-} from "../../storage/node-repository.js";
+} from "../../storage/tool-error-repository.js";
 import { successResponse } from "../responses.js";
 
 /**

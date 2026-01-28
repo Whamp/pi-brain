@@ -8,9 +8,9 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import {
   countNodes,
   getAllProjects,
-  getToolErrorStats,
   listNodes,
 } from "../../storage/node-repository.js";
+import { getToolErrorStats } from "../../storage/tool-error-repository.js";
 import { successResponse } from "../responses.js";
 
 export async function statsRoutes(app: FastifyInstance): Promise<void> {

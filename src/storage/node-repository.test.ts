@@ -32,9 +32,7 @@ import {
   getAllTags,
   getAllTopics,
   getAggregatedQuirks,
-  getAggregatedToolErrors,
   getAllQuirkModels,
-  getAllToolsWithErrors,
   getConnectedNodes,
   getDescendants,
   getEdge,
@@ -49,8 +47,6 @@ import {
   getNodesByTag,
   getNodesByTopic,
   getNodeTags,
-  getNodeToolErrors,
-  getToolErrorStats,
   getNodeTopics,
   getNodeVersion,
   getQuirksByModel,
@@ -61,9 +57,7 @@ import {
   listLessons,
   listNodes,
   listQuirks,
-  listToolErrors,
   countQuirks,
-  countToolErrors,
   nodeExistsInDb,
   searchNodes,
   searchNodesAdvanced,
@@ -79,6 +73,14 @@ import {
   generateNodeId,
   type Node,
 } from "./node-types.js";
+import {
+  countToolErrors,
+  getAggregatedToolErrors,
+  getAllToolsWithErrors,
+  getNodeToolErrors,
+  getToolErrorStats,
+  listToolErrors,
+} from "./tool-error-repository.js";
 
 // =============================================================================
 // Test Fixtures

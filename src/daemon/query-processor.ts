@@ -18,10 +18,10 @@ import {
   searchNodesAdvanced,
   listNodes,
   getAggregatedQuirks,
-  getAggregatedToolErrors,
   type ListNodesFilters,
   type NodeRow,
 } from "../storage/node-repository.js";
+import { getAggregatedToolErrors } from "../storage/tool-error-repository.js";
 import { consoleLogger, type ProcessorLogger } from "./processor.js";
 
 // =============================================================================

@@ -236,7 +236,9 @@ export function getAggregatedToolErrors(
       tool: row.tool,
       errorType: row.errorType,
       count: row.count,
-      recentNodes: [...new Set(row.nodeIdsList.split(","))].slice(0, 5),
+      recentNodes: row.nodeIdsList
+        ? [...new Set(row.nodeIdsList.split(","))].slice(0, 5)
+        : [],
     };
 
     if (groupByModel) {

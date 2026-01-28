@@ -12,7 +12,6 @@ import {
   getConnectedNodes,
   getNodeLessons,
   getNodeQuirks,
-  getNodeToolErrors,
   getNodeTags,
   getNodeTopics,
   getAllNodeVersions,
@@ -20,6 +19,7 @@ import {
   type ListNodesOptions,
 } from "../../storage/node-repository.js";
 import { readNodeFromPath } from "../../storage/node-storage.js";
+import { getNodeToolErrors } from "../../storage/tool-error-repository.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**

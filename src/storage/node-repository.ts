@@ -124,26 +124,6 @@ export {
   type QuirkSeverity,
 } from "./quirk-repository.js";
 
-// Re-export tool error functions and types from tool-error-repository.ts for backward compatibility
-export {
-  countToolErrors,
-  getAggregatedToolErrors,
-  getAllToolsWithErrors,
-  getNodeToolErrors,
-  getToolErrorStats,
-  listToolErrors,
-  type AggregatedToolError,
-  type ListToolErrorsFilters,
-  type ListToolErrorsOptions,
-  type ListToolErrorsResult,
-  type ModelErrorStats,
-  type NodeToolError,
-  type ToolErrorResult,
-  type ToolErrorStatsResult,
-  type ToolErrorTrends,
-  type ToolStats,
-} from "./tool-error-repository.js";
-
 // =============================================================================
 // Node CRUD Operations
 // =============================================================================

@@ -176,17 +176,17 @@ src/daemon/cli.ts [1-1060]
         - src/daemon/cli.ts:913: call join -> external
     929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 17 [call: 16, type: 1]
+      refs out: 16 [call: 15, type: 1]
         - src/daemon/cli.ts:949: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:952: call log -> external
         - src/daemon/cli.ts:968: call set -> external
         - src/daemon/cli.ts:972: call log -> external
         - src/daemon/cli.ts:975: call log -> external
-        - src/daemon/cli.ts:977: call clearAllData -> src/storage/node-repository.ts
         - src/daemon/cli.ts:980: call log -> external
         - src/daemon/cli.ts:999: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1000: call Socket.write -> external
         - src/daemon/cli.ts:1004: call log -> external
+        - src/daemon/cli.ts:1007: call log -> external
   variable:
     69-69: any [exported]
       /** PID file location */
@@ -657,6 +657,7 @@ src/daemon/query-processor.ts [1-727]
   imports:
     - ../config/types.js
     - ../storage/node-repository.js
+    - ../storage/tool-error-repository.js
     - ./processor.js
     - better-sqlite3
     - node:child_process
@@ -1471,4 +1472,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 38
-Estimated tokens: 19,363 (codebase: ~968,382)
+Estimated tokens: 19,366 (codebase: ~968,279)
