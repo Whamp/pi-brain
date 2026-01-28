@@ -233,3 +233,25 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: 33c6c7c4
 **Notes**: Session analyzer prompt now instructs the LLM to extract typed relationships (LEADS_TO, PREFERS_OVER, CONTRADICTS, REINFORCES, DERIVED_FROM, EXEMPLIFIES, PART_OF, RELATES_TO, OCCURRED_BEFORE, INVALIDATED_BY, EVOLVED_INTO). Next task 20.2.2 will update processor.ts to parse and store these typed edges.
+
+---
+
+## 2026-01-28 11:50 - Task 20.2.2
+
+**Status**: pending → done
+**Validation**: 
+  - Added `RelationshipOutput` type to AgentNodeOutput in processor.ts
+  - Created src/storage/relationship-edges.ts with:
+    - `storeRelationshipEdges()`: stores edges with resolved or unresolved targets
+    - `findUnresolvedRelationships()`: queries edges pending resolution
+    - `resolveRelationship()`: updates edge target after semantic search match
+    - `isAutoMemEdgeType()`: validates AutoMem edge types
+    - `validateRelationship()`: validates relationship output from analyzer
+  - Integrated into worker.ts processJob() as step 9
+  - Handle unresolved targets by storing with placeholder (source==target)
+    and unresolvedTarget in metadata for future resolution
+  - 19 new unit tests for relationship edge functionality
+  - All 1315 tests pass (19 new tests added)
+  - Lint/format checks pass
+**Commit**: 0557a7d3
+**Notes**: Complete AutoMem typed edge extraction pipeline. When analyzer produces relationships, they are stored as edges. Unresolved relationships (where targetNodeId is null) are stored with a placeholder and can be resolved later via semantic search. Next tasks in Phase 20.3 will implement the Consolidation Engine (decay, creative association).
