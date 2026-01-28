@@ -11,6 +11,8 @@ src/storage/index.ts
       - src/types/index.ts
       - [builtin] crypto
     - [external] better-sqlite3
+  - src/storage/embedding-utils.ts
+    - src/types/index.ts
   - src/storage/graph-repository.ts
     - src/storage/edge-repository.ts
       - src/storage/node-types.ts

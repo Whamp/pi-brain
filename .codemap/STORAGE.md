@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 15 files
+- typescript: 16 files
 
 ## Statistics
-- Total files: 15
-- Total symbols: 170
-  - function: 113
+- Total files: 16
+- Total symbols: 173
+  - function: 116
   - interface: 44
   - type: 10
   - variable: 3
@@ -103,6 +103,17 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
+src/storage/embedding-utils.ts [1-97]
+  function:
+    32-66: buildEmbeddingText(node: Node): string [exported]
+      /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
+    74-86: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). */
+    93-96: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. */
+  imports:
+    - ../types/index.js
+
 src/storage/graph-repository.ts [1-366]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
@@ -131,10 +142,11 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-17]
+src/storage/index.ts [1-18]
   imports:
     - ./database.js
     - ./edge-repository.js
+    - ./embedding-utils.js
     - ./graph-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
@@ -501,5 +513,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 15
-Estimated tokens: 7,181 (codebase: ~1,005,395)
+Files: 16
+Estimated tokens: 7,446 (codebase: ~1,007,880)

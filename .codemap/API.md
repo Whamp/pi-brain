@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 87 files
+- typescript: 88 files
 
 ## Statistics
-- Total files: 87
-- Total symbols: 629
-  - function: 351
+- Total files: 88
+- Total symbols: 632
+  - function: 354
   - interface: 200
   - type: 39
   - variable: 27
@@ -1329,6 +1329,17 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
+src/storage/embedding-utils.ts [1-97]
+  function:
+    32-66: buildEmbeddingText(node: Node): string [exported]
+      /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
+    74-86: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). */
+    93-96: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. */
+  imports:
+    - ../types/index.js
+
 src/storage/graph-repository.ts [1-366]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
@@ -1357,10 +1368,11 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-17]
+src/storage/index.ts [1-18]
   imports:
     - ./database.js
     - ./edge-repository.js
+    - ./embedding-utils.js
     - ./graph-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
@@ -2038,5 +2050,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 87
-Estimated tokens: 24,962 (codebase: ~1,005,395)
+Files: 88
+Estimated tokens: 25,227 (codebase: ~1,007,880)

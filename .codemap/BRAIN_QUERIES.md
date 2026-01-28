@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 51 files
+- typescript: 53 files
 
 ## Statistics
-- Total files: 51
-- Total symbols: 307
-  - function: 182
+- Total files: 53
+- Total symbols: 310
+  - function: 185
   - interface: 83
   - type: 17
   - variable: 16
@@ -1789,6 +1789,43 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
+src/storage/embedding-utils.test.ts [1-333]
+  imports:
+    - ../types/index.js
+    - ./embedding-utils.js
+    - vitest
+
+src/storage/embedding-utils.ts [1-97]
+  function:
+    32-66: buildEmbeddingText(node: Node): string [exported]
+      /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
+      refs in: 6 [call: 5, import: 1]
+        - src/storage/embedding-utils.test.ts:10: import (module)
+        - src/storage/embedding-utils.test.ts:105: call text
+        - src/storage/embedding-utils.test.ts:133: call text
+        - src/storage/embedding-utils.test.ts:190: call text
+        - src/storage/embedding-utils.test.ts:241: call text
+        - src/storage/embedding-utils.test.ts:276: call text
+    74-86: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). */
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/embedding-utils.test.ts:11: import (module)
+        - src/storage/embedding-utils.test.ts:286: call text
+        - src/storage/embedding-utils.test.ts:291: call text
+        - src/storage/embedding-utils.test.ts:296: call text
+        - src/storage/embedding-utils.test.ts:301: call text
+    93-96: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. */
+      refs in: 6 [call: 5, import: 1]
+        - src/storage/embedding-utils.test.ts:12: import (module)
+        - src/storage/embedding-utils.test.ts:309: call (module)
+        - src/storage/embedding-utils.test.ts:314: call (module)
+        - src/storage/embedding-utils.test.ts:320: call (module)
+        - src/storage/embedding-utils.test.ts:325: call (module)
+        - src/storage/embedding-utils.test.ts:330: call (module)
+  imports:
+    - ../types/index.js
+
 src/storage/graph-repository.ts [1-366]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
@@ -1876,10 +1913,11 @@ src/storage/index.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/index.ts [1-17]
+src/storage/index.ts [1-18]
   imports:
     - ./database.js
     - ./edge-repository.js
+    - ./embedding-utils.js
     - ./graph-repository.js
     - ./lesson-repository.js
     - ./node-conversion.js
@@ -2976,5 +3014,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 51
-Estimated tokens: 38,122 (codebase: ~1,007,445)
+Files: 53
+Estimated tokens: 38,713 (codebase: ~1,011,574)

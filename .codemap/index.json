@@ -1,12 +1,12 @@
 {
   "stats": {
-    "totalFiles": 87,
-    "totalSymbols": 1076,
+    "totalFiles": 88,
+    "totalSymbols": 1079,
     "byLanguage": {
-      "typescript": 87
+      "typescript": 88
     },
     "bySymbolKind": {
-      "function": 478,
+      "function": 481,
       "type": 40,
       "interface": 253,
       "variable": 105,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 36084,
-  "codebase_tokens": 1007445,
+  "total_tokens": 36349,
+  "codebase_tokens": 1011574,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15578,6 +15578,81 @@
       ]
     },
     {
+      "path": "src/storage/embedding-utils.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        97
+      ],
+      "detail_level": "full",
+      "token_estimate": 258,
+      "symbols": [
+        {
+          "name": "buildEmbeddingText",
+          "kind": "function",
+          "signature": "buildEmbeddingText(node: Node): string",
+          "lines": [
+            32,
+            66
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Build embedding text from a node for semantic search.\n\nFormat:\n```\n[{type}] {summary}\n\nDecisions:\n- {decision.what} (why: {decision.why})\n- ...\n\nLessons:\n- {lesson.summary}\n- ...\n```\n\nThis richer format enables semantic search to find nodes by:\n- What type of work was done\n- What was accomplished (summary)\n- What decisions were made and why\n- What lessons were learned",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "buildSimpleEmbeddingText",
+          "kind": "function",
+          "signature": "buildSimpleEmbeddingText(type: string | null, summary: string | null): string",
+          "lines": [
+            74,
+            86
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Build simple embedding text from node summary data.\n\nThis is a lightweight version for use with partial node data\n(e.g., NodeSummaryRow from database queries).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isRichEmbeddingFormat",
+          "kind": "function",
+          "signature": "isRichEmbeddingFormat(inputText: string): boolean",
+          "lines": [
+            93,
+            96
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../types/index.js"
+      ]
+    },
+    {
       "path": "src/storage/graph-repository.ts",
       "language": "typescript",
       "lines": [
@@ -15774,10 +15849,10 @@
       "language": "typescript",
       "lines": [
         1,
-        17
+        18
       ],
       "detail_level": "full",
-      "token_estimate": 88,
+      "token_estimate": 95,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -15785,6 +15860,7 @@
       "imports": [
         "./database.js",
         "./edge-repository.js",
+        "./embedding-utils.js",
         "./graph-repository.js",
         "./lesson-repository.js",
         "./node-conversion.js",
