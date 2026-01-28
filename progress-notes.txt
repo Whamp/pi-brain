@@ -340,3 +340,17 @@ Functions still in node-repository.ts (CRUD operations: clearAllData, insertNode
 **Commit**: [pending]
 
 **Notes**: This ensures that if the daemon crashes, any jobs that were in "running" state are immediately made available for retry upon daemon restart, rather than waiting for the 30-minute lock timeout.
+
+# Code Review Fix Progress
+
+Branch: fix/code-review-20260127-185436
+Created: 2026-01-27 18:54
+Main branch: major/pi-brain
+
+## Issues to Fix
+
+- [P1] Inconsistent Job State in releaseAllRunning: Clear started_at and error.
+- [P2] Missing Retry Increment for "Poison Pill" Detection: Increment retry_count on release.
+- [P2] Deviation from Repair Plan Guidance: Reconcile releaseAllRunning vs releaseStale.
+
+---

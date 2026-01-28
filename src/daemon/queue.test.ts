@@ -525,13 +525,13 @@ describe("queueManager", () => {
   });
 
   describe("releaseStale", () => {
-    it("should release jobs with expired locks", () => {
+    it("should release jobs with expired locks and increment retry count", () => {
       // Manually insert a job with an expired lock
       db.prepare(
         `
         INSERT INTO analysis_queue (
           id, type, priority, session_file, status, queued_at,
-          started_at, worker_id, locked_until, max_retries
+          started_at, worker_id, locked_until, max_retries, retry_count
         ) VALUES (
           'stale-job-id12',
           'initial',
@@ -542,7 +542,8 @@ describe("queueManager", () => {
           datetime('now', '-1 hour'),
           'worker-dead',
           datetime('now', '-30 minutes'),
-          3
+          3,
+          0
         )
       `
       ).run();
@@ -554,26 +555,20 @@ describe("queueManager", () => {
       const job = queue.getJob("stale-job-id12");
       expect(job?.status).toBe("pending");
       expect(job?.workerId).toBeUndefined();
+      expect(job?.retryCount).toBe(1);
+      expect(job?.startedAt).toBeUndefined();
+      expect(job?.error).toBeUndefined();
     });
-  });
 
-  describe("releaseAllRunning", () => {
-    it("should release all running jobs regardless of lock expiration", () => {
-      // Add a job and make it running (locked in future)
-      queue.enqueue({
-        type: "initial",
-        sessionFile: "/path/running.jsonl",
-      });
-      queue.dequeue("worker-1");
-
-      // Add another stale job (locked in past)
+    it("should mark as failed if max retries reached during release", () => {
+      // Manually insert a job that will hit max retries (current 2 + 1 >= 3)
       db.prepare(
         `
         INSERT INTO analysis_queue (
           id, type, priority, session_file, status, queued_at,
-          started_at, worker_id, locked_until, max_retries
+          started_at, worker_id, locked_until, max_retries, retry_count
         ) VALUES (
-          'stale-job-id34',
+          'stale-job-max',
           'initial',
           100,
           '/path/stale.jsonl',
@@ -582,17 +577,41 @@ describe("queueManager", () => {
           datetime('now', '-1 hour'),
           'worker-dead',
           datetime('now', '-30 minutes'),
-          3
+          3,
+          2
         )
       `
       ).run();
 
+      queue.releaseStale();
+
+      const job = queue.getJob("stale-job-max");
+      expect(job?.status).toBe("failed");
+      expect(job?.retryCount).toBe(3);
+      expect(job?.error).toContain("max retries exceeded");
+    });
+  });
+
+  describe("releaseAllRunning", () => {
+    it("should release all running jobs, clear state, and increment retry count", () => {
+      // Add a job and make it running (locked in future)
+      const id = queue.enqueue({
+        type: "initial",
+        sessionFile: "/path/running.jsonl",
+        maxRetries: 3,
+      });
+      queue.dequeue("worker-1");
+
       const count = queue.releaseAllRunning();
 
-      expect(count).toBe(2);
+      expect(count).toBe(1);
 
-      const job1 = queue.getJob("stale-job-id34");
-      expect(job1?.status).toBe("pending");
+      const job = queue.getJob(id);
+      expect(job?.status).toBe("pending");
+      expect(job?.workerId).toBeUndefined();
+      expect(job?.retryCount).toBe(1);
+      expect(job?.startedAt).toBeUndefined();
+      expect(job?.error).toBeUndefined();
 
       const runningJobs = queue.getRunningJobs();
       expect(runningJobs).toHaveLength(0);

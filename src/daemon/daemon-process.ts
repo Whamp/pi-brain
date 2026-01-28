@@ -64,10 +64,25 @@ async function main(): Promise<void> {
   console.log("[daemon] Queue manager initialized");
 
   // Release any stale jobs from previous run
+  // We use releaseAllRunning() here instead of releaseStale() because on daemon startup
+  // any jobs marked as 'running' are definitely stale regardless of lock expiration.
   const releasedCount = queue.releaseAllRunning();
   if (releasedCount > 0) {
-    console.log(`[daemon] Released ${releasedCount} stale running jobs`);
+    console.log(
+      `[daemon] Released ${releasedCount} stale running jobs from previous session`
+    );
   }
+
+  // Periodically release stale locks (every 15 minutes) to recover from worker crashes
+  const staleReleaseInterval = setInterval(
+    () => {
+      const staleCount = queue.releaseStale();
+      if (staleCount > 0) {
+        console.log(`[daemon] Released ${staleCount} stale locks`);
+      }
+    },
+    15 * 60 * 1000
+  );
 
   // Create worker
   const worker = createWorker({
@@ -156,6 +171,8 @@ async function main(): Promise<void> {
   // Graceful shutdown
   const shutdown = async (signal: string) => {
     console.log(`[daemon] Received ${signal}, shutting down...`);
+
+    clearInterval(staleReleaseInterval);
 
     // Stop components in order
     worker.stop();
