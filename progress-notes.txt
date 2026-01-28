@@ -150,3 +150,21 @@ the reactivity chain.
     type-specific icons and colors (success/error/warning/info)
   - Mobile responsive: toasts appear at bottom on small screens
   - Integrated into root layout for app-wide availability
+
+## 2026-01-28 06:25 - Task 18.3
+
+**Status**: pending → done
+**Validation**: 
+  - Svelte type-check passes (0 errors, 0 warnings)
+  - All 1272 backend tests pass
+  - Lint and format checks pass
+  - Dev server verifies component loads on /sessions and /graph pages
+  - Component properly displays when no data exists
+**Commit**: c362defc
+**Notes**: Implemented reusable GettingStarted component with two variants:
+  - `getting-started.svelte`: Reusable component with `variant` prop ("sessions" | "graph")
+  - Features: 3-step Quick Start guide, copy-to-clipboard for commands, links to settings/docs
+  - Sessions page: Shows guide when no projects exist
+  - Graph page: Shows guide when no nodes exist AND no filters applied
+  - Used Svelte 5 runes properly ($state, $derived) for reactivity
+  - Added hasLoadedOnce tracking to distinguish fresh vs filtered empty state
