@@ -65,3 +65,29 @@ Main branch: major/pi-brain
   - findNodesNeedingEmbedding uses model name and isRichEmbeddingFormat to detect outdated embeddings.
   - backfillEmbeddings supports batching and is resilient to individual node/batch failures.
   - Used dependency injection for readNodeFromPath to maintain modularity.
+
+## 2026-01-27 22:15 - Task 17.4.2
+
+**Status**: active → done
+**Validation**: 
+  - Added `backfillEmbeddingsSchedule` and `backfillLimit` to configuration.
+  - Implemented `runBackfillEmbeddings` job in `Scheduler` class.
+  - Updated `createScheduler` to pass new configuration options.
+  - Added unit tests for backfill scheduling and execution logic in `src/daemon/scheduler.test.ts`.
+  - Verified tests pass with `npm test`.
+**Commit**: 6f69b57e
+**Notes**: 
+  - The backfill job is scheduled via cron (default: "0 5 * * *").
+  - It uses a configurable limit (default: 100) to batch process nodes needing embeddings.
+  - Skips gracefully if embedding provider/API key is missing.
+
+## 2026-01-27 22:45 - Task 17.4.3
+
+**Status**: pending → done
+**Validation**: 
+  - Verified `pi-brain rebuild --embeddings` command implementation in src/cli.ts and src/daemon/cli.ts
+  - Fixed lint errors in src/daemon/cli.test.ts, src/daemon/query-processor.test.ts, and src/storage/semantic-search.test.ts
+  - Verified tests pass for daemon CLI: `npm test -- --run src/daemon/cli.test.ts`
+  - Command correctly initializes embedding provider and calls backfillEmbeddings with force option support
+**Commit**: a3553cbd
+**Notes**: The command was already largely implemented in previous commits but had lint issues in tests. Cleaned up tests and verified functionality.

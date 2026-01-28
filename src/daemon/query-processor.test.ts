@@ -1,78 +1,204 @@
-/**
- * Tests for query processor
- */
+import type { Database } from "better-sqlite3";
+import type * as ChildProcess from "node:child_process";
+import type * as FsPromises from "node:fs/promises";
 
-import { describe, it, expect } from "vitest";
+import { spawn } from "node:child_process";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
-// Test the query output parsing functions by importing internal helpers
-// Since the module is complex, we test the key validation logic
+import type { DaemonConfig } from "../config/types.js";
+import type * as NodeQueries from "../storage/node-queries.js";
+import type * as QuirkRepo from "../storage/quirk-repository.js";
+import type * as SearchRepo from "../storage/search-repository.js";
+import type * as ToolErrorRepo from "../storage/tool-error-repository.js";
 
-describe("query-processor", () => {
-  describe("isValidQueryOutput", () => {
-    // We can't directly import the private function, so we test through behavior
-    // by checking the expected output structure
+import { listNodes } from "../storage/node-queries.js";
+import { searchNodesAdvanced } from "../storage/search-repository.js";
+import { processQuery, type QueryRequest } from "./query-processor.js";
 
-    it("should define the expected response structure", () => {
-      // This test documents the expected output structure
-      const validResponse = {
-        answer: "This is the answer",
-        summary: "Short summary",
-        confidence: "high" as const,
-        relatedNodes: [
-          {
-            id: "node-1",
-            relevance: 0.9,
-            summary: "Node summary",
-          },
-        ],
-        sources: [
-          {
-            nodeId: "node-1",
-            excerpt: "Relevant excerpt",
-          },
-        ],
-      };
+// Mocks
+vi.mock<typeof SearchRepo>("../storage/search-repository.js", () => ({
+  searchNodesAdvanced: vi.fn(),
+}));
 
-      expect(validResponse.answer).toBeDefined();
-      expect(validResponse.summary).toBeDefined();
-      expect(validResponse.confidence).toBe("high");
-      expect(validResponse.relatedNodes).toBeInstanceOf(Array);
-      expect(validResponse.sources).toBeInstanceOf(Array);
-    });
+vi.mock<typeof NodeQueries>("../storage/node-queries.js", () => ({
+  listNodes: vi.fn(),
+}));
 
-    it("should accept valid confidence levels", () => {
-      const levels = ["high", "medium", "low"] as const;
-      for (const level of levels) {
-        expect(["high", "medium", "low"]).toContain(level);
-      }
-    });
+vi.mock<typeof QuirkRepo>("../storage/quirk-repository.js", () => ({
+  getAggregatedQuirks: vi.fn(() => []),
+}));
+
+vi.mock<typeof ToolErrorRepo>("../storage/tool-error-repository.js", () => ({
+  getAggregatedToolErrors: vi.fn(() => []),
+}));
+
+vi.mock<typeof ChildProcess>("node:child_process", () => ({
+  spawn: vi.fn(),
+}));
+
+vi.mock<typeof FsPromises>("node:fs/promises", () => ({
+  access: vi.fn(),
+}));
+
+// Mock Database
+const mockDb = {} as unknown as Database;
+
+// Mock Logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+};
+
+// Mock Daemon Config
+const mockDaemonConfig = {
+  provider: "test-provider",
+  model: "test-model",
+  analysisTimeoutMinutes: 1,
+} as unknown as DaemonConfig;
+
+describe("query Processor", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  describe("queryRequest structure", () => {
-    it("should define valid query request", () => {
-      const request = {
-        query: "What did we decide about authentication?",
-        context: {
-          project: "/home/will/projects/myapp",
-          model: "zai/glm-4.7",
-        },
-        options: {
-          maxNodes: 10,
-          includeDetails: true,
-        },
-      };
+  describe("processQuery", () => {
+    it("should return early if no nodes found", async () => {
+      (searchNodesAdvanced as Mock).mockReturnValue({ results: [] });
+      (listNodes as Mock).mockReturnValue({ nodes: [] });
 
-      expect(request.query).toBe("What did we decide about authentication?");
-      expect(request.context?.project).toBe("/home/will/projects/myapp");
-      expect(request.options?.maxNodes).toBe(10);
+      const request: QueryRequest = { query: "nothing here" };
+      const response = await processQuery(request, {
+        db: mockDb,
+        daemonConfig: mockDaemonConfig,
+        logger: mockLogger,
+      });
+
+      expect(response.confidence).toBe("high");
+      expect(response.summary).toContain("No matching sessions found");
+      expect(response.relatedNodes).toHaveLength(0);
     });
 
-    it("should allow minimal query request", () => {
-      const request = {
-        query: "How did we implement auth?",
-      };
+    it("should process query with relevant nodes", async () => {
+      // Mock search results
+      (searchNodesAdvanced as Mock).mockReturnValue({
+        results: [
+          {
+            node: {
+              id: "1",
+              summary: "Node 1",
+              session_file: "s1.jsonl",
+              timestamp: "2023-01-01",
+            },
+            score: 0.9,
+          },
+        ],
+      });
 
-      expect(request.query).toBeDefined();
+      // Mock pi agent spawning
+      const mockProc = {
+        stdout: { on: vi.fn() },
+        stderr: { on: vi.fn() },
+        on: vi.fn(),
+        kill: vi.fn(),
+        unref: vi.fn(),
+      };
+      (spawn as Mock).mockReturnValue(mockProc);
+
+      // Simulate pi output
+      /* eslint-disable promise/prefer-await-to-callbacks */
+      mockProc.stdout.on.mockImplementation(
+        (_event: string, cb: (data: Buffer) => void) => {
+          const output = {
+            type: "agent_end",
+            messages: [
+              {
+                role: "assistant",
+                content: [
+                  {
+                    type: "text",
+                    text: JSON.stringify({
+                      answer: "This is the answer",
+                      summary: "Short summary",
+                      confidence: "high",
+                      sources: [],
+                    }),
+                  },
+                ],
+              },
+            ],
+          };
+          cb(Buffer.from(JSON.stringify(output) + "\n"));
+        }
+      );
+
+      mockProc.on.mockImplementation(
+        (event: string, cb: (code: number) => void) => {
+          if (event === "close") {
+            cb(0);
+          }
+        }
+      );
+      /* eslint-enable promise/prefer-await-to-callbacks */
+
+      const request: QueryRequest = { query: "test query" };
+      const response = await processQuery(request, {
+        db: mockDb,
+        daemonConfig: mockDaemonConfig,
+        logger: mockLogger,
+      });
+
+      expect(response.answer).toBe("This is the answer");
+      expect(response.relatedNodes).toHaveLength(1);
+      expect(response.relatedNodes[0].id).toBe("1");
+    });
+
+    it("should handle pi agent errors", async () => {
+      // Mock search results
+      (searchNodesAdvanced as Mock).mockReturnValue({
+        results: [
+          {
+            node: {
+              id: "1",
+              summary: "Node 1",
+              session_file: "s1.jsonl",
+              timestamp: "2023-01-01",
+            },
+            score: 0.9,
+          },
+        ],
+      });
+
+      // Mock pi agent spawning failure
+      const mockProc = {
+        stdout: { on: vi.fn() },
+        stderr: { on: vi.fn() },
+        on: vi.fn(),
+        kill: vi.fn(),
+        unref: vi.fn(),
+      };
+      (spawn as Mock).mockReturnValue(mockProc);
+
+      /* eslint-disable promise/prefer-await-to-callbacks */
+      mockProc.on.mockImplementation(
+        (event: string, cb: (err: Error) => void) => {
+          if (event === "error") {
+            cb(new Error("Spawn failed"));
+          }
+        }
+      );
+      /* eslint-enable promise/prefer-await-to-callbacks */
+
+      const request: QueryRequest = { query: "test query" };
+      const response = await processQuery(request, {
+        db: mockDb,
+        daemonConfig: mockDaemonConfig,
+        logger: mockLogger,
+      });
+
+      expect(response.confidence).toBe("low");
+      expect(response.summary).toContain("failed");
     });
   });
 });

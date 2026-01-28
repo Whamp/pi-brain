@@ -747,31 +747,31 @@ src/api/websocket.ts [1-388]
     - fastify
     - ws
 
-src/cli.ts [1-1102]
+src/cli.ts [1-1141]
   variable:
-    72-72: any
+    73-73: any
       refs out: 1 [instantiate: 1]
-        - src/cli.ts:72: instantiate Command -> external
-    198-200: any
+        - src/cli.ts:73: instantiate Command -> external
+    199-201: any
       refs out: 2 [call: 2]
-        - src/cli.ts:198: call Command.description -> external
-        - src/cli.ts:198: call Command.command -> external
-    343-345: any
+        - src/cli.ts:199: call Command.description -> external
+        - src/cli.ts:199: call Command.command -> external
+    382-384: any
       refs out: 2 [call: 2]
-        - src/cli.ts:343: call Command.description -> external
-        - src/cli.ts:343: call Command.command -> external
-    508-510: any
+        - src/cli.ts:382: call Command.description -> external
+        - src/cli.ts:382: call Command.command -> external
+    547-549: any
       refs out: 2 [call: 2]
-        - src/cli.ts:508: call Command.description -> external
-        - src/cli.ts:508: call Command.command -> external
-    895-897: any
+        - src/cli.ts:547: call Command.description -> external
+        - src/cli.ts:547: call Command.command -> external
+    934-936: any
       refs out: 2 [call: 2]
-        - src/cli.ts:895: call Command.description -> external
-        - src/cli.ts:895: call Command.command -> external
-    1046-1048: any
+        - src/cli.ts:934: call Command.description -> external
+        - src/cli.ts:934: call Command.command -> external
+    1085-1087: any
       refs out: 2 [call: 2]
-        - src/cli.ts:1046: call Command.description -> external
-        - src/cli.ts:1046: call Command.command -> external
+        - src/cli.ts:1085: call Command.description -> external
+        - src/cli.ts:1085: call Command.command -> external
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -795,4 +795,4 @@ src/cli.ts [1-1102]
 
 ---
 Files: 27
-Estimated tokens: 8,835 (codebase: ~1,037,606)
+Estimated tokens: 8,835 (codebase: ~1,041,324)

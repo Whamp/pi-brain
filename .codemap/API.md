@@ -1,13 +1,13 @@
 # Project Overview
 
 ## Languages
-- typescript: 88 files
+- typescript: 89 files
 
 ## Statistics
-- Total files: 88
-- Total symbols: 646
-  - function: 363
-  - interface: 204
+- Total files: 89
+- Total symbols: 653
+  - function: 368
+  - interface: 206
   - type: 39
   - variable: 28
   - class: 12
@@ -262,7 +262,7 @@ src/api/websocket.ts [1-388]
     - fastify
     - ws
 
-src/cli.ts [1-1102]
+src/cli.ts [1-1141]
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -284,42 +284,42 @@ src/cli.ts [1-1102]
     - node:path
     - open
 
-src/config/config.ts [1-745]
+src/config/config.ts [1-759]
   class:
-    491-499: class ConfigError extends Error [exported]
+    505-513: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
       /** Expand ~ in paths to home directory */
     48-54: getDefaultHubConfig(): HubConfig [exported]
       /** Default hub configuration */
-    59-92: getDefaultDaemonConfig(): DaemonConfig [exported]
+    59-93: getDefaultDaemonConfig(): DaemonConfig [exported]
       /** Default daemon configuration */
-    97-102: getDefaultQueryConfig(): QueryConfig [exported]
+    98-103: getDefaultQueryConfig(): QueryConfig [exported]
       /** Default query configuration */
-    107-117: getDefaultApiConfig(): ApiConfig [exported]
+    108-118: getDefaultApiConfig(): ApiConfig [exported]
       /** Default API configuration */
-    122-130: getDefaultConfig(): PiBrainConfig [exported]
+    123-131: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    321-486: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    322-500: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    504-550: loadConfig(configPath?: string): PiBrainConfig [exported]
+    518-564: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    555-560: ensureConfigDir(configDir?: string): void [exported]
+    569-574: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    565-600: ensureDirectories(config: PiBrainConfig): void [exported]
+    579-614: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    605-663: writeDefaultConfig(configPath?: string): void [exported]
+    619-677: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    668-676: getSessionDirs(config: PiBrainConfig): {} [exported]
+    682-690: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    681-683: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    695-697: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    688-692: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    702-706: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    697-704: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    711-718: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    715-744: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    729-758: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -338,7 +338,7 @@ src/config/index.ts [1-36]
     - ./config.js
     - ./types.js
 
-src/config/types.ts [1-260]
+src/config/types.ts [1-264]
   interface:
     16-28: interface RsyncOptions [exported]
       /** Rsync-specific options for spoke configuration */
@@ -346,82 +346,86 @@ src/config/types.ts [1-260]
       /** Spoke machine configuration Spokes are secondary machines that sync sessions to the hub */
     61-70: interface HubConfig [exported]
       /** Hub configuration The hub is the primary computer where daemon runs */
-    76-151: interface DaemonConfig [exported]
+    76-154: interface DaemonConfig [exported]
       /** Daemon configuration Controls the background analysis process */
-    157-163: interface QueryConfig [exported]
+    160-166: interface QueryConfig [exported]
       /** Query configuration Controls the /brain query interface */
-    168-177: interface ApiConfig [exported]
+    171-180: interface ApiConfig [exported]
       /** API server configuration */
-    182-197: interface PiBrainConfig [exported]
+    185-200: interface PiBrainConfig [exported]
       /** Complete pi-brain configuration */
-    203-259: interface RawConfig [exported]
+    206-263: interface RawConfig [exported]
       /** Raw YAML configuration (snake_case, before transformation) This matches the YAML file structure */
   type:
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
       /** Configuration types for pi-brain Configuration is loaded from ~/.pi-brain/config.yaml All paths support ~ expansion for home directory Spoke sync method options */
 
-src/daemon/cli.ts [1-1060]
+src/daemon/cli.ts [1-1149]
   interface:
-    75-81: interface DaemonStatus [exported]
+    77-83: interface DaemonStatus [exported]
       /** Daemon status info */
-    84-89: interface QueueStatus [exported]
+    86-91: interface QueueStatus [exported]
       /** Queue status info */
-    92-97: interface HealthCheckResult [exported]
+    94-99: interface HealthCheckResult [exported]
       /** Health check result */
-    100-104: interface HealthStatus [exported]
+    102-106: interface HealthStatus [exported]
       /** Overall health status */
-    107-110: interface OutputOptions [exported]
+    109-112: interface OutputOptions [exported]
       /** CLI output options */
-    237-240: interface StartOptions [exported]
+    239-242: interface StartOptions [exported]
       /** Start options */
-    243-246: interface StopOptions [exported]
+    245-248: interface StopOptions [exported]
       /** Stop options */
   function:
-    119-130: readPidFile(): number [exported]
+    121-132: readPidFile(): number [exported]
       /** Read the daemon PID from the PID file */
-    135-141: writePidFile(pid: number): void [exported]
+    137-143: writePidFile(pid: number): void [exported]
       /** Write the daemon PID to the PID file */
-    146-154: removePidFile(): void [exported]
+    148-156: removePidFile(): void [exported]
       /** Remove the PID file */
-    159-167: isProcessRunning(pid: number): boolean [exported]
+    161-169: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
-    172-185: isDaemonRunning(): { running: boolean; pid: number; } [exported]
+    174-187: isDaemonRunning(): { running: boolean; pid: number; } [exported]
       /** Check if the daemon is currently running */
-    194-215: formatUptime(seconds: number): string [exported]
+    196-217: formatUptime(seconds: number): string [exported]
       /** Format uptime in a human-readable way */
-    220-230: getProcessUptime(): number [exported]
+    222-232: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
-    251-361: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
+    253-363: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-    366-428: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
+    368-430: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-    433-445: getDaemonStatus(configPath?: string): DaemonStatus [exported]
+    435-447: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-    454-483: getQueueStatus(configPath?: string): QueueStatus [exported]
+    456-485: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-    488-541: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
+    490-543: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-    761-791: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
+    763-793: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-    800-821: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
+    802-823: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-    826-876: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
+    828-878: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-    891-914: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
+    893-916: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-    929-1049: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
+    931-1051: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
+    1056-1138: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
+      /** Rebuild embeddings for all nodes */
   variable:
-    69-69: any [exported]
+    71-71: any [exported]
       /** PID file location */
-    72-72: any [exported]
+    74-74: any [exported]
       /** Log file location */
   imports:
     - ../config/config.js
     - ../config/types.js
     - ../storage/database.js
+    - ../storage/embedding-utils.js
     - ../storage/index.js
     - ../storage/node-storage.js
+    - ./facet-discovery.js
     - ./processor.js
     - ./queue.js
     - node:child_process
@@ -572,9 +576,9 @@ src/daemon/graph-export.ts [1-131]
     - node:fs
     - node:path
 
-src/daemon/index.ts [1-181]
+src/daemon/index.ts [1-182]
   variable:
-    180-180: "0.1.0" [exported]
+    181-181: "0.1.0" [exported]
       /** Daemon module version */
   imports:
     - ./cli.js
@@ -660,7 +664,7 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-724]
+src/daemon/query-processor.ts [1-731]
   interface:
     29-42: interface QueryRequest [exported]
       /** Query request from the API */
@@ -1730,6 +1734,8 @@ src/storage/search-repository.ts [1-532]
       /** Index a node for full-text search */
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
+    344-415: buildFilterClause(filters: SearchFilters | undefined): { clause: string; params: {}; } [exported]
+      /** Build WHERE clause conditions and params from search filters */
     441-501: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
     506-531: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
@@ -1737,6 +1743,24 @@ src/storage/search-repository.ts [1-532]
   imports:
     - ./node-crud.js
     - ./node-types.js
+    - better-sqlite3
+
+src/storage/semantic-search.ts [1-209]
+  interface:
+    25-28: interface SemanticSearchResult extends SearchResult [exported]
+    30-39: interface SemanticSearchOptions [exported]
+  function:
+    55-151: semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {} [exported]
+      /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
+    161-174: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
+      /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
+    184-208: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
+      /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
+  imports:
+    - ./database.js
+    - ./embedding-utils.js
+    - ./node-crud.js
+    - ./search-repository.js
     - better-sqlite3
 
 src/storage/tool-error-repository.ts [1-352]
@@ -2089,5 +2113,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 88
-Estimated tokens: 26,291 (codebase: ~1,037,606)
+Files: 89
+Estimated tokens: 26,659 (codebase: ~1,041,324)

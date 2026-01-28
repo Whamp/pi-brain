@@ -1,14 +1,14 @@
 {
   "stats": {
-    "totalFiles": 88,
-    "totalSymbols": 1103,
+    "totalFiles": 89,
+    "totalSymbols": 1109,
     "byLanguage": {
-      "typescript": 88
+      "typescript": 89
     },
     "bySymbolKind": {
-      "function": 490,
+      "function": 494,
       "type": 40,
-      "interface": 258,
+      "interface": 260,
       "variable": 107,
       "class": 12,
       "property": 51,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 37783,
-  "codebase_tokens": 1038600,
+  "total_tokens": 38108,
+  "codebase_tokens": 1041847,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -2003,7 +2003,7 @@
       "language": "typescript",
       "lines": [
         1,
-        1102
+        1141
       ],
       "detail_level": "full",
       "token_estimate": 157,
@@ -2013,8 +2013,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            72,
-            72
+            73,
+            73
           ],
           "exported": false,
           "is_default": false,
@@ -2032,8 +2032,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            198,
-            200
+            199,
+            201
           ],
           "exported": false,
           "is_default": false,
@@ -2051,8 +2051,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            343,
-            345
+            382,
+            384
           ],
           "exported": false,
           "is_default": false,
@@ -2070,8 +2070,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            508,
-            510
+            547,
+            549
           ],
           "exported": false,
           "is_default": false,
@@ -2089,8 +2089,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            895,
-            897
+            934,
+            936
           ],
           "exported": false,
           "is_default": false,
@@ -2108,8 +2108,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            1046,
-            1048
+            1085,
+            1087
           ],
           "exported": false,
           "is_default": false,
@@ -2153,7 +2153,7 @@
       "language": "typescript",
       "lines": [
         1,
-        745
+        759
       ],
       "detail_level": "full",
       "token_estimate": 836,
@@ -2240,7 +2240,7 @@
           "signature": "getDefaultDaemonConfig(): DaemonConfig",
           "lines": [
             59,
-            92
+            93
           ],
           "exported": true,
           "is_default": false,
@@ -2258,8 +2258,8 @@
           "kind": "function",
           "signature": "getDefaultQueryConfig(): QueryConfig",
           "lines": [
-            97,
-            102
+            98,
+            103
           ],
           "exported": true,
           "is_default": false,
@@ -2277,8 +2277,8 @@
           "kind": "function",
           "signature": "getDefaultApiConfig(): ApiConfig",
           "lines": [
-            107,
-            117
+            108,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -2296,8 +2296,8 @@
           "kind": "function",
           "signature": "getDefaultConfig(): PiBrainConfig",
           "lines": [
-            122,
-            130
+            123,
+            131
           ],
           "exported": true,
           "is_default": false,
@@ -2315,8 +2315,8 @@
           "kind": "function",
           "signature": "validateSyncMethod(method: string, spokeName: string): SyncMethod",
           "lines": [
-            135,
-            152
+            136,
+            153
           ],
           "exported": false,
           "is_default": false,
@@ -2334,8 +2334,8 @@
           "kind": "function",
           "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
           "lines": [
-            157,
-            270
+            158,
+            271
           ],
           "exported": false,
           "is_default": false,
@@ -2353,8 +2353,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            275,
-            283
+            276,
+            284
           ],
           "exported": false,
           "is_default": false,
@@ -2372,8 +2372,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            288,
-            294
+            289,
+            295
           ],
           "exported": false,
           "is_default": false,
@@ -2391,8 +2391,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            299,
-            305
+            300,
+            306
           ],
           "exported": false,
           "is_default": false,
@@ -2410,8 +2410,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            310,
-            316
+            311,
+            317
           ],
           "exported": false,
           "is_default": false,
@@ -2429,8 +2429,8 @@
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            321,
-            486
+            322,
+            500
           ],
           "exported": true,
           "is_default": false,
@@ -2448,8 +2448,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            491,
-            499
+            505,
+            513
           ],
           "exported": true,
           "is_default": false,
@@ -2467,8 +2467,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            492,
-            498
+            506,
+            512
           ],
           "exported": false,
           "is_default": false,
@@ -2486,8 +2486,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            504,
-            550
+            518,
+            564
           ],
           "exported": true,
           "is_default": false,
@@ -2505,8 +2505,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            555,
-            560
+            569,
+            574
           ],
           "exported": true,
           "is_default": false,
@@ -2524,8 +2524,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            565,
-            600
+            579,
+            614
           ],
           "exported": true,
           "is_default": false,
@@ -2543,8 +2543,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            605,
-            663
+            619,
+            677
           ],
           "exported": true,
           "is_default": false,
@@ -2562,8 +2562,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            668,
-            676
+            682,
+            690
           ],
           "exported": true,
           "is_default": false,
@@ -2581,8 +2581,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            681,
-            683
+            695,
+            697
           ],
           "exported": true,
           "is_default": false,
@@ -2600,8 +2600,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            688,
-            692
+            702,
+            706
           ],
           "exported": true,
           "is_default": false,
@@ -2619,8 +2619,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            697,
-            704
+            711,
+            718
           ],
           "exported": true,
           "is_default": false,
@@ -2638,8 +2638,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            715,
-            744
+            729,
+            758
           ],
           "exported": true,
           "is_default": false,
@@ -2687,7 +2687,7 @@
       "language": "typescript",
       "lines": [
         1,
-        260
+        264
       ],
       "detail_level": "full",
       "token_estimate": 306,
@@ -2774,7 +2774,7 @@
           "signature": "DaemonConfig",
           "lines": [
             76,
-            151
+            154
           ],
           "exported": true,
           "is_default": false,
@@ -2792,8 +2792,8 @@
           "kind": "interface",
           "signature": "QueryConfig",
           "lines": [
-            157,
-            163
+            160,
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -2811,8 +2811,8 @@
           "kind": "interface",
           "signature": "ApiConfig",
           "lines": [
-            168,
-            177
+            171,
+            180
           ],
           "exported": true,
           "is_default": false,
@@ -2830,8 +2830,8 @@
           "kind": "interface",
           "signature": "PiBrainConfig",
           "lines": [
-            182,
-            197
+            185,
+            200
           ],
           "exported": true,
           "is_default": false,
@@ -2849,8 +2849,8 @@
           "kind": "interface",
           "signature": "RawConfig",
           "lines": [
-            203,
-            259
+            206,
+            263
           ],
           "exported": true,
           "is_default": false,
@@ -2874,18 +2874,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1060
+        1149
       ],
       "detail_level": "full",
-      "token_estimate": 1076,
+      "token_estimate": 1145,
       "symbols": [
         {
           "name": "sleep",
           "kind": "function",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            58,
-            62
+            60,
+            64
           ],
           "exported": false,
           "is_default": false,
@@ -2903,8 +2903,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            69,
-            69
+            71,
+            71
           ],
           "exported": true,
           "is_default": false,
@@ -2922,8 +2922,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            72,
-            72
+            74,
+            74
           ],
           "exported": true,
           "is_default": false,
@@ -2941,8 +2941,8 @@
           "kind": "interface",
           "signature": "DaemonStatus",
           "lines": [
-            75,
-            81
+            77,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -2960,8 +2960,8 @@
           "kind": "interface",
           "signature": "QueueStatus",
           "lines": [
-            84,
-            89
+            86,
+            91
           ],
           "exported": true,
           "is_default": false,
@@ -2979,8 +2979,8 @@
           "kind": "interface",
           "signature": "HealthCheckResult",
           "lines": [
-            92,
-            97
+            94,
+            99
           ],
           "exported": true,
           "is_default": false,
@@ -2998,8 +2998,8 @@
           "kind": "interface",
           "signature": "HealthStatus",
           "lines": [
-            100,
-            104
+            102,
+            106
           ],
           "exported": true,
           "is_default": false,
@@ -3017,8 +3017,8 @@
           "kind": "interface",
           "signature": "OutputOptions",
           "lines": [
-            107,
-            110
+            109,
+            112
           ],
           "exported": true,
           "is_default": false,
@@ -3036,8 +3036,8 @@
           "kind": "function",
           "signature": "readPidFile(): number",
           "lines": [
-            119,
-            130
+            121,
+            132
           ],
           "exported": true,
           "is_default": false,
@@ -3055,8 +3055,8 @@
           "kind": "function",
           "signature": "writePidFile(pid: number): void",
           "lines": [
-            135,
-            141
+            137,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -3074,8 +3074,8 @@
           "kind": "function",
           "signature": "removePidFile(): void",
           "lines": [
-            146,
-            154
+            148,
+            156
           ],
           "exported": true,
           "is_default": false,
@@ -3093,8 +3093,8 @@
           "kind": "function",
           "signature": "isProcessRunning(pid: number): boolean",
           "lines": [
-            159,
-            167
+            161,
+            169
           ],
           "exported": true,
           "is_default": false,
@@ -3112,8 +3112,8 @@
           "kind": "function",
           "signature": "isDaemonRunning(): { running: boolean; pid: number; }",
           "lines": [
-            172,
-            185
+            174,
+            187
           ],
           "exported": true,
           "is_default": false,
@@ -3131,8 +3131,8 @@
           "kind": "function",
           "signature": "formatUptime(seconds: number): string",
           "lines": [
-            194,
-            215
+            196,
+            217
           ],
           "exported": true,
           "is_default": false,
@@ -3150,8 +3150,8 @@
           "kind": "function",
           "signature": "getProcessUptime(): number",
           "lines": [
-            220,
-            230
+            222,
+            232
           ],
           "exported": true,
           "is_default": false,
@@ -3169,8 +3169,8 @@
           "kind": "interface",
           "signature": "StartOptions",
           "lines": [
-            237,
-            240
+            239,
+            242
           ],
           "exported": true,
           "is_default": false,
@@ -3188,8 +3188,8 @@
           "kind": "interface",
           "signature": "StopOptions",
           "lines": [
-            243,
-            246
+            245,
+            248
           ],
           "exported": true,
           "is_default": false,
@@ -3207,8 +3207,8 @@
           "kind": "function",
           "signature": "async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }>",
           "lines": [
-            251,
-            361
+            253,
+            363
           ],
           "exported": true,
           "is_default": false,
@@ -3226,8 +3226,8 @@
           "kind": "function",
           "signature": "async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }>",
           "lines": [
-            366,
-            428
+            368,
+            430
           ],
           "exported": true,
           "is_default": false,
@@ -3245,8 +3245,8 @@
           "kind": "function",
           "signature": "getDaemonStatus(configPath?: string): DaemonStatus",
           "lines": [
-            433,
-            445
+            435,
+            447
           ],
           "exported": true,
           "is_default": false,
@@ -3264,8 +3264,8 @@
           "kind": "function",
           "signature": "getQueueStatus(configPath?: string): QueueStatus",
           "lines": [
-            454,
-            483
+            456,
+            485
           ],
           "exported": true,
           "is_default": false,
@@ -3283,8 +3283,8 @@
           "kind": "function",
           "signature": "queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; }",
           "lines": [
-            488,
-            541
+            490,
+            543
           ],
           "exported": true,
           "is_default": false,
@@ -3302,8 +3302,8 @@
           "kind": "function",
           "signature": "async checkPiCli(): Promise<HealthCheckResult>",
           "lines": [
-            550,
-            587
+            552,
+            589
           ],
           "exported": false,
           "is_default": false,
@@ -3321,8 +3321,8 @@
           "kind": "function",
           "signature": "async checkRequiredSkills(): Promise<HealthCheckResult>",
           "lines": [
-            592,
-            617
+            594,
+            619
           ],
           "exported": false,
           "is_default": false,
@@ -3340,8 +3340,8 @@
           "kind": "function",
           "signature": "async checkOptionalSkills(): Promise<HealthCheckResult>",
           "lines": [
-            622,
-            647
+            624,
+            649
           ],
           "exported": false,
           "is_default": false,
@@ -3359,8 +3359,8 @@
           "kind": "function",
           "signature": "checkSessionsDir(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            652,
-            702
+            654,
+            704
           ],
           "exported": false,
           "is_default": false,
@@ -3378,8 +3378,8 @@
           "kind": "function",
           "signature": "checkDatabaseAccess(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            707,
-            735
+            709,
+            737
           ],
           "exported": false,
           "is_default": false,
@@ -3397,8 +3397,8 @@
           "kind": "function",
           "signature": "checkPromptFile(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            740,
-            756
+            742,
+            758
           ],
           "exported": false,
           "is_default": false,
@@ -3416,8 +3416,8 @@
           "kind": "function",
           "signature": "async runHealthChecks(configPath?: string): Promise<HealthStatus>",
           "lines": [
-            761,
-            791
+            763,
+            793
           ],
           "exported": true,
           "is_default": false,
@@ -3435,8 +3435,8 @@
           "kind": "function",
           "signature": "formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string",
           "lines": [
-            800,
-            821
+            802,
+            823
           ],
           "exported": true,
           "is_default": false,
@@ -3454,8 +3454,8 @@
           "kind": "function",
           "signature": "formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string",
           "lines": [
-            826,
-            876
+            828,
+            878
           ],
           "exported": true,
           "is_default": false,
@@ -3473,8 +3473,8 @@
           "kind": "function",
           "signature": "getHealthIcon(result: HealthCheckResult): string",
           "lines": [
-            881,
-            886
+            883,
+            888
           ],
           "exported": false,
           "is_default": false,
@@ -3492,8 +3492,8 @@
           "kind": "function",
           "signature": "formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string",
           "lines": [
-            891,
-            914
+            893,
+            916
           ],
           "exported": true,
           "is_default": false,
@@ -3511,8 +3511,8 @@
           "kind": "function",
           "signature": "truncatePath(filePath: string, maxLen: number): string",
           "lines": [
-            919,
-            924
+            921,
+            926
           ],
           "exported": false,
           "is_default": false,
@@ -3530,8 +3530,8 @@
           "kind": "function",
           "signature": "rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; }",
           "lines": [
-            929,
-            1049
+            931,
+            1051
           ],
           "exported": true,
           "is_default": false,
@@ -3545,12 +3545,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "rebuildEmbeddings",
+          "kind": "function",
+          "signature": "async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }>",
+          "lines": [
+            1056,
+            1138
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Rebuild embeddings for all nodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "truncateString",
           "kind": "function",
           "signature": "truncateString(str: string, maxLen: number): string",
           "lines": [
-            1054,
-            1059
+            1143,
+            1148
           ],
           "exported": false,
           "is_default": false,
@@ -3571,8 +3590,10 @@
         "../config/config.js",
         "../config/types.js",
         "../storage/database.js",
+        "../storage/embedding-utils.js",
         "../storage/index.js",
         "../storage/node-storage.js",
+        "./facet-discovery.js",
         "./processor.js",
         "./queue.js",
         "node:child_process",
@@ -5817,7 +5838,7 @@
       "language": "typescript",
       "lines": [
         1,
-        181
+        182
       ],
       "detail_level": "full",
       "token_estimate": 91,
@@ -5827,8 +5848,8 @@
           "kind": "variable",
           "signature": "\"0.1.0\"",
           "lines": [
-            180,
-            180
+            181,
+            181
           ],
           "exported": true,
           "is_default": false,
@@ -7105,7 +7126,7 @@
       "language": "typescript",
       "lines": [
         1,
-        724
+        731
       ],
       "detail_level": "full",
       "token_estimate": 613,
@@ -7249,7 +7270,7 @@
           "signature": "findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number): {}",
           "lines": [
             197,
-            229
+            236
           ],
           "exported": false,
           "is_default": false,
@@ -7267,8 +7288,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            234,
-            244
+            241,
+            251
           ],
           "exported": false,
           "is_default": false,
@@ -7286,8 +7307,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            250,
-            253
+            257,
+            260
           ],
           "exported": false,
           "is_default": false,
@@ -7305,8 +7326,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            258,
-            308
+            265,
+            315
           ],
           "exported": false,
           "is_default": false,
@@ -7324,8 +7345,8 @@
           "kind": "function",
           "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            317,
-            418
+            324,
+            425
           ],
           "exported": false,
           "is_default": false,
@@ -7343,8 +7364,8 @@
           "kind": "function",
           "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
           "lines": [
-            423,
-            485
+            430,
+            492
           ],
           "exported": false,
           "is_default": false,
@@ -7362,8 +7383,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            491,
-            497
+            498,
+            504
           ],
           "exported": false,
           "is_default": false,
@@ -7381,8 +7402,8 @@
           "kind": "function",
           "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            499,
-            561
+            506,
+            568
           ],
           "exported": false,
           "is_default": false,
@@ -7400,8 +7421,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            567,
-            571
+            574,
+            578
           ],
           "exported": false,
           "is_default": false,
@@ -7419,8 +7440,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            573,
-            576
+            580,
+            583
           ],
           "exported": false,
           "is_default": false,
@@ -7438,8 +7459,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            578,
-            581
+            585,
+            588
           ],
           "exported": false,
           "is_default": false,
@@ -7457,8 +7478,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            583,
-            587
+            590,
+            594
           ],
           "exported": false,
           "is_default": false,
@@ -7476,8 +7497,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            589,
-            665
+            596,
+            672
           ],
           "exported": false,
           "is_default": false,
@@ -7495,8 +7516,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            667,
-            700
+            674,
+            707
           ],
           "exported": false,
           "is_default": false,
@@ -7514,8 +7535,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            702,
-            723
+            709,
+            730
           ],
           "exported": false,
           "is_default": false,
@@ -18648,7 +18669,7 @@
         532
       ],
       "detail_level": "full",
-      "token_estimate": 621,
+      "token_estimate": 624,
       "symbols": [
         {
           "name": "SearchField",
@@ -18905,7 +18926,7 @@
             344,
             415
           ],
-          "exported": false,
+          "exported": true,
           "is_default": false,
           "is_async": false,
           "is_static": false,
@@ -18961,6 +18982,123 @@
       "imports": [
         "./node-crud.js",
         "./node-types.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/semantic-search.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        209
+      ],
+      "detail_level": "full",
+      "token_estimate": 253,
+      "symbols": [
+        {
+          "name": "SemanticSearchResult",
+          "kind": "interface",
+          "signature": "SemanticSearchResult extends SearchResult",
+          "lines": [
+            25,
+            28
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SemanticSearchOptions",
+          "kind": "interface",
+          "signature": "SemanticSearchOptions",
+          "lines": [
+            30,
+            39
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "semanticSearch",
+          "kind": "function",
+          "signature": "semanticSearch(db: Database.Database, queryEmbedding: number[], options: SemanticSearchOptions = {}): {}",
+          "lines": [
+            55,
+            151
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Perform semantic search using vector similarity.\n\nFinds nodes with embeddings close to the query embedding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getNodeEmbeddingVector",
+          "kind": "function",
+          "signature": "getNodeEmbeddingVector(db: Database.Database, nodeId: string): {}",
+          "lines": [
+            161,
+            174
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get the embedding vector for a node from the database.\nUseful for finding \"related nodes\" (node-to-node similarity).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findSimilarNodes",
+          "kind": "function",
+          "signature": "findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {}",
+          "lines": [
+            184,
+            208
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find nodes similar to a given node.\nWraps semanticSearch using the node's own embedding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./database.js",
+        "./embedding-utils.js",
+        "./node-crud.js",
+        "./search-repository.js",
         "better-sqlite3"
       ]
     },
