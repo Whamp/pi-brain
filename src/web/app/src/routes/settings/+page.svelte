@@ -21,11 +21,11 @@
   let idleTimeoutMinutes = $state(10);
   let parallelWorkers = $state(1);
 
-  // Original values (for reset)
-  let originalProvider = "";
-  let originalModel = "";
-  let originalIdleTimeoutMinutes = 10;
-  let originalParallelWorkers = 1;
+  // Original values (for reset) - must be $state for $derived reactivity
+  let originalProvider = $state("");
+  let originalModel = $state("");
+  let originalIdleTimeoutMinutes = $state(10);
+  let originalParallelWorkers = $state(1);
 
   // Available providers
   let providers: Provider[] = $state([]);
