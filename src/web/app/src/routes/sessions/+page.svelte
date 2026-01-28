@@ -176,6 +176,7 @@
       class:active={view === "projects"}
       onclick={() => loadProjects()}
       aria-current={view === "projects" ? "page" : undefined}
+      disabled={view === "projects"}
     >
       <Home size={14} />
       <span>All Projects</span>
@@ -188,6 +189,7 @@
         class:active={view === "sessions"}
         onclick={() => loadSessions(currentProject!)}
         aria-current={view === "sessions" ? "page" : undefined}
+        disabled={view === "sessions"}
       >
         <Folder size={14} />
         <span>{getProjectName(currentProject)}</span>
@@ -199,6 +201,7 @@
       <button
         class="breadcrumb active"
         aria-current="page"
+        disabled
       >
         <FileText size={14} />
         <span>{getSessionName(currentSession)}</span>

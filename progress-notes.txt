@@ -205,3 +205,22 @@ the reactivity chain.
     - Backend `extractSnippet` produces <mark> tags
 **Commit**: 35d24c44
 **Notes**: Improved search result UX by adding context-aware highlighting. The backend now performs regex-based replacement to wrap query terms in snippets, which the frontend safely renders.
+
+## 2026-01-28 08:12 - Task 18.7
+
+**Status**: pending → done
+**Validation**: 
+  - Verified no click handler on current page breadcrumb
+  - Verified styling remains active but non-interactive
+  - Verified backend tests pass (1276 tests)
+**Commit**: 7b50d086
+**Notes**: Fixed UX issue where current page breadcrumb looked disabled. It is now styled as active but remains non-interactive as expected for a "current page" indicator.
+
+## 2026-01-28 08:30 - Task 18.7 (Refinement)
+
+**Status**: done
+**Validation**: 
+  - Verified `disabled` attribute added to active breadcrumbs
+  - Checked `npm run check` passes
+**Commit**: (will be committed shortly)
+**Notes**: Improved the implementation by explicitly disabling the active breadcrumb buttons to ensure no-op behavior and correct cursor styling.

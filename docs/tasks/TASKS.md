@@ -305,4 +305,4 @@ Ref: docs/plans/Web-UI-Functionality-Report.md
 | 18.4 | Fix sidebar overflow on small viewports               | done   | -    | 2026-01-28 |
 | 18.5 | Real-time Dashboard stats via WebSocket               | done   | 16.2 | 2026-01-28 |
 | 18.6 | Search result FTS term highlighting                   | done   | -    | 2026-01-28 |
-| 18.7 | Breadcrumb click on current page is no-op             | active | -    | 2026-01-28 |
+| 18.7 | Breadcrumb click on current page is no-op             | done   | -    | 2026-01-28 |
