@@ -9,7 +9,7 @@ import {
   countNodes,
   getAllProjects,
   listNodes,
-} from "../../storage/node-repository.js";
+} from "../../storage/node-queries.js";
 import { getToolErrorStats } from "../../storage/tool-error-repository.js";
 import { successResponse } from "../responses.js";
 

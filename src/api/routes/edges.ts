@@ -7,12 +7,12 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import type { EdgeType } from "../../storage/node-types.js";
 
 import {
+  createEdge,
+  deleteEdge,
   getEdge,
   getEdgesFrom,
   getEdgesTo,
-  createEdge,
-  deleteEdge,
-} from "../../storage/node-repository.js";
+} from "../../storage/edge-repository.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**

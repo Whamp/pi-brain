@@ -5,12 +5,12 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import {
-  listQuirks,
-  getQuirksByModel,
   getAggregatedQuirks,
+  getQuirksByModel,
+  listQuirks,
   type ListQuirksFilters,
   type ListQuirksOptions,
-} from "../../storage/node-repository.js";
+} from "../../storage/quirk-repository.js";
 import { successResponse } from "../responses.js";
 
 /**

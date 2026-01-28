@@ -8,9 +8,9 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import {
   getAllProjects,
-  listNodes,
   getSessionSummaries,
-} from "../../storage/node-repository.js";
+  listNodes,
+} from "../../storage/node-queries.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**

@@ -173,7 +173,7 @@ src/api/routes/edges.ts [1-221]
         - src/api/routes/edges.ts:36: type FastifyRequest -> external
         - src/api/routes/edges.ts:45: type FastifyReply -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/edge-repository.js
     - ../../storage/node-types.js
     - ../responses.js
     - fastify
@@ -199,36 +199,40 @@ src/api/routes/lessons.ts [1-94]
         - src/api/routes/lessons.ts:46: type FastifyRequest -> external
         - src/api/routes/lessons.ts:56: type FastifyReply -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/lesson-repository.js
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-234]
+src/api/routes/nodes.ts [1-233]
   function:
-    28-36: parseArrayParam(value: string | undefined): {}
+    27-35: parseArrayParam(value: string | undefined): {}
       /** Parse comma-separated string to array */
       refs out: 4 [call: 4]
-        - src/api/routes/nodes.ts:32: call filter -> external
-        - src/api/routes/nodes.ts:32: call map -> external
-        - src/api/routes/nodes.ts:32: call split -> external
-        - src/api/routes/nodes.ts:34: call trim -> external
-    41-46: parseBooleanParam(value: string | undefined): boolean
+        - src/api/routes/nodes.ts:31: call filter -> external
+        - src/api/routes/nodes.ts:31: call map -> external
+        - src/api/routes/nodes.ts:31: call split -> external
+        - src/api/routes/nodes.ts:33: call trim -> external
+    40-45: parseBooleanParam(value: string | undefined): boolean
       /** Parse boolean query param */
-    51-57: parseIntParam(value: string | undefined): number
+    50-56: parseIntParam(value: string | undefined): number
       /** Parse integer query param */
       refs out: 1 [call: 1]
-        - src/api/routes/nodes.ts:56: call isNaN -> external
-    59-233: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 41 [call: 33, type: 8]
-        - src/api/routes/nodes.ts:59: type FastifyInstance -> external
-        - src/api/routes/nodes.ts:59: type Promise -> external
-        - src/api/routes/nodes.ts:63: call get -> external
-        - src/api/routes/nodes.ts:66: type FastifyRequest -> external
-        - src/api/routes/nodes.ts:84: type FastifyReply -> external
+        - src/api/routes/nodes.ts:55: call isNaN -> external
+    58-232: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 43 [call: 35, type: 8]
+        - src/api/routes/nodes.ts:58: type FastifyInstance -> external
+        - src/api/routes/nodes.ts:58: type Promise -> external
+        - src/api/routes/nodes.ts:62: call get -> external
+        - src/api/routes/nodes.ts:65: type FastifyRequest -> external
+        - src/api/routes/nodes.ts:83: type FastifyReply -> external
   imports:
+    - ../../storage/graph-repository.js
+    - ../../storage/lesson-repository.js
+    - ../../storage/node-queries.js
     - ../../storage/node-repository.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
+    - ../../storage/quirk-repository.js
     - ../../storage/tool-error-repository.js
     - ../responses.js
     - fastify
@@ -314,32 +318,33 @@ src/api/routes/quirks.ts [1-110]
         - src/api/routes/quirks.ts:34: type FastifyRequest -> external
         - src/api/routes/quirks.ts:44: type FastifyReply -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/quirk-repository.js
     - ../responses.js
     - fastify
 
-src/api/routes/search.ts [1-104]
+src/api/routes/search.ts [1-105]
   function:
-    18-26: parseArrayParam(value: string | undefined): {}
+    19-27: parseArrayParam(value: string | undefined): {}
       /** Parse comma-separated string to array */
       refs out: 4 [call: 4]
-        - src/api/routes/search.ts:22: call filter -> external
-        - src/api/routes/search.ts:22: call map -> external
-        - src/api/routes/search.ts:22: call split -> external
-        - src/api/routes/search.ts:24: call trim -> external
-    31-37: parseIntParam(value: string | undefined): number
+        - src/api/routes/search.ts:23: call filter -> external
+        - src/api/routes/search.ts:23: call map -> external
+        - src/api/routes/search.ts:23: call split -> external
+        - src/api/routes/search.ts:25: call trim -> external
+    32-38: parseIntParam(value: string | undefined): number
       /** Parse integer query param */
       refs out: 1 [call: 1]
-        - src/api/routes/search.ts:36: call isNaN -> external
-    39-103: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/search.ts:37: call isNaN -> external
+    40-104: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 7 [call: 3, type: 4]
-        - src/api/routes/search.ts:39: type FastifyInstance -> external
-        - src/api/routes/search.ts:39: type Promise -> external
-        - src/api/routes/search.ts:43: call get -> external
-        - src/api/routes/search.ts:46: type FastifyRequest -> external
-        - src/api/routes/search.ts:61: type FastifyReply -> external
+        - src/api/routes/search.ts:40: type FastifyInstance -> external
+        - src/api/routes/search.ts:40: type Promise -> external
+        - src/api/routes/search.ts:44: call get -> external
+        - src/api/routes/search.ts:47: type FastifyRequest -> external
+        - src/api/routes/search.ts:62: type FastifyReply -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
+    - ../../storage/search-repository.js
     - ../responses.js
     - fastify
 
@@ -362,7 +367,7 @@ src/api/routes/sessions.ts [1-272]
         - src/api/routes/sessions.ts:60: type FastifyRequest -> external
         - src/api/routes/sessions.ts:60: type FastifyReply -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
     - ../responses.js
     - fastify
 
@@ -428,7 +433,7 @@ src/api/routes/stats.ts [1-165]
       refs out: 1 [type: 1]
         - src/api/routes/stats.ts:160: type Database -> external
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
     - ../responses.js
     - better-sqlite3
@@ -574,4 +579,4 @@ src/cli.ts [1-1047]
 
 ---
 Files: 25
-Estimated tokens: 6,063 (codebase: ~971,255)
+Estimated tokens: 6,111 (codebase: ~971,994)

@@ -215,15 +215,18 @@ src/daemon/connection-discovery.test.ts [1-440]
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-623]
+src/daemon/connection-discovery.ts [1-620]
   class:
-    162-622: class ConnectionDiscoverer [exported]
+    159-619: class ConnectionDiscoverer [exported]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    141-146: interface ConnectionResult [exported]
+    138-143: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:145: type Edge -> src/types/index.ts
+        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
+    - ../storage/edge-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
     - ../storage/node-repository.js
     - ../types/index.js
     - better-sqlite3
@@ -629,34 +632,37 @@ src/daemon/query-processor.test.ts [1-79]
   imports:
     - vitest
 
-src/daemon/query-processor.ts [1-727]
+src/daemon/query-processor.ts [1-724]
   interface:
-    32-45: interface QueryRequest [exported]
+    29-42: interface QueryRequest [exported]
       /** Query request from the API */
-    48-66: interface QueryResponse [exported]
+    45-63: interface QueryResponse [exported]
       /** Query response to return to the client */
-    91-100: interface QueryProcessorConfig [exported]
+    88-97: interface QueryProcessorConfig [exported]
       refs out: 3 [type: 3]
-        - src/daemon/query-processor.ts:93: type Database -> external
-        - src/daemon/query-processor.ts:95: type DaemonConfig -> src/config/types.ts
-        - src/daemon/query-processor.ts:97: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:90: type Database -> external
+        - src/daemon/query-processor.ts:92: type DaemonConfig -> src/config/types.ts
+        - src/daemon/query-processor.ts:94: type ProcessorLogger -> src/daemon/processor.ts
   function:
-    105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    102-178: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
       refs out: 12 [call: 8, type: 4]
-        - src/daemon/query-processor.ts:106: type QueryRequest -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:107: type QueryProcessorConfig -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:108: type Promise -> external
-        - src/daemon/query-processor.ts:108: type QueryResponse -> src/daemon/query-processor.ts
-        - src/daemon/query-processor.ts:112: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:112: call slice -> external
-        - src/daemon/query-processor.ts:122: call info -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:157: call error -> src/daemon/processor.ts
-        - src/daemon/query-processor.ts:162: call map -> external
-        - src/daemon/query-processor.ts:173: call map -> external
+        - src/daemon/query-processor.ts:103: type QueryRequest -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:104: type QueryProcessorConfig -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:105: type Promise -> external
+        - src/daemon/query-processor.ts:105: type QueryResponse -> src/daemon/query-processor.ts
+        - src/daemon/query-processor.ts:109: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:109: call slice -> external
+        - src/daemon/query-processor.ts:119: call info -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:154: call error -> src/daemon/processor.ts
+        - src/daemon/query-processor.ts:159: call map -> external
+        - src/daemon/query-processor.ts:170: call map -> external
   imports:
     - ../config/types.js
-    - ../storage/node-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
+    - ../storage/quirk-repository.js
+    - ../storage/search-repository.js
     - ../storage/tool-error-repository.js
     - ./processor.js
     - better-sqlite3
@@ -1002,6 +1008,7 @@ src/daemon/worker.ts [1-594]
     - ../config/types.js
     - ../parser/index.js
     - ../prompt/prompt.js
+    - ../storage/node-conversion.js
     - ../storage/node-repository.js
     - ../storage/node-types.js
     - ./connection-discovery.js
@@ -1472,4 +1479,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 38
-Estimated tokens: 19,374 (codebase: ~971,859)
+Estimated tokens: 19,433 (codebase: ~972,765)

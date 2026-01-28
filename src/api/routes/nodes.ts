@@ -6,19 +6,18 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import type { EdgeType } from "../../storage/node-types.js";
 
+import { getConnectedNodes } from "../../storage/graph-repository.js";
+import { getNodeLessons } from "../../storage/lesson-repository.js";
 import {
-  getNode,
-  listNodes,
-  getConnectedNodes,
-  getNodeLessons,
-  getNodeQuirks,
   getNodeTags,
   getNodeTopics,
-  getAllNodeVersions,
+  listNodes,
   type ListNodesFilters,
   type ListNodesOptions,
-} from "../../storage/node-repository.js";
+} from "../../storage/node-queries.js";
+import { getAllNodeVersions, getNode } from "../../storage/node-repository.js";
 import { readNodeFromPath } from "../../storage/node-storage.js";
+import { getNodeQuirks } from "../../storage/quirk-repository.js";
 import { getNodeToolErrors } from "../../storage/tool-error-repository.js";
 import { successResponse, errorResponse } from "../responses.js";
 

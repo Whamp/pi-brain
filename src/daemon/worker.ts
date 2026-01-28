@@ -24,8 +24,8 @@ import {
   parseSession,
 } from "../parser/index.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
+import { agentOutputToNode } from "../storage/node-conversion.js";
 import {
-  agentOutputToNode,
   findPreviousProjectNode,
   linkNodeToPredecessors,
   upsertNode,

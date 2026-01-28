@@ -13,14 +13,11 @@ import * as os from "node:os";
 import * as path from "node:path";
 
 import type { DaemonConfig } from "../config/types.js";
+import type { NodeRow } from "../storage/node-crud.js";
 
-import {
-  searchNodesAdvanced,
-  listNodes,
-  getAggregatedQuirks,
-  type ListNodesFilters,
-  type NodeRow,
-} from "../storage/node-repository.js";
+import { listNodes, type ListNodesFilters } from "../storage/node-queries.js";
+import { getAggregatedQuirks } from "../storage/quirk-repository.js";
+import { searchNodesAdvanced } from "../storage/search-repository.js";
 import { getAggregatedToolErrors } from "../storage/tool-error-repository.js";
 import { consoleLogger, type ProcessorLogger } from "./processor.js";
 

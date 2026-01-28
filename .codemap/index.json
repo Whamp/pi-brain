@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 34364,
-  "codebase_tokens": 971859,
+  "total_tokens": 34470,
+  "codebase_tokens": 972765,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -516,7 +516,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/edge-repository.js",
         "../../storage/node-types.js",
         "../responses.js",
         "fastify"
@@ -594,7 +594,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/lesson-repository.js",
         "../responses.js",
         "fastify"
       ]
@@ -604,18 +604,18 @@
       "language": "typescript",
       "lines": [
         1,
-        234
+        233
       ],
       "detail_level": "full",
-      "token_estimate": 159,
+      "token_estimate": 198,
       "symbols": [
         {
           "name": "parseArrayParam",
           "kind": "function",
           "signature": "parseArrayParam(value: string | undefined): {}",
           "lines": [
-            28,
-            36
+            27,
+            35
           ],
           "exported": false,
           "is_default": false,
@@ -633,8 +633,8 @@
           "kind": "function",
           "signature": "parseBooleanParam(value: string | undefined): boolean",
           "lines": [
-            41,
-            46
+            40,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -652,8 +652,8 @@
           "kind": "function",
           "signature": "parseIntParam(value: string | undefined): number",
           "lines": [
-            51,
-            57
+            50,
+            56
           ],
           "exported": false,
           "is_default": false,
@@ -671,8 +671,8 @@
           "kind": "function",
           "signature": "async nodesRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            59,
-            233
+            58,
+            232
           ],
           "exported": true,
           "is_default": false,
@@ -690,9 +690,13 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "../../storage/graph-repository.js",
+        "../../storage/lesson-repository.js",
+        "../../storage/node-queries.js",
         "../../storage/node-repository.js",
         "../../storage/node-storage.js",
         "../../storage/node-types.js",
+        "../../storage/quirk-repository.js",
         "../../storage/tool-error-repository.js",
         "../responses.js",
         "fastify"
@@ -865,7 +869,7 @@
         110
       ],
       "detail_level": "full",
-      "token_estimate": 77,
+      "token_estimate": 78,
       "symbols": [
         {
           "name": "parseIntParam",
@@ -910,7 +914,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/quirk-repository.js",
         "../responses.js",
         "fastify"
       ]
@@ -920,18 +924,18 @@
       "language": "typescript",
       "lines": [
         1,
-        104
+        105
       ],
       "detail_level": "full",
-      "token_estimate": 105,
+      "token_estimate": 114,
       "symbols": [
         {
           "name": "parseArrayParam",
           "kind": "function",
           "signature": "parseArrayParam(value: string | undefined): {}",
           "lines": [
-            18,
-            26
+            19,
+            27
           ],
           "exported": false,
           "is_default": false,
@@ -949,8 +953,8 @@
           "kind": "function",
           "signature": "parseIntParam(value: string | undefined): number",
           "lines": [
-            31,
-            37
+            32,
+            38
           ],
           "exported": false,
           "is_default": false,
@@ -968,8 +972,8 @@
           "kind": "function",
           "signature": "async searchRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            39,
-            103
+            40,
+            104
           ],
           "exported": true,
           "is_default": false,
@@ -987,7 +991,8 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/node-queries.js",
+        "../../storage/search-repository.js",
         "../responses.js",
         "fastify"
       ]
@@ -1000,7 +1005,7 @@
         272
       ],
       "detail_level": "full",
-      "token_estimate": 125,
+      "token_estimate": 124,
       "symbols": [
         {
           "name": "parseIntParam",
@@ -1083,7 +1088,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/node-queries.js",
         "../responses.js",
         "fastify"
       ]
@@ -1231,7 +1236,7 @@
         165
       ],
       "detail_level": "full",
-      "token_estimate": 93,
+      "token_estimate": 92,
       "symbols": [
         {
           "name": "statsRoutes",
@@ -1276,7 +1281,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../../storage/node-repository.js",
+        "../../storage/node-queries.js",
         "../../storage/tool-error-repository.js",
         "../responses.js",
         "better-sqlite3",
@@ -3004,18 +3009,18 @@
       "language": "typescript",
       "lines": [
         1,
-        623
+        620
       ],
       "detail_level": "full",
-      "token_estimate": 627,
+      "token_estimate": 652,
       "symbols": [
         {
           "name": "LessonRow",
           "kind": "interface",
           "signature": "LessonRow",
           "lines": [
-            20,
-            27
+            17,
+            24
           ],
           "exported": false,
           "is_default": false,
@@ -3033,8 +3038,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            30,
-            139
+            27,
+            136
           ],
           "exported": false,
           "is_default": false,
@@ -3052,8 +3057,8 @@
           "kind": "interface",
           "signature": "ConnectionResult",
           "lines": [
-            141,
-            146
+            138,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -3071,8 +3076,8 @@
           "kind": "class",
           "signature": "ConnectionDiscoverer",
           "lines": [
-            162,
-            622
+            159,
+            619
           ],
           "exported": true,
           "is_default": false,
@@ -3090,8 +3095,8 @@
           "kind": "constructor",
           "signature": "constructor(private db: Database.Database)",
           "lines": [
-            167,
-            167
+            164,
+            164
           ],
           "exported": false,
           "is_default": false,
@@ -3109,8 +3114,8 @@
           "kind": "method",
           "signature": "async discover(nodeId: string, options: {\n      threshold?: number;\n      limit?: number;\n      daysToLookBack?: number;\n    } = {}): Promise<ConnectionResult>",
           "lines": [
-            195,
-            287
+            192,
+            284
           ],
           "exported": false,
           "is_default": false,
@@ -3128,8 +3133,8 @@
           "kind": "method",
           "signature": "getNodeMetadata(nodeId: string): { tags: Set<string>; topics: Set<string>; }",
           "lines": [
-            289,
-            307
+            286,
+            304
           ],
           "exported": false,
           "is_default": false,
@@ -3147,8 +3152,8 @@
           "kind": "method",
           "signature": "findCandidates(excludeNodeId: string, sourceTimestamp: string, days: number, limit: number): {}",
           "lines": [
-            309,
-            338
+            306,
+            335
           ],
           "exported": false,
           "is_default": false,
@@ -3166,8 +3171,8 @@
           "kind": "method",
           "signature": "getNodeFullText(nodeId: string): string",
           "lines": [
-            340,
-            361
+            337,
+            358
           ],
           "exported": false,
           "is_default": false,
@@ -3185,8 +3190,8 @@
           "kind": "method",
           "signature": "escapeFtsToken(token: string): string",
           "lines": [
-            367,
-            369
+            364,
+            366
           ],
           "exported": false,
           "is_default": false,
@@ -3204,8 +3209,8 @@
           "kind": "method",
           "signature": "detectReferences(sourceNodeId: string, sourceText: string): {}",
           "lines": [
-            371,
-            412
+            368,
+            409
           ],
           "exported": false,
           "is_default": false,
@@ -3223,8 +3228,8 @@
           "kind": "method",
           "signature": "detectLessonReinforcement(nodeId: string, sourceTimestamp: string, threshold: number, limit: number): {}",
           "lines": [
-            414,
-            507
+            411,
+            504
           ],
           "exported": false,
           "is_default": false,
@@ -3242,8 +3247,8 @@
           "kind": "method",
           "signature": "getLessons(nodeId: string): {}",
           "lines": [
-            509,
-            513
+            506,
+            510
           ],
           "exported": false,
           "is_default": false,
@@ -3261,8 +3266,8 @@
           "kind": "method",
           "signature": "findBestLessonMatch(targetLesson: LessonRow, candidateLessons: LessonRow[]): { lesson: LessonRow; score: number; }",
           "lines": [
-            515,
-            549
+            512,
+            546
           ],
           "exported": false,
           "is_default": false,
@@ -3280,8 +3285,8 @@
           "kind": "method",
           "signature": "calculateSimilarity(a: { tags: Set<string>; topics: Set<string>; summary: string }, b: { tags: Set<string>; topics: Set<string>; summary: string }): number",
           "lines": [
-            578,
-            591
+            575,
+            588
           ],
           "exported": false,
           "is_default": false,
@@ -3299,8 +3304,8 @@
           "kind": "method",
           "signature": "jaccardIndex(setA: Set<string>, setB: Set<string>): number",
           "lines": [
-            593,
-            607
+            590,
+            604
           ],
           "exported": false,
           "is_default": false,
@@ -3318,8 +3323,8 @@
           "kind": "method",
           "signature": "tokenize(text: string): Set<string>",
           "lines": [
-            609,
-            621
+            606,
+            618
           ],
           "exported": false,
           "is_default": false,
@@ -3337,6 +3342,9 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "../storage/edge-repository.js",
+        "../storage/node-crud.js",
+        "../storage/node-queries.js",
         "../storage/node-repository.js",
         "../types/index.js",
         "better-sqlite3"
@@ -6320,18 +6328,18 @@
       "language": "typescript",
       "lines": [
         1,
-        727
+        724
       ],
       "detail_level": "full",
-      "token_estimate": 588,
+      "token_estimate": 613,
       "symbols": [
         {
           "name": "QueryRequest",
           "kind": "interface",
           "signature": "QueryRequest",
           "lines": [
-            32,
-            45
+            29,
+            42
           ],
           "exported": true,
           "is_default": false,
@@ -6349,8 +6357,8 @@
           "kind": "interface",
           "signature": "QueryResponse",
           "lines": [
-            48,
-            66
+            45,
+            63
           ],
           "exported": true,
           "is_default": false,
@@ -6368,8 +6376,8 @@
           "kind": "interface",
           "signature": "AgentQueryResult",
           "lines": [
-            69,
-            74
+            66,
+            71
           ],
           "exported": false,
           "is_default": false,
@@ -6387,8 +6395,8 @@
           "kind": "interface",
           "signature": "AgentQueryOutput",
           "lines": [
-            77,
-            85
+            74,
+            82
           ],
           "exported": false,
           "is_default": false,
@@ -6406,8 +6414,8 @@
           "kind": "interface",
           "signature": "QueryProcessorConfig",
           "lines": [
-            91,
-            100
+            88,
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -6425,8 +6433,8 @@
           "kind": "function",
           "signature": "async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse>",
           "lines": [
-            105,
-            181
+            102,
+            178
           ],
           "exported": true,
           "is_default": false,
@@ -6444,8 +6452,8 @@
           "kind": "interface",
           "signature": "RelevantNode",
           "lines": [
-            187,
-            195
+            184,
+            192
           ],
           "exported": false,
           "is_default": false,
@@ -6463,8 +6471,8 @@
           "kind": "function",
           "signature": "findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number): {}",
           "lines": [
-            200,
-            232
+            197,
+            229
           ],
           "exported": false,
           "is_default": false,
@@ -6482,8 +6490,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            237,
-            247
+            234,
+            244
           ],
           "exported": false,
           "is_default": false,
@@ -6501,8 +6509,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            253,
-            256
+            250,
+            253
           ],
           "exported": false,
           "is_default": false,
@@ -6520,8 +6528,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            261,
-            311
+            258,
+            308
           ],
           "exported": false,
           "is_default": false,
@@ -6539,8 +6547,8 @@
           "kind": "function",
           "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            320,
-            421
+            317,
+            418
           ],
           "exported": false,
           "is_default": false,
@@ -6558,8 +6566,8 @@
           "kind": "function",
           "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
           "lines": [
-            426,
-            488
+            423,
+            485
           ],
           "exported": false,
           "is_default": false,
@@ -6577,8 +6585,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            494,
-            500
+            491,
+            497
           ],
           "exported": false,
           "is_default": false,
@@ -6596,8 +6604,8 @@
           "kind": "function",
           "signature": "async spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            502,
-            564
+            499,
+            561
           ],
           "exported": false,
           "is_default": false,
@@ -6615,8 +6623,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            570,
-            574
+            567,
+            571
           ],
           "exported": false,
           "is_default": false,
@@ -6634,8 +6642,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            576,
-            579
+            573,
+            576
           ],
           "exported": false,
           "is_default": false,
@@ -6653,8 +6661,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            581,
-            584
+            578,
+            581
           ],
           "exported": false,
           "is_default": false,
@@ -6672,8 +6680,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            586,
-            590
+            583,
+            587
           ],
           "exported": false,
           "is_default": false,
@@ -6691,8 +6699,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            592,
-            668
+            589,
+            665
           ],
           "exported": false,
           "is_default": false,
@@ -6710,8 +6718,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            670,
-            703
+            667,
+            700
           ],
           "exported": false,
           "is_default": false,
@@ -6729,8 +6737,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            705,
-            726
+            702,
+            723
           ],
           "exported": false,
           "is_default": false,
@@ -6749,7 +6757,10 @@
       "code_blocks": null,
       "imports": [
         "../config/types.js",
-        "../storage/node-repository.js",
+        "../storage/node-crud.js",
+        "../storage/node-queries.js",
+        "../storage/quirk-repository.js",
+        "../storage/search-repository.js",
         "../storage/tool-error-repository.js",
         "./processor.js",
         "better-sqlite3",
@@ -9169,7 +9180,7 @@
         594
       ],
       "detail_level": "full",
-      "token_estimate": 789,
+      "token_estimate": 798,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -9826,6 +9837,7 @@
         "../config/types.js",
         "../parser/index.js",
         "../prompt/prompt.js",
+        "../storage/node-conversion.js",
         "../storage/node-repository.js",
         "../storage/node-types.js",
         "./connection-discovery.js",

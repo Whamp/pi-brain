@@ -5,11 +5,11 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import {
-  listLessons,
   getLessonsByLevel,
+  listLessons,
   type ListLessonsFilters,
   type ListLessonsOptions,
-} from "../../storage/node-repository.js";
+} from "../../storage/lesson-repository.js";
 import { successResponse } from "../responses.js";
 
 /**

@@ -4,12 +4,13 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
+import type { ListNodesFilters } from "../../storage/node-queries.js";
+
 import {
   searchNodesAdvanced,
-  type SearchOptions,
   type SearchField,
-  type ListNodesFilters,
-} from "../../storage/node-repository.js";
+  type SearchOptions,
+} from "../../storage/search-repository.js";
 import { successResponse } from "../responses.js";
 
 /**

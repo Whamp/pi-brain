@@ -134,6 +134,37 @@ src/daemon/index.ts
     - [builtin] fs
     - [builtin] path
   - src/daemon/connection-discovery.ts
+    - src/storage/edge-repository.ts
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
+      - [external] better-sqlite3
+    - src/storage/node-crud.ts
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
+      - [external] better-sqlite3
+    - src/storage/node-queries.ts
+      - src/storage/node-crud.ts
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
+      - [external] better-sqlite3
     - src/storage/node-repository.ts
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
@@ -335,6 +366,37 @@ src/daemon/index.ts
       - [external] yaml
     - src/config/types.ts
     - src/daemon/connection-discovery.ts
+      - src/storage/edge-repository.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/node-crud.ts
+        - src/storage/node-storage.ts
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [external] better-sqlite3
+      - src/storage/node-queries.ts
+        - src/storage/node-crud.ts
+          - src/storage/node-storage.ts
+            - src/storage/node-types.ts
+              - src/types/index.ts
+              - [builtin] crypto
+            - [builtin] fs
+            - [builtin] os
+            - [builtin] path
+          - src/storage/node-types.ts
+            - src/types/index.ts
+            - [builtin] crypto
+          - [external] better-sqlite3
+        - [external] better-sqlite3
       - src/storage/node-repository.ts
         - src/storage/edge-repository.ts
           - src/storage/node-types.ts
@@ -475,6 +537,20 @@ src/daemon/index.ts
       - [builtin] os
       - [builtin] path
       - [builtin] url
+    - src/storage/node-conversion.ts
+      - src/daemon/processor.ts
+        - src/config/types.ts
+        - src/daemon/queue.ts
+          - [external] better-sqlite3
+        - [builtin] child_process
+        - [builtin] fs/promises
+        - [builtin] os
+        - [builtin] path
+      - src/daemon/queue.ts
+        - [external] better-sqlite3
+      - src/storage/node-types.ts
+        - src/types/index.ts
+        - [builtin] crypto
     - src/storage/node-repository.ts
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts

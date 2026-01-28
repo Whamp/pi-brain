@@ -84,7 +84,7 @@ src/api/routes/edges.ts [1-221]
   function:
     29-220: async edgesRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/edge-repository.js
     - ../../storage/node-types.js
     - ../responses.js
     - fastify
@@ -93,17 +93,21 @@ src/api/routes/lessons.ts [1-94]
   function:
     39-93: async lessonsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/lesson-repository.js
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-234]
+src/api/routes/nodes.ts [1-233]
   function:
-    59-233: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+    58-232: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
+    - ../../storage/graph-repository.js
+    - ../../storage/lesson-repository.js
+    - ../../storage/node-queries.js
     - ../../storage/node-repository.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
+    - ../../storage/quirk-repository.js
     - ../../storage/tool-error-repository.js
     - ../responses.js
     - fastify
@@ -140,15 +144,16 @@ src/api/routes/quirks.ts [1-110]
   function:
     27-109: async quirksRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/quirk-repository.js
     - ../responses.js
     - fastify
 
-src/api/routes/search.ts [1-104]
+src/api/routes/search.ts [1-105]
   function:
-    39-103: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
+    40-104: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
+    - ../../storage/search-repository.js
     - ../responses.js
     - fastify
 
@@ -156,7 +161,7 @@ src/api/routes/sessions.ts [1-272]
   function:
     56-271: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
     - ../responses.js
     - fastify
 
@@ -173,7 +178,7 @@ src/api/routes/stats.ts [1-165]
   function:
     16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
-    - ../../storage/node-repository.js
+    - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
     - ../responses.js
     - better-sqlite3
@@ -385,13 +390,16 @@ src/daemon/cli.ts [1-1060]
     - node:fs
     - node:path
 
-src/daemon/connection-discovery.ts [1-623]
+src/daemon/connection-discovery.ts [1-620]
   class:
-    162-622: class ConnectionDiscoverer [exported]
+    159-619: class ConnectionDiscoverer [exported]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    141-146: interface ConnectionResult [exported]
+    138-143: interface ConnectionResult [exported]
   imports:
+    - ../storage/edge-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
     - ../storage/node-repository.js
     - ../types/index.js
     - better-sqlite3
@@ -583,19 +591,22 @@ src/daemon/processor.ts [1-773]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-727]
+src/daemon/query-processor.ts [1-724]
   interface:
-    32-45: interface QueryRequest [exported]
+    29-42: interface QueryRequest [exported]
       /** Query request from the API */
-    48-66: interface QueryResponse [exported]
+    45-63: interface QueryResponse [exported]
       /** Query response to return to the client */
-    91-100: interface QueryProcessorConfig [exported]
+    88-97: interface QueryProcessorConfig [exported]
   function:
-    105-181: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    102-178: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
-    - ../storage/node-repository.js
+    - ../storage/node-crud.js
+    - ../storage/node-queries.js
+    - ../storage/quirk-repository.js
+    - ../storage/search-repository.js
     - ../storage/tool-error-repository.js
     - ./processor.js
     - better-sqlite3
@@ -764,6 +775,7 @@ src/daemon/worker.ts [1-594]
     - ../config/types.js
     - ../parser/index.js
     - ../prompt/prompt.js
+    - ../storage/node-conversion.js
     - ../storage/node-repository.js
     - ../storage/node-types.js
     - ./connection-discovery.js
@@ -1961,4 +1973,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 85
-Estimated tokens: 24,038 (codebase: ~971,255)
+Estimated tokens: 24,143 (codebase: ~971,994)
