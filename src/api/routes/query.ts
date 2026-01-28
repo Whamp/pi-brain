@@ -127,6 +127,7 @@ export async function queryRoutes(app: FastifyInstance): Promise<void> {
           options?: {
             maxNodes?: number;
             includeDetails?: boolean;
+            enableBridgeDiscovery?: boolean;
           };
         };
       }>,

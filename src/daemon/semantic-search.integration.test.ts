@@ -203,14 +203,16 @@ describe("semantic Search Integration", () => {
     });
 
     // 4. Verify results
-    expect(response.relatedNodes).toHaveLength(1);
+    // Hybrid search may return multiple results sorted by score
+    // node1 should be the top result due to vector similarity
+    expect(response.relatedNodes.length).toBeGreaterThan(0);
     expect(response.relatedNodes[0].id).toBe("node1");
     expect(mockLogger.info).toHaveBeenCalledWith(
-      expect.stringContaining("Semantic search found")
+      expect.stringContaining("Hybrid search found")
     );
   });
 
-  it("should fall back to FTS when semantic search distance is too high", async () => {
+  it("should find node via FTS even if semantic match is poor", async () => {
     // 1. Setup node with specific keywords
     // FTS matches keywords. "SpecialUniqueKeyword" is not in the embedding text but it IS in the summary.
     const node1 = createDummyNode("node1", "SpecialUniqueKeyword search test");
@@ -238,18 +240,15 @@ describe("semantic Search Integration", () => {
       daemonConfig: mockConfig,
       logger: mockLogger,
       embeddingProvider: mockEmbeddingProvider,
-      semanticSearchThreshold: 0.5, // Distance threshold
+      semanticSearchThreshold: 0.5, // Not strictly used by hybridSearch same way, but passed
     });
 
     // 4. Verify results
-    // Semantic search should find nothing because distance (1.0) > threshold (0.5)
-    // FTS should find node1 by keyword
+    // Hybrid search combines scores. Vector score will be low, but FTS score high.
     expect(response.relatedNodes).toHaveLength(1);
     expect(response.relatedNodes[0].id).toBe("node1");
     expect(mockLogger.info).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Semantic search returned no results, falling back to FTS"
-      )
+      expect.stringContaining("Hybrid search found")
     );
   });
 
@@ -299,6 +298,9 @@ describe("semantic Search Integration", () => {
   });
 
   it("should fall back to FTS when embedding dimensions mismatch", async () => {
+    // Enable FTS for this test since we rely on it for fallback
+    options.skipFts = false;
+
     // 1. Setup node with 4096-dim embedding (standard in our test migrations)
     const node1 = createDummyNode("node1", "Dimension mismatch test");
     createNode(db, node1, options);
@@ -324,13 +326,14 @@ describe("semantic Search Integration", () => {
     });
 
     // 4. Verify results
-    // It should fall back to FTS because sqlite-vec will return [] on dimension mismatch
+    // It should still find the node via FTS despite embedding mismatch
     expect(response.relatedNodes).toHaveLength(1);
     expect(response.relatedNodes[0].id).toBe("node1");
+
+    // We expect a warning about embedding generation/usage, but success via FTS
+    // The logger.info will show "Hybrid search found..."
     expect(mockLogger.info).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Semantic search returned no results, falling back to FTS"
-      )
+      expect.stringContaining("Hybrid search found")
     );
   });
 });

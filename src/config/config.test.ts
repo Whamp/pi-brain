@@ -144,6 +144,18 @@ describe("getDefaultDaemonConfig", () => {
     const daemon = getDefaultDaemonConfig();
     expect(daemon.semanticSearchThreshold).toBe(0.5);
   });
+
+  it("returns correct consolidation schedules", () => {
+    const daemon = getDefaultDaemonConfig();
+    expect(daemon.decaySchedule).toBe("0 3 * * *");
+    expect(daemon.creativeSchedule).toBe("0 4 * * 0");
+  });
+
+  it("returns correct consolidation parameters", () => {
+    const daemon = getDefaultDaemonConfig();
+    expect(daemon.baseDecayRate).toBe(0.1);
+    expect(daemon.creativeSimilarityThreshold).toBe(0.75);
+  });
 });
 
 describe("getDefaultQueryConfig", () => {
@@ -390,6 +402,30 @@ describe("transformConfig", () => {
     };
     const config = transformConfig(raw);
     expect(config.daemon.semanticSearchThreshold).toBe(0.75);
+  });
+
+  it("transforms daemon consolidation schedules", () => {
+    const raw: RawConfig = {
+      daemon: {
+        decay_schedule: "0 5 * * *",
+        creative_schedule: "0 6 * * 6",
+      },
+    };
+    const config = transformConfig(raw);
+    expect(config.daemon.decaySchedule).toBe("0 5 * * *");
+    expect(config.daemon.creativeSchedule).toBe("0 6 * * 6");
+  });
+
+  it("transforms daemon consolidation parameters", () => {
+    const raw: RawConfig = {
+      daemon: {
+        base_decay_rate: 0.2,
+        creative_similarity_threshold: 0.8,
+      },
+    };
+    const config = transformConfig(raw);
+    expect(config.daemon.baseDecayRate).toBe(0.2);
+    expect(config.daemon.creativeSimilarityThreshold).toBe(0.8);
   });
 
   it("transforms query config", () => {
@@ -676,6 +712,48 @@ describe("transformConfig", () => {
       };
       const config = transformConfig(raw);
       expect(config.daemon.semanticSearchThreshold).toBe(1);
+    });
+
+    it("rejects base_decay_rate below 0", () => {
+      const raw: RawConfig = {
+        daemon: { base_decay_rate: -0.1 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("rejects base_decay_rate above 1", () => {
+      const raw: RawConfig = {
+        daemon: { base_decay_rate: 1.5 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("rejects creative_similarity_threshold below 0", () => {
+      const raw: RawConfig = {
+        daemon: { creative_similarity_threshold: -0.1 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("rejects creative_similarity_threshold above 1", () => {
+      const raw: RawConfig = {
+        daemon: { creative_similarity_threshold: 1.5 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("rejects invalid decay_schedule", () => {
+      const raw: RawConfig = {
+        daemon: { decay_schedule: "invalid" },
+      };
+      expect(() => transformConfig(raw)).toThrow("Invalid cron schedule");
+    });
+
+    it("rejects invalid creative_schedule", () => {
+      const raw: RawConfig = {
+        daemon: { creative_schedule: "invalid" },
+      };
+      expect(() => transformConfig(raw)).toThrow("Invalid cron schedule");
     });
   });
 });

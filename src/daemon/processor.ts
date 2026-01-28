@@ -113,6 +113,33 @@ export interface AgentNodeOutput {
     analysisLog?: string;
     segmentTokenCount?: number;
   };
+  /** AutoMem typed relationships extracted by the analyzer */
+  relationships?: RelationshipOutput[];
+}
+
+/** Output schema for relationships extracted by the session analyzer */
+export interface RelationshipOutput {
+  /** UUID of the target node if known (null if unknown) */
+  targetNodeId: string | null;
+  /** Human-readable description of what this connects to */
+  targetDescription: string;
+  /** One of the 11 AutoMem relationship types */
+  type:
+    | "LEADS_TO"
+    | "PREFERS_OVER"
+    | "CONTRADICTS"
+    | "REINFORCES"
+    | "DERIVED_FROM"
+    | "EXEMPLIFIES"
+    | "PART_OF"
+    | "RELATES_TO"
+    | "OCCURRED_BEFORE"
+    | "INVALIDATED_BY"
+    | "EVOLVED_INTO";
+  /** Confidence in this relationship (0.0-1.0) */
+  confidence: number;
+  /** Brief explanation of why this relationship exists */
+  reason: string;
 }
 
 interface LessonOutput {

@@ -13,6 +13,7 @@ import {
   readPidFile,
 } from "../../daemon/cli.js";
 import { parseStoredError } from "../../daemon/errors.js";
+import { PatternAggregator } from "../../daemon/pattern-aggregation.js";
 import {
   getQueueStatusSummary,
   createQueueManager,
@@ -208,6 +209,51 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
       return reply.send(
         successResponse({ jobs: jobsWithParsedErrors }, durationMs)
       );
+    }
+  );
+
+  /**
+   * POST /daemon/aggregate - Trigger pattern aggregation
+   *
+   * Manually runs pattern aggregation to update model_stats,
+   * failure_patterns, and lesson_patterns tables from source data.
+   */
+  app.post(
+    "/aggregate",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
+
+      try {
+        const aggregator = new PatternAggregator(db);
+
+        const failurePatterns = aggregator.aggregateFailurePatterns();
+        const modelStats = aggregator.aggregateModelStats();
+        const lessonPatterns = aggregator.aggregateLessons();
+
+        const durationMs = Date.now() - startTime;
+        return reply.send(
+          successResponse(
+            {
+              aggregated: {
+                failurePatterns,
+                modelStats,
+                lessonPatterns,
+              },
+              message: "Pattern aggregation completed successfully",
+            },
+            durationMs
+          )
+        );
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        return reply
+          .status(500)
+          .send(
+            errorResponse("INTERNAL_ERROR", `Aggregation failed: ${message}`)
+          );
+      }
     }
   );
 }

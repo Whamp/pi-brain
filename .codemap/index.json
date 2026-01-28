@@ -1,24 +1,24 @@
 {
   "stats": {
-    "totalFiles": 91,
-    "totalSymbols": 1155,
+    "totalFiles": 98,
+    "totalSymbols": 1256,
     "byLanguage": {
-      "typescript": 91
+      "typescript": 98
     },
     "bySymbolKind": {
-      "function": 517,
-      "type": 42,
-      "interface": 263,
-      "variable": 119,
-      "class": 12,
-      "property": 51,
-      "constructor": 11,
-      "method": 138,
+      "function": 538,
+      "type": 43,
+      "interface": 283,
+      "variable": 134,
+      "class": 15,
+      "property": 62,
+      "constructor": 14,
+      "method": 165,
       "getter": 2
     }
   },
-  "total_tokens": 40152,
-  "codebase_tokens": 1103251,
+  "total_tokens": 43608,
+  "codebase_tokens": 1186031,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -369,18 +369,18 @@
       "language": "typescript",
       "lines": [
         1,
-        214
+        260
       ],
       "detail_level": "full",
-      "token_estimate": 71,
+      "token_estimate": 82,
       "symbols": [
         {
           "name": "daemonRoutes",
           "kind": "function",
           "signature": "async daemonRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            24,
-            213
+            25,
+            259
           ],
           "exported": true,
           "is_default": false,
@@ -400,6 +400,7 @@
       "imports": [
         "../../daemon/cli.js",
         "../../daemon/errors.js",
+        "../../daemon/pattern-aggregation.js",
         "../../daemon/queue.js",
         "../responses.js",
         "fastify",
@@ -808,7 +809,7 @@
       "language": "typescript",
       "lines": [
         1,
-        281
+        282
       ],
       "detail_level": "full",
       "token_estimate": 234,
@@ -895,7 +896,7 @@
           "signature": "async queryRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             106,
-            280
+            281
           ],
           "exported": true,
           "is_default": false,
@@ -2214,7 +2215,7 @@
       "language": "typescript",
       "lines": [
         1,
-        901
+        931
       ],
       "detail_level": "full",
       "token_estimate": 1325,
@@ -2301,7 +2302,7 @@
           "signature": "getDefaultDaemonConfig(): DaemonConfig",
           "lines": [
             59,
-            93
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -2319,8 +2320,8 @@
           "kind": "function",
           "signature": "getDefaultQueryConfig(): QueryConfig",
           "lines": [
-            98,
-            103
+            102,
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -2338,8 +2339,8 @@
           "kind": "function",
           "signature": "getDefaultApiConfig(): ApiConfig",
           "lines": [
-            108,
-            118
+            112,
+            122
           ],
           "exported": true,
           "is_default": false,
@@ -2357,8 +2358,8 @@
           "kind": "function",
           "signature": "getDefaultConfig(): PiBrainConfig",
           "lines": [
-            123,
-            131
+            127,
+            135
           ],
           "exported": true,
           "is_default": false,
@@ -2376,8 +2377,8 @@
           "kind": "function",
           "signature": "validateSyncMethod(method: string, spokeName: string): SyncMethod",
           "lines": [
-            136,
-            153
+            140,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -2395,8 +2396,8 @@
           "kind": "function",
           "signature": "validateSpokeSchedule(spokeName: string, syncMethod: SyncMethod, schedule: string, index: number): void",
           "lines": [
-            158,
-            170
+            162,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -2414,8 +2415,8 @@
           "kind": "function",
           "signature": "validateRsyncOptions(spokeName: string, syncMethod: SyncMethod, rawOptions: RawConfig[\"spokes\"][number][\"rsync_options\"]): any",
           "lines": [
-            175,
-            243
+            179,
+            247
           ],
           "exported": false,
           "is_default": false,
@@ -2433,8 +2434,8 @@
           "kind": "function",
           "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
           "lines": [
-            248,
-            296
+            252,
+            300
           ],
           "exported": false,
           "is_default": false,
@@ -2452,8 +2453,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            301,
-            309
+            305,
+            313
           ],
           "exported": false,
           "is_default": false,
@@ -2471,8 +2472,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            314,
-            320
+            318,
+            324
           ],
           "exported": false,
           "is_default": false,
@@ -2490,8 +2491,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            325,
-            331
+            329,
+            335
           ],
           "exported": false,
           "is_default": false,
@@ -2509,8 +2510,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            336,
-            342
+            340,
+            346
           ],
           "exported": false,
           "is_default": false,
@@ -2528,8 +2529,8 @@
           "kind": "function",
           "signature": "transformHubConfig(raw: RawConfig, defaults: PiBrainConfig): HubConfig",
           "lines": [
-            347,
-            364
+            351,
+            368
           ],
           "exported": false,
           "is_default": false,
@@ -2547,8 +2548,8 @@
           "kind": "function",
           "signature": "transformDaemonSchedules(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"reanalysisSchedule\" | \"connectionDiscoverySchedule\" | \"patternAggregationSchedule\" | \"clusteringSchedule\" | \"backfillEmbeddingsSchedule\">",
           "lines": [
-            369,
-            395
+            373,
+            399
           ],
           "exported": false,
           "is_default": false,
@@ -2566,8 +2567,8 @@
           "kind": "function",
           "signature": "transformDaemonLimits(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"backfillLimit\" | \"reanalysisLimit\" | \"connectionDiscoveryLimit\" | \"connectionDiscoveryLookbackDays\" | \"connectionDiscoveryCooldownHours\" | \"semanticSearchThreshold\">",
           "lines": [
-            400,
-            429
+            404,
+            433
           ],
           "exported": false,
           "is_default": false,
@@ -2585,8 +2586,8 @@
           "kind": "function",
           "signature": "transformDaemonEmbeddings(raw: RawConfig, defaults: PiBrainConfig): Pick<DaemonConfig, \"embeddingProvider\" | \"embeddingModel\" | \"embeddingApiKey\" | \"embeddingBaseUrl\" | \"embeddingDimensions\">",
           "lines": [
-            434,
-            454
+            438,
+            458
           ],
           "exported": false,
           "is_default": false,
@@ -2604,8 +2605,8 @@
           "kind": "function",
           "signature": "transformDaemonConfig(raw: RawConfig, defaults: PiBrainConfig): DaemonConfig",
           "lines": [
-            459,
-            493
+            463,
+            504
           ],
           "exported": false,
           "is_default": false,
@@ -2623,8 +2624,8 @@
           "kind": "function",
           "signature": "validateDaemonConfig(daemon: DaemonConfig): void",
           "lines": [
-            498,
-            562
+            509,
+            588
           ],
           "exported": false,
           "is_default": false,
@@ -2642,8 +2643,8 @@
           "kind": "function",
           "signature": "transformQueryConfig(raw: RawConfig, defaults: PiBrainConfig): QueryConfig",
           "lines": [
-            567,
-            575
+            593,
+            601
           ],
           "exported": false,
           "is_default": false,
@@ -2661,8 +2662,8 @@
           "kind": "function",
           "signature": "transformApiConfig(raw: RawConfig, defaults: PiBrainConfig): ApiConfig",
           "lines": [
-            580,
-            593
+            606,
+            619
           ],
           "exported": false,
           "is_default": false,
@@ -2680,8 +2681,8 @@
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            598,
-            632
+            624,
+            658
           ],
           "exported": true,
           "is_default": false,
@@ -2699,8 +2700,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            637,
-            645
+            663,
+            671
           ],
           "exported": true,
           "is_default": false,
@@ -2718,8 +2719,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            638,
-            644
+            664,
+            670
           ],
           "exported": false,
           "is_default": false,
@@ -2737,8 +2738,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            650,
-            705
+            676,
+            731
           ],
           "exported": true,
           "is_default": false,
@@ -2756,8 +2757,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            710,
-            715
+            736,
+            741
           ],
           "exported": true,
           "is_default": false,
@@ -2775,8 +2776,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            720,
-            755
+            746,
+            781
           ],
           "exported": true,
           "is_default": false,
@@ -2794,8 +2795,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            760,
-            819
+            786,
+            849
           ],
           "exported": true,
           "is_default": false,
@@ -2813,8 +2814,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            824,
-            832
+            854,
+            862
           ],
           "exported": true,
           "is_default": false,
@@ -2832,8 +2833,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            837,
-            839
+            867,
+            869
           ],
           "exported": true,
           "is_default": false,
@@ -2851,8 +2852,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            844,
-            848
+            874,
+            878
           ],
           "exported": true,
           "is_default": false,
@@ -2870,8 +2871,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            853,
-            860
+            883,
+            890
           ],
           "exported": true,
           "is_default": false,
@@ -2889,8 +2890,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            871,
-            900
+            901,
+            930
           ],
           "exported": true,
           "is_default": false,
@@ -2938,7 +2939,7 @@
       "language": "typescript",
       "lines": [
         1,
-        264
+        280
       ],
       "detail_level": "full",
       "token_estimate": 306,
@@ -3025,7 +3026,7 @@
           "signature": "DaemonConfig",
           "lines": [
             76,
-            154
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -3043,8 +3044,8 @@
           "kind": "interface",
           "signature": "QueryConfig",
           "lines": [
-            160,
-            166
+            172,
+            178
           ],
           "exported": true,
           "is_default": false,
@@ -3062,8 +3063,8 @@
           "kind": "interface",
           "signature": "ApiConfig",
           "lines": [
-            171,
-            180
+            183,
+            192
           ],
           "exported": true,
           "is_default": false,
@@ -3081,8 +3082,8 @@
           "kind": "interface",
           "signature": "PiBrainConfig",
           "lines": [
-            185,
-            200
+            197,
+            212
           ],
           "exported": true,
           "is_default": false,
@@ -3100,8 +3101,8 @@
           "kind": "interface",
           "signature": "RawConfig",
           "lines": [
-            206,
-            263
+            218,
+            279
           ],
           "exported": true,
           "is_default": false,
@@ -4238,22 +4239,1317 @@
       ]
     },
     {
+      "path": "src/daemon/consolidation/creative-associator.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        245
+      ],
+      "detail_level": "full",
+      "token_estimate": 429,
+      "symbols": [
+        {
+          "name": "DEFAULT_SIMILARITY_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.75",
+          "lines": [
+            26,
+            26
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default similarity threshold for creating edges",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_SAMPLE_SIZE",
+          "kind": "variable",
+          "signature": "50",
+          "lines": [
+            29,
+            29
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default number of nodes to sample per run",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_EDGES_PER_NODE",
+          "kind": "variable",
+          "signature": "3",
+          "lines": [
+            32,
+            32
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Maximum edges to create per node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociatorConfig",
+          "kind": "interface",
+          "signature": "CreativeAssociatorConfig",
+          "lines": [
+            41,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Configuration for the creative associator",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociatorResult",
+          "kind": "interface",
+          "signature": "CreativeAssociatorResult",
+          "lines": [
+            55,
+            64
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of a creative association run",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeWithEmbedding",
+          "kind": "interface",
+          "signature": "NodeWithEmbedding",
+          "lines": [
+            69,
+            73
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Node with embedding data",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociator",
+          "kind": "class",
+          "signature": "CreativeAssociator",
+          "lines": [
+            82,
+            244
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Discovers and creates non-obvious connections between nodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "similarityThreshold",
+          "kind": "property",
+          "signature": "similarityThreshold: number",
+          "lines": [
+            83,
+            83
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sampleSize",
+          "kind": "property",
+          "signature": "sampleSize: number",
+          "lines": [
+            84,
+            84
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "minRelevance",
+          "kind": "property",
+          "signature": "minRelevance: number",
+          "lines": [
+            85,
+            85
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "maxEdgesPerNode",
+          "kind": "property",
+          "signature": "maxEdgesPerNode: number",
+          "lines": [
+            86,
+            86
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private db: Database.Database, config: CreativeAssociatorConfig = {})",
+          "lines": [
+            88,
+            97
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "edgeExists",
+          "kind": "method",
+          "signature": "edgeExists(sourceId: string, targetId: string): boolean",
+          "lines": [
+            102,
+            113
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Check if a connection already exists between two nodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sampleNodes",
+          "kind": "method",
+          "signature": "sampleNodes(): {}",
+          "lines": [
+            118,
+            139
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Sample nodes with sufficient relevance that have embeddings",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findSimilarNodes",
+          "kind": "method",
+          "signature": "async findSimilarNodes(nodeId: string, summary: string | null): Promise<{}>",
+          "lines": [
+            144,
+            168
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Find similar nodes using semantic search",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "run",
+          "kind": "method",
+          "signature": "async run(): Promise<CreativeAssociatorResult>",
+          "lines": [
+            173,
+            231
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Run creative association to discover new connections",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getConfig",
+          "kind": "method",
+          "signature": "getConfig(): Required<CreativeAssociatorConfig>",
+          "lines": [
+            236,
+            243
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Get configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../../storage/database.js",
+        "../../storage/edge-repository.js",
+        "../../storage/embedding-utils.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/decay-scheduler.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        351
+      ],
+      "detail_level": "full",
+      "token_estimate": 656,
+      "symbols": [
+        {
+          "name": "ConsolidationConfig",
+          "kind": "interface",
+          "signature": "ConsolidationConfig",
+          "lines": [
+            31,
+            40
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Configuration for consolidation jobs",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationResult",
+          "kind": "interface",
+          "signature": "ConsolidationResult",
+          "lines": [
+            45,
+            52
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of a consolidation job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationLogger",
+          "kind": "interface",
+          "signature": "ConsolidationLogger",
+          "lines": [
+            57,
+            62
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Logger interface",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "noopLogger",
+          "kind": "variable",
+          "signature": "ConsolidationLogger",
+          "lines": [
+            65,
+            72
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default no-op logger",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_DECAY_SCHEDULE",
+          "kind": "variable",
+          "signature": "\"0 3 * * *\"",
+          "lines": [
+            79,
+            79
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default decay schedule: daily at 3am",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_CREATIVE_SCHEDULE",
+          "kind": "variable",
+          "signature": "\"0 4 * * 0\"",
+          "lines": [
+            82,
+            82
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default creative schedule: weekly Sunday at 4am",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationScheduler",
+          "kind": "class",
+          "signature": "ConsolidationScheduler",
+          "lines": [
+            91,
+            339
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Scheduler for memory consolidation jobs",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "decayJob",
+          "kind": "property",
+          "signature": "decayJob: Cron | null",
+          "lines": [
+            92,
+            92
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "creativeJob",
+          "kind": "property",
+          "signature": "creativeJob: Cron | null",
+          "lines": [
+            93,
+            93
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "running",
+          "kind": "property",
+          "signature": "running",
+          "lines": [
+            94,
+            94
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "lastDecayResult",
+          "kind": "property",
+          "signature": "lastDecayResult: ConsolidationResult | null",
+          "lines": [
+            95,
+            95
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "lastCreativeResult",
+          "kind": "property",
+          "signature": "lastCreativeResult: ConsolidationResult | null",
+          "lines": [
+            96,
+            96
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "relevanceCalculator",
+          "kind": "property",
+          "signature": "relevanceCalculator: RelevanceCalculator",
+          "lines": [
+            97,
+            97
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "creativeAssociator",
+          "kind": "property",
+          "signature": "creativeAssociator: CreativeAssociator",
+          "lines": [
+            98,
+            98
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private config: ConsolidationConfig, private db: Database.Database, private logger: ConsolidationLogger = noopLogger)",
+          "lines": [
+            100,
+            110
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "start",
+          "kind": "method",
+          "signature": "start(): void",
+          "lines": [
+            115,
+            169
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Start the consolidation scheduler",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "stop",
+          "kind": "method",
+          "signature": "stop(): void",
+          "lines": [
+            174,
+            192
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Stop the consolidation scheduler",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isRunning",
+          "kind": "method",
+          "signature": "isRunning(): boolean",
+          "lines": [
+            197,
+            199
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Check if scheduler is running",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getStatus",
+          "kind": "method",
+          "signature": "getStatus(): { running: boolean; decay: { schedule: string; nextRun: any; lastResult: ConsolidationResult; }; creative: { schedule: string; nextRun: any; lastResult: ConsolidationResult; }; }",
+          "lines": [
+            204,
+            230
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get scheduler status",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "triggerDecay",
+          "kind": "method",
+          "signature": "triggerDecay(): Promise<ConsolidationResult>",
+          "lines": [
+            235,
+            237
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Manually trigger decay job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "triggerCreative",
+          "kind": "method",
+          "signature": "triggerCreative(): Promise<ConsolidationResult>",
+          "lines": [
+            242,
+            244
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Manually trigger creative association job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runDecay",
+          "kind": "method",
+          "signature": "runDecay(): Promise<ConsolidationResult>",
+          "lines": [
+            249,
+            279
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Run decay job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runCreative",
+          "kind": "method",
+          "signature": "async runCreative(): Promise<ConsolidationResult>",
+          "lines": [
+            284,
+            324
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Run creative association job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getRelevanceCalculator",
+          "kind": "method",
+          "signature": "getRelevanceCalculator(): RelevanceCalculator",
+          "lines": [
+            329,
+            331
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get the relevance calculator for direct access",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getCreativeAssociator",
+          "kind": "method",
+          "signature": "getCreativeAssociator(): CreativeAssociator",
+          "lines": [
+            336,
+            338
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get the creative associator for direct access",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createConsolidationScheduler",
+          "kind": "function",
+          "signature": "createConsolidationScheduler(db: Database.Database, config?: ConsolidationConfig, logger?: ConsolidationLogger): ConsolidationScheduler",
+          "lines": [
+            344,
+            350
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Create a consolidation scheduler with default configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./creative-associator.js",
+        "./relevance.js",
+        "better-sqlite3",
+        "croner"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/index.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        25
+      ],
+      "detail_level": "full",
+      "token_estimate": 33,
+      "symbols": [],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./creative-associator.js",
+        "./decay-scheduler.js",
+        "./relevance.js"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/relevance.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        346
+      ],
+      "detail_level": "full",
+      "token_estimate": 630,
+      "symbols": [
+        {
+          "name": "DEFAULT_BASE_DECAY_RATE",
+          "kind": "variable",
+          "signature": "0.1",
+          "lines": [
+            21,
+            21
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default daily decay rate (10% per day of age)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ARCHIVE_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.2",
+          "lines": [
+            24,
+            24
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Threshold below which nodes get archived",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DELETE_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.05",
+          "lines": [
+            27,
+            27
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Threshold below which nodes get deleted (if enabled)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MS_PER_DAY",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            30,
+            30
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Milliseconds per day",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceFactors",
+          "kind": "interface",
+          "signature": "RelevanceFactors",
+          "lines": [
+            39,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Factors used in relevance calculation",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceResult",
+          "kind": "interface",
+          "signature": "RelevanceResult",
+          "lines": [
+            55,
+            62
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of calculating relevance for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeRow",
+          "kind": "interface",
+          "signature": "NodeRow",
+          "lines": [
+            67,
+            74
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Node data needed for relevance calculation",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceCalculator",
+          "kind": "class",
+          "signature": "RelevanceCalculator",
+          "lines": [
+            83,
+            345
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculates and updates node relevance scores",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private db: Database.Database, private baseDecayRate: number = DEFAULT_BASE_DECAY_RATE)",
+          "lines": [
+            84,
+            87
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateDecayFactor",
+          "kind": "method",
+          "signature": "calculateDecayFactor(ageInDays: number): number",
+          "lines": [
+            93,
+            95
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate the decay factor based on age\nUses exponential decay: e^(-rate * age)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateAccessRecency",
+          "kind": "method",
+          "signature": "calculateAccessRecency(daysSinceAccess: number): number",
+          "lines": [
+            101,
+            112
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate access recency factor (0.0-1.0)\nReturns 1.0 for recently accessed, decreasing over time",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelationshipDensity",
+          "kind": "method",
+          "signature": "calculateRelationshipDensity(edgeCount: number): number",
+          "lines": [
+            118,
+            121
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate relationship density factor\nMore edges = higher relevance",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelevance",
+          "kind": "method",
+          "signature": "calculateRelevance(factors: RelevanceFactors): number",
+          "lines": [
+            126,
+            143
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate full relevance score using AutoMem formula",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getEdgeCount",
+          "kind": "method",
+          "signature": "getEdgeCount(nodeId: string): number",
+          "lines": [
+            148,
+            158
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get edge count for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateForNode",
+          "kind": "method",
+          "signature": "calculateForNode(nodeId: string): RelevanceResult",
+          "lines": [
+            163,
+            202
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate relevance for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "updateNodeRelevance",
+          "kind": "method",
+          "signature": "updateNodeRelevance(nodeId: string): RelevanceResult",
+          "lines": [
+            207,
+            222
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Update relevance score for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runDecay",
+          "kind": "method",
+          "signature": "runDecay(): { updated: number; archived: number; deleted: number; results: {}; }",
+          "lines": [
+            228,
+            301
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Run decay on all non-archived nodes\nReturns count of nodes updated",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "touchNode",
+          "kind": "method",
+          "signature": "touchNode(nodeId: string): void",
+          "lines": [
+            307,
+            315
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Mark node as accessed (updates last_accessed timestamp)\nCall this when a node is queried or viewed",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "unarchiveNode",
+          "kind": "method",
+          "signature": "unarchiveNode(nodeId: string): void",
+          "lines": [
+            321,
+            330
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Unarchive a node (restore from archived state)\nAlso resets relevance score to 0.5",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getArchiveThreshold",
+          "kind": "method",
+          "signature": "getArchiveThreshold(): number",
+          "lines": [
+            335,
+            337
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get archive threshold",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getDeleteThreshold",
+          "kind": "method",
+          "signature": "getDeleteThreshold(): number",
+          "lines": [
+            342,
+            344
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get delete threshold",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "better-sqlite3"
+      ]
+    },
+    {
       "path": "src/daemon/daemon-process.ts",
       "language": "typescript",
       "lines": [
         1,
-        312
+        339
       ],
       "detail_level": "full",
-      "token_estimate": 112,
+      "token_estimate": 120,
       "symbols": [
         {
           "name": "args",
           "kind": "variable",
           "signature": "any",
           "lines": [
-            30,
-            30
+            31,
+            31
           ],
           "exported": false,
           "is_default": false,
@@ -4271,8 +5567,8 @@
           "kind": "variable",
           "signature": "string | undefined",
           "lines": [
-            31,
-            31
+            32,
+            32
           ],
           "exported": false,
           "is_default": false,
@@ -4290,8 +5586,8 @@
           "kind": "variable",
           "signature": "boolean",
           "lines": [
-            32,
-            32
+            33,
+            33
           ],
           "exported": false,
           "is_default": false,
@@ -4309,8 +5605,8 @@
           "kind": "variable",
           "signature": "(event: Event): void",
           "lines": [
-            47,
-            50
+            48,
+            51
           ],
           "exported": false,
           "is_default": false,
@@ -4328,8 +5624,8 @@
           "kind": "variable",
           "signature": "(ms: number): any",
           "lines": [
-            52,
-            55
+            53,
+            56
           ],
           "exported": false,
           "is_default": false,
@@ -4347,8 +5643,8 @@
           "kind": "function",
           "signature": "async main(): Promise<void>",
           "lines": [
-            61,
-            300
+            62,
+            327
           ],
           "exported": false,
           "is_default": false,
@@ -4370,6 +5666,7 @@
         "../config/config.js",
         "../storage/database.js",
         "./cli.js",
+        "./consolidation/index.js",
         "./queue.js",
         "./scheduler.js",
         "./watcher-events.js",
@@ -6823,10 +8120,10 @@
       "language": "typescript",
       "lines": [
         1,
-        809
+        836
       ],
       "detail_level": "full",
-      "token_estimate": 1060,
+      "token_estimate": 1093,
       "symbols": [
         {
           "name": "AgentResult",
@@ -6853,7 +8150,7 @@
           "signature": "AgentNodeOutput",
           "lines": [
             37,
-            116
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -6867,12 +8164,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "RelationshipOutput",
+          "kind": "interface",
+          "signature": "RelationshipOutput",
+          "lines": [
+            121,
+            143
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Output schema for relationships extracted by the session analyzer",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "LessonOutput",
           "kind": "interface",
           "signature": "LessonOutput",
           "lines": [
-            118,
-            125
+            145,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -6890,8 +8206,8 @@
           "kind": "interface",
           "signature": "SkillInfo",
           "lines": [
-            128,
-            132
+            155,
+            159
           ],
           "exported": true,
           "is_default": false,
@@ -6909,8 +8225,8 @@
           "kind": "interface",
           "signature": "ProcessorLogger",
           "lines": [
-            135,
-            140
+            162,
+            167
           ],
           "exported": true,
           "is_default": false,
@@ -6928,8 +8244,8 @@
           "kind": "variable",
           "signature": "ProcessorLogger",
           "lines": [
-            143,
-            148
+            170,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -6947,8 +8263,8 @@
           "kind": "variable",
           "signature": "readonly []",
           "lines": [
-            155,
-            155
+            182,
+            182
           ],
           "exported": true,
           "is_default": false,
@@ -6966,8 +8282,8 @@
           "kind": "variable",
           "signature": "readonly [\"codemap\"]",
           "lines": [
-            158,
-            158
+            185,
+            185
           ],
           "exported": true,
           "is_default": false,
@@ -6985,8 +8301,8 @@
           "kind": "variable",
           "signature": "readonly [\"rlm\"]",
           "lines": [
-            161,
-            161
+            188,
+            188
           ],
           "exported": true,
           "is_default": false,
@@ -7004,8 +8320,8 @@
           "kind": "variable",
           "signature": "number",
           "lines": [
-            164,
-            164
+            191,
+            191
           ],
           "exported": true,
           "is_default": false,
@@ -7023,8 +8339,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            167,
-            167
+            194,
+            194
           ],
           "exported": true,
           "is_default": false,
@@ -7042,8 +8358,8 @@
           "kind": "function",
           "signature": "async checkSkillAvailable(skillName: string): Promise<boolean>",
           "lines": [
-            176,
-            184
+            203,
+            211
           ],
           "exported": true,
           "is_default": false,
@@ -7061,8 +8377,8 @@
           "kind": "function",
           "signature": "async getSkillAvailability(): Promise<Map<string, SkillInfo>>",
           "lines": [
-            189,
-            209
+            216,
+            236
           ],
           "exported": true,
           "is_default": false,
@@ -7080,8 +8396,8 @@
           "kind": "interface",
           "signature": "EnvironmentValidationResult",
           "lines": [
-            212,
-            219
+            239,
+            246
           ],
           "exported": true,
           "is_default": false,
@@ -7099,8 +8415,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            225,
-            237
+            252,
+            264
           ],
           "exported": true,
           "is_default": false,
@@ -7118,8 +8434,8 @@
           "kind": "function",
           "signature": "async buildSkillsArg(sessionFile?: string): Promise<string>",
           "lines": [
-            246,
-            283
+            273,
+            310
           ],
           "exported": true,
           "is_default": false,
@@ -7137,8 +8453,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            292,
-            324
+            319,
+            351
           ],
           "exported": true,
           "is_default": false,
@@ -7156,8 +8472,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            329,
-            348
+            356,
+            375
           ],
           "exported": false,
           "is_default": false,
@@ -7175,8 +8491,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            357,
-            465
+            384,
+            492
           ],
           "exported": true,
           "is_default": false,
@@ -7194,8 +8510,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            468,
-            474
+            495,
+            501
           ],
           "exported": false,
           "is_default": false,
@@ -7213,8 +8529,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            479,
-            543
+            506,
+            570
           ],
           "exported": false,
           "is_default": false,
@@ -7232,8 +8548,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            550,
-            555
+            577,
+            582
           ],
           "exported": false,
           "is_default": false,
@@ -7251,8 +8567,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            557,
-            560
+            584,
+            587
           ],
           "exported": false,
           "is_default": false,
@@ -7270,8 +8586,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            562,
-            566
+            589,
+            593
           ],
           "exported": false,
           "is_default": false,
@@ -7289,8 +8605,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            571,
-            640
+            598,
+            667
           ],
           "exported": true,
           "is_default": false,
@@ -7308,8 +8624,8 @@
           "kind": "function",
           "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput",
           "lines": [
-            646,
-            679
+            673,
+            706
           ],
           "exported": true,
           "is_default": false,
@@ -7327,8 +8643,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            684,
-            730
+            711,
+            757
           ],
           "exported": true,
           "is_default": false,
@@ -7346,8 +8662,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            737,
-            742
+            764,
+            769
           ],
           "exported": true,
           "is_default": false,
@@ -7365,8 +8681,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            747,
-            801
+            774,
+            828
           ],
           "exported": true,
           "is_default": false,
@@ -7384,8 +8700,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            748,
-            748
+            775,
+            775
           ],
           "exported": false,
           "is_default": false,
@@ -7403,8 +8719,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            749,
-            749
+            776,
+            776
           ],
           "exported": false,
           "is_default": false,
@@ -7422,8 +8738,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            751,
-            754
+            778,
+            781
           ],
           "exported": false,
           "is_default": false,
@@ -7441,8 +8757,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            759,
-            775
+            786,
+            802
           ],
           "exported": false,
           "is_default": false,
@@ -7460,8 +8776,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            781,
-            800
+            808,
+            827
           ],
           "exported": false,
           "is_default": false,
@@ -7479,8 +8795,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            806,
-            808
+            833,
+            835
           ],
           "exported": true,
           "is_default": false,
@@ -7511,18 +8827,18 @@
       "language": "typescript",
       "lines": [
         1,
-        786
+        823
       ],
       "detail_level": "full",
-      "token_estimate": 727,
+      "token_estimate": 676,
       "symbols": [
         {
           "name": "QueryRequest",
           "kind": "interface",
           "signature": "QueryRequest",
           "lines": [
-            32,
-            45
+            38,
+            52
           ],
           "exported": true,
           "is_default": false,
@@ -7540,8 +8856,8 @@
           "kind": "interface",
           "signature": "QueryResponse",
           "lines": [
-            48,
-            66
+            55,
+            73
           ],
           "exported": true,
           "is_default": false,
@@ -7559,8 +8875,8 @@
           "kind": "interface",
           "signature": "AgentQueryResult",
           "lines": [
-            69,
-            74
+            76,
+            81
           ],
           "exported": false,
           "is_default": false,
@@ -7578,8 +8894,8 @@
           "kind": "interface",
           "signature": "AgentQueryOutput",
           "lines": [
-            77,
-            85
+            84,
+            92
           ],
           "exported": false,
           "is_default": false,
@@ -7597,8 +8913,8 @@
           "kind": "interface",
           "signature": "QueryProcessorConfig",
           "lines": [
-            91,
-            104
+            98,
+            111
           ],
           "exported": true,
           "is_default": false,
@@ -7616,8 +8932,8 @@
           "kind": "function",
           "signature": "async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse>",
           "lines": [
-            109,
-            188
+            116,
+            211
           ],
           "exported": true,
           "is_default": false,
@@ -7635,8 +8951,8 @@
           "kind": "interface",
           "signature": "RelevantNode",
           "lines": [
-            194,
-            202
+            217,
+            227
           ],
           "exported": false,
           "is_default": false,
@@ -7652,10 +8968,10 @@
         {
           "name": "findRelevantNodes",
           "kind": "function",
-          "signature": "async findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number, embeddingProvider: EmbeddingProvider | undefined, semanticSearchThreshold: number | undefined, logger: ProcessorLogger): Promise<{}>",
+          "signature": "async findRelevantNodes(db: Database, query: string, project: string | undefined, maxNodes: number, embeddingProvider: EmbeddingProvider | undefined, logger: ProcessorLogger): Promise<{}>",
           "lines": [
-            213,
-            291
+            232,
+            305
           ],
           "exported": false,
           "is_default": false,
@@ -7664,7 +8980,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Find nodes relevant to the query.\n\nUses a two-phase search strategy:\n1. Semantic search (if embedding provider configured) - finds nodes by meaning\n2. FTS fallback - finds nodes by keyword match\n\nFalls back to listing recent nodes if both searches return no results.",
+          "comment": "Find nodes relevant to the query using Hybrid Search.",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -7673,8 +8989,8 @@
           "kind": "function",
           "signature": "nodeRowToRelevant(row: NodeRow): RelevantNode",
           "lines": [
-            296,
-            306
+            310,
+            320
           ],
           "exported": false,
           "is_default": false,
@@ -7692,8 +9008,8 @@
           "kind": "interface",
           "signature": "AdditionalContext",
           "lines": [
-            312,
-            315
+            326,
+            329
           ],
           "exported": false,
           "is_default": false,
@@ -7711,8 +9027,8 @@
           "kind": "function",
           "signature": "gatherAdditionalContext(db: Database, query: string, logger: ProcessorLogger): AdditionalContext",
           "lines": [
-            320,
-            370
+            334,
+            384
           ],
           "exported": false,
           "is_default": false,
@@ -7728,10 +9044,10 @@
         {
           "name": "invokeQueryAgent",
           "kind": "function",
-          "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
+          "signature": "async invokeQueryAgent(query: string, nodes: RelevantNode[], bridgePaths: BridgePath[], additionalContext: AdditionalContext, config: QueryProcessorConfig, logger: ProcessorLogger): Promise<AgentQueryResult>",
           "lines": [
-            379,
-            480
+            393,
+            500
           ],
           "exported": false,
           "is_default": false,
@@ -7747,10 +9063,10 @@
         {
           "name": "buildQueryPrompt",
           "kind": "function",
-          "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], additionalContext: AdditionalContext): string",
+          "signature": "buildQueryPrompt(query: string, nodes: RelevantNode[], bridgePaths: BridgePath[], additionalContext: AdditionalContext): string",
           "lines": [
-            485,
-            547
+            505,
+            584
           ],
           "exported": false,
           "is_default": false,
@@ -7768,8 +9084,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            553,
-            559
+            590,
+            596
           ],
           "exported": false,
           "is_default": false,
@@ -7787,8 +9103,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            561,
-            623
+            598,
+            660
           ],
           "exported": false,
           "is_default": false,
@@ -7806,8 +9122,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            629,
-            633
+            666,
+            670
           ],
           "exported": false,
           "is_default": false,
@@ -7825,8 +9141,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            635,
-            638
+            672,
+            675
           ],
           "exported": false,
           "is_default": false,
@@ -7844,8 +9160,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            640,
-            643
+            677,
+            680
           ],
           "exported": false,
           "is_default": false,
@@ -7863,8 +9179,8 @@
           "kind": "interface",
           "signature": "ParseResult",
           "lines": [
-            645,
-            649
+            682,
+            686
           ],
           "exported": false,
           "is_default": false,
@@ -7882,8 +9198,8 @@
           "kind": "function",
           "signature": "parseQueryOutput(stdout: string, logger: ProcessorLogger): ParseResult",
           "lines": [
-            651,
-            727
+            688,
+            764
           ],
           "exported": false,
           "is_default": false,
@@ -7901,8 +9217,8 @@
           "kind": "function",
           "signature": "extractQueryOutput(text: string, logger: ProcessorLogger): AgentQueryOutput",
           "lines": [
-            729,
-            762
+            766,
+            799
           ],
           "exported": false,
           "is_default": false,
@@ -7920,8 +9236,8 @@
           "kind": "function",
           "signature": "isValidQueryOutput(obj: unknown): boolean",
           "lines": [
-            764,
-            785
+            801,
+            822
           ],
           "exported": false,
           "is_default": false,
@@ -7940,12 +9256,12 @@
       "code_blocks": null,
       "imports": [
         "../config/types.js",
+        "../storage/bridge-discovery.js",
         "../storage/database.js",
+        "../storage/hybrid-search.js",
         "../storage/node-crud.js",
         "../storage/node-queries.js",
         "../storage/quirk-repository.js",
-        "../storage/search-repository.js",
-        "../storage/semantic-search.js",
         "../storage/tool-error-repository.js",
         "./facet-discovery.js",
         "./processor.js",
@@ -10498,18 +11814,18 @@
       "language": "typescript",
       "lines": [
         1,
-        791
+        815
       ],
       "detail_level": "full",
-      "token_estimate": 1212,
+      "token_estimate": 1221,
       "symbols": [
         {
           "name": "WorkerConfig",
           "kind": "interface",
           "signature": "WorkerConfig",
           "lines": [
-            66,
-            83
+            67,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -10527,8 +11843,8 @@
           "kind": "interface",
           "signature": "WorkerStatus",
           "lines": [
-            86,
-            101
+            87,
+            102
           ],
           "exported": true,
           "is_default": false,
@@ -10546,8 +11862,8 @@
           "kind": "interface",
           "signature": "JobProcessingResult",
           "lines": [
-            104,
-            117
+            105,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -10565,8 +11881,8 @@
           "kind": "class",
           "signature": "Worker",
           "lines": [
-            126,
-            730
+            127,
+            754
           ],
           "exported": true,
           "is_default": false,
@@ -10584,8 +11900,8 @@
           "kind": "property",
           "signature": "id: string",
           "lines": [
-            127,
-            127
+            128,
+            128
           ],
           "exported": false,
           "is_default": false,
@@ -10603,8 +11919,8 @@
           "kind": "property",
           "signature": "config: PiBrainConfig",
           "lines": [
-            128,
-            128
+            129,
+            129
           ],
           "exported": false,
           "is_default": false,
@@ -10622,8 +11938,8 @@
           "kind": "property",
           "signature": "retryPolicy: RetryPolicy",
           "lines": [
-            129,
-            129
+            130,
+            130
           ],
           "exported": false,
           "is_default": false,
@@ -10641,8 +11957,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            130,
-            130
+            131,
+            131
           ],
           "exported": false,
           "is_default": false,
@@ -10660,8 +11976,8 @@
           "kind": "property",
           "signature": "onJobStarted?: (\n    job: AnalysisJob,\n    workerId: string\n  ) => Promise<void>",
           "lines": [
-            131,
-            134
+            132,
+            135
           ],
           "exported": false,
           "is_default": false,
@@ -10679,8 +11995,8 @@
           "kind": "property",
           "signature": "onNodeCreated?: (\n    job: AnalysisJob,\n    node: Node\n  ) => Promise<void>",
           "lines": [
-            135,
-            138
+            136,
+            139
           ],
           "exported": false,
           "is_default": false,
@@ -10698,8 +12014,8 @@
           "kind": "property",
           "signature": "onJobFailed?: (\n    job: AnalysisJob,\n    error: Error\n  ) => Promise<void>",
           "lines": [
-            139,
-            142
+            140,
+            143
           ],
           "exported": false,
           "is_default": false,
@@ -10717,8 +12033,8 @@
           "kind": "property",
           "signature": "pollIntervalMs: number",
           "lines": [
-            143,
-            143
+            144,
+            144
           ],
           "exported": false,
           "is_default": false,
@@ -10736,8 +12052,8 @@
           "kind": "property",
           "signature": "queue: QueueManager | null",
           "lines": [
-            145,
-            145
+            146,
+            146
           ],
           "exported": false,
           "is_default": false,
@@ -10755,8 +12071,8 @@
           "kind": "property",
           "signature": "processor: JobProcessor | null",
           "lines": [
-            146,
-            146
+            147,
+            147
           ],
           "exported": false,
           "is_default": false,
@@ -10774,8 +12090,8 @@
           "kind": "property",
           "signature": "connectionDiscoverer: ConnectionDiscoverer | null",
           "lines": [
-            147,
-            147
+            148,
+            148
           ],
           "exported": false,
           "is_default": false,
@@ -10793,8 +12109,8 @@
           "kind": "property",
           "signature": "embeddingProvider: EmbeddingProvider | null",
           "lines": [
-            148,
-            148
+            149,
+            149
           ],
           "exported": false,
           "is_default": false,
@@ -10812,8 +12128,8 @@
           "kind": "property",
           "signature": "db: Database.Database | null",
           "lines": [
-            149,
-            149
+            150,
+            150
           ],
           "exported": false,
           "is_default": false,
@@ -10831,8 +12147,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            150,
-            150
+            151,
+            151
           ],
           "exported": false,
           "is_default": false,
@@ -10850,8 +12166,8 @@
           "kind": "property",
           "signature": "currentJob: AnalysisJob | null",
           "lines": [
-            151,
-            151
+            152,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -10869,8 +12185,8 @@
           "kind": "property",
           "signature": "startedAt: Date | null",
           "lines": [
-            152,
-            152
+            153,
+            153
           ],
           "exported": false,
           "is_default": false,
@@ -10888,8 +12204,8 @@
           "kind": "property",
           "signature": "jobsProcessed",
           "lines": [
-            155,
-            155
+            156,
+            156
           ],
           "exported": false,
           "is_default": false,
@@ -10907,8 +12223,8 @@
           "kind": "property",
           "signature": "jobsSucceeded",
           "lines": [
-            156,
-            156
+            157,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -10926,8 +12242,8 @@
           "kind": "property",
           "signature": "jobsFailed",
           "lines": [
-            157,
-            157
+            158,
+            158
           ],
           "exported": false,
           "is_default": false,
@@ -10945,8 +12261,8 @@
           "kind": "constructor",
           "signature": "constructor(config: WorkerConfig)",
           "lines": [
-            159,
-            168
+            160,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -10964,8 +12280,8 @@
           "kind": "method",
           "signature": "initialize(db: Database.Database): void",
           "lines": [
-            173,
-            184
+            174,
+            185
           ],
           "exported": false,
           "is_default": false,
@@ -10983,8 +12299,8 @@
           "kind": "method",
           "signature": "initializeEmbeddingProvider(): void",
           "lines": [
-            190,
-            229
+            191,
+            230
           ],
           "exported": false,
           "is_default": false,
@@ -11002,8 +12318,8 @@
           "kind": "method",
           "signature": "async start(): Promise<void>",
           "lines": [
-            234,
-            293
+            235,
+            294
           ],
           "exported": false,
           "is_default": false,
@@ -11021,8 +12337,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            298,
-            301
+            299,
+            302
           ],
           "exported": false,
           "is_default": false,
@@ -11040,8 +12356,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            306,
-            308
+            307,
+            309
           ],
           "exported": false,
           "is_default": false,
@@ -11059,8 +12375,8 @@
           "kind": "method",
           "signature": "getCurrentJob(): any",
           "lines": [
-            313,
-            315
+            314,
+            316
           ],
           "exported": false,
           "is_default": false,
@@ -11078,8 +12394,8 @@
           "kind": "method",
           "signature": "getStatus(): WorkerStatus",
           "lines": [
-            320,
-            330
+            321,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -11097,8 +12413,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            335,
-            377
+            336,
+            378
           ],
           "exported": false,
           "is_default": false,
@@ -11116,8 +12432,8 @@
           "kind": "method",
           "signature": "async handleConnectionDiscoveryJob(job: AnalysisJob, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            382,
-            411
+            383,
+            412
           ],
           "exported": false,
           "is_default": false,
@@ -11135,8 +12451,8 @@
           "kind": "method",
           "signature": "async handleAnalysisJob(job: AnalysisJob, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            416,
-            434
+            417,
+            435
           ],
           "exported": false,
           "is_default": false,
@@ -11154,8 +12470,8 @@
           "kind": "method",
           "signature": "async processAnalysisResult(job: AnalysisJob, result: Awaited<ReturnType<JobProcessor[\"process\"]>>, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            439,
-            542
+            440,
+            566
           ],
           "exported": false,
           "is_default": false,
@@ -11173,8 +12489,8 @@
           "kind": "method",
           "signature": "extractSegment(entries: { id: string; timestamp?: string }[], segmentStart?: string, segmentEnd?: string): { segmentEntries: {}; entryCount: number; }",
           "lines": [
-            547,
-            570
+            571,
+            594
           ],
           "exported": false,
           "is_default": false,
@@ -11192,8 +12508,8 @@
           "kind": "method",
           "signature": "detectAbandonedRestart(project: string | undefined, segmentStartTime: string, currentFilesTouched: string[]): boolean",
           "lines": [
-            575,
-            603
+            599,
+            627
           ],
           "exported": false,
           "is_default": false,
@@ -11211,8 +12527,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            608,
-            675
+            632,
+            699
           ],
           "exported": false,
           "is_default": false,
@@ -11230,8 +12546,8 @@
           "kind": "method",
           "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
           "lines": [
-            683,
-            720
+            707,
+            744
           ],
           "exported": false,
           "is_default": false,
@@ -11249,8 +12565,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            725,
-            729
+            749,
+            753
           ],
           "exported": false,
           "is_default": false,
@@ -11268,8 +12584,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            739,
-            741
+            763,
+            765
           ],
           "exported": true,
           "is_default": false,
@@ -11287,8 +12603,8 @@
           "kind": "function",
           "signature": "processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            747,
-            761
+            771,
+            785
           ],
           "exported": true,
           "is_default": false,
@@ -11306,8 +12622,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            766,
-            790
+            790,
+            814
           ],
           "exported": true,
           "is_default": false,
@@ -11333,6 +12649,7 @@
         "../storage/index.js",
         "../storage/node-conversion.js",
         "../storage/node-types.js",
+        "../storage/relationship-edges.js",
         "./connection-discovery.js",
         "./errors.js",
         "./facet-discovery.js",
@@ -15591,6 +16908,122 @@
       "imports": []
     },
     {
+      "path": "src/storage/bridge-discovery.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        260
+      ],
+      "detail_level": "full",
+      "token_estimate": 203,
+      "symbols": [
+        {
+          "name": "BridgePath",
+          "kind": "interface",
+          "signature": "BridgePath",
+          "lines": [
+            23,
+            32
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "A discovered path in the graph",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "BridgeDiscoveryOptions",
+          "kind": "interface",
+          "signature": "BridgeDiscoveryOptions",
+          "lines": [
+            34,
+            41
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findBridgePaths",
+          "kind": "function",
+          "signature": "findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {}",
+          "lines": [
+            57,
+            218
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find interesting multi-hop paths originating from seed nodes.\n\nUses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence\nand node relevance.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generatePathDescription",
+          "kind": "function",
+          "signature": "generatePathDescription(nodes: NodeRow[], edges: EdgeRow[]): string",
+          "lines": [
+            223,
+            252
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Generate a human-readable description of the path",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "truncate",
+          "kind": "function",
+          "signature": "truncate(str: string, len = 30): string",
+          "lines": [
+            254,
+            259
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./edge-repository.js",
+        "./node-crud.js",
+        "./node-storage.js",
+        "better-sqlite3"
+      ]
+    },
+    {
       "path": "src/storage/database.ts",
       "language": "typescript",
       "lines": [
@@ -16054,10 +17487,10 @@
       "language": "typescript",
       "lines": [
         1,
-        186
+        197
       ],
       "detail_level": "full",
-      "token_estimate": 393,
+      "token_estimate": 405,
       "symbols": [
         {
           "name": "EdgeRow",
@@ -16065,7 +17498,7 @@
           "signature": "EdgeRow",
           "lines": [
             19,
-            27
+            30
           ],
           "exported": true,
           "is_default": false,
@@ -16083,8 +17516,8 @@
           "kind": "function",
           "signature": "generateEdgeId(): string",
           "lines": [
-            36,
-            38
+            39,
+            41
           ],
           "exported": true,
           "is_default": false,
@@ -16100,10 +17533,10 @@
         {
           "name": "createEdge",
           "kind": "function",
-          "signature": "createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {\n    metadata?: EdgeMetadata;\n    createdBy?: \"boundary\" | \"daemon\" | \"user\";\n  } = {}): Edge",
+          "signature": "createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {\n    metadata?: EdgeMetadata;\n    createdBy?: \"boundary\" | \"daemon\" | \"user\";\n    confidence?: number;\n    similarity?: number;\n  } = {}): Edge",
           "lines": [
-            47,
-            83
+            50,
+            92
           ],
           "exported": true,
           "is_default": false,
@@ -16121,8 +17554,8 @@
           "kind": "function",
           "signature": "getEdgesFrom(db: Database.Database, nodeId: string): {}",
           "lines": [
-            88,
-            95
+            97,
+            104
           ],
           "exported": true,
           "is_default": false,
@@ -16140,8 +17573,8 @@
           "kind": "function",
           "signature": "getEdgesTo(db: Database.Database, nodeId: string): {}",
           "lines": [
-            100,
-            107
+            109,
+            116
           ],
           "exported": true,
           "is_default": false,
@@ -16159,8 +17592,8 @@
           "kind": "function",
           "signature": "getNodeEdges(db: Database.Database, nodeId: string): {}",
           "lines": [
-            112,
-            119
+            121,
+            128
           ],
           "exported": true,
           "is_default": false,
@@ -16178,8 +17611,8 @@
           "kind": "function",
           "signature": "getAllEdges(db: Database.Database): {}",
           "lines": [
-            124,
-            127
+            133,
+            136
           ],
           "exported": true,
           "is_default": false,
@@ -16197,8 +17630,8 @@
           "kind": "function",
           "signature": "getEdge(db: Database.Database, edgeId: string): EdgeRow",
           "lines": [
-            132,
-            135
+            141,
+            144
           ],
           "exported": true,
           "is_default": false,
@@ -16216,8 +17649,8 @@
           "kind": "function",
           "signature": "deleteEdge(db: Database.Database, edgeId: string): boolean",
           "lines": [
-            140,
-            143
+            149,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -16235,8 +17668,8 @@
           "kind": "function",
           "signature": "edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean",
           "lines": [
-            148,
-            166
+            157,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -16254,8 +17687,8 @@
           "kind": "function",
           "signature": "edgeRowToEdge(row: EdgeRow): Edge",
           "lines": [
-            175,
-            185
+            184,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -16945,23 +18378,428 @@
       ]
     },
     {
-      "path": "src/storage/index.ts",
+      "path": "src/storage/hybrid-search.ts",
       "language": "typescript",
       "lines": [
         1,
-        18
+        606
       ],
       "detail_level": "full",
-      "token_estimate": 95,
-      "symbols": [],
+      "token_estimate": 855,
+      "symbols": [
+        {
+          "name": "HYBRID_WEIGHTS",
+          "kind": "variable",
+          "signature": "HYBRID_WEIGHTS",
+          "lines": [
+            30,
+            39
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Weights for each scoring component.\nSum should equal ~1.3 to allow strong signals to boost final score.\nFinal scores are normalized to 0..1 range.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_EDGES_FOR_SCORE",
+          "kind": "variable",
+          "signature": "10",
+          "lines": [
+            42,
+            42
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Max edges to consider for relation score (diminishing returns after)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RECENCY_HALF_LIFE_DAYS",
+          "kind": "variable",
+          "signature": "30",
+          "lines": [
+            45,
+            45
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Days after which recency score starts decaying",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MS_PER_DAY",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            48,
+            48
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Milliseconds per day",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridScoreBreakdown",
+          "kind": "interface",
+          "signature": "HybridScoreBreakdown",
+          "lines": [
+            57,
+            76
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Breakdown of scores for transparency and debugging.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchResult",
+          "kind": "interface",
+          "signature": "HybridSearchResult",
+          "lines": [
+            81,
+            92
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Enhanced search result with hybrid scoring.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchOptions",
+          "kind": "interface",
+          "signature": "HybridSearchOptions",
+          "lines": [
+            97,
+            114
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Options for hybrid search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HybridSearchResponse",
+          "kind": "interface",
+          "signature": "HybridSearchResponse",
+          "lines": [
+            119,
+            130
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result from hybrid search with pagination metadata.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CandidateNode",
+          "kind": "interface",
+          "signature": "CandidateNode",
+          "lines": [
+            136,
+            143
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateVectorScore",
+          "kind": "function",
+          "signature": "calculateVectorScore(distance: number | null): number",
+          "lines": [
+            153,
+            159
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate vector similarity score from distance.\nLower distance = higher score.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateKeywordScore",
+          "kind": "function",
+          "signature": "calculateKeywordScore(rank: number | null): number",
+          "lines": [
+            165,
+            174
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate keyword score from FTS5 rank.\nFTS5 rank is negative, lower (more negative) is better.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelationScore",
+          "kind": "function",
+          "signature": "calculateRelationScore(edgeCount: number): number",
+          "lines": [
+            180,
+            183
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate relation score based on edge count.\nMore edges = higher score (up to MAX_EDGES_FOR_SCORE).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateContentScore",
+          "kind": "function",
+          "signature": "calculateContentScore(query: string, summary: string | null): number",
+          "lines": [
+            189,
+            219
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate content overlap score.\nBased on exact token matching between query and summary.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateTemporalScore",
+          "kind": "function",
+          "signature": "calculateTemporalScore(nodeTimestamp: string, referenceTime: Date | null): number",
+          "lines": [
+            225,
+            240
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate temporal proximity score.\nNodes closer to the reference time get higher scores.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateTagScore",
+          "kind": "function",
+          "signature": "calculateTagScore(matchedTags: number, totalBoostTags: number): number",
+          "lines": [
+            245,
+            253
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate tag match score.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateImportanceScore",
+          "kind": "function",
+          "signature": "calculateImportanceScore(importance: number | null): number",
+          "lines": [
+            258,
+            260
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate importance score from node importance field.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRecencyScore",
+          "kind": "function",
+          "signature": "calculateRecencyScore(nodeTimestamp: string): number",
+          "lines": [
+            266,
+            273
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate recency score based on node age.\nNewer nodes get higher scores.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateHybridScore",
+          "kind": "function",
+          "signature": "calculateHybridScore(candidate: CandidateNode, query: string, options: HybridSearchOptions): HybridScoreBreakdown",
+          "lines": [
+            278,
+            331
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate final hybrid score from all components.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "hybridSearch",
+          "kind": "function",
+          "signature": "hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse",
+          "lines": [
+            348,
+            550
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Perform hybrid search combining vector, FTS, relation, and other signals.\n\nThe algorithm:\n1. If queryEmbedding provided, perform vector search to get initial candidates\n2. Perform FTS search to get keyword matches\n3. Merge candidates from both sources\n4. For each candidate, calculate edge count (relation score)\n5. Calculate all score components and weighted final score\n6. Sort by final score, apply pagination",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateNodeHybridScore",
+          "kind": "function",
+          "signature": "calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown",
+          "lines": [
+            559,
+            605
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate hybrid score for a single node (useful for re-ranking).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
       "annotation": null,
       "headings": null,
       "code_blocks": null,
       "imports": [
         "./database.js",
+        "./filter-utils.js",
+        "./node-crud.js",
+        "./search-repository.js",
+        "./semantic-search.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/index.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        22
+      ],
+      "detail_level": "full",
+      "token_estimate": 122,
+      "symbols": [],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./bridge-discovery.js",
+        "./database.js",
         "./edge-repository.js",
         "./embedding-utils.js",
         "./graph-repository.js",
+        "./hybrid-search.js",
         "./lesson-repository.js",
         "./node-conversion.js",
         "./node-crud.js",
@@ -16969,7 +18807,9 @@
         "./node-storage.js",
         "./node-types.js",
         "./quirk-repository.js",
+        "./relationship-edges.js",
         "./search-repository.js",
+        "./semantic-search.js",
         "./tool-error-repository.js"
       ]
     },
@@ -17167,7 +19007,7 @@
       "language": "typescript",
       "lines": [
         1,
-        343
+        356
       ],
       "detail_level": "full",
       "token_estimate": 240,
@@ -17216,7 +19056,7 @@
           "signature": "nodeRowToNode(row: NodeRow, loadFull = false): Node",
           "lines": [
             268,
-            335
+            348
           ],
           "exported": true,
           "is_default": false,
@@ -17234,8 +19074,8 @@
           "kind": "function",
           "signature": "nodeRowsToNodes(rows: NodeRow[], loadFull = false): {}",
           "lines": [
-            340,
-            342
+            353,
+            355
           ],
           "exported": true,
           "is_default": false,
@@ -17265,18 +19105,37 @@
       "language": "typescript",
       "lines": [
         1,
-        751
+        857
       ],
       "detail_level": "full",
-      "token_estimate": 1246,
+      "token_estimate": 1310,
       "symbols": [
+        {
+          "name": "createPatternId",
+          "kind": "function",
+          "signature": "createPatternId(input: string): string",
+          "lines": [
+            43,
+            45
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Create a short hash ID for aggregation patterns",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "RepositoryOptions",
           "kind": "interface",
           "signature": "RepositoryOptions extends NodeStorageOptions",
           "lines": [
-            39,
-            42
+            52,
+            55
           ],
           "exported": true,
           "is_default": false,
@@ -17294,8 +19153,8 @@
           "kind": "interface",
           "signature": "NodeRow",
           "lines": [
-            45,
-            67
+            58,
+            85
           ],
           "exported": true,
           "is_default": false,
@@ -17313,8 +19172,8 @@
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            76,
-            107
+            94,
+            149
           ],
           "exported": true,
           "is_default": false,
@@ -17323,7 +19182,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Insert lessons for a node",
+          "comment": "Insert lessons for a node and update lesson_patterns aggregation",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -17332,8 +19191,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            112,
-            132
+            154,
+            187
           ],
           "exported": true,
           "is_default": false,
@@ -17342,7 +19201,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Insert model quirks for a node",
+          "comment": "Insert model quirks for a node and update model_stats aggregation",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -17351,8 +19210,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            137,
-            157
+            192,
+            256
           ],
           "exported": true,
           "is_default": false,
@@ -17361,7 +19220,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Insert tool errors for a node",
+          "comment": "Insert tool errors for a node and update failure_patterns + model_stats aggregation",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -17370,8 +19229,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            162,
-            181
+            261,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -17389,8 +19248,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            191,
-            220
+            290,
+            319
           ],
           "exported": true,
           "is_default": false,
@@ -17408,8 +19267,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            226,
-            292
+            325,
+            398
           ],
           "exported": true,
           "is_default": false,
@@ -17427,8 +19286,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            298,
-            312
+            404,
+            418
           ],
           "exported": true,
           "is_default": false,
@@ -17446,8 +19305,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            323,
-            430
+            429,
+            536
           ],
           "exported": true,
           "is_default": false,
@@ -17465,8 +19324,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            437,
-            527
+            543,
+            633
           ],
           "exported": true,
           "is_default": false,
@@ -17484,8 +19343,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
           "lines": [
-            532,
-            538
+            638,
+            644
           ],
           "exported": true,
           "is_default": false,
@@ -17503,8 +19362,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
           "lines": [
-            545,
-            555
+            651,
+            661
           ],
           "exported": true,
           "is_default": false,
@@ -17522,8 +19381,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            560,
-            563
+            666,
+            669
           ],
           "exported": true,
           "is_default": false,
@@ -17541,8 +19400,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            568,
-            574
+            674,
+            680
           ],
           "exported": true,
           "is_default": false,
@@ -17560,8 +19419,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            580,
-            586
+            686,
+            692
           ],
           "exported": true,
           "is_default": false,
@@ -17579,8 +19438,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
           "lines": [
-            591,
-            603
+            697,
+            709
           ],
           "exported": true,
           "is_default": false,
@@ -17598,8 +19457,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            608,
-            619
+            714,
+            725
           ],
           "exported": true,
           "is_default": false,
@@ -17617,8 +19476,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            624,
-            635
+            730,
+            741
           ],
           "exported": true,
           "is_default": false,
@@ -17636,8 +19495,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            644,
-            669
+            750,
+            775
           ],
           "exported": true,
           "is_default": false,
@@ -17655,8 +19514,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            672,
-            679
+            778,
+            785
           ],
           "exported": false,
           "is_default": false,
@@ -17674,8 +19533,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            684,
-            689
+            790,
+            795
           ],
           "exported": false,
           "is_default": false,
@@ -17693,8 +19552,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            696,
-            734
+            802,
+            840
           ],
           "exported": true,
           "is_default": false,
@@ -17712,8 +19571,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            739,
-            750
+            845,
+            856
           ],
           "exported": false,
           "is_default": false,
@@ -17735,7 +19594,8 @@
         "./node-storage.js",
         "./node-types.js",
         "./search-repository.js",
-        "better-sqlite3"
+        "better-sqlite3",
+        "node:crypto"
       ]
     },
     {
@@ -19333,6 +21193,179 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/storage/relationship-edges.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        290
+      ],
+      "detail_level": "full",
+      "token_estimate": 468,
+      "symbols": [
+        {
+          "name": "StoreRelationshipsResult",
+          "kind": "interface",
+          "signature": "StoreRelationshipsResult",
+          "lines": [
+            28,
+            37
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of storing relationships for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "UnresolvedEdgeRow",
+          "kind": "interface",
+          "signature": "UnresolvedEdgeRow",
+          "lines": [
+            40,
+            46
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Row shape for unresolved relationship edges",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "UnresolvedRelationship",
+          "kind": "interface",
+          "signature": "UnresolvedRelationship",
+          "lines": [
+            49,
+            56
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result type for unresolved relationships",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isAutoMemEdgeType",
+          "kind": "function",
+          "signature": "isAutoMemEdgeType(type: string): boolean",
+          "lines": [
+            65,
+            67
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a type is a valid AutoMem edge type",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateRelationship",
+          "kind": "function",
+          "signature": "validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; }",
+          "lines": [
+            72,
+            105
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a relationship output from the analyzer",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "storeRelationshipEdges",
+          "kind": "function",
+          "signature": "storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult",
+          "lines": [
+            118,
+            185
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Store relationships extracted by the analyzer as edges\n\nFor resolved relationships (with targetNodeId), creates an edge directly.\nFor unresolved relationships (targetNodeId is null), stores the description\nin metadata for potential future resolution via semantic search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findUnresolvedRelationships",
+          "kind": "function",
+          "signature": "findUnresolvedRelationships(db: Database.Database, nodeId?: string): {}",
+          "lines": [
+            194,
+            234
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Find unresolved relationships (edges with unresolvedTarget in metadata)\n\nThese are relationships where the analyzer identified a connection but\ncouldn't determine the target node ID. They can be resolved later via\nsemantic search.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "resolveRelationship",
+          "kind": "function",
+          "signature": "resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean",
+          "lines": [
+            242,
+            289
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Resolve an unresolved relationship by updating its target node\n\nCall this after semantic search finds a matching node for an unresolved\nrelationship.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../daemon/processor.js",
+        "../types/index.js",
+        "./edge-repository.js",
         "better-sqlite3"
       ]
     },
@@ -21209,10 +23242,10 @@
       "language": "typescript",
       "lines": [
         1,
-        661
+        707
       ],
       "detail_level": "full",
-      "token_estimate": 1060,
+      "token_estimate": 1129,
       "symbols": [
         {
           "name": "Node",
@@ -21220,7 +23253,7 @@
           "signature": "Node",
           "lines": [
             12,
-            30
+            40
           ],
           "exported": true,
           "is_default": false,
@@ -21238,8 +23271,8 @@
           "kind": "interface",
           "signature": "NodeSource",
           "lines": [
-            32,
-            49
+            42,
+            59
           ],
           "exported": true,
           "is_default": false,
@@ -21257,8 +23290,8 @@
           "kind": "type",
           "signature": "NodeType = | \"coding\"\n  | \"debugging\"\n  | \"refactoring\"\n  | \"sysadmin\"\n  | \"research\"\n  | \"planning\"\n  | \"qa\"\n  | \"brainstorm\"\n  | \"handoff\"\n  | \"documentation\"\n  | \"configuration\"\n  | \"data\"\n  | \"other\"",
           "lines": [
-            51,
-            64
+            61,
+            74
           ],
           "exported": true,
           "is_default": false,
@@ -21276,8 +23309,8 @@
           "kind": "interface",
           "signature": "NodeClassification",
           "lines": [
-            66,
-            78
+            76,
+            88
           ],
           "exported": true,
           "is_default": false,
@@ -21295,8 +23328,8 @@
           "kind": "type",
           "signature": "Outcome = \"success\" | \"partial\" | \"failed\" | \"abandoned\"",
           "lines": [
-            80,
-            80
+            90,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -21314,8 +23347,8 @@
           "kind": "interface",
           "signature": "Decision",
           "lines": [
-            82,
-            86
+            92,
+            96
           ],
           "exported": true,
           "is_default": false,
@@ -21333,8 +23366,8 @@
           "kind": "interface",
           "signature": "ErrorSummary",
           "lines": [
-            88,
-            92
+            98,
+            102
           ],
           "exported": true,
           "is_default": false,
@@ -21352,8 +23385,8 @@
           "kind": "interface",
           "signature": "NodeContent",
           "lines": [
-            94,
-            105
+            104,
+            115
           ],
           "exported": true,
           "is_default": false,
@@ -21371,8 +23404,8 @@
           "kind": "type",
           "signature": "LessonLevel = | \"project\"\n  | \"task\"\n  | \"user\"\n  | \"model\"\n  | \"tool\"\n  | \"skill\"\n  | \"subagent\"",
           "lines": [
-            111,
-            118
+            121,
+            128
           ],
           "exported": true,
           "is_default": false,
@@ -21390,8 +23423,8 @@
           "kind": "type",
           "signature": "Confidence = \"high\" | \"medium\" | \"low\"",
           "lines": [
-            120,
-            120
+            130,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -21409,8 +23442,8 @@
           "kind": "interface",
           "signature": "Lesson",
           "lines": [
-            122,
-            133
+            132,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -21428,8 +23461,8 @@
           "kind": "interface",
           "signature": "LessonsByLevel",
           "lines": [
-            135,
-            143
+            145,
+            153
           ],
           "exported": true,
           "is_default": false,
@@ -21447,8 +23480,8 @@
           "kind": "interface",
           "signature": "ModelUsage",
           "lines": [
-            149,
-            157
+            159,
+            167
           ],
           "exported": true,
           "is_default": false,
@@ -21466,8 +23499,8 @@
           "kind": "type",
           "signature": "Frequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
           "lines": [
-            159,
-            159
+            169,
+            169
           ],
           "exported": true,
           "is_default": false,
@@ -21485,8 +23518,8 @@
           "kind": "interface",
           "signature": "ModelQuirk",
           "lines": [
-            161,
-            168
+            171,
+            178
           ],
           "exported": true,
           "is_default": false,
@@ -21504,8 +23537,8 @@
           "kind": "interface",
           "signature": "ToolError",
           "lines": [
-            170,
-            176
+            180,
+            186
           ],
           "exported": true,
           "is_default": false,
@@ -21523,8 +23556,8 @@
           "kind": "interface",
           "signature": "ModelObservations",
           "lines": [
-            178,
-            186
+            188,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -21542,8 +23575,8 @@
           "kind": "interface",
           "signature": "NodeMetadata",
           "lines": [
-            192,
-            205
+            202,
+            215
           ],
           "exported": true,
           "is_default": false,
@@ -21561,8 +23594,8 @@
           "kind": "interface",
           "signature": "SemanticData",
           "lines": [
-            207,
-            216
+            217,
+            226
           ],
           "exported": true,
           "is_default": false,
@@ -21580,8 +23613,8 @@
           "kind": "interface",
           "signature": "DaemonDecision",
           "lines": [
-            218,
-            225
+            228,
+            235
           ],
           "exported": true,
           "is_default": false,
@@ -21599,8 +23632,8 @@
           "kind": "interface",
           "signature": "DaemonMeta",
           "lines": [
-            227,
-            237
+            237,
+            247
           ],
           "exported": true,
           "is_default": false,
@@ -21618,8 +23651,8 @@
           "kind": "type",
           "signature": "EdgeType = | \"fork\"\n  | \"branch\"\n  | \"tree_jump\"\n  | \"resume\"\n  | \"compaction\"\n  | \"continuation\"\n  | \"handoff\"\n  // Semantic edges (daemon discovers)\n  | \"semantic\"\n  | \"reference\"\n  | \"lesson_application\"\n  | ...",
           "lines": [
-            243,
-            258
+            253,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -21637,8 +23670,8 @@
           "kind": "type",
           "signature": "EdgeCreator = \"boundary\" | \"daemon\" | \"user\"",
           "lines": [
-            260,
-            260
+            282,
+            282
           ],
           "exported": true,
           "is_default": false,
@@ -21656,8 +23689,8 @@
           "kind": "interface",
           "signature": "EdgeMetadata",
           "lines": [
-            262,
-            275
+            284,
+            297
           ],
           "exported": true,
           "is_default": false,
@@ -21675,8 +23708,46 @@
           "kind": "interface",
           "signature": "Edge",
           "lines": [
-            277,
-            286
+            299,
+            312
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AUTOMEM_EDGE_TYPES",
+          "kind": "variable",
+          "signature": "AUTOMEM_EDGE_TYPES",
+          "lines": [
+            318,
+            330
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "AutoMem typed relationship edge types (per automem-features.md)\nThese enable semantic reasoning (\"why\" queries, causal chains)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AutoMemEdgeType",
+          "kind": "type",
+          "signature": "AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number]",
+          "lines": [
+            332,
+            332
           ],
           "exported": true,
           "is_default": false,
@@ -21694,8 +23765,8 @@
           "kind": "type",
           "signature": "VersionTrigger = | \"initial\"\n  | \"prompt_update\"\n  | \"connection_found\"\n  | \"user_feedback\"\n  | \"schema_migration\"",
           "lines": [
-            292,
-            297
+            338,
+            343
           ],
           "exported": true,
           "is_default": false,
@@ -21713,8 +23784,8 @@
           "kind": "interface",
           "signature": "NodeVersion",
           "lines": [
-            299,
-            306
+            345,
+            352
           ],
           "exported": true,
           "is_default": false,
@@ -21732,8 +23803,8 @@
           "kind": "interface",
           "signature": "AggregatedFailurePattern",
           "lines": [
-            312,
-            322
+            358,
+            368
           ],
           "exported": true,
           "is_default": false,
@@ -21751,8 +23822,8 @@
           "kind": "interface",
           "signature": "AggregatedModelStats",
           "lines": [
-            324,
-            333
+            370,
+            379
           ],
           "exported": true,
           "is_default": false,
@@ -21770,8 +23841,8 @@
           "kind": "interface",
           "signature": "AggregatedLessonPattern",
           "lines": [
-            335,
-            344
+            381,
+            390
           ],
           "exported": true,
           "is_default": false,
@@ -21789,8 +23860,8 @@
           "kind": "type",
           "signature": "InsightType = \"quirk\" | \"win\" | \"failure\" | \"tool_error\" | \"lesson\"",
           "lines": [
-            350,
-            350
+            396,
+            396
           ],
           "exported": true,
           "is_default": false,
@@ -21808,8 +23879,8 @@
           "kind": "type",
           "signature": "InsightSeverity = \"low\" | \"medium\" | \"high\"",
           "lines": [
-            351,
-            351
+            397,
+            397
           ],
           "exported": true,
           "is_default": false,
@@ -21827,8 +23898,8 @@
           "kind": "interface",
           "signature": "AggregatedInsight",
           "lines": [
-            353,
-            380
+            399,
+            426
           ],
           "exported": true,
           "is_default": false,
@@ -21846,8 +23917,8 @@
           "kind": "interface",
           "signature": "PromptAddition",
           "lines": [
-            386,
-            397
+            432,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -21865,8 +23936,8 @@
           "kind": "interface",
           "signature": "DateRange",
           "lines": [
-            406,
-            411
+            452,
+            457
           ],
           "exported": true,
           "is_default": false,
@@ -21884,8 +23955,8 @@
           "kind": "interface",
           "signature": "EffectivenessResult",
           "lines": [
-            416,
-            434
+            462,
+            480
           ],
           "exported": true,
           "is_default": false,
@@ -21903,8 +23974,8 @@
           "kind": "interface",
           "signature": "PromptEffectiveness",
           "lines": [
-            439,
-            475
+            485,
+            521
           ],
           "exported": true,
           "is_default": false,
@@ -21922,8 +23993,8 @@
           "kind": "interface",
           "signature": "ManualFlag",
           "lines": [
-            484,
-            491
+            530,
+            537
           ],
           "exported": true,
           "is_default": false,
@@ -21941,8 +24012,8 @@
           "kind": "interface",
           "signature": "FrictionSignals",
           "lines": [
-            496,
-            511
+            542,
+            557
           ],
           "exported": true,
           "is_default": false,
@@ -21960,8 +24031,8 @@
           "kind": "interface",
           "signature": "DelightSignals",
           "lines": [
-            516,
-            525
+            562,
+            571
           ],
           "exported": true,
           "is_default": false,
@@ -21979,8 +24050,8 @@
           "kind": "interface",
           "signature": "NodeSignals",
           "lines": [
-            530,
-            534
+            576,
+            580
           ],
           "exported": true,
           "is_default": false,
@@ -21998,8 +24069,8 @@
           "kind": "type",
           "signature": "ClusterStatus = \"pending\" | \"confirmed\" | \"dismissed\"",
           "lines": [
-            543,
-            543
+            589,
+            589
           ],
           "exported": true,
           "is_default": false,
@@ -22017,8 +24088,8 @@
           "kind": "type",
           "signature": "ClusterSignalType = \"friction\" | \"delight\" | null",
           "lines": [
-            548,
-            548
+            594,
+            594
           ],
           "exported": true,
           "is_default": false,
@@ -22036,8 +24107,8 @@
           "kind": "interface",
           "signature": "Cluster",
           "lines": [
-            553,
-            575
+            599,
+            621
           ],
           "exported": true,
           "is_default": false,
@@ -22055,8 +24126,8 @@
           "kind": "interface",
           "signature": "ClusterNode",
           "lines": [
-            580,
-            587
+            626,
+            633
           ],
           "exported": true,
           "is_default": false,
@@ -22074,8 +24145,8 @@
           "kind": "interface",
           "signature": "NodeEmbedding",
           "lines": [
-            592,
-            602
+            638,
+            648
           ],
           "exported": true,
           "is_default": false,
@@ -22093,8 +24164,8 @@
           "kind": "interface",
           "signature": "ClusteringRun",
           "lines": [
-            607,
-            620
+            653,
+            666
           ],
           "exported": true,
           "is_default": false,
@@ -22112,8 +24183,8 @@
           "kind": "interface",
           "signature": "EmbeddingConfig",
           "lines": [
-            625,
-            636
+            671,
+            682
           ],
           "exported": true,
           "is_default": false,
@@ -22131,8 +24202,8 @@
           "kind": "interface",
           "signature": "ClusteringConfig",
           "lines": [
-            641,
-            652
+            687,
+            698
           ],
           "exported": true,
           "is_default": false,
@@ -22150,8 +24221,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryResult",
           "lines": [
-            657,
-            660
+            703,
+            706
           ],
           "exported": true,
           "is_default": false,

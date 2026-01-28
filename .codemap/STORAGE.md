@@ -1,17 +1,31 @@
 # Project Overview
 
 ## Languages
-- typescript: 18 files
+- typescript: 21 files
 
 ## Statistics
-- Total files: 18
-- Total symbols: 198
-  - function: 132
-  - interface: 51
+- Total files: 21
+- Total symbols: 215
+  - function: 140
+  - interface: 59
   - type: 11
-  - variable: 4
+  - variable: 5
 
 ---
+
+src/storage/bridge-discovery.ts [1-260]
+  interface:
+    23-32: interface BridgePath [exported]
+      /** A discovered path in the graph */
+    34-41: interface BridgeDiscoveryOptions [exported]
+  function:
+    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+      /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
+  imports:
+    - ./edge-repository.js
+    - ./node-crud.js
+    - ./node-storage.js
+    - better-sqlite3
 
 src/storage/database.ts [1-298]
   interface:
@@ -71,33 +85,35 @@ src/storage/decision-repository.ts [1-143]
   imports:
     - better-sqlite3
 
-src/storage/edge-repository.ts [1-186]
+src/storage/edge-repository.ts [1-197]
   interface:
-    19-27: interface EdgeRow [exported]
+    19-30: interface EdgeRow [exported]
       /** Edge row from the database */
   function:
-    36-38: generateEdgeId(): string [exported]
+    39-41: generateEdgeId(): string [exported]
       /** Generate a unique edge ID with 'edg_' prefix */
-    47-83: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
+    50-92: createEdge(db: Database.Database, sourceNodeId: string, targetNodeId: string, type: EdgeType, options: {
     metadata?: EdgeMetadata;
     createdBy?: "boundary" | "daemon" | "user";
+    confidence?: number;
+    similarity?: number;
   } = {}): Edge [exported]
       /** Create an edge between two nodes */
-    88-95: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
+    97-104: getEdgesFrom(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges from a node (outgoing) */
-    100-107: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
+    109-116: getEdgesTo(db: Database.Database, nodeId: string): {} [exported]
       /** Get edges to a node (incoming) */
-    112-119: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
+    121-128: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
       /** Get all edges for a node (both directions) */
-    124-127: getAllEdges(db: Database.Database): {} [exported]
+    133-136: getAllEdges(db: Database.Database): {} [exported]
       /** Get all edges */
-    132-135: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
+    141-144: getEdge(db: Database.Database, edgeId: string): EdgeRow [exported]
       /** Get edge by ID */
-    140-143: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
+    149-152: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
-    148-166: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
+    157-175: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
-    175-185: edgeRowToEdge(row: EdgeRow): Edge [exported]
+    184-196: edgeRowToEdge(row: EdgeRow): Edge [exported]
       /** Convert an Edge row from the database to an Edge object */
   imports:
     - ./node-types.js
@@ -188,12 +204,40 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/index.ts [1-18]
+src/storage/hybrid-search.ts [1-606]
+  interface:
+    57-76: interface HybridScoreBreakdown [exported]
+      /** Breakdown of scores for transparency and debugging. */
+    81-92: interface HybridSearchResult [exported]
+      /** Enhanced search result with hybrid scoring. */
+    97-114: interface HybridSearchOptions [exported]
+      /** Options for hybrid search. */
+    119-130: interface HybridSearchResponse [exported]
+      /** Result from hybrid search with pagination metadata. */
+  function:
+    348-550: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+      /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
+    559-605: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+      /** Calculate hybrid score for a single node (useful for re-ranking). */
+  variable:
+    30-39: HYBRID_WEIGHTS [exported]
+      /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
+    - ./database.js
+    - ./filter-utils.js
+    - ./node-crud.js
+    - ./search-repository.js
+    - ./semantic-search.js
+    - better-sqlite3
+
+src/storage/index.ts [1-22]
+  imports:
+    - ./bridge-discovery.js
     - ./database.js
     - ./edge-repository.js
     - ./embedding-utils.js
     - ./graph-repository.js
+    - ./hybrid-search.js
     - ./lesson-repository.js
     - ./node-conversion.js
     - ./node-crud.js
@@ -201,7 +245,9 @@ src/storage/index.ts [1-18]
     - ./node-storage.js
     - ./node-types.js
     - ./quirk-repository.js
+    - ./relationship-edges.js
     - ./search-repository.js
+    - ./semantic-search.js
     - ./tool-error-repository.js
 
 src/storage/lesson-repository.ts [1-284]
@@ -239,16 +285,16 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-343]
+src/storage/node-conversion.ts [1-356]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-335: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    268-348: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    340-342: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    353-355: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -257,50 +303,50 @@ src/storage/node-conversion.ts [1-343]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-751]
+src/storage/node-crud.ts [1-857]
   interface:
-    39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
+    52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    45-67: interface NodeRow [exported]
+    58-85: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
-      /** Insert lessons for a node */
-    112-132: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
-      /** Insert model quirks for a node */
-    137-157: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
-      /** Insert tool errors for a node */
-    162-181: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    94-149: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+      /** Insert lessons for a node and update lesson_patterns aggregation */
+    154-187: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+      /** Insert model quirks for a node and update model_stats aggregation */
+    192-256: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+      /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
+    261-280: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    191-220: clearAllData(db: Database.Database): void [exported]
+    290-319: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    226-292: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    325-398: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    404-418: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    429-536: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    437-527: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    543-633: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    532-538: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    638-644: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    545-555: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    651-661: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    560-563: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    666-669: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    568-574: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    674-680: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    580-586: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    686-692: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    591-603: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    697-709: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    608-619: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    714-725: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    730-741: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    750-775: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    802-840: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -310,6 +356,7 @@ src/storage/node-crud.ts [1-751]
     - ./node-types.js
     - ./search-repository.js
     - better-sqlite3
+    - node:crypto
 
 src/storage/node-queries.ts [1-336]
   interface:
@@ -493,6 +540,29 @@ src/storage/quirk-repository.ts [1-310]
   imports:
     - better-sqlite3
 
+src/storage/relationship-edges.ts [1-290]
+  interface:
+    28-37: interface StoreRelationshipsResult [exported]
+      /** Result of storing relationships for a node */
+    49-56: interface UnresolvedRelationship [exported]
+      /** Result type for unresolved relationships */
+  function:
+    65-67: isAutoMemEdgeType(type: string): boolean [exported]
+      /** Check if a type is a valid AutoMem edge type */
+    72-105: validateRelationship(relationship: RelationshipOutput): { valid: true; } | { valid: false; error: string; } [exported]
+      /** Validate a relationship output from the analyzer */
+    118-185: storeRelationshipEdges(db: Database.Database, sourceNodeId: string, relationships: RelationshipOutput[]): StoreRelationshipsResult [exported]
+      /** Store relationships extracted by the analyzer as edges For resolved relationships (with targetNodeId), creates an edge directly. For unresolved relationships (targetNodeId is null), stores the description in metadata for potential future resolution via semantic search. */
+    194-234: findUnresolvedRelationships(db: Database.Database, nodeId?: string): {} [exported]
+      /** Find unresolved relationships (edges with unresolvedTarget in metadata) These are relationships where the analyzer identified a connection but couldn't determine the target node ID. They can be resolved later via semantic search. */
+    242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
+      /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
+  imports:
+    - ../daemon/processor.js
+    - ../types/index.js
+    - ./edge-repository.js
+    - better-sqlite3
+
 src/storage/search-repository.ts [1-449]
   interface:
     41-46: interface SearchHighlight [exported]
@@ -587,5 +657,5 @@ src/storage/tool-error-repository.ts [1-352]
     - better-sqlite3
 
 ---
-Files: 18
-Estimated tokens: 9,098 (codebase: ~1,093,386)
+Files: 21
+Estimated tokens: 10,186 (codebase: ~1,162,805)

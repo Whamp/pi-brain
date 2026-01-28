@@ -34,6 +34,7 @@ import {
   upsertNode,
 } from "../storage/index.js";
 import { agentOutputToNode } from "../storage/node-conversion.js";
+import { storeRelationshipEdges } from "../storage/relationship-edges.js";
 import { ConnectionDiscoverer } from "./connection-discovery.js";
 import {
   classifyError,
@@ -519,6 +520,29 @@ export class Worker {
 
     // 8. Generate and store embedding for semantic search
     await this.generateNodeEmbedding(node);
+
+    // 9. Store typed relationship edges from analyzer output
+    if (
+      result.nodeData.relationships &&
+      result.nodeData.relationships.length > 0
+    ) {
+      const relResult = storeRelationshipEdges(
+        this.db,
+        node.id,
+        result.nodeData.relationships
+      );
+      if (relResult.edgesCreated > 0) {
+        this.logger.info(
+          `Created ${relResult.edgesCreated} relationship edges ` +
+            `(${relResult.resolvedCount} resolved, ${relResult.unresolvedCount} unresolved)`
+        );
+      }
+      if (relResult.errors.length > 0) {
+        this.logger.warn(
+          `Relationship edge errors: ${relResult.errors.join(", ")}`
+        );
+      }
+    }
 
     this.queue.complete(job.id, node.id);
     this.jobsSucceeded++;

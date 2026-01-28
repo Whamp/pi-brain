@@ -9,6 +9,8 @@
 
 import type Database from "better-sqlite3";
 
+import { createHash } from "node:crypto";
+
 import { createEdge, edgeExists } from "./edge-repository.js";
 import {
   listNodeVersions,
@@ -30,6 +32,17 @@ import {
   type ToolError,
 } from "./node-types.js";
 import { indexNodeForSearch } from "./search-repository.js";
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+/**
+ * Create a short hash ID for aggregation patterns
+ */
+function createPatternId(input: string): string {
+  return createHash("sha256").update(input).digest("hex").slice(0, 16);
+}
 
 // =============================================================================
 // Types
@@ -64,6 +77,11 @@ export interface NodeRow {
   signals: string | null;
   created_at: string;
   updated_at: string;
+  // AutoMem consolidation fields
+  relevance_score: number | null;
+  last_accessed: string | null;
+  archived: number | null;
+  importance: number | null;
 }
 
 // =============================================================================
@@ -71,7 +89,7 @@ export interface NodeRow {
 // =============================================================================
 
 /**
- * Insert lessons for a node
+ * Insert lessons for a node and update lesson_patterns aggregation
  */
 export function insertLessons(
   db: Database.Database,
@@ -86,6 +104,17 @@ export function insertLessons(
   const insertLessonTag = db.prepare(
     "INSERT OR IGNORE INTO lesson_tags (lesson_id, tag) VALUES (?, ?)"
   );
+
+  // Incremental aggregation: upsert into lesson_patterns
+  // Simple increment - nightly batch handles full recalculation if needed
+  const upsertLessonPattern = db.prepare(`
+    INSERT INTO lesson_patterns (id, level, pattern, occurrences, tags, example_nodes, last_seen)
+    VALUES (?, ?, ?, 1, ?, ?, datetime('now'))
+    ON CONFLICT(level, pattern) DO UPDATE SET
+      occurrences = occurrences + 1,
+      last_seen = datetime('now'),
+      updated_at = datetime('now')
+  `);
 
   for (const [_level, lessons] of Object.entries(lessonsByLevel)) {
     for (const lesson of lessons) {
@@ -102,12 +131,25 @@ export function insertLessons(
       for (const tag of lesson.tags) {
         insertLessonTag.run(lessonId, tag);
       }
+
+      // Update lesson_patterns aggregation
+      const patternId = createPatternId(`${lesson.level}:${lesson.summary}`);
+      const tagsJson = JSON.stringify(lesson.tags);
+      const exampleNodesJson = JSON.stringify([nodeId]);
+
+      upsertLessonPattern.run(
+        patternId,
+        lesson.level,
+        lesson.summary.trim(),
+        tagsJson,
+        exampleNodesJson
+      );
     }
   }
 }
 
 /**
- * Insert model quirks for a node
+ * Insert model quirks for a node and update model_stats aggregation
  */
 export function insertModelQuirks(
   db: Database.Database,
@@ -119,6 +161,16 @@ export function insertModelQuirks(
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
+  // Incremental aggregation: upsert into model_stats
+  const upsertModelStats = db.prepare(`
+    INSERT INTO model_stats (model, quirk_count, error_count, last_used)
+    VALUES (?, 1, 0, datetime('now'))
+    ON CONFLICT(model) DO UPDATE SET
+      quirk_count = quirk_count + 1,
+      last_used = datetime('now'),
+      updated_at = datetime('now')
+  `);
+
   for (const quirk of quirks) {
     insertQuirk.run(
       generateQuirkId(),
@@ -128,11 +180,14 @@ export function insertModelQuirks(
       quirk.frequency,
       quirk.workaround ?? null
     );
+
+    // Update model_stats aggregation
+    upsertModelStats.run(quirk.model);
   }
 }
 
 /**
- * Insert tool errors for a node
+ * Insert tool errors for a node and update failure_patterns + model_stats aggregation
  */
 export function insertToolErrors(
   db: Database.Database,
@@ -144,6 +199,28 @@ export function insertToolErrors(
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
+  // Incremental aggregation: upsert into failure_patterns
+  // Simple increment - nightly batch handles full recalculation if needed
+  const upsertFailurePattern = db.prepare(`
+    INSERT INTO failure_patterns (
+      id, pattern, occurrences, models, tools, example_nodes, last_seen, learning_opportunity
+    ) VALUES (?, ?, 1, ?, ?, ?, datetime('now'), ?)
+    ON CONFLICT(id) DO UPDATE SET
+      occurrences = occurrences + 1,
+      last_seen = datetime('now'),
+      updated_at = datetime('now')
+  `);
+
+  // Incremental aggregation: upsert into model_stats for error_count
+  const upsertModelStatsError = db.prepare(`
+    INSERT INTO model_stats (model, quirk_count, error_count, last_used)
+    VALUES (?, 0, 1, datetime('now'))
+    ON CONFLICT(model) DO UPDATE SET
+      error_count = error_count + 1,
+      last_used = datetime('now'),
+      updated_at = datetime('now')
+  `);
+
   for (const error of errors) {
     insertError.run(
       generateErrorId(),
@@ -153,6 +230,28 @@ export function insertToolErrors(
       error.context,
       error.model
     );
+
+    // Update failure_patterns aggregation
+    const patternId = createPatternId(`${error.tool}:${error.errorType}`);
+    const pattern = `Error '${error.errorType}' in tool '${error.tool}'`;
+    const modelsJson = error.model ? JSON.stringify([error.model]) : "[]";
+    const toolsJson = JSON.stringify([error.tool]);
+    const exampleNodesJson = JSON.stringify([nodeId]);
+    const learningOpportunity = `Investigate why ${error.tool} fails with ${error.errorType}`;
+
+    upsertFailurePattern.run(
+      patternId,
+      pattern,
+      modelsJson,
+      toolsJson,
+      exampleNodesJson,
+      learningOpportunity
+    );
+
+    // Update model_stats error_count if model is present
+    if (error.model) {
+      upsertModelStatsError.run(error.model);
+    }
   }
 }
 
@@ -234,12 +333,14 @@ export function insertNodeToDb(
       id, version, session_file, segment_start, segment_end, computer,
       type, project, is_new_project, had_clear_goal, outcome,
       tokens_used, cost, duration_minutes,
-      timestamp, analyzed_at, analyzer_version, data_file, signals
+      timestamp, analyzed_at, analyzer_version, data_file, signals,
+      relevance_score, last_accessed, archived, importance
     ) VALUES (
       ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?,
       ?, ?, ?,
-      ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?,
+      ?, ?, ?, ?
     )
   `);
 
@@ -262,7 +363,12 @@ export function insertNodeToDb(
     node.metadata.analyzedAt,
     node.metadata.analyzerVersion,
     dataFile,
-    node.signals ? JSON.stringify(node.signals) : null
+    node.signals ? JSON.stringify(node.signals) : null,
+    // AutoMem consolidation fields - default values for new nodes
+    node.relevanceScore ?? 1, // New nodes start at max relevance
+    node.lastAccessed ?? null,
+    node.archived ? 1 : 0,
+    node.importance ?? 0.5 // Default importance
   );
 
   // Insert related data

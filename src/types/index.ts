@@ -27,6 +27,16 @@ export interface Node {
   daemonMeta: DaemonMeta;
   /** Friction/delight signals (optional, populated by signal detection) */
   signals?: NodeSignals;
+
+  // Memory consolidation fields (AutoMem)
+  /** Relevance score (0.0-1.0), decays over time. Default 1.0 for new nodes */
+  relevanceScore?: number;
+  /** ISO 8601 timestamp of last access/query. Used for decay calculation */
+  lastAccessed?: string;
+  /** Whether this node is archived (soft-deleted). Excluded from normal queries */
+  archived?: boolean;
+  /** Base importance level (0.0-1.0) for decay resistance. Default 0.5 */
+  importance?: number;
 }
 
 export interface NodeSource {
@@ -255,7 +265,19 @@ export type EdgeType =
   | "lesson_application"
   | "failure_pattern"
   | "project_related"
-  | "technique_shared";
+  | "technique_shared"
+  // AutoMem typed relationship edges (11 types per automem-features.md)
+  | "RELATES_TO" // General connection
+  | "LEADS_TO" // Causal relationship (A caused B)
+  | "OCCURRED_BEFORE" // Temporal sequence
+  | "PREFERS_OVER" // User preferences (chose A instead of B)
+  | "EXEMPLIFIES" // Pattern examples
+  | "CONTRADICTS" // Conflicting information
+  | "REINFORCES" // Supporting evidence
+  | "INVALIDATED_BY" // Outdated information
+  | "EVOLVED_INTO" // Knowledge evolution
+  | "DERIVED_FROM" // Source tracking
+  | "PART_OF"; // Hierarchical structure
 
 export type EdgeCreator = "boundary" | "daemon" | "user";
 
@@ -283,7 +305,31 @@ export interface Edge {
   /** ISO 8601 */
   createdAt: string;
   createdBy: EdgeCreator;
+  /** Confidence in this edge relationship (0.0-1.0), used for path scoring */
+  confidence?: number;
+  /** Vector cosine similarity (0.0-1.0), for edges created via semantic search */
+  similarity?: number;
 }
+
+/**
+ * AutoMem typed relationship edge types (per automem-features.md)
+ * These enable semantic reasoning ("why" queries, causal chains)
+ */
+export const AUTOMEM_EDGE_TYPES = [
+  "RELATES_TO", // General connection
+  "LEADS_TO", // Causal relationship (A caused B)
+  "OCCURRED_BEFORE", // Temporal sequence
+  "PREFERS_OVER", // User preferences (chose A instead of B)
+  "EXEMPLIFIES", // Pattern examples
+  "CONTRADICTS", // Conflicting information
+  "REINFORCES", // Supporting evidence
+  "INVALIDATED_BY", // Outdated information
+  "EVOLVED_INTO", // Knowledge evolution
+  "DERIVED_FROM", // Source tracking
+  "PART_OF", // Hierarchical structure
+] as const;
+
+export type AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number];
 
 // =============================================================================
 // Version Types

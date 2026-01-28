@@ -24,6 +24,9 @@ export interface EdgeRow {
   metadata: string | null;
   created_at: string;
   created_by: string | null;
+  // AutoMem edge fields
+  confidence: number | null;
+  similarity: number | null;
 }
 
 // =============================================================================
@@ -52,6 +55,8 @@ export function createEdge(
   options: {
     metadata?: EdgeMetadata;
     createdBy?: "boundary" | "daemon" | "user";
+    confidence?: number;
+    similarity?: number;
   } = {}
 ): Edge {
   const edge: Edge = {
@@ -62,11 +67,13 @@ export function createEdge(
     metadata: options.metadata ?? {},
     createdAt: new Date().toISOString(),
     createdBy: options.createdBy ?? "daemon",
+    confidence: options.confidence,
+    similarity: options.similarity,
   };
 
   const stmt = db.prepare(`
-    INSERT INTO edges (id, source_node_id, target_node_id, type, metadata, created_at, created_by)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO edges (id, source_node_id, target_node_id, type, metadata, created_at, created_by, confidence, similarity)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
@@ -76,7 +83,9 @@ export function createEdge(
     edge.type,
     JSON.stringify(edge.metadata),
     edge.createdAt,
-    edge.createdBy
+    edge.createdBy,
+    edge.confidence ?? null,
+    edge.similarity ?? null
   );
 
   return edge;
@@ -181,5 +190,7 @@ export function edgeRowToEdge(row: EdgeRow): Edge {
     metadata: row.metadata ? JSON.parse(row.metadata) : {},
     createdAt: row.created_at,
     createdBy: row.created_by as "boundary" | "daemon" | "user",
+    confidence: row.confidence ?? undefined,
+    similarity: row.similarity ?? undefined,
   };
 }

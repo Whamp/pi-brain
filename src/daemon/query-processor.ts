@@ -16,11 +16,17 @@ import type { DaemonConfig } from "../config/types.js";
 import type { NodeRow } from "../storage/node-crud.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
+import {
+  findBridgePaths,
+  type BridgePath,
+} from "../storage/bridge-discovery.js";
 import { isVecLoaded } from "../storage/database.js";
+import {
+  hybridSearch,
+  type HybridScoreBreakdown,
+} from "../storage/hybrid-search.js";
 import { listNodes, type ListNodesFilters } from "../storage/node-queries.js";
 import { getAggregatedQuirks } from "../storage/quirk-repository.js";
-import { searchNodesAdvanced } from "../storage/search-repository.js";
-import { semanticSearch } from "../storage/semantic-search.js";
 import { getAggregatedToolErrors } from "../storage/tool-error-repository.js";
 import { consoleLogger, type ProcessorLogger } from "./processor.js";
 
@@ -41,6 +47,7 @@ export interface QueryRequest {
   options?: {
     maxNodes?: number;
     includeDetails?: boolean;
+    enableBridgeDiscovery?: boolean;
   };
 }
 
@@ -115,14 +122,13 @@ export async function processQuery(
 
   logger.info(`Processing query: "${request.query.slice(0, 100)}..."`);
 
-  // Step 1: Search for relevant nodes (semantic + FTS)
+  // Step 1: Search for relevant nodes (Hybrid Search)
   const relevantNodes = await findRelevantNodes(
     config.db,
     request.query,
     request.context?.project,
     maxNodes,
     config.embeddingProvider,
-    config.semanticSearchThreshold,
     logger
   );
 
@@ -144,17 +150,34 @@ export async function processQuery(
     };
   }
 
-  // Step 3: Check for model quirks and tool errors if query seems related
+  // Step 3: Find context bridges (multi-hop paths)
+  let bridgePaths: BridgePath[] = [];
+  if (request.options?.enableBridgeDiscovery !== false) {
+    // Use top 3 relevant nodes as seeds
+    const seedNodeIds = relevantNodes.slice(0, 3).map((n) => n.id);
+    bridgePaths = findBridgePaths(config.db, seedNodeIds, {
+      maxDepth: 2,
+      limit: 5,
+      minScore: 0.1,
+    });
+
+    if (bridgePaths.length > 0) {
+      logger.info(`Found ${bridgePaths.length} bridge paths for context`);
+    }
+  }
+
+  // Step 4: Check for model quirks and tool errors if query seems related
   const additionalContext = gatherAdditionalContext(
     config.db,
     request.query,
     logger
   );
 
-  // Step 4: Invoke pi agent to synthesize answer
+  // Step 5: Invoke pi agent to synthesize answer
   const result = await invokeQueryAgent(
     request.query,
     relevantNodes,
+    bridgePaths,
     additionalContext,
     config,
     logger
@@ -199,16 +222,12 @@ interface RelevantNode {
   outcome: string;
   timestamp: string;
   sessionFile: string;
+  score?: number;
+  breakdown?: HybridScoreBreakdown;
 }
 
 /**
- * Find nodes relevant to the query.
- *
- * Uses a two-phase search strategy:
- * 1. Semantic search (if embedding provider configured) - finds nodes by meaning
- * 2. FTS fallback - finds nodes by keyword match
- *
- * Falls back to listing recent nodes if both searches return no results.
+ * Find nodes relevant to the query using Hybrid Search.
  */
 async function findRelevantNodes(
   db: Database,
@@ -216,78 +235,73 @@ async function findRelevantNodes(
   project: string | undefined,
   maxNodes: number,
   embeddingProvider: EmbeddingProvider | undefined,
-  semanticSearchThreshold: number | undefined,
   logger: ProcessorLogger
 ): Promise<RelevantNode[]> {
   const filters: ListNodesFilters | undefined = project
     ? { project }
     : undefined;
 
-  // Phase 1: Try semantic search if embedding provider is configured
-  if (embeddingProvider) {
-    if (isVecLoaded(db)) {
-      try {
-        // Embed the query
-        const [queryEmbedding] = await embeddingProvider.embed([query]);
-
-        // Guard against empty embedding result
-        if (!queryEmbedding) {
-          throw new Error("Embedding returned empty result");
-        }
-
-        // Perform semantic search
-        const semanticResults = semanticSearch(db, queryEmbedding, {
-          limit: maxNodes,
-          maxDistance: semanticSearchThreshold,
-          filters,
-        });
-
-        if (semanticResults.length > 0) {
-          logger.info(
-            `Semantic search found ${semanticResults.length} results (closest distance: ${semanticResults[0].distance.toFixed(3)})`
-          );
-          return semanticResults.map((r) => nodeRowToRelevant(r.node));
-        }
-
-        logger.info("Semantic search returned no results, falling back to FTS");
-      } catch (error) {
-        // Log and fall through to FTS
-        logger.warn(
-          `Semantic search failed: ${error instanceof Error ? error.message : String(error)}, falling back to FTS`
-        );
+  // Generate embedding if provider available
+  let queryEmbedding: number[] | undefined;
+  if (embeddingProvider && isVecLoaded(db)) {
+    try {
+      const [embedding] = await embeddingProvider.embed([query]);
+      if (embedding) {
+        queryEmbedding = [...embedding]; // Convert Float32Array to number[]
       }
-    } else {
+    } catch (error) {
       logger.warn(
-        "Semantic search skipped: sqlite-vec extension not loaded. Falling back to FTS."
+        `Embedding generation failed: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }
 
-  // Phase 2: Full-text search
-  const searchResults = searchNodesAdvanced(db, query, {
+  // Perform Hybrid Search
+  const searchResponse = hybridSearch(db, query, {
     limit: maxNodes,
     filters,
+    queryEmbedding,
+    // Add archived filter handling implicitly via options if needed, defaults to false
   });
 
-  if (searchResults.results.length > 0) {
-    logger.info(`FTS found ${searchResults.results.length} results`);
-    return searchResults.results.map((r) => nodeRowToRelevant(r.node));
+  if (searchResponse.results.length > 0) {
+    logger.info(
+      `Hybrid search found ${searchResponse.results.length} results. Top score: ${searchResponse.results[0].score.toFixed(3)}`
+    );
+    return searchResponse.results.map((r) => ({
+      ...nodeRowToRelevant(r.node),
+      score: r.score,
+      breakdown: r.breakdown,
+    }));
   }
 
-  // Phase 3: Fallback to listing recent nodes from the project
-  logger.info("No search results, returning recent nodes");
-  const listFilters: ListNodesFilters = {};
-  if (project) {
-    listFilters.project = project;
+  // Fallback: list recent nodes if absolutely nothing found (and no query provided? No, query is required)
+  // If hybrid search returns nothing (e.g. strict filters or no matches), we might just return empty.
+  // The original logic fell back to recent nodes if search failed.
+  // Hybrid search handles "no matches" by returning empty.
+  // Let's keep the fallback for now if query was empty-ish or something went wrong?
+  // Actually, hybrid search with empty query + filters acts as a list.
+  // But hybridSearch requires non-empty query OR embedding OR filters.
+  // If we have filters but no query/embedding, hybridSearch might work if designed so.
+  // Looking at hybridSearch impl: "If no candidates at all, return empty".
+  // Candidates come from vector search OR FTS.
+  // If no query and no embedding, no candidates.
+
+  if (!query && !queryEmbedding) {
+    logger.info("No query or embedding, returning recent nodes");
+    const listFilters: ListNodesFilters = {};
+    if (project) {
+      listFilters.project = project;
+    }
+    const nodes = listNodes(db, listFilters, {
+      sort: "timestamp",
+      order: "desc",
+      limit: maxNodes,
+    });
+    return nodes.nodes.map(nodeRowToRelevant);
   }
 
-  const nodes = listNodes(db, listFilters, {
-    sort: "timestamp",
-    order: "desc",
-    limit: maxNodes,
-  });
-
-  return nodes.nodes.map(nodeRowToRelevant);
+  return [];
 }
 
 /**
@@ -379,6 +393,7 @@ function gatherAdditionalContext(
 async function invokeQueryAgent(
   query: string,
   nodes: RelevantNode[],
+  bridgePaths: BridgePath[],
   additionalContext: AdditionalContext,
   config: QueryProcessorConfig,
   logger: ProcessorLogger
@@ -414,7 +429,12 @@ async function invokeQueryAgent(
   }
 
   // Build the context prompt
-  const contextPrompt = buildQueryPrompt(query, nodes, additionalContext);
+  const contextPrompt = buildQueryPrompt(
+    query,
+    nodes,
+    bridgePaths,
+    additionalContext
+  );
 
   // Build pi arguments
   const args = [
@@ -485,6 +505,7 @@ async function invokeQueryAgent(
 function buildQueryPrompt(
   query: string,
   nodes: RelevantNode[],
+  bridgePaths: BridgePath[],
   additionalContext: AdditionalContext
 ): string {
   const parts: string[] = [
@@ -504,9 +525,25 @@ function buildQueryPrompt(
     parts.push(`- **Outcome**: ${node.outcome}`);
     parts.push(`- **Date**: ${node.timestamp}`);
     parts.push(`- **Summary**: ${node.summary}`);
+    if (node.score !== undefined) {
+      parts.push(`- **Relevance Score**: ${node.score.toFixed(2)}`);
+    }
     parts.push(
       `- **Raw File**: ${node.sessionFile} (Use RLM to read details if needed)`
     );
+    parts.push("");
+  }
+
+  // Add bridge paths (Context Connections)
+  if (bridgePaths.length > 0) {
+    parts.push("## Context Connections");
+    parts.push(
+      "The following paths explain potential relationships between sessions:"
+    );
+    parts.push("");
+    for (const path of bridgePaths) {
+      parts.push(`- ${path.description} (Score: ${path.score.toFixed(2)})`);
+    }
     parts.push("");
   }
 

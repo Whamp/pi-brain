@@ -89,6 +89,10 @@ export function getDefaultDaemonConfig(): DaemonConfig {
     maxConcurrentAnalysis: 1,
     analysisTimeoutMinutes: 30,
     maxQueueSize: 1000,
+    decaySchedule: "0 3 * * *", // 3am daily
+    creativeSchedule: "0 4 * * 0", // 4am Sunday
+    baseDecayRate: 0.1,
+    creativeSimilarityThreshold: 0.75,
   };
 }
 
@@ -487,6 +491,13 @@ function transformDaemonConfig(
       raw.daemon?.analysis_timeout_minutes ??
       defaults.daemon.analysisTimeoutMinutes,
     maxQueueSize: raw.daemon?.max_queue_size ?? defaults.daemon.maxQueueSize,
+    decaySchedule: raw.daemon?.decay_schedule ?? defaults.daemon.decaySchedule,
+    creativeSchedule:
+      raw.daemon?.creative_schedule ?? defaults.daemon.creativeSchedule,
+    baseDecayRate: raw.daemon?.base_decay_rate ?? defaults.daemon.baseDecayRate,
+    creativeSimilarityThreshold:
+      raw.daemon?.creative_similarity_threshold ??
+      defaults.daemon.creativeSimilarityThreshold,
   };
 
   return daemon;
@@ -557,6 +568,21 @@ function validateDaemonConfig(daemon: DaemonConfig): void {
   ) {
     throw new Error(
       `Invalid value for daemon.semantic_search_threshold: ${daemon.semanticSearchThreshold}. Must be between 0.0 and 1.0.`
+    );
+  }
+  validateCronSchedule(daemon.decaySchedule, "daemon.decay_schedule");
+  validateCronSchedule(daemon.creativeSchedule, "daemon.creative_schedule");
+  if (daemon.baseDecayRate < 0 || daemon.baseDecayRate > 1) {
+    throw new Error(
+      `Invalid value for daemon.base_decay_rate: ${daemon.baseDecayRate}. Must be between 0.0 and 1.0.`
+    );
+  }
+  if (
+    daemon.creativeSimilarityThreshold < 0 ||
+    daemon.creativeSimilarityThreshold > 1
+  ) {
+    throw new Error(
+      `Invalid value for daemon.creative_similarity_threshold: ${daemon.creativeSimilarityThreshold}. Must be between 0.0 and 1.0.`
     );
   }
 }
@@ -805,6 +831,10 @@ daemon:
                                              # Without this, clustering is skipped (no error)
   # embedding_base_url: https://...          # optional, for custom endpoints
   semantic_search_threshold: 0.5             # 0.0-1.0, distance above which FTS fallback triggers
+  decay_schedule: "0 3 * * *"                # 3am daily - memory decay job
+  creative_schedule: "0 4 * * 0"             # 4am Sunday - creative association job
+  base_decay_rate: 0.1                       # 0.0-1.0, higher = faster memory decay
+  creative_similarity_threshold: 0.75        # 0.0-1.0, minimum similarity for creative edges
   provider: zai
   model: glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md

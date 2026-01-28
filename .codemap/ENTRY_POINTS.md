@@ -129,18 +129,19 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-214]
+src/api/routes/daemon.ts [1-260]
   function:
-    24-213: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 38 [call: 28, type: 10]
-        - src/api/routes/daemon.ts:24: type FastifyInstance -> external
-        - src/api/routes/daemon.ts:24: type Promise -> external
-        - src/api/routes/daemon.ts:28: call get -> external
-        - src/api/routes/daemon.ts:28: type FastifyRequest -> external
-        - src/api/routes/daemon.ts:28: type FastifyReply -> external
+    25-259: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 46 [call: 34, type: 12]
+        - src/api/routes/daemon.ts:25: type FastifyInstance -> external
+        - src/api/routes/daemon.ts:25: type Promise -> external
+        - src/api/routes/daemon.ts:29: call get -> external
+        - src/api/routes/daemon.ts:29: type FastifyRequest -> external
+        - src/api/routes/daemon.ts:29: type FastifyReply -> external
   imports:
     - ../../daemon/cli.js
     - ../../daemon/errors.js
+    - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
     - ../responses.js
     - fastify
@@ -287,7 +288,7 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-281]
+src/api/routes/query.ts [1-282]
   function:
     60-104: getEmbeddingProvider(config: {
   embeddingProvider?: "openrouter" | "ollama" | "openai";
@@ -297,13 +298,16 @@ src/api/routes/query.ts [1-281]
   embeddingDimensions?: number;
 }): any
       /** Get or create the embedding provider with caching. Cache is invalidated if the configuration changes. */
-    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 2 [call: 1, type: 1]
+        - src/api/routes/query.ts:66: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/api/routes/query.ts:94: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
+    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 37 [call: 30, instantiate: 1, type: 6]
         - src/api/routes/query.ts:106: type FastifyInstance -> external
         - src/api/routes/query.ts:106: type Promise -> external
         - src/api/routes/query.ts:117: call post -> external
         - src/api/routes/query.ts:120: type FastifyRequest -> external
-        - src/api/routes/query.ts:133: type FastifyReply -> external
+        - src/api/routes/query.ts:134: type FastifyReply -> external
   variable:
     24-47: DEFAULT_QUERY_CONFIG
       /** Default daemon config for query processing */
@@ -313,6 +317,8 @@ src/api/routes/query.ts [1-281]
         - src/api/routes/query.ts:42: type const -> external
     53-53: EmbeddingProvider | undefined
       /** Cached embedding provider instance. Created once on first use to avoid HTTP client setup overhead per request. */
+      refs out: 1 [type: 1]
+        - src/api/routes/query.ts:53: type EmbeddingProvider -> src/daemon/facet-discovery.ts
     54-54: string | undefined
   imports:
     - ../../daemon/facet-discovery.js
@@ -693,12 +699,12 @@ src/api/websocket.ts [1-404]
           - src/api/websocket.ts:294: instantiate Date -> external
       301-323: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
         /** Broadcast analysis completed event */
-        refs out: 8 [call: 4, instantiate: 2, type: 2]
+        refs out: 7 [call: 4, instantiate: 2, type: 1]
           - src/api/websocket.ts:301: type AnalysisJob -> src/daemon/queue.ts
-          - src/api/websocket.ts:301: type Node -> src/types/index.ts
           - src/api/websocket.ts:302: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:309: call toISOString -> external
           - src/api/websocket.ts:309: instantiate Date -> external
+          - src/api/websocket.ts:313: call WebSocketManager.broadcast -> src/api/websocket.ts
       328-342: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
         /** Broadcast analysis failed event */
         refs out: 5 [call: 2, instantiate: 1, type: 2]
@@ -830,4 +836,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,145 (codebase: ~1,093,386)
+Estimated tokens: 9,251 (codebase: ~1,162,805)

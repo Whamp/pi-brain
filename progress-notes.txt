@@ -193,3 +193,197 @@ the reactivity chain.
   - All 1291 tests pass, including new integration tests.
 **Commit**: 60c88128
 **Notes**: Completed Phase 17 Semantic Search implementation and verification. The system now has robust error handling and graceful degradation for vector search.
+
+---
+
+## 2026-01-28 11:23 - Tasks 20.1.1, 20.1.2, 20.1.3
+
+**Status**: pending → done
+**Validation**:
+  - Created migration 013_automem_consolidation.sql with:
+    - nodes table: relevance_score, last_accessed, archived, importance
+    - edges table: confidence, similarity
+    - 4 new indexes for consolidation queries
+  - Updated src/types/index.ts with 11 AutoMem relationship types:
+    - RELATES_TO, LEADS_TO, OCCURRED_BEFORE, PREFERS_OVER, EXEMPLIFIES
+    - CONTRADICTS, REINFORCES, INVALIDATED_BY, EVOLVED_INTO, DERIVED_FROM, PART_OF
+  - Added AUTOMEM_EDGE_TYPES const and AutoMemEdgeType type
+  - Updated Node interface with memory consolidation fields
+  - Updated Edge interface with confidence/similarity fields
+  - Updated storage layer (node-crud.ts, edge-repository.ts, node-conversion.ts)
+  - Added 5 new database tests for AutoMem schema validation
+  - Fixed connection-discovery.test.ts inline schema
+  - All 1296 tests pass (5 new tests added)
+**Commit**: f01da352
+**Notes**: Completed Phase 1 of AutoMem Native Port. Schema and types are ready for Phase 2 (Analyzer Upgrade) and Phase 3 (Consolidation Engine).
+
+---
+
+## 2026-01-28 11:36 - Task 20.2.1
+
+**Status**: pending → done
+**Validation**: 
+  - Updated prompts/session-analyzer.md to include typed relationship extraction
+  - Added `relationships` field to output JSON schema with all 11 AutoMem edge types
+  - Added "Relationship Types" section with table documenting all edge types
+  - Added "When to Extract Relationships" guidance section
+  - Updated all 3 examples to include relationship extraction
+  - Added reminder #7 to Important Reminders about relationships
+  - All 1296 tests pass
+  - Lint/format checks pass
+**Commit**: 33c6c7c4
+**Notes**: Session analyzer prompt now instructs the LLM to extract typed relationships (LEADS_TO, PREFERS_OVER, CONTRADICTS, REINFORCES, DERIVED_FROM, EXEMPLIFIES, PART_OF, RELATES_TO, OCCURRED_BEFORE, INVALIDATED_BY, EVOLVED_INTO). Next task 20.2.2 will update processor.ts to parse and store these typed edges.
+
+---
+
+## 2026-01-28 11:50 - Task 20.2.2
+
+**Status**: pending → done
+**Validation**: 
+  - Added `RelationshipOutput` type to AgentNodeOutput in processor.ts
+  - Created src/storage/relationship-edges.ts with:
+    - `storeRelationshipEdges()`: stores edges with resolved or unresolved targets
+    - `findUnresolvedRelationships()`: queries edges pending resolution
+    - `resolveRelationship()`: updates edge target after semantic search match
+    - `isAutoMemEdgeType()`: validates AutoMem edge types
+    - `validateRelationship()`: validates relationship output from analyzer
+  - Integrated into worker.ts processJob() as step 9
+  - Handle unresolved targets by storing with placeholder (source==target)
+    and unresolvedTarget in metadata for future resolution
+  - 19 new unit tests for relationship edge functionality
+  - All 1315 tests pass (19 new tests added)
+  - Lint/format checks pass
+**Commit**: 0557a7d3
+**Notes**: Complete AutoMem typed edge extraction pipeline. When analyzer produces relationships, they are stored as edges. Unresolved relationships (where targetNodeId is null) are stored with a placeholder and can be resolved later via semantic search. Next tasks in Phase 20.3 will implement the Consolidation Engine (decay, creative association).
+
+---
+
+## 2026-01-28 12:08 - Task 20.3.1
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/daemon/consolidation/ module with 5 files:
+    - index.ts: Module exports (RelevanceCalculator, ConsolidationScheduler, CreativeAssociator)
+    - relevance.ts: RelevanceCalculator implementing AutoMem decay formula
+    - creative-associator.ts: CreativeAssociator for vector-based edge discovery
+    - decay-scheduler.ts: ConsolidationScheduler with cron jobs for decay/creative cycles
+  - Implemented relevance scoring with:
+    - Exponential decay factor based on age
+    - Access recency factor (linear for first week, logarithmic after)
+    - Relationship density factor (edges boost relevance)
+    - Importance and confidence multipliers
+  - Archive threshold at 0.2, delete threshold at 0.05
+  - Touch nodes on access to prevent premature decay
+  - 31 unit tests covering all consolidation functionality
+  - All 1346 tests pass (31 new tests added)
+  - Lint/format checks pass
+**Commit**: f9c7da9d
+**Notes**: Consolidation module structure complete. DecayScheduler supports daily decay and weekly creative association cron jobs. CreativeAssociator uses vector similarity to find non-obvious connections between nodes. Next task 20.3.2 will implement the DecayScheduler cron integration.
+
+---
+
+## 2026-01-28 12:14 - Task 20.3.2
+
+**Status**: pending → done
+**Validation**: 
+  - Added consolidation config fields to DaemonConfig type:
+    - decaySchedule: cron for daily memory decay (default: "0 3 * * *")
+    - creativeSchedule: cron for weekly creative association (default: "0 4 * * 0")
+    - baseDecayRate: 0.0-1.0 decay rate (default: 0.1)
+    - creativeSimilarityThreshold: 0.0-1.0 min similarity (default: 0.75)
+  - Updated RawConfig to parse snake_case fields from YAML
+  - Added validation for new fields in transformConfig()
+  - Integrated ConsolidationScheduler into daemon-process.ts:
+    - Creates scheduler with config from daemon settings
+    - Starts scheduler after main scheduler
+    - Stops scheduler during graceful shutdown
+  - Added 10 new config tests
+  - All 1356 tests pass (10 new tests added)
+  - Lint/format checks pass
+**Commit**: 84545a45
+**Notes**: The ConsolidationScheduler was already fully implemented in 20.3.1. This task focused on integrating it into the daemon process lifecycle and adding the necessary configuration. The daemon now runs both the main Scheduler (for reanalysis, connection discovery, etc.) and the ConsolidationScheduler (for memory decay and creative association).
+
+---
+
+## 2026-01-28 12:29 - Task 20.4.1
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/storage/hybrid-search.ts with weighted 9-component scoring:
+    - Vector similarity (0.25): semantic distance from embeddings  
+    - Keyword match (0.15): FTS5 rank score
+    - Relation density (0.25): edge count/graph centrality
+    - Content overlap (0.25): token matching in summary
+    - Temporal proximity (0.15): distance from reference time
+    - Tag boost (0.10): matching boost tags
+    - Importance (0.05): node importance field
+    - Recency (0.10): node age decay
+  - hybridSearch() merges FTS and vector candidates, enriches with
+    edge counts/tag matches, calculates composite score, returns
+    paginated results with score breakdowns
+  - calculateNodeHybridScore() for single-node re-ranking
+  - 18 unit tests covering all scoring components
+  - Exported hybrid search from storage index
+  - Fixed null-safety in tag count query
+  - All 1374 tests pass (18 new tests added)
+  - Lint/format checks pass
+**Commit**: 6525ed34
+**Notes**: Hybrid search enables multi-signal ranking for brain queries. Next task 20.4.2 will implement bridge discovery for multi-hop graph traversal to explain context between nodes.
+
+---
+
+## 2026-01-28 12:40 - Task 20.4.2
+
+**Status**: pending → done
+**Validation**: 
+  - Created src/storage/bridge-discovery.ts with findBridgePaths()
+  - Implemented multi-hop traversal to explain context between nodes
+  - Implemented path scoring based on edge confidence and hop penalty
+  - Implemented human-readable path description generation with node summaries
+  - Added 6 unit tests covering:
+    - Direct connections (1 hop)
+    - Multi-hop paths (2 hops)
+    - Score thresholding
+    - Cycle detection
+    - Path prioritization
+    - Description generation
+  - All 1380 tests pass (6 new tests added)
+  - Lint/format checks pass
+**Commit**: [hash]
+**Notes**: Bridge discovery enables the system to explain "why" two nodes are related by finding causal or semantic paths between them. Next task 20.4.3 will expose these new query capabilities via the API.
+
+## 2026-01-28 12:50 - Task 20.4.3
+
+**Status**: pending → done
+**Validation**: 
+  - Updated src/daemon/query-processor.ts to use hybridSearch instead of findRelevantNodes (FTS/Semantic fallback)
+  - Added bridge discovery integration to processQuery (top 3 nodes as seeds, max depth 2)
+  - Updated QueryRequest and API route options to support enableBridgeDiscovery flag
+  - Updated src/daemon/query-processor.test.ts to verify hybrid search and bridge discovery calls
+  - Updated src/daemon/semantic-search.integration.test.ts to verify hybrid search results and fallback logic
+  - All 1383 tests pass
+  - Lint/format checks pass
+**Commit**: [hash]
+**Notes**: The query API now leverages the full power of the new storage engines (hybrid search + graph traversal). Next task 20.5.1 will update the UI to visualize these new capabilities.
+
+## 2026-01-28 13:08 - Task 20.5.1
+
+**Status**: pending → done
+**Validation**: 
+  - Updated `src/web/app/src/lib/components/graph.svelte` with:
+    - `edgeColors` mapping for all edge types including 11 AutoMem types
+    - `initGraph` creating 11+ colored arrow markers
+    - `updateGraph` using dynamic strokes and markers
+    - Dynamic legend showing only edge types present in current graph
+  - Updated `src/web/app/src/app.css` with 11 new CSS variables for AutoMem edge colors
+  - Verified `npm run check` (backend) passes
+  - Verified `npm run web:check` (frontend) passes
+  - Verified `npm test` passes (all 1383 tests)
+**Commit**: 71f7aa63
+**Notes**: The graph now provides visual distinction for different relationship types, essential for understanding the knowledge graph structure with the new AutoMem capabilities.
+
+## 2026-01-28 13:14 - Task 20.5.2
+
+**Status**: pending → done
+**Validation**: npm run check, npm test (unit + integration)
+**Notes**: Implemented node opacity based on relevance_score and archived status. Added relevance legend to Graph component.
