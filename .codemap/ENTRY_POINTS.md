@@ -129,17 +129,18 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-157]
+src/api/routes/daemon.ts [1-203]
   function:
-    22-156: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 32 [call: 24, type: 8]
-        - src/api/routes/daemon.ts:22: type FastifyInstance -> external
-        - src/api/routes/daemon.ts:22: type Promise -> external
-        - src/api/routes/daemon.ts:26: call get -> external
-        - src/api/routes/daemon.ts:26: type FastifyRequest -> external
-        - src/api/routes/daemon.ts:26: type FastifyReply -> external
+    23-202: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 41 [call: 31, type: 10]
+        - src/api/routes/daemon.ts:23: type FastifyInstance -> external
+        - src/api/routes/daemon.ts:23: type Promise -> external
+        - src/api/routes/daemon.ts:27: call get -> external
+        - src/api/routes/daemon.ts:27: type FastifyRequest -> external
+        - src/api/routes/daemon.ts:27: type FastifyReply -> external
   imports:
     - ../../daemon/cli.js
+    - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
     - ../responses.js
     - fastify
@@ -834,4 +835,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,233 (codebase: ~1,160,177)
+Estimated tokens: 9,243 (codebase: ~1,161,394)
