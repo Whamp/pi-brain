@@ -1,16 +1,16 @@
 # Project Overview
 
 ## Languages
-- typescript: 91 files
+- typescript: 95 files
 
 ## Statistics
-- Total files: 91
-- Total symbols: 672
-  - function: 378
-  - interface: 210
+- Total files: 95
+- Total symbols: 682
+  - function: 379
+  - interface: 216
   - type: 41
   - variable: 31
-  - class: 12
+  - class: 15
 
 ---
 
@@ -452,6 +452,57 @@ src/daemon/connection-discovery.ts [1-620]
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../types/index.js
+    - better-sqlite3
+
+src/daemon/consolidation/creative-associator.ts [1-245]
+  class:
+    82-244: class CreativeAssociator [exported]
+      /** Discovers and creates non-obvious connections between nodes */
+  interface:
+    41-50: interface CreativeAssociatorConfig [exported]
+      /** Configuration for the creative associator */
+    55-64: interface CreativeAssociatorResult [exported]
+      /** Result of a creative association run */
+  imports:
+    - ../../storage/database.js
+    - ../../storage/edge-repository.js
+    - ../../storage/embedding-utils.js
+    - better-sqlite3
+
+src/daemon/consolidation/decay-scheduler.ts [1-351]
+  class:
+    91-339: class ConsolidationScheduler [exported]
+      /** Scheduler for memory consolidation jobs */
+  interface:
+    31-40: interface ConsolidationConfig [exported]
+      /** Configuration for consolidation jobs */
+    45-52: interface ConsolidationResult [exported]
+      /** Result of a consolidation job */
+  function:
+    344-350: createConsolidationScheduler(db: Database.Database, config?: ConsolidationConfig, logger?: ConsolidationLogger): ConsolidationScheduler [exported]
+      /** Create a consolidation scheduler with default configuration */
+  imports:
+    - ./creative-associator.js
+    - ./relevance.js
+    - better-sqlite3
+    - croner
+
+src/daemon/consolidation/index.ts [1-25]
+  imports:
+    - ./creative-associator.js
+    - ./decay-scheduler.js
+    - ./relevance.js
+
+src/daemon/consolidation/relevance.ts [1-346]
+  class:
+    83-345: class RelevanceCalculator [exported]
+      /** Calculates and updates node relevance scores */
+  interface:
+    39-50: interface RelevanceFactors [exported]
+      /** Factors used in relevance calculation */
+    55-62: interface RelevanceResult [exported]
+      /** Result of calculating relevance for a single node */
+  imports:
     - better-sqlite3
 
 src/daemon/daemon-process.ts [1-312]
@@ -2177,5 +2228,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 91
-Estimated tokens: 27,572 (codebase: ~1,105,310)
+Files: 95
+Estimated tokens: 28,030 (codebase: ~1,115,390)

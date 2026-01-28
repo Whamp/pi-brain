@@ -414,12 +414,12 @@ Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.m
 
 ### 20.3 Consolidation Engine
 
-| ID     | Task                                                    | Status  | Deps   | Notes |
-| ------ | ------------------------------------------------------- | ------- | ------ | ----- |
-| 20.3.1 | Create src/daemon/consolidation/ module structure       | pending | 20.1.1 |       |
-| 20.3.2 | Implement DecayScheduler (cron job)                     | pending | 20.3.1 |       |
-| 20.3.3 | Implement RelevanceCalculator (decay formula)           | pending | 20.3.2 |       |
-| 20.3.4 | Implement CreativeAssociator (vector similarity search) | pending | 20.3.2 |       |
+| ID     | Task                                                    | Status  | Deps   | Notes      |
+| ------ | ------------------------------------------------------- | ------- | ------ | ---------- |
+| 20.3.1 | Create src/daemon/consolidation/ module structure       | active  | 20.1.1 | 2026-01-28 |
+| 20.3.2 | Implement DecayScheduler (cron job)                     | pending | 20.3.1 |            |
+| 20.3.3 | Implement RelevanceCalculator (decay formula)           | pending | 20.3.2 |            |
+| 20.3.4 | Implement CreativeAssociator (vector similarity search) | pending | 20.3.2 |            |
 
 ### 20.4 Query Engine Upgrade
 

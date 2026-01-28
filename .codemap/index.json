@@ -1,24 +1,24 @@
 {
   "stats": {
-    "totalFiles": 91,
-    "totalSymbols": 1141,
+    "totalFiles": 95,
+    "totalSymbols": 1205,
     "byLanguage": {
-      "typescript": 91
+      "typescript": 95
     },
     "bySymbolKind": {
-      "function": 506,
+      "function": 507,
       "type": 42,
-      "interface": 266,
-      "variable": 118,
-      "class": 12,
-      "property": 51,
-      "constructor": 11,
-      "method": 133,
+      "interface": 275,
+      "variable": 128,
+      "class": 15,
+      "property": 62,
+      "constructor": 14,
+      "method": 160,
       "getter": 2
     }
   },
-  "total_tokens": 39487,
-  "codebase_tokens": 1108835,
+  "total_tokens": 41235,
+  "codebase_tokens": 1119862,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -4043,6 +4043,1301 @@
         "../storage/node-crud.js",
         "../storage/node-queries.js",
         "../types/index.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/creative-associator.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        245
+      ],
+      "detail_level": "full",
+      "token_estimate": 429,
+      "symbols": [
+        {
+          "name": "DEFAULT_SIMILARITY_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.75",
+          "lines": [
+            26,
+            26
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default similarity threshold for creating edges",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_SAMPLE_SIZE",
+          "kind": "variable",
+          "signature": "50",
+          "lines": [
+            29,
+            29
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default number of nodes to sample per run",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_EDGES_PER_NODE",
+          "kind": "variable",
+          "signature": "3",
+          "lines": [
+            32,
+            32
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Maximum edges to create per node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociatorConfig",
+          "kind": "interface",
+          "signature": "CreativeAssociatorConfig",
+          "lines": [
+            41,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Configuration for the creative associator",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociatorResult",
+          "kind": "interface",
+          "signature": "CreativeAssociatorResult",
+          "lines": [
+            55,
+            64
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of a creative association run",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeWithEmbedding",
+          "kind": "interface",
+          "signature": "NodeWithEmbedding",
+          "lines": [
+            69,
+            73
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Node with embedding data",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "CreativeAssociator",
+          "kind": "class",
+          "signature": "CreativeAssociator",
+          "lines": [
+            82,
+            244
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Discovers and creates non-obvious connections between nodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "similarityThreshold",
+          "kind": "property",
+          "signature": "similarityThreshold: number",
+          "lines": [
+            83,
+            83
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sampleSize",
+          "kind": "property",
+          "signature": "sampleSize: number",
+          "lines": [
+            84,
+            84
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "minRelevance",
+          "kind": "property",
+          "signature": "minRelevance: number",
+          "lines": [
+            85,
+            85
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "maxEdgesPerNode",
+          "kind": "property",
+          "signature": "maxEdgesPerNode: number",
+          "lines": [
+            86,
+            86
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private db: Database.Database, config: CreativeAssociatorConfig = {})",
+          "lines": [
+            88,
+            97
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "edgeExists",
+          "kind": "method",
+          "signature": "edgeExists(sourceId: string, targetId: string): boolean",
+          "lines": [
+            102,
+            113
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Check if a connection already exists between two nodes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "sampleNodes",
+          "kind": "method",
+          "signature": "sampleNodes(): {}",
+          "lines": [
+            118,
+            139
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Sample nodes with sufficient relevance that have embeddings",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "findSimilarNodes",
+          "kind": "method",
+          "signature": "async findSimilarNodes(nodeId: string, summary: string | null): Promise<{}>",
+          "lines": [
+            144,
+            168
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Find similar nodes using semantic search",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "run",
+          "kind": "method",
+          "signature": "async run(): Promise<CreativeAssociatorResult>",
+          "lines": [
+            173,
+            231
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Run creative association to discover new connections",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getConfig",
+          "kind": "method",
+          "signature": "getConfig(): Required<CreativeAssociatorConfig>",
+          "lines": [
+            236,
+            243
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "CreativeAssociator",
+          "annotation": null,
+          "comment": "Get configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../../storage/database.js",
+        "../../storage/edge-repository.js",
+        "../../storage/embedding-utils.js",
+        "better-sqlite3"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/decay-scheduler.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        351
+      ],
+      "detail_level": "full",
+      "token_estimate": 656,
+      "symbols": [
+        {
+          "name": "ConsolidationConfig",
+          "kind": "interface",
+          "signature": "ConsolidationConfig",
+          "lines": [
+            31,
+            40
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Configuration for consolidation jobs",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationResult",
+          "kind": "interface",
+          "signature": "ConsolidationResult",
+          "lines": [
+            45,
+            52
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of a consolidation job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationLogger",
+          "kind": "interface",
+          "signature": "ConsolidationLogger",
+          "lines": [
+            57,
+            62
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Logger interface",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "noopLogger",
+          "kind": "variable",
+          "signature": "ConsolidationLogger",
+          "lines": [
+            65,
+            72
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default no-op logger",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_DECAY_SCHEDULE",
+          "kind": "variable",
+          "signature": "\"0 3 * * *\"",
+          "lines": [
+            79,
+            79
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default decay schedule: daily at 3am",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_CREATIVE_SCHEDULE",
+          "kind": "variable",
+          "signature": "\"0 4 * * 0\"",
+          "lines": [
+            82,
+            82
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default creative schedule: weekly Sunday at 4am",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ConsolidationScheduler",
+          "kind": "class",
+          "signature": "ConsolidationScheduler",
+          "lines": [
+            91,
+            339
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Scheduler for memory consolidation jobs",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "decayJob",
+          "kind": "property",
+          "signature": "decayJob: Cron | null",
+          "lines": [
+            92,
+            92
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "creativeJob",
+          "kind": "property",
+          "signature": "creativeJob: Cron | null",
+          "lines": [
+            93,
+            93
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "running",
+          "kind": "property",
+          "signature": "running",
+          "lines": [
+            94,
+            94
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "lastDecayResult",
+          "kind": "property",
+          "signature": "lastDecayResult: ConsolidationResult | null",
+          "lines": [
+            95,
+            95
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "lastCreativeResult",
+          "kind": "property",
+          "signature": "lastCreativeResult: ConsolidationResult | null",
+          "lines": [
+            96,
+            96
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "relevanceCalculator",
+          "kind": "property",
+          "signature": "relevanceCalculator: RelevanceCalculator",
+          "lines": [
+            97,
+            97
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "creativeAssociator",
+          "kind": "property",
+          "signature": "creativeAssociator: CreativeAssociator",
+          "lines": [
+            98,
+            98
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private config: ConsolidationConfig, private db: Database.Database, private logger: ConsolidationLogger = noopLogger)",
+          "lines": [
+            100,
+            110
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "start",
+          "kind": "method",
+          "signature": "start(): void",
+          "lines": [
+            115,
+            169
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Start the consolidation scheduler",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "stop",
+          "kind": "method",
+          "signature": "stop(): void",
+          "lines": [
+            174,
+            192
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Stop the consolidation scheduler",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isRunning",
+          "kind": "method",
+          "signature": "isRunning(): boolean",
+          "lines": [
+            197,
+            199
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Check if scheduler is running",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getStatus",
+          "kind": "method",
+          "signature": "getStatus(): { running: boolean; decay: { schedule: string; nextRun: any; lastResult: ConsolidationResult; }; creative: { schedule: string; nextRun: any; lastResult: ConsolidationResult; }; }",
+          "lines": [
+            204,
+            230
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get scheduler status",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "triggerDecay",
+          "kind": "method",
+          "signature": "triggerDecay(): Promise<ConsolidationResult>",
+          "lines": [
+            235,
+            237
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Manually trigger decay job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "triggerCreative",
+          "kind": "method",
+          "signature": "triggerCreative(): Promise<ConsolidationResult>",
+          "lines": [
+            242,
+            244
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Manually trigger creative association job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runDecay",
+          "kind": "method",
+          "signature": "runDecay(): Promise<ConsolidationResult>",
+          "lines": [
+            249,
+            279
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Run decay job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runCreative",
+          "kind": "method",
+          "signature": "async runCreative(): Promise<ConsolidationResult>",
+          "lines": [
+            284,
+            324
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Run creative association job",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getRelevanceCalculator",
+          "kind": "method",
+          "signature": "getRelevanceCalculator(): RelevanceCalculator",
+          "lines": [
+            329,
+            331
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get the relevance calculator for direct access",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getCreativeAssociator",
+          "kind": "method",
+          "signature": "getCreativeAssociator(): CreativeAssociator",
+          "lines": [
+            336,
+            338
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "ConsolidationScheduler",
+          "annotation": null,
+          "comment": "Get the creative associator for direct access",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createConsolidationScheduler",
+          "kind": "function",
+          "signature": "createConsolidationScheduler(db: Database.Database, config?: ConsolidationConfig, logger?: ConsolidationLogger): ConsolidationScheduler",
+          "lines": [
+            344,
+            350
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Create a consolidation scheduler with default configuration",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./creative-associator.js",
+        "./relevance.js",
+        "better-sqlite3",
+        "croner"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/index.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        25
+      ],
+      "detail_level": "full",
+      "token_estimate": 33,
+      "symbols": [],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "./creative-associator.js",
+        "./decay-scheduler.js",
+        "./relevance.js"
+      ]
+    },
+    {
+      "path": "src/daemon/consolidation/relevance.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        346
+      ],
+      "detail_level": "full",
+      "token_estimate": 630,
+      "symbols": [
+        {
+          "name": "DEFAULT_BASE_DECAY_RATE",
+          "kind": "variable",
+          "signature": "0.1",
+          "lines": [
+            21,
+            21
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default daily decay rate (10% per day of age)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ARCHIVE_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.2",
+          "lines": [
+            24,
+            24
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Threshold below which nodes get archived",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DELETE_THRESHOLD",
+          "kind": "variable",
+          "signature": "0.05",
+          "lines": [
+            27,
+            27
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Threshold below which nodes get deleted (if enabled)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MS_PER_DAY",
+          "kind": "variable",
+          "signature": "number",
+          "lines": [
+            30,
+            30
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Milliseconds per day",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceFactors",
+          "kind": "interface",
+          "signature": "RelevanceFactors",
+          "lines": [
+            39,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Factors used in relevance calculation",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceResult",
+          "kind": "interface",
+          "signature": "RelevanceResult",
+          "lines": [
+            55,
+            62
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Result of calculating relevance for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "NodeRow",
+          "kind": "interface",
+          "signature": "NodeRow",
+          "lines": [
+            67,
+            74
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Node data needed for relevance calculation",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelevanceCalculator",
+          "kind": "class",
+          "signature": "RelevanceCalculator",
+          "lines": [
+            83,
+            345
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculates and updates node relevance scores",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "constructor",
+          "kind": "constructor",
+          "signature": "constructor(private db: Database.Database, private baseDecayRate: number = DEFAULT_BASE_DECAY_RATE)",
+          "lines": [
+            84,
+            87
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateDecayFactor",
+          "kind": "method",
+          "signature": "calculateDecayFactor(ageInDays: number): number",
+          "lines": [
+            93,
+            95
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate the decay factor based on age\nUses exponential decay: e^(-rate * age)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateAccessRecency",
+          "kind": "method",
+          "signature": "calculateAccessRecency(daysSinceAccess: number): number",
+          "lines": [
+            101,
+            112
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate access recency factor (0.0-1.0)\nReturns 1.0 for recently accessed, decreasing over time",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelationshipDensity",
+          "kind": "method",
+          "signature": "calculateRelationshipDensity(edgeCount: number): number",
+          "lines": [
+            118,
+            121
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate relationship density factor\nMore edges = higher relevance",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateRelevance",
+          "kind": "method",
+          "signature": "calculateRelevance(factors: RelevanceFactors): number",
+          "lines": [
+            126,
+            143
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate full relevance score using AutoMem formula",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getEdgeCount",
+          "kind": "method",
+          "signature": "getEdgeCount(nodeId: string): number",
+          "lines": [
+            148,
+            158
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get edge count for a node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "calculateForNode",
+          "kind": "method",
+          "signature": "calculateForNode(nodeId: string): RelevanceResult",
+          "lines": [
+            163,
+            202
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Calculate relevance for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "updateNodeRelevance",
+          "kind": "method",
+          "signature": "updateNodeRelevance(nodeId: string): RelevanceResult",
+          "lines": [
+            207,
+            222
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Update relevance score for a single node",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "runDecay",
+          "kind": "method",
+          "signature": "runDecay(): { updated: number; archived: number; deleted: number; results: {}; }",
+          "lines": [
+            228,
+            301
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Run decay on all non-archived nodes\nReturns count of nodes updated",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "touchNode",
+          "kind": "method",
+          "signature": "touchNode(nodeId: string): void",
+          "lines": [
+            307,
+            315
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Mark node as accessed (updates last_accessed timestamp)\nCall this when a node is queried or viewed",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "unarchiveNode",
+          "kind": "method",
+          "signature": "unarchiveNode(nodeId: string): void",
+          "lines": [
+            321,
+            330
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Unarchive a node (restore from archived state)\nAlso resets relevance score to 0.5",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getArchiveThreshold",
+          "kind": "method",
+          "signature": "getArchiveThreshold(): number",
+          "lines": [
+            335,
+            337
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get archive threshold",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getDeleteThreshold",
+          "kind": "method",
+          "signature": "getDeleteThreshold(): number",
+          "lines": [
+            342,
+            344
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Get delete threshold",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "better-sqlite3"
       ]
     },
