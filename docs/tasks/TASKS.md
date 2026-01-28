@@ -431,7 +431,7 @@ Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.m
 
 ### 20.5 UI & Visualization
 
-| ID     | Task                                                           | Status  | Deps   | Notes |
-| ------ | -------------------------------------------------------------- | ------- | ------ | ----- |
-| 20.5.1 | Update Web UI graph view to color-code edge types              | pending | 20.1.3 |       |
-| 20.5.2 | Add "Relevance" visualization (fade out old/unimportant nodes) | pending | 20.1.1 |       |
+| ID     | Task                                                           | Status | Deps   | Notes                                     |
+| ------ | -------------------------------------------------------------- | ------ | ------ | ----------------------------------------- |
+| 20.5.1 | Update Web UI graph view to color-code edge types              | done   | 20.1.3 | 2026-01-28 - Colored edges & legend added |
+| 20.5.2 | Add "Relevance" visualization (fade out old/unimportant nodes) | done   | 20.1.1 | 2026-01-28 - Opacity & Legend             |

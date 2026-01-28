@@ -326,6 +326,20 @@
       .select("text")
       .text((d) => truncateLabel(d.content?.summary ?? `Node ${d.id}`, MAX_LABEL_LENGTH));
 
+    // Update opacity based on relevance (AutoMem)
+    // 0.0-1.0 score -> 0.3-1.0 opacity
+    // Archived nodes get 0.2 opacity
+    allNodes
+      .transition()
+      .duration(300)
+      .attr("opacity", (d) => {
+        const archived = d.archived ?? false;
+        if (archived) {return 0.2;}
+        
+        const score = d.relevanceScore ?? 1;
+        return 0.3 + (score * 0.7);
+      });
+
     // Update selection state
     allNodes.classed("selected", (d) => d.id === selectedNodeId);
 
@@ -608,16 +622,34 @@
     </button>
   </div>
   
-  {#if showLegend && presentEdgeTypes.length > 0}
-    <div class="legend" role="complementary" aria-label="Edge type legend">
-      <div class="legend-title">Relationships</div>
+  {#if showLegend && (presentEdgeTypes.length > 0 || nodes.length > 0)}
+    <div class="legend" role="complementary" aria-label="Graph legend">
+      {#if presentEdgeTypes.length > 0}
+        <div class="legend-title">Relationships</div>
+        <div class="legend-items">
+          {#each presentEdgeTypes as type}
+            <div class="legend-item">
+              <span class="legend-color" style:background-color={getEdgeColor(type)}></span>
+              <span class="legend-label">{type.replace(/_/g, ' ')}</span>
+            </div>
+          {/each}
+        </div>
+      {/if}
+
+      <div class="legend-title" style="margin-top: var(--space-3)">Relevance</div>
       <div class="legend-items">
-        {#each presentEdgeTypes as type}
-          <div class="legend-item">
-            <span class="legend-color" style:background-color={getEdgeColor(type)}></span>
-            <span class="legend-label">{type.replace(/_/g, ' ')}</span>
-          </div>
-        {/each}
+        <div class="legend-item">
+          <span class="legend-node-example" style="opacity: 1.0"></span>
+          <span class="legend-label">Recent / High</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-node-example" style="opacity: 0.5"></span>
+          <span class="legend-label">Older / Decayed</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-node-example" style="opacity: 0.2"></span>
+          <span class="legend-label">Archived</span>
+        </div>
       </div>
     </div>
   {/if}
@@ -700,6 +732,13 @@
     border-radius: 1px;
   }
   
+  .legend-node-example {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-text-muted);
+  }
+  
   .legend-label {
     text-transform: capitalize;
   }
@@ -730,7 +769,7 @@
   /* Node styles (applied via D3) */
   :global(.node) {
     cursor: pointer;
-    transition: transform var(--transition-fast);
+    transition: transform var(--transition-fast), opacity var(--transition-medium);
   }
 
   :global(.node:hover circle) {

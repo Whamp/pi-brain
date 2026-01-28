@@ -365,3 +365,25 @@ the reactivity chain.
   - Lint/format checks pass
 **Commit**: [hash]
 **Notes**: The query API now leverages the full power of the new storage engines (hybrid search + graph traversal). Next task 20.5.1 will update the UI to visualize these new capabilities.
+
+## 2026-01-28 13:08 - Task 20.5.1
+
+**Status**: pending → done
+**Validation**: 
+  - Updated `src/web/app/src/lib/components/graph.svelte` with:
+    - `edgeColors` mapping for all edge types including 11 AutoMem types
+    - `initGraph` creating 11+ colored arrow markers
+    - `updateGraph` using dynamic strokes and markers
+    - Dynamic legend showing only edge types present in current graph
+  - Updated `src/web/app/src/app.css` with 11 new CSS variables for AutoMem edge colors
+  - Verified `npm run check` (backend) passes
+  - Verified `npm run web:check` (frontend) passes
+  - Verified `npm test` passes (all 1383 tests)
+**Commit**: 71f7aa63
+**Notes**: The graph now provides visual distinction for different relationship types, essential for understanding the knowledge graph structure with the new AutoMem capabilities.
+
+## 2026-01-28 13:14 - Task 20.5.2
+
+**Status**: pending → done
+**Validation**: npm run check, npm test (unit + integration)
+**Notes**: Implemented node opacity based on relevance_score and archived status. Added relevance legend to Graph component.
