@@ -291,7 +291,7 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 | ID     | Task                                     | Status | Deps      | Notes      |
 | ------ | ---------------------------------------- | ------ | --------- | ---------- |
-| 17.8.1 | Run backfill on existing data and verify | active | 17.1-17.7 | 2026-01-28 |
+| 17.8.1 | Run backfill on existing data and verify | done   | 17.1-17.7 | 2026-01-28 |
 
 ## Phase 18: Web UI Polish
 

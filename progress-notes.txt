@@ -177,3 +177,19 @@ the reactivity chain.
   - Checked `npm run check` passes
 **Commit**: (will be committed shortly)
 **Notes**: Improved the implementation by explicitly disabling the active breadcrumb buttons to ensure no-op behavior and correct cursor styling.
+
+## 2026-01-28 10:05 - Task 17.6.3, 17.7.1, 17.7.2, 17.7.3, 17.8.1
+
+**Status**: active → done
+**Validation**:
+  - Implemented comprehensive integration tests in `src/daemon/semantic-search.integration.test.ts` verifying:
+    - Semantic search finds nodes when keywords don't match.
+    - Fallback to FTS when semantic search distance exceeds threshold.
+    - Semantic search works with project filtering.
+    - Graceful fallback to FTS on dimension mismatch.
+  - Added explicit check for `sqlite-vec` extension in `findRelevantNodes` with descriptive warning.
+  - Improved `semanticSearch` to log a warning on dimension mismatch.
+  - Documented semantic search configuration in `README.md`.
+  - All 1291 tests pass, including new integration tests.
+**Commit**: 60c88128
+**Notes**: Completed Phase 17 Semantic Search implementation and verification. The system now has robust error handling and graceful degradation for vector search.
