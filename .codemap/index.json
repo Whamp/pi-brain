@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 36349,
-  "codebase_tokens": 1012984,
+  "total_tokens": 36468,
+  "codebase_tokens": 1014052,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15582,10 +15582,10 @@
       "language": "typescript",
       "lines": [
         1,
-        97
+        119
       ],
       "detail_level": "full",
-      "token_estimate": 258,
+      "token_estimate": 377,
       "symbols": [
         {
           "name": "buildEmbeddingText",
@@ -15593,7 +15593,7 @@
           "signature": "buildEmbeddingText(node: Node): string",
           "lines": [
             32,
-            66
+            67
           ],
           "exported": true,
           "is_default": false,
@@ -15611,8 +15611,8 @@
           "kind": "function",
           "signature": "buildSimpleEmbeddingText(type: string | null, summary: string | null): string",
           "lines": [
-            74,
-            86
+            81,
+            93
           ],
           "exported": true,
           "is_default": false,
@@ -15621,7 +15621,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Build simple embedding text from node summary data.\n\nThis is a lightweight version for use with partial node data\n(e.g., NodeSummaryRow from database queries).",
+          "comment": "Build simple embedding text from node summary data.\n\nThis is a lightweight version for use with partial node data\n(e.g., NodeSummaryRow from database queries).\n\nReturns:\n- `[type] summary` when both are present\n- `summary` when only summary is present\n- `[type]` when only type is present (sparse but valid for type-only filtering)\n- `` (empty string) when both are null",
           "incoming_refs": null,
           "outgoing_refs": null
         },
@@ -15630,8 +15630,8 @@
           "kind": "function",
           "signature": "isRichEmbeddingFormat(inputText: string): boolean",
           "lines": [
-            93,
-            96
+            106,
+            118
           ],
           "exported": true,
           "is_default": false,
@@ -15640,7 +15640,7 @@
           "is_abstract": false,
           "parent_name": null,
           "annotation": null,
-          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.",
+          "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection criteria:\n1. Text must start with `[type]` format (e.g., `[coding]`)\n2. Text must contain section headers on their own line: `\\n\\nDecisions:\\n` or `\\n\\nLessons:\\n`\n\nThis is more robust than just checking for `\\nDecisions:` which could match user content.",
           "incoming_refs": null,
           "outgoing_refs": null
         }

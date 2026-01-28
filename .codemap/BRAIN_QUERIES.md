@@ -1789,40 +1789,42 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.test.ts [1-333]
+src/storage/embedding-utils.test.ts [1-362]
   imports:
     - ../types/index.js
     - ./embedding-utils.js
     - vitest
 
-src/storage/embedding-utils.ts [1-97]
+src/storage/embedding-utils.ts [1-119]
   function:
-    32-66: buildEmbeddingText(node: Node): string [exported]
+    32-67: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
       refs in: 6 [call: 5, import: 1]
         - src/storage/embedding-utils.test.ts:10: import (module)
-        - src/storage/embedding-utils.test.ts:105: call text
-        - src/storage/embedding-utils.test.ts:133: call text
-        - src/storage/embedding-utils.test.ts:190: call text
-        - src/storage/embedding-utils.test.ts:241: call text
-        - src/storage/embedding-utils.test.ts:276: call text
-    74-86: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
-      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). */
+        - src/storage/embedding-utils.test.ts:123: call text
+        - src/storage/embedding-utils.test.ts:151: call text
+        - src/storage/embedding-utils.test.ts:208: call text
+        - src/storage/embedding-utils.test.ts:259: call text
+        - src/storage/embedding-utils.test.ts:294: call text
+    81-93: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
       refs in: 5 [call: 4, import: 1]
         - src/storage/embedding-utils.test.ts:11: import (module)
-        - src/storage/embedding-utils.test.ts:286: call text
-        - src/storage/embedding-utils.test.ts:291: call text
-        - src/storage/embedding-utils.test.ts:296: call text
-        - src/storage/embedding-utils.test.ts:301: call text
-    93-96: isRichEmbeddingFormat(inputText: string): boolean [exported]
-      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. */
-      refs in: 6 [call: 5, import: 1]
+        - src/storage/embedding-utils.test.ts:304: call text
+        - src/storage/embedding-utils.test.ts:309: call text
+        - src/storage/embedding-utils.test.ts:314: call text
+        - src/storage/embedding-utils.test.ts:319: call text
+    106-118: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria: 1. Text must start with `[type]` format (e.g., `[coding]`) 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n` This is more robust than just checking for `\nDecisions:` which could match user content. */
+      refs in: 8 [call: 7, import: 1]
         - src/storage/embedding-utils.test.ts:12: import (module)
-        - src/storage/embedding-utils.test.ts:309: call (module)
-        - src/storage/embedding-utils.test.ts:314: call (module)
-        - src/storage/embedding-utils.test.ts:320: call (module)
-        - src/storage/embedding-utils.test.ts:325: call (module)
-        - src/storage/embedding-utils.test.ts:330: call (module)
+        - src/storage/embedding-utils.test.ts:327: call (module)
+        - src/storage/embedding-utils.test.ts:332: call (module)
+        - src/storage/embedding-utils.test.ts:338: call (module)
+        - src/storage/embedding-utils.test.ts:343: call (module)
+        - src/storage/embedding-utils.test.ts:348: call (module)
+        - src/storage/embedding-utils.test.ts:353: call (module)
+        - src/storage/embedding-utils.test.ts:359: call (module)
   imports:
     - ../types/index.js
 
@@ -3015,4 +3017,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 38,713 (codebase: ~1,012,984)
+Estimated tokens: 38,865 (codebase: ~1,014,052)

@@ -1329,14 +1329,14 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-97]
+src/storage/embedding-utils.ts [1-119]
   function:
-    32-66: buildEmbeddingText(node: Node): string [exported]
+    32-67: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
-    74-86: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
-      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). */
-    93-96: isRichEmbeddingFormat(inputText: string): boolean [exported]
-      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. */
+    81-93: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+      /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
+    106-118: isRichEmbeddingFormat(inputText: string): boolean [exported]
+      /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria: 1. Text must start with `[type]` format (e.g., `[coding]`) 2. Text must contain section headers on their own line: `\n\nDecisions:\n` or `\n\nLessons:\n` This is more robust than just checking for `\nDecisions:` which could match user content. */
   imports:
     - ../types/index.js
 
@@ -2051,4 +2051,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 88
-Estimated tokens: 25,227 (codebase: ~1,011,574)
+Estimated tokens: 25,346 (codebase: ~1,013,602)
