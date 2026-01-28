@@ -62,11 +62,12 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-157]
+src/api/routes/daemon.ts [1-203]
   function:
-    22-156: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+    23-202: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/cli.js
+    - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
     - ../responses.js
     - fastify
@@ -1495,50 +1496,50 @@ src/storage/node-conversion.ts [1-343]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-751]
+src/storage/node-crud.ts [1-845]
   interface:
-    39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
+    52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    45-67: interface NodeRow [exported]
+    58-80: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
-      /** Insert lessons for a node */
-    112-132: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
-      /** Insert model quirks for a node */
-    137-157: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
-      /** Insert tool errors for a node */
-    162-181: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    89-144: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+      /** Insert lessons for a node and update lesson_patterns aggregation */
+    149-182: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+      /** Insert model quirks for a node and update model_stats aggregation */
+    187-251: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+      /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
+    256-275: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    191-220: clearAllData(db: Database.Database): void [exported]
+    285-314: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    226-292: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    320-386: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    392-406: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    417-524: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    437-527: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    531-621: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    532-538: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    626-632: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    545-555: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    639-649: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    560-563: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    654-657: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    568-574: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    662-668: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    580-586: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    674-680: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    591-603: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    685-697: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    608-619: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    702-713: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    718-729: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    738-763: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    790-828: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -1548,6 +1549,7 @@ src/storage/node-crud.ts [1-751]
     - ./node-types.js
     - ./search-repository.js
     - better-sqlite3
+    - node:crypto
 
 src/storage/node-queries.ts [1-455]
   interface:
@@ -2149,4 +2151,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 27,087 (codebase: ~1,090,953)
+Estimated tokens: 27,134 (codebase: ~1,092,171)

@@ -50,6 +50,7 @@ src/storage/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
       - [external] better-sqlite3
+      - [builtin] crypto
     - src/storage/node-types.ts
       - src/types/index.ts
       - [builtin] crypto
@@ -90,6 +91,7 @@ src/storage/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
       - [external] better-sqlite3
+      - [builtin] crypto
     - src/storage/node-storage.ts
       - src/storage/node-types.ts
         - src/types/index.ts
@@ -123,6 +125,7 @@ src/storage/index.ts
         - [builtin] crypto
       - [external] better-sqlite3
     - [external] better-sqlite3
+    - [builtin] crypto
   - src/storage/node-queries.ts
     - src/storage/node-crud.ts
       - src/storage/edge-repository.ts
@@ -147,6 +150,7 @@ src/storage/index.ts
           - [builtin] crypto
         - [external] better-sqlite3
       - [external] better-sqlite3
+      - [builtin] crypto
     - [external] better-sqlite3
   - src/storage/node-storage.ts
     - src/storage/node-types.ts
@@ -179,6 +183,7 @@ src/storage/index.ts
         - [builtin] crypto
       - src/storage/search-repository.ts (circular ref)
       - [external] better-sqlite3
+      - [builtin] crypto
     - src/storage/node-types.ts
       - src/types/index.ts
       - [builtin] crypto

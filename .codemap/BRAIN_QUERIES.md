@@ -86,7 +86,9 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:321: call existingPid
     158-169: readPidFile(): number [exported]
       /** Read the daemon PID from the PID file */
-      refs in: 2 [call: 1, reexport: 1]
+      refs in: 4 [call: 2, import: 1, reexport: 1]
+        - src/api/routes/daemon.ts:13: import (module)
+        - src/api/routes/daemon.ts:32: call pid
         - src/daemon/cli.ts:212: call pid
         - src/daemon/index.ts:116: reexport (module)
     174-180: writePidFile(pid: number): void [exported]
@@ -119,7 +121,9 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/index.ts:119: reexport (module)
     211-224: isDaemonRunning(): { running: boolean; pid: number; } [exported]
       /** Check if the daemon is currently running */
-      refs in: 6 [call: 5, reexport: 1]
+      refs in: 8 [call: 6, import: 1, reexport: 1]
+        - src/api/routes/daemon.ts:11: import (module)
+        - src/api/routes/daemon.ts:31: call running
         - src/daemon/cli.ts:299: call status
         - src/daemon/cli.ts:447: call status
         - src/daemon/cli.ts:509: call { running, pid }
@@ -133,7 +137,9 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/index.ts:121: reexport (module)
     259-269: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
-      refs in: 2 [call: 1, reexport: 1]
+      refs in: 4 [call: 2, import: 1, reexport: 1]
+        - src/api/routes/daemon.ts:12: import (module)
+        - src/api/routes/daemon.ts:33: call uptime
         - src/daemon/cli.ts:510: call uptime
         - src/daemon/index.ts:122: reexport (module)
     291-436: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
@@ -688,7 +694,9 @@ src/daemon/pattern-aggregation.test.ts [1-384]
 src/daemon/pattern-aggregation.ts [1-332]
   class:
     22-331: class PatternAggregator [exported]
-      refs in: 7 [import: 2, instantiate: 2, reexport: 1, type: 2]
+      refs in: 9 [import: 3, instantiate: 3, reexport: 1, type: 2]
+        - src/api/routes/daemon.ts:15: import (module)
+        - src/api/routes/daemon.ts:171: instantiate aggregator
         - src/daemon/index.ts:165: reexport (module)
         - src/daemon/pattern-aggregation.test.ts:4: import (module)
         - src/daemon/pattern-aggregation.test.ts:21: type aggregator
@@ -1091,7 +1099,9 @@ src/daemon/queue.ts [1-787]
         - src/daemon/queue.ts:206: call QueueManager.id
     760-762: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-      refs in: 11 [call: 5, import: 5, reexport: 1]
+      refs in: 13 [call: 6, import: 6, reexport: 1]
+        - src/api/routes/daemon.ts:18: import (module)
+        - src/api/routes/daemon.ts:134: call queue
         - src/daemon/cli.ts:48: import (module)
         - src/daemon/cli.ts:589: call queue
         - src/daemon/daemon-process.ts:20: import (module)
@@ -1100,17 +1110,19 @@ src/daemon/queue.ts [1-787]
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
         - src/daemon/worker.test.ts:16: import (module)
-        - src/daemon/worker.test.ts:281: call (module)
-        - src/daemon/worker.ts:56: import (module)
     768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
-      refs in: 2 [call: 1, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/daemon.ts:17: import (module)
+        - src/api/routes/daemon.ts:36: call queueStatus
+        - src/api/routes/daemon.ts:82: call status
         - src/daemon/cli.ts:47: import (module)
         - src/daemon/cli.ts:554: call getQueueStatus
   variable:
     23-34: PRIORITY [exported]
       /** Priority levels (lower = higher priority) */
-      refs in: 5 [import: 4, reexport: 1]
+      refs in: 6 [import: 5, reexport: 1]
+        - src/api/routes/daemon.ts:19: import (module)
         - src/daemon/cli.ts:49: import (module)
         - src/daemon/daemon-process.ts:20: import (module)
         - src/daemon/index.ts:45: reexport (module)
@@ -2217,20 +2229,20 @@ src/storage/node-conversion.ts [1-343]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-751]
+src/storage/node-crud.ts [1-845]
   interface:
-    39-42: interface RepositoryOptions extends NodeStorageOptions [exported]
+    52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
       refs in: 8 [import: 2, type: 6]
         - src/storage/decision-repository.test.ts:8: import (module)
         - src/storage/decision-repository.test.ts:22: type options
         - src/storage/index.test.ts:67: import (module)
         - src/storage/index.test.ts:273: type options
-        - src/storage/node-crud.ts:301: type createNode
-        - src/storage/node-crud.ts:326: type upsertNode
-        - src/storage/node-crud.ts:440: type updateNode
-        - src/storage/node-crud.ts:570: type getAllNodeVersions
-    45-67: interface NodeRow [exported]
+        - src/storage/node-crud.ts:395: type createNode
+        - src/storage/node-crud.ts:420: type upsertNode
+        - src/storage/node-crud.ts:534: type updateNode
+        - src/storage/node-crud.ts:664: type getAllNodeVersions
+    58-80: interface NodeRow [exported]
       /** Node row from the database */
       refs in: 42 [import: 8, type: 34]
         - src/daemon/connection-discovery.ts:10: import (module)
@@ -2244,43 +2256,43 @@ src/storage/node-crud.ts [1-751]
         - src/storage/graph-repository.ts:72: type ConnectedNodesResult
         - src/storage/graph-repository.ts:199: type nodes
   function:
-    76-107: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
-      /** Insert lessons for a node */
+    89-144: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+      /** Insert lessons for a node and update lesson_patterns aggregation */
       refs in: 3 [call: 3]
-        - src/storage/node-crud.ts:283: call insertNodeToDb
-        - src/storage/node-crud.ts:418: call upsertNode
-        - src/storage/node-crud.ts:515: call updateNode
-    112-132: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
-      /** Insert model quirks for a node */
+        - src/storage/node-crud.ts:377: call insertNodeToDb
+        - src/storage/node-crud.ts:512: call upsertNode
+        - src/storage/node-crud.ts:609: call updateNode
+    149-182: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+      /** Insert model quirks for a node and update model_stats aggregation */
       refs in: 3 [call: 3]
-        - src/storage/node-crud.ts:284: call insertNodeToDb
-        - src/storage/node-crud.ts:419: call upsertNode
-        - src/storage/node-crud.ts:516: call updateNode
-    137-157: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
-      /** Insert tool errors for a node */
+        - src/storage/node-crud.ts:378: call insertNodeToDb
+        - src/storage/node-crud.ts:513: call upsertNode
+        - src/storage/node-crud.ts:610: call updateNode
+    187-251: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+      /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
       refs in: 3 [call: 3]
-        - src/storage/node-crud.ts:285: call insertNodeToDb
-        - src/storage/node-crud.ts:420: call upsertNode
-        - src/storage/node-crud.ts:517: call updateNode
-    162-181: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+        - src/storage/node-crud.ts:379: call insertNodeToDb
+        - src/storage/node-crud.ts:514: call upsertNode
+        - src/storage/node-crud.ts:611: call updateNode
+    256-275: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
       refs in: 3 [call: 3]
-        - src/storage/node-crud.ts:286: call insertNodeToDb
-        - src/storage/node-crud.ts:421: call upsertNode
-        - src/storage/node-crud.ts:518: call updateNode
-    191-220: clearAllData(db: Database.Database): void [exported]
+        - src/storage/node-crud.ts:380: call insertNodeToDb
+        - src/storage/node-crud.ts:515: call upsertNode
+        - src/storage/node-crud.ts:612: call updateNode
+    285-314: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/cli.ts:31: import (module)
         - src/daemon/cli.ts:1052: call rebuildIndex
-    226-292: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    320-386: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
       refs in: 4 [call: 3, import: 1]
         - src/daemon/cli.ts:32: import (module)
         - src/daemon/cli.ts:1064: call processInsertBatch
-        - src/storage/node-crud.ts:308: call createNode
-        - src/storage/node-crud.ts:336: call upsertNode
-    298-312: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+        - src/storage/node-crud.ts:402: call createNode
+        - src/storage/node-crud.ts:430: call upsertNode
+    392-406: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
       refs in: 258 [call: 254, import: 4]
         - src/api/server.test.ts:14: import (module)
@@ -2293,7 +2305,7 @@ src/storage/node-crud.ts [1-751]
         - src/api/server.test.ts:584: call (module)
         - src/api/server.test.ts:585: call (module)
         - src/api/server.test.ts:660: call (module)
-    323-430: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    417-524: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 9 [call: 7, import: 2]
         - src/daemon/worker.ts:34: import (module)
@@ -2305,7 +2317,7 @@ src/storage/node-crud.ts [1-751]
         - src/storage/index.test.ts:677: call second
         - src/storage/index.test.ts:703: call (module)
         - src/storage/index.test.ts:751: call (module)
-    437-527: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    531-621: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
       refs in: 6 [call: 5, import: 1]
         - src/storage/index.test.ts:64: import (module)
@@ -2314,12 +2326,9 @@ src/storage/node-crud.ts [1-751]
         - src/storage/index.test.ts:868: call (module)
         - src/storage/index.test.ts:895: call (module)
         - src/storage/index.test.ts:908: call (module)
-    532-538: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    626-632: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-      refs in: 14 [call: 11, import: 3]
-        - src/api/routes/nodes.ts:10: import (module)
-        - src/api/routes/nodes.ts:143: call nodeRow
-        - src/api/routes/nodes.ts:220: call nodeRow
+      refs in: 11 [call: 9, import: 2]
         - src/daemon/connection-discovery.ts:14: import (module)
         - src/daemon/connection-discovery.ts:205: call ConnectionDiscoverer.sourceNode
         - src/daemon/connection-discovery.ts:390: call ConnectionDiscoverer.targetNode
@@ -2327,13 +2336,16 @@ src/storage/node-crud.ts [1-751]
         - src/storage/index.test.ts:304: call row
         - src/storage/index.test.ts:442: call result
         - src/storage/index.test.ts:450: call result
-    545-555: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+        - src/storage/index.test.ts:665: call dbNode
+        - src/storage/index.test.ts:833: call row
+        - src/storage/index.test.ts:852: call row
+    639-649: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
       refs in: 3 [call: 2, import: 1]
         - src/storage/index.test.ts:51: import (module)
         - src/storage/index.test.ts:461: call result
         - src/storage/index.test.ts:470: call result
-    560-563: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    654-657: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
       refs in: 8 [call: 7, import: 1]
         - src/storage/index.test.ts:61: import (module)
@@ -2342,31 +2354,29 @@ src/storage/node-crud.ts [1-751]
         - src/storage/index.test.ts:629: call (module)
         - src/storage/index.test.ts:681: call (module)
         - src/storage/index.test.ts:767: call (module)
-        - src/storage/node-crud.ts:329: call exists
-        - src/storage/node-crud.ts:444: call updateNode
-    568-574: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+        - src/storage/node-crud.ts:423: call exists
+        - src/storage/node-crud.ts:538: call updateNode
+    662-668: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-      refs in: 4 [call: 2, import: 2]
-        - src/api/routes/nodes.ts:10: import (module)
-        - src/api/routes/nodes.ts:186: call allVersions
+      refs in: 2 [call: 1, import: 1]
         - src/storage/index.test.ts:30: import (module)
         - src/storage/index.test.ts:897: call allVersions
-    580-586: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    674-680: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
       refs in: 4 [call: 3, import: 1]
         - src/storage/index.test.ts:23: import (module)
         - src/storage/index.test.ts:765: call result
         - src/storage/index.test.ts:771: call result
         - src/storage/index.test.ts:796: call (module)
-    591-603: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    685-697: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    608-619: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    702-713: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
       refs in: 1 [call: 1]
-        - src/storage/node-crud.ts:727: call parentLastNode
-    624-635: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+        - src/storage/node-crud.ts:821: call parentLastNode
+    718-729: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    644-669: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    738-763: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/worker.ts:32: import (module)
@@ -2377,7 +2387,7 @@ src/storage/node-crud.ts [1-751]
         - src/storage/index.test.ts:553: call result
         - src/storage/index.test.ts:578: call result
         - src/storage/index.test.ts:607: call result
-    696-734: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    790-828: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -2398,6 +2408,7 @@ src/storage/node-crud.ts [1-751]
     - ./node-types.js
     - ./search-repository.js
     - better-sqlite3
+    - node:crypto
 
 src/storage/node-queries.ts [1-455]
   interface:
@@ -2588,8 +2599,8 @@ src/storage/node-storage.ts [1-323]
   interface:
     44-47: interface NodeStorageOptions [exported]
       refs in: 10 [extends: 1, import: 1, type: 8]
-        - src/storage/node-crud.ts:17: import (module)
-        - src/storage/node-crud.ts:39: extends RepositoryOptions
+        - src/storage/node-crud.ts:19: import (module)
+        - src/storage/node-crud.ts:52: extends RepositoryOptions
         - src/storage/node-storage.ts:84: type writeNode
         - src/storage/node-storage.ts:122: type readNode
         - src/storage/node-storage.ts:154: type nodeExists
@@ -2620,10 +2631,10 @@ src/storage/node-storage.ts [1-323]
     82-113: writeNode(node: Node, options: NodeStorageOptions = {}): string [exported]
       /** Write a node to JSON file storage */
       refs in: 28 [call: 26, import: 2]
-        - src/storage/node-crud.ts:16: import (module)
-        - src/storage/node-crud.ts:305: call dataFile
-        - src/storage/node-crud.ts:332: call dataFile
-        - src/storage/node-crud.ts:451: call dataFile
+        - src/storage/node-crud.ts:18: import (module)
+        - src/storage/node-crud.ts:399: call dataFile
+        - src/storage/node-crud.ts:426: call dataFile
+        - src/storage/node-crud.ts:545: call dataFile
         - src/storage/node-storage.test.ts:22: import (module)
         - src/storage/node-storage.test.ts:182: call path
         - src/storage/node-storage.test.ts:207: call (module)
@@ -2670,8 +2681,8 @@ src/storage/node-storage.ts [1-323]
     212-233: listNodeVersions(nodeId: string, options: NodeStorageOptions = {}): {} [exported]
       /** List all versions of a specific node Returns array of { version, path } sorted by version ascending */
       refs in: 7 [call: 5, import: 2]
-        - src/storage/node-crud.ts:14: import (module)
-        - src/storage/node-crud.ts:572: call versions
+        - src/storage/node-crud.ts:16: import (module)
+        - src/storage/node-crud.ts:666: call versions
         - src/storage/node-storage.test.ts:16: import (module)
         - src/storage/node-storage.test.ts:356: call versions
         - src/storage/node-storage.test.ts:420: call versions
@@ -2737,20 +2748,20 @@ src/storage/node-types.ts [1-129]
         - src/storage/node-storage.test.ts:754: call (module)
     29-31: generateLessonId(): string [exported]
       refs in: 2 [call: 1, import: 1]
-        - src/storage/node-crud.ts:22: import (module)
-        - src/storage/node-crud.ts:92: call lessonId
+        - src/storage/node-crud.ts:24: import (module)
+        - src/storage/node-crud.ts:116: call lessonId
     33-35: generateQuirkId(): string [exported]
       refs in: 2 [call: 1, import: 1]
-        - src/storage/node-crud.ts:23: import (module)
-        - src/storage/node-crud.ts:124: call insertModelQuirks
+        - src/storage/node-crud.ts:25: import (module)
+        - src/storage/node-crud.ts:171: call insertModelQuirks
     37-39: generateErrorId(): string [exported]
       refs in: 2 [call: 1, import: 1]
-        - src/storage/node-crud.ts:21: import (module)
-        - src/storage/node-crud.ts:149: call insertToolErrors
+        - src/storage/node-crud.ts:23: import (module)
+        - src/storage/node-crud.ts:221: call insertToolErrors
     41-43: generateDecisionId(): string [exported]
       refs in: 2 [call: 1, import: 1]
-        - src/storage/node-crud.ts:20: import (module)
-        - src/storage/node-crud.ts:174: call insertDaemonDecisions
+        - src/storage/node-crud.ts:22: import (module)
+        - src/storage/node-crud.ts:268: call insertDaemonDecisions
     59-69: generateDeterministicNodeId(sessionFile: string, segmentStart: string, segmentEnd: string): string [exported]
       /** Generate a deterministic 16-character hex node ID based on session and segment. This ensures idempotent ingestion - re-running the same job produces the same ID. The ID is derived from: - Session file path - Segment start entry ID - Segment end entry ID Uses length-prefix encoding to prevent collisions from inputs containing delimiter characters (e.g., "a:b" + "c" vs "a" + "b:c"). Two jobs with the same inputs will always produce the same node ID. */
       refs in: 14 [call: 12, import: 2]
@@ -3050,10 +3061,10 @@ src/storage/search-repository.ts [1-549]
       refs in: 6 [call: 4, import: 2]
         - src/storage/index.test.ts:55: import (module)
         - src/storage/index.test.ts:1498: call (module)
-        - src/storage/node-crud.ts:32: import (module)
-        - src/storage/node-crud.ts:290: call insertNodeToDb
-        - src/storage/node-crud.ts:425: call upsertNode
-        - src/storage/node-crud.ts:522: call updateNode
+        - src/storage/node-crud.ts:34: import (module)
+        - src/storage/node-crud.ts:384: call insertNodeToDb
+        - src/storage/node-crud.ts:519: call upsertNode
+        - src/storage/node-crud.ts:616: call updateNode
     146-172: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
       refs in: 10 [call: 9, import: 1]
@@ -3273,4 +3284,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,899 (codebase: ~1,091,955)
+Estimated tokens: 43,078 (codebase: ~1,103,263)
