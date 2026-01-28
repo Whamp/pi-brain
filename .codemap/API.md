@@ -130,9 +130,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-280]
+src/api/routes/query.ts [1-281]
   function:
-    105-279: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -285,7 +285,7 @@ src/cli.ts [1-1141]
     - node:path
     - open
 
-src/config/config.ts [1-759]
+src/config/config.ts [1-760]
   class:
     505-513: class ConfigError extends Error [exported]
       /** Configuration loading errors */
@@ -310,17 +310,17 @@ src/config/config.ts [1-759]
       /** Ensure the config directory exists */
     579-614: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    619-677: writeDefaultConfig(configPath?: string): void [exported]
+    619-678: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    682-690: getSessionDirs(config: PiBrainConfig): {} [exported]
+    683-691: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    695-697: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    696-698: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    702-706: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    703-707: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    711-718: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    712-719: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    729-758: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    730-759: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -866,7 +866,7 @@ src/daemon/worker.ts [1-715]
     - better-sqlite3
     - node:path
 
-src/index.ts [1-54]
+src/index.ts [1-58]
   imports:
     - ./config/index.js
     - ./daemon/index.js
@@ -2117,4 +2117,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 89
-Estimated tokens: 26,684 (codebase: ~1,050,573)
+Estimated tokens: 26,684 (codebase: ~1,049,378)

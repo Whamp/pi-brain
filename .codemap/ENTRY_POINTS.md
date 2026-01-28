@@ -285,9 +285,9 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-280]
+src/api/routes/query.ts [1-281]
   function:
-    59-103: getEmbeddingProvider(config: {
+    60-104: getEmbeddingProvider(config: {
   embeddingProvider?: "openrouter" | "ollama" | "openai";
   embeddingModel?: string;
   embeddingApiKey?: string;
@@ -296,27 +296,27 @@ src/api/routes/query.ts [1-280]
 }): any
       /** Get or create the embedding provider with caching. Cache is invalidated if the configuration changes. */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/query.ts:65: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-        - src/api/routes/query.ts:93: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
-    105-279: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/query.ts:66: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/api/routes/query.ts:94: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
+    106-280: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 37 [call: 30, instantiate: 1, type: 6]
-        - src/api/routes/query.ts:105: type FastifyInstance -> external
-        - src/api/routes/query.ts:105: type Promise -> external
-        - src/api/routes/query.ts:116: call post -> external
-        - src/api/routes/query.ts:119: type FastifyRequest -> external
-        - src/api/routes/query.ts:132: type FastifyReply -> external
+        - src/api/routes/query.ts:106: type FastifyInstance -> external
+        - src/api/routes/query.ts:106: type Promise -> external
+        - src/api/routes/query.ts:117: call post -> external
+        - src/api/routes/query.ts:120: type FastifyRequest -> external
+        - src/api/routes/query.ts:133: type FastifyReply -> external
   variable:
-    24-46: DEFAULT_QUERY_CONFIG
+    24-47: DEFAULT_QUERY_CONFIG
       /** Default daemon config for query processing */
       refs out: 3 [call: 2, type: 1]
         - src/api/routes/query.ts:27: call join -> external
         - src/api/routes/query.ts:28: call homedir -> external
         - src/api/routes/query.ts:42: type const -> external
-    52-52: EmbeddingProvider | undefined
+    53-53: EmbeddingProvider | undefined
       /** Cached embedding provider instance. Created once on first use to avoid HTTP client setup overhead per request. */
       refs out: 1 [type: 1]
-        - src/api/routes/query.ts:52: type EmbeddingProvider -> src/daemon/facet-discovery.ts
-    53-53: string | undefined
+        - src/api/routes/query.ts:53: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+    54-54: string | undefined
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -816,4 +816,4 @@ src/cli.ts [1-1141]
 
 ---
 Files: 27
-Estimated tokens: 9,139 (codebase: ~1,050,573)
+Estimated tokens: 9,139 (codebase: ~1,049,378)

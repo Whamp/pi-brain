@@ -139,6 +139,11 @@ describe("getDefaultDaemonConfig", () => {
     expect(daemon.analysisTimeoutMinutes).toBe(30);
     expect(daemon.maxQueueSize).toBe(1000);
   });
+
+  it("returns correct semantic search threshold", () => {
+    const daemon = getDefaultDaemonConfig();
+    expect(daemon.semanticSearchThreshold).toBe(0.5);
+  });
 });
 
 describe("getDefaultQueryConfig", () => {
@@ -377,6 +382,14 @@ describe("transformConfig", () => {
     expect(config.daemon.maxConcurrentAnalysis).toBe(2);
     expect(config.daemon.analysisTimeoutMinutes).toBe(60);
     expect(config.daemon.maxQueueSize).toBe(500);
+  });
+
+  it("transforms daemon semantic_search_threshold", () => {
+    const raw: RawConfig = {
+      daemon: { semantic_search_threshold: 0.75 },
+    };
+    const config = transformConfig(raw);
+    expect(config.daemon.semanticSearchThreshold).toBe(0.75);
   });
 
   it("transforms query config", () => {
@@ -633,6 +646,36 @@ describe("transformConfig", () => {
         daemon: { max_retries: -1 },
       };
       expect(() => transformConfig(raw)).toThrow("non-negative integer");
+    });
+
+    it("rejects semantic_search_threshold below 0", () => {
+      const raw: RawConfig = {
+        daemon: { semantic_search_threshold: -0.1 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("rejects semantic_search_threshold above 1", () => {
+      const raw: RawConfig = {
+        daemon: { semantic_search_threshold: 1.5 },
+      };
+      expect(() => transformConfig(raw)).toThrow("Must be between 0.0 and 1.0");
+    });
+
+    it("allows semantic_search_threshold of 0", () => {
+      const raw: RawConfig = {
+        daemon: { semantic_search_threshold: 0 },
+      };
+      const config = transformConfig(raw);
+      expect(config.daemon.semanticSearchThreshold).toBe(0);
+    });
+
+    it("allows semantic_search_threshold of 1", () => {
+      const raw: RawConfig = {
+        daemon: { semantic_search_threshold: 1 },
+      };
+      const config = transformConfig(raw);
+      expect(config.daemon.semanticSearchThreshold).toBe(1);
     });
   });
 });

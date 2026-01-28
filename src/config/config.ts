@@ -663,6 +663,7 @@ daemon:
                                              # Get a key at: https://openrouter.ai/keys
                                              # Without this, clustering is skipped (no error)
   # embedding_base_url: https://...          # optional, for custom endpoints
+  semantic_search_threshold: 0.5             # 0.0-1.0, distance above which FTS fallback triggers
   provider: zai
   model: glm-4.7
   prompt_file: ~/.pi-brain/prompts/session-analyzer.md

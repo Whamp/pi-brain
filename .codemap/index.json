@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 38359,
-  "codebase_tokens": 1049308,
+  "codebase_tokens": 1053345,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -806,7 +806,7 @@
       "language": "typescript",
       "lines": [
         1,
-        280
+        281
       ],
       "detail_level": "full",
       "token_estimate": 234,
@@ -817,7 +817,7 @@
           "signature": "DEFAULT_QUERY_CONFIG",
           "lines": [
             24,
-            46
+            47
           ],
           "exported": false,
           "is_default": false,
@@ -835,8 +835,8 @@
           "kind": "variable",
           "signature": "EmbeddingProvider | undefined",
           "lines": [
-            52,
-            52
+            53,
+            53
           ],
           "exported": false,
           "is_default": false,
@@ -854,8 +854,8 @@
           "kind": "variable",
           "signature": "string | undefined",
           "lines": [
-            53,
-            53
+            54,
+            54
           ],
           "exported": false,
           "is_default": false,
@@ -873,8 +873,8 @@
           "kind": "function",
           "signature": "getEmbeddingProvider(config: {\n  embeddingProvider?: \"openrouter\" | \"ollama\" | \"openai\";\n  embeddingModel?: string;\n  embeddingApiKey?: string;\n  embeddingBaseUrl?: string;\n  embeddingDimensions?: number;\n}): any",
           "lines": [
-            59,
-            103
+            60,
+            104
           ],
           "exported": false,
           "is_default": false,
@@ -892,8 +892,8 @@
           "kind": "function",
           "signature": "async queryRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            105,
-            279
+            106,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -2211,7 +2211,7 @@
       "language": "typescript",
       "lines": [
         1,
-        759
+        760
       ],
       "detail_level": "full",
       "token_estimate": 836,
@@ -2602,7 +2602,7 @@
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
             619,
-            677
+            678
           ],
           "exported": true,
           "is_default": false,
@@ -2620,8 +2620,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            682,
-            690
+            683,
+            691
           ],
           "exported": true,
           "is_default": false,
@@ -2639,8 +2639,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            695,
-            697
+            696,
+            698
           ],
           "exported": true,
           "is_default": false,
@@ -2658,8 +2658,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            702,
-            706
+            703,
+            707
           ],
           "exported": true,
           "is_default": false,
@@ -2677,8 +2677,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            711,
-            718
+            712,
+            719
           ],
           "exported": true,
           "is_default": false,
@@ -2696,8 +2696,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            729,
-            758
+            730,
+            759
           ],
           "exported": true,
           "is_default": false,
@@ -10905,7 +10905,7 @@
       "language": "typescript",
       "lines": [
         1,
-        54
+        58
       ],
       "detail_level": "full",
       "token_estimate": 85,

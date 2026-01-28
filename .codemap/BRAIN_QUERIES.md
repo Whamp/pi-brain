@@ -527,9 +527,9 @@ src/daemon/facet-discovery.ts [1-1757]
       /** Interface for embedding providers */
       refs in: 26 [import: 5, reexport: 1, type: 20]
         - src/api/routes/query.ts:14: import (module)
-        - src/api/routes/query.ts:52: type cachedEmbeddingProvider
-        - src/api/routes/query.ts:65: type getEmbeddingProvider
-        - src/api/routes/query.ts:165: type embeddingProvider
+        - src/api/routes/query.ts:53: type cachedEmbeddingProvider
+        - src/api/routes/query.ts:66: type getEmbeddingProvider
+        - src/api/routes/query.ts:166: type embeddingProvider
         - src/daemon/facet-discovery.ts:150: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:151: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:153: type isEmbeddingProvider
@@ -547,7 +547,7 @@ src/daemon/facet-discovery.ts [1-1757]
       /** Create an embedding provider from config */
       refs in: 13 [call: 7, import: 5, reexport: 1]
         - src/api/routes/query.ts:13: import (module)
-        - src/api/routes/query.ts:93: call getEmbeddingProvider
+        - src/api/routes/query.ts:94: call getEmbeddingProvider
         - src/daemon/cli.ts:39: import (module)
         - src/daemon/cli.ts:1083: call provider
         - src/daemon/facet-discovery.test.ts:15: import (module)
@@ -912,7 +912,7 @@ src/daemon/query-processor.ts [1-779]
       /** Query request from the API */
       refs in: 12 [import: 2, type: 10]
         - src/api/routes/query.ts:18: import (module)
-        - src/api/routes/query.ts:154: type queryRequest
+        - src/api/routes/query.ts:155: type queryRequest
         - src/daemon/query-processor.test.ts:19: import (module)
         - src/daemon/query-processor.test.ts:87: type request
         - src/daemon/query-processor.test.ts:161: type request
@@ -925,7 +925,7 @@ src/daemon/query-processor.ts [1-779]
       /** Query response to return to the client */
       refs in: 5 [import: 1, type: 4]
         - src/api/routes/query.ts:19: import (module)
-        - src/api/routes/query.ts:175: type response
+        - src/api/routes/query.ts:176: type response
         - src/daemon/query-processor.ts:70: type AgentQueryResult
         - src/daemon/query-processor.ts:111: type processQuery
         - src/daemon/query-processor.ts:640: type ParseResult
@@ -938,7 +938,7 @@ src/daemon/query-processor.ts [1-779]
       /** Process a natural language query against the knowledge graph */
       refs in: 11 [call: 9, import: 2]
         - src/api/routes/query.ts:17: import (module)
-        - src/api/routes/query.ts:175: call response
+        - src/api/routes/query.ts:176: call response
         - src/daemon/query-processor.test.ts:19: import (module)
         - src/daemon/query-processor.test.ts:88: call response
         - src/daemon/query-processor.test.ts:162: call response
@@ -1231,68 +1231,60 @@ src/daemon/watcher-events.ts [1-117]
   interface:
     8-11: interface SessionEventDetail [exported]
       /** Event types for the SessionWatcher Event detail for session events */
-      refs in: 6 [reexport: 2, type: 4]
+      refs in: 5 [reexport: 1, type: 4]
         - src/daemon/index.ts:35: reexport (module)
         - src/daemon/watcher-events.ts:51: type createSessionEvent
         - src/daemon/watcher-events.ts:52: type createSessionEvent
         - src/daemon/watcher-events.ts:78: type isSessionEvent
         - src/daemon/watcher-events.ts:81: type isSessionEvent
-        - src/index.ts:47: reexport (module)
     16-19: interface ErrorEventDetail [exported]
       /** Event detail for error events */
-      refs in: 6 [reexport: 2, type: 4]
+      refs in: 5 [reexport: 1, type: 4]
         - src/daemon/index.ts:36: reexport (module)
         - src/daemon/watcher-events.ts:60: type createErrorEvent
         - src/daemon/watcher-events.ts:61: type createErrorEvent
         - src/daemon/watcher-events.ts:91: type isErrorEvent
         - src/daemon/watcher-events.ts:94: type isErrorEvent
-        - src/index.ts:48: reexport (module)
   type:
     42-43: SessionEventName = (typeof SESSION_EVENTS)[keyof typeof SESSION_EVENTS] [exported]
       /** Type for session event names */
-      refs in: 2 [reexport: 2]
+      refs in: 1 [reexport: 1]
         - src/daemon/index.ts:37: reexport (module)
-        - src/index.ts:49: reexport (module)
   function:
     48-55: createSessionEvent(type: string, sessionPath: string): CustomEvent<SessionEventDetail> [exported]
       /** Create a session event */
-      refs in: 7 [call: 4, import: 1, reexport: 2]
+      refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:28: reexport (module)
         - src/daemon/watcher.ts:19: import (module)
         - src/daemon/watcher.ts:417: call SessionWatcher.handleNewFile
         - src/daemon/watcher.ts:449: call SessionWatcher.handleFileChange
         - src/daemon/watcher.ts:479: call SessionWatcher.handleFileRemove
         - src/daemon/watcher.ts:532: call SessionWatcher.checkIdle
-        - src/index.ts:36: reexport (module)
     60-64: createErrorEvent(error: Error): CustomEvent<ErrorEventDetail> [exported]
       /** Create an error event */
-      refs in: 4 [call: 1, import: 1, reexport: 2]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:29: reexport (module)
         - src/daemon/watcher.ts:20: import (module)
         - src/daemon/watcher.ts:274: call SessionWatcher.start
-        - src/index.ts:37: reexport (module)
     69-71: createReadyEvent(): Event [exported]
       /** Create a ready event */
-      refs in: 4 [call: 1, import: 1, reexport: 2]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:30: reexport (module)
         - src/daemon/watcher.ts:21: import (module)
         - src/daemon/watcher.ts:277: call SessionWatcher.start
-        - src/index.ts:38: reexport (module)
     76-84: isSessionEvent(event: Event): boolean [exported]
       /** Type guard to check if an event is a session event */
-      refs in: 3 [call: 1, reexport: 2]
+      refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:31: reexport (module)
         - src/daemon/watcher-events.ts:102: call getSessionPath
-        - src/index.ts:39: reexport (module)
     89-96: isErrorEvent(event: Event): boolean [exported]
       /** Type guard to check if an event is an error event */
-      refs in: 3 [call: 1, reexport: 2]
+      refs in: 2 [call: 1, reexport: 1]
         - src/daemon/index.ts:32: reexport (module)
         - src/daemon/watcher-events.ts:112: call getEventError
-        - src/index.ts:40: reexport (module)
     101-106: getSessionPath(event: Event): string [exported]
       /** Helper to get session path from a session event */
-      refs in: 13 [call: 9, import: 2, reexport: 2]
+      refs in: 12 [call: 9, import: 2, reexport: 1]
         - src/daemon/daemon-process.ts:22: import (module)
         - src/daemon/daemon-process.ts:139: call sessionPath
         - src/daemon/daemon-process.ts:157: call sessionPath
@@ -1305,20 +1297,18 @@ src/daemon/watcher-events.ts [1-117]
         - src/daemon/watcher.test.ts:364: call (module)
     111-116: getEventError(event: Event): any [exported]
       /** Helper to get error from an error event */
-      refs in: 4 [call: 1, import: 1, reexport: 2]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:34: reexport (module)
         - src/daemon/watcher.test.ts:13: import (module)
         - src/daemon/watcher.test.ts:840: call (module)
-        - src/index.ts:42: reexport (module)
   variable:
     24-37: SESSION_EVENTS [exported]
       /** Session event names */
-      refs in: 5 [import: 3, reexport: 2]
+      refs in: 4 [import: 3, reexport: 1]
         - src/daemon/daemon-process.ts:22: import (module)
         - src/daemon/index.ts:27: reexport (module)
         - src/daemon/watcher.test.ts:18: import (module)
         - src/daemon/watcher.ts:18: import (module)
-        - src/index.ts:35: reexport (module)
 
 src/daemon/watcher.test.ts [1-844]
   imports:
@@ -1332,7 +1322,7 @@ src/daemon/watcher.ts [1-582]
   class:
     83-541: class SessionWatcher extends EventTarget [exported]
       /** Session file watcher Monitors directories for .jsonl session files, tracks their state, and emits events when sessions are ready for analysis. Uses EventTarget for cross-platform compatibility. */
-      refs in: 22 [import: 2, instantiate: 14, reexport: 2, type: 4]
+      refs in: 21 [import: 2, instantiate: 14, reexport: 1, type: 4]
         - src/daemon/daemon-process.ts:23: import (module)
         - src/daemon/daemon-process.ts:133: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
@@ -1346,32 +1336,29 @@ src/daemon/watcher.ts [1-582]
   interface:
     27-42: interface SessionState [exported]
       /** State tracking for a single session file */
-      refs in: 6 [reexport: 2, type: 4]
+      refs in: 5 [reexport: 1, type: 4]
         - src/daemon/index.ts:21: reexport (module)
         - src/daemon/watcher.ts:85: type SessionWatcher.sessionStates
         - src/daemon/watcher.ts:335: type SessionWatcher.getSessionState
         - src/daemon/watcher.ts:342: type SessionWatcher.getAllSessions
         - src/daemon/watcher.ts:405: type SessionWatcher.state
-        - src/index.ts:45: reexport (module)
     47-62: interface WatcherConfig [exported]
       /** Watcher configuration options */
-      refs in: 5 [reexport: 2, type: 3]
+      refs in: 4 [reexport: 1, type: 3]
         - src/daemon/index.ts:22: reexport (module)
         - src/daemon/watcher.ts:67: type DEFAULT_WATCHER_CONFIG
         - src/daemon/watcher.ts:86: type SessionWatcher.watchConfig
         - src/daemon/watcher.ts:96: type SessionWatcher.constructor
-        - src/index.ts:46: reexport (module)
   function:
     546-550: createWatcher(daemonConfig: DaemonConfig): SessionWatcher [exported]
       /** Create a watcher from daemon config */
-      refs in: 4 [call: 1, import: 1, reexport: 2]
+      refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:16: reexport (module)
         - src/daemon/watcher.test.ts:11: import (module)
         - src/daemon/watcher.test.ts:776: call watcher
-        - src/index.ts:27: reexport (module)
     555-557: isSessionFile(filePath: string): boolean [exported]
       /** Check if a path is a valid session file */
-      refs in: 8 [call: 5, import: 1, reexport: 2]
+      refs in: 7 [call: 5, import: 1, reexport: 1]
         - src/daemon/index.ts:17: reexport (module)
         - src/daemon/watcher.test.ts:17: import (module)
         - src/daemon/watcher.test.ts:783: call (module)
@@ -1379,30 +1366,26 @@ src/daemon/watcher.ts [1-582]
         - src/daemon/watcher.test.ts:788: call (module)
         - src/daemon/watcher.test.ts:789: call (module)
         - src/daemon/watcher.test.ts:790: call (module)
-        - src/index.ts:32: reexport (module)
     562-564: getSessionName(sessionPath: string): string [exported]
       /** Extract session name from path */
-      refs in: 5 [call: 2, import: 1, reexport: 2]
+      refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:18: reexport (module)
         - src/daemon/watcher.test.ts:15: import (module)
         - src/daemon/watcher.test.ts:796: call (module)
         - src/daemon/watcher.test.ts:798: call (module)
-        - src/index.ts:31: reexport (module)
     571-581: getProjectFromSessionPath(sessionPath: string): string [exported]
       /** Extract project name from session path Session paths are typically: ~/.pi/agent/sessions/<project-name>/<session-file>.jsonl */
-      refs in: 5 [call: 2, import: 1, reexport: 2]
+      refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:19: reexport (module)
         - src/daemon/watcher.test.ts:14: import (module)
         - src/daemon/watcher.test.ts:806: call (module)
         - src/daemon/watcher.test.ts:814: call (module)
-        - src/index.ts:30: reexport (module)
   variable:
     67-73: WatcherConfig [exported]
       /** Default watcher configuration */
-      refs in: 3 [import: 1, reexport: 2]
+      refs in: 2 [import: 1, reexport: 1]
         - src/daemon/index.ts:20: reexport (module)
         - src/daemon/watcher.test.ts:12: import (module)
-        - src/index.ts:28: reexport (module)
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -3213,4 +3196,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 55
-Estimated tokens: 42,141 (codebase: ~1,049,308)
+Estimated tokens: 41,949 (codebase: ~1,053,345)

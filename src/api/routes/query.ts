@@ -43,6 +43,7 @@ const DEFAULT_QUERY_CONFIG = {
   embeddingModel: "qwen/qwen3-embedding-8b",
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,
+  semanticSearchThreshold: 0.5,
 };
 
 /**

@@ -91,17 +91,17 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/cli.ts:228: call now -> external
     253-363: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
       /** Start the daemon process */
-      refs out: 20 [call: 15, type: 5]
+      refs out: 18 [call: 13, type: 5]
         - src/daemon/cli.ts:253: type StartOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:253: type Promise -> external
-        - src/daemon/cli.ts:272: call loadConfig -> src/config/config.ts
         - src/daemon/cli.ts:276: type Error -> external
-        - src/daemon/cli.ts:282: call ensureDirectories -> src/config/config.ts
         - src/daemon/cli.ts:286: type Error -> external
         - src/daemon/cli.ts:292: call writePidFile -> src/daemon/cli.ts
         - src/daemon/cli.ts:305: call existsSync -> external
         - src/daemon/cli.ts:306: call mkdirSync -> external
         - src/daemon/cli.ts:313: call push -> external
+        - src/daemon/cli.ts:318: call spawn -> external
+        - src/daemon/cli.ts:327: call closeSync -> external
     368-430: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 9 [call: 7, type: 2]
@@ -1563,4 +1563,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,421 (codebase: ~1,049,308)
+Estimated tokens: 20,412 (codebase: ~1,053,345)
