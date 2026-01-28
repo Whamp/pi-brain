@@ -64,6 +64,8 @@ export interface WorkerConfig {
   retryPolicy?: RetryPolicy;
   /** Logger */
   logger?: ProcessorLogger;
+  /** Callback when a job starts processing */
+  onJobStarted?: (job: AnalysisJob, workerId: string) => Promise<void>;
   /** Callback when a node is created */
   onNodeCreated?: (job: AnalysisJob, node: Node) => Promise<void>;
   /** Callback when a job fails permanently */
@@ -118,6 +120,10 @@ export class Worker {
   private readonly config: PiBrainConfig;
   private readonly retryPolicy: RetryPolicy;
   private readonly logger: ProcessorLogger;
+  private readonly onJobStarted?: (
+    job: AnalysisJob,
+    workerId: string
+  ) => Promise<void>;
   private readonly onNodeCreated?: (
     job: AnalysisJob,
     node: Node
@@ -146,6 +152,7 @@ export class Worker {
     this.config = config.config;
     this.retryPolicy = config.retryPolicy ?? DEFAULT_RETRY_POLICY;
     this.logger = config.logger ?? consoleLogger;
+    this.onJobStarted = config.onJobStarted;
     this.onNodeCreated = config.onNodeCreated;
     this.onJobFailed = config.onJobFailed;
     this.pollIntervalMs = config.pollIntervalMs ?? 5000;
@@ -283,6 +290,15 @@ export class Worker {
     this.jobsProcessed++;
 
     this.logger.info(`Processing job ${job.id}: ${job.type}`);
+
+    // Notify listeners that job has started
+    if (this.onJobStarted) {
+      try {
+        await this.onJobStarted(job, this.id);
+      } catch (error) {
+        this.logger.error(`onJobStarted callback error: ${error}`);
+      }
+    }
 
     try {
       // Handle connection discovery jobs specifically

@@ -102,6 +102,10 @@ async function main(): Promise<void> {
       error: (msg: string) => console.error(`[worker] ${msg}`),
       debug: (msg: string) => console.debug(`[worker] ${msg}`),
     },
+    onJobStarted: async (job, workerId) => {
+      // Broadcast analysis started via WebSocket
+      wsManager.broadcastAnalysisStarted(job, workerId);
+    },
     onNodeCreated: async (job, node) => {
       // Broadcast analysis completed + node created via WebSocket
       wsManager.broadcastAnalysisCompleted(job, node);
