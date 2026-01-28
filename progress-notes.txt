@@ -155,3 +155,27 @@ The daemon gracefully degrades when skills are missing.
 - Reduced `node-repository.ts` from 1811 to 1520 lines (291 lines removed)
 
 **Notes**: Part of Phase 13 refactoring - extracting modules from monolithic node-repository.ts.
+
+---
+
+## 2026-01-27 17:24 - Task 13.7 Code Review Fixes
+
+**Status**: Code review fixes applied
+**Validation**: 
+- `npm run check` passes (lint + format)
+- `npm test -- --run` passes (1198 tests)
+
+**Commit**: e2e1f84
+
+**Changes**:
+- Removed backward compatibility re-exports from node-repository.ts
+- Updated all imports to use tool-error-repository.ts directly:
+  - src/api/routes/stats.ts
+  - src/api/routes/tool-errors.ts
+  - src/api/routes/nodes.ts
+  - src/daemon/query-processor.ts
+  - src/storage/node-repository.test.ts
+- Fixed potential null pointer in getAggregatedToolErrors (nodeIdsList check)
+- Reduced node-repository.ts from 1520 to 1500 lines
+
+**Notes**: Per code review, backward compatibility not needed - clean imports preferred.
