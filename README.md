@@ -50,6 +50,30 @@ The `sqlite-vec` extension is installed automatically via npm and provides nativ
 
 No additional configuration is needed - the extension loads automatically when the database opens.
 
+## Quick Start: Launching the UI
+
+To explore the pi-brain experience and visualize your knowledge graph:
+
+1. **Build the project** (if not already built):
+
+   ```bash
+   npm run build
+   ```
+
+2. **Start the background daemon**:
+
+   ```bash
+   node dist/src/daemon/daemon-process.js --force
+   ```
+
+3. **Start the Web UI**:
+   ```bash
+   npm run web:dev
+   ```
+   Open **[http://localhost:5173/](http://localhost:5173/)** in your browser.
+
+---
+
 ## Usage
 
 ### Daemon

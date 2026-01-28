@@ -1,30 +1,65 @@
-# Ultracite Code Standards
+# pi-brain
+
+A "second brain" for the pi coding agent that analyzes, connects, and learns from every interaction.
+
+## What It Does
+
+pi-brain runs in the background to build a knowledge graph from your coding sessions. It ingests session files, extracts decisions, errors, patterns, and lessons, then stores them in a SQLite database with vector embeddings for semantic search.
+
+Query the brain to recall past decisions, avoid recurring mistakes, and learn model quirks. Explore the SvelteKit web dashboard to visualize session history, trace connections between decisions, and understand agent behavior over time.
+
+## Components
+
+- **Daemon**: Background service that watches session files and analyzes them with LLMs
+- **Knowledge Graph**: SQLite database with `better-sqlite3` and `sqlite-vec` for vector search
+- **Web Dashboard**: SvelteKit app for graph visualization and session exploration
+- **Pi Integration**: `brain-query` extension that lets agents query the knowledge graph
+
+## Quick Start
+
+```bash
+npm install && npm run build
+node dist/src/daemon/daemon-process.js --force
+npm run web:dev
+# Open http://localhost:5173/
+```
+
+---
+
+## Code Standards
+
+### Quick Start: Launching the UI
+
+1. **Build**: `npm run build`
+2. **Start Daemon**: `node dist/src/daemon/daemon-process.js --force`
+3. **Start Web UI**: `npm run web:dev`
+4. **Access**: [http://localhost:5173/](http://localhost:5173/)
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
 
-## Important Writing Standards
+### Important Writing Standards
 
 **available skill** `writing-clearly-and-concisely`
 
-## Toolchain
+### Toolchain
 
 Ultracite wraps two tools:
 
 - **oxlint** - Fast linter (rules configured in `.oxlintrc.json`)
 - **oxfmt** - Fast formatter (configured in `.oxfmtrc.jsonc`)
 
-## Commands
+### Commands
 
 **Critical Principle:** Always run read-only checks before applying any auto-fixes. Never skip exploration by running fix commands directly.
 
-### 📖 Read-Only Commands
+#### 📖 Read-Only Commands
 
 | Command                | What it does                                          |
 | ---------------------- | ----------------------------------------------------- |
 | `npm run check`        | Runs linter + formatter check. Fails if issues exist. |
 | `npx ultracite doctor` | Diagnoses Ultracite setup issues.                     |
 
-### ✏️ Auto-Modify Commands
+#### ✏️ Auto-Modify Commands
 
 Run `npm run check` first to understand what will change.
 
@@ -33,7 +68,7 @@ Run `npm run check` first to understand what will change.
 | `npm run fix`         | **MODIFIES FILES.** Auto-fixes lint issues. |
 | `npx oxfmt --write .` | **MODIFIES FILES.** Auto-fixes formatting.  |
 
-### 🔄 Blocking Commands
+#### 🔄 Blocking Commands
 
 Use tmux—these never exit on their own.
 
@@ -43,7 +78,7 @@ Use tmux—these never exit on their own.
 | `npm run dev`     | **BLOCKS.** tsup watch mode.                                           |
 | `npm run web:dev` | **BLOCKS.** Vite dev server for web app.                               |
 
-### 🏗️ Build Commands
+#### 🏗️ Build Commands
 
 Safe to run directly—these exit when done.
 
@@ -52,7 +87,7 @@ Safe to run directly—these exit when done.
 | `npm run build`     | Builds with tsup. Output: dist/ |
 | `npm run web:build` | Builds the web app.             |
 
-### Workflow
+#### Workflow
 
 ```bash
 npm run check                    # See issues (no changes)
@@ -61,7 +96,7 @@ npm run check                    # Verify
 npm test -- --run                # Test (non-blocking)
 ```
 
-### When to Use tmux
+#### When to Use tmux
 
 Commands that never exit block your session. Use tmux for:
 
@@ -70,7 +105,7 @@ Commands that never exit block your session. Use tmux for:
 - Log streaming: `tail -f`, `docker logs -f`
 - REPLs: `node`, `python3`, `psql`
 
-### Pre-commit Hook
+#### Pre-commit Hook
 
 The pre-commit hook runs:
 
@@ -83,7 +118,7 @@ If any step fails, the commit is blocked.
 
 ---
 
-## Codebase Navigation
+### Codebase Navigation
 
 This project uses **codemap** to provide structured navigation aids for agents. These are stored in the `.codemap/` directory and auto-refreshed on every commit.
 
@@ -102,9 +137,9 @@ This project uses **codemap** to provide structured navigation aids for agents. 
 
 ---
 
-## Configuration
+### Configuration
 
-### `.oxlintrc.json` - Linter Rules
+#### `.oxlintrc.json` - Linter Rules
 
 Extends ultracite's core config. Project-specific rule overrides:
 
@@ -117,17 +152,17 @@ Extends ultracite's core config. Project-specific rule overrides:
 }
 ```
 
-### `.oxfmtrc.jsonc` - Formatter Config
+#### `.oxfmtrc.jsonc` - Formatter Config
 
 Standard Prettier-compatible options (printWidth, semi, quotes, etc.)
 
 ---
 
-## Core Principles
+### Core Principles
 
 Write code that is **accessible, performant, type-safe, and maintainable**. Focus on clarity and explicit intent over brevity.
 
-### Type Safety & Explicitness
+#### Type Safety & Explicitness
 
 - Use explicit types for function parameters and return values when they enhance clarity
 - Prefer `unknown` over `any` when the type is genuinely unknown
@@ -135,7 +170,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Leverage TypeScript's type narrowing instead of type assertions
 - Use meaningful variable names instead of magic numbers - extract constants with descriptive names
 
-### Modern JavaScript/TypeScript
+#### Modern JavaScript/TypeScript
 
 - Use arrow functions for callbacks and short functions
 - Prefer `for...of` loops over `.forEach()` and indexed `for` loops
@@ -144,14 +179,14 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Use destructuring for object and array assignments
 - Use `const` by default, `let` only when reassignment is needed, never `var`
 
-### Async & Promises
+#### Async & Promises
 
 - Always `await` promises in async functions - don't forget to use the return value
 - Use `async/await` syntax instead of promise chains for better readability
 - Handle errors appropriately in async code with try-catch blocks
 - Don't use async functions as Promise executors
 
-### Svelte & SvelteKit
+#### Svelte & SvelteKit
 
 The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 
@@ -161,14 +196,14 @@ The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 - Use semantic HTML and ARIA attributes for accessibility
 - Prefer `+page.server.ts` load functions over client-side fetching
 
-### Error Handling
+#### Error Handling
 
 - Remove `console.log`, `debugger`, and `alert` before committing
 - Throw `Error` objects with descriptive messages, not strings
 - Use `try-catch` meaningfully—don't catch just to rethrow
 - Prefer early returns over nested conditionals
 
-### Code Organization
+#### Code Organization
 
 - Keep functions focused—limit cognitive complexity
 - Extract complex conditions into well-named boolean variables
@@ -176,14 +211,14 @@ The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 - Prefer simple conditionals over nested ternaries
 - Group related code; separate concerns
 
-### Security
+#### Security
 
 - Add `rel="noopener"` when using `target="_blank"` on links
 - Use `{@html}` sparingly in Svelte—sanitize untrusted content
 - Don't use `eval()` or assign directly to `document.cookie`
 - Validate and sanitize user input
 
-### Performance
+#### Performance
 
 - Avoid spread syntax in accumulators within loops
 - Use top-level regex literals instead of creating them in loops
@@ -192,14 +227,14 @@ The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 
 ---
 
-## Testing
+### Testing
 
 - Write assertions inside `it()` or `test()` blocks
 - Avoid done callbacks in async tests—use async/await
 - Don't use `.only` or `.skip` in committed code
 - Keep test suites reasonably flat—avoid excessive `describe` nesting
 
-## What Linting Can't Catch
+### What Linting Can't Catch
 
 Focus on:
 
