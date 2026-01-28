@@ -785,23 +785,18 @@ export class Scheduler {
 
       // Run backfill
       // Limit to a reasonable batch size per nightly run to avoid blowing API limits/costs
-      const backfillLimit = this.config.backfillLimit;
+      const { backfillLimit } = this.config;
 
-      result = await backfillEmbeddings(
-        this.db,
-        provider,
-        readNodeFromPath,
-        {
-          limit: backfillLimit,
-          batchSize: 10,
-          logger: {
-            info: (msg) => this.logger.info(`[backfill] ${msg}`),
-            warn: (msg) => this.logger.warn(`[backfill] ${msg}`),
-            error: (msg) => this.logger.error(`[backfill] ${msg}`),
-            debug: (msg) => this.logger.debug?.(`[backfill] ${msg}`),
-          },
-        }
-      );
+      result = await backfillEmbeddings(this.db, provider, readNodeFromPath, {
+        limit: backfillLimit,
+        batchSize: 10,
+        logger: {
+          info: (msg) => this.logger.info(`[backfill] ${msg}`),
+          warn: (msg) => this.logger.warn(`[backfill] ${msg}`),
+          error: (msg) => this.logger.error(`[backfill] ${msg}`),
+          debug: (msg) => this.logger.debug?.(`[backfill] ${msg}`),
+        },
+      });
 
       this.logger.info(
         `Backfill embeddings completed: ${result.successCount} succeeded, ${result.failureCount} failed`
