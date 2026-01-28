@@ -15,12 +15,12 @@
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { 
     DashboardStats, 
-    DaemonStatus, 
     Node,
     AggregatedFailurePattern,
     AggregatedLessonPattern,
     AggregatedModelStats
   } from "$lib/types";
+  import { daemonStore } from "$lib/stores/daemon";
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
@@ -38,7 +38,6 @@
   let failurePatterns: AggregatedFailurePattern[] = [];
   let lessonPatterns: AggregatedLessonPattern[] = [];
   let modelStats: AggregatedModelStats[] = [];
-  let daemonStatus: DaemonStatus | null = null;
   let loading = true;
   let errorMessage: string | null = null;
 
@@ -50,8 +49,7 @@
         activityResult, 
         failuresResult, 
         lessonsResult,
-        modelsResult,
-        daemonResult
+        modelsResult
       ] =
         await Promise.allSettled([
           api.getStats(),
@@ -59,8 +57,7 @@
           api.listNodes({}, { limit: 5, sort: "timestamp", order: "desc" }),
           api.getFailurePatterns({ limit: 3 }),
           api.getLessonPatterns({ limit: 3 }),
-          api.getModelStats(),
-          api.getDaemonStatus(),
+          api.getModelStats()
         ]);
 
       if (statsResult.status === "fulfilled") {
@@ -87,12 +84,9 @@
       if (modelsResult.status === "fulfilled") {
         modelStats = modelsResult.value;
       }
-      if (daemonResult.status === "fulfilled") {
-        daemonStatus = daemonResult.value;
-      }
 
       // Show error only if all calls failed
-      const allResults = [statsResult, toolErrorsResult, activityResult, failuresResult, daemonResult];
+      const allResults = [statsResult, toolErrorsResult, activityResult, failuresResult];
       const allFailed = allResults.every(r => r.status === "rejected");
       if (allFailed) {
         // Get the first error for a specific message
@@ -342,33 +336,39 @@
           <h2 class="card-title">Daemon Status</h2>
         </div>
 
-        {#if daemonStatus}
+        {#if $daemonStore.status}
           <div class="daemon-info">
             <div class="daemon-row">
               <span class="daemon-label">Status</span>
               <span class="daemon-value">
                 <span
                   class="status-dot"
-                  class:success={daemonStatus.running}
-                  class:error={!daemonStatus.running}
+                  class:success={$daemonStore.status.running}
+                  class:error={!$daemonStore.status.running}
                 ></span>
-                {daemonStatus.running ? "Running" : "Stopped"}
+                {$daemonStore.status.running ? "Running" : "Stopped"}
               </span>
             </div>
             <div class="daemon-row">
               <span class="daemon-label">Started</span>
-              <span class="daemon-value">{daemonStatus.uptime ? formatDistanceToNow(new Date(Date.now() - daemonStatus.uptime * 1000)) : "-"}</span>
+              <span class="daemon-value">{$daemonStore.status.uptime ? formatDistanceToNow(new Date(Date.now() - $daemonStore.status.uptime * 1000)) : "-"}</span>
             </div>
             <div class="daemon-row">
               <span class="daemon-label">Queue</span>
               <span class="daemon-value"
-                >{daemonStatus.queue.pending} pending</span
+                >{$daemonStore.status.queue.pending} pending</span
               >
             </div>
             <div class="daemon-row">
               <span class="daemon-label">Workers</span>
               <span class="daemon-value"
-                >{daemonStatus.workers.active}/{daemonStatus.workers.total} active</span
+                >{$daemonStore.status.workers.active}/{$daemonStore.status.workers.total} active</span
+              >
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Today</span>
+              <span class="daemon-value"
+                >{$daemonStore.status.queue.completedToday} completed / {$daemonStore.status.queue.failedToday} failed</span
               >
             </div>
           </div>
@@ -376,7 +376,15 @@
           <div class="daemon-info">
             <div class="daemon-row">
               <span class="daemon-label">Status</span>
-              <span class="daemon-value">Unknown</span>
+              <span class="daemon-value">
+                {#if $daemonStore.loading}
+                  Checking...
+                {:else if $daemonStore.backendOffline}
+                  Backend offline
+                {:else}
+                  Unknown
+                {/if}
+              </span>
             </div>
           </div>
         {/if}

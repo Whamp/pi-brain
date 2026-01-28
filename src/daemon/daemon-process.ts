@@ -191,6 +191,28 @@ async function main(): Promise<void> {
     `[daemon] API server listening on http://${config.api.host}:${config.api.port}`
   );
 
+  // Broadcast daemon status periodically
+  const statusBroadcastInterval = setInterval(() => {
+    const queueStats = queue.getStats();
+    const dailyStats = queue.getDailyStats();
+    const workerStatus = worker.getStatus();
+
+    wsManager.broadcastDaemonStatus({
+      running: true,
+      workers: {
+        total: 1, // Currently single worker
+        active: workerStatus.currentJob ? 1 : 0,
+        idle: workerStatus.currentJob ? 0 : 1,
+      },
+      queue: {
+        pending: queueStats.pending,
+        running: queueStats.running,
+        completedToday: dailyStats.completedToday,
+        failedToday: dailyStats.failedToday,
+      },
+    });
+  }, 2000); // Every 2 seconds
+
   console.log("[daemon] pi-brain daemon is running");
 
   // Graceful shutdown
@@ -198,6 +220,7 @@ async function main(): Promise<void> {
     console.log(`[daemon] Received ${signal}, shutting down...`);
 
     clearInterval(staleReleaseInterval);
+    clearInterval(statusBroadcastInterval);
 
     // Stop components in order
     worker.stop();

@@ -598,6 +598,27 @@ export class QueueManager {
   }
 
   /**
+   * Get queue statistics for today
+   */
+  getDailyStats(): { completedToday: number; failedToday: number } {
+    const result = this.db
+      .prepare(
+        `
+      SELECT
+        SUM(CASE WHEN status = 'completed' AND completed_at >= date('now', 'start of day') THEN 1 ELSE 0 END) as completed_today,
+        SUM(CASE WHEN status = 'failed' AND completed_at >= date('now', 'start of day') THEN 1 ELSE 0 END) as failed_today
+      FROM analysis_queue
+    `
+      )
+      .get() as { completed_today: number; failed_today: number };
+
+    return {
+      completedToday: result.completed_today ?? 0,
+      failedToday: result.failed_today ?? 0,
+    };
+  }
+
+  /**
    * Get queue statistics
    */
   getStats(): QueueStats {

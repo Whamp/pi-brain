@@ -98,8 +98,8 @@ src/daemon/cli.ts [1-1149]
         - src/daemon/cli.ts:401: call stopDaemon
         - src/daemon/cli.ts:419: call stopDaemon
         - src/daemon/daemon-process.ts:19: import (module)
-        - src/daemon/daemon-process.ts:221: call shutdown
-        - src/daemon/daemon-process.ts:244: call (module)
+        - src/daemon/daemon-process.ts:244: call shutdown
+        - src/daemon/daemon-process.ts:267: call (module)
         - src/daemon/index.ts:118: reexport (module)
     161-169: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
@@ -255,7 +255,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-248]
+src/daemon/daemon-process.ts [1-271]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -946,7 +946,7 @@ src/daemon/query-processor.ts [1-731]
     - node:os
     - node:path
 
-src/daemon/queue.test.ts [1-790]
+src/daemon/queue.test.ts [1-837]
   imports:
     - ../storage/database.js
     - ./queue.js
@@ -956,17 +956,17 @@ src/daemon/queue.test.ts [1-790]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-766]
+src/daemon/queue.ts [1-787]
   class:
-    151-721: class QueueManager [exported]
+    151-742: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
       refs in: 14 [import: 4, instantiate: 2, reexport: 1, type: 7]
         - src/daemon/index.ts:42: reexport (module)
         - src/daemon/queue.test.ts:14: import (module)
         - src/daemon/queue.test.ts:23: type queue
-        - src/daemon/queue.ts:739: type createQueueManager
-        - src/daemon/queue.ts:740: instantiate createQueueManager
-        - src/daemon/queue.ts:753: instantiate queue
+        - src/daemon/queue.ts:760: type createQueueManager
+        - src/daemon/queue.ts:761: instantiate createQueueManager
+        - src/daemon/queue.ts:774: instantiate queue
         - src/daemon/scheduler.test.ts:9: import (module)
         - src/daemon/scheduler.test.ts:23: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
@@ -979,28 +979,28 @@ src/daemon/queue.ts [1-766]
         - src/daemon/errors.ts:253: type classifyError
         - src/daemon/index.ts:48: reexport (module)
         - src/daemon/queue.ts:67: type AnalysisJob
-        - src/daemon/queue.ts:707: type QueueManager.parseRow
+        - src/daemon/queue.ts:728: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 54 [import: 8, reexport: 1, type: 45]
-        - src/api/websocket.test.ts:9: import (module)
-        - src/api/websocket.test.ts:300: type mockJob
-        - src/api/websocket.test.ts:415: type mockJob
-        - src/api/websocket.ts:11: import (module)
-        - src/api/websocket.ts:270: type WebSocketManager.broadcastAnalysisStarted
-        - src/api/websocket.ts:285: type WebSocketManager.broadcastAnalysisCompleted
-        - src/api/websocket.ts:313: type WebSocketManager.broadcastAnalysisFailed
+      refs in: 44 [import: 5, reexport: 1, type: 38]
         - src/daemon/cli.ts:50: import (module)
         - src/daemon/cli.ts:88: type QueueStatus
         - src/daemon/cli.ts:89: type QueueStatus
+        - src/daemon/cli.ts:90: type QueueStatus
+        - src/daemon/index.ts:50: reexport (module)
+        - src/daemon/processor.test.ts:9: import (module)
+        - src/daemon/processor.test.ts:32: type createTestJob
+        - src/daemon/processor.test.ts:32: type createTestJob
+        - src/daemon/processor.ts:14: import (module)
+        - src/daemon/processor.ts:248: type buildAnalysisPrompt
     102-115: interface QueueStats [exported]
       /** Queue statistics */
       refs in: 5 [import: 1, reexport: 1, type: 3]
         - src/daemon/cli.ts:49: import (module)
         - src/daemon/cli.ts:87: type QueueStatus
         - src/daemon/index.ts:51: reexport (module)
-        - src/daemon/queue.ts:603: type QueueManager.getStats
-        - src/daemon/queue.ts:748: type getQueueStatusSummary
+        - src/daemon/queue.ts:624: type QueueManager.getStats
+        - src/daemon/queue.ts:769: type getQueueStatusSummary
   type:
     17-17: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
       /** Job type determines analysis behavior */
@@ -1009,7 +1009,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:35: type createTestJob
         - src/daemon/queue.ts:57: type AnalysisJob
-        - src/daemon/queue.ts:701: type QueueManager.parseRow
+        - src/daemon/queue.ts:722: type QueueManager.parseRow
     20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
       /** Job status tracks progress through the queue */
       refs in: 8 [import: 1, reexport: 1, type: 6]
@@ -1017,10 +1017,10 @@ src/daemon/queue.ts [1-766]
         - src/daemon/processor.test.ts:9: import (module)
         - src/daemon/processor.test.ts:39: type createTestJob
         - src/daemon/queue.ts:69: type AnalysisJob
-        - src/daemon/queue.ts:643: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:654: type QueueManager.counts
-        - src/daemon/queue.ts:663: type QueueManager.getJobCounts
-        - src/daemon/queue.ts:709: type QueueManager.parseRow
+        - src/daemon/queue.ts:664: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:675: type QueueManager.counts
+        - src/daemon/queue.ts:684: type QueueManager.getJobCounts
+        - src/daemon/queue.ts:730: type QueueManager.parseRow
     91-99: JobInput = Omit<
   AnalysisJob,
   "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
@@ -1041,7 +1041,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/scheduler.test.ts:27: type createMockQueue
         - src/daemon/scheduler.test.ts:47: type createMockQueue
   function:
-    732-734: generateJobId(): string [exported]
+    753-755: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs in: 6 [call: 4, import: 1, reexport: 1]
         - src/daemon/index.ts:44: reexport (module)
@@ -1050,7 +1050,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/queue.test.ts:47: call (module)
         - src/daemon/queue.ts:161: call QueueManager.id
         - src/daemon/queue.ts:206: call QueueManager.id
-    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
+    760-762: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs in: 11 [call: 5, import: 5, reexport: 1]
         - src/daemon/cli.ts:47: import (module)
@@ -1063,7 +1063,7 @@ src/daemon/queue.ts [1-766]
         - src/daemon/worker.test.ts:16: import (module)
         - src/daemon/worker.test.ts:275: call (module)
         - src/daemon/worker.ts:56: import (module)
-    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs in: 2 [call: 1, import: 1]
         - src/daemon/cli.ts:46: import (module)
@@ -3196,4 +3196,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 55
-Estimated tokens: 41,864 (codebase: ~1,051,058)
+Estimated tokens: 41,848 (codebase: ~1,051,911)

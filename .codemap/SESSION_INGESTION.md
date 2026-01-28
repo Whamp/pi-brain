@@ -244,7 +244,7 @@ src/daemon/connection-discovery.ts [1-620]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-248]
+src/daemon/daemon-process.ts [1-271]
   imports:
     - ../api/server.js
     - ../config/config.js
@@ -576,7 +576,8 @@ src/daemon/processor.ts [1-773]
       /** Result of environment validation */
     701-706: interface ProcessorConfig [exported]
       /** Processor configuration */
-      refs out: 1 [type: 1]
+      refs out: 2 [type: 2]
+        - src/daemon/processor.ts:703: type DaemonConfig -> src/config/types.ts
         - src/daemon/processor.ts:705: type ProcessorLogger -> src/daemon/processor.ts
   function:
     170-178: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
@@ -618,8 +619,9 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:279: call join -> external
     313-429: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-      refs out: 13 [call: 9, type: 4]
+      refs out: 14 [call: 9, type: 5]
         - src/daemon/processor.ts:314: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/processor.ts:315: type DaemonConfig -> src/config/types.ts
         - src/daemon/processor.ts:316: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/processor.ts:317: type Promise -> external
         - src/daemon/processor.ts:317: type AgentResult -> src/daemon/processor.ts
@@ -628,7 +630,6 @@ src/daemon/processor.ts [1-773]
         - src/daemon/processor.ts:335: call access -> external
         - src/daemon/processor.ts:342: call now -> external
         - src/daemon/processor.ts:354: call now -> external
-        - src/daemon/processor.ts:378: call debug -> src/daemon/processor.ts
     535-604: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
@@ -744,7 +745,7 @@ src/daemon/query-processor.ts [1-731]
     - node:os
     - node:path
 
-src/daemon/queue.test.ts [1-790]
+src/daemon/queue.test.ts [1-837]
   imports:
     - ../storage/database.js
     - ./queue.js
@@ -754,9 +755,9 @@ src/daemon/queue.test.ts [1-790]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-766]
+src/daemon/queue.ts [1-787]
   class:
-    151-721: class QueueManager [exported]
+    151-742: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -786,26 +787,26 @@ src/daemon/queue.ts [1-766]
         - src/daemon/queue.ts:91: type Omit -> external
         - src/daemon/queue.ts:92: type AnalysisJob -> src/daemon/queue.ts
   function:
-    732-734: generateJobId(): string [exported]
+    753-755: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs out: 3 [call: 3]
-        - src/daemon/queue.ts:733: call slice -> external
-        - src/daemon/queue.ts:733: call replaceAll -> external
-        - src/daemon/queue.ts:733: call randomUUID -> external
-    739-741: createQueueManager(db: Database.Database): QueueManager [exported]
+        - src/daemon/queue.ts:754: call slice -> external
+        - src/daemon/queue.ts:754: call replaceAll -> external
+        - src/daemon/queue.ts:754: call randomUUID -> external
+    760-762: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/queue.ts:739: type Database -> external
-        - src/daemon/queue.ts:739: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/queue.ts:740: instantiate QueueManager -> src/daemon/queue.ts
-    747-765: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+        - src/daemon/queue.ts:760: type Database -> external
+        - src/daemon/queue.ts:760: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/queue.ts:761: instantiate QueueManager -> src/daemon/queue.ts
+    768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs out: 5 [type: 5]
-        - src/daemon/queue.ts:747: type Database -> external
-        - src/daemon/queue.ts:748: type QueueStats -> src/daemon/queue.ts
-        - src/daemon/queue.ts:749: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:750: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:751: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:768: type Database -> external
+        - src/daemon/queue.ts:769: type QueueStats -> src/daemon/queue.ts
+        - src/daemon/queue.ts:770: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:771: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:772: type AnalysisJob -> src/daemon/queue.ts
   variable:
     23-34: PRIORITY [exported]
       /** Priority levels (lower = higher priority) */
@@ -853,7 +854,8 @@ src/daemon/scheduler.ts [1-972]
   function:
     905-935: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-      refs out: 5 [instantiate: 1, type: 4]
+      refs out: 6 [instantiate: 1, type: 5]
+        - src/daemon/scheduler.ts:906: type DaemonConfig -> src/config/types.ts
         - src/daemon/scheduler.ts:907: type QueueManager -> src/daemon/queue.ts
         - src/daemon/scheduler.ts:908: type Database -> external
         - src/daemon/scheduler.ts:909: type SchedulerLogger -> src/daemon/scheduler.ts
@@ -1558,4 +1560,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 40
-Estimated tokens: 20,365 (codebase: ~1,051,058)
+Estimated tokens: 20,406 (codebase: ~1,051,911)

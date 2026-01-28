@@ -649,6 +649,53 @@ describe("queueManager", () => {
     });
   });
 
+  describe("getDailyStats", () => {
+    it("should return completed and failed counts for today", () => {
+      // Completed today
+      const id1 = queue.enqueue({
+        type: "initial",
+        sessionFile: "/path/today-completed.jsonl",
+      });
+      queue.dequeue("worker-1");
+      queue.complete(id1, null as unknown as string);
+
+      // Failed today
+      const id2 = queue.enqueue({
+        type: "initial",
+        sessionFile: "/path/today-failed.jsonl",
+        maxRetries: 0,
+      });
+      queue.dequeue("worker-2");
+      queue.fail(id2, "Error");
+
+      // Completed yesterday (manually insert)
+      db.prepare(
+        `
+        INSERT INTO analysis_queue (
+          id, type, priority, session_file, status, queued_at,
+          started_at, completed_at, max_retries, result_node_id
+        ) VALUES (
+          'yesterday-completed',
+          'initial',
+          100,
+          '/path/yesterday.jsonl',
+          'completed',
+          datetime('now', '-1 day'),
+          datetime('now', '-1 day'),
+          datetime('now', '-1 day'),
+          3,
+          NULL
+        )
+      `
+      ).run();
+
+      const stats = queue.getDailyStats();
+
+      expect(stats.completedToday).toBe(1);
+      expect(stats.failedToday).toBe(1);
+    });
+  });
+
   describe("getStats", () => {
     it("should return queue statistics", () => {
       // First add the completed and failed jobs (they get dequeued immediately)
