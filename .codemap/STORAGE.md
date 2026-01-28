@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 16
-- Total symbols: 174
-  - function: 116
+- Total symbols: 180
+  - function: 122
   - interface: 44
   - type: 10
   - variable: 4
@@ -103,19 +103,33 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-137]
+src/storage/embedding-utils.ts [1-316]
   function:
-    39-79: buildEmbeddingText(node: Node): string [exported]
+    43-83: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
-    93-105: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+    97-109: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
-    119-136: isRichEmbeddingFormat(inputText: string): boolean [exported]
+    123-140: isRichEmbeddingFormat(inputText: string): boolean [exported]
       /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria (any of these indicate rich format): 1. Contains the version marker [emb:v2] 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-` The version marker is the primary check - it handles nodes with empty decisions/lessons that would otherwise be perpetually re-embedded. */
+    152-206: storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; } [exported]
+      /** Store an embedding for a node in both node_embeddings and node_embeddings_vec tables. Handles upsert semantics - if an embedding already exists for the node, it will be replaced. The vec table is only updated if sqlite-vec is loaded. */
+    211-237: deleteEmbedding(db: Database.Database, nodeId: string): boolean [exported]
+      /** Delete an embedding from both node_embeddings and node_embeddings_vec tables. */
+    242-275: getEmbedding(db: Database.Database, nodeId: string): { embedding: {}; modelName: string; inputText: string; createdAt: string; } [exported]
+      /** Get embedding for a node. */
+    280-285: hasEmbedding(db: Database.Database, nodeId: string): boolean [exported]
+      /** Check if a node has an embedding stored. */
+    296-302: serializeEmbedding(embedding: number[]): Buffer [exported]
+      /** Serialize an embedding array to a binary Buffer (Float32 little-endian). This format is used for storing in the node_embeddings table. */
+    309-315: deserializeEmbedding(buffer: Buffer): {} [exported]
+      /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
   variable:
-    15-15: "[emb:v2]" [exported]
+    19-19: "[emb:v2]" [exported]
       /** Format version marker appended to rich embedding text. Used to distinguish new-format embeddings (even with empty decisions/lessons) from old simple-format embeddings. */
   imports:
     - ../types/index.js
+    - ./database.js
+    - better-sqlite3
 
 src/storage/graph-repository.ts [1-366]
   interface:
@@ -517,4 +531,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 16
-Estimated tokens: 7,631 (codebase: ~1,016,095)
+Estimated tokens: 7,972 (codebase: ~1,017,390)

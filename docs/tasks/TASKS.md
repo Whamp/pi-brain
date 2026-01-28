@@ -251,10 +251,10 @@ Ref: docs/specs/semantic-search.md, docs/plans/2026-01-27-semantic-search-plan.m
 
 ### 17.3 Embedding at Ingest Time
 
-| ID     | Task                                      | Status  | Deps          | Notes |
-| ------ | ----------------------------------------- | ------- | ------------- | ----- |
-| 17.3.1 | Add storeEmbeddingWithVec helper function | pending | 17.1.3        |       |
-| 17.3.2 | Add embedding generation in worker.ts     | pending | 17.3.1,17.2.1 |       |
+| ID     | Task                                      | Status  | Deps          | Notes      |
+| ------ | ----------------------------------------- | ------- | ------------- | ---------- |
+| 17.3.1 | Add storeEmbeddingWithVec helper function | active  | 17.1.3        | 2026-01-27 |
+| 17.3.2 | Add embedding generation in worker.ts     | pending | 17.3.1,17.2.1 |            |
 
 ### 17.4 Backfill Job
 

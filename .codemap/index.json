@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 88,
-    "totalSymbols": 1080,
+    "totalSymbols": 1086,
     "byLanguage": {
       "typescript": 88
     },
     "bySymbolKind": {
-      "function": 481,
+      "function": 487,
       "type": 40,
       "interface": 253,
       "variable": 106,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 36610,
-  "codebase_tokens": 1016621,
+  "total_tokens": 36951,
+  "codebase_tokens": 1020775,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -15584,18 +15584,18 @@
       "language": "typescript",
       "lines": [
         1,
-        137
+        316
       ],
       "detail_level": "full",
-      "token_estimate": 443,
+      "token_estimate": 784,
       "symbols": [
         {
           "name": "EMBEDDING_FORMAT_VERSION",
           "kind": "variable",
           "signature": "\"[emb:v2]\"",
           "lines": [
-            15,
-            15
+            19,
+            19
           ],
           "exported": true,
           "is_default": false,
@@ -15613,8 +15613,8 @@
           "kind": "function",
           "signature": "buildEmbeddingText(node: Node): string",
           "lines": [
-            39,
-            79
+            43,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -15632,8 +15632,8 @@
           "kind": "function",
           "signature": "buildSimpleEmbeddingText(type: string | null, summary: string | null): string",
           "lines": [
-            93,
-            105
+            97,
+            109
           ],
           "exported": true,
           "is_default": false,
@@ -15651,8 +15651,8 @@
           "kind": "function",
           "signature": "isRichEmbeddingFormat(inputText: string): boolean",
           "lines": [
-            119,
-            136
+            123,
+            140
           ],
           "exported": true,
           "is_default": false,
@@ -15664,13 +15664,129 @@
           "comment": "Check if embedding text uses the rich format (includes decisions/lessons).\n\nUsed to detect nodes with old-format embeddings that need re-embedding.\n\nDetection criteria (any of these indicate rich format):\n1. Contains the version marker [emb:v2]\n2. Contains section headers: `\\n\\nDecisions:\\n-` or `\\n\\nLessons:\\n-`\n\nThe version marker is the primary check - it handles nodes with empty\ndecisions/lessons that would otherwise be perpetually re-embedded.",
           "incoming_refs": null,
           "outgoing_refs": null
+        },
+        {
+          "name": "storeEmbeddingWithVec",
+          "kind": "function",
+          "signature": "storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; }",
+          "lines": [
+            152,
+            206
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Store an embedding for a node in both node_embeddings and node_embeddings_vec tables.\n\nHandles upsert semantics - if an embedding already exists for the node, it will be\nreplaced. The vec table is only updated if sqlite-vec is loaded.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "deleteEmbedding",
+          "kind": "function",
+          "signature": "deleteEmbedding(db: Database.Database, nodeId: string): boolean",
+          "lines": [
+            211,
+            237
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Delete an embedding from both node_embeddings and node_embeddings_vec tables.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getEmbedding",
+          "kind": "function",
+          "signature": "getEmbedding(db: Database.Database, nodeId: string): { embedding: {}; modelName: string; inputText: string; createdAt: string; }",
+          "lines": [
+            242,
+            275
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get embedding for a node.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "hasEmbedding",
+          "kind": "function",
+          "signature": "hasEmbedding(db: Database.Database, nodeId: string): boolean",
+          "lines": [
+            280,
+            285
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a node has an embedding stored.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "serializeEmbedding",
+          "kind": "function",
+          "signature": "serializeEmbedding(embedding: number[]): Buffer",
+          "lines": [
+            296,
+            302
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Serialize an embedding array to a binary Buffer (Float32 little-endian).\n\nThis format is used for storing in the node_embeddings table.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "deserializeEmbedding",
+          "kind": "function",
+          "signature": "deserializeEmbedding(buffer: Buffer): {}",
+          "lines": [
+            309,
+            315
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Deserialize a binary Buffer to an embedding array.\n\nInverse of serializeEmbedding.",
+          "incoming_refs": null,
+          "outgoing_refs": null
         }
       ],
       "annotation": null,
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../types/index.js"
+        "../types/index.js",
+        "./database.js",
+        "better-sqlite3"
       ]
     },
     {

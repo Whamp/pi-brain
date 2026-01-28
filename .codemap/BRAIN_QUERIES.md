@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 53
-- Total symbols: 311
-  - function: 185
+- Total symbols: 317
+  - function: 191
   - interface: 83
   - variable: 17
   - type: 17
@@ -1537,7 +1537,7 @@ src/storage/database.ts [1-298]
   function:
     46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-      refs in: 60 [call: 48, import: 12]
+      refs in: 69 [call: 56, import: 13]
         - src/daemon/cli.test.ts:12: import (module)
         - src/daemon/cli.test.ts:215: call db
         - src/daemon/cli.test.ts:594: call db
@@ -1595,7 +1595,7 @@ src/storage/database.ts [1-298]
         - src/daemon/cli.ts:513: call queueAnalysis
     254-256: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-      refs in: 12 [call: 7, import: 5]
+      refs in: 16 [call: 10, import: 6]
         - src/daemon/queue.test.ts:12: import (module)
         - src/daemon/queue.test.ts:34: call (module)
         - src/daemon/worker.test.ts:14: import (module)
@@ -1619,10 +1619,13 @@ src/storage/database.ts [1-298]
         - src/storage/database.ts:68: call loaded
     286-297: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
-      refs in: 3 [call: 2, import: 1]
+      refs in: 6 [call: 4, import: 2]
         - src/storage/database-vec.test.ts:8: import (module)
         - src/storage/database-vec.test.ts:35: call (module)
         - src/storage/database.ts:181: call checkMigrationRequirements
+        - src/storage/embedding-utils.ts:12: import (module)
+        - src/storage/embedding-utils.ts:183: call storeEmbeddingWithVec
+        - src/storage/embedding-utils.ts:225: call deleteEmbedding
   variable:
     15-15: any [exported]
       /** Default pi-brain data directory */
@@ -1791,55 +1794,107 @@ src/storage/edge-repository.ts [1-186]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.test.ts [1-378]
+src/storage/embedding-utils.test.ts [1-618]
   imports:
     - ../types/index.js
+    - ./database.js
     - ./embedding-utils.js
+    - better-sqlite3
     - vitest
 
-src/storage/embedding-utils.ts [1-137]
+src/storage/embedding-utils.ts [1-316]
   function:
-    39-79: buildEmbeddingText(node: Node): string [exported]
+    43-83: buildEmbeddingText(node: Node): string [exported]
       /** Build embedding text from a node for semantic search. Format: ``` [{type}] {summary} Decisions: - {decision.what} (why: {decision.why}) - ... Lessons: - {lesson.summary} - ... ``` This richer format enables semantic search to find nodes by: - What type of work was done - What was accomplished (summary) - What decisions were made and why - What lessons were learned */
       refs in: 8 [call: 6, import: 2]
         - src/daemon/facet-discovery.ts:35: import (module)
         - src/daemon/facet-discovery.ts:873: call FacetDiscovery.buildNodeEmbeddingText
-        - src/storage/embedding-utils.test.ts:10: import (module)
-        - src/storage/embedding-utils.test.ts:124: call text
-        - src/storage/embedding-utils.test.ts:154: call text
-        - src/storage/embedding-utils.test.ts:211: call text
-        - src/storage/embedding-utils.test.ts:262: call text
-        - src/storage/embedding-utils.test.ts:297: call text
-    93-105: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
+        - src/storage/embedding-utils.test.ts:13: import (module)
+        - src/storage/embedding-utils.test.ts:133: call text
+        - src/storage/embedding-utils.test.ts:163: call text
+        - src/storage/embedding-utils.test.ts:220: call text
+        - src/storage/embedding-utils.test.ts:271: call text
+        - src/storage/embedding-utils.test.ts:306: call text
+    97-109: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
       /** Build simple embedding text from node summary data. This is a lightweight version for use with partial node data (e.g., NodeSummaryRow from database queries). Returns: - `[type] summary` when both are present - `summary` when only summary is present - `[type]` when only type is present (sparse but valid for type-only filtering) - `` (empty string) when both are null */
       refs in: 7 [call: 5, import: 2]
         - src/daemon/facet-discovery.ts:36: import (module)
         - src/daemon/facet-discovery.ts:879: call FacetDiscovery.buildNodeEmbeddingText
-        - src/storage/embedding-utils.test.ts:11: import (module)
-        - src/storage/embedding-utils.test.ts:309: call text
-        - src/storage/embedding-utils.test.ts:314: call text
-        - src/storage/embedding-utils.test.ts:319: call text
-        - src/storage/embedding-utils.test.ts:324: call text
-    119-136: isRichEmbeddingFormat(inputText: string): boolean [exported]
+        - src/storage/embedding-utils.test.ts:14: import (module)
+        - src/storage/embedding-utils.test.ts:318: call text
+        - src/storage/embedding-utils.test.ts:323: call text
+        - src/storage/embedding-utils.test.ts:328: call text
+        - src/storage/embedding-utils.test.ts:333: call text
+    123-140: isRichEmbeddingFormat(inputText: string): boolean [exported]
       /** Check if embedding text uses the rich format (includes decisions/lessons). Used to detect nodes with old-format embeddings that need re-embedding. Detection criteria (any of these indicate rich format): 1. Contains the version marker [emb:v2] 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-` The version marker is the primary check - it handles nodes with empty decisions/lessons that would otherwise be perpetually re-embedded. */
       refs in: 12 [call: 10, import: 2]
         - src/daemon/facet-discovery.ts:37: import (module)
         - src/daemon/facet-discovery.ts:817: call FacetDiscovery.embedNodes
-        - src/storage/embedding-utils.test.ts:13: import (module)
-        - src/storage/embedding-utils.test.ts:332: call (module)
-        - src/storage/embedding-utils.test.ts:337: call (module)
-        - src/storage/embedding-utils.test.ts:343: call (module)
-        - src/storage/embedding-utils.test.ts:348: call (module)
-        - src/storage/embedding-utils.test.ts:353: call (module)
-        - src/storage/embedding-utils.test.ts:358: call (module)
-        - src/storage/embedding-utils.test.ts:364: call (module)
+        - src/storage/embedding-utils.test.ts:20: import (module)
+        - src/storage/embedding-utils.test.ts:341: call (module)
+        - src/storage/embedding-utils.test.ts:346: call (module)
+        - src/storage/embedding-utils.test.ts:352: call (module)
+        - src/storage/embedding-utils.test.ts:357: call (module)
+        - src/storage/embedding-utils.test.ts:362: call (module)
+        - src/storage/embedding-utils.test.ts:367: call (module)
+        - src/storage/embedding-utils.test.ts:373: call (module)
+    152-206: storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; } [exported]
+      /** Store an embedding for a node in both node_embeddings and node_embeddings_vec tables. Handles upsert semantics - if an embedding already exists for the node, it will be replaced. The vec table is only updated if sqlite-vec is loaded. */
+      refs in: 8 [call: 7, import: 1]
+        - src/storage/embedding-utils.test.ts:22: import (module)
+        - src/storage/embedding-utils.test.ts:409: call result
+        - src/storage/embedding-utils.test.ts:435: call (module)
+        - src/storage/embedding-utils.test.ts:438: call result
+        - src/storage/embedding-utils.test.ts:470: call result
+        - src/storage/embedding-utils.test.ts:492: call result
+        - src/storage/embedding-utils.test.ts:529: call (module)
+        - src/storage/embedding-utils.test.ts:568: call (module)
+    211-237: deleteEmbedding(db: Database.Database, nodeId: string): boolean [exported]
+      /** Delete an embedding from both node_embeddings and node_embeddings_vec tables. */
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/embedding-utils.test.ts:15: import (module)
+        - src/storage/embedding-utils.test.ts:572: call deleted
+        - src/storage/embedding-utils.test.ts:580: call deleted
+    242-275: getEmbedding(db: Database.Database, nodeId: string): { embedding: {}; modelName: string; inputText: string; createdAt: string; } [exported]
+      /** Get embedding for a node. */
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/embedding-utils.test.ts:18: import (module)
+        - src/storage/embedding-utils.test.ts:421: call stored
+        - src/storage/embedding-utils.test.ts:449: call stored
+    280-285: hasEmbedding(db: Database.Database, nodeId: string): boolean [exported]
+      /** Check if a node has an embedding stored. */
+      refs in: 6 [call: 5, import: 1]
+        - src/storage/embedding-utils.test.ts:19: import (module)
+        - src/storage/embedding-utils.test.ts:505: call (module)
+        - src/storage/embedding-utils.test.ts:537: call (module)
+        - src/storage/embedding-utils.test.ts:544: call (module)
+        - src/storage/embedding-utils.test.ts:570: call (module)
+        - src/storage/embedding-utils.test.ts:574: call (module)
+    296-302: serializeEmbedding(embedding: number[]): Buffer [exported]
+      /** Serialize an embedding array to a binary Buffer (Float32 little-endian). This format is used for storing in the node_embeddings table. */
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/embedding-utils.test.ts:21: import (module)
+        - src/storage/embedding-utils.test.ts:588: call buffer
+        - src/storage/embedding-utils.test.ts:600: call buffer
+        - src/storage/embedding-utils.test.ts:609: call buffer
+        - src/storage/embedding-utils.ts:160: call embeddingBlob
+    309-315: deserializeEmbedding(buffer: Buffer): {} [exported]
+      /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/embedding-utils.test.ts:16: import (module)
+        - src/storage/embedding-utils.test.ts:589: call restored
+        - src/storage/embedding-utils.test.ts:601: call restored
+        - src/storage/embedding-utils.test.ts:610: call restored
+        - src/storage/embedding-utils.ts:270: call getEmbedding
   variable:
-    15-15: "[emb:v2]" [exported]
+    19-19: "[emb:v2]" [exported]
       /** Format version marker appended to rich embedding text. Used to distinguish new-format embeddings (even with empty decisions/lessons) from old simple-format embeddings. */
       refs in: 1 [import: 1]
-        - src/storage/embedding-utils.test.ts:12: import (module)
+        - src/storage/embedding-utils.test.ts:17: import (module)
   imports:
     - ../types/index.js
+    - ./database.js
+    - better-sqlite3
 
 src/storage/graph-repository.ts [1-366]
   interface:
@@ -3030,4 +3085,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 53
-Estimated tokens: 39,081 (codebase: ~1,016,621)
+Estimated tokens: 40,022 (codebase: ~1,020,775)
