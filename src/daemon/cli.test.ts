@@ -543,6 +543,17 @@ describe("rebuildIndex", () => {
   let configPath: string;
 
   beforeEach(() => {
+    // Ensure no global PID file interferes with tests
+    // This handles the case where a real daemon or stale PID file exists at ~/.pi-brain/daemon.pid
+    // which causes rebuildIndex to fail with "Daemon is running"
+    try {
+      if (fs.existsSync(PID_FILE)) {
+        fs.unlinkSync(PID_FILE);
+      }
+    } catch {
+      // Ignore errors
+    }
+
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "pi-brain-rebuild-test-"));
     configPath = path.join(tempDir, "config.yaml");
 

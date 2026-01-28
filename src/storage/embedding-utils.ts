@@ -113,30 +113,11 @@ export function buildSimpleEmbeddingText(
  *
  * Used to detect nodes with old-format embeddings that need re-embedding.
  *
- * Detection criteria (any of these indicate rich format):
- * 1. Contains the version marker [emb:v2]
- * 2. Contains section headers: `\n\nDecisions:\n-` or `\n\nLessons:\n-`
- *
- * The version marker is the primary check - it handles nodes with empty
- * decisions/lessons that would otherwise be perpetually re-embedded.
+ * Detection relies on the version marker [emb:v2]. This avoids strict
+ * dependencies on whitespace or formatting of the sections.
  */
 export function isRichEmbeddingFormat(inputText: string): boolean {
-  // Check for version marker first (handles empty decisions/lessons case)
-  if (inputText.includes(EMBEDDING_FORMAT_VERSION)) {
-    return true;
-  }
-
-  // Must start with [type] format
-  if (!inputText.startsWith("[")) {
-    return false;
-  }
-
-  // Rich format has section headers preceded by blank line and followed by bullet points
-  // Check for "\n\nDecisions:\n-" or "\n\nLessons:\n-" patterns
-  const hasDecisionsSection = inputText.includes("\n\nDecisions:\n-");
-  const hasLessonsSection = inputText.includes("\n\nLessons:\n-");
-
-  return hasDecisionsSection || hasLessonsSection;
+  return inputText.includes(EMBEDDING_FORMAT_VERSION);
 }
 
 // =============================================================================
@@ -199,29 +180,22 @@ export function storeEmbeddingWithVec(
     // Update vec table if sqlite-vec is loaded
     let vecUpdated = false;
     if (isVecLoaded(db)) {
-      try {
-        // Delete old entry using the OLD rowid (may differ from new rowid)
-        if (oldRowid !== null) {
-          db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(
-            oldRowid
-          );
-        }
-
-        // Insert into vec table with JSON array format using the NEW rowid
-        db.prepare(
-          `INSERT INTO node_embeddings_vec (rowid, embedding) VALUES (?, vec_f32(?))`
-        ).run(rowid, JSON.stringify(embedding));
-
-        vecUpdated = true;
-      } catch (error) {
-        // Dimension mismatch or other vec table error - log but don't fail
-        // This can happen if the embedding dimension doesn't match the table schema
-        const message = error instanceof Error ? error.message : String(error);
-        if (!message.includes("Dimension mismatch")) {
-          throw error; // Re-throw non-dimension errors
-        }
-        // Dimension mismatch is expected when model changes - backfill job will fix
+      // Delete old entry using the OLD rowid (may differ from new rowid)
+      if (oldRowid !== null) {
+        db.prepare(`DELETE FROM node_embeddings_vec WHERE rowid = ?`).run(
+          oldRowid
+        );
       }
+
+      // Insert into vec table with JSON array format using the NEW rowid
+      // This will throw if dimensions mismatch the table schema, which is intentional.
+      // Failing here prevents the system from being in an inconsistent state
+      // (embedded in blob but not searchable).
+      db.prepare(
+        `INSERT INTO node_embeddings_vec (rowid, embedding) VALUES (?, vec_f32(?))`
+      ).run(rowid, JSON.stringify(embedding));
+
+      vecUpdated = true;
     }
 
     return { rowid, vecUpdated };
@@ -417,15 +391,6 @@ interface NodeNeedingEmbeddingRow {
 }
 
 /**
- * Row type for embedding check
- */
-interface EmbeddingCheckRow {
-  node_id: string;
-  embedding_model: string;
-  input_text: string;
-}
-
-/**
  * Find nodes that need embedding generation or update.
  *
  * A node needs embedding if:
@@ -453,50 +418,26 @@ export function findNodesNeedingEmbedding(
   }
 
   // Normal mode: find nodes missing embeddings or with outdated format
-  // Step 1: Get all nodes up to limit
-  const allNodes = db
+  // We use a LEFT JOIN to find nodes that:
+  // 1. Have no embedding record (ne.node_id IS NULL)
+  // 2. OR have an embedding from a different model
+  // 3. OR have an embedding with the old format (missing version marker)
+  return db
     .prepare(
       `SELECT n.id, n.data_file
        FROM nodes n
+       LEFT JOIN node_embeddings ne ON n.id = ne.node_id
+       WHERE ne.node_id IS NULL
+          OR ne.embedding_model != ?
+          OR ne.input_text NOT LIKE '%' || ? || '%'
        ORDER BY n.timestamp DESC
        LIMIT ?`
     )
-    .all(limit) as NodeNeedingEmbeddingRow[];
-
-  if (allNodes.length === 0) {
-    return [];
-  }
-
-  // Step 2: Get existing embeddings for these nodes
-  const nodeIds = allNodes.map((n) => n.id);
-  const placeholders = nodeIds.map(() => "?").join(",");
-  const existingEmbeddings = db
-    .prepare(
-      `SELECT node_id, embedding_model, input_text
-       FROM node_embeddings
-       WHERE node_id IN (${placeholders})`
-    )
-    .all(...nodeIds) as EmbeddingCheckRow[];
-
-  const embeddingMap = new Map(existingEmbeddings.map((e) => [e.node_id, e]));
-
-  // Step 3: Filter to nodes that need embedding
-  const needsEmbedding: NodeNeedingEmbeddingRow[] = [];
-  for (const node of allNodes) {
-    const existing = embeddingMap.get(node.id);
-    if (!existing) {
-      // No embedding exists
-      needsEmbedding.push(node);
-    } else if (existing.embedding_model !== provider.modelName) {
-      // Different model
-      needsEmbedding.push(node);
-    } else if (!isRichEmbeddingFormat(existing.input_text)) {
-      // Old format (doesn't include decisions/lessons)
-      needsEmbedding.push(node);
-    }
-  }
-
-  return needsEmbedding;
+    .all(
+      provider.modelName,
+      EMBEDDING_FORMAT_VERSION,
+      limit
+    ) as NodeNeedingEmbeddingRow[];
 }
 
 /**
