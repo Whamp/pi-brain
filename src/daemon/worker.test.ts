@@ -12,6 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PiBrainConfig } from "../config/types.js";
 
 import { openDatabase, closeDatabase } from "../storage/database.js";
+import { hasEmbedding } from "../storage/embedding-utils.js";
 import { createQueueManager, PRIORITY, type AnalysisJob } from "./queue.js";
 import {
   createWorker,
@@ -440,5 +441,98 @@ describe("error Classification in Worker", () => {
     // Transient errors should be retryable
     expect(result.shouldRetry).toBeTruthy();
     expect(result.category.type).toBe("transient");
+  });
+});
+
+// =============================================================================
+// Embedding Generation Tests
+// =============================================================================
+
+describe("embedding generation in worker", () => {
+  let db: Database.Database;
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = mkdtempSync(join(tmpdir(), "pi-brain-worker-embed-test-"));
+    db = openDatabase({ path: join(tempDir, "test.db") });
+  });
+
+  afterEach(() => {
+    closeDatabase(db);
+    rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("logs warning when embedding provider requires API key but none configured", () => {
+    const logger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+
+    const config = createTestConfig(tempDir);
+    // Set provider that requires API key but don't provide one
+    config.daemon.embeddingProvider = "openrouter";
+    config.daemon.embeddingApiKey = undefined;
+
+    const worker = createWorker({ id: "test", config, logger });
+    worker.initialize(db);
+
+    // Should have logged a warning about missing API key
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining("requires an API key")
+    );
+  });
+
+  it("logs info when embedding provider is successfully initialized", () => {
+    const logger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+
+    const config = createTestConfig(tempDir);
+    config.daemon.embeddingProvider = "openrouter";
+    config.daemon.embeddingModel = "test-model";
+    config.daemon.embeddingApiKey = "test-api-key"; // Provide API key
+
+    const worker = createWorker({ id: "test", config, logger });
+    worker.initialize(db);
+
+    // Should have logged successful initialization
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining("Embedding provider initialized")
+    );
+  });
+
+  it("skips embedding provider initialization when not configured", () => {
+    const logger = {
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+
+    const config = createTestConfig(tempDir);
+    // Remove embedding configuration
+    // Using type assertion since we're testing the absence of config
+    (config.daemon as Record<string, unknown>).embeddingProvider = undefined;
+
+    const worker = createWorker({ id: "test", config, logger });
+    worker.initialize(db);
+
+    // Should not log about embedding provider
+    expect(logger.warn).not.toHaveBeenCalledWith(
+      expect.stringContaining("requires an API key")
+    );
+    expect(logger.info).not.toHaveBeenCalledWith(
+      expect.stringContaining("Embedding provider initialized")
+    );
+  });
+
+  it("hasEmbedding returns false for non-existent node", () => {
+    // This tests the storage utility used by embedding generation
+    expect(hasEmbedding(db, "non-existent-node")).toBeFalsy();
   });
 });

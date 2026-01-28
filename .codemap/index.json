@@ -1,7 +1,7 @@
 {
   "stats": {
     "totalFiles": 88,
-    "totalSymbols": 1086,
+    "totalSymbols": 1089,
     "byLanguage": {
       "typescript": 88
     },
@@ -11,14 +11,14 @@
       "interface": 253,
       "variable": 106,
       "class": 12,
-      "property": 48,
+      "property": 49,
       "constructor": 11,
-      "method": 127,
+      "method": 129,
       "getter": 2
     }
   },
-  "total_tokens": 36972,
-  "codebase_tokens": 1023621,
+  "total_tokens": 37115,
+  "codebase_tokens": 1025543,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -9973,18 +9973,18 @@
       "language": "typescript",
       "lines": [
         1,
-        610
+        715
       ],
       "detail_level": "full",
-      "token_estimate": 819,
+      "token_estimate": 962,
       "symbols": [
         {
           "name": "WorkerConfig",
           "kind": "interface",
           "signature": "WorkerConfig",
           "lines": [
-            58,
-            75
+            66,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -10002,8 +10002,8 @@
           "kind": "interface",
           "signature": "WorkerStatus",
           "lines": [
-            78,
-            93
+            86,
+            101
           ],
           "exported": true,
           "is_default": false,
@@ -10021,8 +10021,8 @@
           "kind": "interface",
           "signature": "JobProcessingResult",
           "lines": [
-            96,
-            109
+            104,
+            117
           ],
           "exported": true,
           "is_default": false,
@@ -10040,8 +10040,8 @@
           "kind": "class",
           "signature": "Worker",
           "lines": [
-            118,
-            549
+            126,
+            654
           ],
           "exported": true,
           "is_default": false,
@@ -10059,8 +10059,8 @@
           "kind": "property",
           "signature": "id: string",
           "lines": [
-            119,
-            119
+            127,
+            127
           ],
           "exported": false,
           "is_default": false,
@@ -10078,8 +10078,8 @@
           "kind": "property",
           "signature": "config: PiBrainConfig",
           "lines": [
-            120,
-            120
+            128,
+            128
           ],
           "exported": false,
           "is_default": false,
@@ -10097,8 +10097,8 @@
           "kind": "property",
           "signature": "retryPolicy: RetryPolicy",
           "lines": [
-            121,
-            121
+            129,
+            129
           ],
           "exported": false,
           "is_default": false,
@@ -10116,8 +10116,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            122,
-            122
+            130,
+            130
           ],
           "exported": false,
           "is_default": false,
@@ -10135,8 +10135,8 @@
           "kind": "property",
           "signature": "onJobStarted?: (\n    job: AnalysisJob,\n    workerId: string\n  ) => Promise<void>",
           "lines": [
-            123,
-            126
+            131,
+            134
           ],
           "exported": false,
           "is_default": false,
@@ -10154,8 +10154,8 @@
           "kind": "property",
           "signature": "onNodeCreated?: (\n    job: AnalysisJob,\n    node: Node\n  ) => Promise<void>",
           "lines": [
-            127,
-            130
+            135,
+            138
           ],
           "exported": false,
           "is_default": false,
@@ -10173,8 +10173,8 @@
           "kind": "property",
           "signature": "onJobFailed?: (\n    job: AnalysisJob,\n    error: Error\n  ) => Promise<void>",
           "lines": [
-            131,
-            134
+            139,
+            142
           ],
           "exported": false,
           "is_default": false,
@@ -10192,8 +10192,8 @@
           "kind": "property",
           "signature": "pollIntervalMs: number",
           "lines": [
-            135,
-            135
+            143,
+            143
           ],
           "exported": false,
           "is_default": false,
@@ -10211,8 +10211,8 @@
           "kind": "property",
           "signature": "queue: QueueManager | null",
           "lines": [
-            137,
-            137
+            145,
+            145
           ],
           "exported": false,
           "is_default": false,
@@ -10230,8 +10230,8 @@
           "kind": "property",
           "signature": "processor: JobProcessor | null",
           "lines": [
-            138,
-            138
+            146,
+            146
           ],
           "exported": false,
           "is_default": false,
@@ -10249,8 +10249,27 @@
           "kind": "property",
           "signature": "connectionDiscoverer: ConnectionDiscoverer | null",
           "lines": [
-            139,
-            139
+            147,
+            147
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "embeddingProvider",
+          "kind": "property",
+          "signature": "embeddingProvider: EmbeddingProvider | null",
+          "lines": [
+            148,
+            148
           ],
           "exported": false,
           "is_default": false,
@@ -10268,8 +10287,8 @@
           "kind": "property",
           "signature": "db: Database.Database | null",
           "lines": [
-            140,
-            140
+            149,
+            149
           ],
           "exported": false,
           "is_default": false,
@@ -10287,8 +10306,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            141,
-            141
+            150,
+            150
           ],
           "exported": false,
           "is_default": false,
@@ -10306,8 +10325,8 @@
           "kind": "property",
           "signature": "currentJob: AnalysisJob | null",
           "lines": [
-            142,
-            142
+            151,
+            151
           ],
           "exported": false,
           "is_default": false,
@@ -10325,8 +10344,8 @@
           "kind": "property",
           "signature": "startedAt: Date | null",
           "lines": [
-            143,
-            143
+            152,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -10344,8 +10363,8 @@
           "kind": "property",
           "signature": "jobsProcessed",
           "lines": [
-            146,
-            146
+            155,
+            155
           ],
           "exported": false,
           "is_default": false,
@@ -10363,8 +10382,8 @@
           "kind": "property",
           "signature": "jobsSucceeded",
           "lines": [
-            147,
-            147
+            156,
+            156
           ],
           "exported": false,
           "is_default": false,
@@ -10382,8 +10401,8 @@
           "kind": "property",
           "signature": "jobsFailed",
           "lines": [
-            148,
-            148
+            157,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -10401,8 +10420,8 @@
           "kind": "constructor",
           "signature": "constructor(config: WorkerConfig)",
           "lines": [
-            150,
-            159
+            159,
+            168
           ],
           "exported": false,
           "is_default": false,
@@ -10420,8 +10439,8 @@
           "kind": "method",
           "signature": "initialize(db: Database.Database): void",
           "lines": [
-            164,
-            172
+            173,
+            184
           ],
           "exported": false,
           "is_default": false,
@@ -10435,12 +10454,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "initializeEmbeddingProvider",
+          "kind": "method",
+          "signature": "initializeEmbeddingProvider(): void",
+          "lines": [
+            190,
+            229
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Initialize the embedding provider from config.\nCalled during worker initialization. Safe to call multiple times.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "start",
           "kind": "method",
           "signature": "async start(): Promise<void>",
           "lines": [
-            177,
-            236
+            234,
+            293
           ],
           "exported": false,
           "is_default": false,
@@ -10458,8 +10496,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            241,
-            244
+            298,
+            301
           ],
           "exported": false,
           "is_default": false,
@@ -10477,8 +10515,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            249,
-            251
+            306,
+            308
           ],
           "exported": false,
           "is_default": false,
@@ -10496,8 +10534,8 @@
           "kind": "method",
           "signature": "getCurrentJob(): any",
           "lines": [
-            256,
-            258
+            313,
+            315
           ],
           "exported": false,
           "is_default": false,
@@ -10515,8 +10553,8 @@
           "kind": "method",
           "signature": "getStatus(): WorkerStatus",
           "lines": [
-            263,
-            273
+            320,
+            330
           ],
           "exported": false,
           "is_default": false,
@@ -10534,8 +10572,8 @@
           "kind": "method",
           "signature": "async processJob(job: AnalysisJob): Promise<JobProcessingResult>",
           "lines": [
-            278,
-            467
+            335,
+            527
           ],
           "exported": false,
           "is_default": false,
@@ -10553,8 +10591,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            472,
-            539
+            532,
+            599
           ],
           "exported": false,
           "is_default": false,
@@ -10568,12 +10606,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "generateNodeEmbedding",
+          "kind": "method",
+          "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
+          "lines": [
+            607,
+            644
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "Worker",
+          "annotation": null,
+          "comment": "Generate and store embedding for a node.\n\nThis is called after node creation to enable semantic search.\nErrors are logged but don't fail the job - the backfill job will catch any gaps.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "sleep",
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            544,
-            548
+            649,
+            653
           ],
           "exported": false,
           "is_default": false,
@@ -10591,8 +10648,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            558,
-            560
+            663,
+            665
           ],
           "exported": true,
           "is_default": false,
@@ -10610,8 +10667,8 @@
           "kind": "function",
           "signature": "async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult>",
           "lines": [
-            566,
-            580
+            671,
+            685
           ],
           "exported": true,
           "is_default": false,
@@ -10629,8 +10686,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            585,
-            609
+            690,
+            714
           ],
           "exported": true,
           "is_default": false,
@@ -10652,11 +10709,13 @@
         "../config/types.js",
         "../parser/index.js",
         "../prompt/prompt.js",
+        "../storage/embedding-utils.js",
         "../storage/index.js",
         "../storage/node-conversion.js",
         "../storage/node-types.js",
         "./connection-discovery.js",
         "./errors.js",
+        "./facet-discovery.js",
         "./processor.js",
         "./queue.js",
         "better-sqlite3",

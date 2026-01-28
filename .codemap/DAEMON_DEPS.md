@@ -752,6 +752,32 @@ src/daemon/index.ts
     - src/daemon/errors.ts
       - src/daemon/queue.ts
         - [external] better-sqlite3
+    - src/daemon/facet-discovery.ts
+      - src/storage/embedding-utils.ts
+        - src/storage/database.ts
+          - [external] better-sqlite3
+          - [builtin] fs
+          - [builtin] os
+          - [builtin] path
+          - [external] sqlite-vec
+          - [builtin] url
+        - src/types/index.ts
+        - [external] better-sqlite3
+      - src/storage/node-storage.ts
+        - src/storage/node-types.ts
+          - src/types/index.ts
+          - [builtin] crypto
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+      - src/types/index.ts
+      - [external] better-sqlite3
+      - [builtin] child_process
+      - [builtin] crypto
+      - [builtin] fs/promises
+      - [builtin] os
+      - [builtin] path
+      - [builtin] url
     - src/daemon/processor.ts
       - src/config/types.ts
       - src/daemon/queue.ts
@@ -787,6 +813,16 @@ src/daemon/index.ts
       - [builtin] os
       - [builtin] path
       - [builtin] url
+    - src/storage/embedding-utils.ts
+      - src/storage/database.ts
+        - [external] better-sqlite3
+        - [builtin] fs
+        - [builtin] os
+        - [builtin] path
+        - [external] sqlite-vec
+        - [builtin] url
+      - src/types/index.ts
+      - [external] better-sqlite3
     - src/storage/index.ts
       - src/storage/database.ts
         - [external] better-sqlite3

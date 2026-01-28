@@ -821,34 +821,36 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-610]
+src/daemon/worker.ts [1-715]
   class:
-    118-549: class Worker [exported]
+    126-654: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    58-75: interface WorkerConfig [exported]
+    66-83: interface WorkerConfig [exported]
       /** Worker configuration */
-    78-93: interface WorkerStatus [exported]
+    86-101: interface WorkerStatus [exported]
       /** Worker status */
-    96-109: interface JobProcessingResult [exported]
+    104-117: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    558-560: createWorker(config: WorkerConfig): Worker [exported]
+    663-665: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    566-580: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    671-685: async processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    585-609: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    690-714: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
     - ../config/types.js
     - ../parser/index.js
     - ../prompt/prompt.js
+    - ../storage/embedding-utils.js
     - ../storage/index.js
     - ../storage/node-conversion.js
     - ../storage/node-types.js
     - ./connection-discovery.js
     - ./errors.js
+    - ./facet-discovery.js
     - ./processor.js
     - ./queue.js
     - better-sqlite3
@@ -2070,4 +2072,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 88
-Estimated tokens: 25,791 (codebase: ~1,021,032)
+Estimated tokens: 25,807 (codebase: ~1,024,080)

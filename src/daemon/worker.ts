@@ -25,6 +25,10 @@ import {
 } from "../parser/index.js";
 import { getOrCreatePromptVersion } from "../prompt/prompt.js";
 import {
+  buildEmbeddingText,
+  storeEmbeddingWithVec,
+} from "../storage/embedding-utils.js";
+import {
   findPreviousProjectNode,
   linkNodeToPredecessors,
   upsertNode,
@@ -38,6 +42,10 @@ import {
   type RetryPolicy,
   DEFAULT_RETRY_POLICY,
 } from "./errors.js";
+import {
+  createEmbeddingProvider,
+  type EmbeddingProvider,
+} from "./facet-discovery.js";
 import {
   consoleLogger,
   createProcessor,
@@ -137,6 +145,7 @@ export class Worker {
   private queue: QueueManager | null = null;
   private processor: JobProcessor | null = null;
   private connectionDiscoverer: ConnectionDiscoverer | null = null;
+  private embeddingProvider: EmbeddingProvider | null = null;
   private db: Database.Database | null = null;
   private running = false;
   private currentJob: AnalysisJob | null = null;
@@ -169,6 +178,54 @@ export class Worker {
       logger: this.logger,
     });
     this.connectionDiscoverer = new ConnectionDiscoverer(db);
+
+    // Initialize embedding provider if configured
+    this.initializeEmbeddingProvider();
+  }
+
+  /**
+   * Initialize the embedding provider from config.
+   * Called during worker initialization. Safe to call multiple times.
+   */
+  private initializeEmbeddingProvider(): void {
+    const daemonConfig = this.config.daemon;
+
+    // Check if embedding is configured
+    if (!daemonConfig.embeddingProvider) {
+      return;
+    }
+
+    // Check for API key if required
+    const requiresApiKey =
+      daemonConfig.embeddingProvider === "openrouter" ||
+      daemonConfig.embeddingProvider === "openai";
+
+    if (requiresApiKey && !daemonConfig.embeddingApiKey) {
+      this.logger.warn(
+        `Embedding provider ${daemonConfig.embeddingProvider} requires an API key. ` +
+          "Node embeddings will not be generated at ingest time."
+      );
+      return;
+    }
+
+    try {
+      this.embeddingProvider = createEmbeddingProvider({
+        provider: daemonConfig.embeddingProvider,
+        model: daemonConfig.embeddingModel ?? "qwen/qwen3-embedding-8b",
+        apiKey: daemonConfig.embeddingApiKey,
+        baseUrl: daemonConfig.embeddingBaseUrl,
+        dimensions: daemonConfig.embeddingDimensions,
+      });
+
+      this.logger.info(
+        `Embedding provider initialized: ${daemonConfig.embeddingProvider}/${daemonConfig.embeddingModel ?? "qwen/qwen3-embedding-8b"}`
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `Failed to initialize embedding provider: ${message}. Node embeddings will be generated during backfill.`
+      );
+    }
   }
 
   /**
@@ -431,6 +488,9 @@ export class Worker {
           });
         }
 
+        // 8. Generate and store embedding for semantic search
+        await this.generateNodeEmbedding(node);
+
         this.queue.complete(job.id, node.id);
         this.jobsSucceeded++;
 
@@ -536,6 +596,51 @@ export class Worker {
       willRetry: false,
       durationMs: Date.now() - startTime,
     };
+  }
+
+  /**
+   * Generate and store embedding for a node.
+   *
+   * This is called after node creation to enable semantic search.
+   * Errors are logged but don't fail the job - the backfill job will catch any gaps.
+   */
+  private async generateNodeEmbedding(node: Node): Promise<void> {
+    // Skip if embedding provider is not configured
+    if (!this.embeddingProvider || !this.db) {
+      return;
+    }
+
+    try {
+      // Build rich embedding text from node
+      const text = buildEmbeddingText(node);
+
+      // Generate embedding
+      const embeddings = await this.embeddingProvider.embed([text]);
+
+      if (!embeddings[0] || embeddings[0].length === 0) {
+        this.logger.warn(
+          `Empty embedding returned for node ${node.id}, skipping storage`
+        );
+        return;
+      }
+
+      // Store in database (node_embeddings + node_embeddings_vec if available)
+      const { vecUpdated } = storeEmbeddingWithVec(
+        this.db,
+        node.id,
+        embeddings[0],
+        this.embeddingProvider.modelName,
+        text
+      );
+
+      this.logger.info(
+        `Generated embedding for node ${node.id} (${embeddings[0].length}d, vec=${vecUpdated})`
+      );
+    } catch (error) {
+      // Log but don't fail - backfill job will catch this
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to embed node ${node.id}: ${message}`);
+    }
   }
 
   /**
