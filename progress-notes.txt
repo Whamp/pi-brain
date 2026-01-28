@@ -15,3 +15,18 @@ Main branch: major/pi-brain
 
 ## Progress Log
 
+### 2026-01-27 21:10 - All issues fixed
+
+Commit: 4fe5fe4e - fix(storage): improve isRichEmbeddingFormat robustness
+
+Changes made:
+1. [P2] isRichEmbeddingFormat: Now requires text to start with `[`, and section headers 
+   to have proper structure `\n\nDecisions:\n-` or `\n\nLessons:\n-`. Added 2 new tests 
+   for edge cases.
+2. [P3] Added documentation for lesson ordering (deterministic: project, task, user, 
+   model, tool, skill, subagent)
+3. [P3] Added documentation for buildSimpleEmbeddingText explaining all return cases
+4. [P3] Fixed createTestNode type safety - now requires complete sub-objects when 
+   overriding (no partial nested objects allowed)
+
+All 1239 tests pass. Ready for merge.
