@@ -909,6 +909,317 @@ describe("config api routes", () => {
     });
   });
 
+  // Embedding configuration tests
+  describe("embedding config in daemon routes", () => {
+    it("returns embedding fields on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingProvider).toBeDefined();
+      expect(body.data.embeddingModel).toBeDefined();
+      expect(typeof body.data.hasApiKey).toBe("boolean");
+      // embeddingBaseUrl and embeddingDimensions may be undefined if not set
+      // Just verify the main fields are present
+    });
+
+    it("never returns actual API key on GET", async () => {
+      // First set an API key
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingApiKey: "sk-test-secret-key" },
+      });
+
+      // Then verify it's not returned
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingApiKey).toBeUndefined();
+      expect(body.data.hasApiKey).toBeTruthy();
+    });
+
+    it("returns hasApiKey: false when no key is set", async () => {
+      // Clear any existing key
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingApiKey: null },
+      });
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.hasApiKey).toBeFalsy();
+    });
+
+    it("includes embedding defaults for UI reference", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.defaults.embeddingProvider).toBeDefined();
+      expect(body.data.defaults.embeddingModel).toBeDefined();
+    });
+
+    it("validates embeddingProvider must be valid", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingProvider: "invalid-provider" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingProvider");
+      expect(body.error.message).toContain("ollama");
+      expect(body.error.message).toContain("openai");
+      expect(body.error.message).toContain("openrouter");
+    });
+
+    it("accepts valid embeddingProvider: ollama", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingProvider: "ollama" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingProvider).toBe("ollama");
+    });
+
+    it("accepts valid embeddingProvider: openai", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingProvider: "openai" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingProvider).toBe("openai");
+    });
+
+    it("accepts valid embeddingProvider: openrouter", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingProvider: "openrouter" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingProvider).toBe("openrouter");
+    });
+
+    it("validates embeddingModel must be non-empty string", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingModel: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingModel");
+      expect(body.error.message).toContain("non-empty");
+    });
+
+    it("accepts valid embeddingModel", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingModel: "text-embedding-3-small" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingModel).toBe("text-embedding-3-small");
+    });
+
+    it("accepts embeddingApiKey and returns hasApiKey: true on PUT", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingApiKey: "sk-test-key-12345" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.hasApiKey).toBeTruthy();
+      expect(body.data.embeddingApiKey).toBeUndefined();
+    });
+
+    it("clears API key when set to null", async () => {
+      // First set a key
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingApiKey: "sk-will-be-cleared" },
+      });
+
+      // Then clear it
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingApiKey: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.hasApiKey).toBeFalsy();
+    });
+
+    it("validates embeddingBaseUrl must be non-empty string or null", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingBaseUrl: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingBaseUrl");
+    });
+
+    it("accepts valid embeddingBaseUrl", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingBaseUrl: "https://custom-api.example.com/v1" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingBaseUrl).toBe(
+        "https://custom-api.example.com/v1"
+      );
+    });
+
+    it("clears embeddingBaseUrl when set to null", async () => {
+      // First set a value
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingBaseUrl: "https://example.com" },
+      });
+
+      // Then clear it
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingBaseUrl: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingBaseUrl).toBeUndefined();
+    });
+
+    it("validates embeddingDimensions minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: 0 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingDimensions");
+      expect(body.error.message).toContain("positive integer");
+    });
+
+    it("validates embeddingDimensions maximum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: 10_001 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingDimensions");
+    });
+
+    it("validates embeddingDimensions must be integer", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: 512.5 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("embeddingDimensions");
+      expect(body.error.message).toContain("integer");
+    });
+
+    it("accepts valid embeddingDimensions", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: 1536 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingDimensions).toBe(1536);
+    });
+
+    it("clears embeddingDimensions when set to null", async () => {
+      // First set a value
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: 768 },
+      });
+
+      // Then clear it
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { embeddingDimensions: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingDimensions).toBeUndefined();
+    });
+
+    it("updates multiple embedding fields together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          embeddingProvider: "openai",
+          embeddingModel: "text-embedding-3-large",
+          embeddingDimensions: 3072,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.embeddingProvider).toBe("openai");
+      expect(body.data.embeddingModel).toBe("text-embedding-3-large");
+      expect(body.data.embeddingDimensions).toBe(3072);
+    });
+  });
+
   describe("gET /config/providers", () => {
     it("returns list of providers", async () => {
       const response = await app.inject({

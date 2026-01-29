@@ -343,13 +343,13 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.4 Embedding Config (Moderate)
 
-| ID     | Task                                           | Status  | Deps          | Notes |
-| ------ | ---------------------------------------------- | ------- | ------------- | ----- |
-| 19.4.1 | Add embedding fields to daemon routes          | pending | -             |       |
-| 19.4.2 | Implement secure API key handling (write-only) | pending | 19.4.1        |       |
-| 19.4.3 | Create PasswordInput component                 | pending | -             |       |
-| 19.4.4 | Add Embeddings section to settings UI          | pending | 19.4.1-19.4.3 |       |
-| 19.4.5 | Conditional field visibility by provider       | pending | 19.4.4        |       |
+| ID     | Task                                           | Status  | Deps          | Notes                   |
+| ------ | ---------------------------------------------- | ------- | ------------- | ----------------------- |
+| 19.4.1 | Add embedding fields to daemon routes          | done    | -             | 2026-01-28 21 new tests |
+| 19.4.2 | Implement secure API key handling (write-only) | pending | 19.4.1        |                         |
+| 19.4.3 | Create PasswordInput component                 | pending | -             |                         |
+| 19.4.4 | Add Embeddings section to settings UI          | pending | 19.4.1-19.4.3 |                         |
+| 19.4.5 | Conditional field visibility by provider       | pending | 19.4.4        |                         |
 
 ### 19.5 Cron Schedules (Moderate)
 

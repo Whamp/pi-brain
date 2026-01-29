@@ -175,7 +175,7 @@ the reactivity chain.
 **Validation**: 
   - Verified `disabled` attribute added to active breadcrumbs
   - Checked `npm run check` passes
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Improved the implementation by explicitly disabling the active breadcrumb buttons to ensure no-op behavior and correct cursor styling.
 
 ## 2026-01-28 10:05 - Task 17.6.3, 17.7.1, 17.7.2, 17.7.3, 17.8.1
@@ -210,7 +210,7 @@ the reactivity chain.
   - Added 12 new tests covering validation (min/max, integer) and update behavior
   - All 1331 tests pass (1331 passed, 4 skipped)
   - Linting: 0 errors, 0 warnings
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Extended daemon configuration API with queue and limit settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality.
 
 ---
@@ -231,7 +231,7 @@ the reactivity chain.
   - Added test for GET returning all daemon fields including connection discovery
   - All 1346 tests pass (1346 passed, 4 skipped)
   - Linting: 0 errors, 0 warnings
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Extended daemon configuration API with connection discovery settings. Follows existing pattern for field validation and config file persistence. New tests provide good coverage for the new functionality. Fields correspond to: connection_discovery_limit, connection_discovery_lookback_days, connection_discovery_cooldown_hours in config.yaml.
 
 ---
@@ -296,7 +296,7 @@ the reactivity chain.
   - Verified type safety with `npm run web:check` (0 errors)
   - Verified formatting with `npm run check` (0 errors)
   - Manual inspection of code confirms fields match API spec
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Updated Settings UI to include Analysis Execution, Queue & Limits, Connection Discovery, and Semantic Search sections. Updated API client to support new configuration fields.
 
 ## 2026-01-28 13:44 - Task 19.2.1
@@ -338,7 +338,7 @@ the reactivity chain.
   - All 1376 tests pass (1376 passed, 4 skipped)
   - Linting: 0 errors, 0 warnings
   - Config file properly restored/cleaned up after tests
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Extended configuration API with API server settings. Follows existing pattern established by daemon and query config routes. Port validated as integer in range 1024-65535. Host validated as non-empty string. CORS origins validated as array of strings. Config persists to ~/.pi-brain/config.yaml. Tests now properly isolated using beforeAll/afterAll pattern.
 
 ## 2026-01-28 14:11 - Task 19.2.3
@@ -358,7 +358,7 @@ the reactivity chain.
   - All 1376 tests pass
   - npm run check: 0 errors, 0 warnings
   - npm run web:check: 0 errors, 0 warnings
-**Commit**: (will be committed shortly)
+**Commit**: 956c7187
 **Notes**: Created reusable TagInput component for editing string arrays like CORS origins. Component follows Svelte 5 patterns and design system conventions.
 
 ## 2026-01-28 14:21 - Task 19.2.4
@@ -394,3 +394,49 @@ the reactivity chain.
   - Verified with npm test -- --run (1376 passed)
 **Commit**: c379b600
 **Notes**: Integrated API Server configuration into settings UI. CORS Origins uses the new TagInput component.
+
+---
+
+## 2026-01-28 18:45 - Task 19.3.1, 19.3.2, 19.3.3, 19.3.4
+
+**Status**: pending → done
+**Validation**:
+  - Added GET/PUT /config/hub routes with validation
+  - Implemented validatePath helper ensuring dirs exist or have writable parents
+  - Added Hub section to Settings UI with Sessions Dir, Database Dir, and Web UI Port
+  - Added warning box in UI about path changes requiring restart/migration
+  - Verified with npm run web:check (0 errors)
+  - Verified with npm test -- --run (1386 passed)
+**Commit**: 51c42700
+**Notes**: Completed Hub configuration section implementation across backend and frontend.
+
+---
+
+## 2026-01-28 21:20 - Task 19.4.1
+
+**Status**: pending → done
+**Validation**:
+  - Added embedding fields to GET /config/daemon route:
+    - embeddingProvider (ollama | openai | openrouter)
+    - embeddingModel (string)
+    - hasApiKey (boolean - never exposes actual key)
+    - embeddingBaseUrl (optional string)
+    - embeddingDimensions (optional number)
+  - Added embedding fields to PUT /config/daemon route:
+    - Validation: embeddingProvider must be one of ollama/openai/openrouter
+    - Validation: embeddingModel must be non-empty string
+    - Validation: embeddingDimensions must be 1-10000 integer or null
+    - API key handling: string sets, null clears, never returned
+    - Base URL handling: string sets, null clears
+  - Added defaults for embeddingProvider and embeddingModel
+  - Added 21 new tests covering:
+    - GET returns embedding fields
+    - GET never returns actual API key
+    - GET returns hasApiKey boolean
+    - Validation tests for each field
+    - Setting and clearing nullable fields
+    - Multi-field updates
+  - All 1407 tests pass (1407 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: 956c7187
+**Notes**: Implemented secure API key handling - keys are write-only and never returned in GET responses. Follows spec pattern from docs/specs/settings-ui.md for Embedding Config section.

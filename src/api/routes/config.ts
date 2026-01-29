@@ -63,6 +63,12 @@ function validateFloatRange(
 }
 
 /**
+ * Valid embedding providers
+ */
+const VALID_EMBEDDING_PROVIDERS = ["ollama", "openai", "openrouter"] as const;
+type EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number];
+
+/**
  * Daemon configuration update request body
  */
 interface DaemonConfigUpdateBody {
@@ -81,6 +87,12 @@ interface DaemonConfigUpdateBody {
   connectionDiscoveryLookbackDays?: number;
   connectionDiscoveryCooldownHours?: number;
   semanticSearchThreshold?: number;
+  // Embedding fields
+  embeddingProvider?: EmbeddingProvider;
+  embeddingModel?: string;
+  embeddingApiKey?: string | null;
+  embeddingBaseUrl?: string | null;
+  embeddingDimensions?: number | null;
 }
 
 /**
@@ -127,6 +139,10 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     connectionDiscoveryLookbackDays,
     connectionDiscoveryCooldownHours,
     semanticSearchThreshold,
+    embeddingProvider,
+    embeddingModel,
+    embeddingBaseUrl,
+    embeddingDimensions,
   } = body;
 
   const validations: ValidationResult[] = [
@@ -171,6 +187,42 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     }
   }
 
+  // Validate embeddingProvider is one of the allowed values
+  if (
+    embeddingProvider !== undefined &&
+    !VALID_EMBEDDING_PROVIDERS.includes(embeddingProvider)
+  ) {
+    return `embeddingProvider must be one of: ${VALID_EMBEDDING_PROVIDERS.join(", ")}`;
+  }
+
+  // Validate embeddingModel is non-empty string
+  if (
+    embeddingModel !== undefined &&
+    (!embeddingModel || typeof embeddingModel !== "string")
+  ) {
+    return "embeddingModel must be a non-empty string";
+  }
+
+  // Validate embeddingBaseUrl is non-empty string or null
+  if (
+    embeddingBaseUrl !== undefined &&
+    embeddingBaseUrl !== null &&
+    (!embeddingBaseUrl || typeof embeddingBaseUrl !== "string")
+  ) {
+    return "embeddingBaseUrl must be a non-empty string or null";
+  }
+
+  // Validate embeddingDimensions is positive integer or null
+  if (embeddingDimensions !== undefined && embeddingDimensions !== null) {
+    if (
+      !Number.isInteger(embeddingDimensions) ||
+      embeddingDimensions < 1 ||
+      embeddingDimensions > 10_000
+    ) {
+      return "embeddingDimensions must be a positive integer between 1 and 10000";
+    }
+  }
+
   return null;
 }
 
@@ -197,6 +249,11 @@ function applyDaemonUpdates(
     connectionDiscoveryLookbackDays,
     connectionDiscoveryCooldownHours,
     semanticSearchThreshold,
+    embeddingProvider,
+    embeddingModel,
+    embeddingApiKey,
+    embeddingBaseUrl,
+    embeddingDimensions,
   } = body;
 
   // Initialize daemon section if needed
@@ -251,6 +308,38 @@ function applyDaemonUpdates(
   }
   if (semanticSearchThreshold !== undefined) {
     rawConfig.daemon.semantic_search_threshold = semanticSearchThreshold;
+  }
+
+  // Embedding fields
+  if (embeddingProvider !== undefined) {
+    rawConfig.daemon.embedding_provider = embeddingProvider;
+  }
+  if (embeddingModel !== undefined) {
+    rawConfig.daemon.embedding_model = embeddingModel;
+  }
+  // API key: null clears, undefined skips, string sets
+  if (embeddingApiKey !== undefined) {
+    if (embeddingApiKey === null) {
+      delete rawConfig.daemon.embedding_api_key;
+    } else {
+      rawConfig.daemon.embedding_api_key = embeddingApiKey;
+    }
+  }
+  // Base URL: null clears, undefined skips, string sets
+  if (embeddingBaseUrl !== undefined) {
+    if (embeddingBaseUrl === null) {
+      delete rawConfig.daemon.embedding_base_url;
+    } else {
+      rawConfig.daemon.embedding_base_url = embeddingBaseUrl;
+    }
+  }
+  // Dimensions: null clears, undefined skips, number sets
+  if (embeddingDimensions !== undefined) {
+    if (embeddingDimensions === null) {
+      delete rawConfig.daemon.embedding_dimensions;
+    } else {
+      rawConfig.daemon.embedding_dimensions = embeddingDimensions;
+    }
   }
 }
 
@@ -479,10 +568,18 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           connectionDiscoveryCooldownHours:
             config.daemon.connectionDiscoveryCooldownHours,
           semanticSearchThreshold: config.daemon.semanticSearchThreshold,
+          // Embedding fields - never return the actual API key
+          embeddingProvider: config.daemon.embeddingProvider,
+          embeddingModel: config.daemon.embeddingModel,
+          hasApiKey: !!config.daemon.embeddingApiKey,
+          embeddingBaseUrl: config.daemon.embeddingBaseUrl,
+          embeddingDimensions: config.daemon.embeddingDimensions,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
             model: defaults.model,
+            embeddingProvider: defaults.embeddingProvider,
+            embeddingModel: defaults.embeddingModel,
           },
         },
         durationMs
@@ -517,6 +614,11 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         connectionDiscoveryLookbackDays,
         connectionDiscoveryCooldownHours,
         semanticSearchThreshold,
+        embeddingProvider,
+        embeddingModel,
+        embeddingApiKey,
+        embeddingBaseUrl,
+        embeddingDimensions,
       } = body;
 
       // Validate at least one field is provided
@@ -535,7 +637,12 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
         connectionDiscoveryLimit !== undefined ||
         connectionDiscoveryLookbackDays !== undefined ||
         connectionDiscoveryCooldownHours !== undefined ||
-        semanticSearchThreshold !== undefined;
+        semanticSearchThreshold !== undefined ||
+        embeddingProvider !== undefined ||
+        embeddingModel !== undefined ||
+        embeddingApiKey !== undefined ||
+        embeddingBaseUrl !== undefined ||
+        embeddingDimensions !== undefined;
 
       if (!hasAnyField) {
         return reply
@@ -601,6 +708,12 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
               updatedConfig.daemon.connectionDiscoveryCooldownHours,
             semanticSearchThreshold:
               updatedConfig.daemon.semanticSearchThreshold,
+            // Embedding fields - never return the actual API key
+            embeddingProvider: updatedConfig.daemon.embeddingProvider,
+            embeddingModel: updatedConfig.daemon.embeddingModel,
+            hasApiKey: !!updatedConfig.daemon.embeddingApiKey,
+            embeddingBaseUrl: updatedConfig.daemon.embeddingBaseUrl,
+            embeddingDimensions: updatedConfig.daemon.embeddingDimensions,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

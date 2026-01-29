@@ -5,12 +5,12 @@
 
 ## Statistics
 - Total files: 28
-- Total symbols: 113
+- Total symbols: 115
   - function: 63
   - interface: 18
+  - variable: 12
   - method: 12
-  - variable: 11
-  - type: 5
+  - type: 6
   - property: 2
   - class: 1
   - constructor: 1
@@ -112,7 +112,7 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.test.ts [1-1381]
+src/api/routes/config.test.ts [1-1692]
   imports:
     - ../../config/config.js
     - ../../storage/database.js
@@ -121,19 +121,22 @@ src/api/routes/config.test.ts [1-1381]
     - node:fs
     - vitest
 
-src/api/routes/config.ts [1-957]
+src/api/routes/config.ts [1-1070]
   interface:
-    68-84: interface DaemonConfigUpdateBody
+    74-96: interface DaemonConfigUpdateBody
       /** Daemon configuration update request body */
-    89-92: interface QueryConfigUpdateBody
+      refs out: 1 [type: 1]
+        - src/api/routes/config.ts:91: type EmbeddingProvider -> src/api/routes/config.ts
+    101-104: interface QueryConfigUpdateBody
       /** Query configuration update request body */
-    97-101: interface ApiConfigUpdateBody
+    109-113: interface ApiConfigUpdateBody
       /** API configuration update request body */
-    106-110: interface HubConfigUpdateBody
+    118-122: interface HubConfigUpdateBody
       /** Hub configuration update request body */
   type:
     27-27: ValidationResult = string | null
       /** Validation result - either success (null) or error message */
+    69-69: EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]
   function:
     32-45: validateIntRange(value: number | undefined, field: string, min: number, max: number): string
       /** Validate an integer field is within a range */
@@ -144,62 +147,70 @@ src/api/routes/config.ts [1-957]
       /** Validate a float field is within a range */
       refs out: 1 [type: 1]
         - src/api/routes/config.ts:55: type ValidationResult -> src/api/routes/config.ts
-    115-175: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
+    127-227: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
       /** Validate daemon configuration update fields */
-      refs out: 2 [type: 2]
-        - src/api/routes/config.ts:115: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:115: type ValidationResult -> src/api/routes/config.ts
-    180-255: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
+      refs out: 5 [call: 3, type: 2]
+        - src/api/routes/config.ts:127: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:127: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:193: call includes -> external
+        - src/api/routes/config.ts:195: call join -> external
+        - src/api/routes/config.ts:218: call isInteger -> external
+    232-344: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
       /** Apply daemon config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:181: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:182: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-    260-274: validateQueryUpdate(body: QueryConfigUpdateBody): string
+        - src/api/routes/config.ts:233: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:234: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+    349-363: validateQueryUpdate(body: QueryConfigUpdateBody): string
       /** Validate query configuration update fields */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:260: type QueryConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:260: type ValidationResult -> src/api/routes/config.ts
-    279-308: validateApiUpdate(body: ApiConfigUpdateBody): string
+        - src/api/routes/config.ts:349: type QueryConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:349: type ValidationResult -> src/api/routes/config.ts
+    368-397: validateApiUpdate(body: ApiConfigUpdateBody): string
       /** Validate API configuration update fields */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/config.ts:279: type ApiConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:279: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:297: call isArray -> external
-    313-335: validatePath(p: string, field: string): string
+        - src/api/routes/config.ts:368: type ApiConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:368: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:386: call isArray -> external
+    402-424: validatePath(p: string, field: string): string
       /** Validate a path exists or has a writable parent */
       refs out: 7 [call: 5, type: 2]
-        - src/api/routes/config.ts:313: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:315: call existsSync -> external
-        - src/api/routes/config.ts:317: call isDirectory -> external
-        - src/api/routes/config.ts:317: call statSync -> external
-        - src/api/routes/config.ts:321: type Error -> external
-    340-374: validateHubUpdate(body: HubConfigUpdateBody): string
+        - src/api/routes/config.ts:402: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:404: call existsSync -> external
+        - src/api/routes/config.ts:406: call isDirectory -> external
+        - src/api/routes/config.ts:406: call statSync -> external
+        - src/api/routes/config.ts:410: type Error -> external
+    429-463: validateHubUpdate(body: HubConfigUpdateBody): string
       /** Validate hub configuration update fields */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:340: type HubConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:340: type ValidationResult -> src/api/routes/config.ts
-    379-397: applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void
+        - src/api/routes/config.ts:429: type HubConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:429: type ValidationResult -> src/api/routes/config.ts
+    468-486: applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void
       /** Apply query config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:380: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:381: type QueryConfigUpdateBody -> src/api/routes/config.ts
-    402-423: applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void
+        - src/api/routes/config.ts:469: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:470: type QueryConfigUpdateBody -> src/api/routes/config.ts
+    491-512: applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void
       /** Apply API config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:403: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:404: type ApiConfigUpdateBody -> src/api/routes/config.ts
-    428-449: applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void
+        - src/api/routes/config.ts:492: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:493: type ApiConfigUpdateBody -> src/api/routes/config.ts
+    517-538: applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void
       /** Apply hub config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:429: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:430: type HubConfigUpdateBody -> src/api/routes/config.ts
-    451-956: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/config.ts:518: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:519: type HubConfigUpdateBody -> src/api/routes/config.ts
+    540-1069: async configRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 99 [call: 71, type: 28]
-        - src/api/routes/config.ts:451: type FastifyInstance -> external
-        - src/api/routes/config.ts:451: type Promise -> external
-        - src/api/routes/config.ts:455: call get -> external
-        - src/api/routes/config.ts:455: type FastifyRequest -> external
-        - src/api/routes/config.ts:455: type FastifyReply -> external
+        - src/api/routes/config.ts:540: type FastifyInstance -> external
+        - src/api/routes/config.ts:540: type Promise -> external
+        - src/api/routes/config.ts:544: call get -> external
+        - src/api/routes/config.ts:544: type FastifyRequest -> external
+        - src/api/routes/config.ts:544: type FastifyReply -> external
+  variable:
+    68-68: readonly ["ollama", "openai", "openrouter"]
+      /** Valid embedding providers */
+      refs out: 1 [type: 1]
+        - src/api/routes/config.ts:68: type const -> external
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -909,4 +920,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 28
-Estimated tokens: 10,306 (codebase: ~1,121,543)
+Estimated tokens: 10,455 (codebase: ~1,127,837)

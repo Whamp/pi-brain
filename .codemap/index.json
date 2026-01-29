@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1148,
+    "totalSymbols": 1150,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
       "function": 512,
-      "type": 42,
+      "type": 43,
       "interface": 266,
-      "variable": 119,
+      "variable": 120,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39492,
-  "codebase_tokens": 1123057,
+  "total_tokens": 39538,
+  "codebase_tokens": 1128083,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,10 +327,10 @@
       "language": "typescript",
       "lines": [
         1,
-        957
+        1070
       ],
       "detail_level": "full",
-      "token_estimate": 578,
+      "token_estimate": 624,
       "symbols": [
         {
           "name": "ValidationResult",
@@ -390,12 +390,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "VALID_EMBEDDING_PROVIDERS",
+          "kind": "variable",
+          "signature": "readonly [\"ollama\", \"openai\", \"openrouter\"]",
+          "lines": [
+            68,
+            68
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Valid embedding providers",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "EmbeddingProvider",
+          "kind": "type",
+          "signature": "EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]",
+          "lines": [
+            69,
+            69
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "DaemonConfigUpdateBody",
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            68,
-            84
+            74,
+            96
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +451,8 @@
           "kind": "interface",
           "signature": "QueryConfigUpdateBody",
           "lines": [
-            89,
-            92
+            101,
+            104
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +470,8 @@
           "kind": "interface",
           "signature": "ApiConfigUpdateBody",
           "lines": [
-            97,
-            101
+            109,
+            113
           ],
           "exported": false,
           "is_default": false,
@@ -451,8 +489,8 @@
           "kind": "interface",
           "signature": "HubConfigUpdateBody",
           "lines": [
-            106,
-            110
+            118,
+            122
           ],
           "exported": false,
           "is_default": false,
@@ -470,8 +508,8 @@
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            115,
-            175
+            127,
+            227
           ],
           "exported": false,
           "is_default": false,
@@ -489,8 +527,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            180,
-            255
+            232,
+            344
           ],
           "exported": false,
           "is_default": false,
@@ -508,8 +546,8 @@
           "kind": "function",
           "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
           "lines": [
-            260,
-            274
+            349,
+            363
           ],
           "exported": false,
           "is_default": false,
@@ -527,8 +565,8 @@
           "kind": "function",
           "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
           "lines": [
-            279,
-            308
+            368,
+            397
           ],
           "exported": false,
           "is_default": false,
@@ -546,8 +584,8 @@
           "kind": "function",
           "signature": "validatePath(p: string, field: string): string",
           "lines": [
-            313,
-            335
+            402,
+            424
           ],
           "exported": false,
           "is_default": false,
@@ -565,8 +603,8 @@
           "kind": "function",
           "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
           "lines": [
-            340,
-            374
+            429,
+            463
           ],
           "exported": false,
           "is_default": false,
@@ -584,8 +622,8 @@
           "kind": "function",
           "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
           "lines": [
-            379,
-            397
+            468,
+            486
           ],
           "exported": false,
           "is_default": false,
@@ -603,8 +641,8 @@
           "kind": "function",
           "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
           "lines": [
-            402,
-            423
+            491,
+            512
           ],
           "exported": false,
           "is_default": false,
@@ -622,8 +660,8 @@
           "kind": "function",
           "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
           "lines": [
-            428,
-            449
+            517,
+            538
           ],
           "exported": false,
           "is_default": false,
@@ -641,8 +679,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            451,
-            956
+            540,
+            1069
           ],
           "exported": true,
           "is_default": false,
