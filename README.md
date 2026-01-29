@@ -102,6 +102,35 @@ Generated files are placed in `~/.pi/agent/contexts/` and automatically loaded b
 
 ### Key Features
 
+#### AutoMem Integration
+
+The knowledge graph implements AutoMem-style memory management with typed relationships and lifecycle processing:
+
+**Typed Relationships (11 Edge Types):**
+The analyzer extracts semantic connections between nodes:
+
+- `LEADS_TO` - Causal links (problem → solution)
+- `PREFERS_OVER` - User preferences (chose A over B)
+- `CONTRADICTS` / `REINFORCES` - Conflicts and supporting evidence
+- `DERIVED_FROM` / `EVOLVED_INTO` - Source tracking and evolution
+- `EXEMPLIFIES` - Pattern examples
+- `PART_OF` - Hierarchical grouping
+- `RELATES_TO`, `OCCURRED_BEFORE`, `INVALIDATED_BY` - General, temporal, and deprecation links
+
+**Sleep Cycle Processing:**
+Scheduled consolidation runs manage the knowledge graph lifecycle:
+
+- **Daily Decay** - Updates relevance scores using age, access patterns, and relationship density
+- **Weekly Creative** - Connects similar unlinked nodes via vector similarity
+- **Monthly Cluster** - Groups dense embeddings into Meta-Nodes
+- **Quarterly Forget** - Archives low-relevance nodes
+
+**Hybrid Search:**
+Searches combine nine weighted signals: vector similarity, keyword matching, graph centrality, content overlap, temporal proximity, tags, importance, and recency.
+
+**Bridge Discovery:**
+Multi-hop traversal returns explanatory paths (source → bridge → target) instead of isolated results.
+
 #### Signals Detection (Phase 11)
 
 Automatic detection of friction and delight patterns in coding sessions:
