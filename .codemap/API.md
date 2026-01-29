@@ -51,15 +51,16 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-750]
+src/api/routes/config.ts [1-957]
   function:
-    347-749: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    451-956: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
     - ../responses.js
     - fastify
     - node:fs
+    - node:path
     - yaml
 
 src/api/routes/daemon.ts [1-157]
@@ -2030,7 +2031,7 @@ src/types/index.ts [1-661]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-616]
+src/web/app/src/lib/api/client.ts [1-644]
   function:
     65-74: createApiError(options: ApiErrorOptions): Error [exported]
     76-80: createTimeoutError(timeoutMs: number): Error [exported]
@@ -2045,7 +2046,7 @@ src/web/app/src/lib/api/client.ts [1-616]
     132-149: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    220-602: api [exported]
+    220-630: api [exported]
   imports:
     - $lib/types
 
@@ -2149,4 +2150,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 27,087 (codebase: ~1,117,972)
+Estimated tokens: 27,091 (codebase: ~1,120,456)

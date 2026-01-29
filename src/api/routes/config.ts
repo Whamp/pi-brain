@@ -5,6 +5,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import * as fs from "node:fs";
+import * as path from "node:path";
 import * as yaml from "yaml";
 
 import type { RawConfig } from "../../config/types.js";
@@ -15,6 +16,8 @@ import {
   getDefaultDaemonConfig,
   getDefaultQueryConfig,
   getDefaultApiConfig,
+  getDefaultHubConfig,
+  expandPath,
 } from "../../config/config.js";
 import { successResponse, errorResponse } from "../responses.js";
 
@@ -95,6 +98,15 @@ interface ApiConfigUpdateBody {
   port?: number;
   host?: string;
   corsOrigins?: string[];
+}
+
+/**
+ * Hub configuration update request body
+ */
+interface HubConfigUpdateBody {
+  sessionsDir?: string;
+  databaseDir?: string;
+  webUiPort?: number;
 }
 
 /**
@@ -296,6 +308,72 @@ function validateApiUpdate(body: ApiConfigUpdateBody): ValidationResult {
 }
 
 /**
+ * Validate a path exists or has a writable parent
+ */
+function validatePath(p: string, field: string): ValidationResult {
+  const expanded = expandPath(p);
+  if (fs.existsSync(expanded)) {
+    try {
+      if (!fs.statSync(expanded).isDirectory()) {
+        return `${field} exists but is not a directory`;
+      }
+    } catch (error) {
+      return `Failed to access ${field}: ${(error as Error).message}`;
+    }
+  } else {
+    const parent = path.dirname(expanded);
+    if (!fs.existsSync(parent)) {
+      return `Parent directory for ${field} does not exist: ${parent}`;
+    }
+    try {
+      fs.accessSync(parent, fs.constants.W_OK);
+    } catch {
+      return `Parent directory for ${field} is not writable: ${parent}`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Validate hub configuration update fields
+ */
+function validateHubUpdate(body: HubConfigUpdateBody): ValidationResult {
+  const { sessionsDir, databaseDir, webUiPort } = body;
+
+  // Validate sessionsDir is non-empty string and valid path
+  if (sessionsDir !== undefined) {
+    if (!sessionsDir || typeof sessionsDir !== "string") {
+      return "sessionsDir must be a non-empty string";
+    }
+    const pathError = validatePath(sessionsDir, "sessionsDir");
+    if (pathError) {
+      return pathError;
+    }
+  }
+
+  // Validate databaseDir is non-empty string and valid path
+  if (databaseDir !== undefined) {
+    if (!databaseDir || typeof databaseDir !== "string") {
+      return "databaseDir must be a non-empty string";
+    }
+    const pathError = validatePath(databaseDir, "databaseDir");
+    if (pathError) {
+      return pathError;
+    }
+  }
+
+  // Validate webUiPort range
+  if (webUiPort !== undefined) {
+    const portError = validateIntRange(webUiPort, "webUiPort", 1024, 65_535);
+    if (portError !== null) {
+      return portError;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Apply query config updates to raw config object
  */
 function applyQueryUpdates(
@@ -341,6 +419,32 @@ function applyApiUpdates(
   }
   if (corsOrigins !== undefined) {
     rawConfig.api.cors_origins = corsOrigins;
+  }
+}
+
+/**
+ * Apply hub config updates to raw config object
+ */
+function applyHubUpdates(
+  rawConfig: RawConfig,
+  body: HubConfigUpdateBody
+): void {
+  const { sessionsDir, databaseDir, webUiPort } = body;
+
+  // Initialize hub section if needed
+  if (!rawConfig.hub) {
+    rawConfig.hub = {};
+  }
+
+  // Update provided fields
+  if (sessionsDir !== undefined) {
+    rawConfig.hub.sessions_dir = sessionsDir;
+  }
+  if (databaseDir !== undefined) {
+    rawConfig.hub.database_dir = databaseDir;
+  }
+  if (webUiPort !== undefined) {
+    rawConfig.hub.web_ui_port = webUiPort;
   }
 }
 
@@ -740,6 +844,109 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             corsOrigins: updatedConfig.api.corsOrigins,
             message:
               "Configuration updated. Restart API server to apply changes.",
+          },
+          durationMs
+        )
+      );
+    }
+  );
+
+  /**
+   * GET /config/hub - Get hub configuration
+   */
+  app.get("/hub", async (request: FastifyRequest, reply: FastifyReply) => {
+    const startTime = request.startTime ?? Date.now();
+
+    const config = loadConfig();
+    const defaults = getDefaultHubConfig();
+
+    const durationMs = Date.now() - startTime;
+    return reply.send(
+      successResponse(
+        {
+          sessionsDir: config.hub.sessionsDir,
+          databaseDir: config.hub.databaseDir,
+          webUiPort: config.hub.webUiPort,
+          // Include defaults for UI reference
+          defaults: {
+            sessionsDir: defaults.sessionsDir,
+            databaseDir: defaults.databaseDir,
+            webUiPort: defaults.webUiPort,
+          },
+        },
+        durationMs
+      )
+    );
+  });
+
+  /**
+   * PUT /config/hub - Update hub configuration
+   */
+  app.put(
+    "/hub",
+    async (
+      request: FastifyRequest<{ Body: HubConfigUpdateBody }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const body = request.body ?? {};
+      const { sessionsDir, databaseDir, webUiPort } = body;
+
+      // Validate at least one field is provided
+      const hasAnyField =
+        sessionsDir !== undefined ||
+        databaseDir !== undefined ||
+        webUiPort !== undefined;
+
+      if (!hasAnyField) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse(
+              "BAD_REQUEST",
+              "At least one configuration field is required"
+            )
+          );
+      }
+
+      // Validate fields
+      const validationError = validateHubUpdate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
+      }
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Apply updates
+      applyHubUpdates(rawConfig, body);
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      // Reload and return updated config
+      const updatedConfig = loadConfig();
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            sessionsDir: updatedConfig.hub.sessionsDir,
+            databaseDir: updatedConfig.hub.databaseDir,
+            webUiPort: updatedConfig.hub.webUiPort,
+            message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs
         )

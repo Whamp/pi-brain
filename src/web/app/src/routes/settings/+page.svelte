@@ -41,6 +41,11 @@
   let apiHost = $state("localhost");
   let apiCorsOrigins: string[] = $state([]);
 
+  // Hub config values
+  let hubSessionsDir = $state("");
+  let hubDatabaseDir = $state("");
+  let hubWebUiPort = $state(8765);
+
   // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
@@ -66,6 +71,11 @@
   let originalApiPort = $state(8765);
   let originalApiHost = $state("localhost");
   let originalApiCorsOrigins: string[] = $state([]);
+
+  // Hub config original values
+  let originalHubSessionsDir = $state("");
+  let originalHubDatabaseDir = $state("");
+  let originalHubWebUiPort = $state(8765);
 
   // Available providers
   let providers: Provider[] = $state([]);
@@ -96,11 +106,20 @@
     queryModel !== originalQueryModel ||
     apiPort !== originalApiPort ||
     apiHost !== originalApiHost ||
-    JSON.stringify(apiCorsOrigins) !== JSON.stringify(originalApiCorsOrigins)
+    JSON.stringify(apiCorsOrigins) !== JSON.stringify(originalApiCorsOrigins) ||
+    hubSessionsDir !== originalHubSessionsDir ||
+    hubDatabaseDir !== originalHubDatabaseDir ||
+    hubWebUiPort !== originalHubWebUiPort
   );
 
   onMount(async () => {
-    await Promise.all([loadConfig(), loadProviders(), loadQueryConfig(), loadApiConfig()]);
+    await Promise.all([
+      loadConfig(),
+      loadProviders(),
+      loadQueryConfig(),
+      loadApiConfig(),
+      loadHubConfig(),
+    ]);
     loading = false;
   });
 
@@ -204,6 +223,27 @@
     }
   }
 
+  async function loadHubConfig() {
+    try {
+      const config = await api.getHubConfig();
+      hubSessionsDir = config.sessionsDir;
+      hubDatabaseDir = config.databaseDir;
+      hubWebUiPort = config.webUiPort;
+
+      // Store originals
+      originalHubSessionsDir = hubSessionsDir;
+      originalHubDatabaseDir = hubDatabaseDir;
+      originalHubWebUiPort = hubWebUiPort;
+    } catch (error) {
+      console.error("Failed to load hub config:", error);
+      toastStore.error(
+        isBackendOffline(error)
+          ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+          : getErrorMessage(error)
+      );
+    }
+  }
+
   async function saveConfig() {
     saving = true;
 
@@ -240,6 +280,13 @@
         corsOrigins: apiCorsOrigins,
       });
 
+      // Save Hub config
+      const hubResult = await api.updateHubConfig({
+        sessionsDir: hubSessionsDir,
+        databaseDir: hubDatabaseDir,
+        webUiPort: hubWebUiPort,
+      });
+
       // Update originals
       originalProvider = daemonResult.provider;
       originalModel = daemonResult.model;
@@ -261,6 +308,9 @@
       originalApiPort = apiResult.port;
       originalApiHost = apiResult.host;
       originalApiCorsOrigins = [...apiResult.corsOrigins];
+      originalHubSessionsDir = hubResult.sessionsDir;
+      originalHubDatabaseDir = hubResult.databaseDir;
+      originalHubWebUiPort = hubResult.webUiPort;
 
       toastStore.success(daemonResult.message);
     } catch (error) {
@@ -296,6 +346,9 @@
     apiPort = originalApiPort;
     apiHost = originalApiHost;
     apiCorsOrigins = [...originalApiCorsOrigins];
+    hubSessionsDir = originalHubSessionsDir;
+    hubDatabaseDir = originalHubDatabaseDir;
+    hubWebUiPort = originalHubWebUiPort;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -640,6 +693,53 @@
       </div>
     </section>
 
+    <section class="settings-section">
+      <h2>Hub Configuration</h2>
+      <p class="section-description">
+        Configure core paths and hub settings
+      </p>
+
+      <div class="warning-box" style="margin-bottom: var(--space-4);">
+        <p><strong>⚠️ Warning:</strong> Changing directory paths requires a daemon restart and may require manual data migration if files are moved.</p>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="sessionsDir">Sessions Directory</label>
+          <input
+            type="text"
+            id="sessionsDir"
+            bind:value={hubSessionsDir}
+            placeholder="~/.pi/agent/sessions"
+          />
+          <span class="hint">Path to where pi session files are stored</span>
+        </div>
+
+        <div class="form-group">
+          <label for="databaseDir">Database Directory</label>
+          <input
+            type="text"
+            id="databaseDir"
+            bind:value={hubDatabaseDir}
+            placeholder="~/.pi-brain/data"
+          />
+          <span class="hint">Path to where the brain database and nodes are stored</span>
+        </div>
+
+        <div class="form-group">
+          <label for="webUiPort">Web UI Port</label>
+          <input
+            type="number"
+            id="webUiPort"
+            bind:value={hubWebUiPort}
+            min="1024"
+            max="65535"
+          />
+          <span class="hint">Port the Web UI dashboard runs on</span>
+        </div>
+      </div>
+    </section>
+
     <div class="actions">
       <button
         class="btn-secondary"
@@ -770,6 +870,19 @@
   .form-group .hint {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
+  }
+  
+  .warning-box {
+    background: var(--color-warning-muted, #fff7ed);
+    border: 1px solid var(--color-warning, #f97316);
+    color: var(--color-warning-text, #9a3412);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+  }
+  
+  .warning-box p {
+    margin: 0;
   }
   
   .range-group {

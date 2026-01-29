@@ -325,21 +325,21 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 ### 19.2 Query & API Config (Trivial)
 
 | ID     | Task                                      | Status | Deps           | Notes      |
-| ------ | ----------------------------------------- | ------ | -------------- | ---------- | ---------------------------------------------------------- |
-| 19.2.1 | Add GET/PUT /config/query routes          | done   | -              | 2026-01-28 | 7 tests, GET/PUT /config/query routes implemented          |
-| 19.2.2 | Add GET/PUT /config/api routes            | done   | -              | 2026-01-28 | 11 tests, GET/PUT /config/api routes implemented           |
-| 19.2.3 | Create TagInput component for corsOrigins | done   | -              | 2026-01-28 | 0 errors, 0 warnings                                       |
-| 19.2.4 | Add Query section to settings UI          | done   | 19.2.1         | 2026-01-28 | Added Query section to settings UI with API client methods |
-| 19.2.5 | Add API Server section to settings UI     | active | 19.2.2, 19.2.3 | 2026-01-28 |
+| ------ | ----------------------------------------- | ------ | -------------- | ---------- | ------------------------------------------------------------------------------------ |
+| 19.2.1 | Add GET/PUT /config/query routes          | done   | -              | 2026-01-28 | 7 tests, GET/PUT /config/query routes implemented                                    |
+| 19.2.2 | Add GET/PUT /config/api routes            | done   | -              | 2026-01-28 | 11 tests, GET/PUT /config/api routes implemented                                     |
+| 19.2.3 | Create TagInput component for corsOrigins | done   | -              | 2026-01-28 | 0 errors, 0 warnings                                                                 |
+| 19.2.4 | Add Query section to settings UI          | done   | 19.2.1         | 2026-01-28 | Added Query section to settings UI with API client methods                           |
+| 19.2.5 | Add API Server section to settings UI     | done   | 19.2.2, 19.2.3 | 2026-01-28 | Added API Server section to settings UI with Port, Host, and CORS Origins (TagInput) |
 
 ### 19.3 Hub Config (Moderate)
 
-| ID     | Task                             | Status  | Deps   | Notes |
-| ------ | -------------------------------- | ------- | ------ | ----- |
-| 19.3.1 | Add GET/PUT /config/hub routes   | pending | -      |       |
-| 19.3.2 | Implement path validation helper | pending | -      |       |
-| 19.3.3 | Add Hub section to settings UI   | pending | 19.3.1 |       |
-| 19.3.4 | Add warning about data migration | pending | 19.3.3 |       |
+| ID     | Task                             | Status | Deps   | Notes      |
+| ------ | -------------------------------- | ------ | ------ | ---------- | ---------------------------------------------------------------------- |
+| 19.3.1 | Add GET/PUT /config/hub routes   | done   | -      | 2026-01-28 | Added GET/PUT /config/hub routes with path validation                  |
+| 19.3.2 | Implement path validation helper | done   | -      | 2026-01-28 | Added validatePath helper ensuring dirs exist or have writable parents |
+| 19.3.3 | Add Hub section to settings UI   | done   | 19.3.1 | 2026-01-28 | Added Hub section with Sessions Dir, Database Dir, and Web UI Port     |
+| 19.3.4 | Add warning about data migration | done   | 19.3.3 | 2026-01-28 | Added warning box about path changes requiring restart/migration       |
 
 ### 19.4 Embedding Config (Moderate)
 

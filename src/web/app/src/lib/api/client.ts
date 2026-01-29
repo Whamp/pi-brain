@@ -542,6 +542,34 @@ export const api = {
       body: JSON.stringify(config),
     }),
 
+  // Hub Configuration
+  getHubConfig: () =>
+    request<{
+      sessionsDir: string;
+      databaseDir: string;
+      webUiPort: number;
+      defaults: {
+        sessionsDir: string;
+        databaseDir: string;
+        webUiPort: number;
+      };
+    }>("/config/hub"),
+
+  updateHubConfig: (config: {
+    sessionsDir?: string;
+    databaseDir?: string;
+    webUiPort?: number;
+  }) =>
+    request<{
+      sessionsDir: string;
+      databaseDir: string;
+      webUiPort: number;
+      message: string;
+    }>("/config/hub", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
   // Prompt Learning
   getPromptInsights: (options?: {
     limit?: number;

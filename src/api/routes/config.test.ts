@@ -1238,4 +1238,143 @@ describe("config api routes", () => {
       expect(body.data.message).toContain("Restart API server");
     });
   });
+
+  describe("get /config/hub", () => {
+    it("returns hub configuration", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/hub",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data).toBeDefined();
+      expect(body.data.sessionsDir).toBeDefined();
+      expect(body.data.databaseDir).toBeDefined();
+      expect(body.data.webUiPort).toBeDefined();
+      expect(body.data.defaults).toBeDefined();
+    });
+
+    it("includes defaults for UI reference", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/hub",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.defaults.sessionsDir).toBeDefined();
+      expect(body.data.defaults.databaseDir).toBeDefined();
+      expect(body.data.defaults.webUiPort).toBeDefined();
+    });
+  });
+
+  describe("put /config/hub", () => {
+    it("rejects request with no fields", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("error");
+      expect(body.error.code).toBe("BAD_REQUEST");
+    });
+
+    it("rejects empty sessionsDir", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { sessionsDir: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("sessionsDir");
+    });
+
+    it("rejects empty databaseDir", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { databaseDir: "" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("databaseDir");
+    });
+
+    it("rejects port below minimum", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { webUiPort: 1023 },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe("BAD_REQUEST");
+      expect(body.error.message).toContain("webUiPort");
+    });
+
+    it("accepts valid sessionsDir update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { sessionsDir: "/tmp/sessions" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.sessionsDir).toBe("/tmp/sessions");
+      expect(body.data.message).toContain("Configuration updated");
+    });
+
+    it("accepts valid databaseDir update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { databaseDir: "/tmp/data" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.databaseDir).toBe("/tmp/data");
+    });
+
+    it("accepts valid webUiPort update", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: { webUiPort: 9001 },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.webUiPort).toBe(9001);
+    });
+
+    it("accepts all fields together", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/hub",
+        payload: {
+          sessionsDir: "/tmp/s2",
+          databaseDir: "/tmp/d2",
+          webUiPort: 9002,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.sessionsDir).toBe("/tmp/s2");
+      expect(body.data.databaseDir).toBe("/tmp/d2");
+      expect(body.data.webUiPort).toBe(9002);
+    });
+  });
 });

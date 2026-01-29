@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1144,
+    "totalSymbols": 1148,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 509,
+      "function": 512,
       "type": 42,
-      "interface": 265,
+      "interface": 266,
       "variable": 119,
       "class": 12,
       "property": 51,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39368,
-  "codebase_tokens": 1118936,
+  "total_tokens": 39492,
+  "codebase_tokens": 1123057,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,18 @@
       "language": "typescript",
       "lines": [
         1,
-        750
+        957
       ],
       "detail_level": "full",
-      "token_estimate": 454,
+      "token_estimate": 578,
       "symbols": [
         {
           "name": "ValidationResult",
           "kind": "type",
           "signature": "ValidationResult = string | null",
           "lines": [
-            24,
-            24
+            27,
+            27
           ],
           "exported": false,
           "is_default": false,
@@ -356,8 +356,8 @@
           "kind": "function",
           "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            29,
-            42
+            32,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -375,8 +375,8 @@
           "kind": "function",
           "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            47,
-            60
+            50,
+            63
           ],
           "exported": false,
           "is_default": false,
@@ -394,8 +394,8 @@
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            65,
-            81
+            68,
+            84
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +413,8 @@
           "kind": "interface",
           "signature": "QueryConfigUpdateBody",
           "lines": [
-            86,
-            89
+            89,
+            92
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +432,8 @@
           "kind": "interface",
           "signature": "ApiConfigUpdateBody",
           "lines": [
-            94,
-            98
+            97,
+            101
           ],
           "exported": false,
           "is_default": false,
@@ -447,12 +447,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "HubConfigUpdateBody",
+          "kind": "interface",
+          "signature": "HubConfigUpdateBody",
+          "lines": [
+            106,
+            110
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Hub configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "validateDaemonUpdate",
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            103,
-            163
+            115,
+            175
           ],
           "exported": false,
           "is_default": false,
@@ -470,8 +489,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            168,
-            243
+            180,
+            255
           ],
           "exported": false,
           "is_default": false,
@@ -489,8 +508,8 @@
           "kind": "function",
           "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
           "lines": [
-            248,
-            262
+            260,
+            274
           ],
           "exported": false,
           "is_default": false,
@@ -508,8 +527,8 @@
           "kind": "function",
           "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
           "lines": [
-            267,
-            296
+            279,
+            308
           ],
           "exported": false,
           "is_default": false,
@@ -523,12 +542,50 @@
           "outgoing_refs": null
         },
         {
+          "name": "validatePath",
+          "kind": "function",
+          "signature": "validatePath(p: string, field: string): string",
+          "lines": [
+            313,
+            335
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a path exists or has a writable parent",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateHubUpdate",
+          "kind": "function",
+          "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
+          "lines": [
+            340,
+            374
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate hub configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "applyQueryUpdates",
           "kind": "function",
           "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
           "lines": [
-            301,
-            319
+            379,
+            397
           ],
           "exported": false,
           "is_default": false,
@@ -546,8 +603,8 @@
           "kind": "function",
           "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
           "lines": [
-            324,
-            345
+            402,
+            423
           ],
           "exported": false,
           "is_default": false,
@@ -561,12 +618,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "applyHubUpdates",
+          "kind": "function",
+          "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
+          "lines": [
+            428,
+            449
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply hub config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "configRoutes",
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            347,
-            749
+            451,
+            956
           ],
           "exported": true,
           "is_default": false,
@@ -589,6 +665,7 @@
         "../responses.js",
         "fastify",
         "node:fs",
+        "node:path",
         "yaml"
       ]
     },
@@ -21959,7 +22036,7 @@
       "language": "typescript",
       "lines": [
         1,
-        616
+        644
       ],
       "detail_level": "full",
       "token_estimate": 345,
@@ -22293,7 +22370,7 @@
           "signature": "api",
           "lines": [
             220,
-            602
+            630
           ],
           "exported": true,
           "is_default": false,

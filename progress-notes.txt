@@ -378,3 +378,19 @@ the reactivity chain.
   - Web TypeScript check: 0 errors, 0 warnings
 **Commit**: 2d5fe9ad
 **Notes**: Added Query configuration section to settings UI. Backend API routes already existed from task 19.2.1. Added API client methods and UI section following existing patterns. Query config is saved together with daemon config in saveConfig.
+
+---
+
+## 2026-01-28 18:21 - Task 19.2.5
+
+**Status**: active → done
+**Validation**:
+  - Updated Settings UI to include API Server section
+  - Added fields for Port (number), Host (string), and CORS Origins (TagInput)
+  - Implemented loadApiConfig to fetch API settings from backend
+  - Updated saveConfig to persist API settings via updateApiConfig
+  - Updated resetConfig to restore API settings to original values
+  - Verified with npm run web:check (0 errors)
+  - Verified with npm test -- --run (1376 passed)
+**Commit**: c379b600
+**Notes**: Integrated API Server configuration into settings UI. CORS Origins uses the new TagInput component.
