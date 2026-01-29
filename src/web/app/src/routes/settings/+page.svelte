@@ -3,6 +3,7 @@
   import { Settings, Save, RotateCcw } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { toastStore } from "$lib/stores/toast";
+  import TagInput from "$lib/components/tag-input.svelte";
 
   interface Provider {
     id: string;
@@ -35,6 +36,11 @@
   let queryProvider = $state("");
   let queryModel = $state("");
 
+  // API config values
+  let apiPort = $state(8765);
+  let apiHost = $state("localhost");
+  let apiCorsOrigins: string[] = $state([]);
+
   // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
@@ -55,6 +61,11 @@
   // Query config original values
   let originalQueryProvider = $state("");
   let originalQueryModel = $state("");
+
+  // API config original values
+  let originalApiPort = $state(8765);
+  let originalApiHost = $state("localhost");
+  let originalApiCorsOrigins: string[] = $state([]);
 
   // Available providers
   let providers: Provider[] = $state([]);
@@ -82,11 +93,14 @@
     connectionDiscoveryCooldownHours !== originalConnectionDiscoveryCooldownHours ||
     semanticSearchThreshold !== originalSemanticSearchThreshold ||
     queryProvider !== originalQueryProvider ||
-    queryModel !== originalQueryModel
+    queryModel !== originalQueryModel ||
+    apiPort !== originalApiPort ||
+    apiHost !== originalApiHost ||
+    JSON.stringify(apiCorsOrigins) !== JSON.stringify(originalApiCorsOrigins)
   );
 
   onMount(async () => {
-    await Promise.all([loadConfig(), loadProviders(), loadQueryConfig()]);
+    await Promise.all([loadConfig(), loadProviders(), loadQueryConfig(), loadApiConfig()]);
     loading = false;
   });
 
@@ -169,6 +183,27 @@
     }
   }
 
+  async function loadApiConfig() {
+    try {
+      const config = await api.getApiConfig();
+      apiPort = config.port;
+      apiHost = config.host;
+      apiCorsOrigins = [...config.corsOrigins];
+
+      // Store originals
+      originalApiPort = apiPort;
+      originalApiHost = apiHost;
+      originalApiCorsOrigins = [...apiCorsOrigins];
+    } catch (error) {
+      console.error("Failed to load API config:", error);
+      toastStore.error(
+        isBackendOffline(error)
+          ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
+          : getErrorMessage(error)
+      );
+    }
+  }
+
   async function saveConfig() {
     saving = true;
 
@@ -198,6 +233,13 @@
         model: queryModel,
       });
 
+      // Save API config
+      const apiResult = await api.updateApiConfig({
+        port: apiPort,
+        host: apiHost,
+        corsOrigins: apiCorsOrigins,
+      });
+
       // Update originals
       originalProvider = daemonResult.provider;
       originalModel = daemonResult.model;
@@ -216,6 +258,9 @@
       originalSemanticSearchThreshold = daemonResult.semanticSearchThreshold;
       originalQueryProvider = queryResult.provider;
       originalQueryModel = queryResult.model;
+      originalApiPort = apiResult.port;
+      originalApiHost = apiResult.host;
+      originalApiCorsOrigins = [...apiResult.corsOrigins];
 
       toastStore.success(daemonResult.message);
     } catch (error) {
@@ -248,6 +293,9 @@
     semanticSearchThreshold = originalSemanticSearchThreshold;
     queryProvider = originalQueryProvider;
     queryModel = originalQueryModel;
+    apiPort = originalApiPort;
+    apiHost = originalApiHost;
+    apiCorsOrigins = [...originalApiCorsOrigins];
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -548,6 +596,47 @@
           </select>
           <span class="hint">Model used to answer /brain queries</span>
         </div>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>API Server</h2>
+      <p class="section-description">
+        Configure the pi-brain API server settings
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="apiPort">Port</label>
+          <input
+            type="number"
+            id="apiPort"
+            bind:value={apiPort}
+            min="1024"
+            max="65535"
+          />
+          <span class="hint">Port the API server listens on (default: 8765)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="apiHost">Host</label>
+          <input
+            type="text"
+            id="apiHost"
+            bind:value={apiHost}
+            placeholder="localhost"
+          />
+          <span class="hint">Address to bind the server to (e.g. localhost, 0.0.0.0)</span>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: var(--space-4);">
+        <TagInput
+          label="CORS Origins"
+          bind:value={apiCorsOrigins}
+          placeholder="e.g. http://localhost:5173"
+          hint="Allowed origins for cross-origin requests. Press Enter to add."
+        />
       </div>
     </section>
 

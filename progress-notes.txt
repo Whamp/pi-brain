@@ -360,3 +360,21 @@ the reactivity chain.
   - npm run web:check: 0 errors, 0 warnings
 **Commit**: (will be committed shortly)
 **Notes**: Created reusable TagInput component for editing string arrays like CORS origins. Component follows Svelte 5 patterns and design system conventions.
+
+## 2026-01-28 14:21 - Task 19.2.4
+
+**Status**: pending → done
+**Validation**:
+  - Added getQueryConfig and updateQueryConfig API client methods
+  - Added getApiConfig and updateApiConfig API client methods (for next task)
+  - Added queryProvider and queryModel state variables to settings page
+  - Added loadQueryConfig function to fetch query config from API
+  - Updated saveConfig to save both daemon and query configs
+  - Updated resetConfig to reset both daemon and query configs
+  - Updated hasChanges derived state to include query config changes
+  - Added Query Configuration section to settings page UI with provider and model selects
+  - All 1376 tests pass (1376 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+  - Web TypeScript check: 0 errors, 0 warnings
+**Commit**: 2d5fe9ad
+**Notes**: Added Query configuration section to settings UI. Backend API routes already existed from task 19.2.1. Added API client methods and UI section following existing patterns. Query config is saved together with daemon config in saveConfig.
