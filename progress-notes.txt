@@ -440,3 +440,23 @@ the reactivity chain.
   - Linting: 0 errors, 0 warnings
 **Commit**: 956c7187
 **Notes**: Implemented secure API key handling - keys are write-only and never returned in GET responses. Follows spec pattern from docs/specs/settings-ui.md for Embedding Config section.
+
+---
+
+## 2026-01-28 21:25 - Tasks 19.4.2, 19.4.3, 19.4.4, 19.4.5
+
+**Status**: pending → done
+**Validation**:
+  - Created PasswordInput component with show/hide toggle and status indicator
+  - Added embedding fields to API client types (GET and PUT)
+  - Added Embeddings section to settings UI with:
+    - Provider dropdown (Ollama, OpenAI, OpenRouter)
+    - Model text input with provider-specific placeholders
+    - API key input (PasswordInput) with write-only security
+    - Base URL and dimensions fields
+  - Implemented conditional visibility: API key/URL/dimensions hidden for Ollama
+  - Verified with npm run check (0 errors)
+  - Verified with npm run web:check (0 errors)
+  - Verified with npm test -- --run (1407 passed)
+**Commit**: efd94c42
+**Notes**: Completed full Embeddings configuration section for Settings UI. PasswordInput provides secure API key handling - keys are write-only (never returned in GET, only written on PUT). The UI conditionally shows cloud-only fields (API key, Base URL, Dimensions) only when a cloud provider (OpenAI/OpenRouter) is selected.

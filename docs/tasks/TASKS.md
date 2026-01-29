@@ -343,13 +343,13 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.4 Embedding Config (Moderate)
 
-| ID     | Task                                           | Status | Deps          | Notes                            |
-| ------ | ---------------------------------------------- | ------ | ------------- | -------------------------------- |
-| 19.4.1 | Add embedding fields to daemon routes          | done   | -             | 2026-01-28 21 new tests          |
-| 19.4.2 | Implement secure API key handling (write-only) | done   | 19.4.1        | 2026-01-28 Implemented in 19.4.1 |
-| 19.4.3 | Create PasswordInput component                 | active | -             | 2026-01-28                       |
-| 19.4.4 | Add Embeddings section to settings UI          | active | 19.4.1-19.4.3 | 2026-01-28                       |
-| 19.4.5 | Conditional field visibility by provider       | active | 19.4.4        | 2026-01-28                       |
+| ID     | Task                                           | Status | Deps          | Notes                                       |
+| ------ | ---------------------------------------------- | ------ | ------------- | ------------------------------------------- |
+| 19.4.1 | Add embedding fields to daemon routes          | done   | -             | 2026-01-28 21 new tests                     |
+| 19.4.2 | Implement secure API key handling (write-only) | done   | 19.4.1        | 2026-01-28 Implemented in 19.4.1            |
+| 19.4.3 | Create PasswordInput component                 | done   | -             | 2026-01-28 Show/hide toggle, status display |
+| 19.4.4 | Add Embeddings section to settings UI          | done   | 19.4.1-19.4.3 | 2026-01-28 Provider/model/key/url/dims      |
+| 19.4.5 | Conditional field visibility by provider       | done   | 19.4.4        | 2026-01-28 Hide API fields for Ollama       |
 
 ### 19.5 Cron Schedules (Moderate)
 
