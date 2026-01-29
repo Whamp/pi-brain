@@ -505,3 +505,29 @@ the reactivity chain.
   - Tests: 1422 passed, 4 skipped
 **Commit**: 23cd2430
 **Notes**: Component follows spec from docs/specs/settings-ui.md. Includes describeCron() function to convert cron expressions to human-readable format (e.g., "0 2 * * *" → "Runs daily at 2am"). Ready for integration in Schedules section (task 19.5.4).
+
+---
+
+## 2026-01-28 21:52 - Task 19.5.4
+
+**Status**: pending → done
+**Validation**:
+  - Updated API client types to include 5 schedule fields (GET and PUT):
+    - reanalysisSchedule
+    - connectionDiscoverySchedule
+    - patternAggregationSchedule
+    - clusteringSchedule
+    - backfillEmbeddingsSchedule
+  - Added defaults for schedules in GET response type
+  - Added state variables and originals for all 5 schedules
+  - Updated hasChanges, loadConfig, saveConfig, resetConfig functions
+  - Created Schedules section with CronInput components for each schedule
+  - Each input has descriptive label and hint text
+  - Uses schedules-grid layout with responsive grid
+  - API testing confirmed schedules returned correctly from GET /config/daemon
+  - API testing confirmed schedules can be updated via PUT /config/daemon
+  - Lint: 0 errors, 0 warnings
+  - Svelte check: 0 errors, 0 warnings  
+  - Tests: 1422 passed, 4 skipped
+**Commit**: a012b5ee
+**Notes**: The Schedules section is placed between Embeddings and Query Configuration in the settings UI. Uses the CronInput component created in task 19.5.3 which provides preset dropdowns (every hour, daily at 2-5am, etc.) and custom cron expression input with human-readable descriptions.
