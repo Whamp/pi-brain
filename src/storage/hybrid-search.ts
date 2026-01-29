@@ -12,12 +12,9 @@
 import type Database from "better-sqlite3";
 
 import type { NodeRow } from "./node-crud.js";
+import type { SearchFilters, SearchHighlight } from "./search-repository.js";
 
 import { isVecLoaded } from "./database.js";
-import {
-  type SearchFilters,
-  type SearchHighlight,
-} from "./search-repository.js";
 import { buildWhereClause } from "./filter-utils.js";
 import { semanticSearch } from "./semantic-search.js";
 

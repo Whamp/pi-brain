@@ -10,6 +10,8 @@ pi-brain runs in the background to build a knowledge graph from your coding sess
 - **Avoid Mistakes**: "What error patterns usually happen with this library?"
 - **Learn Quirks**: "How does this model behave with large file edits?"
 - **Visualize History**: Interactive graph of all sessions, branches, and forks.
+- **Detect Friction**: Automatically identify rephrasing cascades, tool loops, and abandoned tasks.
+- **Surface Patterns**: Discover clusters of related work and insights via the News Feed.
 
 ## Components
 
@@ -17,6 +19,9 @@ pi-brain runs in the background to build a knowledge graph from your coding sess
 - **Knowledge Graph**: SQLite database storing nodes (decisions, errors, patterns) and edges.
 - **Web Dashboard**: SvelteKit app to visualize the graph and track agent performance.
 - **Integration**: `brain-query` extension for pi to access the knowledge graph.
+- **Signal Detection**: Friction (rephrasing, abandonment, churn) and delight (resilience, one-shot success) analysis.
+- **News Feed**: Dashboard panel showing discovered clusters and actionable insights.
+- **AGENTS.md Generator**: Creates model-specific guidance files from aggregated learnings.
 
 ## Installation
 
@@ -34,45 +39,6 @@ npm run build
 # Link CLI globally
 npm link
 ```
-
-### Dependencies
-
-pi-brain uses the following key dependencies:
-
-- **better-sqlite3**: High-performance SQLite bindings for Node.js
-- **sqlite-vec**: Vector similarity search extension for semantic queries
-
-The `sqlite-vec` extension is installed automatically via npm and provides native vector search capabilities. Supported platforms:
-
-- Linux (x64, arm64)
-- macOS (x64, arm64)
-- Windows (x64)
-
-No additional configuration is needed - the extension loads automatically when the database opens.
-
-## Quick Start: Launching the UI
-
-To explore the pi-brain experience and visualize your knowledge graph:
-
-1. **Build the project** (if not already built):
-
-   ```bash
-   npm run build
-   ```
-
-2. **Start the background daemon**:
-
-   ```bash
-   node dist/src/daemon/daemon-process.js --force
-   ```
-
-3. **Start the Web UI**:
-   ```bash
-   npm run web:dev
-   ```
-   Open **[http://localhost:5173/](http://localhost:5173/)** in your browser.
-
----
 
 ## Usage
 
@@ -111,45 +77,64 @@ ln -s $(pwd)/extensions/brain-query ~/.pi/agent/extensions/brain-query
 Then in pi, you can use:
 
 - `/brain` command to see status
+- `/brain --flag` to manually annotate significant moments (friction, breakthrough, insight)
 - Natural language queries like: "Have we seen this error before?" (uses `brain_query` tool)
 
-## Configuration
+### Model-Specific Guidance
 
-pi-brain is configured via `~/.pi-brain/config.yaml`.
-
-```yaml
-daemon:
-  # LLM for session analysis
-  provider: anthropic
-  model: claude-3-5-sonnet-20240620
-
-  # Semantic Search (Vector embeddings)
-  embedding_provider: openrouter # options: openrouter, ollama, openai
-  embedding_model: qwen/qwen3-embedding-8b
-  embedding_api_key: sk-or-v1-...
-  embedding_dimensions: 4096
-  semantic_search_threshold: 0.5 # 0.0 to 1.0 (lower = stricter)
-```
-
-### Semantic Search
-
-pi-brain uses `sqlite-vec` to enable semantic queries. Instead of just keyword matching, it finds sessions with similar meanings.
-
-- **Threshold**: Control how strict the semantic matching is. If no semantic results are found within the threshold, it falls back to keyword search (FTS).
-- **Models**: We recommend `qwen/qwen3-embedding-8b` (4096 dimensions) for high-quality semantic understanding.
-- **Local Search**: Set `embedding_provider: ollama` and `embedding_model: nomic-embed-text` for fully local vector search.
-
-If you change your embedding model, you should re-index your knowledge graph:
+The daemon generates model-specific AGENTS.md files based on aggregated insights:
 
 ```bash
-pi-brain rebuild --embeddings
+# Generate AGENTS.md for a specific model
+pi-brain prompt-learning run --model zai/glm-4.7
+
+# Preview what would be generated
+pi-brain prompt-learning preview --model zai/glm-4.7
 ```
+
+Generated files are placed in `~/.pi/agent/contexts/` and automatically loaded by pi when using that model.
 
 ## Documentation
 
 - [docs/specs/](docs/specs/) - Detailed system specifications
-- [docs/PLAN.md](docs/PLAN.md) - Implementation roadmap
+- [docs/plans/PLAN.md](docs/plans/PLAN.md) - Implementation roadmap
 - [extensions/brain-query/](extensions/brain-query/) - Extension documentation
+
+### Key Features
+
+#### Signals Detection (Phase 11)
+
+Automatic detection of friction and delight patterns in coding sessions:
+
+**Friction Signals:**
+
+- Rephrasing cascades (3+ consecutive user clarifications)
+- Tool loops (same error 3+ times)
+- Context churn (excessive file exploration)
+- Abandoned restarts (task abandoned then resumed)
+
+**Delight Signals:**
+
+- Resilient recovery (success after initial failures)
+- One-shot success (complex task completed without iteration)
+- Explicit praise (user satisfaction detected)
+
+#### News Feed
+
+The web dashboard includes a News Feed panel that surfaces:
+
+- Discovered clusters of related work (via embedding similarity)
+- Friction patterns requiring attention
+- Model-specific insights
+
+Users can confirm or dismiss patterns to refine future analysis.
+
+#### Nightly Processing
+
+The daemon runs scheduled jobs at configured times:
+
+- **2am**: Reanalysis of sessions with outdated prompts
+- **4am**: Facet discovery (clustering pipeline with embeddings)
 
 ## Development
 
