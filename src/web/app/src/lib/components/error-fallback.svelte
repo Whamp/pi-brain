@@ -113,7 +113,7 @@
     width: 80px;
     height: 80px;
     margin-bottom: var(--space-4);
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-error-muted);
     border-radius: 50%;
     color: var(--color-error);
   }

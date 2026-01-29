@@ -5,6 +5,7 @@
     value: string;
     label?: string;
     hint?: string;
+    hintId?: string;
     disabled?: boolean;
   }
 
@@ -12,6 +13,7 @@
     value = $bindable(),
     label,
     hint,
+    hintId,
     disabled = false,
   }: Props = $props();
 
@@ -28,7 +30,9 @@
   ] as const;
 
   let inputId = $state(`cron-input-${Math.random().toString(36).slice(2, 9)}`);
+  let customInputId = $state(`cron-custom-${Math.random().toString(36).slice(2, 9)}`);
   let showCustom = $state(false);
+  let hintElementId = $derived(hintId || `cron-hint-${inputId}`);
 
   // Determine current preset match or custom
   const matchingPreset = $derived(
@@ -129,6 +133,7 @@
         onchange={handlePresetChange}
         disabled={disabled}
         aria-label={label ?? "Cron schedule"}
+        aria-describedby={hint ? hintElementId : undefined}
       >
         {#each PRESETS as preset}
           <option value={preset.label}>{preset.label}</option>
@@ -140,12 +145,14 @@
     {#if isCustom}
       <input
         type="text"
+        id={customInputId}
         class="custom-input"
         value={value}
         oninput={handleCustomChange}
         placeholder="* * * * *"
         disabled={disabled}
         aria-label="Custom cron expression"
+        aria-describedby={hint ? hintElementId : undefined}
         spellcheck="false"
       />
     {/if}
@@ -157,7 +164,7 @@
   </div>
 
   {#if hint}
-    <span class="cron-input-hint">{hint}</span>
+    <span class="cron-input-hint" id={hintElementId}>{hint}</span>
   {/if}
 </div>
 

@@ -6,6 +6,7 @@
     label?: string;
     placeholder?: string;
     hint?: string;
+    hintId?: string;
     disabled?: boolean;
     hasExistingValue?: boolean;
   }
@@ -15,12 +16,14 @@
     label,
     placeholder = "Enter API key...",
     hint,
+    hintId,
     disabled = false,
     hasExistingValue = false,
   }: Props = $props();
 
   let showPassword = $state(false);
   let inputId = $state(`password-input-${Math.random().toString(36).slice(2, 9)}`);
+  let hintElementId = $derived(hintId || `password-hint-${inputId}`);
 
   function toggleVisibility(): void {
     showPassword = !showPassword;
@@ -66,6 +69,7 @@
       disabled={disabled}
       autocomplete="off"
       spellcheck="false"
+      aria-describedby={hint ? hintElementId : undefined}
     />
     <button
       type="button"
@@ -88,7 +92,7 @@
   </div>
 
   {#if hint}
-    <span class="password-input-hint">{hint}</span>
+    <span class="password-input-hint" id={hintElementId}>{hint}</span>
   {/if}
 </div>
 

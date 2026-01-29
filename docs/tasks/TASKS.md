@@ -386,9 +386,9 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.8 Testing & Documentation
 
-| ID     | Task                                      | Status  | Deps      | Notes |
-| ------ | ----------------------------------------- | ------- | --------- | ----- |
-| 19.8.1 | Add API tests for all config routes       | pending | 19.1-19.6 |       |
-| 19.8.2 | Add E2E tests for settings UI             | pending | 19.7      |       |
-| 19.8.3 | Update README with settings capabilities  | pending | 19.8.1    |       |
-| 19.8.4 | Add tooltips/help text for complex fields | pending | 19.7      |       |
+| ID     | Task                                      | Status | Deps      | Notes                                                                                  |
+| ------ | ----------------------------------------- | ------ | --------- | -------------------------------------------------------------------------------------- |
+| 19.8.1 | Add API tests for all config routes       | done   | 19.1-19.6 | 2026-01-28 153 tests in config.test.ts covering all daemon/query/api/hub/spokes routes |
+| 19.8.2 | Add E2E tests for settings UI             | done   | 19.7      | 2026-01-28 34 Playwright tests covering tabs, forms, spokes CRUD                       |
+| 19.8.3 | Update README with settings capabilities  | done   | 19.8.1    | 2026-01-28 Settings section with tabs table and config examples                        |
+| 19.8.4 | Add tooltips/help text for complex fields | done   | 19.7      | 2026-01-28 All fields have contextual hints in UI                                      |

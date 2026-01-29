@@ -1,15 +1,23 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Search as SearchIcon, Filter, X, ChevronDown } from "lucide-svelte";
+  import { Search as SearchIcon, Filter, X, ChevronDown, Clock, Hash, Trash2 } from "lucide-svelte";
   import SearchResultCard from "$lib/components/search-result-card.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
+  import LoadingState from "$lib/components/loading-state.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
   import type { SearchResult, NodeType, Outcome } from "$lib/types";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
+  import { focusTrap, createFocusTrap } from "$lib/utils/focus-trap";
+  import ErrorState from "$lib/components/error-state.svelte";
+  import { searchHistory } from "$lib/stores/search-history";
 
   let searchQuery = $state("");
   let results = $state<SearchResult[]>([]);
   let total = $state(0);
   let loading = $state(false);
+  let isDebouncing = $state(false);
   let errorMessage = $state<string | null>(null);
+  let isOfflineError = $state(false);
 
   // Filters
   let showFilters = $state(false);
@@ -44,20 +52,115 @@
   const allFields = ["summary", "decisions", "lessons", "tags", "topics"];
   let showFieldDropdown = $state(false);
   let fieldDropdownRef = $state<HTMLDivElement | null>(null);
+  let fieldDropdownMenuRef = $state<HTMLDivElement | null>(null);
+  let filterToggleRef = $state<HTMLButtonElement | null>(null);
+  let dropdownTriggerRef = $state<HTMLButtonElement | null>(null);
+  let filtersPanelRef = $state<HTMLDivElement | null>(null);
+  let focusTrapCleanup: (() => void) | null = null;
+  let filtersPanelTrapCleanup: (() => void) | null = null;
+
+  // Search suggestions state
+  let showSuggestions = $state(false);
+  let searchInputRef = $state<HTMLInputElement | null>(null);
+  let suggestionsRef = $state<HTMLDivElement | null>(null);
+  let selectedSuggestionIndex = $state(-1);
+  
+  // Popular tags extracted from results (updated after each search)
+  let popularTags = $state<string[]>([]);
 
   // Debounce timer
   let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  // Click outside handler for field dropdown
+  // Click outside handler for field dropdown and suggestions
   function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
+    
+    // Don't close field dropdown if clicking the trigger button itself
+    if (dropdownTriggerRef?.contains(target)) {
+      return;
+    }
+    
+    // Don't close if clicking inside the dropdown menu
+    if (fieldDropdownMenuRef?.contains(target)) {
+      return;
+    }
+    
     if (
       showFieldDropdown &&
       fieldDropdownRef &&
-      !fieldDropdownRef.contains(event.target as Node)
+      !fieldDropdownRef.contains(target)
     ) {
-      showFieldDropdown = false;
+      closeFieldDropdown();
+    }
+    
+    // Close suggestions if clicking outside
+    if (
+      showSuggestions &&
+      suggestionsRef &&
+      !suggestionsRef.contains(target) &&
+      searchInputRef &&
+      !searchInputRef.contains(target)
+    ) {
+      showSuggestions = false;
+      selectedSuggestionIndex = -1;
     }
   }
+
+  // Close field dropdown on Escape
+  function closeFieldDropdown() {
+    if (focusTrapCleanup) {
+      focusTrapCleanup();
+      focusTrapCleanup = null;
+    }
+    showFieldDropdown = false;
+    dropdownTriggerRef?.focus();
+  }
+
+  // Toggle field dropdown with focus trap
+  function toggleFieldDropdown() {
+    if (showFieldDropdown) {
+      closeFieldDropdown();
+    } else {
+      showFieldDropdown = true;
+      // Focus trap will be set up via $effect when dropdown renders
+    }
+  }
+
+  // Set up focus trap when field dropdown menu is rendered
+  $effect(() => {
+    if (showFieldDropdown && fieldDropdownMenuRef) {
+      focusTrapCleanup = createFocusTrap(fieldDropdownMenuRef, {
+        onEscape: closeFieldDropdown,
+        restoreFocus: dropdownTriggerRef,
+        autoFocus: true,
+      });
+    }
+    return () => {
+      if (focusTrapCleanup) {
+        focusTrapCleanup();
+        focusTrapCleanup = null;
+      }
+    };
+  });
+
+  // Set up focus trap when filters panel is rendered
+  $effect(() => {
+    if (showFilters && filtersPanelRef) {
+      filtersPanelTrapCleanup = createFocusTrap(filtersPanelRef, {
+        onEscape: () => {
+          showFilters = false;
+        },
+        restoreFocus: filterToggleRef,
+        autoFocus: true,
+      });
+    }
+    return () => {
+      if (filtersPanelTrapCleanup) {
+        filtersPanelTrapCleanup();
+        filtersPanelTrapCleanup = null;
+      }
+    };
+  });
 
   // Computed: check if any filters are active
   function hasActiveFilters(): boolean {
@@ -68,6 +171,112 @@
       selectedProject !== "" ||
       selectedTags.length > 0
     );
+  }
+
+  // Get suggestions for dropdown (recent searches + filtered by current query)
+  function getSuggestions(): { query: string; timestamp: number }[] {
+    const history = $searchHistory.entries;
+    if (!searchQuery.trim()) {
+      return history;
+    }
+    // Filter by current query prefix
+    const lower = searchQuery.toLowerCase();
+    return history.filter((e) => 
+      e.query.toLowerCase().includes(lower) && 
+      e.query.toLowerCase() !== lower
+    );
+  }
+
+  // Select a suggestion from the dropdown
+  function selectSuggestion(query: string): void {
+    searchQuery = query;
+    showSuggestions = false;
+    selectedSuggestionIndex = -1;
+    performSearch();
+  }
+
+  // Remove a search from history
+  function removeFromHistory(query: string, event: MouseEvent): void {
+    event.stopPropagation();
+    searchHistory.removeSearch(query);
+  }
+
+  // Handle keyboard navigation in suggestions
+  function handleSearchKeydown(event: KeyboardEvent): void {
+    const suggestions = getSuggestions();
+    
+    if (!showSuggestions || suggestions.length === 0) {
+      if (event.key === "ArrowDown" && $searchHistory.entries.length > 0) {
+        // Open suggestions on arrow down when closed
+        showSuggestions = true;
+        selectedSuggestionIndex = 0;
+        event.preventDefault();
+      }
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown": {
+        event.preventDefault();
+        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
+        break;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+        break;
+      }
+      case "Enter": {
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+          event.preventDefault();
+          selectSuggestion(suggestions[selectedSuggestionIndex].query);
+        }
+        break;
+      }
+      case "Escape": {
+        event.preventDefault();
+        showSuggestions = false;
+        selectedSuggestionIndex = -1;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  // Show suggestions when input is focused
+  function handleSearchFocus(): void {
+    if ($searchHistory.entries.length > 0 || popularTags.length > 0) {
+      showSuggestions = true;
+    }
+  }
+
+  // Extract popular tags from search results
+  function updatePopularTags(searchResults: SearchResult[]): void {
+    const tagCounts = new Map<string, number>();
+    
+    for (const result of searchResults) {
+      const {tags} = result.node.semantic;
+      for (const tag of tags) {
+        tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+      }
+    }
+    
+    // Sort by count and take top 8
+    popularTags = [...tagCounts.entries()]
+      .toSorted((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([tag]) => tag);
+  }
+
+  // Add a tag as a quick filter
+  function addQuickTag(tag: string): void {
+    if (!selectedTags.includes(tag)) {
+      selectedTags = [...selectedTags, tag];
+      showSuggestions = false;
+      performSearch();
+    }
   }
 
   function buildFilters(): Record<string, unknown> {
@@ -127,6 +336,7 @@
     loading = true;
     errorMessage = null;
     offset = 0; // Reset to first page on new search
+    showSuggestions = false; // Hide suggestions when searching
 
     try {
       const filters = buildFilters();
@@ -140,8 +350,15 @@
 
       ({ results } = response);
       ({ total } = response);
+      
+      // Save successful search to history
+      if (response.total > 0) {
+        searchHistory.addSearch(searchQuery);
+        updatePopularTags(response.results);
+      }
     } catch (error: unknown) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
       results = [];
@@ -156,8 +373,14 @@
       clearTimeout(searchTimeout);
     }
 
+    // Show debouncing state while typing
+    if (searchQuery.trim()) {
+      isDebouncing = true;
+    }
+
     // Debounce search by 300ms
     searchTimeout = setTimeout(() => {
+      isDebouncing = false;
       performSearch();
     }, 300);
   }
@@ -209,7 +432,8 @@
 
       results = [...results, ...response.results];
     } catch (error: unknown) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -232,41 +456,138 @@
   <meta name="description" content="Search pi-brain knowledge graph" />
 </svelte:head>
 
-<div class="search-page">
-  <header class="page-header">
-    <h1>Search</h1>
-    <p class="page-description">
+<div class="search-page page-animate">
+  <header class="page-header animate-in">
+    <h1 class="page-title">Search</h1>
+    <p class="page-subtitle page-description">
       Search across all nodes, lessons, decisions, and more in your knowledge graph
     </p>
   </header>
 
-  <!-- Search Box -->
-  <form class="search-box" role="search" onsubmit={handleSearchSubmit}>
-    <SearchIcon size={20} />
-    <input
-      type="search"
-      placeholder="Search summaries, lessons, decisions..."
-      bind:value={searchQuery}
-      oninput={handleSearchInput}
-    />
-    <button
-      type="button"
-      class="filter-toggle"
-      class:active={hasActiveFilters()}
-      onclick={() => (showFilters = !showFilters)}
-      aria-expanded={showFilters}
-      aria-label="Toggle filters"
-    >
-      <Filter size={20} />
-      {#if hasActiveFilters()}
-        <span class="filter-badge"></span>
+  <!-- Search Box with Suggestions -->
+  <div class="search-container">
+    <form class="search-box" class:debouncing={isDebouncing} role="search" onsubmit={handleSearchSubmit}>
+      {#if isDebouncing}
+        <div class="search-spinner"></div>
+      {:else}
+        <SearchIcon size={20} />
       {/if}
-    </button>
-  </form>
+      <input
+        type="search"
+        placeholder="Search summaries, lessons, decisions..."
+        bind:value={searchQuery}
+        bind:this={searchInputRef}
+        oninput={handleSearchInput}
+        onfocus={handleSearchFocus}
+        onkeydown={handleSearchKeydown}
+        autocomplete="off"
+        aria-autocomplete="list"
+        aria-controls="search-suggestions"
+        aria-expanded={showSuggestions}
+      />
+      <button
+        type="button"
+        class="filter-toggle"
+        class:active={hasActiveFilters()}
+        onclick={() => (showFilters = !showFilters)}
+        aria-expanded={showFilters}
+        aria-label="Toggle filters"
+        bind:this={filterToggleRef}
+      >
+        <Filter size={20} />
+        {#if hasActiveFilters()}
+          <span class="filter-badge"></span>
+        {/if}
+      </button>
+    </form>
+
+    <!-- Search Suggestions Dropdown -->
+    {#if showSuggestions && ($searchHistory.entries.length > 0 || popularTags.length > 0)}
+      <div 
+        class="suggestions-dropdown" 
+        id="search-suggestions"
+        role="listbox"
+        bind:this={suggestionsRef}
+      >
+        <!-- Recent Searches -->
+        {#if getSuggestions().length > 0}
+          <div class="suggestions-section">
+            <div class="suggestions-header">
+              <Clock size={14} />
+              <span>Recent searches</span>
+              {#if $searchHistory.entries.length > 0 && !searchQuery.trim()}
+                <button
+                  class="btn-text btn-text-danger"
+                  style="margin-left: auto; font-size: var(--text-xs);"
+                  onclick={() => searchHistory.clearHistory()}
+                  type="button"
+                >
+                  Clear all
+                </button>
+              {/if}
+            </div>
+            <ul class="suggestions-list">
+              {#each getSuggestions() as suggestion, index (suggestion.query)}
+                <li>
+                  <div
+                    class="suggestion-item"
+                    class:selected={index === selectedSuggestionIndex}
+                    role="option"
+                    aria-selected={index === selectedSuggestionIndex}
+                    tabindex="0"
+                    onclick={() => selectSuggestion(suggestion.query)}
+                    onkeydown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectSuggestion(suggestion.query);
+                      }
+                    }}
+                  >
+                    <SearchIcon size={14} />
+                    <span class="suggestion-text">{suggestion.query}</span>
+                    <button
+                      type="button"
+                      class="remove-suggestion"
+                      onclick={(e) => removeFromHistory(suggestion.query, e)}
+                      aria-label="Remove from history"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+
+        <!-- Popular Tags -->
+        {#if popularTags.length > 0}
+          <div class="suggestions-section">
+            <div class="suggestions-header">
+              <Hash size={14} />
+              <span>Popular tags</span>
+            </div>
+            <div class="quick-tags">
+              {#each popularTags as tag (tag)}
+                <button 
+                  type="button"
+                  class="quick-tag"
+                  class:active={selectedTags.includes(tag)}
+                  onclick={() => addQuickTag(tag)}
+                >
+                  #{tag}
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
 
   <!-- Filters Panel -->
   {#if showFilters}
-    <div class="filters-panel">
+    <div class="filters-panel" bind:this={filtersPanelRef}>
       <div class="filters-header">
         <h2>Filters</h2>
         {#if hasActiveFilters()}
@@ -289,7 +610,10 @@
           >
             <button
               class="dropdown-trigger"
-              onclick={() => (showFieldDropdown = !showFieldDropdown)}
+              bind:this={dropdownTriggerRef}
+              onclick={toggleFieldDropdown}
+              aria-haspopup="listbox"
+              aria-expanded={showFieldDropdown}
             >
               {selectedFields.length === 0
                 ? "All fields"
@@ -300,7 +624,11 @@
             </button>
 
             {#if showFieldDropdown}
-              <div class="dropdown-menu">
+              <div 
+                class="dropdown-menu" 
+                role="listbox"
+                bind:this={fieldDropdownMenuRef}
+              >
                 <label class="dropdown-option">
                   <input
                     type="checkbox"
@@ -393,31 +721,27 @@
   <!-- Search Results -->
   <div class="results-container">
     {#if loading && results.length === 0}
-      <div class="loading-state" role="status" aria-live="polite">
-        <div class="spinner"></div>
-        <p>Searching...</p>
-      </div>
+      <LoadingState message="Searching..." />
     {:else if errorMessage}
-      <div class="error-state">
-        <p>Search failed: {errorMessage}</p>
-        <button class="retry-button" onclick={performSearch}>Try again</button>
-      </div>
+      <ErrorState
+        variant={isOfflineError ? "offline" : "failed"}
+        title="Search failed"
+        description={errorMessage}
+        onRetry={performSearch}
+        showSettingsLink={isOfflineError}
+      />
     {:else if !searchQuery}
-      <div class="empty-state">
-        <SearchIcon size={48} />
-        <h2>Search your knowledge graph</h2>
-        <p>
-          Enter a query to search across summaries, lessons, decisions, and more.
-        </p>
-      </div>
+      <EmptyState
+        icon={SearchIcon}
+        title="Search your knowledge graph"
+        description="Enter a query to search across summaries, lessons, decisions, and more."
+      />
     {:else if results.length === 0}
-      <div class="empty-state">
-        <SearchIcon size={48} />
-        <h2>No results found</h2>
-        <p>
-          Try adjusting your search terms or filters to find what you're looking for.
-        </p>
-      </div>
+      <EmptyState
+        icon={SearchIcon}
+        title="No results found"
+        description="Try adjusting your search terms or filters to find what you're looking for."
+      />
     {:else}
       <div class="results-info" role="status" aria-live="polite">
         <p class="results-count">
@@ -432,7 +756,7 @@
       </div>
 
       {#if offset + limit < total}
-        <button class="load-more-button" onclick={loadMore} disabled={loading}>
+        <button class="btn-secondary btn-full" style="margin-top: var(--space-6);" onclick={loadMore} disabled={loading}>
           {loading ? "Loading..." : "Load more"}
         </button>
       {/if}
@@ -449,14 +773,15 @@
     margin-bottom: var(--space-6);
   }
 
-  .page-header h1 {
-    font-size: var(--text-3xl);
-    margin-bottom: var(--space-2);
-  }
-
   .page-description {
     color: var(--color-text-muted);
-    font-size: var(--text-base);
+    margin-bottom: 0;
+  }
+
+  /* Search Container */
+  .search-container {
+    position: relative;
+    margin-bottom: var(--space-6);
   }
 
   /* Search Box */
@@ -468,7 +793,6 @@
     background: var(--color-bg-elevated);
     border: 2px solid var(--color-border);
     border-radius: var(--radius-lg);
-    margin-bottom: var(--space-6);
     color: var(--color-text-muted);
     transition: border-color 0.15s ease;
   }
@@ -476,6 +800,20 @@
   .search-box:focus-within {
     border-color: var(--color-accent);
     color: var(--color-text);
+  }
+
+  .search-box.debouncing {
+    border-color: var(--color-accent-muted);
+  }
+
+  .search-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
   }
 
   .search-box input {
@@ -591,11 +929,6 @@
     cursor: pointer;
   }
 
-  .filter-group select:focus {
-    outline: none;
-    border-color: var(--color-accent);
-  }
-
   /* Field Dropdown */
   .field-dropdown {
     position: relative;
@@ -626,8 +959,10 @@
     left: 0;
     right: 0;
     z-index: 100;
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    background: rgba(20, 20, 23, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     padding: var(--space-2);
@@ -719,7 +1054,6 @@
   }
 
   .loading-state,
-  .error-state,
   .empty-state {
     display: flex;
     flex-direction: column;
@@ -730,8 +1064,7 @@
     text-align: center;
   }
 
-  .loading-state,
-  .error-state {
+  .loading-state {
     color: var(--color-text-muted);
   }
 
@@ -742,36 +1075,6 @@
   .empty-state h2 {
     font-size: var(--text-xl);
     margin-bottom: var(--space-2);
-  }
-
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .retry-button {
-    padding: var(--space-2) var(--space-4);
-    background: var(--color-accent);
-    border: none;
-    border-radius: var(--radius-md);
-    color: white;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .retry-button:hover {
-    background: var(--color-accent-hover);
   }
 
   .results-info {
@@ -789,27 +1092,144 @@
     gap: var(--space-3);
   }
 
-  .load-more-button {
-    display: block;
+  /* Search Suggestions Dropdown */
+  .suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(20, 20, 23, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: slideDown 0.15s ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .suggestions-section {
+    padding: var(--space-3);
+  }
+
+  .suggestions-section + .suggestions-section {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .suggestions-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     width: 100%;
-    margin-top: var(--space-6);
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-2);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
     color: var(--color-text);
     font-size: var(--text-sm);
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    text-align: left;
+    transition: background 0.15s ease;
   }
 
-  .load-more-button:hover:not(:disabled) {
+  .suggestion-item:hover,
+  .suggestion-item.selected {
+    background: var(--color-bg-hover);
+  }
+
+  .suggestion-item.selected {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .suggestion-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .remove-suggestion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1);
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-subtle);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+
+  .suggestion-item:hover .remove-suggestion,
+  .suggestion-item.selected .remove-suggestion {
+    opacity: 1;
+  }
+
+  .remove-suggestion:hover {
+    background: var(--color-bg);
+    color: var(--color-error);
+  }
+
+  /* Quick Tags */
+  .quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .quick-tag {
+    padding: var(--space-1) var(--space-2);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .quick-tag:hover {
     background: var(--color-bg-hover);
     border-color: var(--color-accent);
+    color: var(--color-text);
   }
 
-  .load-more-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .quick-tag.active {
+    background: var(--color-accent-muted);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
 </style>

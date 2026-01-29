@@ -26,7 +26,7 @@
 
   async function handleFeedback(id: string, feedback: string) {
     if (feedbackLoading[id]) {return;}
-    
+
     // Toggle logic: if clicking same feedback, clear it.
     const current = decisions.find(d => d.id === id)?.userFeedback;
     const newFeedback = current === feedback ? null : feedback;
@@ -34,7 +34,7 @@
     feedbackLoading[id] = true;
     try {
       await api.updateDecisionFeedback(id, newFeedback);
-      decisions = decisions.map(d => 
+      decisions = decisions.map(d =>
         d.id === id ? { ...d, userFeedback: newFeedback } : d
       );
     } catch (error) {
@@ -69,8 +69,8 @@
               {formatDistanceToNow(parseDate(decision.timestamp))}
             </span>
             <div class="decision-actions">
-               <button 
-                class="feedback-btn" 
+               <button
+                class="btn-icon-sm"
                 class:active={decision.userFeedback === 'good'}
                 onclick={() => handleFeedback(decision.id, 'good')}
                 title="Good decision"
@@ -78,8 +78,8 @@
               >
                 <ThumbsUp size={14} />
               </button>
-              <button 
-                class="feedback-btn" 
+              <button
+                class="btn-icon-sm"
                 class:active={decision.userFeedback === 'bad'}
                 onclick={() => handleFeedback(decision.id, 'bad')}
                 title="Bad decision"
@@ -89,7 +89,7 @@
               </button>
             </div>
           </div>
-          
+
           <div class="decision-content">
             <div class="decision-text">{decision.decision}</div>
             <div class="decision-reasoning">{decision.reasoning}</div>
@@ -112,7 +112,7 @@
     display: flex;
     flex-direction: column;
   }
-  
+
   .card-header {
     display: flex;
     justify-content: space-between;
@@ -167,34 +167,6 @@
     gap: var(--space-1);
   }
 
-  .feedback-btn {
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    color: var(--color-text-muted);
-    border-radius: var(--radius-sm);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .feedback-btn:hover {
-    background: var(--color-bg-hover);
-    color: var(--color-text);
-  }
-
-  .feedback-btn.active {
-    color: var(--color-accent);
-    background: var(--color-accent-muted);
-  }
-  
-  .feedback-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   .decision-content {
     margin-bottom: var(--space-2);
   }
@@ -224,7 +196,7 @@
     color: var(--color-text-muted);
     font-size: var(--text-sm);
   }
-  
+
   .error {
     color: var(--color-error);
   }

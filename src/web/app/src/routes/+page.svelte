@@ -1,20 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import {
-    Activity,
-    Zap,
-    DollarSign,
     TrendingDown,
     TrendingUp,
     CircleAlert,
-    AlertTriangle,
-    BookOpen,
     Lightbulb,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
-  import type { 
-    DashboardStats, 
+  import type {
+    DashboardStats,
     Node,
     AggregatedFailurePattern,
     AggregatedLessonPattern,
@@ -25,7 +20,16 @@
   import DaemonDecisions from "$lib/components/dashboard/daemon-decisions.svelte";
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
-  import Spinner from "$lib/components/spinner.svelte";
+  import GettingStarted from "$lib/components/getting-started.svelte";
+  import ErrorState from "$lib/components/error-state.svelte";
+  import DashboardSkeleton from "$lib/components/dashboard/dashboard-skeleton.svelte";
+  import QuickActions from "$lib/components/quick-actions.svelte";
+  import TokenSparkline from "$lib/components/dashboard/token-sparkline.svelte";
+  import Card from "$lib/components/card.svelte";
+  import CardHeader from "$lib/components/card-header.svelte";
+  import TableSortIcon from "$lib/components/table-sort-icon.svelte";
+  import Tag from "$lib/components/tag.svelte";
+  import StatusDot from "$lib/components/status-dot.svelte";
 
   // State
   let stats = $state<DashboardStats | null>(null);
@@ -35,12 +39,110 @@
     tool: string;
     errorType: string;
     count: number;
+    models?: string;
   }[]>([]);
   let failurePatterns = $state<AggregatedFailurePattern[]>([]);
   let lessonPatterns = $state<AggregatedLessonPattern[]>([]);
   let modelStats = $state<AggregatedModelStats[]>([]);
+  let timeSeriesData = $state<{
+    date: string;
+    tokens: number;
+    cost: number;
+    nodes: number;
+  }[]>([]);
   let loading = $state(true);
   let errorMessage = $state<string | null>(null);
+  let isOfflineError = $state(false);
+  let timeSeriesLoading = $state(false);
+
+  // Sorting state
+  let toolErrorSort = $state<{ column: string; direction: "asc" | "desc" }>({
+    column: "count",
+    direction: "desc",
+  });
+
+  let modelStatsSort = $state<{ column: string; direction: "asc" | "desc" }>({
+    column: "lastUsed",
+    direction: "desc",
+  });
+
+  // Sort functions
+  function sortToolErrors(column: string) {
+    if (toolErrorSort.column === column) {
+      toolErrorSort.direction = toolErrorSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      toolErrorSort.column = column;
+      toolErrorSort.direction = "desc";
+    }
+  }
+
+  function sortModelStats(column: string) {
+    if (modelStatsSort.column === column) {
+      modelStatsSort.direction = modelStatsSort.direction === "asc" ? "desc" : "asc";
+    } else {
+      modelStatsSort.column = column;
+      modelStatsSort.direction = "desc";
+    }
+  }
+
+  // Derived sorted data
+  const sortedToolErrors = $derived.by(() => {
+    const sorted = [...toolErrors];
+    const { column, direction } = toolErrorSort;
+    
+    sorted.sort((a, b) => {
+      // @ts-expect-error - dynamic column access
+      const aVal = a[column] ?? "";
+      // @ts-expect-error - dynamic column access
+      const bVal = b[column] ?? "";
+      
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+      
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      
+      if (aStr < bStr) {
+        return direction === "asc" ? -1 : 1;
+      }
+      if (aStr > bStr) {
+        return direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+    
+    return sorted;
+  });
+
+  const sortedModelStats = $derived.by(() => {
+    const sorted = [...modelStats];
+    const { column, direction } = modelStatsSort;
+    
+    sorted.sort((a, b) => {
+      // @ts-expect-error - dynamic column access
+      const aVal = a[column] ?? "";
+      // @ts-expect-error - dynamic column access
+      const bVal = b[column] ?? "";
+      
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+      
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      
+      if (aStr < bStr) {
+        return direction === "asc" ? -1 : 1;
+      }
+      if (aStr > bStr) {
+        return direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+    
+    return sorted;
+  });
 
   // Auto-refresh when new nodes are created
   $effect(() => {
@@ -62,7 +164,7 @@
       const toolErrorsRes = await api.getToolErrorStats();
       toolErrors = toolErrorsRes.byTool.map(t => ({
         tool: t.tool,
-        errorType: "various", 
+        errorType: "various",
         count: t.count,
         models: t.models?.join(", ")
       })).slice(0, 10);
@@ -79,15 +181,39 @@
       const modelsRes = await api.getModelStats();
       modelStats = modelsRes;
 
+      // Fetch time series data for sparklines
+      await fetchTimeSeriesData();
+
     } catch (error) {
       console.error("Failed to refresh dashboard data:", error);
       errorMessage = getErrorMessage(error);
+      isOfflineError = isBackendOffline(error);
     } finally {
       if (!silent) {
         loading = false;
       }
     }
   }
+
+  // Fetch time series data
+  async function fetchTimeSeriesData() {
+    timeSeriesLoading = true;
+    try {
+      const res = await api.getTimeSeries(7);
+      timeSeriesData = res.data;
+    } catch (error) {
+      console.error("Failed to fetch time series data:", error);
+      // Don't fail entire dashboard if time series fails
+      timeSeriesData = [];
+    } finally {
+      timeSeriesLoading = false;
+    }
+  }
+
+  // Extract tokens and costs from time series data
+  const tokensTimeSeries = $derived.by(() => timeSeriesData.map((d) => d.tokens));
+
+  const costsTimeSeries = $derived.by(() => timeSeriesData.map((d) => d.cost * 100)); // Multiply by 100 for better visibility in sparkline
 
   onMount(async () => {
     await refreshDashboardData();
@@ -149,110 +275,124 @@
 </svelte:head>
 
 <div class="dashboard">
-  <header class="page-header">
-    <h1>Dashboard</h1>
-  </header>
-
   {#if errorMessage}
-    <div class="error-banner" role="alert">
-      <AlertTriangle size={20} />
-      {errorMessage}
-    </div>
+    <ErrorState
+      variant={isOfflineError ? "offline" : "failed"}
+      description={errorMessage}
+      onRetry={refreshDashboardData}
+      showSettingsLink={isOfflineError}
+    />
   {:else if loading}
-    <div class="loading" role="status" aria-live="polite">
-      <Spinner message="Loading dashboard..." />
-    </div>
+    <DashboardSkeleton />
   {:else if stats}
-    <!-- Quick Stats -->
-    <section class="stats-grid" aria-label="Quick statistics">
-      <div class="stat-card">
-        <div class="stat-icon">
-          <Activity size={20} />
+    {#if stats.totals.nodes === 0}
+      <!-- Empty State: No data yet -->
+      <section class="dashboard-empty">
+        <GettingStarted variant="dashboard" />
+      </section>
+    {:else}
+    <!-- Hero Section with Key Stats -->
+    <section class="dashboard-hero hero-animate">
+      <div class="hero-content">
+        <div class="hero-text">
+          <span class="overline">Knowledge Graph</span>
+          <h1 class="hero-title">Dashboard</h1>
+          <p class="hero-subtitle">Your coding sessions, decisions, and lessons at a glance</p>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{stats.totals.nodes}</div>
-          <div class="stat-label">Total Nodes</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon accent">
-          <Zap size={20} />
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">{stats.recent.nodesThisWeek}</div>
-          <div class="stat-label">This Week</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">
-          <Activity size={20} />
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">
-            {stats.usage.totalTokens.toLocaleString()}
+        <div class="hero-stats list-animate">
+          <div class="hero-stat">
+            <div class="hero-stat-value">{stats.totals.nodes}</div>
+            <div class="hero-stat-label">Total Nodes</div>
           </div>
-          <div class="stat-label">Total Tokens</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon success">
-          <DollarSign size={20} />
-        </div>
-        <div class="stat-content">
-          <div class="stat-value">
-            ${stats.usage.totalCost.toFixed(2)}
+          <div class="hero-stat accent">
+            <div class="hero-stat-value">{stats.recent.nodesThisWeek}</div>
+            <div class="hero-stat-label">This Week</div>
           </div>
-          <div class="stat-label">Total Cost</div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">{stats.usage.totalTokens.toLocaleString()}</div>
+            <div class="hero-stat-label">Total Tokens</div>
+          </div>
+          <div class="hero-stat success">
+            <div class="hero-stat-value">${stats.usage.totalCost.toFixed(2)}</div>
+            <div class="hero-stat-label">Total Cost</div>
+          </div>
         </div>
       </div>
+      <div class="hero-glow"></div>
     </section>
 
     <!-- Main Content Grid -->
-    <div class="dashboard-grid">
+    <div class="dashboard-grid card-grid-animate">
+      <!-- Quick Actions -->
+      <QuickActions />
+
+      <!-- Usage Sparklines -->
+      <TokenSparkline tokens={tokensTimeSeries} costs={costsTimeSeries} loading={timeSeriesLoading} />
+
       <!-- Tool Errors Panel -->
-      <section class="card tool-errors-panel">
-        <div class="card-header">
-          <h2 class="card-title">Tool Errors by Model</h2>
-          <a href="/search?type=error" class="view-all">View all →</a>
-        </div>
+      <Card tag="section" variant="elevated" class="tool-errors-panel">
+        <CardHeader title="Tool Errors by Model" href="/search?type=error" />
 
         <div class="table-wrapper">
           <table class="data-table" aria-label="Tool errors grouped by model">
             <thead>
               <tr>
-                <th>Model</th>
-                <th>Tool</th>
-                <th>Error</th>
-                <th>Count</th>
+                <th
+                  class="sortable"
+                  class:sorted={toolErrorSort.column === "models"}
+                  onclick={() => sortToolErrors("models")}
+                >
+                  Model
+                  <TableSortIcon direction={toolErrorSort.column === "models" ? toolErrorSort.direction : null} />
+                </th>
+                <th
+                  class="sortable"
+                  class:sorted={toolErrorSort.column === "tool"}
+                  onclick={() => sortToolErrors("tool")}
+                >
+                  Tool
+                  <TableSortIcon direction={toolErrorSort.column === "tool" ? toolErrorSort.direction : null} />
+                </th>
+                <th
+                  class="sortable"
+                  class:sorted={toolErrorSort.column === "errorType"}
+                  onclick={() => sortToolErrors("errorType")}
+                >
+                  Error
+                  <TableSortIcon direction={toolErrorSort.column === "errorType" ? toolErrorSort.direction : null} />
+                </th>
+                <th
+                  class="sortable col-numeric"
+                  class:sorted={toolErrorSort.column === "count"}
+                  onclick={() => sortToolErrors("count")}
+                >
+                  Count
+                  <TableSortIcon direction={toolErrorSort.column === "count" ? toolErrorSort.direction : null} />
+                </th>
               </tr>
             </thead>
             <tbody>
-              {#each toolErrors as error}
+              {#each sortedToolErrors as error}
                 <tr>
-                  <td><code>{error.model}</code></td>
+                  <td><code>{error.models || error.model || "Unknown"}</code></td>
                   <td><code>{error.tool}</code></td>
                   <td>{error.errorType}</td>
-                  <td class="count">{error.count}</td>
+                  <td class="col-numeric count">{error.count}</td>
                 </tr>
               {/each}
-              {#if toolErrors.length === 0}
+              {#if sortedToolErrors.length === 0}
                 <tr>
-                  <td colspan="4" class="empty">No errors recorded</td>
+                  <td colspan="4" class="empty-state">No errors recorded</td>
                 </tr>
               {/if}
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
 
       <!-- Vague Goal Tracker -->
-      <section class="card vague-goal-panel">
-        <div class="card-header">
-          <h2 class="card-title">Vague Goal Tracker</h2>
-        </div>
+      <Card tag="section" variant="accent" class="vague-goal-panel">
+        <CardHeader title="Vague Goal Tracker" />
 
         <div class="vague-goal-content">
           <div class="vague-goal-metric">
@@ -295,15 +435,15 @@
             >View sessions →</a
           >
         </div>
-      </section>
+      </Card>
 
       <!-- Recent Activity -->
-      <section class="card recent-activity-panel">
+      <Card tag="section" variant="accent" class="recent-activity-panel">
         <div class="card-header">
           <h2 class="card-title">Recent Activity</h2>
         </div>
 
-        <ul class="activity-list">
+        <ul class="activity-list list-animate">
           {#each recentActivity as activity (activity.id)}
             <li class="activity-item">
               <a href="/nodes/{activity.id}" class="activity-link">
@@ -326,27 +466,24 @@
             <li class="empty-activity">No recent activity</li>
           {/if}
         </ul>
-      </section>
+      </Card>
 
       <!-- Daemon Decisions -->
       <DaemonDecisions />
 
       <!-- Daemon Status -->
-      <section class="card daemon-status-panel">
-        <div class="card-header">
-          <h2 class="card-title">Daemon Status</h2>
-        </div>
+      <Card tag="section" variant="featured" class="daemon-status-panel">
+        <CardHeader title="Daemon Status" />
 
         {#if $daemonStore.status}
           <div class="daemon-info">
             <div class="daemon-row">
               <span class="daemon-label">Status</span>
               <span class="daemon-value">
-                <span
-                  class="status-dot"
-                  class:success={$daemonStore.status.running}
-                  class:error={!$daemonStore.status.running}
-                ></span>
+                <StatusDot
+                  status={$daemonStore.status.running ? 'success' : 'error'}
+                  size={10}
+                />
                 {$daemonStore.status.running ? "Running" : "Stopped"}
               </span>
             </div>
@@ -389,22 +526,19 @@
             </div>
           </div>
         {/if}
-      </section>
+      </Card>
     </div>
 
     <!-- Patterns & Insights -->
-    <div class="patterns-grid">
+    <div class="patterns-grid card-grid-animate">
       <!-- Failure Patterns -->
       {#if failurePatterns.length > 0}
-        <section class="card failure-patterns-panel">
-          <div class="card-header">
-            <h2 class="card-title">Failure Patterns</h2>
-            <a href="/patterns/failures" class="view-all">View all →</a>
-          </div>
+        <Card tag="section" class="failure-patterns-panel">
+          <CardHeader title="Failure Patterns" href="/patterns/failures" />
 
-          <div class="patterns-list">
+          <div class="patterns-list list-animate">
             {#each failurePatterns as pattern}
-              <div class="pattern-card error">
+              <div class="pattern-card error card-interactive">
                 <div class="pattern-header">
                   <CircleAlert size={16} />
                   <span class="pattern-title">{pattern.pattern}</span>
@@ -421,20 +555,17 @@
               </div>
             {/each}
           </div>
-        </section>
+        </Card>
       {/if}
 
       <!-- Lesson Patterns -->
       {#if lessonPatterns.length > 0}
-        <section class="card lesson-patterns-panel">
-          <div class="card-header">
-            <h2 class="card-title">Lesson Patterns</h2>
-            <a href="/patterns/lessons" class="view-all">View all →</a>
-          </div>
+        <Card tag="section" class="lesson-patterns-panel">
+          <CardHeader title="Lesson Patterns" href="/patterns/lessons" />
 
-          <div class="patterns-list">
+          <div class="patterns-list list-animate">
             {#each lessonPatterns as pattern}
-              <div class="pattern-card success">
+              <div class="pattern-card success card-interactive">
                 <div class="pattern-header">
                   <Lightbulb size={16} />
                   <span class="pattern-title">{pattern.pattern}</span>
@@ -445,13 +576,13 @@
                 </div>
                 <div class="pattern-tags">
                   {#each pattern.tags as tag}
-                    <span class="tag">{tag}</span>
+                    <Tag text={tag} variant="auto" />
                   {/each}
                 </div>
               </div>
             {/each}
           </div>
-        </section>
+        </Card>
       {/if}
     </div>
 
@@ -463,35 +594,61 @@
 
     <!-- Model Stats -->
     {#if modelStats.length > 0}
-      <section class="card model-stats-panel">
-        <div class="card-header">
-          <h2 class="card-title">Model Reliability</h2>
-          <a href="/patterns/models" class="view-all">View all →</a>
-        </div>
+      <Card tag="section" variant="elevated" class="model-stats-panel">
+        <CardHeader title="Model Reliability" href="/patterns/models" />
 
         <div class="table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Model</th>
-                <th>Quirks</th>
-                <th>Errors</th>
-                <th>Last Used</th>
+                <th 
+                  class="sortable" 
+                  class:sorted={modelStatsSort.column === "model"} 
+                  onclick={() => sortModelStats("model")}
+                >
+                  Model
+                  <TableSortIcon direction={modelStatsSort.column === "model" ? modelStatsSort.direction : null} />
+                </th>
+                <th 
+                  class="sortable col-numeric" 
+                  class:sorted={modelStatsSort.column === "quirkCount"} 
+                  onclick={() => sortModelStats("quirkCount")}
+                >
+                  Quirks
+                  <TableSortIcon direction={modelStatsSort.column === "quirkCount" ? modelStatsSort.direction : null} />
+                </th>
+                <th 
+                  class="sortable col-numeric" 
+                  class:sorted={modelStatsSort.column === "errorCount"} 
+                  onclick={() => sortModelStats("errorCount")}
+                >
+                  Errors
+                  <TableSortIcon direction={modelStatsSort.column === "errorCount" ? modelStatsSort.direction : null} />
+                </th>
+                <th 
+                  class="sortable" 
+                  class:sorted={modelStatsSort.column === "lastUsed"} 
+                  onclick={() => sortModelStats("lastUsed")}
+                >
+                  Last Used
+                  <TableSortIcon direction={modelStatsSort.column === "lastUsed" ? modelStatsSort.direction : null} />
+                </th>
               </tr>
             </thead>
             <tbody>
-              {#each modelStats as stat}
+              {#each sortedModelStats as stat}
                 <tr>
                   <td><code>{stat.model}</code></td>
-                  <td>{stat.quirkCount}</td>
-                  <td class:count={stat.errorCount > 0}>{stat.errorCount}</td>
+                  <td class="col-numeric">{stat.quirkCount}</td>
+                  <td class="col-numeric" class:count={stat.errorCount > 0}>{stat.errorCount}</td>
                   <td>{formatDistanceToNow(parseDate(stat.lastUsed))}</td>
                 </tr>
               {/each}
             </tbody>
           </table>
         </div>
-      </section>
+      </Card>
+    {/if}
     {/if}
   {/if}
 </div>
@@ -501,91 +658,149 @@
     max-width: 1400px;
   }
 
-  .page-header {
-    margin-bottom: var(--space-6);
-  }
-
-  .page-header h1 {
-    font-size: var(--text-2xl);
-  }
-
-  .loading,
-  .error-banner {
-    padding: var(--space-8);
-    text-align: center;
-    background: var(--color-bg-elevated);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-  }
-
-  .error-banner {
-    color: var(--color-error);
-    border-color: var(--color-error);
+  /* Empty State */
+  .dashboard-empty {
+    padding: var(--space-8) var(--space-4);
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: var(--space-3);
   }
 
-  /* Stats Grid */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-4);
+  /* Hero Section */
+  .dashboard-hero {
+    position: relative;
+    padding: var(--space-8) var(--space-6);
     margin-bottom: var(--space-6);
-  }
-
-  @media (max-width: 1024px) {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 640px) {
-    .stats-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .stat-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4);
     background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
   }
 
-  .stat-icon {
-    width: 40px;
-    height: 40px;
+  .hero-content {
+    position: relative;
+    z-index: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-bg-hover);
-    border-radius: var(--radius-md);
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .hero-text {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .hero-title {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-black);
+    letter-spacing: var(--tracking-tighter);
+    margin-bottom: var(--space-2);
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-lg);
     color: var(--color-text-muted);
+    margin: 0;
   }
 
-  .stat-icon.accent {
-    background: var(--color-accent-muted);
+  .hero-stats {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    text-align: center;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-hover);
+    border-radius: var(--radius-lg);
+    min-width: 100px;
+    border: 1px solid var(--color-border-subtle);
+    transition: border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .hero-stat:hover {
+    border-color: var(--color-border);
+    transform: translateY(-1px);
+  }
+
+  .hero-stat.accent {
+    border-color: var(--color-accent-muted);
+    background: hsla(190, 100%, 50%, 0.05);
+  }
+
+  .hero-stat.accent .hero-stat-value {
     color: var(--color-accent);
   }
 
-  .stat-icon.success {
-    background: rgba(34, 197, 94, 0.1);
+  .hero-stat.success {
+    border-color: hsla(145, 65%, 52%, 0.3);
+    background: hsla(145, 65%, 52%, 0.05);
+  }
+
+  .hero-stat.success .hero-stat-value {
     color: var(--color-success);
   }
 
-  .stat-value {
+  .hero-stat-value {
     font-size: var(--text-2xl);
-    font-weight: 600;
+    font-weight: var(--font-bold);
+    color: var(--color-text);
+    line-height: 1;
+    margin-bottom: var(--space-1);
   }
 
-  .stat-label {
-    font-size: var(--text-sm);
+  .hero-stat-label {
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Decorative glow behind hero */
+  .hero-glow {
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0, 217, 255, 0.08) 0%,
+      transparent 60%
+    );
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-hero {
+      padding: var(--space-6) var(--space-4);
+    }
+
+    .hero-content {
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .hero-stats {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .hero-stat {
+      flex: 1;
+      min-width: 70px;
+      padding: var(--space-2) var(--space-3);
+    }
+
+    .hero-stat-value {
+      font-size: var(--text-lg);
+    }
   }
 
   /* Dashboard Grid */
@@ -608,44 +823,9 @@
   }
 
   /* Tool Errors Table */
-  .table-wrapper {
-    overflow-x: auto;
-  }
-
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--text-sm);
-  }
-
-  .data-table th,
-  .data-table td {
-    padding: var(--space-2) var(--space-3);
-    text-align: left;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .data-table th {
-    color: var(--color-text-muted);
-    font-weight: 500;
-    font-size: var(--text-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .data-table td code {
-    font-size: var(--text-xs);
-  }
-
   .data-table .count {
     font-weight: 600;
     color: var(--color-error);
-  }
-
-  .empty {
-    text-align: center;
-    color: var(--color-text-muted);
-    padding: var(--space-4);
   }
 
   /* Vague Goal Panel */
@@ -788,21 +968,6 @@
     font-weight: 500;
   }
 
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-text-muted);
-  }
-
-  .status-dot.success {
-    background: var(--color-success);
-  }
-
-  .status-dot.error {
-    background: var(--color-error);
-  }
-
   /* Patterns Grid */
   .patterns-grid {
     display: grid;
@@ -834,12 +999,12 @@
   }
 
   .pattern-card.error {
-    background: rgba(239, 68, 68, 0.05);
+    background: hsla(0, 72%, 72%, 0.05);
     border-color: var(--color-error);
   }
 
   .pattern-card.success {
-    background: rgba(34, 197, 94, 0.05);
+    background: hsla(145, 65%, 52%, 0.05);
     border-color: var(--color-success);
   }
 
@@ -888,14 +1053,6 @@
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-2);
-  }
-
-  .tag {
-    font-size: var(--text-xs);
-    padding: 2px 6px;
-    background: var(--color-bg-hover);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-muted);
   }
 
   /* Model Stats */

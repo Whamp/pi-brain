@@ -14,34 +14,36 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 1.1 Typography & Identity
 
-- [ ] **Replace Inter with distinctive font pairing**
+- [x] **Replace Inter with distinctive font pairing**
   - Display font: Something with character (e.g., Cabinet Grotesk, Satoshi, General Sans, or Geist)
   - Body font: Complementary readable sans
   - Code font: Keep JetBrains Mono or switch to Geist Mono
-- [ ] **Establish typographic scale with clear hierarchy**
+- [x] **Establish typographic scale with clear hierarchy**
   - Larger, bolder page titles
   - Distinct heading weights
   - Better line-height for readability
 
 ### 1.2 Color Palette Overhaul
 
-- [ ] **Replace generic blue accent (#3b82f6)**
+- [x] **Replace generic blue accent (#3b82f6)**
   - Consider: Vibrant cyan, electric purple, warm amber, or dual-tone accent
   - Accent should feel intentional, not default
-- [ ] **Design cohesive node type color system**
+  - Implemented: Electric cyan (#00d9ff) with hover (#33e4ff) and muted variants
+- [x] **Design cohesive node type color system**
   - Current colors are arbitrary; create a harmonious palette
   - Consider using HSL with consistent saturation/lightness
-- [ ] **Add gradient capability**
+  - Implemented: HSL palette with ~72% saturation, ~58-62% lightness, evenly distributed hues
+- [x] **Add gradient capability**
   - Subtle gradients for backgrounds, cards, or accent elements
   - Mesh gradients for hero sections
 
 ### 1.3 Layout & Spatial Design
 
-- [ ] **Make sidebar collapsible**
+- [x] **Make sidebar collapsible**
   - Icon-only collapsed state
   - Smooth animation
   - Persist preference
-- [ ] **Add visual variety to layouts**
+- [x] **Add visual variety to layouts**
   - Hero sections on key pages
   - Card elevation variations
   - Strategic use of full-bleed elements
@@ -52,68 +54,80 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 2.1 Mobile Navigation (P0 - Critical)
 
-- [ ] **Add mobile hamburger menu**
+- [x] **Add mobile hamburger menu**
   - Slide-out drawer with navigation
   - Touch-optimized tap targets (44px minimum)
   - Smooth open/close animation
-- [ ] **Make graph controls accessible on mobile**
+- [x] **Make graph controls accessible on mobile**
   - Move filters to bottom sheet or expandable panel
 
 ### 2.2 Empty States & Onboarding
 
-- [ ] **Add dashboard empty state**
+- [x] **Add dashboard empty state**
   - Show getting-started when no stats exist
   - Friendly illustration or icon
-- [ ] **Enhance error states**
+  - Implemented: Dashboard shows GettingStarted component with variant="dashboard" when stats.totals.nodes === 0
+- [x] **Enhance error states**
   - More helpful error messages
   - Contextual recovery actions
   - Softer visual treatment (not harsh red)
+  - Implemented: Softer coral error color (`hsl(0, 65%, 65%)`), error tokens (`--color-error-muted`, `--color-error-hover`), reusable `.inline-error` utility class in app.css
 
 ### 2.3 Loading States
 
-- [ ] **Create unified loading component**
+- [x] **Create unified loading component**
   - Single source of truth for spinner styles
   - Consistent usage across all pages
-- [ ] **Add skeleton loading**
+  - Implemented: Enhanced Spinner component with size variants (sm/md/lg/xl/number), variant prop (default/inline), added global .loading-state and .loading-overlay classes to app.css
+- [x] **Add skeleton loading**
   - Dashboard stats cards
   - Session list items
   - Node detail sections
-- [ ] **Add loading indicator during search debounce**
+  - Implemented: Created Skeleton component (skeleton.svelte), DashboardSkeleton (dashboard-skeleton.svelte), SessionsSkeleton (sessions-skeleton.svelte), NodeDetailSkeleton (node-detail-skeleton.svelte). Added skeleton utility classes to app.css. Updated dashboard, sessions, and node detail pages to use skeleton loading instead of spinner.
+- [x] **Add loading indicator during search debounce**
   - Subtle spinner or pulsing border on search box
+  - Implemented: Search icon replaced with spinner during 300ms debounce, border color changes to accent-muted
 
 ### 2.4 Navigation & Wayfinding
 
-- [ ] **Add consistent breadcrumb component**
+- [x] **Add consistent breadcrumb component**
   - Use across all detail pages
   - Node detail, session detail, cluster detail
-- [ ] **Make settings save actions sticky**
+  - Implemented: Enhanced Breadcrumbs component with icon and onClick support. Updated sessions page to use Breadcrumbs component instead of custom inline implementation. Node detail page already uses the component.
+- [x] **Make settings save actions sticky**
   - Fixed bottom bar when changes pending
-- [ ] **Add keyboard shortcuts**
+  - Implemented: Sticky save bar appears at bottom of viewport when `hasChanges` is true. Includes slide-up animation, pulsing unsaved indicator dot, and responsive layout for mobile. Bar has proper z-index and shadow for visibility.
+- [x] **Add keyboard shortcuts**
   - `/` to focus search
   - `g h` for home, `g g` for graph, etc.
   - Help modal with shortcut reference
+  - Implemented: Full keyboard shortcuts system with `keyboardShortcuts` store, navigation with `g` prefix (g h, g g, g s, g l, g e, g t), `/` to focus search, `?` to toggle help modal, Escape to close modals/clear focus. Help modal displays all shortcuts grouped by category with focus trap.
 
 ### 2.5 Search Improvements
 
-- [ ] **Add search suggestions/history**
+- [x] **Add search suggestions/history**
   - Recent searches
   - Popular tags as quick filters
-- [ ] **Fix filter dropdown focus management**
+  - Implemented: SearchHistory store with localStorage persistence, suggestions dropdown on focus, keyboard navigation (arrow keys, Enter, Escape), remove individual items, clear all history, popular tags from search results
+- [x] **Fix filter dropdown focus management**
   - Trap focus when open
   - Close on Escape key
   - Prevent toggle button from triggering close
+  - Implemented: Focus traps for field dropdown (fieldDropdownMenuRef) and filters panel (filtersPanelRef) using createFocusTrap utility. Escape key closes via onEscape callback. handleClickOutside prevents toggle button from triggering close by checking dropdownTriggerRef.contains(target).
 
 ### 2.6 Graph Improvements
 
-- [ ] **Add node tooltips on hover**
+- [x] **Add node tooltips on hover**
   - Show full summary, project, outcome
   - Smooth fade-in
-- [ ] **Complete the legend**
+- [x] **Complete the legend**
   - Show all 12 node types
   - Collapsible if too long
-- [ ] **Add empty state inside canvas**
+  - Implemented: Legend section with all 12 node types (coding, debugging, refactoring, planning, research, sysadmin, brainstorm, documentation, configuration, qa, handoff, other). Collapsible with chevron animation, persists visual state. Each type uses HSL color from design tokens.
+- [x] **Add empty state inside canvas**
   - Centered illustration
   - Call to action
+  - Implemented: Network icon with animated orbital rings, title, description, and two action buttons (Check Settings, View Sessions). Smooth pulse animation on orbits for visual interest.
 
 ---
 
@@ -121,56 +135,67 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 3.1 Motion & Micro-interactions
 
-- [ ] **Add page entrance animations**
+- [x] **Add page entrance animations**
   - Staggered fade-up for card grids
   - Subtle scale on page load
-- [ ] **Enhance button interactions**
+  - Implemented: Keyframes (fade-in, fade-up, scale-in, slide-in-left/right) with animation classes (.animate-in, .animate-fade, .animate-scale), stagger utilities (.stagger-1 through .stagger-12), container animations (.card-grid-animate, .list-animate, .hero-animate, .page-animate). Applied across all pages (dashboard, sessions, search, settings, graph, node detail). Respects prefers-reduced-motion.
+- [x] **Enhance button interactions**
   - Scale on press
   - Icon animations on hover
-- [ ] **Add toast variety**
+  - Implemented: Enhanced button base with spring easing, lift + shadow on hover for primary/secondary/gradient buttons, icon animation utilities (slide-right, slide-left, grow, rotate, bounce), shine effect class, pulse CTA animation, size variants (sm/lg), respects prefers-reduced-motion
+- [x] **Add toast variety**
   - Different entrance directions
   - Success: subtle confetti or pulse
-- [ ] **Improve graph animation**
+  - Implemented: Toast types have unique entrance animations (success drops from top, error/info slide from right, warning slides diagonal). Success toasts feature a pulse glow animation, subtle confetti burst particles, background gradient, and icon pop animation. Error icons shake, warning icons wobble. All toasts have type-colored progress bars. Respects prefers-reduced-motion.
+- [x] **Improve graph animation**
   - Node entrance animation (scale from 0)
   - Edge draw animation
   - Selection pulse effect
+  - Implemented: Nodes animate in with D3 easeBackOut transition from radius 0, staggered by 20ms per node. Edges animate with stroke-dasharray draw effect, staggered by 30ms. Selected nodes have pulsing glow animation. All animations respect prefers-reduced-motion.
 
 ### 3.2 Visual Depth & Texture
 
-- [ ] **Add background gradient or pattern**
+- [x] **Add background gradient or pattern**
   - Subtle radial gradient from accent color
   - Or: noise/grain texture overlay
-- [ ] **Increase shadow visibility**
+  - Implemented: Multi-layer radial gradients (accent, purple, green) with fixed positioning, combined with a noise texture and subtle grid pattern overlay using mix-blend-mode for depth. Applied globally via .bg-page-effects in layout.
+- [x] **Increase shadow visibility**
   - Adjust for dark theme visibility
   - Add inner shadows for depth
-- [ ] **Add glassmorphism to key elements**
+  - Implemented: Updated shadow variables with higher opacity, added --shadow-highlight and --shadow-inner, applied consistently to cards, buttons, modals, and sidebar for enhanced depth and definition.
+- [x] **Add glassmorphism to key elements**
   - Sidebar background
   - Floating controls
   - Modal overlays
 
 ### 3.3 Component Enhancements
 
-- [ ] **Create card variants**
+- [x] **Create card variants**
   - Elevated card (hero/featured)
   - Accent-bordered card
   - Interactive card with hover lift
-- [ ] **Enhance tables**
+- [x] **Enhance tables**
   - Row hover highlighting
   - Sortable column headers with icons
-- [ ] **Add tag color variants**
+  - Implemented: Added global `.data-table` styles to `app.css` with hover states, sortable header classes, and numeric alignment. Created `TableSortIcon` component. Implemented sorting logic and sortable headers in Dashboard (Tool Errors, Model Reliability) and Prompt Learning (History) pages.
+- [x] **Add tag color variants**
   - Different colors for different tag categories
   - Or: subtle hue variations
+  - Implemented: Added comprehensive tag color system to `app.css` with 10 color variants. Created `Tag.svelte` component with automatic deterministic color assignment based on tag text (hue variations). Updated all pages and components to use the new system.
 
 ### 3.4 Graph Visual Enhancements
 
-- [ ] **Add node glow effect**
+- [x] **Add node glow effect**
   - Subtle glow matching node color
   - Brighter glow on hover/selection
-- [ ] **Vary edge styling by type**
+  - Implemented: Added `--node-color` CSS property to nodes, applied dynamic `drop-shadow` filter to circles, updated selection pulse to use node-specific glow.
+- [x] **Vary edge styling by type**
   - Different stroke patterns (dashed, dotted)
   - Varying thickness by edge weight
-- [ ] **Add selection ring animation**
+  - Implemented: Edge style mapping by type with dynamic stroke-dasharray and weight-based stroke-width (similarity-driven for semantic edges).
+- [x] **Add selection ring animation**
   - Pulsing or rotating selection indicator
+  - Implemented: Added a premium dual-ring selection system with a rotating outer dashed ring and a pulsing inner solid ring. Uses CSS transforms for high-performance animation and smooth transitions.
 
 ---
 
@@ -178,24 +203,28 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 4.1 Color Contrast
 
-- [ ] **Audit text contrast ratios**
+- [x] **Audit text contrast ratios**
   - Verify muted/subtle text meets WCAG AA
   - Adjust if needed
-- [ ] **Add icons to status indicators**
+  - Implemented: Updated `--color-text-subtle` (#71717a -> #898991), `--color-node-other` (lightness 50% -> 60%), and `--color-error` (lightness 65% -> 72%) to meet WCAG AA 4.5:1 contrast on dark backgrounds. Cleaned up hardcoded light-mode colors in Prompt Learning and Dashboard pages.
+- [x] **Add icons to status indicators**
   - Don't rely on color alone
   - Status dots should have shape variants or icons
+  - Implemented: Created StatusDot component with Lucide icons (check, x, alert, info, circle-off) for different states. Applied in sidebar, dashboard, and mobile navigation.
 
 ### 4.2 Focus Management
 
-- [ ] **Add custom focus ring styles**
+- [x] **Add custom focus ring styles**
   - Visible, consistent focus indicators
   - Match accent color
-- [ ] **Trap focus in modals/dropdowns**
+  - Implemented: Global :focus-visible styles in app.css with accent color ring and subtle glow. Consolidated focus styles across components.
+- [x] **Trap focus in modals/dropdowns**
   - Implement focus trap utility
+  - Implemented: Focus trap utility in focus-trap.ts. Applied to ConfirmDialog, SpokeModal, MobileNav, and GraphControlsSheet. Search dropdowns already use it.
 
 ### 4.3 Form Accessibility
 
-- [ ] **Add aria-describedby for hints**
+- [x] **Add aria-describedby for hints**
   - Settings page form fields
   - Search filters
 
@@ -205,30 +234,33 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 5.1 Style Consolidation
 
-- [ ] **Deduplicate button styles**
+- [x] **Deduplicate button styles**
   - Single source in app.css
   - Remove page-level overrides
-- [ ] **Consolidate spinner/loading styles**
+  - Implemented: Added `.btn-outline`, `.btn-outline-color`, `.btn-text`, `.btn-text-danger`, `.btn-full`, `.btn-icon-sm`, `.btn-icon-bordered` to app.css. Replaced page-level button classes in search, decisions, prompt-learning, daemon-decisions, and spoke-list components. Removed all duplicate button style definitions.
+- [x] **Consolidate spinner/loading styles**
   - Use Spinner component everywhere
-- [ ] **Consolidate status dot styles**
+  - Implemented: Replaced all duplicate `.spinner` and `@keyframes spin` definitions with the unified `Spinner` component. Updated settings, search, prompt-learning, graph-controls-sheet, graph, spoke-list, and decisions pages/components.
+- [x] **Consolidate status dot styles**
   - Create StatusDot component
+  - Implemented: Created src/web/app/src/lib/components/status-dot.svelte and replaced inline status dots. Removed local CSS overrides.
 
 ### 5.2 Component Extraction
 
-- [ ] **Create CardHeader component**
+- [x] **Create CardHeader component**
   - Title + "View all" link pattern
-- [ ] **Create EmptyState component**
+- [x] **Create EmptyState component**
   - Icon, title, description, action slots
-- [ ] **Create LoadingState component**
+- [x] **Create LoadingState component**
   - Consistent loading presentation
 
 ### 5.3 Design Token Improvements
 
-- [ ] **Add z-index scale**
+- [x] **Add z-index scale**
   - `--z-dropdown`, `--z-modal`, `--z-toast`, etc.
-- [ ] **Add animation easing tokens**
+- [x] **Add animation easing tokens**
   - `--ease-out`, `--ease-spring`, etc.
-- [ ] **Add semantic color aliases**
+- [x] **Add semantic color aliases**
   - `--color-card-bg`, `--color-card-border`, etc.
 
 ---
@@ -237,38 +269,45 @@ A comprehensive overhaul of the pi-brain web interface to transform it from a fu
 
 ### 6.1 Theme Support
 
-- [ ] **Add light theme**
+- [x] **Add light theme**
   - Full color palette for light mode
   - System preference detection
   - Manual toggle in settings
 
 ### 6.2 Dashboard Enhancements
 
-- [ ] **Add sparkline charts**
+- [x] **Add sparkline charts**
   - Token usage over time
   - Cost trend
-- [ ] **Add quick actions**
+- [x] **Add quick actions**
   - Daemon start/stop
   - Trigger analysis
 
 ### 6.3 Graph Enhancements
 
-- [ ] **Add minimap**
+- [x] **Add minimap**
   - Small overview in corner
   - Click to navigate
-- [ ] **Add search within graph**
+- [x] **Add search within graph**
   - Jump to node by name
-- [ ] **Add layout options**
+- [x] **Add layout options**
   - Force-directed (current)
   - Hierarchical
   - Radial
 
 ### 6.4 Sessions Browser
 
-- [ ] **Add sort options**
+- [x] **Add sort options**
   - By date, tokens, cost, node count
-- [ ] **Add filter persistence**
+  - Implemented sorting for both Projects (name, sessionCount, nodeCount, lastActivity) and Sessions (date, nodeCount, tokens, cost)
+  - UI includes dropdown selector and direction toggle button with SortAsc/SortDesc icons
+  - Fixed all lint errors: proper switch-case braces, default cases, merged duplicate imports, use toSorted() instead of sort()
+- [x] **Add filter persistence**
   - Remember last filter state
+  - Uses localStorage key `pi-brain-sessions-prefs`
+  - Persists: projectSortBy, projectSortDir, sessionSortBy, sessionSortDir, lastViewedProject
+  - Loads on mount and saves when preferences change
+  - Automatically restores last viewed project on page load
 
 ---
 

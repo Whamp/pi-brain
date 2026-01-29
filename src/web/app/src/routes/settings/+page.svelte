@@ -13,9 +13,14 @@
     Server,
     Search,
     Layers,
+    Palette,
+    Monitor,
+    Sun,
+    Moon,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { toastStore } from "$lib/stores/toast";
+  import { themePreference, activeTheme } from "$lib/stores/theme";
   import type { SpokeConfig, SpokeCreateRequest, SpokeUpdateRequest } from "$lib/types";
   import TagInput from "$lib/components/tag-input.svelte";
   import PasswordInput from "$lib/components/password-input.svelte";
@@ -24,6 +29,8 @@
   import SpokeList from "$lib/components/spoke-list.svelte";
   import SpokeModal from "$lib/components/spoke-modal.svelte";
   import ConfirmDialog from "$lib/components/confirm-dialog.svelte";
+  import Card from "$lib/components/card.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
 
   interface Provider {
     id: string;
@@ -39,6 +46,7 @@
     { id: "query", label: "Query", icon: Search },
     { id: "api", label: "API Server", icon: Globe },
     { id: "hub", label: "Hub", icon: Database },
+    { id: "appearance", label: "Appearance", icon: Palette },
     { id: "spokes", label: "Spokes", icon: Server },
   ];
 
@@ -61,6 +69,10 @@
   // State
   let loading = $state(true);
   let saving = $state(false);
+
+  // Theme preference state
+  let themePreferenceValue = $state<"light" | "dark" | "system">("system");
+  let originalThemePreference = $state<"light" | "dark" | "system">("system");
 
   // Config values
   let provider = $state("");
@@ -204,7 +216,8 @@
     connectionDiscoverySchedule !== originalConnectionDiscoverySchedule ||
     patternAggregationSchedule !== originalPatternAggregationSchedule ||
     clusteringSchedule !== originalClusteringSchedule ||
-    backfillEmbeddingsSchedule !== originalBackfillEmbeddingsSchedule
+    backfillEmbeddingsSchedule !== originalBackfillEmbeddingsSchedule ||
+    themePreferenceValue !== originalThemePreference
   );
 
   // Warn before leaving with unsaved changes
@@ -215,6 +228,10 @@
   }
 
   onMount(async () => {
+    // Load theme preference
+    themePreferenceValue = $themePreference;
+    originalThemePreference = $themePreference;
+
     await Promise.all([
       loadConfig(),
       loadProviders(),
@@ -487,6 +504,11 @@
       originalHubDatabaseDir = hubResult.databaseDir;
       originalHubWebUiPort = hubResult.webUiPort;
 
+      // Save theme preference if changed
+      if (themePreferenceValue !== originalThemePreference) {
+        saveTheme();
+      }
+
       toastStore.success(daemonResult.message);
     } catch (error) {
       console.error("Failed to save config:", error);
@@ -498,6 +520,11 @@
     } finally {
       saving = false;
     }
+  }
+
+  function saveTheme() {
+    themePreference.set(themePreferenceValue);
+    originalThemePreference = themePreferenceValue;
   }
 
   function resetConfig() {
@@ -535,6 +562,7 @@
     patternAggregationSchedule = originalPatternAggregationSchedule;
     clusteringSchedule = originalClusteringSchedule;
     backfillEmbeddingsSchedule = originalBackfillEmbeddingsSchedule;
+    themePreferenceValue = originalThemePreference;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -616,19 +644,18 @@
   <meta name="description" content="Configure pi-brain settings" />
 </svelte:head>
 
-<div class="settings-page">
-  <header class="page-header">
-    <h1>
-      <Settings size={28} />
+<div class="settings-page page-animate">
+  <header class="page-header animate-in">
+    <h1 class="page-title">
+      <Settings size={32} />
       Settings
     </h1>
-    <p class="page-description">Configure the pi-brain daemon and analysis settings</p>
+    <p class="page-subtitle">Configure the pi-brain daemon and analysis settings</p>
   </header>
 
   {#if loading}
     <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading configuration...</p>
+      <Spinner size="lg" message="Loading configuration..." />
     </div>
   {:else}
     <SettingsTabs
@@ -640,7 +667,7 @@
     <div class="tab-content">
       <!-- Daemon Tab -->
       {#if activeTab === "daemon"}
-        <section class="settings-section" id="panel-daemon">
+        <Card tag="section" class="settings-section" id="panel-daemon">
           <h2>Daemon Agent Model</h2>
           <p class="section-description">
             Configure which AI model the daemon uses for session analysis
@@ -662,17 +689,17 @@
 
             <div class="form-group">
               <label for="model">Model</label>
-              <select id="model" bind:value={model}>
+              <select id="model" bind:value={model} aria-describedby="model-hint">
                 {#each availableModels as m}
                   <option value={m}>{m}</option>
                 {/each}
               </select>
-              <span class="hint">The model used for analyzing sessions</span>
+              <span class="hint" id="model-hint">The model used for analyzing sessions</span>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section class="settings-section">
+        <Card tag="section" class="settings-section">
           <h2>Daemon Behavior</h2>
           <p class="section-description">
             Configure how the daemon processes sessions
@@ -687,9 +714,10 @@
                 bind:value={idleTimeoutMinutes}
                 min="1"
                 max="1440"
+                aria-describedby="idleTimeout-hint"
               />
-              <span class="hint">
-                Wait time after session activity before analyzing
+              <span class="hint" id="idleTimeout-hint">
+                Minutes to wait after last activity before considering a session idle. Set higher to batch more edits into one analysis, lower for faster insights.
               </span>
             </div>
 
@@ -701,13 +729,14 @@
                 bind:value={parallelWorkers}
                 min="1"
                 max="10"
+                aria-describedby="parallelWorkers-hint"
               />
-              <span class="hint">Number of concurrent analysis workers</span>
+              <span class="hint" id="parallelWorkers-hint">Concurrent analysis workers. Higher = faster processing but more API costs. Recommended: 1-3.</span>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section class="settings-section">
+        <Card tag="section" class="settings-section">
           <h2>Analysis Execution</h2>
           <p class="section-description">
             Fine-tune timeouts and retry logic for analysis jobs
@@ -722,8 +751,9 @@
                 bind:value={analysisTimeoutMinutes}
                 min="1"
                 max="120"
+                aria-describedby="analysisTimeout-hint"
               />
-              <span class="hint">Max time allowed for a single analysis job</span>
+              <span class="hint" id="analysisTimeout-hint">Maximum minutes for a single analysis job before timeout. Long sessions may need higher values (30-60).</span>
             </div>
 
             <div class="form-group">
@@ -734,8 +764,9 @@
                 bind:value={maxConcurrentAnalysis}
                 min="1"
                 max="10"
+                aria-describedby="maxConcurrent-hint"
               />
-              <span class="hint">Limit concurrent API calls to providers</span>
+              <span class="hint" id="maxConcurrent-hint">Parallel LLM API calls. Keep low to avoid rate limits. Match with parallel workers.</span>
             </div>
 
             <div class="form-group">
@@ -746,8 +777,9 @@
                 bind:value={maxRetries}
                 min="0"
                 max="10"
+                aria-describedby="maxRetries-hint"
               />
-              <span class="hint">Number of times to retry failed jobs</span>
+              <span class="hint" id="maxRetries-hint">How many times to retry a failed job. Set to 0 to disable retries. Uses exponential backoff.</span>
             </div>
 
             <div class="form-group">
@@ -758,13 +790,14 @@
                 bind:value={retryDelaySeconds}
                 min="1"
                 max="3600"
+                aria-describedby="retryDelay-hint"
               />
-              <span class="hint">Wait time before retrying a failed job</span>
+              <span class="hint" id="retryDelay-hint">Base delay in seconds before retrying. Increases exponentially with each retry attempt.</span>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section class="settings-section">
+        <Card tag="section" class="settings-section">
           <h2>Queue & Limits</h2>
           <p class="section-description">
             Manage queue capacity and processing limits
@@ -779,8 +812,9 @@
                 bind:value={maxQueueSize}
                 min="10"
                 max="10000"
+                aria-describedby="maxQueueSize-hint"
               />
-              <span class="hint">Maximum number of pending jobs in queue</span>
+              <span class="hint" id="maxQueueSize-hint">Maximum pending jobs before new ones are dropped. Higher values use more memory.</span>
             </div>
 
             <div class="form-group">
@@ -791,8 +825,9 @@
                 bind:value={backfillLimit}
                 min="1"
                 max="1000"
+                aria-describedby="backfillLimit-hint"
               />
-              <span class="hint">Max jobs to process during backfill</span>
+              <span class="hint" id="backfillLimit-hint">Sessions per run when generating missing embeddings. Higher = faster catchup, more API costs.</span>
             </div>
 
             <div class="form-group">
@@ -803,13 +838,14 @@
                 bind:value={reanalysisLimit}
                 min="1"
                 max="1000"
+                aria-describedby="reanalysisLimit-hint"
               />
-              <span class="hint">Max jobs for nightly reanalysis</span>
+              <span class="hint" id="reanalysisLimit-hint">Max jobs for nightly reanalysis</span>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section class="settings-section">
+        <Card tag="section" class="settings-section">
           <h2>Connection Discovery</h2>
           <p class="section-description">
             Configure how the daemon discovers connections between sessions
@@ -824,8 +860,9 @@
                 bind:value={connectionDiscoveryLimit}
                 min="1"
                 max="1000"
+                aria-describedby="connLimit-hint"
               />
-              <span class="hint">Max nodes to check for connections per run</span>
+              <span class="hint" id="connLimit-hint">Max nodes to check for connections per run</span>
             </div>
 
             <div class="form-group">
@@ -836,8 +873,9 @@
                 bind:value={connectionDiscoveryLookbackDays}
                 min="1"
                 max="365"
+                aria-describedby="connLookback-hint"
               />
-              <span class="hint">How far back to check for related sessions</span>
+              <span class="hint" id="connLookback-hint">How far back to check for related sessions</span>
             </div>
 
             <div class="form-group">
@@ -848,13 +886,14 @@
                 bind:value={connectionDiscoveryCooldownHours}
                 min="1"
                 max="168"
+                aria-describedby="connCooldown-hint"
               />
-              <span class="hint">Min time between discovery runs for a node</span>
+              <span class="hint" id="connCooldown-hint">Min time between discovery runs for a node</span>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section class="settings-section">
+        <Card tag="section" class="settings-section">
           <h2>Semantic Search</h2>
           <p class="section-description">
             Configure parameters for vector-based semantic search
@@ -871,17 +910,18 @@
                   min="0"
                   max="1"
                   step="0.05"
+                  aria-describedby="semanticThreshold-hint"
                 />
                 <span class="range-value">{semanticSearchThreshold.toFixed(2)}</span>
               </div>
-              <span class="hint">Minimum similarity score (0.0 - 1.0) for matches</span>
+              <span class="hint" id="semanticThreshold-hint">Minimum similarity score (0.0 - 1.0) for matches</span>
             </div>
           </div>
-        </section>
+        </Card>
 
       <!-- Embeddings Tab -->
       {:else if activeTab === "embeddings"}
-        <section class="settings-section" id="panel-embeddings">
+        <Card tag="section" class="settings-section" id="panel-embeddings">
           <h2>Embedding Configuration</h2>
           <p class="section-description">
             Configure the embedding provider for semantic search and connection discovery
@@ -893,12 +933,13 @@
               <select
                 id="embeddingProvider"
                 bind:value={embeddingProvider}
+                aria-describedby="embeddingProvider-hint"
               >
                 <option value="ollama">Ollama (Local)</option>
                 <option value="openai">OpenAI</option>
                 <option value="openrouter">OpenRouter</option>
               </select>
-              <span class="hint">Embedding service to use for vector generation</span>
+              <span class="hint" id="embeddingProvider-hint">Embedding service to use for vector generation</span>
             </div>
 
             <div class="form-group">
@@ -908,8 +949,9 @@
                 id="embeddingModel"
                 bind:value={embeddingModel}
                 placeholder={embeddingProvider === "ollama" ? "nomic-embed-text" : "text-embedding-3-small"}
+                aria-describedby="embeddingModel-hint"
               />
-              <span class="hint">
+              <span class="hint" id="embeddingModel-hint">
                 {#if embeddingProvider === "ollama"}
                   e.g., nomic-embed-text, mxbai-embed-large
                 {:else if embeddingProvider === "openai"}
@@ -940,8 +982,9 @@
                   id="embeddingBaseUrl"
                   bind:value={embeddingBaseUrl}
                   placeholder={embeddingProvider === "openai" ? "https://api.openai.com/v1" : "https://openrouter.ai/api/v1"}
+                  aria-describedby="embeddingBaseUrl-hint"
                 />
-                <span class="hint">Override the default API endpoint</span>
+                <span class="hint" id="embeddingBaseUrl-hint">Override the default API endpoint</span>
               </div>
 
               <div class="form-group">
@@ -953,16 +996,17 @@
                   placeholder="Auto"
                   min="1"
                   max="10000"
+                  aria-describedby="embeddingDimensions-hint"
                 />
-                <span class="hint">Override embedding vector size (leave empty for default)</span>
+                <span class="hint" id="embeddingDimensions-hint">Override embedding vector size (leave empty for default)</span>
               </div>
             </div>
           {/if}
-        </section>
+        </Card>
 
       <!-- Schedules Tab -->
       {:else if activeTab === "schedules"}
-        <section class="settings-section" id="panel-schedules">
+        <Card tag="section" class="settings-section" id="panel-schedules">
           <h2>Background Task Schedules</h2>
           <p class="section-description">
             Configure when nightly background tasks run. Uses standard cron syntax.
@@ -999,11 +1043,11 @@
               hint="When to generate embeddings for nodes missing them"
             />
           </div>
-        </section>
+        </Card>
 
       <!-- Query Tab -->
       {:else if activeTab === "query"}
-        <section class="settings-section" id="panel-query">
+        <Card tag="section" class="settings-section" id="panel-query">
           <h2>Query Configuration</h2>
           <p class="section-description">
             Configure the AI model used for /brain queries
@@ -1015,29 +1059,30 @@
               <select
                 id="queryProvider"
                 bind:value={queryProvider}
+                aria-describedby="queryProvider-hint"
               >
                 {#each providers as p}
                   <option value={p.id}>{p.name}</option>
                 {/each}
               </select>
-              <span class="hint">Provider for /brain query responses</span>
+              <span class="hint" id="queryProvider-hint">Provider for /brain query responses</span>
             </div>
 
             <div class="form-group">
               <label for="queryModel">Model</label>
-              <select id="queryModel" bind:value={queryModel}>
+              <select id="queryModel" bind:value={queryModel} aria-describedby="queryModel-hint">
                 {#each providers.find((p) => p.id === queryProvider)?.models ?? [] as m}
                   <option value={m}>{m}</option>
                 {/each}
               </select>
-              <span class="hint">Model used to answer /brain queries</span>
+              <span class="hint" id="queryModel-hint">Model used to answer /brain queries</span>
             </div>
           </div>
-        </section>
+        </Card>
 
       <!-- API Server Tab -->
       {:else if activeTab === "api"}
-        <section class="settings-section" id="panel-api">
+        <Card tag="section" class="settings-section" id="panel-api">
           <h2>API Server Configuration</h2>
           <p class="section-description">
             Configure the pi-brain API server settings
@@ -1052,8 +1097,9 @@
                 bind:value={apiPort}
                 min="1024"
                 max="65535"
+                aria-describedby="apiPort-hint"
               />
-              <span class="hint">Port the API server listens on (default: 8765)</span>
+              <span class="hint" id="apiPort-hint">Port the API server listens on (default: 8765)</span>
             </div>
 
             <div class="form-group">
@@ -1063,8 +1109,9 @@
                 id="apiHost"
                 bind:value={apiHost}
                 placeholder="localhost"
+                aria-describedby="apiHost-hint"
               />
-              <span class="hint">Address to bind the server to (e.g. localhost, 0.0.0.0)</span>
+              <span class="hint" id="apiHost-hint">Address to bind the server to (e.g. localhost, 0.0.0.0)</span>
             </div>
           </div>
 
@@ -1076,11 +1123,11 @@
               hint="Allowed origins for cross-origin requests. Press Enter to add."
             />
           </div>
-        </section>
+        </Card>
 
       <!-- Hub Tab -->
       {:else if activeTab === "hub"}
-        <section class="settings-section" id="panel-hub">
+        <Card tag="section" class="settings-section" id="panel-hub">
           <h2>Hub Configuration</h2>
           <p class="section-description">
             Configure core paths and hub settings
@@ -1098,8 +1145,9 @@
                 id="sessionsDir"
                 bind:value={hubSessionsDir}
                 placeholder="~/.pi/agent/sessions"
+                aria-describedby="sessionsDir-hint"
               />
-              <span class="hint">Path to where pi session files are stored</span>
+              <span class="hint" id="sessionsDir-hint">Path to where pi session files are stored</span>
             </div>
 
             <div class="form-group">
@@ -1109,8 +1157,9 @@
                 id="databaseDir"
                 bind:value={hubDatabaseDir}
                 placeholder="~/.pi-brain/data"
+                aria-describedby="databaseDir-hint"
               />
-              <span class="hint">Path to where the brain database and nodes are stored</span>
+              <span class="hint" id="databaseDir-hint">Path to where the brain database and nodes are stored</span>
             </div>
 
             <div class="form-group">
@@ -1121,11 +1170,74 @@
                 bind:value={hubWebUiPort}
                 min="1024"
                 max="65535"
+                aria-describedby="webUiPort-hint"
               />
-              <span class="hint">Port the Web UI dashboard runs on</span>
+              <span class="hint" id="webUiPort-hint">Port the Web UI dashboard runs on</span>
             </div>
           </div>
-        </section>
+        </Card>
+
+      <!-- Appearance Tab -->
+      {:else if activeTab === "appearance"}
+        <Card tag="section" class="settings-section" id="panel-appearance">
+          <h2>Theme</h2>
+          <p class="section-description">
+            Choose your preferred color scheme
+          </p>
+
+          <div class="theme-selector">
+            {#each ["system", "light", "dark"] as option}
+              <button
+                class="theme-option"
+                class:active={themePreferenceValue === option}
+                onclick={() => themePreferenceValue = option}
+                aria-pressed={themePreferenceValue === option}
+              >
+                <div class="theme-icon">
+                  {#if option === "system"}
+                    <Monitor size={24} />
+                  {:else if option === "light"}
+                    <Sun size={24} />
+                  {:else}
+                    <Moon size={24} />
+                  {/if}
+                </div>
+                <div class="theme-label">
+                  <span class="theme-name">
+                    {#if option === "system"}
+                      System
+                    {:else if option === "light"}
+                      Light
+                    {:else}
+                      Dark
+                    {/if}
+                  </span>
+                  <span class="theme-description">
+                    {#if option === "system"}
+                      Use your system preference
+                    {:else if option === "light"}
+                      Always use light mode
+                    {:else}
+                      Always use dark mode
+                    {/if}
+                  </span>
+                </div>
+                {#if themePreferenceValue === option}
+                  <div class="theme-check">
+                    <div class="check-mark"></div>
+                  </div>
+                {/if}
+              </button>
+            {/each}
+          </div>
+
+          <div class="theme-preview">
+            <h3>Preview</h3>
+            <p class="section-description">
+              The active theme is: <strong>{$activeTheme}</strong>
+            </p>
+          </div>
+        </Card>
 
       <!-- Spokes Tab -->
       {:else if activeTab === "spokes"}
@@ -1147,13 +1259,22 @@
       {/if}
     </div>
 
-    <!-- Save/Reset buttons (only show for non-spokes tabs since spokes save immediately) -->
-    {#if activeTab !== "spokes"}
-      <div class="actions">
+  {/if}
+</div>
+
+<!-- Sticky save bar - shows when there are pending changes (except on spokes tab) -->
+{#if hasChanges && activeTab !== "spokes" && !loading}
+  <div class="sticky-save-bar">
+    <div class="sticky-save-content">
+      <span class="unsaved-indicator">
+        <span class="unsaved-dot"></span>
+        You have unsaved changes
+      </span>
+      <div class="sticky-actions">
         <button
           class="btn-secondary"
           onclick={resetConfig}
-          disabled={!hasChanges || saving}
+          disabled={saving}
         >
           <RotateCcw size={16} />
           Reset
@@ -1161,15 +1282,15 @@
         <button
           class="btn-primary"
           onclick={saveConfig}
-          disabled={!hasChanges || saving}
+          disabled={saving}
         >
           <Save size={16} />
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
-    {/if}
-  {/if}
-</div>
+    </div>
+  </div>
+{/if}
 
 <!-- Spoke Modal -->
 <SpokeModal
@@ -1205,12 +1326,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-2);
-  }
-
-  .page-description {
-    color: var(--color-text-muted);
   }
 
   .loading-state {
@@ -1222,29 +1337,11 @@
     color: var(--color-text-muted);
   }
 
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
   .tab-content {
     margin-top: var(--space-4);
   }
 
   .settings-section {
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
     padding: var(--space-6);
     margin-bottom: var(--space-4);
   }
@@ -1289,6 +1386,113 @@
     gap: var(--space-6);
   }
 
+  /* Theme Selector */
+  .theme-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .theme-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+    position: relative;
+  }
+
+  .theme-option:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-accent);
+  }
+
+  .theme-option.active {
+    background: var(--color-accent-muted);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+  }
+
+  .theme-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    transition: color 0.15s ease;
+  }
+
+  .theme-option:hover .theme-icon,
+  .theme-option.active .theme-icon {
+    color: var(--color-accent);
+  }
+
+  .theme-label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .theme-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .theme-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .theme-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    color: white;
+  }
+
+  .check-mark {
+    width: 12px;
+    height: 6px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg);
+    margin-top: -2px;
+  }
+
+  .theme-preview {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .theme-preview h3 {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+
+  .theme-preview strong {
+    color: var(--color-accent);
+  }
+
   .form-group {
     display: flex;
     flex-direction: column;
@@ -1316,13 +1520,6 @@
 
   .form-group input[type="range"] {
     padding: 0;
-  }
-
-  .form-group select:focus,
-  .form-group input[type="number"]:focus,
-  .form-group input[type="text"]:focus {
-    outline: none;
-    border-color: var(--color-accent);
   }
 
   .form-group .hint {
@@ -1406,5 +1603,92 @@
   .btn-secondary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  /* Sticky save bar */
+  .sticky-save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--color-bg-elevated);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    animation: slide-up 0.2s ease-out;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .sticky-save-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .unsaved-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .unsaved-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(0.9);
+    }
+  }
+
+  .sticky-actions {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  /* Adjust page padding to account for sticky bar when visible */
+  :global(body:has(.sticky-save-bar)) .settings-page {
+    padding-bottom: calc(var(--space-12) + 60px);
+  }
+
+  /* On smaller screens, stack the bar content vertically */
+  @media (max-width: 480px) {
+    .sticky-save-content {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .sticky-actions {
+      width: 100%;
+    }
+
+    .sticky-actions button {
+      flex: 1;
+    }
   }
 </style>

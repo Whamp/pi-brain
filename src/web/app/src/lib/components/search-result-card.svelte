@@ -2,6 +2,8 @@
   import type { SearchResult, NodeType, Outcome } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import SafeHighlight from "./safe-highlight.svelte";
+  import Card from "./card.svelte";
+  import Tag from "./tag.svelte";
 
   interface Props {
     result: SearchResult;
@@ -79,7 +81,7 @@
   const timeAgo = $derived(formatDistanceToNow(parseDate(node.metadata.timestamp)));
 </script>
 
-<a href="/nodes/{node.id}" class="result-card">
+<Card href="/nodes/{node.id}" interactive class="result-card">
   <div class="result-header">
     <div class="result-score">
       <span class="score-value">{Math.round(result.score * 100)}%</span>
@@ -113,27 +115,17 @@
   {#if node.semantic.tags.length > 0}
     <div class="tags">
       {#each node.semantic.tags.slice(0, 5) as tag}
-        <span class="tag">#{tag}</span>
+        <Tag text={`#${tag}`} variant="auto" />
       {/each}
     </div>
   {/if}
-</a>
+</Card>
 
 <style>
   .result-card {
     display: block;
-    padding: var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
     text-decoration: none;
     color: inherit;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-
-  .result-card:hover {
-    border-color: var(--color-accent);
-    background: var(--color-bg-hover);
   }
 
   .result-header {
@@ -234,14 +226,5 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
-  }
-
-  .tag {
-    padding: 2px 8px;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border-subtle);
-    border-radius: 4px;
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
   }
 </style>

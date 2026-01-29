@@ -633,19 +633,19 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-165]
+src/api/routes/stats.ts [1-260]
   function:
-    16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 17 [call: 11, type: 6]
+    16-250: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 33 [call: 25, type: 8]
         - src/api/routes/stats.ts:16: type FastifyInstance -> external
         - src/api/routes/stats.ts:16: type Promise -> external
         - src/api/routes/stats.ts:20: call get -> external
         - src/api/routes/stats.ts:20: type FastifyRequest -> external
         - src/api/routes/stats.ts:20: type FastifyReply -> external
-    160-164: countEdges(db: Database.Database): number
+    255-259: countEdges(db: Database.Database): number
       /** Count edges in the database */
       refs out: 1 [type: 1]
-        - src/api/routes/stats.ts:160: type Database -> external
+        - src/api/routes/stats.ts:255: type Database -> external
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -1026,4 +1026,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 28
-Estimated tokens: 12,201 (codebase: ~1,146,834)
+Estimated tokens: 12,201 (codebase: ~1,164,272)

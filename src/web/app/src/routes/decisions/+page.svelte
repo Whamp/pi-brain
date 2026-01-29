@@ -1,13 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { BrainCircuit, ThumbsUp, ThumbsDown, Filter, X } from "lucide-svelte";
+  import { BrainCircuit, ThumbsUp, ThumbsDown, Filter, X, FileX } from "lucide-svelte";
+  import Spinner from "$lib/components/spinner.svelte";
+  import LoadingState from "$lib/components/loading-state.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import type { DaemonDecisionEntity } from "$lib/types";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
+  import ErrorState from "$lib/components/error-state.svelte";
 
   let decisions: DaemonDecisionEntity[] = $state([]);
   let loading = $state(true);
   let errorMessage: string | null = $state(null);
+  let isOfflineError = $state(false);
   let feedbackLoading: Record<string, boolean> = $state({});
 
   // Pagination
@@ -53,7 +58,8 @@
       ({ total } = res);
     } catch (error) {
       console.error("Failed to load decisions:", error);
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -125,11 +131,11 @@
 <div class="decisions-page">
   <header class="page-header">
     <div class="header-left">
-      <h1>
-        <BrainCircuit size={28} />
+      <h1 class="page-title">
+        <BrainCircuit size={32} />
         Daemon Decisions
       </h1>
-      <p class="page-description">
+      <p class="page-subtitle">
         Review and provide feedback on autonomous daemon decisions
       </p>
     </div>
@@ -205,21 +211,20 @@
   </div>
 
   {#if loading && decisions.length === 0}
-    <div class="loading-state" role="status" aria-live="polite">
-      <div class="spinner"></div>
-      <p>Loading decisions...</p>
-    </div>
+    <LoadingState message="Loading decisions..." />
   {:else if errorMessage}
-    <div class="error-state">
-      <p>{errorMessage}</p>
-      <button class="retry-button" onclick={loadDecisions}>Retry</button>
-    </div>
+    <ErrorState
+      variant={isOfflineError ? "offline" : "failed"}
+      description={errorMessage}
+      onRetry={loadDecisions}
+      showSettingsLink={isOfflineError}
+    />
   {:else if decisions.length === 0}
-    <div class="empty-state">
-      <BrainCircuit size={48} />
-      <h2>No decisions found</h2>
-      <p>The daemon hasn't made any decisions yet, or none match your filters.</p>
-    </div>
+    <EmptyState
+      icon={BrainCircuit}
+      title="No decisions found"
+      description="The daemon hasn't made any decisions yet, or none match your filters."
+    />
   {:else}
     <ul class="decision-list">
       {#each decisions as decision}
@@ -230,7 +235,7 @@
             </span>
             <div class="decision-actions">
               <button
-                class="feedback-btn"
+                class="btn-icon-bordered"
                 class:active={decision.userFeedback === "good"}
                 onclick={() => handleFeedback(decision.id, "good")}
                 title="Good decision"
@@ -239,7 +244,7 @@
                 <ThumbsUp size={16} />
               </button>
               <button
-                class="feedback-btn"
+                class="btn-icon-bordered"
                 class:active={decision.userFeedback === "bad"}
                 onclick={() => handleFeedback(decision.id, "bad")}
                 title="Bad decision"
@@ -267,7 +272,7 @@
     </ul>
 
     {#if offset + limit < total}
-      <button class="load-more-button" onclick={loadMore} disabled={loading}>
+      <button class="btn-secondary btn-full" style="margin-top: var(--space-6);" onclick={loadMore} disabled={loading}>
         {loading ? "Loading..." : "Load more"}
       </button>
     {/if}
@@ -290,13 +295,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-2);
-  }
-
-  .page-description {
-    color: var(--color-text-muted);
-    font-size: var(--text-base);
   }
 
   .filter-toggle {
@@ -403,12 +401,6 @@
     cursor: pointer;
   }
 
-  .filter-group select:focus,
-  .filter-group input[type="date"]:focus {
-    outline: none;
-    border-color: var(--color-accent);
-  }
-
   /* Results Info */
   .results-info {
     margin-bottom: var(--space-4);
@@ -421,7 +413,6 @@
 
   /* States */
   .loading-state,
-  .error-state,
   .empty-state {
     display: flex;
     flex-direction: column;
@@ -437,36 +428,6 @@
     font-size: var(--text-xl);
     color: var(--color-text);
     margin-bottom: var(--space-2);
-  }
-
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .retry-button {
-    padding: var(--space-2) var(--space-4);
-    background: var(--color-accent);
-    border: none;
-    border-radius: var(--radius-md);
-    color: white;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .retry-button:hover {
-    background: var(--color-accent-hover);
   }
 
   /* Decision List */
@@ -503,36 +464,6 @@
     gap: var(--space-2);
   }
 
-  .feedback-btn {
-    background: none;
-    border: 1px solid var(--color-border);
-    padding: var(--space-2);
-    cursor: pointer;
-    color: var(--color-text-muted);
-    border-radius: var(--radius-md);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .feedback-btn:hover {
-    background: var(--color-bg-hover);
-    color: var(--color-text);
-    border-color: var(--color-text-subtle);
-  }
-
-  .feedback-btn.active {
-    color: var(--color-accent);
-    background: var(--color-accent-muted);
-    border-color: var(--color-accent);
-  }
-
-  .feedback-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   .decision-content {
     margin-bottom: var(--space-3);
   }
@@ -563,29 +494,5 @@
     border-radius: var(--radius-sm);
     color: var(--color-text-muted);
     font-family: var(--font-mono);
-  }
-
-  .load-more-button {
-    display: block;
-    width: 100%;
-    margin-top: var(--space-6);
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .load-more-button:hover:not(:disabled) {
-    background: var(--color-bg-hover);
-    border-color: var(--color-accent);
-  }
-
-  .load-more-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 </style>

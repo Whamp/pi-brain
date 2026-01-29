@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 90,
-    "totalSymbols": 1171,
+    "totalFiles": 95,
+    "totalSymbols": 1199,
     "byLanguage": {
-      "typescript": 90
+      "typescript": 95
     },
     "bySymbolKind": {
-      "function": 523,
-      "type": 44,
-      "interface": 274,
-      "variable": 121,
+      "function": 534,
+      "type": 45,
+      "interface": 278,
+      "variable": 133,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 40226,
-  "codebase_tokens": 1159465,
+  "total_tokens": 40913,
+  "codebase_tokens": 1248564,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1942,7 +1942,7 @@
       "language": "typescript",
       "lines": [
         1,
-        165
+        260
       ],
       "detail_level": "full",
       "token_estimate": 92,
@@ -1953,7 +1953,7 @@
           "signature": "async statsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             16,
-            155
+            250
           ],
           "exported": true,
           "is_default": false,
@@ -1971,8 +1971,8 @@
           "kind": "function",
           "signature": "countEdges(db: Database.Database): number",
           "lines": [
-            160,
-            164
+            255,
+            259
           ],
           "exported": false,
           "is_default": false,
@@ -22360,6 +22360,23 @@
       "imports": []
     },
     {
+      "path": "src/web/app/playwright.config.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        27
+      ],
+      "detail_level": "full",
+      "token_estimate": 19,
+      "symbols": [],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "@playwright/test"
+      ]
+    },
+    {
       "path": "src/web/app/src/app.d.ts",
       "language": "typescript",
       "lines": [
@@ -22379,7 +22396,7 @@
       "language": "typescript",
       "lines": [
         1,
-        724
+        739
       ],
       "detail_level": "full",
       "token_estimate": 345,
@@ -22713,7 +22730,7 @@
           "signature": "api",
           "lines": [
             223,
-            710
+            725
           ],
           "exported": true,
           "is_default": false,
@@ -22872,6 +22889,101 @@
       ]
     },
     {
+      "path": "src/web/app/src/lib/stores/keyboard-shortcuts.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        198
+      ],
+      "detail_level": "full",
+      "token_estimate": 126,
+      "symbols": [
+        {
+          "name": "Shortcut",
+          "kind": "interface",
+          "signature": "Shortcut",
+          "lines": [
+            7,
+            11
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Keyboard shortcut definition",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "KeyboardShortcutsState",
+          "kind": "interface",
+          "signature": "KeyboardShortcutsState",
+          "lines": [
+            16,
+            19
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Keyboard shortcuts store state",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createKeyboardShortcutsStore",
+          "kind": "function",
+          "signature": "createKeyboardShortcutsStore(): { subscribe: any; init: () => () => void; openHelp: () => void; closeHelp: () => void; getShortcuts: () => {}; }",
+          "lines": [
+            21,
+            195
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "keyboardShortcuts",
+          "kind": "variable",
+          "signature": "keyboardShortcuts",
+          "lines": [
+            197,
+            197
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "$app/navigation",
+        "svelte/store"
+      ]
+    },
+    {
       "path": "src/web/app/src/lib/stores/nodes.ts",
       "language": "typescript",
       "lines": [
@@ -22983,6 +23095,422 @@
       "imports": [
         "$lib/api/client",
         "$lib/types",
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/search-history.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        106
+      ],
+      "detail_level": "full",
+      "token_estimate": 80,
+      "symbols": [
+        {
+          "name": "STORAGE_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-search-history\"",
+          "lines": [
+            8,
+            8
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_HISTORY_SIZE",
+          "kind": "variable",
+          "signature": "10",
+          "lines": [
+            9,
+            9
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SearchHistoryEntry",
+          "kind": "interface",
+          "signature": "SearchHistoryEntry",
+          "lines": [
+            11,
+            14
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SearchHistoryState",
+          "kind": "interface",
+          "signature": "SearchHistoryState",
+          "lines": [
+            16,
+            18
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createSearchHistoryStore",
+          "kind": "function",
+          "signature": "createSearchHistoryStore(): any",
+          "lines": [
+            20,
+            103
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "searchHistory",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            105,
+            105
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/theme.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        171
+      ],
+      "detail_level": "full",
+      "token_estimate": 197,
+      "symbols": [
+        {
+          "name": "Theme",
+          "kind": "type",
+          "signature": "Theme = \"light\" | \"dark\" | \"system\"",
+          "lines": [
+            10,
+            10
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "THEME_PREFERENCE_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-theme-preference\"",
+          "lines": [
+            13,
+            13
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SYSTEM_THEME_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-system-theme\"",
+          "lines": [
+            14,
+            14
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createThemePreferenceStore",
+          "kind": "variable",
+          "signature": "(): { subscribe: any; set: (value: Theme) => void; update: any; }",
+          "lines": [
+            17,
+            31
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "loadThemePreference",
+          "kind": "function",
+          "signature": "loadThemePreference(): Theme",
+          "lines": [
+            33,
+            48
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "saveThemePreference",
+          "kind": "function",
+          "signature": "saveThemePreference(theme: Theme): void",
+          "lines": [
+            50,
+            60
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createSystemThemeStore",
+          "kind": "variable",
+          "signature": "(): { subscribe: any; set: any; }",
+          "lines": [
+            63,
+            78
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "themePreference",
+          "kind": "variable",
+          "signature": "themePreference",
+          "lines": [
+            80,
+            80
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "systemTheme",
+          "kind": "variable",
+          "signature": "{ subscribe: any; set: any; }",
+          "lines": [
+            81,
+            81
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "activeTheme",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            85,
+            89
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "initTheme",
+          "kind": "function",
+          "signature": "initTheme(): () => void",
+          "lines": [
+            92,
+            120
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "updateSystemTheme",
+          "kind": "function",
+          "signature": "updateSystemTheme(theme: \"light\" | \"dark\"): void",
+          "lines": [
+            122,
+            136
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyTheme",
+          "kind": "function",
+          "signature": "applyTheme(theme: \"light\" | \"dark\"): void",
+          "lines": [
+            139,
+            156
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toggleTheme",
+          "kind": "function",
+          "signature": "toggleTheme(): void",
+          "lines": [
+            159,
+            170
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "svelte/store"
       ]
     },
@@ -23961,6 +24489,98 @@
           "parent_name": null,
           "annotation": null,
           "comment": "Parse a date string or Date object to Date",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
+    },
+    {
+      "path": "src/web/app/src/lib/utils/focus-trap.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        146
+      ],
+      "detail_level": "full",
+      "token_estimate": 265,
+      "symbols": [
+        {
+          "name": "FOCUSABLE_SELECTOR",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            6,
+            13
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Focus trap utility for modals, dropdowns, and panels.\nTraps focus within a container and handles Escape key to close.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getFocusableElements",
+          "kind": "function",
+          "signature": "getFocusableElements(container: HTMLElement): {}",
+          "lines": [
+            18,
+            20
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Gets all focusable elements within a container",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createFocusTrap",
+          "kind": "function",
+          "signature": "createFocusTrap(container: HTMLElement, options: {\n    /** Called when Escape key is pressed */\n    onEscape?: () => void;\n    /** Element to restore focus to when trap is removed */\n    restoreFocus?: HTMLElement | null;\n    /** Whether to focus the first element on activation (default: true) */\n    autoFocus?: boolean;\n  } = {}): () => void",
+          "lines": [
+            47,
+            121
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Creates a focus trap for a container element.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "focusTrap",
+          "kind": "function",
+          "signature": "focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; }",
+          "lines": [
+            127,
+            145
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Svelte action for focus trapping.\nUse as `use:focusTrap={{ onEscape: () => ... }}`",
           "incoming_refs": null,
           "outgoing_refs": null
         }

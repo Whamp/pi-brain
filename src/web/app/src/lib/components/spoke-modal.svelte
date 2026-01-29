@@ -1,6 +1,7 @@
 <script lang="ts">
   import { X, ChevronDown, ChevronUp } from "lucide-svelte";
   import type { SpokeConfig, SyncMethod, RsyncOptions } from "$lib/types";
+  import { focusTrap } from "$lib/utils/focus-trap";
   import CronInput from "./cron-input.svelte";
 
   interface Props {
@@ -145,12 +146,6 @@
     onsubmit(spokeData);
   }
 
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === "Escape") {
-      oncancel();
-    }
-  }
-
   function handleBackdropClick(event: MouseEvent) {
     if (event.target === event.currentTarget) {
       oncancel();
@@ -166,10 +161,10 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
+    tabindex="-1"
     onclick={handleBackdropClick}
-    onkeydown={handleKeydown}
   >
-    <div class="modal">
+    <div class="modal" use:focusTrap={{ onEscape: oncancel }}>
       <header class="modal-header">
         <h2 id="modal-title">
           {mode === "create" ? "Add Spoke" : `Edit Spoke: ${spoke?.name}`}
@@ -383,7 +378,9 @@
   .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -399,14 +396,16 @@
   }
 
   .modal {
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    background: rgba(20, 20, 23, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
     width: 100%;
     max-width: 500px;
     margin: var(--space-4);
     margin-bottom: 10vh;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-xl), var(--shadow-highlight);
     animation: slideUp 0.2s ease-out;
   }
 
@@ -490,12 +489,6 @@
     font-size: var(--text-sm);
     color: var(--color-text);
     transition: border-color 0.15s ease;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus {
-    outline: none;
-    border-color: var(--color-accent);
   }
 
   .form-group input.error,

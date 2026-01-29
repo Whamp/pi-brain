@@ -152,6 +152,101 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       return reply.send(successResponse(stats, durationMs));
     }
   );
+
+  /**
+   * GET /stats/timeseries - Time-series data for tokens and costs
+   */
+  app.get(
+    "/timeseries",
+    async (
+      request: FastifyRequest<{
+        Querystring: {
+          days?: string;
+        };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { db } = app.ctx;
+      const days = Number.parseInt(request.query.days ?? "7", 10);
+
+      // Calculate date range
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      // Get daily token/cost totals from database
+      const stmt = db.prepare(`
+        SELECT
+          DATE(timestamp) as date,
+          SUM(tokens_used) as tokens,
+          SUM(cost) as cost,
+          COUNT(*) as nodes
+        FROM nodes
+        WHERE timestamp >= ? AND timestamp <= ?
+        GROUP BY DATE(timestamp)
+        ORDER BY date ASC
+      `);
+
+      const rows = stmt.query(
+        startDate.toISOString(),
+        endDate.toISOString()
+      ) as {
+        date: string;
+        tokens: number;
+        cost: number;
+        nodes: number;
+      }[];
+
+      // Fill in missing dates with zeros
+      const result = [];
+      const currentDate = new Date(startDate);
+      currentDate.setHours(0, 0, 0, 0);
+
+      const endDateMidnight = new Date(endDate);
+      endDateMidnight.setHours(0, 0, 0, 0);
+
+      let rowIndex = 0;
+
+      while (currentDate <= endDateMidnight) {
+        const [dateStr] = currentDate.toISOString().split("T");
+
+        if (rowIndex < rows.length && rows[rowIndex].date === dateStr) {
+          result.push({
+            date: dateStr,
+            tokens: rows[rowIndex].tokens ?? 0,
+            cost: rows[rowIndex].cost ?? 0,
+            nodes: rows[rowIndex].nodes ?? 0,
+          });
+          rowIndex++;
+        } else {
+          result.push({
+            date: dateStr,
+            tokens: 0,
+            cost: 0,
+            nodes: 0,
+          });
+        }
+
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            data: result,
+            summary: {
+              totalTokens: result.reduce((sum, d) => sum + d.tokens, 0),
+              totalCost: result.reduce((sum, d) => sum + d.cost, 0),
+              totalNodes: result.reduce((sum, d) => sum + d.nodes, 0),
+            },
+          },
+          durationMs
+        )
+      );
+    }
+  );
 }
 
 /**

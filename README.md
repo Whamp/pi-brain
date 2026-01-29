@@ -115,7 +115,27 @@ Then in pi, you can use:
 
 ## Configuration
 
-pi-brain is configured via `~/.pi-brain/config.yaml`.
+pi-brain can be configured via the **Web UI Settings** page or by editing `~/.pi-brain/config.yaml` directly.
+
+### Web UI Settings
+
+Access all configuration options through the web dashboard at **Settings** (gear icon). The settings are organized into tabs:
+
+| Tab            | Description                                                           |
+| -------------- | --------------------------------------------------------------------- |
+| **Daemon**     | AI model for session analysis, worker count, timeouts, retry logic    |
+| **Embeddings** | Vector embedding provider (Ollama/OpenAI/OpenRouter), model, API keys |
+| **Schedules**  | Cron schedules for background tasks (reanalysis, clustering, etc.)    |
+| **Query**      | AI model used for `/brain` queries                                    |
+| **API Server** | Port, host, and CORS configuration                                    |
+| **Hub**        | Session and database directory paths                                  |
+| **Spokes**     | Multi-computer sync via rsync or Syncthing                            |
+
+All settings changes require a daemon restart to take effect (except spokes, which apply immediately).
+
+### Configuration File
+
+The config file is located at `~/.pi-brain/config.yaml`:
 
 ```yaml
 daemon:
@@ -129,6 +149,42 @@ daemon:
   embedding_api_key: sk-or-v1-...
   embedding_dimensions: 4096
   semantic_search_threshold: 0.5 # 0.0 to 1.0 (lower = stricter)
+
+  # Analysis behavior
+  idle_timeout_minutes: 10 # Wait before analyzing idle sessions
+  parallel_workers: 2 # Concurrent analysis workers
+  max_retries: 3 # Retry failed analysis jobs
+  retry_delay_seconds: 60 # Delay between retries
+  analysis_timeout_minutes: 10 # Timeout per job
+  max_concurrent_analysis: 2 # Concurrent LLM API calls
+
+query:
+  # LLM for /brain queries (can differ from daemon)
+  provider: anthropic
+  model: claude-3-5-sonnet-20240620
+
+api:
+  port: 8765
+  host: localhost
+  cors_origins:
+    - http://localhost:5173
+
+hub:
+  sessions_dir: ~/.pi/agent/sessions
+  database_dir: ~/.pi-brain/data
+  web_ui_port: 5173
+
+# Multi-computer sync
+spokes:
+  - name: laptop
+    sync_method: syncthing
+    path: /data/laptop-sessions
+    enabled: true
+  - name: server
+    sync_method: rsync
+    path: /data/server-sessions
+    source: user@server:~/.pi/sessions
+    schedule: "0 */6 * * *"
 ```
 
 ### Semantic Search

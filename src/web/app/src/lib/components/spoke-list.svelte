@@ -1,5 +1,8 @@
 <script lang="ts">
   import { Plus, Pencil, Trash2, Server, RefreshCw, Globe, Power, PowerOff } from "lucide-svelte";
+  import Spinner from "$lib/components/spinner.svelte";
+  import LoadingState from "$lib/components/loading-state.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
   import type { SpokeConfig } from "$lib/types";
 
   interface Props {
@@ -63,7 +66,8 @@
     </div>
     <button
       type="button"
-      class="btn-add"
+      class="btn-primary btn-sm btn-with-icon"
+      style="padding: var(--space-2) var(--space-3);"
       onclick={onadd}
       disabled={loading}
     >
@@ -73,24 +77,21 @@
   </div>
 
   {#if loading}
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading spokes...</p>
-    </div>
+    <LoadingState message="Loading spokes..." size="md" variant="sm" />
   {:else if spokes.length === 0}
-    <div class="empty-state">
-      <Server size={40} />
-      <h4>No Spokes Configured</h4>
-      <p>Add a spoke to sync session files from another computer.</p>
-      <button
-        type="button"
-        class="btn-primary"
-        onclick={onadd}
-      >
-        <Plus size={16} />
-        Add First Spoke
-      </button>
-    </div>
+    <EmptyState
+      icon={Server}
+      title="No Spokes Configured"
+      description="Add a spoke to sync session files from another computer."
+      size="sm"
+    >
+      {#snippet actions()}
+        <button type="button" class="btn btn-primary" onclick={onadd}>
+          <Plus size={16} />
+          Add First Spoke
+        </button>
+      {/snippet}
+    </EmptyState>
   {:else}
     <div class="spoke-items">
       {#each spokes as spoke (spoke.name)}
@@ -169,6 +170,7 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    min-height: 300px;
   }
 
   .spoke-list-header {
@@ -196,30 +198,6 @@
     color: var(--color-text-muted);
   }
 
-  .btn-add {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
-    background: var(--color-accent);
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: white;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .btn-add:hover:not(:disabled) {
-    background: var(--color-accent-hover);
-  }
-
-  .btn-add:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
   .loading-state {
     display: flex;
     flex-direction: column;
@@ -227,19 +205,6 @@
     gap: var(--space-3);
     padding: var(--space-8);
     color: var(--color-text-muted);
-  }
-
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
   }
 
   .empty-state {

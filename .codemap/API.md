@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 90 files
+- typescript: 95 files
 
 ## Statistics
-- Total files: 90
-- Total symbols: 669
-  - function: 373
+- Total files: 95
+- Total symbols: 680
+  - function: 378
   - interface: 211
-  - type: 41
-  - variable: 32
+  - type: 42
+  - variable: 37
   - class: 12
 
 ---
@@ -180,9 +180,9 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-165]
+src/api/routes/stats.ts [1-260]
   function:
-    16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    16-250: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -2030,9 +2030,13 @@ src/types/index.ts [1-661]
     548-548: ClusterSignalType = "friction" | "delight" | null [exported]
       /** Signal type a cluster relates to */
 
+src/web/app/playwright.config.ts [1-27]
+  imports:
+    - @playwright/test
+
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-724]
+src/web/app/src/lib/api/client.ts [1-739]
   function:
     68-77: createApiError(options: ApiErrorOptions): Error [exported]
     79-83: createTimeoutError(timeoutMs: number): Error [exported]
@@ -2047,7 +2051,7 @@ src/web/app/src/lib/api/client.ts [1-724]
     135-152: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    223-710: api [exported]
+    223-725: api [exported]
   imports:
     - $lib/types
 
@@ -2068,6 +2072,13 @@ src/web/app/src/lib/stores/daemon.ts [1-132]
     - $lib/types
     - svelte/store
 
+src/web/app/src/lib/stores/keyboard-shortcuts.ts [1-198]
+  variable:
+    197-197: keyboardShortcuts [exported]
+  imports:
+    - $app/navigation
+    - svelte/store
+
 src/web/app/src/lib/stores/nodes.ts [1-112]
   variable:
     105-105: nodesStore [exported]
@@ -2075,6 +2086,26 @@ src/web/app/src/lib/stores/nodes.ts [1-112]
   imports:
     - $lib/api/client
     - $lib/types
+    - svelte/store
+
+src/web/app/src/lib/stores/search-history.ts [1-106]
+  variable:
+    105-105: any [exported]
+  imports:
+    - svelte/store
+
+src/web/app/src/lib/stores/theme.ts [1-171]
+  type:
+    10-10: Theme = "light" | "dark" | "system" [exported]
+  function:
+    92-120: initTheme(): () => void [exported]
+    139-156: applyTheme(theme: "light" | "dark"): void [exported]
+    159-170: toggleTheme(): void [exported]
+  variable:
+    80-80: themePreference [exported]
+    81-81: { subscribe: any; set: any; } [exported]
+    85-89: any [exported]
+  imports:
     - svelte/store
 
 src/web/app/src/lib/stores/toast.ts [1-114]
@@ -2138,6 +2169,20 @@ src/web/app/src/lib/utils/date.ts [1-94]
     91-93: parseDate(date: string | Date): Date [exported]
       /** Parse a date string or Date object to Date */
 
+src/web/app/src/lib/utils/focus-trap.ts [1-146]
+  function:
+    47-121: createFocusTrap(container: HTMLElement, options: {
+    /** Called when Escape key is pressed */
+    onEscape?: () => void;
+    /** Element to restore focus to when trap is removed */
+    restoreFocus?: HTMLElement | null;
+    /** Whether to focus the first element on activation (default: true) */
+    autoFocus?: boolean;
+  } = {}): () => void [exported]
+      /** Creates a focus trap for a container element. */
+    127-145: focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; } [exported]
+      /** Svelte action for focus trapping. Use as `use:focusTrap={{ onEscape: () => ... }}` */
+
 src/web/app/vite.config.ts [1-15]
   imports:
     - @sveltejs/kit/vite
@@ -2156,5 +2201,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 90
-Estimated tokens: 27,169 (codebase: ~1,143,509)
+Files: 95
+Estimated tokens: 27,564 (codebase: ~1,164,272)

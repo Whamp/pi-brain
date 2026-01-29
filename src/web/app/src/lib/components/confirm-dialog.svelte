@@ -1,5 +1,6 @@
 <script lang="ts">
   import { AlertTriangle, X } from "lucide-svelte";
+  import { focusTrap } from "$lib/utils/focus-trap";
 
   interface Props {
     open: boolean;
@@ -47,7 +48,7 @@
     onclick={handleBackdropClick}
     onkeydown={handleKeydown}
   >
-    <div class="dialog">
+    <div class="dialog" use:focusTrap={{ onEscape: oncancel }}>
       <header class="dialog-header">
         <div class="dialog-title-row">
           {#if variant === "danger" || variant === "warning"}
@@ -96,7 +97,9 @@
   .dialog-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -114,13 +117,15 @@
   }
 
   .dialog {
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    background: rgba(20, 20, 23, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-lg);
     width: 100%;
     max-width: 400px;
     margin: var(--space-4);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-xl), var(--shadow-highlight);
     animation: slideUp 0.2s ease-out;
   }
 
@@ -232,7 +237,7 @@
   }
 
   .btn-danger:hover {
-    background: var(--color-error-hover, #dc2626);
+    background: var(--color-error-hover);
   }
 
   .btn-warning {

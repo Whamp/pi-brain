@@ -280,6 +280,21 @@ export const api = {
       trends: { thisWeek: number; lastWeek: number; change: number };
     }>("/stats/tool-errors"),
 
+  getTimeSeries: (days = 7) =>
+    request<{
+      data: {
+        date: string;
+        tokens: number;
+        cost: number;
+        nodes: number;
+      }[];
+      summary: {
+        totalTokens: number;
+        totalCost: number;
+        totalNodes: number;
+      };
+    }>(`/stats/timeseries?days=${days}`),
+
   // Patterns
   getFailurePatterns: (options?: {
     limit?: number;

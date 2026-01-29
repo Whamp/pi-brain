@@ -10,6 +10,9 @@
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { AbandonedRestartPattern, FrictionSummary } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
+  import LoadingState from "$lib/components/loading-state.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
+  import Tag from "$lib/components/tag.svelte";
 
   // State
   let patterns: AbandonedRestartPattern[] = [];
@@ -90,17 +93,14 @@
       {errorMessage}
     </div>
   {:else if loading}
-    <div class="loading-state">
-      <Spinner message="Loading friction patterns..." />
-    </div>
+    <LoadingState message="Loading friction patterns..." size="md" variant="sm" />
   {:else if patterns.length === 0}
-    <div class="empty-state">
-      <RefreshCw size={32} />
-      <p>No abandoned restart patterns detected</p>
-      <span class="empty-hint"
-        >This is good! Users aren't abandoning and restarting tasks.</span
-      >
-    </div>
+    <EmptyState
+      icon={RefreshCw}
+      title="No abandoned restart patterns detected"
+      description="This is good! Users aren't abandoning and restarting tasks."
+      size="sm"
+    />
   {:else}
     <div class="patterns-content">
       {#if summary}
@@ -139,9 +139,11 @@
                 {truncateSummary(pattern.abandonedSummary)}
               </div>
               <div class="pattern-meta">
-                <span class="pattern-project"
-                  >{getProjectName(pattern.abandonedProject)}</span
-                >
+                <Tag 
+                  text={getProjectName(pattern.abandonedProject)} 
+                  variant="auto" 
+                  className="pattern-project" 
+                />
                 {#if pattern.model}
                   <span class="separator">•</span>
                   <code class="pattern-model">{pattern.model}</code>
@@ -355,10 +357,6 @@
 
   .separator {
     color: var(--color-text-subtle);
-  }
-
-  .pattern-project {
-    font-weight: 500;
   }
 
   .pattern-model {

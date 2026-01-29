@@ -1,11 +1,13 @@
 <script lang="ts">
   import { X } from "lucide-svelte";
+  import TagComponent from "./tag.svelte";
 
   interface Props {
     value: string[];
     label?: string;
     placeholder?: string;
     hint?: string;
+    hintId?: string;
     disabled?: boolean;
   }
 
@@ -14,12 +16,14 @@
     label,
     placeholder = "Type and press Enter...",
     hint,
+    hintId,
     disabled = false,
   }: Props = $props();
 
   let newTag = $state("");
   let inputElement: HTMLInputElement | undefined;
   let inputId = $state(`tag-input-${Math.random().toString(36).slice(2, 9)}`);
+  let hintElementId = $derived(hintId || `tag-hint-${inputId}`);
 
   function addTag(): void {
     const trimmed = newTag.trim();
@@ -54,7 +58,7 @@
 
   <div class="tag-container">
     {#each value as tag, i}
-      <span class="tag" class:disabled={disabled}>
+      <TagComponent variant="accent" className={disabled ? 'disabled' : ''}>
         <span class="tag-text">{tag}</span>
         <button
           type="button"
@@ -65,7 +69,7 @@
         >
           <X size={12} />
         </button>
-      </span>
+      </TagComponent>
     {/each}
 
     <input
@@ -77,11 +81,12 @@
       disabled={disabled}
       onkeydown={handleKeydown}
       aria-label="Add new tag"
+      aria-describedby={hint ? hintElementId : undefined}
     />
   </div>
 
   {#if hint}
-    <span class="tag-input-hint">{hint}</span>
+    <span class="tag-input-hint" id={hintElementId}>{hint}</span>
   {/if}
 </div>
 
@@ -118,30 +123,6 @@
 
   .tag-container:focus-within {
     border-color: var(--color-accent);
-  }
-
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1-5);
-    padding: var(--space-1) var(--space-2);
-    background: var(--color-accent-muted);
-    color: var(--color-accent);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-sm);
-    border: 1px solid var(--color-accent-muted);
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .tag:hover:not(.disabled) {
-    background: var(--color-accent-hover);
-    border-color: var(--color-accent-hover);
-    color: white;
-  }
-
-  .tag.disabled {
-    opacity: 0.6;
-    pointer-events: none;
   }
 
   .tag-text {
