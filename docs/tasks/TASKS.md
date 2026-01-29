@@ -355,8 +355,8 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 | ID     | Task                                            | Status  | Deps           | Notes      |
 | ------ | ----------------------------------------------- | ------- | -------------- | ---------- |
-| 19.5.1 | Add schedule fields to daemon routes            | active  | -              | 2026-01-28 |
-| 19.5.2 | Add cron validation using isValidCronExpression | pending | 19.5.1         |            |
+| 19.5.1 | Add schedule fields to daemon routes            | done    | -              | 2026-01-28 |
+| 19.5.2 | Add cron validation using isValidCronExpression | done    | 19.5.1         | 2026-01-28 |
 | 19.5.3 | Create CronInput component with presets         | pending | -              |            |
 | 19.5.4 | Add Schedules section to settings UI            | pending | 19.5.1, 19.5.3 |            |
 

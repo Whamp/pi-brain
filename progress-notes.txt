@@ -460,3 +460,28 @@ the reactivity chain.
   - Verified with npm test -- --run (1407 passed)
 **Commit**: efd94c42
 **Notes**: Completed full Embeddings configuration section for Settings UI. PasswordInput provides secure API key handling - keys are write-only (never returned in GET, only written on PUT). The UI conditionally shows cloud-only fields (API key, Base URL, Dimensions) only when a cloud provider (OpenAI/OpenRouter) is selected.
+
+---
+
+## 2026-01-28 21:37 - Tasks 19.5.1, 19.5.2
+
+**Status**: pending → done
+**Validation**:
+  - Added 5 schedule fields to GET/PUT /config/daemon routes:
+    - reanalysisSchedule
+    - connectionDiscoverySchedule
+    - patternAggregationSchedule
+    - clusteringSchedule
+    - backfillEmbeddingsSchedule
+  - Imported isValidCronExpression from scheduler for cron validation
+  - Added validateCronSchedule helper function
+  - Refactored applyDaemonUpdates with helper functions to reduce complexity:
+    - applyNullableString, applyNullableNumber
+    - applyEmbeddingUpdates, applyScheduleUpdates
+    - hasAnyDaemonField for simplified field presence check
+  - Schedule defaults included in GET response for UI reference
+  - Added 15 new tests covering all schedule field scenarios
+  - All 1422 tests pass (1422 passed, 4 skipped)
+  - Linting: 0 errors, 0 warnings
+**Commit**: ec02af89
+**Notes**: Task 19.5.2 (cron validation) was completed as part of 19.5.1 since the validation was implemented inline with the route handlers.
