@@ -15,6 +15,7 @@
   import { daemonStore } from "$lib/stores/daemon";
   import ErrorFallback from "$lib/components/error-fallback.svelte";
   import Toast from "$lib/components/toast.svelte";
+  import PageTransition from "$lib/components/page-transition.svelte";
 
   interface NavItem {
     href: string;
@@ -125,7 +126,11 @@
 
   <main class="main-content">
     <svelte:boundary>
-      {@render children()}
+      <PageTransition key={page.url.pathname}>
+        {#snippet children()}
+          {@render children()}
+        {/snippet}
+      </PageTransition>
       {#snippet failed(error, reset)}
         <ErrorFallback error={error instanceof Error ? error : new Error(String(error))} {reset} />
       {/snippet}

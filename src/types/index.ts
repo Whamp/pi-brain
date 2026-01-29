@@ -212,6 +212,21 @@ export interface NodeMetadata {
   analyzedAt: string;
   /** Prompt version hash */
   analyzerVersion: string;
+  /** Number of user messages in the segment */
+  userMessageCount?: number;
+  /** Number of assistant messages in the segment */
+  assistantMessageCount?: number;
+  /**
+   * Number of clarifying questions asked by the agent (filtered).
+   * Excludes cases where questions were explicitly requested by
+   * user prompts, tools, skills, or extensions.
+   */
+  clarifyingQuestionCount?: number;
+  /**
+   * Number of questions asked when explicitly prompted to do so.
+   * These are questions requested by user, tools, skills, or extensions.
+   */
+  promptedQuestionCount?: number;
 }
 
 export interface SemanticData {

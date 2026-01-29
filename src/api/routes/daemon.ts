@@ -2,6 +2,7 @@
  * Daemon API routes
  */
 
+import type Database from "better-sqlite3";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import * as fs from "node:fs";
@@ -37,6 +38,61 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
     // Get queue status reusing existing DB connection
     const queueStatus = getQueueStatusSummary(db);
 
+    // Get average processing rate from historical data (bytes per second)
+    // We estimate based on completed jobs with known durations
+    const avgBytesPerSecond = getAverageProcessingRate(db);
+
+    // Map running jobs to include elapsed time and file size
+    const runningJobs = queueStatus.runningJobs.map((job) => {
+      const startedAt = job.startedAt ? new Date(job.startedAt) : null;
+      const elapsedMs = startedAt ? Date.now() - startedAt.getTime() : 0;
+      const elapsedSeconds = Math.floor(elapsedMs / 1000);
+
+      // Extract session name from path
+      const sessionName = job.sessionFile.split("/").pop() ?? job.sessionFile;
+
+      // Get file size
+      let sessionFileSize: number | null = null;
+      try {
+        const stat = fs.statSync(job.sessionFile);
+        sessionFileSize = stat.size;
+      } catch {
+        // File may have been moved or deleted
+      }
+
+      // Estimate remaining time based on file size and processing rate
+      let estimatedTotalSeconds: number | null = null;
+      let estimatedRemainingSeconds: number | null = null;
+      if (sessionFileSize !== null && avgBytesPerSecond > 0) {
+        estimatedTotalSeconds = Math.ceil(sessionFileSize / avgBytesPerSecond);
+        estimatedRemainingSeconds = Math.max(
+          0,
+          estimatedTotalSeconds - elapsedSeconds
+        );
+      }
+
+      // Calculate processing rate for this job
+      const processingRate =
+        sessionFileSize !== null && elapsedSeconds > 0
+          ? Math.round(sessionFileSize / elapsedSeconds)
+          : null;
+
+      return {
+        id: job.id,
+        sessionFile: job.sessionFile,
+        sessionName,
+        type: job.type,
+        startedAt: job.startedAt,
+        elapsedSeconds,
+        retryCount: job.retryCount,
+        maxRetries: job.maxRetries,
+        sessionFileSize,
+        estimatedTotalSeconds,
+        estimatedRemainingSeconds,
+        processingRate,
+      };
+    });
+
     const durationMs = Date.now() - startTime;
     return reply.send(
       successResponse(
@@ -57,6 +113,8 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
             active: queueStatus.stats.running,
             idle: Math.max(0, 1 - queueStatus.stats.running),
           },
+          // Running job details
+          runningJobs,
         },
         durationMs
       )
@@ -256,4 +314,71 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
       }
     }
   );
+}
+
+/**
+ * Calculate average processing rate (bytes per second) from historical completed jobs
+ *
+ * Looks at recently completed jobs to estimate how long processing takes
+ * based on session file size. Returns 0 if no historical data is available.
+ */
+function getAverageProcessingRate(db: Database.Database): number {
+  // Default estimate: ~50KB/s (based on typical session processing)
+  const DEFAULT_BYTES_PER_SECOND = 50_000;
+
+  try {
+    // Query completed jobs with durations from last 7 days
+    const result = db
+      .prepare(
+        `
+        SELECT 
+          session_file,
+          started_at,
+          completed_at
+        FROM analysis_queue
+        WHERE status = 'completed'
+          AND started_at IS NOT NULL
+          AND completed_at IS NOT NULL
+          AND completed_at >= datetime('now', '-7 days')
+        ORDER BY completed_at DESC
+        LIMIT 50
+      `
+      )
+      .all() as {
+      session_file: string;
+      started_at: string;
+      completed_at: string;
+    }[];
+
+    if (result.length === 0) {
+      return DEFAULT_BYTES_PER_SECOND;
+    }
+
+    let totalBytes = 0;
+    let totalSeconds = 0;
+    let validSamples = 0;
+
+    for (const row of result) {
+      try {
+        const stat = fs.statSync(row.session_file);
+        const startTime = new Date(row.started_at).getTime();
+        const endTime = new Date(row.completed_at).getTime();
+        const durationSeconds = Math.max(1, (endTime - startTime) / 1000);
+
+        totalBytes += stat.size;
+        totalSeconds += durationSeconds;
+        validSamples++;
+      } catch {
+        // File may have been moved or deleted, skip
+      }
+    }
+
+    if (validSamples === 0 || totalSeconds === 0) {
+      return DEFAULT_BYTES_PER_SECOND;
+    }
+
+    return Math.round(totalBytes / totalSeconds);
+  } catch {
+    return DEFAULT_BYTES_PER_SECOND;
+  }
 }

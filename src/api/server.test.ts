@@ -361,6 +361,81 @@ describe("aPI Server", () => {
       await app.close();
       db.close();
     });
+
+    it("should return context window usage statistics", async () => {
+      const tempDir = createTempDir();
+      const db = openDatabase({ path: ":memory:" });
+      migrate(db);
+      const config = createTestApiConfig();
+      const nodesDir = join(tempDir, "nodes");
+
+      // Create nodes with varying token usage
+      // 128K context window is the default
+      const highUsageNode = createTestNode({
+        id: "high-usage",
+        metadata: {
+          tokensUsed: 100_000, // ~78% of 128K
+          cost: 0.1,
+          durationMinutes: 30,
+          timestamp: new Date().toISOString(),
+          analyzedAt: new Date().toISOString(),
+          analyzerVersion: "1.0.0",
+        },
+      });
+
+      const mediumUsageNode = createTestNode({
+        id: "medium-usage",
+        metadata: {
+          tokensUsed: 70_000, // ~55% of 128K
+          cost: 0.07,
+          durationMinutes: 20,
+          timestamp: new Date().toISOString(),
+          analyzedAt: new Date().toISOString(),
+          analyzerVersion: "1.0.0",
+        },
+      });
+
+      const lowUsageNode = createTestNode({
+        id: "low-usage",
+        metadata: {
+          tokensUsed: 20_000, // ~16% of 128K
+          cost: 0.02,
+          durationMinutes: 10,
+          timestamp: new Date().toISOString(),
+          analyzedAt: new Date().toISOString(),
+          analyzerVersion: "1.0.0",
+        },
+      });
+
+      createNode(db, highUsageNode, { nodesDir });
+      createNode(db, mediumUsageNode, { nodesDir });
+      createNode(db, lowUsageNode, { nodesDir });
+
+      const app = await createServer(db, config);
+
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/stats",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.contextWindowUsage).toBeDefined();
+
+      const usage = body.data.contextWindowUsage;
+      expect(usage.nodesWithData).toBe(3);
+      expect(usage.defaultContextWindowSize).toBe(128_000);
+      // One node at 100K > 75% (96K), one at 70K > 50% (64K)
+      expect(usage.exceeds75PercentCount).toBe(1);
+      expect(usage.exceeds50PercentCount).toBe(2); // Both 100K and 70K exceed 50%
+      // Average: (100K + 70K + 20K) / 3 / 128K = 190K / 3 / 128K ≈ 0.495
+      expect(usage.averageUsagePercent).toBeCloseTo(0.495, 2);
+
+      await app.close();
+      db.close();
+      cleanupTempDir(tempDir);
+    });
   });
 
   describe("gET /api/v1/search", () => {

@@ -285,16 +285,16 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-356]
+src/storage/node-conversion.ts [1-360]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-348: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    268-352: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    353-355: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    357-359: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -303,50 +303,50 @@ src/storage/node-conversion.ts [1-356]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-857]
+src/storage/node-crud.ts [1-881]
   interface:
     52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    58-85: interface NodeRow [exported]
+    58-91: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    94-149: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    100-155: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node and update lesson_patterns aggregation */
-    154-187: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    160-193: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node and update model_stats aggregation */
-    192-256: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    198-262: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
-    261-280: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    267-286: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    290-319: clearAllData(db: Database.Database): void [exported]
+    296-325: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    325-398: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    331-414: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    404-418: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    420-434: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    429-536: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    445-560: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    543-633: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    567-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    638-644: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    662-668: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    651-661: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    675-685: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    666-669: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    690-693: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    674-680: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    698-704: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    686-692: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    710-716: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    697-709: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    721-733: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    714-725: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    738-749: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    730-741: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    754-765: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    750-775: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    774-799: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    802-840: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    826-864: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -658,4 +658,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 21
-Estimated tokens: 10,186 (codebase: ~1,162,805)
+Estimated tokens: 10,186 (codebase: ~1,189,460)

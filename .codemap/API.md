@@ -5,9 +5,9 @@
 
 ## Statistics
 - Total files: 98
-- Total symbols: 696
+- Total symbols: 697
   - function: 382
-  - interface: 223
+  - interface: 224
   - type: 42
   - variable: 34
   - class: 15
@@ -62,15 +62,16 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-260]
+src/api/routes/daemon.ts [1-385]
   function:
-    25-259: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+    26-317: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/cli.js
     - ../../daemon/errors.js
     - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
     - ../responses.js
+    - better-sqlite3
     - fastify
     - node:fs
     - node:path
@@ -180,9 +181,9 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-165]
+src/api/routes/stats.ts [1-345]
   function:
-    16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    184-335: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -1594,16 +1595,16 @@ src/storage/lesson-repository.ts [1-284]
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-356]
+src/storage/node-conversion.ts [1-360]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-348: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    268-352: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    353-355: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    357-359: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -1612,50 +1613,50 @@ src/storage/node-conversion.ts [1-356]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-857]
+src/storage/node-crud.ts [1-881]
   interface:
     52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    58-85: interface NodeRow [exported]
+    58-91: interface NodeRow [exported]
       /** Node row from the database */
   function:
-    94-149: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    100-155: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node and update lesson_patterns aggregation */
-    154-187: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    160-193: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node and update model_stats aggregation */
-    192-256: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    198-262: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
-    261-280: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    267-286: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    290-319: clearAllData(db: Database.Database): void [exported]
+    296-325: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    325-398: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    331-414: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    404-418: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    420-434: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    429-536: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    445-560: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    543-633: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    567-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    638-644: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    662-668: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    651-661: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
+    675-685: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
       /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    666-669: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    690-693: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    674-680: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    698-704: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    686-692: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
+    710-716: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
       /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    697-709: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
+    721-733: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary */
-    714-725: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    738-749: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the latest node for a given session file */
-    730-741: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    754-765: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find the first node for a given session file */
-    750-775: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    774-799: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    802-840: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    826-864: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -2065,7 +2066,7 @@ src/types.ts [1-298]
   | ToolCallContent
   | ImageContent [exported]
 
-src/types/index.ts [1-707]
+src/types/index.ts [1-722]
   interface:
     12-40: interface Node [exported]
       /** Shared type definitions for pi-brain This file contains pure type definitions (no runtime code) shared between the daemon/storage backend and the web frontend. */
@@ -2080,45 +2081,45 @@ src/types/index.ts [1-707]
     171-178: interface ModelQuirk [exported]
     180-186: interface ToolError [exported]
     188-196: interface ModelObservations [exported]
-    202-215: interface NodeMetadata [exported]
-    217-226: interface SemanticData [exported]
-    228-235: interface DaemonDecision [exported]
-    237-247: interface DaemonMeta [exported]
-    284-297: interface EdgeMetadata [exported]
-    299-312: interface Edge [exported]
-    345-352: interface NodeVersion [exported]
-    358-368: interface AggregatedFailurePattern [exported]
-    370-379: interface AggregatedModelStats [exported]
-    381-390: interface AggregatedLessonPattern [exported]
-    399-426: interface AggregatedInsight [exported]
-    432-443: interface PromptAddition [exported]
-    452-457: interface DateRange [exported]
+    202-230: interface NodeMetadata [exported]
+    232-241: interface SemanticData [exported]
+    243-250: interface DaemonDecision [exported]
+    252-262: interface DaemonMeta [exported]
+    299-312: interface EdgeMetadata [exported]
+    314-327: interface Edge [exported]
+    360-367: interface NodeVersion [exported]
+    373-383: interface AggregatedFailurePattern [exported]
+    385-394: interface AggregatedModelStats [exported]
+    396-405: interface AggregatedLessonPattern [exported]
+    414-441: interface AggregatedInsight [exported]
+    447-458: interface PromptAddition [exported]
+    467-472: interface DateRange [exported]
       /** Date range for measuring effectiveness before/after prompt addition */
-    462-480: interface EffectivenessResult [exported]
+    477-495: interface EffectivenessResult [exported]
       /** Result of measuring prompt effectiveness for a single insight */
-    485-521: interface PromptEffectiveness [exported]
+    500-536: interface PromptEffectiveness [exported]
       /** Full effectiveness measurement record stored in database */
-    530-537: interface ManualFlag [exported]
+    545-552: interface ManualFlag [exported]
       /** Manual flag recorded by user via /brain --flag command */
-    542-557: interface FrictionSignals [exported]
+    557-572: interface FrictionSignals [exported]
       /** Friction signals detected in a session segment */
-    562-571: interface DelightSignals [exported]
+    577-586: interface DelightSignals [exported]
       /** Delight signals detected in a session segment */
-    576-580: interface NodeSignals [exported]
+    591-595: interface NodeSignals [exported]
       /** Combined signals for a node */
-    599-621: interface Cluster [exported]
+    614-636: interface Cluster [exported]
       /** A discovered cluster from facet discovery */
-    626-633: interface ClusterNode [exported]
+    641-648: interface ClusterNode [exported]
       /** Node membership in a cluster */
-    638-648: interface NodeEmbedding [exported]
+    653-663: interface NodeEmbedding [exported]
       /** Cached embedding for a node */
-    653-666: interface ClusteringRun [exported]
+    668-681: interface ClusteringRun [exported]
       /** Record of a clustering run */
-    671-682: interface EmbeddingConfig [exported]
+    686-697: interface EmbeddingConfig [exported]
       /** Configuration for the embedding provider */
-    687-698: interface ClusteringConfig [exported]
+    702-713: interface ClusteringConfig [exported]
       /** Configuration for clustering algorithm */
-    703-706: interface FacetDiscoveryResult [exported]
+    718-721: interface FacetDiscoveryResult [exported]
       /** Result of facet discovery pipeline */
   type:
     61-74: NodeType = | "coding"
@@ -2144,7 +2145,7 @@ src/types/index.ts [1-707]
   | "subagent" [exported]
     130-130: Confidence = "high" | "medium" | "low" [exported]
     169-169: Frequency = "once" | "sometimes" | "often" | "always" [exported]
-    253-280: EdgeType = | "fork"
+    268-295: EdgeType = | "fork"
   | "branch"
   | "tree_jump"
   | "resume"
@@ -2156,21 +2157,21 @@ src/types/index.ts [1-707]
   | "reference"
   | "lesson_application"
   | ... [exported]
-    282-282: EdgeCreator = "boundary" | "daemon" | "user" [exported]
-    332-332: AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number] [exported]
-    338-343: VersionTrigger = | "initial"
+    297-297: EdgeCreator = "boundary" | "daemon" | "user" [exported]
+    347-347: AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number] [exported]
+    353-358: VersionTrigger = | "initial"
   | "prompt_update"
   | "connection_found"
   | "user_feedback"
   | "schema_migration" [exported]
-    396-396: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
-    397-397: InsightSeverity = "low" | "medium" | "high" [exported]
-    589-589: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
+    411-411: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
+    412-412: InsightSeverity = "low" | "medium" | "high" [exported]
+    604-604: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
       /** Cluster status for user feedback */
-    594-594: ClusterSignalType = "friction" | "delight" | null [exported]
+    609-609: ClusterSignalType = "friction" | "delight" | null [exported]
       /** Signal type a cluster relates to */
   variable:
-    318-330: AUTOMEM_EDGE_TYPES [exported]
+    333-345: AUTOMEM_EDGE_TYPES [exported]
       /** AutoMem typed relationship edge types (per automem-features.md) These enable semantic reasoning ("why" queries, causal chains) */
 
 src/web/app/src/app.d.ts [1-12]
@@ -2239,26 +2240,28 @@ src/web/app/src/lib/stores/websocket.ts [1-179]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-286]
+src/web/app/src/lib/types.ts [1-342]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
     93-98: interface ToolErrorEntity extends ToolError [exported]
     101-106: interface ListNodesResponse [exported]
     108-116: interface SearchResult [exported]
-    118-148: interface DashboardStats [exported]
-    150-170: interface DaemonStatus [exported]
-    174-183: interface DaemonDecisionEntity [exported]
-    186-195: interface NodeFilters [exported]
-    198-203: interface ProjectSummary [exported]
-    205-219: interface SessionSummary [exported]
-    222-227: interface ClusterNodeWithDetails extends ClusterNode [exported]
-    229-231: interface ClusterWithNodes extends Cluster [exported]
-    233-236: interface ClusterFeedResponse [exported]
-    238-243: interface ClusterListResponse [exported]
-    246-262: interface AbandonedRestartPattern [exported]
-    264-270: interface AbandonedRestartsResponse [exported]
-    272-285: interface FrictionSummary [exported]
+    118-182: interface DashboardStats [exported]
+    185-202: interface RunningJob [exported]
+      /** Running job details for real-time monitoring */
+    204-226: interface DaemonStatus [exported]
+    230-239: interface DaemonDecisionEntity [exported]
+    242-251: interface NodeFilters [exported]
+    254-259: interface ProjectSummary [exported]
+    261-275: interface SessionSummary [exported]
+    278-283: interface ClusterNodeWithDetails extends ClusterNode [exported]
+    285-287: interface ClusterWithNodes extends Cluster [exported]
+    289-292: interface ClusterFeedResponse [exported]
+    294-299: interface ClusterListResponse [exported]
+    302-318: interface AbandonedRestartPattern [exported]
+    320-326: interface AbandonedRestartsResponse [exported]
+    328-341: interface FrictionSummary [exported]
   imports:
     - ../../../../types/index.js
 
@@ -2294,4 +2297,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 98
-Estimated tokens: 28,963 (codebase: ~1,162,805)
+Estimated tokens: 28,994 (codebase: ~1,189,460)

@@ -82,6 +82,12 @@ export interface NodeRow {
   last_accessed: string | null;
   archived: number | null;
   importance: number | null;
+  // Message count fields
+  user_message_count: number | null;
+  assistant_message_count: number | null;
+  // Clarifying question count fields
+  clarifying_question_count: number | null;
+  prompted_question_count: number | null;
 }
 
 // =============================================================================
@@ -334,13 +340,17 @@ export function insertNodeToDb(
       type, project, is_new_project, had_clear_goal, outcome,
       tokens_used, cost, duration_minutes,
       timestamp, analyzed_at, analyzer_version, data_file, signals,
-      relevance_score, last_accessed, archived, importance
+      relevance_score, last_accessed, archived, importance,
+      user_message_count, assistant_message_count,
+      clarifying_question_count, prompted_question_count
     ) VALUES (
       ?, ?, ?, ?, ?, ?,
       ?, ?, ?, ?, ?,
       ?, ?, ?,
       ?, ?, ?, ?, ?,
-      ?, ?, ?, ?
+      ?, ?, ?, ?,
+      ?, ?,
+      ?, ?
     )
   `);
 
@@ -368,7 +378,13 @@ export function insertNodeToDb(
     node.relevanceScore ?? 1, // New nodes start at max relevance
     node.lastAccessed ?? null,
     node.archived ? 1 : 0,
-    node.importance ?? 0.5 // Default importance
+    node.importance ?? 0.5, // Default importance
+    // Message count fields
+    node.metadata.userMessageCount ?? null,
+    node.metadata.assistantMessageCount ?? null,
+    // Clarifying question count fields
+    node.metadata.clarifyingQuestionCount ?? null,
+    node.metadata.promptedQuestionCount ?? null
   );
 
   // Insert related data
@@ -463,6 +479,10 @@ export function upsertNode(
         analyzer_version = ?,
         data_file = ?,
         signals = ?,
+        user_message_count = ?,
+        assistant_message_count = ?,
+        clarifying_question_count = ?,
+        prompted_question_count = ?,
         updated_at = datetime('now')
       WHERE id = ?
     `);
@@ -482,6 +502,10 @@ export function upsertNode(
       node.metadata.analyzerVersion,
       dataFile,
       node.signals ? JSON.stringify(node.signals) : null,
+      node.metadata.userMessageCount ?? null,
+      node.metadata.assistantMessageCount ?? null,
+      node.metadata.clarifyingQuestionCount ?? null,
+      node.metadata.promptedQuestionCount ?? null,
       node.id
     );
 

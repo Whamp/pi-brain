@@ -10,6 +10,8 @@
     AlertTriangle,
     BookOpen,
     Lightbulb,
+    MessageSquare,
+    HelpCircle,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
@@ -26,7 +28,9 @@
   import NewsFeed from "$lib/components/dashboard/news-feed.svelte";
   import AbandonedRestarts from "$lib/components/dashboard/abandoned-restarts.svelte";
   import JobErrors from "$lib/components/dashboard/job-errors.svelte";
-  import Spinner from "$lib/components/spinner.svelte";
+  import CurrentJobs from "$lib/components/dashboard/current-jobs.svelte";
+  import ContextWindowUsage from "$lib/components/dashboard/context-window-usage.svelte";
+  import DashboardSkeleton from "$lib/components/dashboard-skeleton.svelte";
 
   // State
   let stats = $state<DashboardStats | null>(null);
@@ -138,9 +142,7 @@
       {errorMessage}
     </div>
   {:else if loading}
-    <div class="loading" role="status" aria-live="polite">
-      <Spinner message="Loading dashboard..." />
-    </div>
+    <DashboardSkeleton />
   {:else if stats}
     <!-- Quick Stats -->
     <section class="stats-grid" aria-label="Quick statistics">
@@ -187,7 +189,38 @@
           <div class="stat-label">Total Cost</div>
         </div>
       </div>
+
+      {#if stats.messageEngagement && stats.messageEngagement.nodesWithData > 0}
+        <div class="stat-card">
+          <div class="stat-icon" title="Agent responses per user message">
+            <MessageSquare size={20} />
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">
+              {stats.messageEngagement.agentPerUserRatio.toFixed(1)}x
+            </div>
+            <div class="stat-label">Agent/User Ratio</div>
+          </div>
+        </div>
+      {/if}
+
+      {#if stats.clarifyingQuestions && stats.clarifyingQuestions.nodesWithData > 0}
+        <div class="stat-card">
+          <div class="stat-icon" title="Agent-initiated clarifying questions (filtered)">
+            <HelpCircle size={20} />
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">
+              {stats.clarifyingQuestions.totalClarifyingQuestions}
+            </div>
+            <div class="stat-label">Clarifying Questions</div>
+          </div>
+        </div>
+      {/if}
     </section>
+
+    <!-- Current Job Activity -->
+    <CurrentJobs />
 
     <!-- Main Content Grid -->
     <div class="dashboard-grid">
@@ -275,6 +308,9 @@
           >
         </div>
       </section>
+
+      <!-- Context Window Usage -->
+      <ContextWindowUsage {stats} />
 
       <!-- Recent Activity -->
       <section class="card recent-activity-panel">
@@ -491,7 +527,6 @@
     font-size: var(--text-2xl);
   }
 
-  .loading,
   .error-banner {
     padding: var(--space-8);
     text-align: center;
@@ -512,15 +547,9 @@
   /* Stats Grid */
   .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-4);
     margin-bottom: var(--space-6);
-  }
-
-  @media (max-width: 1024px) {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
   }
 
   @media (max-width: 640px) {

@@ -5,11 +5,11 @@
 
 ## Statistics
 - Total files: 27
-- Total symbols: 97
-  - function: 52
-  - interface: 14
+- Total symbols: 105
+  - function: 56
+  - interface: 17
+  - variable: 12
   - method: 12
-  - variable: 11
   - type: 4
   - property: 2
   - class: 1
@@ -129,21 +129,27 @@ src/api/routes/config.ts [1-218]
     - node:fs
     - yaml
 
-src/api/routes/daemon.ts [1-260]
+src/api/routes/daemon.ts [1-385]
   function:
-    25-259: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+    26-317: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 46 [call: 34, type: 12]
-        - src/api/routes/daemon.ts:25: type FastifyInstance -> external
-        - src/api/routes/daemon.ts:25: type Promise -> external
-        - src/api/routes/daemon.ts:29: call get -> external
-        - src/api/routes/daemon.ts:29: type FastifyRequest -> external
-        - src/api/routes/daemon.ts:29: type FastifyReply -> external
+        - src/api/routes/daemon.ts:26: type FastifyInstance -> external
+        - src/api/routes/daemon.ts:26: type Promise -> external
+        - src/api/routes/daemon.ts:30: call get -> external
+        - src/api/routes/daemon.ts:30: type FastifyRequest -> external
+        - src/api/routes/daemon.ts:30: type FastifyReply -> external
+    325-384: getAverageProcessingRate(db: Database.Database): number
+      /** Calculate average processing rate (bytes per second) from historical completed jobs Looks at recently completed jobs to estimate how long processing takes based on session file size. Returns 0 if no historical data is available. */
+      refs out: 2 [call: 1, type: 1]
+        - src/api/routes/daemon.ts:325: type Database -> external
+        - src/api/routes/daemon.ts:380: call round -> external
   imports:
     - ../../daemon/cli.js
     - ../../daemon/errors.js
     - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
     - ../responses.js
+    - better-sqlite3
     - fastify
     - node:fs
     - node:path
@@ -443,19 +449,44 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-165]
+src/api/routes/stats.ts [1-345]
+  interface:
+    17-26: interface MessageEngagement
+      /** Message engagement stats from aggregating user/assistant message counts */
+    29-40: interface ClarifyingQuestions
+      /** Clarifying questions stats from aggregating question counts */
+    43-54: interface ContextWindowUsage
+      /** Context window usage stats */
   function:
-    16-155: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    59-87: getMessageEngagement(db: Database.Database): MessageEngagement
+      /** Get message engagement statistics from the database */
+      refs out: 2 [type: 2]
+        - src/api/routes/stats.ts:59: type Database -> external
+        - src/api/routes/stats.ts:59: type MessageEngagement -> src/api/routes/stats.ts
+    95-140: getClarifyingQuestions(db: Database.Database): ClarifyingQuestions
+      /** Get clarifying questions statistics from the database Tracks agent-initiated clarifying questions (filtered to exclude cases where questions were explicitly requested by user/tools/skills). */
+      refs out: 2 [type: 2]
+        - src/api/routes/stats.ts:95: type Database -> external
+        - src/api/routes/stats.ts:95: type ClarifyingQuestions -> src/api/routes/stats.ts
+    153-182: getContextWindowUsage(db: Database.Database): ContextWindowUsage
+      /** Get context window usage statistics from the database. Calculates what percentage of the context window is typically used, and counts how many sessions exceeded 50% and 75% thresholds. */
+      refs out: 2 [type: 2]
+        - src/api/routes/stats.ts:153: type Database -> external
+        - src/api/routes/stats.ts:153: type ContextWindowUsage -> src/api/routes/stats.ts
+    184-335: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 17 [call: 11, type: 6]
-        - src/api/routes/stats.ts:16: type FastifyInstance -> external
-        - src/api/routes/stats.ts:16: type Promise -> external
-        - src/api/routes/stats.ts:20: call get -> external
-        - src/api/routes/stats.ts:20: type FastifyRequest -> external
-        - src/api/routes/stats.ts:20: type FastifyReply -> external
-    160-164: countEdges(db: Database.Database): number
+        - src/api/routes/stats.ts:184: type FastifyInstance -> external
+        - src/api/routes/stats.ts:184: type Promise -> external
+        - src/api/routes/stats.ts:188: call get -> external
+        - src/api/routes/stats.ts:188: type FastifyRequest -> external
+        - src/api/routes/stats.ts:188: type FastifyReply -> external
+    340-344: countEdges(db: Database.Database): number
       /** Count edges in the database */
       refs out: 1 [type: 1]
-        - src/api/routes/stats.ts:160: type Database -> external
+        - src/api/routes/stats.ts:340: type Database -> external
+  variable:
+    145-145: 128000
+      /** Default context window size for analysis (128K tokens, common for modern LLMs) */
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -481,7 +512,7 @@ src/api/routes/tool-errors.ts [1-121]
     - ../responses.js
     - fastify
 
-src/api/server.test.ts [1-703]
+src/api/server.test.ts [1-778]
   function:
     21-25: createTempDir(): string
       refs out: 1 [call: 1]
@@ -836,4 +867,4 @@ src/cli.ts [1-1148]
 
 ---
 Files: 27
-Estimated tokens: 9,251 (codebase: ~1,162,805)
+Estimated tokens: 9,800 (codebase: ~1,190,078)

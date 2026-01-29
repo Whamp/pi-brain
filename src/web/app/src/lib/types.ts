@@ -145,6 +145,60 @@ export interface DashboardStats {
       change: number;
     };
   };
+  messageEngagement?: {
+    /** Total user messages across all nodes */
+    totalUserMessages: number;
+    /** Total assistant messages across all nodes */
+    totalAssistantMessages: number;
+    /** Ratio of assistant messages per user message */
+    agentPerUserRatio: number;
+    /** Number of nodes with message count data */
+    nodesWithData: number;
+  };
+  clarifyingQuestions?: {
+    /** Total clarifying questions (agent-initiated, filtered) */
+    totalClarifyingQuestions: number;
+    /** Total prompted questions (explicitly requested) */
+    totalPromptedQuestions: number;
+    /** Ratio of organic questions vs prompted questions (-1 = all organic) */
+    organicVsPromptedRatio: number;
+    /** Questions per user message (engagement indicator) */
+    questionsPerUserMessage: number;
+    /** Number of nodes with question count data */
+    nodesWithData: number;
+  };
+  contextWindowUsage?: {
+    /** Average percentage of context window used (0.0-1.0) */
+    averageUsagePercent: number;
+    /** Number of nodes where context usage exceeded 75% */
+    exceeds75PercentCount: number;
+    /** Number of nodes where context usage exceeded 50% */
+    exceeds50PercentCount: number;
+    /** Default context window size used for calculations */
+    defaultContextWindowSize: number;
+    /** Number of nodes with token data */
+    nodesWithData: number;
+  };
+}
+
+/** Running job details for real-time monitoring */
+export interface RunningJob {
+  id: string;
+  sessionFile: string;
+  sessionName: string;
+  type: "initial" | "reanalysis" | "connection_discovery";
+  startedAt?: string;
+  elapsedSeconds: number;
+  retryCount: number;
+  maxRetries: number;
+  /** Session file size in bytes */
+  sessionFileSize: number | null;
+  /** Estimated total processing time in seconds (based on file size) */
+  estimatedTotalSeconds: number | null;
+  /** Estimated remaining time in seconds */
+  estimatedRemainingSeconds: number | null;
+  /** Current processing rate in bytes/second */
+  processingRate: number | null;
 }
 
 export interface DaemonStatus {
@@ -162,6 +216,8 @@ export interface DaemonStatus {
     completedToday: number;
     failedToday: number;
   };
+  /** Currently running jobs with elapsed time */
+  runningJobs?: RunningJob[];
   lastAnalysis?: string;
   nextScheduled?: {
     reanalysis?: string;

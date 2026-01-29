@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 98,
-    "totalSymbols": 1256,
+    "totalSymbols": 1265,
     "byLanguage": {
       "typescript": 98
     },
     "bySymbolKind": {
-      "function": 538,
+      "function": 542,
       "type": 43,
-      "interface": 283,
-      "variable": 134,
+      "interface": 287,
+      "variable": 135,
       "class": 15,
       "property": 62,
       "constructor": 14,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 43608,
-  "codebase_tokens": 1186031,
+  "total_tokens": 44006,
+  "codebase_tokens": 1203045,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -369,18 +369,18 @@
       "language": "typescript",
       "lines": [
         1,
-        260
+        385
       ],
       "detail_level": "full",
-      "token_estimate": 82,
+      "token_estimate": 165,
       "symbols": [
         {
           "name": "daemonRoutes",
           "kind": "function",
           "signature": "async daemonRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            25,
-            259
+            26,
+            317
           ],
           "exported": true,
           "is_default": false,
@@ -390,6 +390,25 @@
           "parent_name": null,
           "annotation": null,
           "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getAverageProcessingRate",
+          "kind": "function",
+          "signature": "getAverageProcessingRate(db: Database.Database): number",
+          "lines": [
+            325,
+            384
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate average processing rate (bytes per second) from historical completed jobs\n\nLooks at recently completed jobs to estimate how long processing takes\nbased on session file size. Returns 0 if no historical data is available.",
           "incoming_refs": null,
           "outgoing_refs": null
         }
@@ -403,6 +422,7 @@
         "../../daemon/pattern-aggregation.js",
         "../../daemon/queue.js",
         "../responses.js",
+        "better-sqlite3",
         "fastify",
         "node:fs",
         "node:path"
@@ -1296,18 +1316,151 @@
       "language": "typescript",
       "lines": [
         1,
-        165
+        345
       ],
       "detail_level": "full",
-      "token_estimate": 92,
+      "token_estimate": 380,
       "symbols": [
+        {
+          "name": "MessageEngagement",
+          "kind": "interface",
+          "signature": "MessageEngagement",
+          "lines": [
+            17,
+            26
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Message engagement stats from aggregating user/assistant message counts",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ClarifyingQuestions",
+          "kind": "interface",
+          "signature": "ClarifyingQuestions",
+          "lines": [
+            29,
+            40
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Clarifying questions stats from aggregating question counts",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ContextWindowUsage",
+          "kind": "interface",
+          "signature": "ContextWindowUsage",
+          "lines": [
+            43,
+            54
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Context window usage stats",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getMessageEngagement",
+          "kind": "function",
+          "signature": "getMessageEngagement(db: Database.Database): MessageEngagement",
+          "lines": [
+            59,
+            87
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get message engagement statistics from the database",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getClarifyingQuestions",
+          "kind": "function",
+          "signature": "getClarifyingQuestions(db: Database.Database): ClarifyingQuestions",
+          "lines": [
+            95,
+            140
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get clarifying questions statistics from the database\n\nTracks agent-initiated clarifying questions (filtered to exclude\ncases where questions were explicitly requested by user/tools/skills).",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DEFAULT_CONTEXT_WINDOW_SIZE",
+          "kind": "variable",
+          "signature": "128000",
+          "lines": [
+            145,
+            145
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default context window size for analysis (128K tokens, common for modern LLMs)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getContextWindowUsage",
+          "kind": "function",
+          "signature": "getContextWindowUsage(db: Database.Database): ContextWindowUsage",
+          "lines": [
+            153,
+            182
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Get context window usage statistics from the database.\n\nCalculates what percentage of the context window is typically used,\nand counts how many sessions exceeded 50% and 75% thresholds.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "statsRoutes",
           "kind": "function",
           "signature": "async statsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            16,
-            155
+            184,
+            335
           ],
           "exported": true,
           "is_default": false,
@@ -1325,8 +1478,8 @@
           "kind": "function",
           "signature": "countEdges(db: Database.Database): number",
           "lines": [
-            160,
-            164
+            340,
+            344
           ],
           "exported": false,
           "is_default": false,
@@ -19007,7 +19160,7 @@
       "language": "typescript",
       "lines": [
         1,
-        356
+        360
       ],
       "detail_level": "full",
       "token_estimate": 240,
@@ -19056,7 +19209,7 @@
           "signature": "nodeRowToNode(row: NodeRow, loadFull = false): Node",
           "lines": [
             268,
-            348
+            352
           ],
           "exported": true,
           "is_default": false,
@@ -19074,8 +19227,8 @@
           "kind": "function",
           "signature": "nodeRowsToNodes(rows: NodeRow[], loadFull = false): {}",
           "lines": [
-            353,
-            355
+            357,
+            359
           ],
           "exported": true,
           "is_default": false,
@@ -19105,10 +19258,10 @@
       "language": "typescript",
       "lines": [
         1,
-        857
+        881
       ],
       "detail_level": "full",
-      "token_estimate": 1310,
+      "token_estimate": 1311,
       "symbols": [
         {
           "name": "createPatternId",
@@ -19154,7 +19307,7 @@
           "signature": "NodeRow",
           "lines": [
             58,
-            85
+            91
           ],
           "exported": true,
           "is_default": false,
@@ -19172,8 +19325,8 @@
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            94,
-            149
+            100,
+            155
           ],
           "exported": true,
           "is_default": false,
@@ -19191,8 +19344,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            154,
-            187
+            160,
+            193
           ],
           "exported": true,
           "is_default": false,
@@ -19210,8 +19363,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            192,
-            256
+            198,
+            262
           ],
           "exported": true,
           "is_default": false,
@@ -19229,8 +19382,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            261,
-            280
+            267,
+            286
           ],
           "exported": true,
           "is_default": false,
@@ -19248,8 +19401,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            290,
-            319
+            296,
+            325
           ],
           "exported": true,
           "is_default": false,
@@ -19267,8 +19420,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            325,
-            398
+            331,
+            414
           ],
           "exported": true,
           "is_default": false,
@@ -19286,8 +19439,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            404,
-            418
+            420,
+            434
           ],
           "exported": true,
           "is_default": false,
@@ -19305,8 +19458,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            429,
-            536
+            445,
+            560
           ],
           "exported": true,
           "is_default": false,
@@ -19324,8 +19477,8 @@
           "kind": "function",
           "signature": "updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            543,
-            633
+            567,
+            657
           ],
           "exported": true,
           "is_default": false,
@@ -19343,8 +19496,8 @@
           "kind": "function",
           "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
           "lines": [
-            638,
-            644
+            662,
+            668
           ],
           "exported": true,
           "is_default": false,
@@ -19362,8 +19515,8 @@
           "kind": "function",
           "signature": "getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow",
           "lines": [
-            651,
-            661
+            675,
+            685
           ],
           "exported": true,
           "is_default": false,
@@ -19381,8 +19534,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            666,
-            669
+            690,
+            693
           ],
           "exported": true,
           "is_default": false,
@@ -19400,8 +19553,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            674,
-            680
+            698,
+            704
           ],
           "exported": true,
           "is_default": false,
@@ -19419,8 +19572,8 @@
           "kind": "function",
           "signature": "deleteNode(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            686,
-            692
+            710,
+            716
           ],
           "exported": true,
           "is_default": false,
@@ -19438,8 +19591,8 @@
           "kind": "function",
           "signature": "findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow",
           "lines": [
-            697,
-            709
+            721,
+            733
           ],
           "exported": true,
           "is_default": false,
@@ -19457,8 +19610,8 @@
           "kind": "function",
           "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            714,
-            725
+            738,
+            749
           ],
           "exported": true,
           "is_default": false,
@@ -19476,8 +19629,8 @@
           "kind": "function",
           "signature": "findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
           "lines": [
-            730,
-            741
+            754,
+            765
           ],
           "exported": true,
           "is_default": false,
@@ -19495,8 +19648,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            750,
-            775
+            774,
+            799
           ],
           "exported": true,
           "is_default": false,
@@ -19514,8 +19667,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            778,
-            785
+            802,
+            809
           ],
           "exported": false,
           "is_default": false,
@@ -19533,8 +19686,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            790,
-            795
+            814,
+            819
           ],
           "exported": false,
           "is_default": false,
@@ -19552,8 +19705,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            802,
-            840
+            826,
+            864
           ],
           "exported": true,
           "is_default": false,
@@ -19571,8 +19724,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            845,
-            856
+            869,
+            880
           ],
           "exported": false,
           "is_default": false,
@@ -23242,7 +23395,7 @@
       "language": "typescript",
       "lines": [
         1,
-        707
+        722
       ],
       "detail_level": "full",
       "token_estimate": 1129,
@@ -23576,7 +23729,7 @@
           "signature": "NodeMetadata",
           "lines": [
             202,
-            215
+            230
           ],
           "exported": true,
           "is_default": false,
@@ -23594,8 +23747,8 @@
           "kind": "interface",
           "signature": "SemanticData",
           "lines": [
-            217,
-            226
+            232,
+            241
           ],
           "exported": true,
           "is_default": false,
@@ -23613,8 +23766,8 @@
           "kind": "interface",
           "signature": "DaemonDecision",
           "lines": [
-            228,
-            235
+            243,
+            250
           ],
           "exported": true,
           "is_default": false,
@@ -23632,8 +23785,8 @@
           "kind": "interface",
           "signature": "DaemonMeta",
           "lines": [
-            237,
-            247
+            252,
+            262
           ],
           "exported": true,
           "is_default": false,
@@ -23651,8 +23804,8 @@
           "kind": "type",
           "signature": "EdgeType = | \"fork\"\n  | \"branch\"\n  | \"tree_jump\"\n  | \"resume\"\n  | \"compaction\"\n  | \"continuation\"\n  | \"handoff\"\n  // Semantic edges (daemon discovers)\n  | \"semantic\"\n  | \"reference\"\n  | \"lesson_application\"\n  | ...",
           "lines": [
-            253,
-            280
+            268,
+            295
           ],
           "exported": true,
           "is_default": false,
@@ -23670,8 +23823,8 @@
           "kind": "type",
           "signature": "EdgeCreator = \"boundary\" | \"daemon\" | \"user\"",
           "lines": [
-            282,
-            282
+            297,
+            297
           ],
           "exported": true,
           "is_default": false,
@@ -23689,8 +23842,8 @@
           "kind": "interface",
           "signature": "EdgeMetadata",
           "lines": [
-            284,
-            297
+            299,
+            312
           ],
           "exported": true,
           "is_default": false,
@@ -23708,8 +23861,8 @@
           "kind": "interface",
           "signature": "Edge",
           "lines": [
-            299,
-            312
+            314,
+            327
           ],
           "exported": true,
           "is_default": false,
@@ -23727,8 +23880,8 @@
           "kind": "variable",
           "signature": "AUTOMEM_EDGE_TYPES",
           "lines": [
-            318,
-            330
+            333,
+            345
           ],
           "exported": true,
           "is_default": false,
@@ -23746,8 +23899,8 @@
           "kind": "type",
           "signature": "AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number]",
           "lines": [
-            332,
-            332
+            347,
+            347
           ],
           "exported": true,
           "is_default": false,
@@ -23765,8 +23918,8 @@
           "kind": "type",
           "signature": "VersionTrigger = | \"initial\"\n  | \"prompt_update\"\n  | \"connection_found\"\n  | \"user_feedback\"\n  | \"schema_migration\"",
           "lines": [
-            338,
-            343
+            353,
+            358
           ],
           "exported": true,
           "is_default": false,
@@ -23784,8 +23937,8 @@
           "kind": "interface",
           "signature": "NodeVersion",
           "lines": [
-            345,
-            352
+            360,
+            367
           ],
           "exported": true,
           "is_default": false,
@@ -23803,8 +23956,8 @@
           "kind": "interface",
           "signature": "AggregatedFailurePattern",
           "lines": [
-            358,
-            368
+            373,
+            383
           ],
           "exported": true,
           "is_default": false,
@@ -23822,8 +23975,8 @@
           "kind": "interface",
           "signature": "AggregatedModelStats",
           "lines": [
-            370,
-            379
+            385,
+            394
           ],
           "exported": true,
           "is_default": false,
@@ -23841,8 +23994,8 @@
           "kind": "interface",
           "signature": "AggregatedLessonPattern",
           "lines": [
-            381,
-            390
+            396,
+            405
           ],
           "exported": true,
           "is_default": false,
@@ -23860,8 +24013,8 @@
           "kind": "type",
           "signature": "InsightType = \"quirk\" | \"win\" | \"failure\" | \"tool_error\" | \"lesson\"",
           "lines": [
-            396,
-            396
+            411,
+            411
           ],
           "exported": true,
           "is_default": false,
@@ -23879,8 +24032,8 @@
           "kind": "type",
           "signature": "InsightSeverity = \"low\" | \"medium\" | \"high\"",
           "lines": [
-            397,
-            397
+            412,
+            412
           ],
           "exported": true,
           "is_default": false,
@@ -23898,8 +24051,8 @@
           "kind": "interface",
           "signature": "AggregatedInsight",
           "lines": [
-            399,
-            426
+            414,
+            441
           ],
           "exported": true,
           "is_default": false,
@@ -23917,8 +24070,8 @@
           "kind": "interface",
           "signature": "PromptAddition",
           "lines": [
-            432,
-            443
+            447,
+            458
           ],
           "exported": true,
           "is_default": false,
@@ -23936,8 +24089,8 @@
           "kind": "interface",
           "signature": "DateRange",
           "lines": [
-            452,
-            457
+            467,
+            472
           ],
           "exported": true,
           "is_default": false,
@@ -23955,8 +24108,8 @@
           "kind": "interface",
           "signature": "EffectivenessResult",
           "lines": [
-            462,
-            480
+            477,
+            495
           ],
           "exported": true,
           "is_default": false,
@@ -23974,8 +24127,8 @@
           "kind": "interface",
           "signature": "PromptEffectiveness",
           "lines": [
-            485,
-            521
+            500,
+            536
           ],
           "exported": true,
           "is_default": false,
@@ -23993,8 +24146,8 @@
           "kind": "interface",
           "signature": "ManualFlag",
           "lines": [
-            530,
-            537
+            545,
+            552
           ],
           "exported": true,
           "is_default": false,
@@ -24012,8 +24165,8 @@
           "kind": "interface",
           "signature": "FrictionSignals",
           "lines": [
-            542,
-            557
+            557,
+            572
           ],
           "exported": true,
           "is_default": false,
@@ -24031,8 +24184,8 @@
           "kind": "interface",
           "signature": "DelightSignals",
           "lines": [
-            562,
-            571
+            577,
+            586
           ],
           "exported": true,
           "is_default": false,
@@ -24050,8 +24203,8 @@
           "kind": "interface",
           "signature": "NodeSignals",
           "lines": [
-            576,
-            580
+            591,
+            595
           ],
           "exported": true,
           "is_default": false,
@@ -24069,8 +24222,8 @@
           "kind": "type",
           "signature": "ClusterStatus = \"pending\" | \"confirmed\" | \"dismissed\"",
           "lines": [
-            589,
-            589
+            604,
+            604
           ],
           "exported": true,
           "is_default": false,
@@ -24088,8 +24241,8 @@
           "kind": "type",
           "signature": "ClusterSignalType = \"friction\" | \"delight\" | null",
           "lines": [
-            594,
-            594
+            609,
+            609
           ],
           "exported": true,
           "is_default": false,
@@ -24107,8 +24260,8 @@
           "kind": "interface",
           "signature": "Cluster",
           "lines": [
-            599,
-            621
+            614,
+            636
           ],
           "exported": true,
           "is_default": false,
@@ -24126,8 +24279,8 @@
           "kind": "interface",
           "signature": "ClusterNode",
           "lines": [
-            626,
-            633
+            641,
+            648
           ],
           "exported": true,
           "is_default": false,
@@ -24145,8 +24298,8 @@
           "kind": "interface",
           "signature": "NodeEmbedding",
           "lines": [
-            638,
-            648
+            653,
+            663
           ],
           "exported": true,
           "is_default": false,
@@ -24164,8 +24317,8 @@
           "kind": "interface",
           "signature": "ClusteringRun",
           "lines": [
-            653,
-            666
+            668,
+            681
           ],
           "exported": true,
           "is_default": false,
@@ -24183,8 +24336,8 @@
           "kind": "interface",
           "signature": "EmbeddingConfig",
           "lines": [
-            671,
-            682
+            686,
+            697
           ],
           "exported": true,
           "is_default": false,
@@ -24202,8 +24355,8 @@
           "kind": "interface",
           "signature": "ClusteringConfig",
           "lines": [
-            687,
-            698
+            702,
+            713
           ],
           "exported": true,
           "is_default": false,
@@ -24221,8 +24374,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryResult",
           "lines": [
-            703,
-            706
+            718,
+            721
           ],
           "exported": true,
           "is_default": false,
@@ -25177,10 +25330,10 @@
       "language": "typescript",
       "lines": [
         1,
-        286
+        342
       ],
       "detail_level": "full",
-      "token_estimate": 279,
+      "token_estimate": 305,
       "symbols": [
         {
           "name": "LessonEntity",
@@ -25283,7 +25436,7 @@
           "signature": "DashboardStats",
           "lines": [
             118,
-            148
+            182
           ],
           "exported": true,
           "is_default": false,
@@ -25297,12 +25450,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "RunningJob",
+          "kind": "interface",
+          "signature": "RunningJob",
+          "lines": [
+            185,
+            202
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Running job details for real-time monitoring",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "DaemonStatus",
           "kind": "interface",
           "signature": "DaemonStatus",
           "lines": [
-            150,
-            170
+            204,
+            226
           ],
           "exported": true,
           "is_default": false,
@@ -25320,8 +25492,8 @@
           "kind": "interface",
           "signature": "DaemonDecisionEntity",
           "lines": [
-            174,
-            183
+            230,
+            239
           ],
           "exported": true,
           "is_default": false,
@@ -25339,8 +25511,8 @@
           "kind": "interface",
           "signature": "NodeFilters",
           "lines": [
-            186,
-            195
+            242,
+            251
           ],
           "exported": true,
           "is_default": false,
@@ -25358,8 +25530,8 @@
           "kind": "interface",
           "signature": "ProjectSummary",
           "lines": [
-            198,
-            203
+            254,
+            259
           ],
           "exported": true,
           "is_default": false,
@@ -25377,8 +25549,8 @@
           "kind": "interface",
           "signature": "SessionSummary",
           "lines": [
-            205,
-            219
+            261,
+            275
           ],
           "exported": true,
           "is_default": false,
@@ -25396,8 +25568,8 @@
           "kind": "interface",
           "signature": "ClusterNodeWithDetails extends ClusterNode",
           "lines": [
-            222,
-            227
+            278,
+            283
           ],
           "exported": true,
           "is_default": false,
@@ -25415,8 +25587,8 @@
           "kind": "interface",
           "signature": "ClusterWithNodes extends Cluster",
           "lines": [
-            229,
-            231
+            285,
+            287
           ],
           "exported": true,
           "is_default": false,
@@ -25434,8 +25606,8 @@
           "kind": "interface",
           "signature": "ClusterFeedResponse",
           "lines": [
-            233,
-            236
+            289,
+            292
           ],
           "exported": true,
           "is_default": false,
@@ -25453,8 +25625,8 @@
           "kind": "interface",
           "signature": "ClusterListResponse",
           "lines": [
-            238,
-            243
+            294,
+            299
           ],
           "exported": true,
           "is_default": false,
@@ -25472,8 +25644,8 @@
           "kind": "interface",
           "signature": "AbandonedRestartPattern",
           "lines": [
-            246,
-            262
+            302,
+            318
           ],
           "exported": true,
           "is_default": false,
@@ -25491,8 +25663,8 @@
           "kind": "interface",
           "signature": "AbandonedRestartsResponse",
           "lines": [
-            264,
-            270
+            320,
+            326
           ],
           "exported": true,
           "is_default": false,
@@ -25510,8 +25682,8 @@
           "kind": "interface",
           "signature": "FrictionSummary",
           "lines": [
-            272,
-            285
+            328,
+            341
           ],
           "exported": true,
           "is_default": false,
