@@ -485,3 +485,23 @@ the reactivity chain.
   - Linting: 0 errors, 0 warnings
 **Commit**: ec02af89
 **Notes**: Task 19.5.2 (cron validation) was completed as part of 19.5.1 since the validation was implemented inline with the route handlers.
+
+---
+
+## 2026-01-28 21:44 - Task 19.5.3
+
+**Status**: pending → done
+**Validation**:
+  - Created CronInput component at src/web/app/src/lib/components/cron-input.svelte
+  - Features implemented:
+    - Dropdown with 7 common cron presets (every hour, every 6 hours, daily at 2-5am, weekly)
+    - Custom mode with manual cron expression input
+    - Human-readable description of current cron expression
+    - Displays raw cron value with monospace styling
+    - Matches existing component patterns (TagInput, PasswordInput)
+  - Presets cover all default schedule values in config
+  - Lint: 0 errors, 0 warnings
+  - Svelte check: 0 errors, 0 warnings
+  - Tests: 1422 passed, 4 skipped
+**Commit**: 23cd2430
+**Notes**: Component follows spec from docs/specs/settings-ui.md. Includes describeCron() function to convert cron expressions to human-readable format (e.g., "0 2 * * *" → "Runs daily at 2am"). Ready for integration in Schedules section (task 19.5.4).
