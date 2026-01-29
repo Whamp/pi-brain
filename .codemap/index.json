@@ -1,12 +1,12 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1150,
+    "totalSymbols": 1156,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 512,
+      "function": 518,
       "type": 43,
       "interface": 266,
       "variable": 120,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39538,
-  "codebase_tokens": 1130997,
+  "total_tokens": 39868,
+  "codebase_tokens": 1134482,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1070
+        1150
       ],
       "detail_level": "full",
-      "token_estimate": 624,
+      "token_estimate": 954,
       "symbols": [
         {
           "name": "ValidationResult",
           "kind": "type",
           "signature": "ValidationResult = string | null",
           "lines": [
-            27,
-            27
+            28,
+            28
           ],
           "exported": false,
           "is_default": false,
@@ -356,8 +356,8 @@
           "kind": "function",
           "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            32,
-            45
+            33,
+            46
           ],
           "exported": false,
           "is_default": false,
@@ -375,8 +375,8 @@
           "kind": "function",
           "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            50,
-            63
+            51,
+            64
           ],
           "exported": false,
           "is_default": false,
@@ -390,12 +390,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateCronSchedule",
+          "kind": "function",
+          "signature": "validateCronSchedule(value: string | null | undefined, field: string): string",
+          "lines": [
+            70,
+            81
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a cron schedule expression\nReturns error message if invalid, null if valid or undefined",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "VALID_EMBEDDING_PROVIDERS",
           "kind": "variable",
           "signature": "readonly [\"ollama\", \"openai\", \"openrouter\"]",
           "lines": [
-            68,
-            68
+            86,
+            86
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +432,8 @@
           "kind": "type",
           "signature": "EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]",
           "lines": [
-            69,
-            69
+            87,
+            87
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +451,8 @@
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            74,
-            96
+            92,
+            120
           ],
           "exported": false,
           "is_default": false,
@@ -451,8 +470,8 @@
           "kind": "interface",
           "signature": "QueryConfigUpdateBody",
           "lines": [
-            101,
-            104
+            125,
+            128
           ],
           "exported": false,
           "is_default": false,
@@ -470,8 +489,8 @@
           "kind": "interface",
           "signature": "ApiConfigUpdateBody",
           "lines": [
-            109,
-            113
+            133,
+            137
           ],
           "exported": false,
           "is_default": false,
@@ -489,8 +508,8 @@
           "kind": "interface",
           "signature": "HubConfigUpdateBody",
           "lines": [
-            118,
-            122
+            142,
+            146
           ],
           "exported": false,
           "is_default": false,
@@ -508,8 +527,8 @@
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            127,
-            227
+            151,
+            271
           ],
           "exported": false,
           "is_default": false,
@@ -523,12 +542,107 @@
           "outgoing_refs": null
         },
         {
+          "name": "hasAnyDaemonField",
+          "kind": "function",
+          "signature": "hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean",
+          "lines": [
+            276,
+            278
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if daemon config update body has at least one field defined",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyNullableString",
+          "kind": "function",
+          "signature": "applyNullableString(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: string | null | undefined): void",
+          "lines": [
+            284,
+            299
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply an optional nullable string field to a raw config object\nnull/empty clears the field, undefined skips, string sets",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyNullableNumber",
+          "kind": "function",
+          "signature": "applyNullableNumber(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: number | null | undefined): void",
+          "lines": [
+            305,
+            319
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply an optional nullable numeric field to a raw config object\nnull clears the field, undefined skips, number sets",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyEmbeddingUpdates",
+          "kind": "function",
+          "signature": "applyEmbeddingUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            324,
+            345
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply embedding config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyScheduleUpdates",
+          "kind": "function",
+          "signature": "applyScheduleUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            350,
+            379
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply schedule config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "applyDaemonUpdates",
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            232,
-            344
+            384,
+            447
           ],
           "exported": false,
           "is_default": false,
@@ -546,8 +660,8 @@
           "kind": "function",
           "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
           "lines": [
-            349,
-            363
+            452,
+            466
           ],
           "exported": false,
           "is_default": false,
@@ -565,8 +679,8 @@
           "kind": "function",
           "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
           "lines": [
-            368,
-            397
+            471,
+            500
           ],
           "exported": false,
           "is_default": false,
@@ -584,8 +698,8 @@
           "kind": "function",
           "signature": "validatePath(p: string, field: string): string",
           "lines": [
-            402,
-            424
+            505,
+            527
           ],
           "exported": false,
           "is_default": false,
@@ -603,8 +717,8 @@
           "kind": "function",
           "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
           "lines": [
-            429,
-            463
+            532,
+            566
           ],
           "exported": false,
           "is_default": false,
@@ -622,8 +736,8 @@
           "kind": "function",
           "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
           "lines": [
-            468,
-            486
+            571,
+            589
           ],
           "exported": false,
           "is_default": false,
@@ -641,8 +755,8 @@
           "kind": "function",
           "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
           "lines": [
-            491,
-            512
+            594,
+            615
           ],
           "exported": false,
           "is_default": false,
@@ -660,8 +774,8 @@
           "kind": "function",
           "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
           "lines": [
-            517,
-            538
+            620,
+            641
           ],
           "exported": false,
           "is_default": false,
@@ -679,8 +793,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            540,
-            1069
+            643,
+            1149
           ],
           "exported": true,
           "is_default": false,
@@ -700,6 +814,7 @@
       "imports": [
         "../../config/config.js",
         "../../config/types.js",
+        "../../daemon/scheduler.js",
         "../responses.js",
         "fastify",
         "node:fs",

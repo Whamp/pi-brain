@@ -19,6 +19,7 @@ import {
   getDefaultHubConfig,
   expandPath,
 } from "../../config/config.js";
+import { isValidCronExpression } from "../../daemon/scheduler.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**
@@ -63,6 +64,23 @@ function validateFloatRange(
 }
 
 /**
+ * Validate a cron schedule expression
+ * Returns error message if invalid, null if valid or undefined
+ */
+function validateCronSchedule(
+  value: string | null | undefined,
+  field: string
+): ValidationResult {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+  if (!isValidCronExpression(value)) {
+    return `${field} must be a valid cron expression (e.g., "0 2 * * *")`;
+  }
+  return null;
+}
+
+/**
  * Valid embedding providers
  */
 const VALID_EMBEDDING_PROVIDERS = ["ollama", "openai", "openrouter"] as const;
@@ -93,6 +111,12 @@ interface DaemonConfigUpdateBody {
   embeddingApiKey?: string | null;
   embeddingBaseUrl?: string | null;
   embeddingDimensions?: number | null;
+  // Schedule fields
+  reanalysisSchedule?: string | null;
+  connectionDiscoverySchedule?: string | null;
+  patternAggregationSchedule?: string | null;
+  clusteringSchedule?: string | null;
+  backfillEmbeddingsSchedule?: string | null;
 }
 
 /**
@@ -143,6 +167,11 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     embeddingModel,
     embeddingBaseUrl,
     embeddingDimensions,
+    reanalysisSchedule,
+    connectionDiscoverySchedule,
+    patternAggregationSchedule,
+    clusteringSchedule,
+    backfillEmbeddingsSchedule,
   } = body;
 
   const validations: ValidationResult[] = [
@@ -178,6 +207,21 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
       "semanticSearchThreshold",
       0,
       1
+    ),
+    // Schedule validations
+    validateCronSchedule(reanalysisSchedule, "reanalysisSchedule"),
+    validateCronSchedule(
+      connectionDiscoverySchedule,
+      "connectionDiscoverySchedule"
+    ),
+    validateCronSchedule(
+      patternAggregationSchedule,
+      "patternAggregationSchedule"
+    ),
+    validateCronSchedule(clusteringSchedule, "clusteringSchedule"),
+    validateCronSchedule(
+      backfillEmbeddingsSchedule,
+      "backfillEmbeddingsSchedule"
     ),
   ];
 
@@ -227,28 +271,61 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
 }
 
 /**
- * Apply daemon config updates to raw config object
+ * Check if daemon config update body has at least one field defined
  */
-function applyDaemonUpdates(
-  rawConfig: RawConfig,
+function hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean {
+  return Object.values(body).some((value) => value !== undefined);
+}
+
+/**
+ * Apply an optional nullable string field to a raw config object
+ * null/empty clears the field, undefined skips, string sets
+ */
+function applyNullableString(
+  target: NonNullable<RawConfig["daemon"]>,
+  key: keyof NonNullable<RawConfig["daemon"]>,
+  value: string | null | undefined
+): void {
+  if (value === undefined) {
+    return;
+  }
+  if (value === null || value === "") {
+    // Clear the field by setting to undefined
+    // TypeScript needs us to use a type assertion here
+    target[key] = undefined as never;
+  } else {
+    target[key] = value as never;
+  }
+}
+
+/**
+ * Apply an optional nullable numeric field to a raw config object
+ * null clears the field, undefined skips, number sets
+ */
+function applyNullableNumber(
+  target: NonNullable<RawConfig["daemon"]>,
+  key: keyof NonNullable<RawConfig["daemon"]>,
+  value: number | null | undefined
+): void {
+  if (value === undefined) {
+    return;
+  }
+  if (value === null) {
+    // Clear the field by setting to undefined
+    target[key] = undefined as never;
+  } else {
+    target[key] = value as never;
+  }
+}
+
+/**
+ * Apply embedding config updates to raw config object
+ */
+function applyEmbeddingUpdates(
+  daemon: NonNullable<RawConfig["daemon"]>,
   body: DaemonConfigUpdateBody
 ): void {
   const {
-    provider,
-    model,
-    idleTimeoutMinutes,
-    parallelWorkers,
-    maxRetries,
-    retryDelaySeconds,
-    analysisTimeoutMinutes,
-    maxConcurrentAnalysis,
-    maxQueueSize,
-    backfillLimit,
-    reanalysisLimit,
-    connectionDiscoveryLimit,
-    connectionDiscoveryLookbackDays,
-    connectionDiscoveryCooldownHours,
-    semanticSearchThreshold,
     embeddingProvider,
     embeddingModel,
     embeddingApiKey,
@@ -256,91 +333,117 @@ function applyDaemonUpdates(
     embeddingDimensions,
   } = body;
 
+  if (embeddingProvider !== undefined) {
+    daemon.embedding_provider = embeddingProvider;
+  }
+  if (embeddingModel !== undefined) {
+    daemon.embedding_model = embeddingModel;
+  }
+  applyNullableString(daemon, "embedding_api_key", embeddingApiKey);
+  applyNullableString(daemon, "embedding_base_url", embeddingBaseUrl);
+  applyNullableNumber(daemon, "embedding_dimensions", embeddingDimensions);
+}
+
+/**
+ * Apply schedule config updates to raw config object
+ */
+function applyScheduleUpdates(
+  daemon: NonNullable<RawConfig["daemon"]>,
+  body: DaemonConfigUpdateBody
+): void {
+  const {
+    reanalysisSchedule,
+    connectionDiscoverySchedule,
+    patternAggregationSchedule,
+    clusteringSchedule,
+    backfillEmbeddingsSchedule,
+  } = body;
+
+  applyNullableString(daemon, "reanalysis_schedule", reanalysisSchedule);
+  applyNullableString(
+    daemon,
+    "connection_discovery_schedule",
+    connectionDiscoverySchedule
+  );
+  applyNullableString(
+    daemon,
+    "pattern_aggregation_schedule",
+    patternAggregationSchedule
+  );
+  applyNullableString(daemon, "clustering_schedule", clusteringSchedule);
+  applyNullableString(
+    daemon,
+    "backfill_embeddings_schedule",
+    backfillEmbeddingsSchedule
+  );
+}
+
+/**
+ * Apply daemon config updates to raw config object
+ */
+function applyDaemonUpdates(
+  rawConfig: RawConfig,
+  body: DaemonConfigUpdateBody
+): void {
   // Initialize daemon section if needed
   if (!rawConfig.daemon) {
     rawConfig.daemon = {};
   }
 
-  // Update provided fields
-  if (provider !== undefined) {
-    rawConfig.daemon.provider = provider;
+  const { daemon } = rawConfig;
+
+  // Simple field mappings
+  if (body.provider !== undefined) {
+    daemon.provider = body.provider;
   }
-  if (model !== undefined) {
-    rawConfig.daemon.model = model;
+  if (body.model !== undefined) {
+    daemon.model = body.model;
   }
-  if (idleTimeoutMinutes !== undefined) {
-    rawConfig.daemon.idle_timeout_minutes = idleTimeoutMinutes;
+  if (body.idleTimeoutMinutes !== undefined) {
+    daemon.idle_timeout_minutes = body.idleTimeoutMinutes;
   }
-  if (parallelWorkers !== undefined) {
-    rawConfig.daemon.parallel_workers = parallelWorkers;
+  if (body.parallelWorkers !== undefined) {
+    daemon.parallel_workers = body.parallelWorkers;
   }
-  if (maxRetries !== undefined) {
-    rawConfig.daemon.max_retries = maxRetries;
+  if (body.maxRetries !== undefined) {
+    daemon.max_retries = body.maxRetries;
   }
-  if (retryDelaySeconds !== undefined) {
-    rawConfig.daemon.retry_delay_seconds = retryDelaySeconds;
+  if (body.retryDelaySeconds !== undefined) {
+    daemon.retry_delay_seconds = body.retryDelaySeconds;
   }
-  if (analysisTimeoutMinutes !== undefined) {
-    rawConfig.daemon.analysis_timeout_minutes = analysisTimeoutMinutes;
+  if (body.analysisTimeoutMinutes !== undefined) {
+    daemon.analysis_timeout_minutes = body.analysisTimeoutMinutes;
   }
-  if (maxConcurrentAnalysis !== undefined) {
-    rawConfig.daemon.max_concurrent_analysis = maxConcurrentAnalysis;
+  if (body.maxConcurrentAnalysis !== undefined) {
+    daemon.max_concurrent_analysis = body.maxConcurrentAnalysis;
   }
-  if (maxQueueSize !== undefined) {
-    rawConfig.daemon.max_queue_size = maxQueueSize;
+  if (body.maxQueueSize !== undefined) {
+    daemon.max_queue_size = body.maxQueueSize;
   }
-  if (backfillLimit !== undefined) {
-    rawConfig.daemon.backfill_limit = backfillLimit;
+  if (body.backfillLimit !== undefined) {
+    daemon.backfill_limit = body.backfillLimit;
   }
-  if (reanalysisLimit !== undefined) {
-    rawConfig.daemon.reanalysis_limit = reanalysisLimit;
+  if (body.reanalysisLimit !== undefined) {
+    daemon.reanalysis_limit = body.reanalysisLimit;
   }
-  if (connectionDiscoveryLimit !== undefined) {
-    rawConfig.daemon.connection_discovery_limit = connectionDiscoveryLimit;
+  if (body.connectionDiscoveryLimit !== undefined) {
+    daemon.connection_discovery_limit = body.connectionDiscoveryLimit;
   }
-  if (connectionDiscoveryLookbackDays !== undefined) {
-    rawConfig.daemon.connection_discovery_lookback_days =
-      connectionDiscoveryLookbackDays;
+  if (body.connectionDiscoveryLookbackDays !== undefined) {
+    daemon.connection_discovery_lookback_days =
+      body.connectionDiscoveryLookbackDays;
   }
-  if (connectionDiscoveryCooldownHours !== undefined) {
-    rawConfig.daemon.connection_discovery_cooldown_hours =
-      connectionDiscoveryCooldownHours;
+  if (body.connectionDiscoveryCooldownHours !== undefined) {
+    daemon.connection_discovery_cooldown_hours =
+      body.connectionDiscoveryCooldownHours;
   }
-  if (semanticSearchThreshold !== undefined) {
-    rawConfig.daemon.semantic_search_threshold = semanticSearchThreshold;
+  if (body.semanticSearchThreshold !== undefined) {
+    daemon.semantic_search_threshold = body.semanticSearchThreshold;
   }
 
-  // Embedding fields
-  if (embeddingProvider !== undefined) {
-    rawConfig.daemon.embedding_provider = embeddingProvider;
-  }
-  if (embeddingModel !== undefined) {
-    rawConfig.daemon.embedding_model = embeddingModel;
-  }
-  // API key: null clears, undefined skips, string sets
-  if (embeddingApiKey !== undefined) {
-    if (embeddingApiKey === null) {
-      delete rawConfig.daemon.embedding_api_key;
-    } else {
-      rawConfig.daemon.embedding_api_key = embeddingApiKey;
-    }
-  }
-  // Base URL: null clears, undefined skips, string sets
-  if (embeddingBaseUrl !== undefined) {
-    if (embeddingBaseUrl === null) {
-      delete rawConfig.daemon.embedding_base_url;
-    } else {
-      rawConfig.daemon.embedding_base_url = embeddingBaseUrl;
-    }
-  }
-  // Dimensions: null clears, undefined skips, number sets
-  if (embeddingDimensions !== undefined) {
-    if (embeddingDimensions === null) {
-      delete rawConfig.daemon.embedding_dimensions;
-    } else {
-      rawConfig.daemon.embedding_dimensions = embeddingDimensions;
-    }
-  }
+  // Delegate to specialized update functions
+  applyEmbeddingUpdates(daemon, body);
+  applyScheduleUpdates(daemon, body);
 }
 
 /**
@@ -574,12 +677,24 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           hasApiKey: !!config.daemon.embeddingApiKey,
           embeddingBaseUrl: config.daemon.embeddingBaseUrl,
           embeddingDimensions: config.daemon.embeddingDimensions,
+          // Schedule fields
+          reanalysisSchedule: config.daemon.reanalysisSchedule,
+          connectionDiscoverySchedule:
+            config.daemon.connectionDiscoverySchedule,
+          patternAggregationSchedule: config.daemon.patternAggregationSchedule,
+          clusteringSchedule: config.daemon.clusteringSchedule,
+          backfillEmbeddingsSchedule: config.daemon.backfillEmbeddingsSchedule,
           // Include defaults for UI reference
           defaults: {
             provider: defaults.provider,
             model: defaults.model,
             embeddingProvider: defaults.embeddingProvider,
             embeddingModel: defaults.embeddingModel,
+            reanalysisSchedule: defaults.reanalysisSchedule,
+            connectionDiscoverySchedule: defaults.connectionDiscoverySchedule,
+            patternAggregationSchedule: defaults.patternAggregationSchedule,
+            clusteringSchedule: defaults.clusteringSchedule,
+            backfillEmbeddingsSchedule: defaults.backfillEmbeddingsSchedule,
           },
         },
         durationMs
@@ -598,53 +713,9 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
     ) => {
       const startTime = request.startTime ?? Date.now();
       const body = request.body ?? {};
-      const {
-        provider,
-        model,
-        idleTimeoutMinutes,
-        parallelWorkers,
-        maxRetries,
-        retryDelaySeconds,
-        analysisTimeoutMinutes,
-        maxConcurrentAnalysis,
-        maxQueueSize,
-        backfillLimit,
-        reanalysisLimit,
-        connectionDiscoveryLimit,
-        connectionDiscoveryLookbackDays,
-        connectionDiscoveryCooldownHours,
-        semanticSearchThreshold,
-        embeddingProvider,
-        embeddingModel,
-        embeddingApiKey,
-        embeddingBaseUrl,
-        embeddingDimensions,
-      } = body;
 
       // Validate at least one field is provided
-      const hasAnyField =
-        provider !== undefined ||
-        model !== undefined ||
-        idleTimeoutMinutes !== undefined ||
-        parallelWorkers !== undefined ||
-        maxRetries !== undefined ||
-        retryDelaySeconds !== undefined ||
-        analysisTimeoutMinutes !== undefined ||
-        maxConcurrentAnalysis !== undefined ||
-        maxQueueSize !== undefined ||
-        backfillLimit !== undefined ||
-        reanalysisLimit !== undefined ||
-        connectionDiscoveryLimit !== undefined ||
-        connectionDiscoveryLookbackDays !== undefined ||
-        connectionDiscoveryCooldownHours !== undefined ||
-        semanticSearchThreshold !== undefined ||
-        embeddingProvider !== undefined ||
-        embeddingModel !== undefined ||
-        embeddingApiKey !== undefined ||
-        embeddingBaseUrl !== undefined ||
-        embeddingDimensions !== undefined;
-
-      if (!hasAnyField) {
+      if (!hasAnyDaemonField(body)) {
         return reply
           .status(400)
           .send(
@@ -655,7 +726,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
           );
       }
 
-      // Validate numeric fields
+      // Validate fields
       const validationError = validateDaemonUpdate(body);
       if (validationError !== null) {
         return reply
@@ -714,6 +785,15 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             hasApiKey: !!updatedConfig.daemon.embeddingApiKey,
             embeddingBaseUrl: updatedConfig.daemon.embeddingBaseUrl,
             embeddingDimensions: updatedConfig.daemon.embeddingDimensions,
+            // Schedule fields
+            reanalysisSchedule: updatedConfig.daemon.reanalysisSchedule,
+            connectionDiscoverySchedule:
+              updatedConfig.daemon.connectionDiscoverySchedule,
+            patternAggregationSchedule:
+              updatedConfig.daemon.patternAggregationSchedule,
+            clusteringSchedule: updatedConfig.daemon.clusteringSchedule,
+            backfillEmbeddingsSchedule:
+              updatedConfig.daemon.backfillEmbeddingsSchedule,
             message: "Configuration updated. Restart daemon to apply changes.",
           },
           durationMs

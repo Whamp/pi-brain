@@ -1204,7 +1204,9 @@ src/daemon/scheduler.ts [1-978]
         - src/daemon/scheduler.test.ts:562: call scheduler
     945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-      refs in: 12 [call: 10, import: 1, reexport: 1]
+      refs in: 14 [call: 11, import: 2, reexport: 1]
+        - src/api/routes/config.ts:22: import (module)
+        - src/api/routes/config.ts:77: call validateCronSchedule
         - src/daemon/index.ts:147: reexport (module)
         - src/daemon/scheduler.test.ts:14: import (module)
         - src/daemon/scheduler.test.ts:573: call (module)
@@ -1213,8 +1215,6 @@ src/daemon/scheduler.ts [1-978]
         - src/daemon/scheduler.test.ts:576: call (module)
         - src/daemon/scheduler.test.ts:577: call (module)
         - src/daemon/scheduler.test.ts:581: call (module)
-        - src/daemon/scheduler.test.ts:582: call (module)
-        - src/daemon/scheduler.test.ts:583: call (module)
     960-977: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs in: 5 [call: 3, import: 1, reexport: 1]
@@ -3264,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,798 (codebase: ~1,130,997)
+Estimated tokens: 42,799 (codebase: ~1,134,482)

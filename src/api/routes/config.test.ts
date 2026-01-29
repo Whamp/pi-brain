@@ -1220,6 +1220,223 @@ describe("config api routes", () => {
     });
   });
 
+  describe("schedule config in daemon routes", () => {
+    it("returns schedule fields on GET", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.reanalysisSchedule).toBeDefined();
+      expect(body.data.connectionDiscoverySchedule).toBeDefined();
+      expect(body.data.patternAggregationSchedule).toBeDefined();
+      expect(body.data.clusteringSchedule).toBeDefined();
+      // backfillEmbeddingsSchedule may be undefined if not set
+    });
+
+    it("includes schedule defaults for UI reference", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/daemon",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.defaults.reanalysisSchedule).toBeDefined();
+      expect(body.data.defaults.connectionDiscoverySchedule).toBeDefined();
+      expect(body.data.defaults.patternAggregationSchedule).toBeDefined();
+      expect(body.data.defaults.clusteringSchedule).toBeDefined();
+      expect(body.data.defaults.backfillEmbeddingsSchedule).toBeDefined();
+    });
+
+    it("validates reanalysisSchedule must be valid cron expression", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisSchedule: "invalid cron" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("reanalysisSchedule");
+      expect(body.error.message).toContain("valid cron expression");
+    });
+
+    it("validates connectionDiscoverySchedule must be valid cron expression", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoverySchedule: "bad schedule" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("connectionDiscoverySchedule");
+    });
+
+    it("validates patternAggregationSchedule must be valid cron expression", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { patternAggregationSchedule: "not a cron" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("patternAggregationSchedule");
+    });
+
+    it("validates clusteringSchedule must be valid cron expression", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { clusteringSchedule: "1 2 3" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("clusteringSchedule");
+    });
+
+    it("validates backfillEmbeddingsSchedule must be valid cron expression", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillEmbeddingsSchedule: "every hour" },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("backfillEmbeddingsSchedule");
+    });
+
+    it("accepts valid reanalysisSchedule", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisSchedule: "0 3 * * *" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.reanalysisSchedule).toBe("0 3 * * *");
+    });
+
+    it("accepts valid connectionDiscoverySchedule", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { connectionDiscoverySchedule: "0 */6 * * *" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.connectionDiscoverySchedule).toBe("0 */6 * * *");
+    });
+
+    it("accepts valid patternAggregationSchedule", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { patternAggregationSchedule: "30 4 * * *" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.patternAggregationSchedule).toBe("30 4 * * *");
+    });
+
+    it("accepts valid clusteringSchedule", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { clusteringSchedule: "0 5 * * 0" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.clusteringSchedule).toBe("0 5 * * 0");
+    });
+
+    it("accepts valid backfillEmbeddingsSchedule", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillEmbeddingsSchedule: "0 6 * * *" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.backfillEmbeddingsSchedule).toBe("0 6 * * *");
+    });
+
+    it("clears schedule with null value", async () => {
+      // First set a schedule
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillEmbeddingsSchedule: "0 7 * * *" },
+      });
+
+      // Then clear it
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { backfillEmbeddingsSchedule: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      // After clearing, it returns to default
+      expect(body.data.backfillEmbeddingsSchedule).toBeDefined();
+    });
+
+    it("clears schedule with empty string", async () => {
+      // First set a schedule
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisSchedule: "0 8 * * *" },
+      });
+
+      // Then clear it with empty string
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: { reanalysisSchedule: "" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      // After clearing, it returns to default
+      expect(body.data.reanalysisSchedule).toBeDefined();
+    });
+
+    it("updates multiple schedules at once", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/daemon",
+        payload: {
+          reanalysisSchedule: "0 1 * * *",
+          connectionDiscoverySchedule: "0 2 * * *",
+          patternAggregationSchedule: "0 3 * * *",
+          clusteringSchedule: "0 4 * * *",
+          backfillEmbeddingsSchedule: "0 5 * * *",
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.reanalysisSchedule).toBe("0 1 * * *");
+      expect(body.data.connectionDiscoverySchedule).toBe("0 2 * * *");
+      expect(body.data.patternAggregationSchedule).toBe("0 3 * * *");
+      expect(body.data.clusteringSchedule).toBe("0 4 * * *");
+      expect(body.data.backfillEmbeddingsSchedule).toBe("0 5 * * *");
+    });
+  });
+
   describe("gET /config/providers", () => {
     it("returns list of providers", async () => {
       const response = await app.inject({
