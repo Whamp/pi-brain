@@ -23,6 +23,9 @@ import type {
   ClusterStatus,
   AbandonedRestartsResponse,
   FrictionSummary,
+  SpokeConfig,
+  SpokeCreateRequest,
+  SpokeUpdateRequest,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -673,6 +676,37 @@ export const api = {
 
   getFrictionSummary: () =>
     request<FrictionSummary>("/signals/friction-summary"),
+
+  // Spokes Configuration
+  getSpokes: () =>
+    request<{
+      spokes: SpokeConfig[];
+    }>("/config/spokes"),
+
+  createSpoke: (spoke: SpokeCreateRequest) =>
+    request<{
+      spoke: SpokeConfig;
+      message: string;
+    }>("/config/spokes", {
+      method: "POST",
+      body: JSON.stringify(spoke),
+    }),
+
+  updateSpoke: (name: string, updates: SpokeUpdateRequest) =>
+    request<{
+      spoke: SpokeConfig;
+      message: string;
+    }>(`/config/spokes/${encodeURIComponent(name)}`, {
+      method: "PUT",
+      body: JSON.stringify(updates),
+    }),
+
+  deleteSpoke: (name: string) =>
+    request<{
+      message: string;
+    }>(`/config/spokes/${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    }),
 };
 
 export {

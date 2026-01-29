@@ -1,15 +1,15 @@
 {
   "stats": {
     "totalFiles": 90,
-    "totalSymbols": 1156,
+    "totalSymbols": 1171,
     "byLanguage": {
       "typescript": 90
     },
     "bySymbolKind": {
-      "function": 518,
-      "type": 43,
-      "interface": 266,
-      "variable": 120,
+      "function": 523,
+      "type": 44,
+      "interface": 274,
+      "variable": 121,
       "class": 12,
       "property": 51,
       "constructor": 11,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 39868,
-  "codebase_tokens": 1139210,
+  "total_tokens": 40226,
+  "codebase_tokens": 1159465,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1150
+        1743
       ],
       "detail_level": "full",
-      "token_estimate": 954,
+      "token_estimate": 1243,
       "symbols": [
         {
           "name": "ValidationResult",
           "kind": "type",
           "signature": "ValidationResult = string | null",
           "lines": [
-            28,
-            28
+            32,
+            32
           ],
           "exported": false,
           "is_default": false,
@@ -356,8 +356,8 @@
           "kind": "function",
           "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            33,
-            46
+            37,
+            50
           ],
           "exported": false,
           "is_default": false,
@@ -375,8 +375,8 @@
           "kind": "function",
           "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            51,
-            64
+            55,
+            68
           ],
           "exported": false,
           "is_default": false,
@@ -394,8 +394,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(value: string | null | undefined, field: string): string",
           "lines": [
-            70,
-            81
+            74,
+            85
           ],
           "exported": false,
           "is_default": false,
@@ -413,8 +413,8 @@
           "kind": "variable",
           "signature": "readonly [\"ollama\", \"openai\", \"openrouter\"]",
           "lines": [
-            86,
-            86
+            90,
+            90
           ],
           "exported": false,
           "is_default": false,
@@ -432,8 +432,8 @@
           "kind": "type",
           "signature": "EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]",
           "lines": [
-            87,
-            87
+            91,
+            91
           ],
           "exported": false,
           "is_default": false,
@@ -451,8 +451,8 @@
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            92,
-            120
+            96,
+            124
           ],
           "exported": false,
           "is_default": false,
@@ -470,8 +470,8 @@
           "kind": "interface",
           "signature": "QueryConfigUpdateBody",
           "lines": [
-            125,
-            128
+            129,
+            132
           ],
           "exported": false,
           "is_default": false,
@@ -489,8 +489,8 @@
           "kind": "interface",
           "signature": "ApiConfigUpdateBody",
           "lines": [
-            133,
-            137
+            137,
+            141
           ],
           "exported": false,
           "is_default": false,
@@ -508,8 +508,8 @@
           "kind": "interface",
           "signature": "HubConfigUpdateBody",
           "lines": [
-            142,
-            146
+            146,
+            150
           ],
           "exported": false,
           "is_default": false,
@@ -523,12 +523,107 @@
           "outgoing_refs": null
         },
         {
+          "name": "VALID_SYNC_METHODS",
+          "kind": "variable",
+          "signature": "SyncMethod[]",
+          "lines": [
+            155,
+            155
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Valid sync methods for spokes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RsyncOptionsBody",
+          "kind": "interface",
+          "signature": "RsyncOptionsBody",
+          "lines": [
+            160,
+            165
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke rsync options request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeCreateBody",
+          "kind": "interface",
+          "signature": "SpokeCreateBody",
+          "lines": [
+            170,
+            178
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke configuration create request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeUpdateBody",
+          "kind": "interface",
+          "signature": "SpokeUpdateBody",
+          "lines": [
+            183,
+            190
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeResponse",
+          "kind": "interface",
+          "signature": "SpokeResponse",
+          "lines": [
+            195,
+            203
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke response format",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "validateDaemonUpdate",
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            151,
-            271
+            208,
+            328
           ],
           "exported": false,
           "is_default": false,
@@ -546,8 +641,8 @@
           "kind": "function",
           "signature": "hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean",
           "lines": [
-            276,
-            278
+            333,
+            335
           ],
           "exported": false,
           "is_default": false,
@@ -565,8 +660,8 @@
           "kind": "function",
           "signature": "applyNullableString(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: string | null | undefined): void",
           "lines": [
-            284,
-            299
+            341,
+            356
           ],
           "exported": false,
           "is_default": false,
@@ -584,8 +679,8 @@
           "kind": "function",
           "signature": "applyNullableNumber(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: number | null | undefined): void",
           "lines": [
-            305,
-            319
+            362,
+            376
           ],
           "exported": false,
           "is_default": false,
@@ -603,8 +698,8 @@
           "kind": "function",
           "signature": "applyEmbeddingUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
           "lines": [
-            324,
-            345
+            381,
+            402
           ],
           "exported": false,
           "is_default": false,
@@ -622,8 +717,8 @@
           "kind": "function",
           "signature": "applyScheduleUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
           "lines": [
-            350,
-            379
+            407,
+            436
           ],
           "exported": false,
           "is_default": false,
@@ -641,8 +736,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            384,
-            447
+            441,
+            504
           ],
           "exported": false,
           "is_default": false,
@@ -660,8 +755,8 @@
           "kind": "function",
           "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
           "lines": [
-            452,
-            466
+            509,
+            523
           ],
           "exported": false,
           "is_default": false,
@@ -679,8 +774,8 @@
           "kind": "function",
           "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
           "lines": [
-            471,
-            500
+            528,
+            557
           ],
           "exported": false,
           "is_default": false,
@@ -698,8 +793,8 @@
           "kind": "function",
           "signature": "validatePath(p: string, field: string): string",
           "lines": [
-            505,
-            527
+            562,
+            584
           ],
           "exported": false,
           "is_default": false,
@@ -717,8 +812,8 @@
           "kind": "function",
           "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
           "lines": [
-            532,
-            566
+            589,
+            623
           ],
           "exported": false,
           "is_default": false,
@@ -732,12 +827,107 @@
           "outgoing_refs": null
         },
         {
+          "name": "validateSpokeName",
+          "kind": "function",
+          "signature": "validateSpokeName(name: string): string",
+          "lines": [
+            628,
+            639
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke name is valid (alphanumeric, dash, underscore)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateRsyncOptions",
+          "kind": "function",
+          "signature": "validateRsyncOptions(options: RsyncOptionsBody | undefined, field: string): string",
+          "lines": [
+            644,
+            682
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate rsync options",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateSpokeCreate",
+          "kind": "function",
+          "signature": "validateSpokeCreate(body: SpokeCreateBody): string",
+          "lines": [
+            687,
+            741
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke create request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateSpokeUpdate",
+          "kind": "function",
+          "signature": "validateSpokeUpdate(body: SpokeUpdateBody): string",
+          "lines": [
+            746,
+            787
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "spokeToResponse",
+          "kind": "function",
+          "signature": "spokeToResponse(spoke: {\n  name: string;\n  syncMethod: SyncMethod;\n  path: string;\n  source?: string;\n  enabled: boolean;\n  schedule?: string;\n  rsyncOptions?: RsyncOptions;\n}): SpokeResponse",
+          "lines": [
+            792,
+            819
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Convert a spoke config to response format",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "applyQueryUpdates",
           "kind": "function",
           "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
           "lines": [
-            571,
-            589
+            824,
+            842
           ],
           "exported": false,
           "is_default": false,
@@ -755,8 +945,8 @@
           "kind": "function",
           "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
           "lines": [
-            594,
-            615
+            847,
+            868
           ],
           "exported": false,
           "is_default": false,
@@ -774,8 +964,8 @@
           "kind": "function",
           "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
           "lines": [
-            620,
-            641
+            873,
+            894
           ],
           "exported": false,
           "is_default": false,
@@ -793,8 +983,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            643,
-            1149
+            896,
+            1742
           ],
           "exported": true,
           "is_default": false,
@@ -22189,7 +22379,7 @@
       "language": "typescript",
       "lines": [
         1,
-        690
+        724
       ],
       "detail_level": "full",
       "token_estimate": 345,
@@ -22199,8 +22389,8 @@
           "kind": "function",
           "signature": "getDefaultBaseUrl(): string",
           "lines": [
-            29,
-            40
+            32,
+            43
           ],
           "exported": false,
           "is_default": false,
@@ -22218,8 +22408,8 @@
           "kind": "variable",
           "signature": "string",
           "lines": [
-            42,
-            42
+            45,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -22237,8 +22427,8 @@
           "kind": "variable",
           "signature": "30000",
           "lines": [
-            43,
-            43
+            46,
+            46
           ],
           "exported": false,
           "is_default": false,
@@ -22256,8 +22446,8 @@
           "kind": "interface",
           "signature": "ApiResponse<T>",
           "lines": [
-            45,
-            57
+            48,
+            60
           ],
           "exported": false,
           "is_default": false,
@@ -22275,8 +22465,8 @@
           "kind": "interface",
           "signature": "ApiErrorOptions",
           "lines": [
-            59,
-            63
+            62,
+            66
           ],
           "exported": false,
           "is_default": false,
@@ -22294,8 +22484,8 @@
           "kind": "function",
           "signature": "createApiError(options: ApiErrorOptions): Error",
           "lines": [
-            65,
-            74
+            68,
+            77
           ],
           "exported": true,
           "is_default": false,
@@ -22313,8 +22503,8 @@
           "kind": "function",
           "signature": "createTimeoutError(timeoutMs: number): Error",
           "lines": [
-            76,
-            80
+            79,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -22332,8 +22522,8 @@
           "kind": "function",
           "signature": "createNetworkError(message: string): Error",
           "lines": [
-            82,
-            86
+            85,
+            89
           ],
           "exported": true,
           "is_default": false,
@@ -22351,8 +22541,8 @@
           "kind": "function",
           "signature": "createContentTypeError(status: number, contentType: string): Error",
           "lines": [
-            88,
-            97
+            91,
+            100
           ],
           "exported": true,
           "is_default": false,
@@ -22370,8 +22560,8 @@
           "kind": "function",
           "signature": "isApiError(error: unknown): boolean",
           "lines": [
-            99,
-            103
+            102,
+            106
           ],
           "exported": true,
           "is_default": false,
@@ -22389,8 +22579,8 @@
           "kind": "function",
           "signature": "isTimeoutError(error: unknown): boolean",
           "lines": [
-            105,
-            107
+            108,
+            110
           ],
           "exported": true,
           "is_default": false,
@@ -22408,8 +22598,8 @@
           "kind": "function",
           "signature": "isNetworkError(error: unknown): boolean",
           "lines": [
-            109,
-            111
+            112,
+            114
           ],
           "exported": true,
           "is_default": false,
@@ -22427,8 +22617,8 @@
           "kind": "function",
           "signature": "isContentTypeError(error: unknown): boolean",
           "lines": [
-            113,
-            117
+            116,
+            120
           ],
           "exported": true,
           "is_default": false,
@@ -22446,8 +22636,8 @@
           "kind": "function",
           "signature": "isBackendOffline(error: unknown): boolean",
           "lines": [
-            123,
-            127
+            126,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -22465,8 +22655,8 @@
           "kind": "function",
           "signature": "getErrorMessage(error: unknown): string",
           "lines": [
-            132,
-            149
+            135,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -22484,8 +22674,8 @@
           "kind": "function",
           "signature": "toQueryString(params: Record<string, unknown>): string",
           "lines": [
-            151,
-            168
+            154,
+            171
           ],
           "exported": false,
           "is_default": false,
@@ -22503,8 +22693,8 @@
           "kind": "function",
           "signature": "async request<T>(endpoint: string, options: RequestInit = {}, baseUrl: string = DEFAULT_BASE_URL, timeoutMs: number = DEFAULT_TIMEOUT_MS): Promise<T>",
           "lines": [
-            170,
-            218
+            173,
+            221
           ],
           "exported": false,
           "is_default": false,
@@ -22522,8 +22712,8 @@
           "kind": "variable",
           "signature": "api",
           "lines": [
-            220,
-            676
+            223,
+            710
           ],
           "exported": true,
           "is_default": false,
@@ -23105,10 +23295,10 @@
       "language": "typescript",
       "lines": [
         1,
-        286
+        325
       ],
       "detail_level": "full",
-      "token_estimate": 279,
+      "token_estimate": 348,
       "symbols": [
         {
           "name": "LessonEntity",
@@ -23440,6 +23630,101 @@
           "lines": [
             272,
             285
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SyncMethod",
+          "kind": "type",
+          "signature": "SyncMethod = \"syncthing\" | \"rsync\" | \"api\"",
+          "lines": [
+            288,
+            288
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RsyncOptions",
+          "kind": "interface",
+          "signature": "RsyncOptions",
+          "lines": [
+            290,
+            295
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeConfig",
+          "kind": "interface",
+          "signature": "SpokeConfig",
+          "lines": [
+            297,
+            305
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeCreateRequest",
+          "kind": "interface",
+          "signature": "SpokeCreateRequest",
+          "lines": [
+            307,
+            315
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeUpdateRequest",
+          "kind": "interface",
+          "signature": "SpokeUpdateRequest",
+          "lines": [
+            317,
+            324
           ],
           "exported": true,
           "is_default": false,

@@ -531,3 +531,53 @@ the reactivity chain.
   - Tests: 1422 passed, 4 skipped
 **Commit**: a012b5ee
 **Notes**: The Schedules section is placed between Embeddings and Query Configuration in the settings UI. Uses the CronInput component created in task 19.5.3 which provides preset dropdowns (every hour, daily at 2-5am, etc.) and custom cron expression input with human-readable descriptions.
+
+---
+
+## 2026-01-28 22:06 - Tasks 19.6.1, 19.6.2, 19.6.3, 19.6.4, 19.6.5
+
+**Status**: pending → done
+**Validation**:
+  - Added 4 new API routes for spokes CRUD operations:
+    - GET /api/v1/config/spokes - List all spokes
+    - POST /api/v1/config/spokes - Create new spoke
+    - PUT /api/v1/config/spokes/:name - Update spoke
+    - DELETE /api/v1/config/spokes/:name - Delete spoke
+  - Implemented comprehensive validation:
+    - Name format: alphanumeric, dash, underscore (max 64 chars)
+    - syncMethod: syncthing | rsync | api
+    - path: validates exists or parent is writable
+    - source: required for rsync method
+    - schedule: valid cron expression if provided
+    - rsyncOptions: bwLimit (0-1000000), timeoutSeconds (0-86400), extraArgs (string[])
+    - Unique name enforcement with 409 Conflict response
+  - Added 25 new tests covering all CRUD operations and validation
+  - Lint: 0 errors, 0 warnings
+  - Tests: 1447 passed, 4 skipped (25 new tests)
+**Notes**: API routes follow existing patterns in config.ts. Response format consistent with other config endpoints. Spoke name is immutable after creation (change requires delete+recreate). UI components (19.6.6-19.6.10) pending.
+
+---
+
+## 2026-01-28 22:15 - Tasks 19.6.6, 19.6.7, 19.6.8, 19.6.9, 19.6.10, 19.7.1, 19.7.2, 19.7.3, 19.7.4
+
+**Status**: pending → done
+**Validation**:
+  - Created SpokeList component with add/edit/delete/toggle actions
+  - Created SpokeModal component with create/edit form and validation
+  - Implemented rsync options as collapsible nested section
+  - Created ConfirmDialog component for delete confirmation
+  - Created SettingsTabs component with keyboard navigation
+  - Refactored settings page into tabbed interface with 7 tabs:
+    - Daemon, Embeddings, Schedules, Query, API Server, Hub, Spokes
+  - Added URL hash support for direct tab linking (#daemon, #embeddings, etc.)
+  - Added beforeunload handler for unsaved changes warning
+  - Added spoke API client methods (getSpokes, createSpoke, updateSpoke, deleteSpoke)
+  - Added spoke types to types.ts (SpokeConfig, SpokeCreateRequest, SpokeUpdateRequest)
+  - Svelte check: 0 errors, 1 warning (unused CSS selector)
+  - Lint check: 0 errors, 0 warnings
+  - All 1447 backend tests pass
+**Commit**: (pending)
+**Notes**: Major refactor of settings UI from single scrollable page to tabbed interface.
+Spokes section uses immediate save pattern (no Save/Reset buttons) since spoke CRUD
+operations are performed immediately via API calls. Other tabs retain the form-based
+save/reset pattern.

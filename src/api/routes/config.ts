@@ -8,7 +8,11 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as yaml from "yaml";
 
-import type { RawConfig } from "../../config/types.js";
+import type {
+  RawConfig,
+  SyncMethod,
+  RsyncOptions,
+} from "../../config/types.js";
 
 import {
   DEFAULT_CONFIG_PATH,
@@ -143,6 +147,59 @@ interface HubConfigUpdateBody {
   sessionsDir?: string;
   databaseDir?: string;
   webUiPort?: number;
+}
+
+/**
+ * Valid sync methods for spokes
+ */
+const VALID_SYNC_METHODS: SyncMethod[] = ["syncthing", "rsync", "api"];
+
+/**
+ * Spoke rsync options request body
+ */
+interface RsyncOptionsBody {
+  bwLimit?: number;
+  delete?: boolean;
+  extraArgs?: string[];
+  timeoutSeconds?: number;
+}
+
+/**
+ * Spoke configuration create request body
+ */
+interface SpokeCreateBody {
+  name: string;
+  syncMethod: SyncMethod;
+  path: string;
+  source?: string;
+  enabled?: boolean;
+  schedule?: string;
+  rsyncOptions?: RsyncOptionsBody;
+}
+
+/**
+ * Spoke configuration update request body
+ */
+interface SpokeUpdateBody {
+  syncMethod?: SyncMethod;
+  path?: string;
+  source?: string | null;
+  enabled?: boolean;
+  schedule?: string | null;
+  rsyncOptions?: RsyncOptionsBody | null;
+}
+
+/**
+ * Spoke response format
+ */
+interface SpokeResponse {
+  name: string;
+  syncMethod: SyncMethod;
+  path: string;
+  source?: string;
+  enabled: boolean;
+  schedule?: string;
+  rsyncOptions?: RsyncOptions;
 }
 
 /**
@@ -563,6 +620,202 @@ function validateHubUpdate(body: HubConfigUpdateBody): ValidationResult {
   }
 
   return null;
+}
+
+/**
+ * Validate spoke name is valid (alphanumeric, dash, underscore)
+ */
+function validateSpokeName(name: string): ValidationResult {
+  if (!name || typeof name !== "string") {
+    return "name must be a non-empty string";
+  }
+  if (!/^[\w-]+$/.test(name)) {
+    return "name must contain only letters, numbers, dashes, and underscores";
+  }
+  if (name.length > 64) {
+    return "name must be 64 characters or fewer";
+  }
+  return null;
+}
+
+/**
+ * Validate rsync options
+ */
+function validateRsyncOptions(
+  options: RsyncOptionsBody | undefined,
+  field: string
+): ValidationResult {
+  if (options === undefined) {
+    return null;
+  }
+
+  const { bwLimit, timeoutSeconds, extraArgs } = options;
+
+  if (bwLimit !== undefined) {
+    if (!Number.isInteger(bwLimit) || bwLimit < 0 || bwLimit > 1_000_000) {
+      return `${field}.bwLimit must be an integer between 0 and 1000000`;
+    }
+  }
+
+  if (timeoutSeconds !== undefined) {
+    if (
+      !Number.isInteger(timeoutSeconds) ||
+      timeoutSeconds < 0 ||
+      timeoutSeconds > 86_400
+    ) {
+      return `${field}.timeoutSeconds must be an integer between 0 and 86400`;
+    }
+  }
+
+  if (extraArgs !== undefined) {
+    if (!Array.isArray(extraArgs)) {
+      return `${field}.extraArgs must be an array`;
+    }
+    for (const arg of extraArgs) {
+      if (typeof arg !== "string") {
+        return `${field}.extraArgs must be an array of strings`;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Validate spoke create request body
+ */
+function validateSpokeCreate(body: SpokeCreateBody): ValidationResult {
+  const {
+    name,
+    syncMethod,
+    path: spokePath,
+    source,
+    schedule,
+    rsyncOptions,
+  } = body;
+
+  // Validate name
+  const nameError = validateSpokeName(name);
+  if (nameError !== null) {
+    return nameError;
+  }
+
+  // Validate syncMethod
+  if (!syncMethod || !VALID_SYNC_METHODS.includes(syncMethod)) {
+    return `syncMethod must be one of: ${VALID_SYNC_METHODS.join(", ")}`;
+  }
+
+  // Validate path is non-empty string
+  if (!spokePath || typeof spokePath !== "string") {
+    return "path must be a non-empty string";
+  }
+
+  // Validate path exists or has writable parent
+  const pathError = validatePath(spokePath, "path");
+  if (pathError !== null) {
+    return pathError;
+  }
+
+  // Validate source for rsync
+  if (syncMethod === "rsync") {
+    if (!source || typeof source !== "string") {
+      return "source is required for rsync sync method";
+    }
+  }
+
+  // Validate schedule is a valid cron expression if provided
+  if (schedule !== undefined && schedule !== null && schedule !== "") {
+    const scheduleError = validateCronSchedule(schedule, "schedule");
+    if (scheduleError !== null) {
+      return scheduleError;
+    }
+  }
+
+  // Validate rsyncOptions
+  const rsyncError = validateRsyncOptions(rsyncOptions, "rsyncOptions");
+  if (rsyncError !== null) {
+    return rsyncError;
+  }
+
+  return null;
+}
+
+/**
+ * Validate spoke update request body
+ */
+function validateSpokeUpdate(body: SpokeUpdateBody): ValidationResult {
+  const { syncMethod, path: spokePath, source, schedule, rsyncOptions } = body;
+
+  // Validate syncMethod if provided
+  if (syncMethod !== undefined && !VALID_SYNC_METHODS.includes(syncMethod)) {
+    return `syncMethod must be one of: ${VALID_SYNC_METHODS.join(", ")}`;
+  }
+
+  // Validate path if provided
+  if (spokePath !== undefined) {
+    if (!spokePath || typeof spokePath !== "string") {
+      return "path must be a non-empty string";
+    }
+    const pathError = validatePath(spokePath, "path");
+    if (pathError !== null) {
+      return pathError;
+    }
+  }
+
+  // Validate source if provided (string or null)
+  if (source !== undefined && source !== null && typeof source !== "string") {
+    return "source must be a string or null";
+  }
+
+  // Validate schedule if provided
+  if (schedule !== undefined && schedule !== null && schedule !== "") {
+    const scheduleError = validateCronSchedule(schedule, "schedule");
+    if (scheduleError !== null) {
+      return scheduleError;
+    }
+  }
+
+  // Validate rsyncOptions if provided
+  if (rsyncOptions !== null) {
+    const rsyncError = validateRsyncOptions(rsyncOptions, "rsyncOptions");
+    if (rsyncError !== null) {
+      return rsyncError;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Convert a spoke config to response format
+ */
+function spokeToResponse(spoke: {
+  name: string;
+  syncMethod: SyncMethod;
+  path: string;
+  source?: string;
+  enabled: boolean;
+  schedule?: string;
+  rsyncOptions?: RsyncOptions;
+}): SpokeResponse {
+  const response: SpokeResponse = {
+    name: spoke.name,
+    syncMethod: spoke.syncMethod,
+    path: spoke.path,
+    enabled: spoke.enabled,
+  };
+
+  if (spoke.source !== undefined) {
+    response.source = spoke.source;
+  }
+  if (spoke.schedule !== undefined) {
+    response.schedule = spoke.schedule;
+  }
+  if (spoke.rsyncOptions !== undefined) {
+    response.rsyncOptions = spoke.rsyncOptions;
+  }
+
+  return response;
 }
 
 /**
@@ -1140,6 +1393,346 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
             databaseDir: updatedConfig.hub.databaseDir,
             webUiPort: updatedConfig.hub.webUiPort,
             message: "Configuration updated. Restart daemon to apply changes.",
+          },
+          durationMs
+        )
+      );
+    }
+  );
+
+  /**
+   * GET /config/spokes - List all spokes
+   */
+  app.get("/spokes", async (request: FastifyRequest, reply: FastifyReply) => {
+    const startTime = request.startTime ?? Date.now();
+
+    const config = loadConfig();
+
+    const spokes = config.spokes.map((spoke) => spokeToResponse(spoke));
+
+    const durationMs = Date.now() - startTime;
+    return reply.send(successResponse({ spokes }, durationMs));
+  });
+
+  /**
+   * POST /config/spokes - Create a new spoke
+   */
+  app.post(
+    "/spokes",
+    async (
+      request: FastifyRequest<{ Body: SpokeCreateBody }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { body } = request;
+
+      // Validate body
+      if (!body || typeof body !== "object") {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", "Request body is required"));
+      }
+
+      // Validate fields
+      const validationError = validateSpokeCreate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
+      }
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Initialize spokes array if needed
+      if (!rawConfig.spokes) {
+        rawConfig.spokes = [];
+      }
+
+      // Check for duplicate name
+      const existingSpoke = rawConfig.spokes.find((s) => s.name === body.name);
+      if (existingSpoke) {
+        return reply
+          .status(409)
+          .send(
+            errorResponse("CONFLICT", `Spoke "${body.name}" already exists`)
+          );
+      }
+
+      // Build raw spoke config
+      const rawSpoke: NonNullable<RawConfig["spokes"]>[number] = {
+        name: body.name,
+        sync_method: body.syncMethod,
+        path: body.path,
+        enabled: body.enabled ?? true,
+      };
+
+      if (body.source !== undefined) {
+        rawSpoke.source = body.source;
+      }
+      if (body.schedule !== undefined) {
+        rawSpoke.schedule = body.schedule;
+      }
+      if (body.rsyncOptions !== undefined) {
+        rawSpoke.rsync_options = {};
+        if (body.rsyncOptions.bwLimit !== undefined) {
+          rawSpoke.rsync_options.bw_limit = body.rsyncOptions.bwLimit;
+        }
+        if (body.rsyncOptions.delete !== undefined) {
+          rawSpoke.rsync_options.delete = body.rsyncOptions.delete;
+        }
+        if (body.rsyncOptions.extraArgs !== undefined) {
+          rawSpoke.rsync_options.extra_args = body.rsyncOptions.extraArgs;
+        }
+        if (body.rsyncOptions.timeoutSeconds !== undefined) {
+          rawSpoke.rsync_options.timeout_seconds =
+            body.rsyncOptions.timeoutSeconds;
+        }
+      }
+
+      // Add to spokes array
+      rawConfig.spokes.push(rawSpoke);
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      // Reload and return created spoke
+      const updatedConfig = loadConfig();
+      const createdSpoke = updatedConfig.spokes.find(
+        (s) => s.name === body.name
+      );
+
+      if (!createdSpoke) {
+        return reply
+          .status(500)
+          .send(
+            errorResponse(
+              "INTERNAL_ERROR",
+              "Failed to create spoke - not found after save"
+            )
+          );
+      }
+
+      const durationMs = Date.now() - startTime;
+      return reply.status(201).send(
+        successResponse(
+          {
+            spoke: spokeToResponse(createdSpoke),
+            message: "Spoke created. Restart daemon to apply changes.",
+          },
+          durationMs
+        )
+      );
+    }
+  );
+
+  /**
+   * PUT /config/spokes/:name - Update a spoke
+   */
+  app.put(
+    "/spokes/:name",
+    async (
+      request: FastifyRequest<{
+        Params: { name: string };
+        Body: SpokeUpdateBody;
+      }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { name } = request.params;
+      const body = request.body ?? {};
+
+      // Check if at least one field is provided
+      const hasAnyField =
+        body.syncMethod !== undefined ||
+        body.path !== undefined ||
+        body.source !== undefined ||
+        body.enabled !== undefined ||
+        body.schedule !== undefined ||
+        body.rsyncOptions !== undefined;
+
+      if (!hasAnyField) {
+        return reply
+          .status(400)
+          .send(
+            errorResponse(
+              "BAD_REQUEST",
+              "At least one configuration field is required"
+            )
+          );
+      }
+
+      // Validate fields
+      const validationError = validateSpokeUpdate(body);
+      if (validationError !== null) {
+        return reply
+          .status(400)
+          .send(errorResponse("BAD_REQUEST", validationError));
+      }
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Find spoke by name
+      if (!rawConfig.spokes) {
+        rawConfig.spokes = [];
+      }
+
+      const spokeIndex = rawConfig.spokes.findIndex((s) => s.name === name);
+      if (spokeIndex === -1) {
+        return reply
+          .status(404)
+          .send(errorResponse("NOT_FOUND", `Spoke "${name}" not found`));
+      }
+
+      const rawSpoke = rawConfig.spokes[spokeIndex];
+
+      // Apply updates
+      if (body.syncMethod !== undefined) {
+        rawSpoke.sync_method = body.syncMethod;
+      }
+      if (body.path !== undefined) {
+        rawSpoke.path = body.path;
+      }
+      if (body.source !== undefined) {
+        if (body.source === null) {
+          delete rawSpoke.source;
+        } else {
+          rawSpoke.source = body.source;
+        }
+      }
+      if (body.enabled !== undefined) {
+        rawSpoke.enabled = body.enabled;
+      }
+      if (body.schedule !== undefined) {
+        if (body.schedule === null || body.schedule === "") {
+          delete rawSpoke.schedule;
+        } else {
+          rawSpoke.schedule = body.schedule;
+        }
+      }
+      if (body.rsyncOptions !== undefined) {
+        if (body.rsyncOptions === null) {
+          delete rawSpoke.rsync_options;
+        } else {
+          if (!rawSpoke.rsync_options) {
+            rawSpoke.rsync_options = {};
+          }
+          if (body.rsyncOptions.bwLimit !== undefined) {
+            rawSpoke.rsync_options.bw_limit = body.rsyncOptions.bwLimit;
+          }
+          if (body.rsyncOptions.delete !== undefined) {
+            rawSpoke.rsync_options.delete = body.rsyncOptions.delete;
+          }
+          if (body.rsyncOptions.extraArgs !== undefined) {
+            rawSpoke.rsync_options.extra_args = body.rsyncOptions.extraArgs;
+          }
+          if (body.rsyncOptions.timeoutSeconds !== undefined) {
+            rawSpoke.rsync_options.timeout_seconds =
+              body.rsyncOptions.timeoutSeconds;
+          }
+        }
+      }
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      // Reload and return updated spoke
+      const updatedConfig = loadConfig();
+      const updatedSpoke = updatedConfig.spokes.find((s) => s.name === name);
+
+      if (!updatedSpoke) {
+        return reply
+          .status(500)
+          .send(
+            errorResponse(
+              "INTERNAL_ERROR",
+              "Failed to update spoke - not found after save"
+            )
+          );
+      }
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            spoke: spokeToResponse(updatedSpoke),
+            message: "Spoke updated. Restart daemon to apply changes.",
+          },
+          durationMs
+        )
+      );
+    }
+  );
+
+  /**
+   * DELETE /config/spokes/:name - Delete a spoke
+   */
+  app.delete(
+    "/spokes/:name",
+    async (
+      request: FastifyRequest<{ Params: { name: string } }>,
+      reply: FastifyReply
+    ) => {
+      const startTime = request.startTime ?? Date.now();
+      const { name } = request.params;
+
+      // Read existing config file
+      let rawConfig: RawConfig = {};
+      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
+        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+        if (content.trim()) {
+          rawConfig = yaml.parse(content) as RawConfig;
+        }
+      }
+
+      // Find spoke by name
+      if (!rawConfig.spokes) {
+        rawConfig.spokes = [];
+      }
+
+      const spokeIndex = rawConfig.spokes.findIndex((s) => s.name === name);
+      if (spokeIndex === -1) {
+        return reply
+          .status(404)
+          .send(errorResponse("NOT_FOUND", `Spoke "${name}" not found`));
+      }
+
+      // Remove the spoke
+      rawConfig.spokes.splice(spokeIndex, 1);
+
+      // Write updated config
+      const yamlContent = yaml.stringify(rawConfig, {
+        indent: 2,
+        lineWidth: 0,
+      });
+      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+
+      const durationMs = Date.now() - startTime;
+      return reply.send(
+        successResponse(
+          {
+            message: `Spoke "${name}" deleted. Restart daemon to apply changes.`,
           },
           durationMs
         )

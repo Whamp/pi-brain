@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 90
-- Total symbols: 664
+- Total symbols: 669
   - function: 373
-  - interface: 207
-  - type: 40
+  - interface: 211
+  - type: 41
   - variable: 32
   - class: 12
 
@@ -51,9 +51,9 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-1150]
+src/api/routes/config.ts [1-1743]
   function:
-    643-1149: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    896-1742: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -2032,22 +2032,22 @@ src/types/index.ts [1-661]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-690]
+src/web/app/src/lib/api/client.ts [1-724]
   function:
-    65-74: createApiError(options: ApiErrorOptions): Error [exported]
-    76-80: createTimeoutError(timeoutMs: number): Error [exported]
-    82-86: createNetworkError(message: string): Error [exported]
-    88-97: createContentTypeError(status: number, contentType: string): Error [exported]
-    99-103: isApiError(error: unknown): boolean [exported]
-    105-107: isTimeoutError(error: unknown): boolean [exported]
-    109-111: isNetworkError(error: unknown): boolean [exported]
-    113-117: isContentTypeError(error: unknown): boolean [exported]
-    123-127: isBackendOffline(error: unknown): boolean [exported]
+    68-77: createApiError(options: ApiErrorOptions): Error [exported]
+    79-83: createTimeoutError(timeoutMs: number): Error [exported]
+    85-89: createNetworkError(message: string): Error [exported]
+    91-100: createContentTypeError(status: number, contentType: string): Error [exported]
+    102-106: isApiError(error: unknown): boolean [exported]
+    108-110: isTimeoutError(error: unknown): boolean [exported]
+    112-114: isNetworkError(error: unknown): boolean [exported]
+    116-120: isContentTypeError(error: unknown): boolean [exported]
+    126-130: isBackendOffline(error: unknown): boolean [exported]
       /** Check if an error indicates the backend is unreachable (network error, timeout, or non-JSON response like 404 HTML page) */
-    132-149: getErrorMessage(error: unknown): string [exported]
+    135-152: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    220-676: api [exported]
+    223-710: api [exported]
   imports:
     - $lib/types
 
@@ -2096,7 +2096,7 @@ src/web/app/src/lib/stores/websocket.ts [1-179]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-286]
+src/web/app/src/lib/types.ts [1-325]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
@@ -2116,6 +2116,12 @@ src/web/app/src/lib/types.ts [1-286]
     246-262: interface AbandonedRestartPattern [exported]
     264-270: interface AbandonedRestartsResponse [exported]
     272-285: interface FrictionSummary [exported]
+    290-295: interface RsyncOptions [exported]
+    297-305: interface SpokeConfig [exported]
+    307-315: interface SpokeCreateRequest [exported]
+    317-324: interface SpokeUpdateRequest [exported]
+  type:
+    288-288: SyncMethod = "syncthing" | "rsync" | "api" [exported]
   imports:
     - ../../../../types/index.js
 
@@ -2151,4 +2157,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 90
-Estimated tokens: 27,099 (codebase: ~1,138,899)
+Estimated tokens: 27,169 (codebase: ~1,143,509)

@@ -1205,8 +1205,8 @@ src/daemon/scheduler.ts [1-978]
     945-955: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs in: 14 [call: 11, import: 2, reexport: 1]
-        - src/api/routes/config.ts:22: import (module)
-        - src/api/routes/config.ts:77: call validateCronSchedule
+        - src/api/routes/config.ts:26: import (module)
+        - src/api/routes/config.ts:81: call validateCronSchedule
         - src/daemon/index.ts:147: reexport (module)
         - src/daemon/scheduler.test.ts:14: import (module)
         - src/daemon/scheduler.test.ts:573: call (module)
@@ -3264,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,799 (codebase: ~1,139,210)
+Estimated tokens: 42,799 (codebase: ~1,159,465)

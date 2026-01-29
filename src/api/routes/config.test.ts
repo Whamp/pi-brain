@@ -1905,4 +1905,460 @@ describe("config api routes", () => {
       expect(body.data.webUiPort).toBe(9002);
     });
   });
+
+  describe("gET /config/spokes", () => {
+    it("returns empty array when no spokes configured", async () => {
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/spokes",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.status).toBe("success");
+      expect(body.data.spokes).toBeDefined();
+      expect(Array.isArray(body.data.spokes)).toBeTruthy();
+    });
+  });
+
+  describe("pOST /config/spokes", () => {
+    it("requires request body", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: null,
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("requires name field", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          syncMethod: "syncthing",
+          path: "/tmp/spoke",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("name");
+    });
+
+    it("requires syncMethod field", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test-spoke",
+          path: "/tmp/spoke",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("syncMethod");
+    });
+
+    it("requires path field", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test-spoke",
+          syncMethod: "syncthing",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("path");
+    });
+
+    it("validates name format", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test spoke!",
+          syncMethod: "syncthing",
+          path: "/tmp/spoke",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("name");
+    });
+
+    it("validates syncMethod is valid", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test-spoke",
+          syncMethod: "invalid",
+          path: "/tmp/spoke",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("syncMethod");
+    });
+
+    it("requires source for rsync method", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test-spoke",
+          syncMethod: "rsync",
+          path: "/tmp/spoke",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("source");
+    });
+
+    it("creates spoke with syncthing method", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "laptop",
+          syncMethod: "syncthing",
+          path: "/tmp/laptop-sessions",
+        },
+      });
+
+      expect(response.statusCode).toBe(201);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.name).toBe("laptop");
+      expect(body.data.spoke.syncMethod).toBe("syncthing");
+      expect(body.data.spoke.path).toBe("/tmp/laptop-sessions");
+      expect(body.data.spoke.enabled).toBeTruthy();
+    });
+
+    it("creates spoke with rsync method", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "server",
+          syncMethod: "rsync",
+          path: "/tmp/server-sessions",
+          source: "user@server:~/.pi/sessions",
+          schedule: "0 */6 * * *",
+        },
+      });
+
+      expect(response.statusCode).toBe(201);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.name).toBe("server");
+      expect(body.data.spoke.syncMethod).toBe("rsync");
+      expect(body.data.spoke.source).toBe("user@server:~/.pi/sessions");
+      expect(body.data.spoke.schedule).toBe("0 */6 * * *");
+    });
+
+    it("creates spoke with rsyncOptions", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "remote",
+          syncMethod: "rsync",
+          path: "/tmp/remote-sessions",
+          source: "user@remote:/data",
+          rsyncOptions: {
+            bwLimit: 1000,
+            delete: true,
+            timeoutSeconds: 300,
+            extraArgs: ["--exclude=*.tmp"],
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(201);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.rsyncOptions).toBeDefined();
+      expect(body.data.spoke.rsyncOptions.bwLimit).toBe(1000);
+      expect(body.data.spoke.rsyncOptions.delete).toBeTruthy();
+      expect(body.data.spoke.rsyncOptions.timeoutSeconds).toBe(300);
+    });
+
+    it("prevents duplicate spoke names", async () => {
+      // Create first spoke
+      await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "unique-spoke",
+          syncMethod: "syncthing",
+          path: "/tmp/spoke1",
+        },
+      });
+
+      // Try to create another with same name
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "unique-spoke",
+          syncMethod: "syncthing",
+          path: "/tmp/spoke2",
+        },
+      });
+
+      expect(response.statusCode).toBe(409);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("already exists");
+    });
+
+    it("validates cron schedule format", async () => {
+      const response = await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "test-spoke",
+          syncMethod: "rsync",
+          path: "/tmp/spoke",
+          source: "user@server:/data",
+          schedule: "invalid cron",
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("cron");
+    });
+  });
+
+  describe("pUT /config/spokes/:name", () => {
+    beforeEach(async () => {
+      // Create a spoke for testing updates
+      await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "update-test",
+          syncMethod: "syncthing",
+          path: "/tmp/update-test",
+          enabled: true,
+        },
+      });
+    });
+
+    it("returns 404 for non-existent spoke", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/non-existent",
+        payload: { enabled: false },
+      });
+
+      expect(response.statusCode).toBe(404);
+      const body = JSON.parse(response.body);
+      expect(body.error.message).toContain("not found");
+    });
+
+    it("requires at least one field", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+
+    it("updates enabled field", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { enabled: false },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.enabled).toBeFalsy();
+    });
+
+    it("updates path field", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { path: "/tmp/new-path" },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.path).toBe("/tmp/new-path");
+    });
+
+    it("updates syncMethod to rsync with source", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: {
+          syncMethod: "rsync",
+          source: "user@host:/path",
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.syncMethod).toBe("rsync");
+      expect(body.data.spoke.source).toBe("user@host:/path");
+    });
+
+    it("clears source with null value", async () => {
+      // First set a source
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { source: "user@host:/path" },
+      });
+
+      // Then clear it
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { source: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.source).toBeUndefined();
+    });
+
+    it("updates rsyncOptions", async () => {
+      // First switch to rsync method with source
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: {
+          syncMethod: "rsync",
+          source: "user@host:/path",
+        },
+      });
+
+      // Now update rsyncOptions
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: {
+          rsyncOptions: {
+            bwLimit: 500,
+            delete: false,
+          },
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.rsyncOptions.bwLimit).toBe(500);
+      expect(body.data.spoke.rsyncOptions.delete).toBeFalsy();
+    });
+
+    it("clears rsyncOptions with null value", async () => {
+      // First switch to rsync and set rsyncOptions
+      await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: {
+          syncMethod: "rsync",
+          source: "user@host:/path",
+          rsyncOptions: { bwLimit: 500 },
+        },
+      });
+
+      // Then clear them
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { rsyncOptions: null },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.spoke.rsyncOptions).toBeUndefined();
+    });
+
+    it("validates rsyncOptions.bwLimit range", async () => {
+      const response = await app.inject({
+        method: "PUT",
+        url: "/api/v1/config/spokes/update-test",
+        payload: { rsyncOptions: { bwLimit: -1 } },
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("dELETE /config/spokes/:name", () => {
+    beforeEach(async () => {
+      // Create a spoke for testing deletion
+      await app.inject({
+        method: "POST",
+        url: "/api/v1/config/spokes",
+        payload: {
+          name: "delete-test",
+          syncMethod: "syncthing",
+          path: "/tmp/delete-test",
+        },
+      });
+    });
+
+    it("returns 404 for non-existent spoke", async () => {
+      const response = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/config/spokes/non-existent",
+      });
+
+      expect(response.statusCode).toBe(404);
+    });
+
+    it("deletes existing spoke", async () => {
+      const response = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/config/spokes/delete-test",
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.data.message).toContain("deleted");
+
+      // Verify it's gone
+      const listResponse = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/spokes",
+      });
+      const listBody = JSON.parse(listResponse.body);
+      const deletedSpoke = listBody.data.spokes.find(
+        (s: { name: string }) => s.name === "delete-test"
+      );
+      expect(deletedSpoke).toBeUndefined();
+    });
+
+    it("persists deletion after GET", async () => {
+      await app.inject({
+        method: "DELETE",
+        url: "/api/v1/config/spokes/delete-test",
+      });
+
+      // Should not find the spoke in subsequent GET
+      const response = await app.inject({
+        method: "GET",
+        url: "/api/v1/config/spokes",
+      });
+
+      const body = JSON.parse(response.body);
+      const spokes = body.data.spokes as { name: string }[];
+      expect(spokes.find((s) => s.name === "delete-test")).toBeUndefined();
+    });
+  });
 });

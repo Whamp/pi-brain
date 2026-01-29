@@ -362,27 +362,27 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.6 Spokes Configuration (Major)
 
-| ID      | Task                                                       | Status  | Deps           | Notes |
-| ------- | ---------------------------------------------------------- | ------- | -------------- | ----- |
-| 19.6.1  | Add GET /config/spokes route                               | pending | -              |       |
-| 19.6.2  | Add POST /config/spokes route                              | pending | -              |       |
-| 19.6.3  | Add PUT /config/spokes/:name route                         | pending | -              |       |
-| 19.6.4  | Add DELETE /config/spokes/:name route                      | pending | -              |       |
-| 19.6.5  | Implement spoke validation (unique names, required fields) | pending | 19.6.2         |       |
-| 19.6.6  | Create SpokeList component                                 | pending | 19.6.1         |       |
-| 19.6.7  | Create SpokeModal component                                | pending | 19.5.3         |       |
-| 19.6.8  | Handle rsync options nested object                         | pending | 19.6.7         |       |
-| 19.6.9  | Add confirmation dialog for delete                         | pending | 19.6.4         |       |
-| 19.6.10 | Add Spokes tab to settings UI                              | pending | 19.6.6, 19.6.7 |       |
+| ID      | Task                                                       | Status | Deps           | Notes                                            |
+| ------- | ---------------------------------------------------------- | ------ | -------------- | ------------------------------------------------ |
+| 19.6.1  | Add GET /config/spokes route                               | done   | -              | 2026-01-28 Returns array of all spoke configs    |
+| 19.6.2  | Add POST /config/spokes route                              | done   | -              | 2026-01-28 Creates spoke with validation         |
+| 19.6.3  | Add PUT /config/spokes/:name route                         | done   | -              | 2026-01-28 Updates spoke by name                 |
+| 19.6.4  | Add DELETE /config/spokes/:name route                      | done   | -              | 2026-01-28 Removes spoke from config             |
+| 19.6.5  | Implement spoke validation (unique names, required fields) | done   | 19.6.2         | 2026-01-28 Name format, syncMethod, path, source |
+| 19.6.6  | Create SpokeList component                                 | done   | 19.6.1         | 2026-01-28 List view with add/edit/delete/toggle |
+| 19.6.7  | Create SpokeModal component                                | done   | 19.5.3         | 2026-01-28 Create/edit form with validation      |
+| 19.6.8  | Handle rsync options nested object                         | done   | 19.6.7         | 2026-01-28 Collapsible rsync options section     |
+| 19.6.9  | Add confirmation dialog for delete                         | done   | 19.6.4         | 2026-01-28 ConfirmDialog component               |
+| 19.6.10 | Add Spokes tab to settings UI                              | done   | 19.6.6, 19.6.7 | 2026-01-28 Integrated into tabbed settings       |
 
 ### 19.7 UI Polish & Tabs (Trivial)
 
-| ID     | Task                                            | Status  | Deps      | Notes |
-| ------ | ----------------------------------------------- | ------- | --------- | ----- |
-| 19.7.1 | Create tab navigation component                 | pending | -         |       |
-| 19.7.2 | Extract settings sections into components       | pending | 19.1-19.6 |       |
-| 19.7.3 | Add URL hash support for direct tab linking     | pending | 19.7.1    |       |
-| 19.7.4 | Add unsaved changes warning when switching tabs | pending | 19.7.1    |       |
+| ID     | Task                                            | Status | Deps      | Notes                                   |
+| ------ | ----------------------------------------------- | ------ | --------- | --------------------------------------- |
+| 19.7.1 | Create tab navigation component                 | done   | -         | 2026-01-28 SettingsTabs with a11y       |
+| 19.7.2 | Extract settings sections into components       | done   | 19.1-19.6 | 2026-01-28 Organized by tab in settings |
+| 19.7.3 | Add URL hash support for direct tab linking     | done   | 19.7.1    | 2026-01-28 #daemon, #embeddings, etc.   |
+| 19.7.4 | Add unsaved changes warning when switching tabs | done   | 19.7.1    | 2026-01-28 beforeunload event handler   |
 
 ### 19.8 Testing & Documentation
 
