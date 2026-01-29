@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 39868,
-  "codebase_tokens": 1137668,
+  "codebase_tokens": 1138899,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -22189,7 +22189,7 @@
       "language": "typescript",
       "lines": [
         1,
-        667
+        690
       ],
       "detail_level": "full",
       "token_estimate": 345,
@@ -22523,7 +22523,7 @@
           "signature": "api",
           "lines": [
             220,
-            653
+            676
           ],
           "exported": true,
           "is_default": false,

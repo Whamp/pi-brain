@@ -451,11 +451,22 @@ export const api = {
       hasApiKey: boolean;
       embeddingBaseUrl: string | null;
       embeddingDimensions: number | null;
+      // Schedule fields
+      reanalysisSchedule: string;
+      connectionDiscoverySchedule: string;
+      patternAggregationSchedule: string;
+      clusteringSchedule: string;
+      backfillEmbeddingsSchedule: string;
       defaults: {
         provider: string;
         model: string;
         embeddingProvider: string;
         embeddingModel: string;
+        reanalysisSchedule: string;
+        connectionDiscoverySchedule: string;
+        patternAggregationSchedule: string;
+        clusteringSchedule: string;
+        backfillEmbeddingsSchedule: string;
       };
     }>("/config/daemon"),
 
@@ -481,6 +492,12 @@ export const api = {
     embeddingApiKey?: string | null;
     embeddingBaseUrl?: string | null;
     embeddingDimensions?: number | null;
+    // Schedule fields
+    reanalysisSchedule?: string;
+    connectionDiscoverySchedule?: string;
+    patternAggregationSchedule?: string;
+    clusteringSchedule?: string;
+    backfillEmbeddingsSchedule?: string;
   }) =>
     request<{
       provider: string;
@@ -504,6 +521,12 @@ export const api = {
       hasApiKey: boolean;
       embeddingBaseUrl: string | null;
       embeddingDimensions: number | null;
+      // Schedule fields
+      reanalysisSchedule: string;
+      connectionDiscoverySchedule: string;
+      patternAggregationSchedule: string;
+      clusteringSchedule: string;
+      backfillEmbeddingsSchedule: string;
       message: string;
     }>("/config/daemon", {
       method: "PUT",

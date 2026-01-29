@@ -353,12 +353,12 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.5 Cron Schedules (Moderate)
 
-| ID     | Task                                            | Status  | Deps           | Notes      |
-| ------ | ----------------------------------------------- | ------- | -------------- | ---------- |
-| 19.5.1 | Add schedule fields to daemon routes            | done    | -              | 2026-01-28 |
-| 19.5.2 | Add cron validation using isValidCronExpression | done    | 19.5.1         | 2026-01-28 |
-| 19.5.3 | Create CronInput component with presets         | done    | -              | 2026-01-28 |
-| 19.5.4 | Add Schedules section to settings UI            | pending | 19.5.1, 19.5.3 |            |
+| ID     | Task                                            | Status | Deps           | Notes      |
+| ------ | ----------------------------------------------- | ------ | -------------- | ---------- |
+| 19.5.1 | Add schedule fields to daemon routes            | done   | -              | 2026-01-28 |
+| 19.5.2 | Add cron validation using isValidCronExpression | done   | 19.5.1         | 2026-01-28 |
+| 19.5.3 | Create CronInput component with presets         | done   | -              | 2026-01-28 |
+| 19.5.4 | Add Schedules section to settings UI            | active | 19.5.1, 19.5.3 | 2026-01-28 |
 
 ### 19.6 Spokes Configuration (Major)
 

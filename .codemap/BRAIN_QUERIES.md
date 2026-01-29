@@ -3264,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,799 (codebase: ~1,137,668)
+Estimated tokens: 42,799 (codebase: ~1,138,899)

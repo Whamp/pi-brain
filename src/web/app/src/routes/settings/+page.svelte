@@ -5,6 +5,7 @@
   import { toastStore } from "$lib/stores/toast";
   import TagInput from "$lib/components/tag-input.svelte";
   import PasswordInput from "$lib/components/password-input.svelte";
+  import CronInput from "$lib/components/cron-input.svelte";
 
   interface Provider {
     id: string;
@@ -55,6 +56,13 @@
   let embeddingDimensions = $state<number | null>(null);
   let hasApiKey = $state(false);
 
+  // Schedule config values
+  let reanalysisSchedule = $state("0 2 * * *");
+  let connectionDiscoverySchedule = $state("0 3 * * *");
+  let patternAggregationSchedule = $state("0 3 * * *");
+  let clusteringSchedule = $state("0 4 * * *");
+  let backfillEmbeddingsSchedule = $state("0 5 * * *");
+
   // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
@@ -93,6 +101,13 @@
   let originalEmbeddingDimensions = $state<number | null>(null);
   let originalHasApiKey = $state(false);
 
+  // Schedule config original values
+  let originalReanalysisSchedule = $state("0 2 * * *");
+  let originalConnectionDiscoverySchedule = $state("0 3 * * *");
+  let originalPatternAggregationSchedule = $state("0 3 * * *");
+  let originalClusteringSchedule = $state("0 4 * * *");
+  let originalBackfillEmbeddingsSchedule = $state("0 5 * * *");
+
   // Available providers
   let providers: Provider[] = $state([]);
 
@@ -130,7 +145,12 @@
     embeddingModel !== originalEmbeddingModel ||
     embeddingApiKey !== "" ||
     embeddingBaseUrl !== originalEmbeddingBaseUrl ||
-    embeddingDimensions !== originalEmbeddingDimensions
+    embeddingDimensions !== originalEmbeddingDimensions ||
+    reanalysisSchedule !== originalReanalysisSchedule ||
+    connectionDiscoverySchedule !== originalConnectionDiscoverySchedule ||
+    patternAggregationSchedule !== originalPatternAggregationSchedule ||
+    clusteringSchedule !== originalClusteringSchedule ||
+    backfillEmbeddingsSchedule !== originalBackfillEmbeddingsSchedule
   );
 
   onMount(async () => {
@@ -171,6 +191,13 @@
       embeddingDimensions = config.embeddingDimensions ?? null;
       embeddingApiKey = ""; // Always clear - write-only field
 
+      // Schedule config
+      reanalysisSchedule = config.reanalysisSchedule ?? config.defaults.reanalysisSchedule;
+      connectionDiscoverySchedule = config.connectionDiscoverySchedule ?? config.defaults.connectionDiscoverySchedule;
+      patternAggregationSchedule = config.patternAggregationSchedule ?? config.defaults.patternAggregationSchedule;
+      clusteringSchedule = config.clusteringSchedule ?? config.defaults.clusteringSchedule;
+      backfillEmbeddingsSchedule = config.backfillEmbeddingsSchedule ?? config.defaults.backfillEmbeddingsSchedule;
+
       // Store originals
       originalProvider = provider;
       originalModel = model;
@@ -192,6 +219,11 @@
       originalHasApiKey = hasApiKey;
       originalEmbeddingBaseUrl = embeddingBaseUrl;
       originalEmbeddingDimensions = embeddingDimensions;
+      originalReanalysisSchedule = reanalysisSchedule;
+      originalConnectionDiscoverySchedule = connectionDiscoverySchedule;
+      originalPatternAggregationSchedule = patternAggregationSchedule;
+      originalClusteringSchedule = clusteringSchedule;
+      originalBackfillEmbeddingsSchedule = backfillEmbeddingsSchedule;
     } catch (error) {
       console.error("Failed to load config:", error);
       toastStore.error(
@@ -303,6 +335,11 @@
         embeddingModel,
         embeddingBaseUrl: embeddingBaseUrl || null,
         embeddingDimensions,
+        reanalysisSchedule,
+        connectionDiscoverySchedule,
+        patternAggregationSchedule,
+        clusteringSchedule,
+        backfillEmbeddingsSchedule,
       };
 
       // Only send API key if user entered a new one
@@ -357,6 +394,11 @@
       // Update hasApiKey from the response
       ({ hasApiKey } = daemonResult);
       originalHasApiKey = hasApiKey;
+      originalReanalysisSchedule = daemonResult.reanalysisSchedule;
+      originalConnectionDiscoverySchedule = daemonResult.connectionDiscoverySchedule;
+      originalPatternAggregationSchedule = daemonResult.patternAggregationSchedule;
+      originalClusteringSchedule = daemonResult.clusteringSchedule;
+      originalBackfillEmbeddingsSchedule = daemonResult.backfillEmbeddingsSchedule;
       originalQueryProvider = queryResult.provider;
       originalQueryModel = queryResult.model;
       originalApiPort = apiResult.port;
@@ -409,6 +451,11 @@
     embeddingBaseUrl = originalEmbeddingBaseUrl;
     embeddingDimensions = originalEmbeddingDimensions;
     hasApiKey = originalHasApiKey;
+    reanalysisSchedule = originalReanalysisSchedule;
+    connectionDiscoverySchedule = originalConnectionDiscoverySchedule;
+    patternAggregationSchedule = originalPatternAggregationSchedule;
+    clusteringSchedule = originalClusteringSchedule;
+    backfillEmbeddingsSchedule = originalBackfillEmbeddingsSchedule;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -760,6 +807,45 @@
     </section>
 
     <section class="settings-section">
+      <h2>Schedules</h2>
+      <p class="section-description">
+        Configure when nightly background tasks run. Uses standard cron syntax.
+      </p>
+
+      <div class="schedules-grid">
+        <CronInput
+          bind:value={reanalysisSchedule}
+          label="Reanalysis"
+          hint="When to reanalyze older sessions with updated prompts"
+        />
+
+        <CronInput
+          bind:value={connectionDiscoverySchedule}
+          label="Connection Discovery"
+          hint="When to find semantic connections between nodes"
+        />
+
+        <CronInput
+          bind:value={patternAggregationSchedule}
+          label="Pattern Aggregation"
+          hint="When to aggregate failure patterns and model quirks"
+        />
+
+        <CronInput
+          bind:value={clusteringSchedule}
+          label="Clustering"
+          hint="When to run cluster analysis and naming"
+        />
+
+        <CronInput
+          bind:value={backfillEmbeddingsSchedule}
+          label="Backfill Embeddings"
+          hint="When to generate embeddings for nodes missing them"
+        />
+      </div>
+    </section>
+
+    <section class="settings-section">
       <h2>Query Configuration</h2>
       <p class="section-description">
         Configure the AI model used for /brain queries
@@ -970,6 +1056,12 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--space-4);
+  }
+
+  .schedules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
   }
 
   .form-group {
