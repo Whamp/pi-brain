@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 98,
-    "totalSymbols": 1265,
+    "totalFiles": 103,
+    "totalSymbols": 1332,
     "byLanguage": {
-      "typescript": 98
+      "typescript": 103
     },
     "bySymbolKind": {
-      "function": 542,
-      "type": 43,
-      "interface": 287,
-      "variable": 135,
+      "function": 575,
+      "type": 47,
+      "interface": 303,
+      "variable": 149,
       "class": 15,
       "property": 62,
       "constructor": 14,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 44006,
-  "codebase_tokens": 1204855,
+  "total_tokens": 45941,
+  "codebase_tokens": 1338344,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -327,18 +327,664 @@
       "language": "typescript",
       "lines": [
         1,
-        218
+        1743
       ],
       "detail_level": "full",
-      "token_estimate": 63,
+      "token_estimate": 1243,
       "symbols": [
+        {
+          "name": "ValidationResult",
+          "kind": "type",
+          "signature": "ValidationResult = string | null",
+          "lines": [
+            32,
+            32
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validation result - either success (null) or error message",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateIntRange",
+          "kind": "function",
+          "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
+          "lines": [
+            37,
+            50
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate an integer field is within a range",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateFloatRange",
+          "kind": "function",
+          "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
+          "lines": [
+            55,
+            68
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a float field is within a range",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateCronSchedule",
+          "kind": "function",
+          "signature": "validateCronSchedule(value: string | null | undefined, field: string): string",
+          "lines": [
+            74,
+            85
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a cron schedule expression\nReturns error message if invalid, null if valid or undefined",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "VALID_EMBEDDING_PROVIDERS",
+          "kind": "variable",
+          "signature": "readonly [\"ollama\", \"openai\", \"openrouter\"]",
+          "lines": [
+            90,
+            90
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Valid embedding providers",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "EmbeddingProvider",
+          "kind": "type",
+          "signature": "EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]",
+          "lines": [
+            91,
+            91
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DaemonConfigUpdateBody",
+          "kind": "interface",
+          "signature": "DaemonConfigUpdateBody",
+          "lines": [
+            96,
+            124
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Daemon configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "QueryConfigUpdateBody",
+          "kind": "interface",
+          "signature": "QueryConfigUpdateBody",
+          "lines": [
+            129,
+            132
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Query configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ApiConfigUpdateBody",
+          "kind": "interface",
+          "signature": "ApiConfigUpdateBody",
+          "lines": [
+            137,
+            141
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "API configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "HubConfigUpdateBody",
+          "kind": "interface",
+          "signature": "HubConfigUpdateBody",
+          "lines": [
+            146,
+            150
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Hub configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "VALID_SYNC_METHODS",
+          "kind": "variable",
+          "signature": "SyncMethod[]",
+          "lines": [
+            155,
+            155
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Valid sync methods for spokes",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RsyncOptionsBody",
+          "kind": "interface",
+          "signature": "RsyncOptionsBody",
+          "lines": [
+            160,
+            165
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke rsync options request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeCreateBody",
+          "kind": "interface",
+          "signature": "SpokeCreateBody",
+          "lines": [
+            170,
+            178
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke configuration create request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeUpdateBody",
+          "kind": "interface",
+          "signature": "SpokeUpdateBody",
+          "lines": [
+            183,
+            190
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke configuration update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeResponse",
+          "kind": "interface",
+          "signature": "SpokeResponse",
+          "lines": [
+            195,
+            203
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Spoke response format",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateDaemonUpdate",
+          "kind": "function",
+          "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
+          "lines": [
+            208,
+            328
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate daemon configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "hasAnyDaemonField",
+          "kind": "function",
+          "signature": "hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean",
+          "lines": [
+            333,
+            335
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if daemon config update body has at least one field defined",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyNullableString",
+          "kind": "function",
+          "signature": "applyNullableString(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: string | null | undefined): void",
+          "lines": [
+            341,
+            356
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply an optional nullable string field to a raw config object\nnull/empty clears the field, undefined skips, string sets",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyNullableNumber",
+          "kind": "function",
+          "signature": "applyNullableNumber(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: number | null | undefined): void",
+          "lines": [
+            362,
+            376
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply an optional nullable numeric field to a raw config object\nnull clears the field, undefined skips, number sets",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyEmbeddingUpdates",
+          "kind": "function",
+          "signature": "applyEmbeddingUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            381,
+            402
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply embedding config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyScheduleUpdates",
+          "kind": "function",
+          "signature": "applyScheduleUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            407,
+            436
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply schedule config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyDaemonUpdates",
+          "kind": "function",
+          "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
+          "lines": [
+            441,
+            504
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply daemon config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateQueryUpdate",
+          "kind": "function",
+          "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
+          "lines": [
+            509,
+            523
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate query configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateApiUpdate",
+          "kind": "function",
+          "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
+          "lines": [
+            528,
+            557
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate API configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validatePath",
+          "kind": "function",
+          "signature": "validatePath(p: string, field: string): string",
+          "lines": [
+            562,
+            584
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate a path exists or has a writable parent",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateHubUpdate",
+          "kind": "function",
+          "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
+          "lines": [
+            589,
+            623
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate hub configuration update fields",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateSpokeName",
+          "kind": "function",
+          "signature": "validateSpokeName(name: string): string",
+          "lines": [
+            628,
+            639
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke name is valid (alphanumeric, dash, underscore)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateRsyncOptions",
+          "kind": "function",
+          "signature": "validateRsyncOptions(options: RsyncOptionsBody | undefined, field: string): string",
+          "lines": [
+            644,
+            682
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate rsync options",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateSpokeCreate",
+          "kind": "function",
+          "signature": "validateSpokeCreate(body: SpokeCreateBody): string",
+          "lines": [
+            687,
+            741
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke create request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "validateSpokeUpdate",
+          "kind": "function",
+          "signature": "validateSpokeUpdate(body: SpokeUpdateBody): string",
+          "lines": [
+            746,
+            787
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Validate spoke update request body",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "spokeToResponse",
+          "kind": "function",
+          "signature": "spokeToResponse(spoke: {\n  name: string;\n  syncMethod: SyncMethod;\n  path: string;\n  source?: string;\n  enabled: boolean;\n  schedule?: string;\n  rsyncOptions?: RsyncOptions;\n}): SpokeResponse",
+          "lines": [
+            792,
+            819
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Convert a spoke config to response format",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyQueryUpdates",
+          "kind": "function",
+          "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
+          "lines": [
+            824,
+            842
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply query config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyApiUpdates",
+          "kind": "function",
+          "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
+          "lines": [
+            847,
+            868
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply API config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyHubUpdates",
+          "kind": "function",
+          "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
+          "lines": [
+            873,
+            894
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Apply hub config updates to raw config object",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "configRoutes",
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            19,
-            217
+            896,
+            1742
           ],
           "exported": true,
           "is_default": false,
@@ -358,9 +1004,11 @@
       "imports": [
         "../../config/config.js",
         "../../config/types.js",
+        "../../daemon/scheduler.js",
         "../responses.js",
         "fastify",
         "node:fs",
+        "node:path",
         "yaml"
       ]
     },
@@ -1316,7 +1964,7 @@
       "language": "typescript",
       "lines": [
         1,
-        345
+        437
       ],
       "detail_level": "full",
       "token_estimate": 380,
@@ -1460,7 +2108,7 @@
           "signature": "async statsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             184,
-            335
+            427
           ],
           "exported": true,
           "is_default": false,
@@ -1478,8 +2126,8 @@
           "kind": "function",
           "signature": "countEdges(db: Database.Database): number",
           "lines": [
-            340,
-            344
+            432,
+            436
           ],
           "exported": false,
           "is_default": false,
@@ -24395,6 +25043,23 @@
       "imports": []
     },
     {
+      "path": "src/web/app/playwright.config.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        27
+      ],
+      "detail_level": "full",
+      "token_estimate": 19,
+      "symbols": [],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "@playwright/test"
+      ]
+    },
+    {
       "path": "src/web/app/src/app.d.ts",
       "language": "typescript",
       "lines": [
@@ -24414,7 +25079,7 @@
       "language": "typescript",
       "lines": [
         1,
-        537
+        739
       ],
       "detail_level": "full",
       "token_estimate": 345,
@@ -24424,8 +25089,8 @@
           "kind": "function",
           "signature": "getDefaultBaseUrl(): string",
           "lines": [
-            29,
-            40
+            32,
+            43
           ],
           "exported": false,
           "is_default": false,
@@ -24443,8 +25108,8 @@
           "kind": "variable",
           "signature": "string",
           "lines": [
-            42,
-            42
+            45,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -24462,8 +25127,8 @@
           "kind": "variable",
           "signature": "30000",
           "lines": [
-            43,
-            43
+            46,
+            46
           ],
           "exported": false,
           "is_default": false,
@@ -24481,8 +25146,8 @@
           "kind": "interface",
           "signature": "ApiResponse<T>",
           "lines": [
-            45,
-            57
+            48,
+            60
           ],
           "exported": false,
           "is_default": false,
@@ -24500,8 +25165,8 @@
           "kind": "interface",
           "signature": "ApiErrorOptions",
           "lines": [
-            59,
-            63
+            62,
+            66
           ],
           "exported": false,
           "is_default": false,
@@ -24519,8 +25184,8 @@
           "kind": "function",
           "signature": "createApiError(options: ApiErrorOptions): Error",
           "lines": [
-            65,
-            74
+            68,
+            77
           ],
           "exported": true,
           "is_default": false,
@@ -24538,8 +25203,8 @@
           "kind": "function",
           "signature": "createTimeoutError(timeoutMs: number): Error",
           "lines": [
-            76,
-            80
+            79,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -24557,8 +25222,8 @@
           "kind": "function",
           "signature": "createNetworkError(message: string): Error",
           "lines": [
-            82,
-            86
+            85,
+            89
           ],
           "exported": true,
           "is_default": false,
@@ -24576,8 +25241,8 @@
           "kind": "function",
           "signature": "createContentTypeError(status: number, contentType: string): Error",
           "lines": [
-            88,
-            97
+            91,
+            100
           ],
           "exported": true,
           "is_default": false,
@@ -24595,8 +25260,8 @@
           "kind": "function",
           "signature": "isApiError(error: unknown): boolean",
           "lines": [
-            99,
-            103
+            102,
+            106
           ],
           "exported": true,
           "is_default": false,
@@ -24614,8 +25279,8 @@
           "kind": "function",
           "signature": "isTimeoutError(error: unknown): boolean",
           "lines": [
-            105,
-            107
+            108,
+            110
           ],
           "exported": true,
           "is_default": false,
@@ -24633,8 +25298,8 @@
           "kind": "function",
           "signature": "isNetworkError(error: unknown): boolean",
           "lines": [
-            109,
-            111
+            112,
+            114
           ],
           "exported": true,
           "is_default": false,
@@ -24652,8 +25317,8 @@
           "kind": "function",
           "signature": "isContentTypeError(error: unknown): boolean",
           "lines": [
-            113,
-            117
+            116,
+            120
           ],
           "exported": true,
           "is_default": false,
@@ -24671,8 +25336,8 @@
           "kind": "function",
           "signature": "isBackendOffline(error: unknown): boolean",
           "lines": [
-            123,
-            127
+            126,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -24690,8 +25355,8 @@
           "kind": "function",
           "signature": "getErrorMessage(error: unknown): string",
           "lines": [
-            132,
-            149
+            135,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -24709,8 +25374,8 @@
           "kind": "function",
           "signature": "toQueryString(params: Record<string, unknown>): string",
           "lines": [
-            151,
-            168
+            154,
+            171
           ],
           "exported": false,
           "is_default": false,
@@ -24728,8 +25393,8 @@
           "kind": "function",
           "signature": "async request<T>(endpoint: string, options: RequestInit = {}, baseUrl: string = DEFAULT_BASE_URL, timeoutMs: number = DEFAULT_TIMEOUT_MS): Promise<T>",
           "lines": [
-            170,
-            218
+            173,
+            221
           ],
           "exported": false,
           "is_default": false,
@@ -24747,8 +25412,8 @@
           "kind": "variable",
           "signature": "api",
           "lines": [
-            220,
-            523
+            223,
+            725
           ],
           "exported": true,
           "is_default": false,
@@ -24907,6 +25572,101 @@
       ]
     },
     {
+      "path": "src/web/app/src/lib/stores/keyboard-shortcuts.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        198
+      ],
+      "detail_level": "full",
+      "token_estimate": 126,
+      "symbols": [
+        {
+          "name": "Shortcut",
+          "kind": "interface",
+          "signature": "Shortcut",
+          "lines": [
+            7,
+            11
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Keyboard shortcut definition",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "KeyboardShortcutsState",
+          "kind": "interface",
+          "signature": "KeyboardShortcutsState",
+          "lines": [
+            16,
+            19
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Keyboard shortcuts store state",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createKeyboardShortcutsStore",
+          "kind": "function",
+          "signature": "createKeyboardShortcutsStore(): { subscribe: any; init: () => () => void; openHelp: () => void; closeHelp: () => void; getShortcuts: () => {}; }",
+          "lines": [
+            21,
+            195
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "keyboardShortcuts",
+          "kind": "variable",
+          "signature": "keyboardShortcuts",
+          "lines": [
+            197,
+            197
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "$app/navigation",
+        "svelte/store"
+      ]
+    },
+    {
       "path": "src/web/app/src/lib/stores/nodes.ts",
       "language": "typescript",
       "lines": [
@@ -25018,6 +25778,422 @@
       "imports": [
         "$lib/api/client",
         "$lib/types",
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/search-history.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        106
+      ],
+      "detail_level": "full",
+      "token_estimate": 80,
+      "symbols": [
+        {
+          "name": "STORAGE_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-search-history\"",
+          "lines": [
+            8,
+            8
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_HISTORY_SIZE",
+          "kind": "variable",
+          "signature": "10",
+          "lines": [
+            9,
+            9
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SearchHistoryEntry",
+          "kind": "interface",
+          "signature": "SearchHistoryEntry",
+          "lines": [
+            11,
+            14
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SearchHistoryState",
+          "kind": "interface",
+          "signature": "SearchHistoryState",
+          "lines": [
+            16,
+            18
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createSearchHistoryStore",
+          "kind": "function",
+          "signature": "createSearchHistoryStore(): any",
+          "lines": [
+            20,
+            103
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "searchHistory",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            105,
+            105
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "svelte/store"
+      ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/theme.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        171
+      ],
+      "detail_level": "full",
+      "token_estimate": 197,
+      "symbols": [
+        {
+          "name": "Theme",
+          "kind": "type",
+          "signature": "Theme = \"light\" | \"dark\" | \"system\"",
+          "lines": [
+            10,
+            10
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "THEME_PREFERENCE_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-theme-preference\"",
+          "lines": [
+            13,
+            13
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SYSTEM_THEME_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-system-theme\"",
+          "lines": [
+            14,
+            14
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createThemePreferenceStore",
+          "kind": "variable",
+          "signature": "(): { subscribe: any; set: (value: Theme) => void; update: any; }",
+          "lines": [
+            17,
+            31
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "loadThemePreference",
+          "kind": "function",
+          "signature": "loadThemePreference(): Theme",
+          "lines": [
+            33,
+            48
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "saveThemePreference",
+          "kind": "function",
+          "signature": "saveThemePreference(theme: Theme): void",
+          "lines": [
+            50,
+            60
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createSystemThemeStore",
+          "kind": "variable",
+          "signature": "(): { subscribe: any; set: any; }",
+          "lines": [
+            63,
+            78
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "themePreference",
+          "kind": "variable",
+          "signature": "themePreference",
+          "lines": [
+            80,
+            80
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "systemTheme",
+          "kind": "variable",
+          "signature": "{ subscribe: any; set: any; }",
+          "lines": [
+            81,
+            81
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "activeTheme",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            85,
+            89
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "initTheme",
+          "kind": "function",
+          "signature": "initTheme(): () => void",
+          "lines": [
+            92,
+            120
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "updateSystemTheme",
+          "kind": "function",
+          "signature": "updateSystemTheme(theme: \"light\" | \"dark\"): void",
+          "lines": [
+            122,
+            136
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "applyTheme",
+          "kind": "function",
+          "signature": "applyTheme(theme: \"light\" | \"dark\"): void",
+          "lines": [
+            139,
+            156
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "toggleTheme",
+          "kind": "function",
+          "signature": "toggleTheme(): void",
+          "lines": [
+            159,
+            170
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
         "svelte/store"
       ]
     },
@@ -25330,10 +26506,10 @@
       "language": "typescript",
       "lines": [
         1,
-        342
+        381
       ],
       "detail_level": "full",
-      "token_estimate": 305,
+      "token_estimate": 373,
       "symbols": [
         {
           "name": "LessonEntity",
@@ -25695,6 +26871,101 @@
           "comment": null,
           "incoming_refs": null,
           "outgoing_refs": null
+        },
+        {
+          "name": "SyncMethod",
+          "kind": "type",
+          "signature": "SyncMethod = \"syncthing\" | \"rsync\" | \"api\"",
+          "lines": [
+            344,
+            344
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RsyncOptions",
+          "kind": "interface",
+          "signature": "RsyncOptions",
+          "lines": [
+            346,
+            351
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeConfig",
+          "kind": "interface",
+          "signature": "SpokeConfig",
+          "lines": [
+            353,
+            361
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeCreateRequest",
+          "kind": "interface",
+          "signature": "SpokeCreateRequest",
+          "lines": [
+            363,
+            371
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "SpokeUpdateRequest",
+          "kind": "interface",
+          "signature": "SpokeUpdateRequest",
+          "lines": [
+            373,
+            380
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
         }
       ],
       "annotation": null,
@@ -25920,6 +27191,98 @@
           "parent_name": null,
           "annotation": null,
           "comment": "Parse a date string or Date object to Date",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
+    },
+    {
+      "path": "src/web/app/src/lib/utils/focus-trap.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        146
+      ],
+      "detail_level": "full",
+      "token_estimate": 265,
+      "symbols": [
+        {
+          "name": "FOCUSABLE_SELECTOR",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            6,
+            13
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Focus trap utility for modals, dropdowns, and panels.\nTraps focus within a container and handles Escape key to close.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getFocusableElements",
+          "kind": "function",
+          "signature": "getFocusableElements(container: HTMLElement): {}",
+          "lines": [
+            18,
+            20
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Gets all focusable elements within a container",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createFocusTrap",
+          "kind": "function",
+          "signature": "createFocusTrap(container: HTMLElement, options: {\n    /** Called when Escape key is pressed */\n    onEscape?: () => void;\n    /** Element to restore focus to when trap is removed */\n    restoreFocus?: HTMLElement | null;\n    /** Whether to focus the first element on activation (default: true) */\n    autoFocus?: boolean;\n  } = {}): () => void",
+          "lines": [
+            47,
+            121
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Creates a focus trap for a container element.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "focusTrap",
+          "kind": "function",
+          "signature": "focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; }",
+          "lines": [
+            127,
+            145
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Svelte action for focus trapping.\nUse as `use:focusTrap={{ onEscape: () => ... }}`",
           "incoming_refs": null,
           "outgoing_refs": null
         }

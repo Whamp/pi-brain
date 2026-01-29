@@ -6,27 +6,57 @@
 <script lang="ts">
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, formatDate, parseDate } from "$lib/utils/date";
+  import { onMount } from "svelte";
   import {
     FolderTree,
     Folder,
     FileText,
     ChevronRight,
-    Home,
     Clock,
     Hash,
-    AlertCircle,
-    Loader2,
     CheckCircle2,
     XCircle,
     MinusCircle,
+    AlertCircle,
+    SortAsc,
+    SortDesc,
   } from "lucide-svelte";
   import type { Node, ProjectSummary, SessionSummary } from "$lib/types";
   import GettingStarted from "$lib/components/getting-started.svelte";
+  import ErrorState from "$lib/components/error-state.svelte";
+  import SessionsSkeleton from "$lib/components/sessions-skeleton.svelte";
+  import Breadcrumbs from "$lib/components/breadcrumbs.svelte";
+  import Card from "$lib/components/card.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
+  import Tag from "$lib/components/tag.svelte";
 
   // View state: "projects" | "sessions" | "nodes"
   let view = $state<"projects" | "sessions" | "nodes">("projects");
   let loading = $state(true);
   let errorMessage = $state<string | null>(null);
+  let isOfflineError = $state(false);
+
+  // Persistence keys
+  const STORAGE_KEY_SESSIONS_PREFS = "pi-brain-sessions-prefs";
+
+  // Preferences (initialized from localStorage if available)
+  let prefs = $state({
+    projectSortBy: "lastActivity" as "name" | "sessionCount" | "nodeCount" | "lastActivity",
+    projectSortDir: "desc" as "asc" | "desc",
+    sessionSortBy: "date" as "date" | "nodeCount" | "tokens" | "cost",
+    sessionSortDir: "desc" as "asc" | "desc",
+    lastViewedProject: null as string | null,
+  });
+
+  // Track if initial load is done to avoid persisting during load
+  let prefsLoaded = false;
+
+  // Persist preferences when they change (but not during initial load)
+  $effect(() => {
+    if (typeof window !== "undefined" && prefsLoaded) {
+      localStorage.setItem(STORAGE_KEY_SESSIONS_PREFS, JSON.stringify(prefs));
+    }
+  });
 
   // Data
   let projects = $state<ProjectSummary[]>([]);
@@ -36,6 +66,63 @@
   // Current selection for breadcrumbs
   let currentProject = $state<string | null>(null);
   let currentSession = $state<string | null>(null);
+
+  // Sorted data
+  const sortedProjects = $derived.by(() =>
+    projects.toSorted((a, b) => {
+      let comparison = 0;
+      switch (prefs.projectSortBy) {
+        case "name": {
+          comparison = a.project.localeCompare(b.project);
+          break;
+        }
+        case "sessionCount": {
+          comparison = a.sessionCount - b.sessionCount;
+          break;
+        }
+        case "nodeCount": {
+          comparison = a.nodeCount - b.nodeCount;
+          break;
+        }
+        case "lastActivity": {
+          comparison = parseDate(a.lastActivity).getTime() - parseDate(b.lastActivity).getTime();
+          break;
+        }
+        default: {
+          comparison = 0;
+        }
+      }
+      return prefs.projectSortDir === "asc" ? comparison : -comparison;
+    })
+  );
+
+  const sortedSessions = $derived.by(() =>
+    sessions.toSorted((a, b) => {
+      let comparison = 0;
+      switch (prefs.sessionSortBy) {
+        case "date": {
+          comparison = parseDate(a.firstTimestamp).getTime() - parseDate(b.firstTimestamp).getTime();
+          break;
+        }
+        case "nodeCount": {
+          comparison = a.nodeCount - b.nodeCount;
+          break;
+        }
+        case "tokens": {
+          comparison = a.totalTokens - b.totalTokens;
+          break;
+        }
+        case "cost": {
+          comparison = a.totalCost - b.totalCost;
+          break;
+        }
+        default: {
+          comparison = 0;
+        }
+      }
+      return prefs.sessionSortDir === "asc" ? comparison : -comparison;
+    })
+  );
 
   // Load projects on mount
   async function loadProjects() {
@@ -47,8 +134,10 @@
       view = "projects";
       currentProject = null;
       currentSession = null;
+      prefs.lastViewedProject = null;
     } catch (error) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -66,8 +155,10 @@
       currentProject = project;
       currentSession = null;
       view = "sessions";
+      prefs.lastViewedProject = project;
     } catch (error) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -85,7 +176,8 @@
       currentSession = sessionFile;
       view = "nodes";
     } catch (error) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -155,83 +247,142 @@
     return tokens.toString();
   }
 
+  // Build breadcrumb items based on current view
+  const breadcrumbItems = $derived.by(() => {
+    const items: { label: string; icon?: typeof Folder; onClick?: () => void }[] = [];
+    
+    // All Projects - always first
+    if (view === "projects") {
+      items.push({ label: "All Projects", icon: FolderTree });
+    } else {
+      items.push({ label: "All Projects", icon: FolderTree, onClick: loadProjects });
+    }
+    
+    // Current project
+    if (currentProject) {
+      const project = currentProject;
+      if (view === "sessions") {
+        items.push({ label: getProjectName(project), icon: Folder });
+      } else if (view === "nodes" && currentSession) {
+        items.push({ 
+          label: getProjectName(project), 
+          icon: Folder, 
+          onClick: () => loadSessions(project) 
+        });
+        items.push({ label: getSessionName(currentSession), icon: FileText });
+      }
+    }
+    
+    return items;
+  });
+
   // Load on mount
-  $effect(() => {
+  onMount(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(STORAGE_KEY_SESSIONS_PREFS);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          prefs = { ...prefs, ...parsed };
+          prefsLoaded = true;
+          if (parsed.lastViewedProject) {
+            loadSessions(parsed.lastViewedProject);
+            return;
+          }
+        } catch {
+          // Ignore invalid saved preferences
+          prefsLoaded = true;
+        }
+      } else {
+        prefsLoaded = true;
+      }
+    }
     loadProjects();
   });
 </script>
 
-<div class="sessions-page">
-  <header class="page-header">
-    <h1>
-      <FolderTree size={24} />
+<div class="sessions-page page-animate">
+  <header class="page-header animate-in">
+    <h1 class="page-title">
+      <FolderTree size={28} />
       Session Browser
     </h1>
   </header>
 
   <!-- Breadcrumbs -->
-  <nav class="breadcrumbs" aria-label="Breadcrumb navigation">
-    <button
-      class="breadcrumb"
-      class:active={view === "projects"}
-      onclick={() => loadProjects()}
-      aria-current={view === "projects" ? "page" : undefined}
-      disabled={view === "projects"}
-    >
-      <Home size={14} />
-      <span>All Projects</span>
-    </button>
+  <div class="page-controls animate-in">
+    <Breadcrumbs items={breadcrumbItems} showHome={false} />
 
-    {#if currentProject}
-      <ChevronRight size={14} class="breadcrumb-separator" />
-      <button
-        class="breadcrumb"
-        class:active={view === "sessions"}
-        onclick={() => loadSessions(currentProject!)}
-        aria-current={view === "sessions" ? "page" : undefined}
-        disabled={view === "sessions"}
-      >
-        <Folder size={14} />
-        <span>{getProjectName(currentProject)}</span>
-      </button>
-    {/if}
+    {#if !loading && !errorMessage && (view === "projects" || view === "sessions")}
+      <div class="sort-controls">
+        <span class="sort-label">Sort by:</span>
+        <select 
+          class="sort-select"
+          value={view === "projects" ? prefs.projectSortBy : prefs.sessionSortBy}
+          onchange={(e) => {
+            const val = e.currentTarget.value;
+            if (view === "projects") prefs.projectSortBy = val as any;
+            else prefs.sessionSortBy = val as any;
+          }}
+        >
+          {#if view === "projects"}
+            <option value="lastActivity">Last Activity</option>
+            <option value="name">Project Name</option>
+            <option value="sessionCount">Sessions</option>
+            <option value="nodeCount">Nodes</option>
+          {:else}
+            <option value="date">Date</option>
+            <option value="nodeCount">Nodes</option>
+            <option value="tokens">Tokens</option>
+            <option value="cost">Cost</option>
+          {/if}
+        </select>
 
-    {#if currentSession}
-      <ChevronRight size={14} class="breadcrumb-separator" />
-      <button
-        class="breadcrumb active"
-        aria-current="page"
-        disabled
-      >
-        <FileText size={14} />
-        <span>{getSessionName(currentSession)}</span>
-      </button>
+        <button 
+          class="sort-dir-btn"
+          title={ (view === "projects" ? prefs.projectSortDir : prefs.sessionSortDir) === "asc" ? "Sort Ascending" : "Sort Descending" }
+          onclick={() => {
+            if (view === "projects") {
+              prefs.projectSortDir = prefs.projectSortDir === "asc" ? "desc" : "asc";
+            } else {
+              prefs.sessionSortDir = prefs.sessionSortDir === "asc" ? "desc" : "asc";
+            }
+          }}
+        >
+          {#if (view === "projects" ? prefs.projectSortDir : prefs.sessionSortDir) === "asc"}
+            <SortAsc size={16} />
+          {:else}
+            <SortDesc size={16} />
+          {/if}
+        </button>
+      </div>
     {/if}
-  </nav>
+  </div>
 
   <!-- Loading State -->
   {#if loading}
-    <div class="loading-state" role="status" aria-live="polite">
-      <Loader2 size={32} class="spinner" />
-      <p>Loading...</p>
-    </div>
+    <SessionsSkeleton 
+      variant={view === "nodes" ? "nodes" : view === "sessions" ? "sessions" : "projects"}
+      count={5}
+    />
   {:else if errorMessage}
     <!-- Error State -->
-    <div class="error-state">
-      <AlertCircle size={32} />
-      <p>{errorMessage}</p>
-      <button class="btn-primary" onclick={() => loadProjects()}>
-        Retry
-      </button>
-    </div>
+    <ErrorState
+      variant={isOfflineError ? "offline" : "failed"}
+      description={errorMessage}
+      onRetry={loadProjects}
+      showSettingsLink={isOfflineError}
+    />
   {:else if view === "projects"}
     <!-- Projects List -->
-    <div class="file-list" aria-label="Projects">
-      {#if projects.length === 0}
+    <div class="file-list list-animate" aria-label="Projects">
+      {#if sortedProjects.length === 0}
         <GettingStarted variant="sessions" />
       {:else}
-        {#each projects as project}
-          <button
+        {#each sortedProjects as project}
+          <Card
+            tag="button"
+            interactive
             class="file-item"
             onclick={() => loadSessions(project.project)}
           >
@@ -257,21 +408,25 @@
               </span>
             </div>
             <ChevronRight size={18} class="file-chevron" />
-          </button>
+          </Card>
         {/each}
       {/if}
     </div>
   {:else if view === "sessions"}
     <!-- Sessions List -->
-    <div class="file-list" aria-label="Sessions">
-      {#if sessions.length === 0}
-        <div class="empty-state">
-          <FileText size={48} />
-          <p>No sessions found for this project</p>
-        </div>
+    <div class="file-list list-animate" aria-label="Sessions">
+      {#if sortedSessions.length === 0}
+        <EmptyState
+          icon={FileText}
+          title="No sessions found"
+          description="No sessions found for this project"
+          size="sm"
+        />
       {:else}
-        {#each sessions as session}
-          <button
+        {#each sortedSessions as session}
+          <Card
+            tag="button"
+            interactive
             class="file-item"
             onclick={() => loadNodes(session.sessionFile)}
           >
@@ -292,10 +447,10 @@
               </div>
               <div class="session-types">
                 {#each session.types.slice(0, 4) as type}
-                  <span class="type-badge">{type}</span>
+                  <Tag text={type} variant="auto" />
                 {/each}
                 {#if session.types.length > 4}
-                  <span class="type-badge more">+{session.types.length - 4}</span>
+                  <Tag text={`+${session.types.length - 4}`} />
                 {/if}
               </div>
             </div>
@@ -328,23 +483,26 @@
               </div>
             </div>
             <ChevronRight size={18} class="file-chevron" />
-          </button>
+          </Card>
         {/each}
       {/if}
     </div>
   {:else if view === "nodes"}
     <!-- Nodes List -->
-    <div class="nodes-list" aria-label="Session nodes">
+    <div class="nodes-list list-animate" aria-label="Session nodes">
       {#if nodes.length === 0}
-        <div class="empty-state">
-          <Hash size={48} />
-          <p>No nodes in this session</p>
-        </div>
+        <EmptyState
+          icon={Hash}
+          title="No nodes"
+          description="No nodes in this session"
+          size="sm"
+        />
       {:else}
         {#each nodes as node, index}
           {@const OutcomeIcon = getOutcomeIcon(node.content?.outcome ?? "abandoned")}
-          <a
+          <Card
             href="/nodes/{node.id}"
+            interactive
             class="node-item"
           >
             <div class="node-index">{index + 1}</div>
@@ -374,16 +532,16 @@
               {#if node.semantic?.tags && node.semantic.tags.length > 0}
                 <div class="node-tags">
                   {#each node.semantic.tags.slice(0, 5) as tag}
-                    <span class="tag">{tag}</span>
+                    <Tag text={tag} variant="auto" />
                   {/each}
                   {#if node.semantic.tags.length > 5}
-                    <span class="tag more">+{node.semantic.tags.length - 5}</span>
+                    <Tag text={`+${node.semantic.tags.length - 5}`} />
                   {/if}
                 </div>
               {/if}
             </div>
             <ChevronRight size={18} class="node-chevron" />
-          </a>
+          </Card>
         {/each}
       {/if}
     </div>
@@ -403,58 +561,69 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    font-size: var(--text-2xl);
   }
 
-  /* Breadcrumbs */
-  .breadcrumbs {
+  .page-controls {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
     margin-bottom: var(--space-4);
-    overflow-x: auto;
+    gap: var(--space-4);
+    flex-wrap: wrap;
   }
 
-  .breadcrumb {
+  .sort-controls {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    background: var(--color-bg-elevated);
     padding: var(--space-1) var(--space-2);
-    background: transparent;
-    border: none;
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
   }
 
-  .breadcrumb:hover:not(:disabled) {
-    background: var(--color-bg-hover);
-    color: var(--color-text);
-  }
-
-  .breadcrumb.active {
-    color: var(--color-accent);
+  .sort-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
     font-weight: 500;
   }
 
-  .breadcrumb:disabled {
-    cursor: default;
+  .sort-select {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: var(--space-1);
+    cursor: pointer;
+    outline: none;
   }
 
-  .breadcrumb-separator {
-    color: var(--color-text-subtle);
-    flex-shrink: 0;
+  .sort-select option {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
   }
 
-  /* Loading and Error States */
+  .sort-dir-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    padding: var(--space-1);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+  }
+
+  .sort-dir-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-accent);
+  }
+
+  /* Loading and Empty States */
   .loading-state,
-  .error-state,
   .empty-state {
     display: flex;
     flex-direction: column;
@@ -469,26 +638,9 @@
     gap: var(--space-4);
   }
 
-  .error-state {
-    color: var(--color-error);
-  }
-
   .empty-hint {
     font-size: var(--text-sm);
     color: var(--color-text-subtle);
-  }
-
-  :global(.spinner) {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
   }
 
   /* File List */
@@ -502,21 +654,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    padding: var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    cursor: pointer;
     text-align: left;
     width: 100%;
-    transition:
-      border-color var(--transition-fast),
-      background var(--transition-fast);
-  }
-
-  .file-item:hover {
-    border-color: var(--color-accent);
-    background: var(--color-bg-hover);
   }
 
   .file-icon {
@@ -535,7 +674,7 @@
   }
 
   .session-icon {
-    background: #22c55e20;
+    background: hsla(145, 65%, 52%, 0.15);
     color: var(--color-success);
   }
 
@@ -601,18 +740,6 @@
     gap: var(--space-1);
   }
 
-  .type-badge {
-    padding: 2px 6px;
-    background: var(--color-bg-hover);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-  }
-
-  .type-badge.more {
-    color: var(--color-text-subtle);
-  }
-
   /* Outcomes */
   .outcomes-row {
     display: flex;
@@ -630,17 +757,17 @@
   }
 
   .outcome-badge.success {
-    background: #22c55e20;
+    background: hsla(145, 65%, 52%, 0.15);
     color: var(--color-success);
   }
 
   .outcome-badge.partial {
-    background: #eab30820;
+    background: hsla(45, 85%, 55%, 0.15);
     color: var(--color-warning);
   }
 
   .outcome-badge.failed {
-    background: #ef444420;
+    background: var(--color-error-muted);
     color: var(--color-error);
   }
 
@@ -662,20 +789,8 @@
     display: flex;
     align-items: flex-start;
     gap: var(--space-4);
-    padding: var(--space-4);
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
     text-decoration: none;
     color: inherit;
-    transition:
-      border-color var(--transition-fast),
-      background var(--transition-fast);
-  }
-
-  .node-item:hover {
-    border-color: var(--color-accent);
-    background: var(--color-bg-hover);
   }
 
   .node-index {
@@ -713,42 +828,42 @@
   }
 
   .type-coding {
-    background: #3b82f620;
+    background: hsla(210, 72%, 60%, 0.15);
     color: var(--color-node-coding);
   }
 
   .type-debugging {
-    background: #ef444420;
+    background: hsla(0, 72%, 62%, 0.15);
     color: var(--color-node-debugging);
   }
 
   .type-refactor {
-    background: #8b5cf620;
+    background: hsla(270, 72%, 62%, 0.15);
     color: var(--color-node-refactor);
   }
 
   .type-sysadmin {
-    background: #22c55e20;
+    background: hsla(145, 65%, 52%, 0.15);
     color: var(--color-node-sysadmin);
   }
 
   .type-research {
-    background: #eab30820;
+    background: hsla(45, 85%, 55%, 0.15);
     color: var(--color-node-research);
   }
 
   .type-planning {
-    background: #06b6d420;
+    background: hsla(190, 72%, 55%, 0.15);
     color: var(--color-node-planning);
   }
 
   .type-documentation {
-    background: #14b8a620;
+    background: hsla(170, 65%, 50%, 0.15);
     color: var(--color-node-documentation);
   }
 
   .type-configuration {
-    background: #6366f120;
+    background: hsla(235, 65%, 62%, 0.15);
     color: var(--color-node-configuration);
   }
 
@@ -806,19 +921,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-1);
-  }
-
-  .node-tags .tag {
-    padding: 2px 6px;
-    background: var(--color-accent-muted);
-    color: var(--color-accent);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-  }
-
-  .node-tags .tag.more {
-    background: var(--color-bg-hover);
-    color: var(--color-text-subtle);
   }
 
   .node-chevron {

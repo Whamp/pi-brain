@@ -339,3 +339,42 @@ export interface FrictionSummary {
   /** Models with highest friction */
   modelFriction: { model: string; count: number }[];
 }
+
+// Spoke configuration types
+export type SyncMethod = "syncthing" | "rsync" | "api";
+
+export interface RsyncOptions {
+  bwLimit?: number;
+  delete?: boolean;
+  extraArgs?: string[];
+  timeoutSeconds?: number;
+}
+
+export interface SpokeConfig {
+  name: string;
+  syncMethod: SyncMethod;
+  path: string;
+  source?: string;
+  enabled: boolean;
+  schedule?: string;
+  rsyncOptions?: RsyncOptions;
+}
+
+export interface SpokeCreateRequest {
+  name: string;
+  syncMethod: SyncMethod;
+  path: string;
+  source?: string;
+  enabled?: boolean;
+  schedule?: string;
+  rsyncOptions?: RsyncOptions;
+}
+
+export interface SpokeUpdateRequest {
+  syncMethod?: SyncMethod;
+  path?: string;
+  source?: string | null;
+  enabled?: boolean;
+  schedule?: string | null;
+  rsyncOptions?: RsyncOptions | null;
+}

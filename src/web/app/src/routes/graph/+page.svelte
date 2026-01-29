@@ -1,11 +1,33 @@
 <script lang="ts">
   import Graph from "$lib/components/graph.svelte";
+  import Spinner from "$lib/components/spinner.svelte";
   import GettingStarted from "$lib/components/getting-started.svelte";
+  import GraphControlsSheet from "$lib/components/graph-controls-sheet.svelte";
   import { nodesStore, selectedNode } from "$lib/stores/nodes";
   import type { NodeFilters, NodeType } from "$lib/types";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { parseDate, formatDateShort } from "$lib/utils/date";
+  import Tag from "$lib/components/tag.svelte";
+
+  // Legend data - all node types with their colors and labels
+  const legendItems: { type: NodeType; label: string; color: string }[] = [
+    { type: "coding", label: "Coding", color: "var(--color-node-coding)" },
+    { type: "debugging", label: "Debugging", color: "var(--color-node-debugging)" },
+    { type: "refactoring", label: "Refactor", color: "var(--color-node-refactor)" },
+    { type: "planning", label: "Planning", color: "var(--color-node-planning)" },
+    { type: "research", label: "Research", color: "var(--color-node-research)" },
+    { type: "sysadmin", label: "Sysadmin", color: "var(--color-node-sysadmin)" },
+    { type: "brainstorm", label: "Brainstorm", color: "var(--color-node-brainstorm)" },
+    { type: "documentation", label: "Documentation", color: "var(--color-node-documentation)" },
+    { type: "configuration", label: "Configuration", color: "var(--color-node-configuration)" },
+    { type: "qa", label: "QA", color: "var(--color-node-qa)" },
+    { type: "handoff", label: "Handoff", color: "var(--color-node-handoff)" },
+    { type: "other", label: "Other", color: "var(--color-node-other)" },
+  ];
+  
+  // Legend collapsed state
+  let legendCollapsed = $state(false);
 
   // Filters state
   let projectFilter = $state("");
@@ -104,6 +126,27 @@
     await loadGraph();
   }
 
+  // Handlers for mobile controls sheet
+  async function handleMobileProjectChange(value: string): Promise<void> {
+    projectFilter = value;
+    await handleFilterChange();
+  }
+
+  async function handleMobileTypeChange(value: NodeType | ""): Promise<void> {
+    typeFilter = value;
+    await handleFilterChange();
+  }
+
+  async function handleMobileDateChange(value: string): Promise<void> {
+    dateRangeFilter = value;
+    await handleFilterChange();
+  }
+
+  async function handleMobileDepthChange(value: number): Promise<void> {
+    depth = value;
+    await handleDepthChange();
+  }
+
   onMount(() => {
     loadGraph();
   });
@@ -117,20 +160,20 @@
   />
 </svelte:head>
 
-<div class="graph-page">
+<div class="graph-page page-animate">
   {#if showGettingStarted}
-    <header class="page-header">
+    <header class="page-header animate-in">
       <div class="header-left">
-        <h1>Knowledge Graph</h1>
+        <h1 class="page-title">Knowledge Graph</h1>
       </div>
     </header>
-    <div class="getting-started-container">
+    <div class="getting-started-container animate-in stagger-2">
       <GettingStarted variant="graph" />
     </div>
   {:else}
-  <header class="page-header">
+  <header class="page-header animate-in">
     <div class="header-left">
-      <h1>Knowledge Graph</h1>
+      <h1 class="page-title">Knowledge Graph</h1>
       {#if $selectedNode}
         <button class="btn-secondary btn-sm" onclick={clearSelection}>
           ← Show all
@@ -150,10 +193,7 @@
       />
 
       {#if $nodesStore.loading}
-        <div class="loading-overlay" role="status" aria-live="polite">
-          <div class="loading-spinner"></div>
-          <span>Loading graph...</span>
-        </div>
+        <Spinner size="md" message="Loading graph..." />
       {/if}
 
       {#if $nodesStore.error}
@@ -237,7 +277,7 @@
           <div class="node-preview" class:loading={$nodesStore.loading}>
             {#if $nodesStore.loading}
               <div class="preview-loading-overlay">
-                <div class="loading-spinner-small"></div>
+                <Spinner size={20} />
               </div>
             {/if}
             <div class="node-type" data-type={$selectedNode.classification.type}>
@@ -258,7 +298,7 @@
             {#if $selectedNode.semantic.tags.length > 0}
               <div class="node-tags">
                 {#each $selectedNode.semantic.tags.slice(0, 5) as tag}
-                  <span class="tag">{tag}</span>
+                  <Tag text={tag} variant="auto" />
                 {/each}
               </div>
             {/if}
@@ -270,47 +310,42 @@
       {/if}
 
       <section class="legend-section">
-        <h2>Legend</h2>
-        <div class="legend-items">
-          <div class="legend-group">
-            <h3>Node Types</h3>
-            <div class="legend-item">
-              <span
-                class="legend-dot"
-                style="background: var(--color-node-coding)"
-              ></span>
-              Coding
-            </div>
-            <div class="legend-item">
-              <span
-                class="legend-dot"
-                style="background: var(--color-node-debugging)"
-              ></span>
-              Debugging
-            </div>
-            <div class="legend-item">
-              <span
-                class="legend-dot"
-                style="background: var(--color-node-refactoring)"
-              ></span>
-              Refactor
-            </div>
-            <div class="legend-item">
-              <span
-                class="legend-dot"
-                style="background: var(--color-node-planning)"
-              ></span>
-              Planning
-            </div>
-            <div class="legend-item">
-              <span
-                class="legend-dot"
-                style="background: var(--color-node-research)"
-              ></span>
-              Research
+        <button 
+          class="legend-header"
+          onclick={() => legendCollapsed = !legendCollapsed}
+          aria-expanded={!legendCollapsed}
+          aria-controls="legend-content"
+        >
+          <h2>Legend</h2>
+          <svg
+            class="legend-chevron"
+            class:collapsed={legendCollapsed}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        {#if !legendCollapsed}
+          <div class="legend-items" id="legend-content">
+            <div class="legend-group">
+              <h3>Node Types</h3>
+              {#each legendItems as item (item.type)}
+                <div class="legend-item">
+                  <span
+                    class="legend-dot"
+                    style="background: {item.color}"
+                  ></span>
+                  {item.label}
+                </div>
+              {/each}
             </div>
           </div>
-        </div>
+        {/if}
       </section>
 
       <section class="stats-section">
@@ -328,6 +363,22 @@
       </section>
     </aside>
   </div>
+
+  <!-- Mobile controls bottom sheet -->
+  <GraphControlsSheet
+    {projectFilter}
+    {typeFilter}
+    {dateRangeFilter}
+    {depth}
+    selectedNode={$selectedNode}
+    nodesCount={$nodesStore.nodes.length}
+    edgesCount={$nodesStore.edges.length}
+    loading={$nodesStore.loading}
+    onProjectChange={handleMobileProjectChange}
+    onTypeChange={handleMobileTypeChange}
+    onDateChange={handleMobileDateChange}
+    onDepthChange={handleMobileDepthChange}
+  />
   {/if}
 </div>
 
@@ -349,10 +400,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-4);
-  }
-
-  .page-header h1 {
-    font-size: var(--text-2xl);
   }
 
   .btn-sm {
@@ -405,25 +452,14 @@
     align-items: center;
     gap: var(--space-2);
     color: var(--color-text-muted);
-    background: var(--color-bg-elevated);
+    background: rgba(20, 20, 23, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: var(--space-4);
     border-radius: var(--radius-md);
   }
 
-  .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
 
   .error-banner {
     position: absolute;
@@ -447,10 +483,13 @@
   }
 
   .graph-sidebar section {
-    background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    background: rgba(20, 20, 23, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-lg);
     padding: var(--space-4);
+    box-shadow: var(--shadow-sm), var(--shadow-highlight);
   }
 
   .graph-sidebar h2 {
@@ -511,15 +550,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;
-  }
-
-  .loading-spinner-small {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
   }
 
   .node-type {
@@ -598,6 +628,43 @@
   }
 
   /* Legend */
+  .legend-section {
+    padding: 0 !important;
+  }
+
+  .legend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-4);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+  }
+
+  .legend-header:hover {
+    background: var(--color-bg-subtle);
+  }
+
+  .legend-header h2 {
+    margin: 0;
+  }
+
+  .legend-chevron {
+    color: var(--color-text-subtle);
+    transition: transform var(--transition-fast);
+  }
+
+  .legend-chevron.collapsed {
+    transform: rotate(-90deg);
+  }
+
+  .legend-items {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
   .legend-group h3 {
     font-size: var(--text-xs);
     color: var(--color-text-subtle);
@@ -611,6 +678,10 @@
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     margin-bottom: var(--space-1);
+  }
+
+  .legend-item:last-child {
+    margin-bottom: 0;
   }
 
   .legend-dot {

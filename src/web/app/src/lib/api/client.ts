@@ -23,6 +23,9 @@ import type {
   ClusterStatus,
   AbandonedRestartsResponse,
   FrictionSummary,
+  SpokeConfig,
+  SpokeCreateRequest,
+  SpokeUpdateRequest,
 } from "$lib/types";
 
 // Use environment variable, or derive from window.location in browser
@@ -277,6 +280,21 @@ export const api = {
       trends: { thisWeek: number; lastWeek: number; change: number };
     }>("/stats/tool-errors"),
 
+  getTimeSeries: (days = 7) =>
+    request<{
+      data: {
+        date: string;
+        tokens: number;
+        cost: number;
+        nodes: number;
+      }[];
+      summary: {
+        totalTokens: number;
+        totalCost: number;
+        totalNodes: number;
+      };
+    }>(`/stats/timeseries?days=${days}`),
+
   // Patterns
   getFailurePatterns: (options?: {
     limit?: number;
@@ -434,7 +452,40 @@ export const api = {
       model: string;
       idleTimeoutMinutes: number;
       parallelWorkers: number;
-      defaults: { provider: string; model: string };
+      maxRetries: number;
+      retryDelaySeconds: number;
+      analysisTimeoutMinutes: number;
+      maxConcurrentAnalysis: number;
+      maxQueueSize: number;
+      backfillLimit: number;
+      reanalysisLimit: number;
+      connectionDiscoveryLimit: number;
+      connectionDiscoveryLookbackDays: number;
+      connectionDiscoveryCooldownHours: number;
+      semanticSearchThreshold: number;
+      // Embedding fields
+      embeddingProvider: string;
+      embeddingModel: string;
+      hasApiKey: boolean;
+      embeddingBaseUrl: string | null;
+      embeddingDimensions: number | null;
+      // Schedule fields
+      reanalysisSchedule: string;
+      connectionDiscoverySchedule: string;
+      patternAggregationSchedule: string;
+      clusteringSchedule: string;
+      backfillEmbeddingsSchedule: string;
+      defaults: {
+        provider: string;
+        model: string;
+        embeddingProvider: string;
+        embeddingModel: string;
+        reanalysisSchedule: string;
+        connectionDiscoverySchedule: string;
+        patternAggregationSchedule: string;
+        clusteringSchedule: string;
+        backfillEmbeddingsSchedule: string;
+      };
     }>("/config/daemon"),
 
   updateDaemonConfig: (config: {
@@ -442,12 +493,58 @@ export const api = {
     model?: string;
     idleTimeoutMinutes?: number;
     parallelWorkers?: number;
+    maxRetries?: number;
+    retryDelaySeconds?: number;
+    analysisTimeoutMinutes?: number;
+    maxConcurrentAnalysis?: number;
+    maxQueueSize?: number;
+    backfillLimit?: number;
+    reanalysisLimit?: number;
+    connectionDiscoveryLimit?: number;
+    connectionDiscoveryLookbackDays?: number;
+    connectionDiscoveryCooldownHours?: number;
+    semanticSearchThreshold?: number;
+    // Embedding fields
+    embeddingProvider?: string;
+    embeddingModel?: string;
+    embeddingApiKey?: string | null;
+    embeddingBaseUrl?: string | null;
+    embeddingDimensions?: number | null;
+    // Schedule fields
+    reanalysisSchedule?: string;
+    connectionDiscoverySchedule?: string;
+    patternAggregationSchedule?: string;
+    clusteringSchedule?: string;
+    backfillEmbeddingsSchedule?: string;
   }) =>
     request<{
       provider: string;
       model: string;
       idleTimeoutMinutes: number;
       parallelWorkers: number;
+      maxRetries: number;
+      retryDelaySeconds: number;
+      analysisTimeoutMinutes: number;
+      maxConcurrentAnalysis: number;
+      maxQueueSize: number;
+      backfillLimit: number;
+      reanalysisLimit: number;
+      connectionDiscoveryLimit: number;
+      connectionDiscoveryLookbackDays: number;
+      connectionDiscoveryCooldownHours: number;
+      semanticSearchThreshold: number;
+      // Embedding fields
+      embeddingProvider: string;
+      embeddingModel: string;
+      hasApiKey: boolean;
+      embeddingBaseUrl: string | null;
+      embeddingDimensions: number | null;
+      // Schedule fields
+      reanalysisSchedule: string;
+      connectionDiscoverySchedule: string;
+      patternAggregationSchedule: string;
+      clusteringSchedule: string;
+      backfillEmbeddingsSchedule: string;
       message: string;
     }>("/config/daemon", {
       method: "PUT",
@@ -462,6 +559,80 @@ export const api = {
         models: string[];
       }[];
     }>("/config/providers"),
+
+  // Query Configuration
+  getQueryConfig: () =>
+    request<{
+      provider: string;
+      model: string;
+      defaults: { provider: string; model: string };
+    }>("/config/query"),
+
+  updateQueryConfig: (config: { provider?: string; model?: string }) =>
+    request<{
+      provider: string;
+      model: string;
+      message: string;
+    }>("/config/query", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
+  // API Configuration
+  getApiConfig: () =>
+    request<{
+      port: number;
+      host: string;
+      corsOrigins: string[];
+      defaults: {
+        port: number;
+        host: string;
+        corsOrigins: string[];
+      };
+    }>("/config/api"),
+
+  updateApiConfig: (config: {
+    port?: number;
+    host?: string;
+    corsOrigins?: string[];
+  }) =>
+    request<{
+      port: number;
+      host: string;
+      corsOrigins: string[];
+      message: string;
+    }>("/config/api", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
+
+  // Hub Configuration
+  getHubConfig: () =>
+    request<{
+      sessionsDir: string;
+      databaseDir: string;
+      webUiPort: number;
+      defaults: {
+        sessionsDir: string;
+        databaseDir: string;
+        webUiPort: number;
+      };
+    }>("/config/hub"),
+
+  updateHubConfig: (config: {
+    sessionsDir?: string;
+    databaseDir?: string;
+    webUiPort?: number;
+  }) =>
+    request<{
+      sessionsDir: string;
+      databaseDir: string;
+      webUiPort: number;
+      message: string;
+    }>("/config/hub", {
+      method: "PUT",
+      body: JSON.stringify(config),
+    }),
 
   // Prompt Learning
   getPromptInsights: (options?: {
@@ -520,6 +691,37 @@ export const api = {
 
   getFrictionSummary: () =>
     request<FrictionSummary>("/signals/friction-summary"),
+
+  // Spokes Configuration
+  getSpokes: () =>
+    request<{
+      spokes: SpokeConfig[];
+    }>("/config/spokes"),
+
+  createSpoke: (spoke: SpokeCreateRequest) =>
+    request<{
+      spoke: SpokeConfig;
+      message: string;
+    }>("/config/spokes", {
+      method: "POST",
+      body: JSON.stringify(spoke),
+    }),
+
+  updateSpoke: (name: string, updates: SpokeUpdateRequest) =>
+    request<{
+      spoke: SpokeConfig;
+      message: string;
+    }>(`/config/spokes/${encodeURIComponent(name)}`, {
+      method: "PUT",
+      body: JSON.stringify(updates),
+    }),
+
+  deleteSpoke: (name: string) =>
+    request<{
+      message: string;
+    }>(`/config/spokes/${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    }),
 };
 
 export {

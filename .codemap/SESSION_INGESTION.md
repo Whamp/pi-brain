@@ -452,7 +452,8 @@ src/daemon/facet-discovery.ts [1-1760]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 7 [call: 3, instantiate: 3, type: 1]
+      refs out: 8 [call: 3, instantiate: 3, type: 2]
+        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
         - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:174: instantiate Error -> external
@@ -1042,7 +1043,8 @@ src/daemon/watcher.ts [1-582]
   function:
     546-550: createWatcher(daemonConfig: DaemonConfig): SessionWatcher [exported]
       /** Create a watcher from daemon config */
-      refs out: 2 [instantiate: 1, type: 1]
+      refs out: 3 [instantiate: 1, type: 2]
+        - src/daemon/watcher.ts:546: type DaemonConfig -> src/config/types.ts
         - src/daemon/watcher.ts:546: type SessionWatcher -> src/daemon/watcher.ts
         - src/daemon/watcher.ts:547: instantiate SessionWatcher -> src/daemon/watcher.ts
     555-557: isSessionFile(filePath: string): boolean [exported]
@@ -1525,21 +1527,25 @@ src/parser/signals.ts [1-1095]
         - src/parser/signals.ts:428: call hasGenuineSuccessIndicator -> src/parser/signals.ts
     479-507: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 2 [call: 1, type: 1]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:479: type SessionEntry -> src/types.ts
+        - src/parser/signals.ts:479: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:497: call push -> external
+        - src/parser/signals.ts:498: type ManualFlag -> src/types/index.ts
     518-546: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 4 [call: 4]
+      refs out: 5 [call: 4, type: 1]
+        - src/parser/signals.ts:518: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:522: call min -> external
         - src/parser/signals.ts:525: call min -> external
         - src/parser/signals.ts:528: call min -> external
         - src/parser/signals.ts:545: call min -> external
     569-601: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:570: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:571: type FrictionDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:572: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:598: call calculateFrictionScore -> src/parser/signals.ts
     611-642: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1599,13 +1605,15 @@ src/parser/signals.ts [1-1095]
         - src/parser/signals.ts:998: call hasGenuinePraise -> src/parser/signals.ts
     1039-1058: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 1 [call: 1]
+      refs out: 2 [call: 1, type: 1]
+        - src/parser/signals.ts:1039: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1057: call min -> external
     1075-1094: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:1076: type SessionEntry -> src/types.ts
         - src/parser/signals.ts:1077: type DelightDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:1078: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1091: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types.js
@@ -1613,4 +1621,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,942 (codebase: ~1,204,855)
+Estimated tokens: 21,106 (codebase: ~1,338,344)

@@ -213,7 +213,9 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.test.ts:954: call (module)
     626-640: getEffectivenessHistory(db: Database.Database, insightId: string): {} [exported]
       /** Get effectiveness measurements for an insight */
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/prompt-learning.ts:8: import (module)
+        - src/api/routes/prompt-learning.ts:95: call history
         - src/prompt/effectiveness.test.ts:18: import (module)
         - src/prompt/effectiveness.test.ts:791: call history
         - src/prompt/effectiveness.test.ts:842: call history
@@ -225,6 +227,9 @@ src/prompt/effectiveness.ts [1-881]
         - src/prompt/effectiveness.test.ts:907: call result
     669-699: getLatestEffectivenessBatch(db: Database.Database, insightIds: string[]): Map<string, PromptEffectiveness> [exported]
       /** Get the latest effectiveness measurements for multiple insights in a single query. Returns a map of insightId -> PromptEffectiveness. */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/prompt-learning.ts:9: import (module)
+        - src/api/routes/prompt-learning.ts:60: call effectivenessMap
     705-731: getInsightsNeedingMeasurement(db: Database.Database, measureAfterDays = 7): {} [exported]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
       refs in: 6 [call: 4, import: 2]
@@ -705,27 +710,19 @@ src/storage/pattern-repository.ts [1-369]
         - src/storage/pattern-repository.ts:201: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
-      refs in: 5 [call: 3, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:13: import (module)
         - src/api/routes/patterns.ts:61: call result
-        - src/storage/pattern-repository.test.ts:8: import (module)
-        - src/storage/pattern-repository.test.ts:28: call patterns
-        - src/storage/pattern-repository.test.ts:35: call rarePatterns
     117-136: listModelStats(db: Database.Database): {} [exported]
-      refs in: 4 [call: 2, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:15: import (module)
         - src/api/routes/patterns.ts:83: call result
-        - src/storage/pattern-repository.test.ts:11: import (module)
-        - src/storage/pattern-repository.test.ts:52: call stats
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-      refs in: 5 [call: 3, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:14: import (module)
         - src/api/routes/patterns.ts:108: call result
-        - src/storage/pattern-repository.test.ts:10: import (module)
-        - src/storage/pattern-repository.test.ts:71: call patterns
-        - src/storage/pattern-repository.test.ts:76: call projectPatterns
     199-252: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-      refs in: 21 [call: 16, import: 5]
+      refs in: 11 [call: 7, import: 4]
         - src/api/routes/prompt-learning.ts:12: import (module)
         - src/api/routes/prompt-learning.ts:51: call insights
         - src/cli.ts:62: import (module)
@@ -737,7 +734,7 @@ src/storage/pattern-repository.ts [1-369]
         - src/prompt/prompt-generator.ts:15: import (module)
         - src/prompt/prompt-generator.ts:263: call insights
     254-268: getInsight(db: Database.Database, id: string): any [exported]
-      refs in: 13 [call: 9, import: 4]
+      refs in: 9 [call: 6, import: 3]
         - src/api/routes/prompt-learning.ts:13: import (module)
         - src/api/routes/prompt-learning.ts:146: call insight
         - src/cli.ts:61: import (module)
@@ -747,21 +744,10 @@ src/storage/pattern-repository.ts [1-369]
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
-        - src/storage/pattern-repository.test.ts:6: import (module)
     270-294: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
-        - src/storage/pattern-repository.test.ts:7: import (module)
-        - src/storage/pattern-repository.test.ts:179: call claudeInsights
-        - src/storage/pattern-repository.test.ts:183: call highConfidence
     296-328: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
-      refs in: 5 [call: 4, import: 1]
-        - src/storage/pattern-repository.test.ts:5: import (module)
-        - src/storage/pattern-repository.test.ts:193: call (module)
-        - src/storage/pattern-repository.test.ts:194: call (module)
-        - src/storage/pattern-repository.test.ts:195: call (module)
-        - src/storage/pattern-repository.test.ts:196: call (module)
     330-347: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
-      refs in: 11 [call: 6, import: 5]
+      refs in: 9 [call: 5, import: 4]
         - src/api/routes/prompt-learning.ts:14: import (module)
         - src/api/routes/prompt-learning.ts:153: call promptLearningRoutes
         - src/cli.ts:63: import (module)
@@ -771,11 +757,10 @@ src/storage/pattern-repository.ts [1-369]
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
         - src/prompt/prompt-generator.ts:329: call updateInsightPromptTexts
-        - src/storage/pattern-repository.test.ts:12: import (module)
   imports:
     - ../types/index.js
     - better-sqlite3
 
 ---
 Files: 14
-Estimated tokens: 10,701 (codebase: ~1,204,855)
+Estimated tokens: 10,445 (codebase: ~1,338,344)

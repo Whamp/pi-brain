@@ -10,7 +10,6 @@
     ChevronDown,
     ChevronRight,
     Tag,
-    AlertCircle,
     CheckCircle,
     XCircle,
     Circle,
@@ -18,10 +17,16 @@
     Zap,
     History,
     ExternalLink,
+    AlertCircle,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { parseDate } from "$lib/utils/date";
   import type { Node, Edge, LessonLevel } from "$lib/types";
+  import ErrorState from "$lib/components/error-state.svelte";
+  import NodeDetailSkeleton from "$lib/components/node-detail-skeleton.svelte";
+  import Breadcrumbs from "$lib/components/breadcrumbs.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
+  import TagComponent from "$lib/components/tag.svelte";
 
   const nodeId = $derived(page.params.id);
 
@@ -30,6 +35,7 @@
   let versions: { version: number; analyzedAt: string }[] = $state([]);
   let loading = $state(true);
   let errorMessage: string | null = $state(null);
+  let isOfflineError = $state(false);
 
   // Collapsed state for decisions
   let expandedDecisions: Record<number, boolean> = $state({});
@@ -57,7 +63,8 @@
         versions: result.versions ?? [],
       });
     } catch (error: unknown) {
-      errorMessage = isBackendOffline(error)
+      isOfflineError = isBackendOffline(error);
+      errorMessage = isOfflineError
         ? "Backend is offline. Start the daemon with 'pi-brain daemon start'."
         : getErrorMessage(error);
     } finally {
@@ -270,26 +277,24 @@
   <meta name="description" content="View node details and lessons learned" />
 </svelte:head>
 
-<div class="node-detail-page">
-  <a href="/graph" class="back-link">
-    <ArrowLeft size={16} />
-    Back to Graph
-  </a>
+<div class="node-detail-page page-animate">
+  <Breadcrumbs items={[
+    { label: 'Graph', href: '/graph' },
+    { label: node?.content?.summary ? (node.content.summary.length > 50 ? node.content.summary.slice(0, 50) + '…' : node.content.summary) : `Node ${nodeId?.slice(0, 8) ?? '...'}` }
+  ]} />
 
   {#if loading}
-    <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Loading node...</p>
-    </div>
+    <NodeDetailSkeleton />
   {:else if errorMessage}
-    <div class="error-state">
-      <AlertCircle size={24} />
-      <p>{errorMessage}</p>
-      <button class="retry-button" onclick={loadNode}>Retry</button>
-    </div>
+    <ErrorState
+      variant={isOfflineError ? "offline" : "not-found"}
+      description={errorMessage}
+      onRetry={loadNode}
+      showHomeLink={true}
+    />
   {:else if node}
     <!-- Header Card -->
-    <div class="header-card">
+    <div class="header-card animate-in">
       <div class="header-top">
         <div class="summary-row">
           {#if node.content?.outcome}
@@ -353,9 +358,11 @@
         {#if node.semantic?.tags && node.semantic.tags.length > 0}
           <div class="tags-row">
             {#each node.semantic.tags as tag}
-              <a href={`/search?tags=${encodeURIComponent(tag)}`} class="tag">
-                {tag}
-              </a>
+              <TagComponent 
+                text={tag} 
+                variant="auto" 
+                href={`/search?tags=${encodeURIComponent(tag)}`} 
+              />
             {/each}
           </div>
         {/if}
@@ -456,7 +463,7 @@
                             {#if lesson.tags && lesson.tags.length > 0}
                               <div class="lesson-tags">
                                 {#each lesson.tags as tag}
-                                  <span class="lesson-tag">#{tag}</span>
+                                  <TagComponent text={`#${tag}`} variant="auto" />
                                 {/each}
                               </div>
                             {/if}
@@ -647,9 +654,11 @@
       </div>
     </div>
   {:else}
-    <div class="empty-state">
-      <p>Node not found</p>
-    </div>
+    <EmptyState
+      title="Node not found"
+      description="The requested node could not be found or has been deleted."
+      size="sm"
+    />
   {/if}
 </div>
 
@@ -660,57 +669,11 @@
     margin: 0 auto;
   }
 
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-4);
-    text-decoration: none;
-  }
-
-  .back-link:hover {
-    color: var(--color-accent);
-  }
-
-  /* Loading & Error States */
-  .loading-state,
-  .error-state,
+  /* Empty State */
   .empty-state {
     padding: var(--space-12);
     text-align: center;
     color: var(--color-text-muted);
-  }
-
-  .loading-spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto var(--space-4);
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .error-state {
-    color: var(--color-error);
-  }
-
-  .retry-button {
-    margin-top: var(--space-4);
-    padding: var(--space-2) var(--space-4);
-    background: var(--color-accent);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
   }
 
   /* Header Card */
@@ -851,21 +814,6 @@
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-3);
-  }
-
-  .tag {
-    padding: 4px 10px;
-    background: var(--color-accent-muted);
-    color: var(--color-accent);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-xs);
-    text-decoration: none;
-    transition: background-color 0.15s ease;
-  }
-
-  .tag:hover {
-    background: var(--color-accent);
-    color: white;
   }
 
   /* Content Grid */
@@ -1083,12 +1031,8 @@
 
   .lesson-tags {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-1);
-  }
-
-  .lesson-tag {
-    font-size: var(--text-xs);
-    color: var(--color-text-subtle);
   }
 
   /* Model Observations */

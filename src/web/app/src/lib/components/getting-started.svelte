@@ -8,10 +8,11 @@
     ArrowRight,
     FileText,
     Network,
+    LayoutDashboard,
   } from "lucide-svelte";
 
   interface Props {
-    variant: "sessions" | "graph";
+    variant: "sessions" | "graph" | "dashboard";
   }
 
   const { variant }: Props = $props();
@@ -48,6 +49,8 @@
     <div class="icon-container">
       {#if variant === "sessions"}
         <FileText size={32} />
+      {:else if variant === "dashboard"}
+        <LayoutDashboard size={32} />
       {:else}
         <Network size={32} />
       {/if}
@@ -55,6 +58,8 @@
     <h2>
       {#if variant === "sessions"}
         No Sessions Yet
+      {:else if variant === "dashboard"}
+        Welcome to pi-brain
       {:else}
         Knowledge Graph Empty
       {/if}
@@ -63,6 +68,10 @@
       {#if variant === "sessions"}
         Once the daemon analyzes your pi sessions, they'll appear here organized
         by project.
+      {:else if variant === "dashboard"}
+        Start by running some pi sessions. The daemon will analyze your coding
+        conversations and build a knowledge graph of decisions, lessons, and
+        patterns.
       {:else}
         Nodes and connections will appear here after the daemon analyzes your pi
         sessions.
@@ -121,6 +130,9 @@
     {#if variant === "sessions"}
       Use <code>/tree</code> and <code>/branch</code> commands in pi to create
       meaningful session segments.
+    {:else if variant === "dashboard"}
+      The daemon analyzes sessions after 10 minutes of idle time, or you can
+      trigger analysis manually with <code>pi-brain analyze</code>.
     {:else}
       Click on nodes to see their connections, or double-click to view full
       details.

@@ -51,6 +51,12 @@
       }
     },
     {
+      "files": ["**/*.svelte"],
+      "rules": {
+        "eslint/no-unassigned-vars": "off"
+      }
+    },
+    {
       "files": ["src/api/routes/**/*.ts", "extensions/dashboard/**/*.ts"],
       "rules": {
         "eslint/require-await": "off"

@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 98 files
+- typescript: 103 files
 
 ## Statistics
-- Total files: 98
-- Total symbols: 697
-  - function: 382
-  - interface: 224
-  - type: 42
-  - variable: 34
+- Total files: 103
+- Total symbols: 713
+  - function: 387
+  - interface: 228
+  - type: 44
+  - variable: 39
   - class: 15
 
 ---
@@ -51,15 +51,17 @@ src/api/routes/clusters.ts [1-375]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-218]
+src/api/routes/config.ts [1-1743]
   function:
-    19-217: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    896-1742: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
+    - ../../daemon/scheduler.js
     - ../responses.js
     - fastify
     - node:fs
+    - node:path
     - yaml
 
 src/api/routes/daemon.ts [1-385]
@@ -181,9 +183,9 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-345]
+src/api/routes/stats.ts [1-437]
   function:
-    184-335: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    184-427: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -2174,24 +2176,28 @@ src/types/index.ts [1-722]
     333-345: AUTOMEM_EDGE_TYPES [exported]
       /** AutoMem typed relationship edge types (per automem-features.md) These enable semantic reasoning ("why" queries, causal chains) */
 
+src/web/app/playwright.config.ts [1-27]
+  imports:
+    - @playwright/test
+
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-537]
+src/web/app/src/lib/api/client.ts [1-739]
   function:
-    65-74: createApiError(options: ApiErrorOptions): Error [exported]
-    76-80: createTimeoutError(timeoutMs: number): Error [exported]
-    82-86: createNetworkError(message: string): Error [exported]
-    88-97: createContentTypeError(status: number, contentType: string): Error [exported]
-    99-103: isApiError(error: unknown): boolean [exported]
-    105-107: isTimeoutError(error: unknown): boolean [exported]
-    109-111: isNetworkError(error: unknown): boolean [exported]
-    113-117: isContentTypeError(error: unknown): boolean [exported]
-    123-127: isBackendOffline(error: unknown): boolean [exported]
+    68-77: createApiError(options: ApiErrorOptions): Error [exported]
+    79-83: createTimeoutError(timeoutMs: number): Error [exported]
+    85-89: createNetworkError(message: string): Error [exported]
+    91-100: createContentTypeError(status: number, contentType: string): Error [exported]
+    102-106: isApiError(error: unknown): boolean [exported]
+    108-110: isTimeoutError(error: unknown): boolean [exported]
+    112-114: isNetworkError(error: unknown): boolean [exported]
+    116-120: isContentTypeError(error: unknown): boolean [exported]
+    126-130: isBackendOffline(error: unknown): boolean [exported]
       /** Check if an error indicates the backend is unreachable (network error, timeout, or non-JSON response like 404 HTML page) */
-    132-149: getErrorMessage(error: unknown): string [exported]
+    135-152: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    220-523: api [exported]
+    223-725: api [exported]
   imports:
     - $lib/types
 
@@ -2212,6 +2218,13 @@ src/web/app/src/lib/stores/daemon.ts [1-132]
     - $lib/types
     - svelte/store
 
+src/web/app/src/lib/stores/keyboard-shortcuts.ts [1-198]
+  variable:
+    197-197: keyboardShortcuts [exported]
+  imports:
+    - $app/navigation
+    - svelte/store
+
 src/web/app/src/lib/stores/nodes.ts [1-112]
   variable:
     105-105: nodesStore [exported]
@@ -2219,6 +2232,26 @@ src/web/app/src/lib/stores/nodes.ts [1-112]
   imports:
     - $lib/api/client
     - $lib/types
+    - svelte/store
+
+src/web/app/src/lib/stores/search-history.ts [1-106]
+  variable:
+    105-105: any [exported]
+  imports:
+    - svelte/store
+
+src/web/app/src/lib/stores/theme.ts [1-171]
+  type:
+    10-10: Theme = "light" | "dark" | "system" [exported]
+  function:
+    92-120: initTheme(): () => void [exported]
+    139-156: applyTheme(theme: "light" | "dark"): void [exported]
+    159-170: toggleTheme(): void [exported]
+  variable:
+    80-80: themePreference [exported]
+    81-81: { subscribe: any; set: any; } [exported]
+    85-89: any [exported]
+  imports:
     - svelte/store
 
 src/web/app/src/lib/stores/toast.ts [1-114]
@@ -2240,7 +2273,7 @@ src/web/app/src/lib/stores/websocket.ts [1-179]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-342]
+src/web/app/src/lib/types.ts [1-381]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
@@ -2262,6 +2295,12 @@ src/web/app/src/lib/types.ts [1-342]
     302-318: interface AbandonedRestartPattern [exported]
     320-326: interface AbandonedRestartsResponse [exported]
     328-341: interface FrictionSummary [exported]
+    346-351: interface RsyncOptions [exported]
+    353-361: interface SpokeConfig [exported]
+    363-371: interface SpokeCreateRequest [exported]
+    373-380: interface SpokeUpdateRequest [exported]
+  type:
+    344-344: SyncMethod = "syncthing" | "rsync" | "api" [exported]
   imports:
     - ../../../../types/index.js
 
@@ -2277,6 +2316,20 @@ src/web/app/src/lib/utils/date.ts [1-94]
       /** Format a date as "YYYY-MM-DD" for input[type="date"] */
     91-93: parseDate(date: string | Date): Date [exported]
       /** Parse a date string or Date object to Date */
+
+src/web/app/src/lib/utils/focus-trap.ts [1-146]
+  function:
+    47-121: createFocusTrap(container: HTMLElement, options: {
+    /** Called when Escape key is pressed */
+    onEscape?: () => void;
+    /** Element to restore focus to when trap is removed */
+    restoreFocus?: HTMLElement | null;
+    /** Whether to focus the first element on activation (default: true) */
+    autoFocus?: boolean;
+  } = {}): () => void [exported]
+      /** Creates a focus trap for a container element. */
+    127-145: focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; } [exported]
+      /** Svelte action for focus trapping. Use as `use:focusTrap={{ onEscape: () => ... }}` */
 
 src/web/app/vite.config.ts [1-15]
   imports:
@@ -2296,5 +2349,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 98
-Estimated tokens: 28,994 (codebase: ~1,204,886)
+Files: 103
+Estimated tokens: 29,471 (codebase: ~252,154)

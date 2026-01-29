@@ -6,6 +6,7 @@
 <script lang="ts">
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDate, parseDate } from "$lib/utils/date";
+  import Spinner from "$lib/components/spinner.svelte";
   import {
     Lightbulb,
     CheckCircle2,
@@ -22,7 +23,7 @@
     FileText,
     ExternalLink
   } from "lucide-svelte";
-  import type { AggregatedInsight, PromptEffectiveness } from "$lib/types";
+  import TableSortIcon from "$lib/components/table-sort-icon.svelte";
 
   type InsightWithEffectiveness = AggregatedInsight & {
     latestEffectiveness: PromptEffectiveness | null;
@@ -41,6 +42,50 @@
   let loadingHistory = $state(false);
   let historyError = $state<string | null>(null);
   let togglingInsightId = $state<string | null>(null);
+
+  // Sorting state for history table
+  let historySort = $state<{ column: string; direction: "asc" | "desc" }>({
+    column: "measuredAt",
+    direction: "desc",
+  });
+
+  function sortHistory(column: string) {
+    if (historySort.column === column) {
+      historySort.direction = historySort.direction === "asc" ? "desc" : "asc";
+    } else {
+      historySort.column = column;
+      historySort.direction = "desc";
+    }
+  }
+
+  const sortedHistory = $derived.by(() => {
+    const sorted = [...effectivenessHistory];
+    const { column, direction } = historySort;
+    
+    sorted.sort((a, b) => {
+      // @ts-expect-error - dynamic column access
+      const aVal = a[column] ?? "";
+      // @ts-expect-error - dynamic column access
+      const bVal = b[column] ?? "";
+      
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+      
+      const aStr = String(aVal).toLowerCase();
+      const bStr = String(bVal).toLowerCase();
+      
+      if (aStr < bStr) {
+        return direction === "asc" ? -1 : 1;
+      }
+      if (aStr > bStr) {
+        return direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+    
+    return sorted;
+  });
 
   async function loadInsights() {
     loading = true;
@@ -175,7 +220,7 @@
       <div class="insight-list">
         {#if loading}
           <div class="list-loading">
-            <Loader2 size={24} class="spinner" />
+            <Spinner size="md" />
             <span>Loading insights...</span>
           </div>
         {:else}
@@ -237,26 +282,26 @@
             </div>
             <div class="detail-actions">
               {#if selectedInsight.promptIncluded}
-                <button 
-                  class="btn-outline color-error" 
+                <button
+                  class="btn-outline-color color-error"
                   onclick={() => toggleInsight(selectedInsight!, false)}
                   disabled={togglingInsightId === selectedInsight.id}
                 >
                   {#if togglingInsightId === selectedInsight.id}
-                    <Loader2 size={16} class="spinner" />
+                    <Spinner size={16} variant="inline" />
                   {:else}
                     <XCircle size={16} />
                   {/if}
                   Disable Addition
                 </button>
               {:else}
-                <button 
-                  class="btn-primary" 
+                <button
+                  class="btn-primary"
                   onclick={() => toggleInsight(selectedInsight!, true)}
                   disabled={togglingInsightId === selectedInsight.id}
                 >
                   {#if togglingInsightId === selectedInsight.id}
-                    <Loader2 size={16} class="spinner" />
+                    <Spinner size={16} variant="inline" />
                   {:else}
                     <CheckCircle2 size={16} />
                   {/if}
@@ -307,7 +352,7 @@
             <h3><BarChart3 size={18} /> Effectiveness</h3>
             {#if loadingHistory}
               <div class="history-loading">
-                <Loader2 size={24} class="spinner" />
+                <Spinner size="md" />
               </div>
             {:else if historyError}
               <div class="error-box">
@@ -343,25 +388,46 @@
                 </div>
               </div>
 
-              <div class="history-table-container">
-                <table class="history-table">
+              <div class="table-wrapper">
+                <table class="data-table">
                   <thead>
                     <tr>
-                      <th>Version</th>
-                      <th>Measured At</th>
-                      <th>Before Rate</th>
-                      <th>After Rate</th>
-                      <th>Improvement</th>
+                      <th 
+                        class="sortable col-mono" 
+                        class:sorted={historySort.column === "promptVersion"} 
+                        onclick={() => sortHistory("promptVersion")}
+                      >
+                        Version
+                        <TableSortIcon direction={historySort.column === "promptVersion" ? historySort.direction : null} />
+                      </th>
+                      <th 
+                        class="sortable" 
+                        class:sorted={historySort.column === "measuredAt"} 
+                        onclick={() => sortHistory("measuredAt")}
+                      >
+                        Measured At
+                        <TableSortIcon direction={historySort.column === "measuredAt" ? historySort.direction : null} />
+                      </th>
+                      <th class="col-numeric">Before Rate</th>
+                      <th class="col-numeric">After Rate</th>
+                      <th 
+                        class="sortable col-numeric" 
+                        class:sorted={historySort.column === "improvementPct"} 
+                        onclick={() => sortHistory("improvementPct")}
+                      >
+                        Improvement
+                        <TableSortIcon direction={historySort.column === "improvementPct" ? historySort.direction : null} />
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {#each effectivenessHistory as record}
+                    {#each sortedHistory as record}
                       <tr>
-                        <td class="font-mono">{record.promptVersion}</td>
+                        <td class="col-mono">{record.promptVersion}</td>
                         <td>{formatDate(parseDate(record.measuredAt))}</td>
-                        <td>{record.beforeOccurrences}/{record.sessionsBefore}</td>
-                        <td>{record.afterOccurrences}/{record.sessionsAfter}</td>
-                        <td class={getImprovementColor(record.improvementPct)}>
+                        <td class="col-numeric">{record.beforeOccurrences}/{record.sessionsBefore}</td>
+                        <td class="col-numeric">{record.afterOccurrences}/{record.sessionsAfter}</td>
+                        <td class="col-numeric {getImprovementColor(record.improvementPct)}">
                           {record.improvementPct > 0 ? "+" : ""}{record.improvementPct.toFixed(1)}%
                         </td>
                       </tr>
@@ -540,15 +606,15 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0 4px;
-    border-radius: 2px;
+    padding: 2px 6px;
+    border-radius: 4px;
   }
 
-  .quirk { background: #fef2f2; color: #991b1b; }
-  .win { background: #f0fdf4; color: #166534; }
-  .failure { background: #fffbeb; color: #92400e; }
-  .tool_error { background: #eff6ff; color: #1e40af; }
-  .lesson { background: #f5f3ff; color: #5b21b6; }
+  .quirk { background: hsla(0, 72%, 72%, 0.15); color: hsl(0, 72%, 72%); }
+  .win { background: hsla(145, 65%, 52%, 0.15); color: hsl(145, 65%, 52%); }
+  .failure { background: hsla(25, 80%, 58%, 0.15); color: hsl(25, 80%, 58%); }
+  .tool_error { background: hsla(210, 72%, 60%, 0.15); color: hsl(210, 72%, 60%); }
+  .lesson { background: hsla(270, 72%, 62%, 0.15); color: hsl(270, 72%, 62%); }
 
   .insight-model {
     font-size: var(--text-xs);
@@ -668,9 +734,9 @@
     text-transform: capitalize;
   }
 
-  .severity-high { background: #fee2e2; color: #dc2626; }
-  .severity-medium { background: #fef3c7; color: #d97706; }
-  .severity-low { background: #ecfdf5; color: #059669; }
+  .severity-high { background: var(--color-error-muted); color: var(--color-error); }
+  .severity-medium { background: hsla(45, 85%, 55%, 0.15); color: hsl(45, 85%, 55%); }
+  .severity-low { background: hsla(145, 65%, 52%, 0.15); color: hsl(145, 65%, 52%); }
 
   .detail-sections {
     display: flex;
@@ -703,9 +769,9 @@
   }
 
   .workaround-box {
-    background: #f0fdfa;
-    border: 1px solid #5eead4;
-    color: #0f766e;
+    background: hsla(170, 65%, 50%, 0.1);
+    border: 1px solid hsla(170, 65%, 50%, 0.3);
+    color: hsl(170, 65%, 50%);
     padding: var(--space-4);
     border-radius: var(--radius-lg);
     font-style: italic;
@@ -738,32 +804,6 @@
     gap: 4px;
   }
 
-  .history-table-container {
-    border: 1px solid var(--color-border-subtle);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--text-sm);
-  }
-
-  .history-table th {
-    background: var(--color-bg);
-    text-align: left;
-    padding: var(--space-2) var(--space-4);
-    color: var(--color-text-muted);
-    font-weight: 600;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  .history-table td {
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
   .examples-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -790,8 +830,8 @@
     color: var(--color-accent);
   }
 
-  .color-success { color: #16a34a; }
-  .color-error { color: #dc2626; }
+  .color-success { color: var(--color-success); }
+  .color-error { color: var(--color-error); }
   .color-muted { color: var(--color-text-subtle); }
 
   .error-box {
@@ -799,46 +839,14 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-4);
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    background: var(--color-error-muted);
+    border: 1px solid hsl(0, 65%, 65%, 0.25);
     border-radius: var(--radius-lg);
-    color: #dc2626;
+    color: var(--color-error);
     font-size: var(--text-sm);
   }
 
   .font-mono { font-family: var(--font-mono); }
-
-  .btn-primary, .btn-outline {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-  }
-
-  .btn-primary {
-    background: var(--color-accent);
-    color: white;
-    border: none;
-  }
-
-  .btn-primary:hover { opacity: 0.9; }
-
-  .btn-primary:disabled, .btn-outline:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid currentColor;
-  }
-
-  .btn-outline:hover { background: var(--color-bg-hover); }
 
   /* Utils */
   .list-loading, .list-empty, .history-loading {
@@ -851,9 +859,6 @@
     color: var(--color-text-subtle);
   }
 
-  :global(.spinner) {
-    animation: spin 1s linear infinite;
-  }
 
   @keyframes spin {
     from { transform: rotate(0deg); }

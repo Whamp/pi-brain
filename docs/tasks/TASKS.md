@@ -313,125 +313,82 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 
 ### 19.1 Extend Daemon Settings (Trivial)
 
-| ID     | Task                                              | Status  | Deps          | Notes |
-| ------ | ------------------------------------------------- | ------- | ------------- | ----- |
-| 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | pending | -             |       |
-| 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | pending | -             |       |
-| 19.1.3 | Add maxQueueSize, backfillLimit, reanalysisLimit  | pending | -             |       |
-| 19.1.4 | Add connectionDiscovery limits (3 fields)         | pending | -             |       |
-| 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | pending | -             |       |
-| 19.1.6 | Update settings UI with new daemon form sections  | pending | 19.1.1-19.1.5 |       |
+| ID     | Task                                              | Status | Deps          | Notes      |
+| ------ | ------------------------------------------------- | ------ | ------------- | ---------- | --- |
+| 19.1.1 | Add maxRetries, retryDelaySeconds to PUT /daemon  | done   | -             | 2026-01-28 |
+| 19.1.2 | Add analysisTimeoutMinutes, maxConcurrentAnalysis | done   | -             | 2026-01-28 |
+| 19.1.3 | Add maxQueueSize, backfillLimit, reanalysisLimit  | done   | -             | 2026-01-28 |
+| 19.1.4 | Add connectionDiscovery limits (3 fields)         | done   | -             | 2026-01-28 |
+| 19.1.5 | Add semanticSearchThreshold (slider 0.0-1.0)      | done   | -             | 2026-01-28 |     |
+| 19.1.6 | Update settings UI with new daemon form sections  | done   | 19.1.1-19.1.5 | 2026-01-28 |
 
 ### 19.2 Query & API Config (Trivial)
 
-| ID     | Task                                      | Status  | Deps           | Notes |
-| ------ | ----------------------------------------- | ------- | -------------- | ----- |
-| 19.2.1 | Add GET/PUT /config/query routes          | pending | -              |       |
-| 19.2.2 | Add GET/PUT /config/api routes            | pending | -              |       |
-| 19.2.3 | Create TagInput component for corsOrigins | pending | -              |       |
-| 19.2.4 | Add Query section to settings UI          | pending | 19.2.1         |       |
-| 19.2.5 | Add API Server section to settings UI     | pending | 19.2.2, 19.2.3 |       |
+| ID     | Task                                      | Status | Deps           | Notes      |
+| ------ | ----------------------------------------- | ------ | -------------- | ---------- | ------------------------------------------------------------------------------------ |
+| 19.2.1 | Add GET/PUT /config/query routes          | done   | -              | 2026-01-28 | 7 tests, GET/PUT /config/query routes implemented                                    |
+| 19.2.2 | Add GET/PUT /config/api routes            | done   | -              | 2026-01-28 | 11 tests, GET/PUT /config/api routes implemented                                     |
+| 19.2.3 | Create TagInput component for corsOrigins | done   | -              | 2026-01-28 | 0 errors, 0 warnings                                                                 |
+| 19.2.4 | Add Query section to settings UI          | done   | 19.2.1         | 2026-01-28 | Added Query section to settings UI with API client methods                           |
+| 19.2.5 | Add API Server section to settings UI     | done   | 19.2.2, 19.2.3 | 2026-01-28 | Added API Server section to settings UI with Port, Host, and CORS Origins (TagInput) |
 
 ### 19.3 Hub Config (Moderate)
 
-| ID     | Task                             | Status  | Deps   | Notes |
-| ------ | -------------------------------- | ------- | ------ | ----- |
-| 19.3.1 | Add GET/PUT /config/hub routes   | pending | -      |       |
-| 19.3.2 | Implement path validation helper | pending | -      |       |
-| 19.3.3 | Add Hub section to settings UI   | pending | 19.3.1 |       |
-| 19.3.4 | Add warning about data migration | pending | 19.3.3 |       |
+| ID     | Task                             | Status | Deps   | Notes      |
+| ------ | -------------------------------- | ------ | ------ | ---------- | ---------------------------------------------------------------------- |
+| 19.3.1 | Add GET/PUT /config/hub routes   | done   | -      | 2026-01-28 | Added GET/PUT /config/hub routes with path validation                  |
+| 19.3.2 | Implement path validation helper | done   | -      | 2026-01-28 | Added validatePath helper ensuring dirs exist or have writable parents |
+| 19.3.3 | Add Hub section to settings UI   | done   | 19.3.1 | 2026-01-28 | Added Hub section with Sessions Dir, Database Dir, and Web UI Port     |
+| 19.3.4 | Add warning about data migration | done   | 19.3.3 | 2026-01-28 | Added warning box about path changes requiring restart/migration       |
 
 ### 19.4 Embedding Config (Moderate)
 
-| ID     | Task                                           | Status  | Deps          | Notes |
-| ------ | ---------------------------------------------- | ------- | ------------- | ----- |
-| 19.4.1 | Add embedding fields to daemon routes          | pending | -             |       |
-| 19.4.2 | Implement secure API key handling (write-only) | pending | 19.4.1        |       |
-| 19.4.3 | Create PasswordInput component                 | pending | -             |       |
-| 19.4.4 | Add Embeddings section to settings UI          | pending | 19.4.1-19.4.3 |       |
-| 19.4.5 | Conditional field visibility by provider       | pending | 19.4.4        |       |
+| ID     | Task                                           | Status | Deps          | Notes                                       |
+| ------ | ---------------------------------------------- | ------ | ------------- | ------------------------------------------- |
+| 19.4.1 | Add embedding fields to daemon routes          | done   | -             | 2026-01-28 21 new tests                     |
+| 19.4.2 | Implement secure API key handling (write-only) | done   | 19.4.1        | 2026-01-28 Implemented in 19.4.1            |
+| 19.4.3 | Create PasswordInput component                 | done   | -             | 2026-01-28 Show/hide toggle, status display |
+| 19.4.4 | Add Embeddings section to settings UI          | done   | 19.4.1-19.4.3 | 2026-01-28 Provider/model/key/url/dims      |
+| 19.4.5 | Conditional field visibility by provider       | done   | 19.4.4        | 2026-01-28 Hide API fields for Ollama       |
 
 ### 19.5 Cron Schedules (Moderate)
 
-| ID     | Task                                            | Status  | Deps           | Notes |
-| ------ | ----------------------------------------------- | ------- | -------------- | ----- |
-| 19.5.1 | Add schedule fields to daemon routes            | pending | -              |       |
-| 19.5.2 | Add cron validation using isValidCronExpression | pending | 19.5.1         |       |
-| 19.5.3 | Create CronInput component with presets         | pending | -              |       |
-| 19.5.4 | Add Schedules section to settings UI            | pending | 19.5.1, 19.5.3 |       |
+| ID     | Task                                            | Status | Deps           | Notes      |
+| ------ | ----------------------------------------------- | ------ | -------------- | ---------- |
+| 19.5.1 | Add schedule fields to daemon routes            | done   | -              | 2026-01-28 |
+| 19.5.2 | Add cron validation using isValidCronExpression | done   | 19.5.1         | 2026-01-28 |
+| 19.5.3 | Create CronInput component with presets         | done   | -              | 2026-01-28 |
+| 19.5.4 | Add Schedules section to settings UI            | done   | 19.5.1, 19.5.3 | 2026-01-28 |
 
 ### 19.6 Spokes Configuration (Major)
 
-| ID      | Task                                                       | Status  | Deps           | Notes |
-| ------- | ---------------------------------------------------------- | ------- | -------------- | ----- |
-| 19.6.1  | Add GET /config/spokes route                               | pending | -              |       |
-| 19.6.2  | Add POST /config/spokes route                              | pending | -              |       |
-| 19.6.3  | Add PUT /config/spokes/:name route                         | pending | -              |       |
-| 19.6.4  | Add DELETE /config/spokes/:name route                      | pending | -              |       |
-| 19.6.5  | Implement spoke validation (unique names, required fields) | pending | 19.6.2         |       |
-| 19.6.6  | Create SpokeList component                                 | pending | 19.6.1         |       |
-| 19.6.7  | Create SpokeModal component                                | pending | 19.5.3         |       |
-| 19.6.8  | Handle rsync options nested object                         | pending | 19.6.7         |       |
-| 19.6.9  | Add confirmation dialog for delete                         | pending | 19.6.4         |       |
-| 19.6.10 | Add Spokes tab to settings UI                              | pending | 19.6.6, 19.6.7 |       |
+| ID      | Task                                                       | Status | Deps           | Notes                                            |
+| ------- | ---------------------------------------------------------- | ------ | -------------- | ------------------------------------------------ |
+| 19.6.1  | Add GET /config/spokes route                               | done   | -              | 2026-01-28 Returns array of all spoke configs    |
+| 19.6.2  | Add POST /config/spokes route                              | done   | -              | 2026-01-28 Creates spoke with validation         |
+| 19.6.3  | Add PUT /config/spokes/:name route                         | done   | -              | 2026-01-28 Updates spoke by name                 |
+| 19.6.4  | Add DELETE /config/spokes/:name route                      | done   | -              | 2026-01-28 Removes spoke from config             |
+| 19.6.5  | Implement spoke validation (unique names, required fields) | done   | 19.6.2         | 2026-01-28 Name format, syncMethod, path, source |
+| 19.6.6  | Create SpokeList component                                 | done   | 19.6.1         | 2026-01-28 List view with add/edit/delete/toggle |
+| 19.6.7  | Create SpokeModal component                                | done   | 19.5.3         | 2026-01-28 Create/edit form with validation      |
+| 19.6.8  | Handle rsync options nested object                         | done   | 19.6.7         | 2026-01-28 Collapsible rsync options section     |
+| 19.6.9  | Add confirmation dialog for delete                         | done   | 19.6.4         | 2026-01-28 ConfirmDialog component               |
+| 19.6.10 | Add Spokes tab to settings UI                              | done   | 19.6.6, 19.6.7 | 2026-01-28 Integrated into tabbed settings       |
 
 ### 19.7 UI Polish & Tabs (Trivial)
 
-| ID     | Task                                            | Status  | Deps      | Notes |
-| ------ | ----------------------------------------------- | ------- | --------- | ----- |
-| 19.7.1 | Create tab navigation component                 | pending | -         |       |
-| 19.7.2 | Extract settings sections into components       | pending | 19.1-19.6 |       |
-| 19.7.3 | Add URL hash support for direct tab linking     | pending | 19.7.1    |       |
-| 19.7.4 | Add unsaved changes warning when switching tabs | pending | 19.7.1    |       |
+| ID     | Task                                            | Status | Deps      | Notes                                   |
+| ------ | ----------------------------------------------- | ------ | --------- | --------------------------------------- |
+| 19.7.1 | Create tab navigation component                 | done   | -         | 2026-01-28 SettingsTabs with a11y       |
+| 19.7.2 | Extract settings sections into components       | done   | 19.1-19.6 | 2026-01-28 Organized by tab in settings |
+| 19.7.3 | Add URL hash support for direct tab linking     | done   | 19.7.1    | 2026-01-28 #daemon, #embeddings, etc.   |
+| 19.7.4 | Add unsaved changes warning when switching tabs | done   | 19.7.1    | 2026-01-28 beforeunload event handler   |
 
 ### 19.8 Testing & Documentation
 
-| ID     | Task                                      | Status  | Deps      | Notes |
-| ------ | ----------------------------------------- | ------- | --------- | ----- |
-| 19.8.1 | Add API tests for all config routes       | pending | 19.1-19.6 |       |
-| 19.8.2 | Add E2E tests for settings UI             | pending | 19.7      |       |
-| 19.8.3 | Update README with settings capabilities  | pending | 19.8.1    |       |
-| 19.8.4 | Add tooltips/help text for complex fields | pending | 19.7      |       |
-
-## Phase 20: AutoMem Native Port
-
-Ref: docs/plans/2026-01-28-automem-native-port.md, docs/specs/automem-features.md
-
-### 20.1 Schema & Data Model
-
-| ID     | Task                                                                            | Status | Deps | Notes      |
-| ------ | ------------------------------------------------------------------------------- | ------ | ---- | ---------- |
-| 20.1.1 | Create migration for nodes table (add relevance_score, last_accessed, archived) | done   | -    | 2026-01-28 |
-| 20.1.2 | Create migration for edges table (add confidence, similarity columns)           | done   | -    | 2026-01-28 |
-| 20.1.3 | Define 11 AutoMem relationship types in src/types/index.ts                      | done   | -    | 2026-01-28 |
-
-### 20.2 Analyzer Upgrade
-
-| ID     | Task                                                      | Status | Deps   | Notes                              |
-| ------ | --------------------------------------------------------- | ------ | ------ | ---------------------------------- |
-| 20.2.1 | Update session-analyzer prompt to use specific edge types | done   | 20.1.3 | 2026-01-28 - relationships section |
-| 20.2.2 | Update processor.ts to parse and store typed edges        | done   | 20.2.1 | 2026-01-28 - relationship-edges.ts |
-
-### 20.3 Consolidation Engine
-
-| ID     | Task                                                    | Status | Deps   | Notes                         |
-| ------ | ------------------------------------------------------- | ------ | ------ | ----------------------------- |
-| 20.3.1 | Create src/daemon/consolidation/ module structure       | done   | 20.1.1 | 2026-01-28                    |
-| 20.3.2 | Implement DecayScheduler (cron job)                     | done   | 20.3.1 | 2026-01-28                    |
-| 20.3.3 | Implement RelevanceCalculator (decay formula)           | done   | 20.3.2 | 2026-01-28 (impl'd in 20.3.1) |
-| 20.3.4 | Implement CreativeAssociator (vector similarity search) | done   | 20.3.2 | 2026-01-28 (impl'd in 20.3.1) |
-
-### 20.4 Query Engine Upgrade
-
-| ID     | Task                                                     | Status | Deps   | Notes      |
-| ------ | -------------------------------------------------------- | ------ | ------ | ---------- |
-| 20.4.1 | Update search-repository.ts for Hybrid Scoring           | done   | 20.1.1 | 2026-01-28 |
-| 20.4.2 | Create bridge-discovery.ts for multi-hop graph traversal | done   | 20.4.1 | 2026-01-28 |
-| 20.4.3 | Expose new query capabilities via /api/v1/query          | done   | 20.4.2 | 2026-01-28 |
-
-### 20.5 UI & Visualization
-
-| ID     | Task                                                           | Status | Deps   | Notes                                     |
-| ------ | -------------------------------------------------------------- | ------ | ------ | ----------------------------------------- |
-| 20.5.1 | Update Web UI graph view to color-code edge types              | done   | 20.1.3 | 2026-01-28 - Colored edges & legend added |
-| 20.5.2 | Add "Relevance" visualization (fade out old/unimportant nodes) | done   | 20.1.1 | 2026-01-28 - Opacity & Legend             |
+| ID     | Task                                      | Status | Deps      | Notes                                                                                  |
+| ------ | ----------------------------------------- | ------ | --------- | -------------------------------------------------------------------------------------- |
+| 19.8.1 | Add API tests for all config routes       | done   | 19.1-19.6 | 2026-01-28 153 tests in config.test.ts covering all daemon/query/api/hub/spokes routes |
+| 19.8.2 | Add E2E tests for settings UI             | done   | 19.7      | 2026-01-28 34 Playwright tests covering tabs, forms, spokes CRUD                       |
+| 19.8.3 | Update README with settings capabilities  | done   | 19.8.1    | 2026-01-28 Settings section with tabs table and config examples                        |
+| 19.8.4 | Add tooltips/help text for complex fields | done   | 19.7      | 2026-01-28 All fields have contextual hints in UI                                      |

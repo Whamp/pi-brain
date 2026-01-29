@@ -14,6 +14,9 @@
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
   import type { ClusterWithNodes } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
+  import LoadingState from "$lib/components/loading-state.svelte";
+  import EmptyState from "$lib/components/empty-state.svelte";
+  import Tag from "$lib/components/tag.svelte";
 
   // Undo delay in milliseconds
   const UNDO_DELAY_MS = 5000;
@@ -189,15 +192,14 @@
       {errorMessage}
     </div>
   {:else if loading}
-    <div class="loading-state">
-      <Spinner message="Discovering patterns..." />
-    </div>
+    <LoadingState message="Discovering patterns..." size="md" variant="sm" />
   {:else if clusters.length === 0}
-    <div class="empty-state">
-      <Sparkles size={32} />
-      <p>No new patterns discovered yet</p>
-      <span class="empty-hint">Clusters will appear here after nightly analysis</span>
-    </div>
+    <EmptyState
+      icon={Sparkles}
+      title="No new patterns discovered yet"
+      description="Clusters will appear here after nightly analysis"
+      size="sm"
+    />
   {:else}
     <div class="clusters-list">
       {#each clusters as cluster (cluster.id)}
@@ -259,9 +261,11 @@
                           {truncateSummary(node.summary ?? "No summary")}
                         </span>
                         {#if node.project}
-                          <span class="example-project">
-                            {node.project.split("/").pop()}
-                          </span>
+                          <Tag 
+                            text={node.project.split("/").pop()} 
+                            variant="auto" 
+                            className="example-project" 
+                          />
                         {/if}
                       </a>
                     </li>
@@ -557,14 +561,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .example-project {
-    font-size: var(--text-xs);
-    color: var(--color-text-subtle);
-    padding: 2px 6px;
-    background: var(--color-bg-hover);
-    border-radius: var(--radius-sm);
   }
 
   .cluster-footer {
