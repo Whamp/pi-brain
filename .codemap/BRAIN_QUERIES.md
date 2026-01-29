@@ -1596,17 +1596,17 @@ src/storage/database.ts [1-298]
         - src/storage/database.ts:221: call unsatisfied
     192-249: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-      refs in: 55 [call: 43, import: 12]
+      refs in: 57 [call: 44, import: 13]
         - src/api/routes/clusters.test.ts:10: import (module)
         - src/api/routes/clusters.test.ts:21: call (module)
         - src/api/routes/config.test.ts:11: import (module)
         - src/api/routes/config.test.ts:33: call (module)
         - src/api/routes/query.test.ts:10: import (module)
         - src/api/routes/query.test.ts:19: call (module)
+        - src/api/routes/stats.test.ts:10: import (module)
+        - src/api/routes/stats.test.ts:21: call (module)
         - src/api/server.test.ts:13: import (module)
         - src/api/server.test.ts:132: call (module)
-        - src/api/server.test.ts:146: call (module)
-        - src/api/server.test.ts:167: call (module)
     254-256: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
       refs in: 20 [call: 14, import: 6]
@@ -3264,4 +3264,4 @@ src/storage/tool-error-repository.ts [1-352]
 
 ---
 Files: 57
-Estimated tokens: 42,799 (codebase: ~1,248,564)
+Estimated tokens: 42,802 (codebase: ~1,255,214)

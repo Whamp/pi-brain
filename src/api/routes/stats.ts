@@ -188,10 +188,7 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
         ORDER BY date ASC
       `);
 
-      const rows = stmt.query(
-        startDate.toISOString(),
-        endDate.toISOString()
-      ) as {
+      const rows = stmt.all(startDate.toISOString(), endDate.toISOString()) as {
         date: string;
         tokens: number;
         cost: number;

@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 28 files
+- typescript: 29 files
 
 ## Statistics
-- Total files: 28
+- Total files: 29
 - Total symbols: 131
   - function: 74
   - interface: 22
@@ -633,19 +633,27 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-260]
+src/api/routes/stats.test.ts [1-290]
+  imports:
+    - ../../storage/database.js
+    - ../server.js
+    - better-sqlite3
+    - fastify
+    - vitest
+
+src/api/routes/stats.ts [1-257]
   function:
-    16-250: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    16-247: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 33 [call: 25, type: 8]
         - src/api/routes/stats.ts:16: type FastifyInstance -> external
         - src/api/routes/stats.ts:16: type Promise -> external
         - src/api/routes/stats.ts:20: call get -> external
         - src/api/routes/stats.ts:20: type FastifyRequest -> external
         - src/api/routes/stats.ts:20: type FastifyReply -> external
-    255-259: countEdges(db: Database.Database): number
+    252-256: countEdges(db: Database.Database): number
       /** Count edges in the database */
       refs out: 1 [type: 1]
-        - src/api/routes/stats.ts:255: type Database -> external
+        - src/api/routes/stats.ts:252: type Database -> external
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -1025,5 +1033,5 @@ src/cli.ts [1-1148]
     - open
 
 ---
-Files: 28
-Estimated tokens: 12,201 (codebase: ~1,164,272)
+Files: 29
+Estimated tokens: 12,238 (codebase: ~1,250,879)

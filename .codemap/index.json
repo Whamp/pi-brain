@@ -18,7 +18,7 @@
     }
   },
   "total_tokens": 40913,
-  "codebase_tokens": 1248564,
+  "codebase_tokens": 1255214,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1942,7 +1942,7 @@
       "language": "typescript",
       "lines": [
         1,
-        260
+        257
       ],
       "detail_level": "full",
       "token_estimate": 92,
@@ -1953,7 +1953,7 @@
           "signature": "async statsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
             16,
-            250
+            247
           ],
           "exported": true,
           "is_default": false,
@@ -1971,8 +1971,8 @@
           "kind": "function",
           "signature": "countEdges(db: Database.Database): number",
           "lines": [
-            255,
-            259
+            252,
+            256
           ],
           "exported": false,
           "is_default": false,

@@ -84,6 +84,7 @@
     display: flex;
     gap: var(--space-1);
     padding: var(--space-1);
+    padding-right: var(--space-2);
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -99,8 +100,8 @@
   .tab {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
+    gap: var(--space-1);
+    padding: var(--space-2);
     background: transparent;
     border: none;
     border-radius: var(--radius-md);
@@ -110,6 +111,12 @@
     white-space: nowrap;
     cursor: pointer;
     transition: color 0.15s ease, background 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  /* Ensure last tab has extra breathing room */
+  .tab:last-child {
+    margin-right: var(--space-1);
   }
 
   .tab:hover {

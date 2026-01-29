@@ -22,7 +22,7 @@
   }: Props = $props();
 
   // Calculate SVG path
-  const svgPath = $derived(() => {
+  const svgPath = $derived.by(() => {
     if (data.length < 2) {
       return "";
     }
@@ -44,14 +44,14 @@
   });
 
   // Calculate area path (filled)
-  const areaPath = $derived(() => {
+  const areaPath = $derived.by(() => {
     if (!svgPath) {
       return "";
     }
     return `${svgPath} L ${width} ${height} L 0 ${height} Z`;
   });
 
-  const lastValue = $derived(() => data.at(-1) ?? 0);
+  const lastValue = $derived(data.at(-1) ?? 0);
 </script>
 
 <svg

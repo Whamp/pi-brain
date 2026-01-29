@@ -180,9 +180,9 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-260]
+src/api/routes/stats.ts [1-257]
   function:
-    16-250: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    16-247: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -2202,4 +2202,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 95
-Estimated tokens: 27,564 (codebase: ~1,164,272)
+Estimated tokens: 27,564 (codebase: ~1,248,557)
