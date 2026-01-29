@@ -189,17 +189,17 @@ src/daemon/cli.ts [1-1222]
         - src/daemon/cli.ts:988: call join -> external
     1004-1124: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-      refs out: 16 [call: 15, type: 1]
+      refs out: 17 [call: 16, type: 1]
         - src/daemon/cli.ts:1024: call migrate -> src/storage/database.ts
         - src/daemon/cli.ts:1027: call log -> external
         - src/daemon/cli.ts:1043: call set -> external
         - src/daemon/cli.ts:1047: call log -> external
         - src/daemon/cli.ts:1050: call log -> external
+        - src/daemon/cli.ts:1052: call clearAllData -> src/storage/node-crud.ts
         - src/daemon/cli.ts:1055: call log -> external
         - src/daemon/cli.ts:1074: call processInsertBatch -> src/daemon/cli.ts
         - src/daemon/cli.ts:1075: call Socket.write -> external
         - src/daemon/cli.ts:1079: call log -> external
-        - src/daemon/cli.ts:1082: call log -> external
     1129-1211: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
       refs out: 12 [call: 10, type: 2]
@@ -250,6 +250,8 @@ src/daemon/connection-discovery.ts [1-620]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
     138-143: interface ConnectionResult [exported]
+      refs out: 1 [type: 1]
+        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
     - ../storage/index.js
@@ -1090,17 +1092,17 @@ src/daemon/worker.ts [1-815]
   interface:
     67-84: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 10 [type: 10]
+      refs out: 11 [type: 11]
         - src/daemon/worker.ts:71: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:73: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:75: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:77: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:77: type Promise -> external
         - src/daemon/worker.ts:79: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:79: type Node -> src/types/index.ts
         - src/daemon/worker.ts:79: type Promise -> external
         - src/daemon/worker.ts:81: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:81: type Error -> external
-        - src/daemon/worker.ts:81: type Promise -> external
     87-102: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1611,4 +1613,4 @@ src/parser/signals.ts [1-1095]
 
 ---
 Files: 41
-Estimated tokens: 20,908 (codebase: ~1,203,045)
+Estimated tokens: 20,942 (codebase: ~1,203,028)
