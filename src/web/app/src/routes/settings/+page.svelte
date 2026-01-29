@@ -4,6 +4,7 @@
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { toastStore } from "$lib/stores/toast";
   import TagInput from "$lib/components/tag-input.svelte";
+  import PasswordInput from "$lib/components/password-input.svelte";
 
   interface Provider {
     id: string;
@@ -46,6 +47,14 @@
   let hubDatabaseDir = $state("");
   let hubWebUiPort = $state(8765);
 
+  // Embedding config values
+  let embeddingProvider = $state("ollama");
+  let embeddingModel = $state("nomic-embed-text");
+  let embeddingApiKey = $state("");
+  let embeddingBaseUrl = $state("");
+  let embeddingDimensions = $state<number | null>(null);
+  let hasApiKey = $state(false);
+
   // Original values (for reset)
   let originalProvider = $state("");
   let originalModel = $state("");
@@ -76,6 +85,13 @@
   let originalHubSessionsDir = $state("");
   let originalHubDatabaseDir = $state("");
   let originalHubWebUiPort = $state(8765);
+
+  // Embedding config original values
+  let originalEmbeddingProvider = $state("ollama");
+  let originalEmbeddingModel = $state("nomic-embed-text");
+  let originalEmbeddingBaseUrl = $state("");
+  let originalEmbeddingDimensions = $state<number | null>(null);
+  let originalHasApiKey = $state(false);
 
   // Available providers
   let providers: Provider[] = $state([]);
@@ -109,7 +125,12 @@
     JSON.stringify(apiCorsOrigins) !== JSON.stringify(originalApiCorsOrigins) ||
     hubSessionsDir !== originalHubSessionsDir ||
     hubDatabaseDir !== originalHubDatabaseDir ||
-    hubWebUiPort !== originalHubWebUiPort
+    hubWebUiPort !== originalHubWebUiPort ||
+    embeddingProvider !== originalEmbeddingProvider ||
+    embeddingModel !== originalEmbeddingModel ||
+    embeddingApiKey !== "" ||
+    embeddingBaseUrl !== originalEmbeddingBaseUrl ||
+    embeddingDimensions !== originalEmbeddingDimensions
   );
 
   onMount(async () => {
@@ -142,6 +163,14 @@
       connectionDiscoveryCooldownHours = config.connectionDiscoveryCooldownHours ?? 24;
       semanticSearchThreshold = config.semanticSearchThreshold ?? 0.6;
 
+      // Embedding config
+      embeddingProvider = config.embeddingProvider ?? "ollama";
+      embeddingModel = config.embeddingModel ?? "nomic-embed-text";
+      hasApiKey = config.hasApiKey ?? false;
+      embeddingBaseUrl = config.embeddingBaseUrl ?? "";
+      embeddingDimensions = config.embeddingDimensions ?? null;
+      embeddingApiKey = ""; // Always clear - write-only field
+
       // Store originals
       originalProvider = provider;
       originalModel = model;
@@ -158,6 +187,11 @@
       originalConnectionDiscoveryLookbackDays = connectionDiscoveryLookbackDays;
       originalConnectionDiscoveryCooldownHours = connectionDiscoveryCooldownHours;
       originalSemanticSearchThreshold = semanticSearchThreshold;
+      originalEmbeddingProvider = embeddingProvider;
+      originalEmbeddingModel = embeddingModel;
+      originalHasApiKey = hasApiKey;
+      originalEmbeddingBaseUrl = embeddingBaseUrl;
+      originalEmbeddingDimensions = embeddingDimensions;
     } catch (error) {
       console.error("Failed to load config:", error);
       toastStore.error(
@@ -248,8 +282,8 @@
     saving = true;
 
     try {
-      // Save daemon config
-      const daemonResult = await api.updateDaemonConfig({
+      // Build daemon config update, only include embeddingApiKey if user entered a new one
+      const daemonUpdate: Parameters<typeof api.updateDaemonConfig>[0] = {
         provider,
         model,
         idleTimeoutMinutes,
@@ -265,7 +299,19 @@
         connectionDiscoveryLookbackDays,
         connectionDiscoveryCooldownHours,
         semanticSearchThreshold,
-      });
+        embeddingProvider,
+        embeddingModel,
+        embeddingBaseUrl: embeddingBaseUrl || null,
+        embeddingDimensions,
+      };
+
+      // Only send API key if user entered a new one
+      if (embeddingApiKey) {
+        daemonUpdate.embeddingApiKey = embeddingApiKey;
+      }
+
+      // Save daemon config
+      const daemonResult = await api.updateDaemonConfig(daemonUpdate);
 
       // Save query config
       const queryResult = await api.updateQueryConfig({
@@ -303,6 +349,14 @@
       originalConnectionDiscoveryLookbackDays = daemonResult.connectionDiscoveryLookbackDays;
       originalConnectionDiscoveryCooldownHours = daemonResult.connectionDiscoveryCooldownHours;
       originalSemanticSearchThreshold = daemonResult.semanticSearchThreshold;
+      originalEmbeddingProvider = daemonResult.embeddingProvider;
+      originalEmbeddingModel = daemonResult.embeddingModel;
+      originalEmbeddingBaseUrl = daemonResult.embeddingBaseUrl ?? "";
+      originalEmbeddingDimensions = daemonResult.embeddingDimensions;
+      embeddingApiKey = ""; // Clear the input after save
+      // Update hasApiKey from the response
+      ({ hasApiKey } = daemonResult);
+      originalHasApiKey = hasApiKey;
       originalQueryProvider = queryResult.provider;
       originalQueryModel = queryResult.model;
       originalApiPort = apiResult.port;
@@ -349,6 +403,12 @@
     hubSessionsDir = originalHubSessionsDir;
     hubDatabaseDir = originalHubDatabaseDir;
     hubWebUiPort = originalHubWebUiPort;
+    embeddingProvider = originalEmbeddingProvider;
+    embeddingModel = originalEmbeddingModel;
+    embeddingApiKey = "";
+    embeddingBaseUrl = originalEmbeddingBaseUrl;
+    embeddingDimensions = originalEmbeddingDimensions;
+    hasApiKey = originalHasApiKey;
     toastStore.info("Settings reset to last saved values");
   }
 
@@ -618,6 +678,85 @@
           <span class="hint">Minimum similarity score (0.0 - 1.0) for matches</span>
         </div>
       </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Embeddings</h2>
+      <p class="section-description">
+        Configure the embedding provider for semantic search and connection discovery
+      </p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="embeddingProvider">Provider</label>
+          <select
+            id="embeddingProvider"
+            bind:value={embeddingProvider}
+          >
+            <option value="ollama">Ollama (Local)</option>
+            <option value="openai">OpenAI</option>
+            <option value="openrouter">OpenRouter</option>
+          </select>
+          <span class="hint">Embedding service to use for vector generation</span>
+        </div>
+
+        <div class="form-group">
+          <label for="embeddingModel">Model</label>
+          <input
+            type="text"
+            id="embeddingModel"
+            bind:value={embeddingModel}
+            placeholder={embeddingProvider === "ollama" ? "nomic-embed-text" : "text-embedding-3-small"}
+          />
+          <span class="hint">
+            {#if embeddingProvider === "ollama"}
+              e.g., nomic-embed-text, mxbai-embed-large
+            {:else if embeddingProvider === "openai"}
+              e.g., text-embedding-3-small, text-embedding-3-large
+            {:else}
+              e.g., qwen3-embedding-8b
+            {/if}
+          </span>
+        </div>
+      </div>
+
+      {#if embeddingProvider !== "ollama"}
+        <div class="form-group" style="margin-top: var(--space-4);">
+          <PasswordInput
+            label="API Key"
+            bind:value={embeddingApiKey}
+            placeholder="Enter your API key..."
+            hint="Required for OpenAI and OpenRouter. Leave empty to keep existing key."
+            hasExistingValue={hasApiKey}
+          />
+        </div>
+
+        <div class="form-grid" style="margin-top: var(--space-4);">
+          <div class="form-group">
+            <label for="embeddingBaseUrl">Base URL (optional)</label>
+            <input
+              type="text"
+              id="embeddingBaseUrl"
+              bind:value={embeddingBaseUrl}
+              placeholder={embeddingProvider === "openai" ? "https://api.openai.com/v1" : "https://openrouter.ai/api/v1"}
+            />
+            <span class="hint">Override the default API endpoint</span>
+          </div>
+
+          <div class="form-group">
+            <label for="embeddingDimensions">Dimensions (optional)</label>
+            <input
+              type="number"
+              id="embeddingDimensions"
+              bind:value={embeddingDimensions}
+              placeholder="Auto"
+              min="1"
+              max="10000"
+            />
+            <span class="hint">Override embedding vector size (leave empty for default)</span>
+          </div>
+        </div>
+      {/if}
     </section>
 
     <section class="settings-section">

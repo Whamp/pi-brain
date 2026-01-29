@@ -445,7 +445,18 @@ export const api = {
       connectionDiscoveryLookbackDays: number;
       connectionDiscoveryCooldownHours: number;
       semanticSearchThreshold: number;
-      defaults: { provider: string; model: string };
+      // Embedding fields
+      embeddingProvider: string;
+      embeddingModel: string;
+      hasApiKey: boolean;
+      embeddingBaseUrl: string | null;
+      embeddingDimensions: number | null;
+      defaults: {
+        provider: string;
+        model: string;
+        embeddingProvider: string;
+        embeddingModel: string;
+      };
     }>("/config/daemon"),
 
   updateDaemonConfig: (config: {
@@ -464,6 +475,12 @@ export const api = {
     connectionDiscoveryLookbackDays?: number;
     connectionDiscoveryCooldownHours?: number;
     semanticSearchThreshold?: number;
+    // Embedding fields
+    embeddingProvider?: string;
+    embeddingModel?: string;
+    embeddingApiKey?: string | null;
+    embeddingBaseUrl?: string | null;
+    embeddingDimensions?: number | null;
   }) =>
     request<{
       provider: string;
@@ -481,6 +498,12 @@ export const api = {
       connectionDiscoveryLookbackDays: number;
       connectionDiscoveryCooldownHours: number;
       semanticSearchThreshold: number;
+      // Embedding fields
+      embeddingProvider: string;
+      embeddingModel: string;
+      hasApiKey: boolean;
+      embeddingBaseUrl: string | null;
+      embeddingDimensions: number | null;
       message: string;
     }>("/config/daemon", {
       method: "PUT",
