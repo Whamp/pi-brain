@@ -1,0 +1,178 @@
+rules:
+  # ============================================
+  # Security Rules
+  # ============================================
+
+  - id: sql-injection-better-sqlite3
+    patterns:
+      - pattern-either:
+          - pattern: $DB.exec($SQL)
+          - pattern: $DB.prepare($SQL).run(...)
+          - pattern: $DB.prepare($SQL).get(...)
+          - pattern: $DB.prepare($SQL).all(...)
+      - pattern-not: $DB.exec("...")
+      - pattern-not: $DB.prepare("...").run(...)
+      - pattern-not: $DB.prepare("...").get(...)
+      - pattern-not: $DB.prepare("...").all(...)
+      - metavariable-regex:
+          metavariable: $SQL
+          regex: .*\+.*|.*\$\{.*\}.*|`.*\$\{.*\}`
+    message: "Potential SQL injection. Use parameterized queries with ? placeholders instead of string concatenation."
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+      owasp: "A03:2021 - Injection"
+
+  - id: path-traversal
+    patterns:
+      - pattern-either:
+          - pattern: fs.readFileSync($PATH, ...)
+          - pattern: fs.readFile($PATH, ...)
+          - pattern: fs.writeFileSync($PATH, ...)
+          - pattern: fs.writeFile($PATH, ...)
+          - pattern: require("fs").readFileSync($PATH, ...)
+          - pattern: require("fs/promises").readFile($PATH, ...)
+      - pattern-not: fs.readFileSync("...", ...)
+      - pattern-not: fs.writeFileSync("...", ...)
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: .*\.\./.*
+    message: "Potential path traversal. Validate and sanitize file paths before use."
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-22: Path Traversal"
+
+  - id: command-injection
+    patterns:
+      - pattern-either:
+          - pattern: child_process.exec($CMD, ...)
+          - pattern: child_process.execSync($CMD, ...)
+          - pattern: require("child_process").exec($CMD, ...)
+          - pattern: require("child_process").execSync($CMD, ...)
+      - pattern-not: child_process.exec("...", ...)
+      - pattern-not: child_process.execSync("...", ...)
+    message: "Potential command injection. Use execFile/spawn with argument arrays instead of exec with string commands."
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-78: Command Injection"
+
+  - id: hardcoded-secret
+    patterns:
+      - pattern-either:
+          - pattern: |
+              $KEY = "..."
+          - pattern: |
+              $KEY: "..."
+      - metavariable-regex:
+          metavariable: $KEY
+          regex: .*(password|secret|api_key|apiKey|token|auth|credential).*
+      - pattern-not: |
+          $KEY = ""
+      - pattern-not: |
+          $KEY = "placeholder"
+      - pattern-not: |
+          $KEY = "test"
+    message: "Potential hardcoded secret. Use environment variables or a secrets manager."
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: "CWE-798: Hardcoded Credentials"
+
+  # ============================================
+  # Code Quality Rules
+  # ============================================
+
+  - id: no-console-log
+    pattern: console.log(...)
+    paths:
+      exclude:
+        - "**/*.test.ts"
+        - "**/scripts/**"
+        - "**/cli.ts"
+        - "**/utils/logger.ts"
+    message: "Remove console.log before committing. Use a proper logger for production code."
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: best-practice
+
+  - id: no-debugger
+    pattern: debugger
+    message: "Remove debugger statement before committing."
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: best-practice
+
+  - id: no-any-type
+    pattern: |
+      $VAR: any
+    paths:
+      exclude:
+        - "**/*.test.ts"
+        - "**/types.ts"
+        - "**/*.d.ts"
+    message: "Avoid 'any' type. Use 'unknown' or a specific type instead."
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: best-practice
+
+  - id: no-floating-promises
+    patterns:
+      - pattern: |
+          $FUNC(...)
+      - metavariable-type:
+          metavariable: $FUNC
+          type: Promise
+      - pattern-not-inside: await $FUNC(...)
+      - pattern-not-inside: return $FUNC(...)
+      - pattern-not-inside: $VAR = $FUNC(...)
+    message: "Unhandled promise. Add await, return, or handle the promise explicitly."
+    languages: [typescript]
+    severity: WARNING
+    metadata:
+      category: best-practice
+
+  # ============================================
+  # Performance Rules
+  # ============================================
+
+  - id: no-sync-fs-in-async
+    patterns:
+      - pattern-either:
+          - pattern: fs.readFileSync(...)
+          - pattern: fs.writeFileSync(...)
+          - pattern: fs.existsSync(...)
+          - pattern: fs.mkdirSync(...)
+      - pattern-inside: |
+          async function $FUNC(...) {
+            ...
+          }
+    message: "Avoid sync filesystem operations in async functions. Use fs/promises instead."
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: performance
+
+  # ============================================
+  # Svelte-specific Rules
+  # ============================================
+
+  - id: svelte-unsafe-html
+    pattern: "{@html $CONTENT}"
+    message: "Ensure content passed to {@html} is sanitized to prevent XSS attacks."
+    languages: [generic]
+    paths:
+      include:
+        - "**/*.svelte"
+    severity: WARNING
+    metadata:
+      category: security

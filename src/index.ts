@@ -55,3 +55,14 @@ export type {
 
 // Web visualization
 export * from "./web/generator.js";
+
+// Utilities
+export {
+  createLogger,
+  daemonLogger,
+  workerLogger,
+  schedulerLogger,
+  websocketLogger,
+  apiLogger,
+} from "./utils/logger.js";
+export type { Logger, LogLevel } from "./utils/logger.js";
