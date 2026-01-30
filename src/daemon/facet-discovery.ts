@@ -379,6 +379,95 @@ interface KMeansResult {
 }
 
 /**
+ * Assign each embedding to the nearest centroid
+ */
+function assignToCentroids(
+  embeddings: number[][],
+  centroids: number[][]
+): number[] {
+  return embeddings.map((emb) => {
+    let minDist = Number.POSITIVE_INFINITY;
+    let minIdx = 0;
+    for (let c = 0; c < centroids.length; c++) {
+      const dist = euclideanDistance(emb, centroids[c]);
+      if (dist < minDist) {
+        minDist = dist;
+        minIdx = c;
+      }
+    }
+    return minIdx;
+  });
+}
+
+/**
+ * Update centroids based on current assignments
+ */
+function updateCentroids(
+  embeddings: number[][],
+  labels: number[],
+  centroids: number[][],
+  k: number,
+  dims: number
+): void {
+  const counts = Array.from<number>({ length: k }).fill(0);
+  const sums = Array.from({ length: k }, () =>
+    Array.from<number>({ length: dims }).fill(0)
+  );
+
+  for (let i = 0; i < embeddings.length; i++) {
+    const c = labels[i];
+    counts[c]++;
+    for (let d = 0; d < dims; d++) {
+      sums[c][d] += embeddings[i][d];
+    }
+  }
+
+  for (let c = 0; c < k; c++) {
+    if (counts[c] > 0) {
+      for (let d = 0; d < dims; d++) {
+        centroids[c][d] = sums[c][d] / counts[c];
+      }
+    }
+  }
+}
+
+/**
+ * Check if labels changed between iterations
+ */
+function labelsChanged(newLabels: number[], oldLabels: number[]): boolean {
+  for (let i = 0; i < newLabels.length; i++) {
+    if (newLabels[i] !== oldLabels[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Run K-means iteration loop until convergence
+ */
+function runKMeansIterations(
+  embeddings: number[][],
+  centroids: number[][],
+  k: number,
+  dims: number,
+  maxIterations: number
+): number[] {
+  let labels = Array.from<number>({ length: embeddings.length }).fill(0);
+
+  for (let iter = 0; iter < maxIterations; iter++) {
+    const newLabels = assignToCentroids(embeddings, centroids);
+    if (!labelsChanged(newLabels, labels)) {
+      return newLabels;
+    }
+    labels = newLabels;
+    updateCentroids(embeddings, labels, centroids, k, dims);
+  }
+
+  return labels;
+}
+
+/**
  * Simple K-means++ clustering implementation
  */
 export function kMeansClustering(
@@ -397,55 +486,15 @@ export function kMeansClustering(
     };
   }
 
-  const n = embeddings.length;
   const dims = embeddings[0]?.length ?? 0;
   const centroids = kMeansPlusPlusInit(embeddings, k);
-
-  let labels = Array.from<number>({ length: n }).fill(0);
-
-  for (let iter = 0; iter < maxIterations; iter++) {
-    const newLabels = embeddings.map((emb) => {
-      let minDist = Number.POSITIVE_INFINITY;
-      let minIdx = 0;
-      for (let c = 0; c < k; c++) {
-        const dist = euclideanDistance(emb, centroids[c]);
-        if (dist < minDist) {
-          minDist = dist;
-          minIdx = c;
-        }
-      }
-      return minIdx;
-    });
-
-    const prevLabels = labels;
-    const changed = newLabels.some((l, i) => l !== prevLabels[i]);
-    labels = newLabels;
-
-    if (!changed) {
-      break;
-    }
-
-    const counts = Array.from<number>({ length: k }).fill(0);
-    const sums = Array.from({ length: k }, () =>
-      Array.from<number>({ length: dims }).fill(0)
-    );
-
-    for (let i = 0; i < n; i++) {
-      const c = labels[i];
-      counts[c]++;
-      for (let d = 0; d < dims; d++) {
-        sums[c][d] += embeddings[i][d];
-      }
-    }
-
-    for (let c = 0; c < k; c++) {
-      if (counts[c] > 0) {
-        for (let d = 0; d < dims; d++) {
-          centroids[c][d] = sums[c][d] / counts[c];
-        }
-      }
-    }
-  }
+  const labels = runKMeansIterations(
+    embeddings,
+    centroids,
+    k,
+    dims,
+    maxIterations
+  );
 
   return { labels, centroids };
 }

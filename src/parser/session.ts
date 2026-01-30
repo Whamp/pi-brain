@@ -82,62 +82,55 @@ export function parseSessionContent(
 }
 
 /**
- * Build a tree structure from entries
+ * Build parent → children map from entries
  */
-export function buildTree(entries: SessionEntry[]): TreeNode | null {
-  if (entries.length === 0) {
-    return null;
-  }
-
-  // Index entries by ID
-  const entriesById = new Map<string, SessionEntry>();
-  for (const entry of entries) {
-    entriesById.set(entry.id, entry);
-  }
-
-  // Build parent → children map
+function buildChildrenMap(
+  entries: SessionEntry[]
+): Map<string | null, SessionEntry[]> {
   const childrenMap = new Map<string | null, SessionEntry[]>();
   for (const entry of entries) {
     const { parentId } = entry;
-    if (!childrenMap.has(parentId)) {
-      childrenMap.set(parentId, []);
-    }
-    const children = childrenMap.get(parentId);
-    if (children) {
-      children.push(entry);
-    }
+    const children = childrenMap.get(parentId) ?? [];
+    children.push(entry);
+    childrenMap.set(parentId, children);
   }
-
   // Sort children by timestamp
   for (const children of childrenMap.values()) {
     children.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
   }
+  return childrenMap;
+}
 
-  // Collect labels
+/**
+ * Collect labels by target ID from entries
+ */
+function collectLabelsMap(entries: SessionEntry[]): Map<string, string[]> {
   const labelsMap = new Map<string, string[]>();
   for (const entry of entries) {
     if (entry.type === "label") {
       const labelEntry = entry as LabelEntry;
       if (labelEntry.label) {
-        if (!labelsMap.has(labelEntry.targetId)) {
-          labelsMap.set(labelEntry.targetId, []);
-        }
-        const labels = labelsMap.get(labelEntry.targetId);
-        if (labels) {
-          labels.push(labelEntry.label);
-        }
+        const labels = labelsMap.get(labelEntry.targetId) ?? [];
+        labels.push(labelEntry.label);
+        labelsMap.set(labelEntry.targetId, labels);
       }
     }
   }
+  return labelsMap;
+}
 
-  // Find leaf
-  const leafId = findLeaf(entries);
-
-  // Build tree recursively
-  function buildNode(entry: SessionEntry, depth: number): TreeNode {
-    const children = childrenMap.get(entry.id) || [];
+/**
+ * Create a node builder function with captured context
+ */
+function createNodeBuilder(
+  childrenMap: Map<string | null, SessionEntry[]>,
+  labelsMap: Map<string, string[]>,
+  leafId: string | null
+): (entry: SessionEntry, depth: number) => TreeNode {
+  const buildNode = (entry: SessionEntry, depth: number): TreeNode => {
+    const children = childrenMap.get(entry.id) ?? [];
     const childNodes = children
-      .filter((e) => e.type !== "label") // Labels don't appear as tree nodes
+      .filter((e) => e.type !== "label")
       .map((e) => buildNode(e, depth + 1));
 
     return {
@@ -146,33 +139,42 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
       entry,
       isBranchPoint: childNodes.length > 1,
       isLeaf: entry.id === leafId,
-      labels: labelsMap.get(entry.id) || [],
+      labels: labelsMap.get(entry.id) ?? [],
     };
+  };
+  return buildNode;
+}
+
+/**
+ * Build a tree structure from entries
+ */
+export function buildTree(entries: SessionEntry[]): TreeNode | null {
+  if (entries.length === 0) {
+    return null;
   }
 
-  // Find root entries (parentId === null)
-  const roots = childrenMap.get(null) || [];
+  const childrenMap = buildChildrenMap(entries);
+  const labelsMap = collectLabelsMap(entries);
+  const leafId = findLeaf(entries);
+  const buildNode = createNodeBuilder(childrenMap, labelsMap, leafId);
+
+  const roots = childrenMap.get(null) ?? [];
   if (roots.length === 0) {
     return null;
   }
 
-  // Single root is the normal case
   if (roots.length === 1) {
     return buildNode(roots[0], 0);
   }
 
-  // Multiple roots detected - this indicates a potentially corrupt session
-  // or entries imported from multiple sources. Log warning for debugging.
+  // Multiple roots detected - log warning for debugging
   console.warn(
     `[session-parser] Warning: Found ${roots.length} root entries (expected 1). ` +
       `This may indicate a corrupt session or merged entries. ` +
       `Root IDs: ${roots.map((r) => r.id).join(", ")}`
   );
 
-  // Return a forest structure: build nodes for all roots at depth 0
-  // This preserves all data rather than silently dropping roots.
-  // For now, return the chronologically first root as the primary tree
-  // since the TreeNode interface doesn't support multiple roots directly.
+  // Return chronologically first root as primary tree
   const sortedRoots = [...roots].toSorted((a, b) =>
     a.timestamp.localeCompare(b.timestamp)
   );
@@ -227,46 +229,68 @@ export function findBranchPoints(entries: SessionEntry[]): string[] {
 }
 
 /**
+ * Message statistics accumulator
+ */
+interface MessageStats {
+  messageCount: number;
+  userMessageCount: number;
+  assistantMessageCount: number;
+  toolResultCount: number;
+  totalTokens: number;
+  totalCost: number;
+  modelsUsed: Set<string>;
+}
+
+/**
+ * Process a message entry and update stats
+ */
+function processMessageEntry(
+  entry: SessionMessageEntry,
+  stats: MessageStats
+): void {
+  stats.messageCount++;
+  const { message } = entry;
+
+  if (message.role === "user") {
+    stats.userMessageCount++;
+  } else if (message.role === "assistant") {
+    stats.assistantMessageCount++;
+    const assistantMsg = message as AssistantMessage;
+    stats.modelsUsed.add(`${assistantMsg.provider}/${assistantMsg.model}`);
+    if (assistantMsg.usage) {
+      stats.totalTokens +=
+        (assistantMsg.usage.input || 0) + (assistantMsg.usage.output || 0);
+      stats.totalCost += assistantMsg.usage.cost?.total ?? 0;
+    }
+  } else if (message.role === "toolResult") {
+    stats.toolResultCount++;
+  }
+}
+
+/**
  * Calculate session statistics
  */
 export function calculateStats(
   entries: SessionEntry[],
   tree: TreeNode | null
 ): SessionStats {
-  let messageCount = 0;
-  let userMessageCount = 0;
-  let assistantMessageCount = 0;
-  let toolResultCount = 0;
+  const msgStats: MessageStats = {
+    assistantMessageCount: 0,
+    messageCount: 0,
+    modelsUsed: new Set<string>(),
+    toolResultCount: 0,
+    totalCost: 0,
+    totalTokens: 0,
+    userMessageCount: 0,
+  };
+
   let compactionCount = 0;
   let branchSummaryCount = 0;
-  let totalTokens = 0;
-  let totalCost = 0;
-  const modelsUsed = new Set<string>();
 
   for (const entry of entries) {
     switch (entry.type) {
       case "message": {
-        messageCount++;
-        const msgEntry = entry as SessionMessageEntry;
-        const msg = msgEntry.message;
-
-        if (msg.role === "user") {
-          userMessageCount++;
-        } else if (msg.role === "assistant") {
-          assistantMessageCount++;
-          const assistantMsg = msg as AssistantMessage;
-          modelsUsed.add(`${assistantMsg.provider}/${assistantMsg.model}`);
-          if (assistantMsg.usage) {
-            totalTokens +=
-              (assistantMsg.usage.input || 0) +
-              (assistantMsg.usage.output || 0);
-            if (assistantMsg.usage.cost) {
-              totalCost += assistantMsg.usage.cost.total || 0;
-            }
-          }
-        } else if (msg.role === "toolResult") {
-          toolResultCount++;
-        }
+        processMessageEntry(entry as SessionMessageEntry, msgStats);
         break;
       }
       case "compaction": {
@@ -277,29 +301,24 @@ export function calculateStats(
         branchSummaryCount++;
         break;
       }
-      default: {
-        // Ignore other entry types (e.g., session_start, config)
-        break;
-      }
+      default:
+      // Ignore other entry types (e.g., session_start, config, label)
     }
   }
 
-  const branchPointCount = findBranchPoints(entries).length;
-  const maxDepth = tree ? calculateMaxDepth(tree) : 0;
-
   return {
-    assistantMessageCount,
-    branchPointCount,
+    assistantMessageCount: msgStats.assistantMessageCount,
+    branchPointCount: findBranchPoints(entries).length,
     branchSummaryCount,
     compactionCount,
     entryCount: entries.length,
-    maxDepth,
-    messageCount,
-    modelsUsed: [...modelsUsed],
-    toolResultCount,
-    totalCost,
-    totalTokens,
-    userMessageCount,
+    maxDepth: tree ? calculateMaxDepth(tree) : 0,
+    messageCount: msgStats.messageCount,
+    modelsUsed: [...msgStats.modelsUsed],
+    toolResultCount: msgStats.toolResultCount,
+    totalCost: msgStats.totalCost,
+    totalTokens: msgStats.totalTokens,
+    userMessageCount: msgStats.userMessageCount,
   };
 }
 

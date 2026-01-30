@@ -38,112 +38,132 @@
   // Validation state
   let errors: Record<string, string> = $state({});
 
+  // Helper: Load form fields from existing spoke config
+  function loadFromSpoke(spokeConfig: SpokeConfig): void {
+    ({ name } = spokeConfig);
+    ({ syncMethod } = spokeConfig);
+    ({ path } = spokeConfig);
+    source = spokeConfig.source ?? "";
+    ({ enabled } = spokeConfig);
+    schedule = spokeConfig.schedule ?? "0 * * * *";
+    loadRsyncOptions(spokeConfig);
+  }
+
+  // Helper: Load rsync options from spoke config
+  function loadRsyncOptions(spokeConfig: SpokeConfig): void {
+    rsyncBwLimit = spokeConfig.rsyncOptions?.bwLimit ?? 0;
+    rsyncDelete = spokeConfig.rsyncOptions?.delete ?? false;
+    rsyncExtraArgs = spokeConfig.rsyncOptions?.extraArgs?.join(" ") ?? "";
+    rsyncTimeoutSeconds = spokeConfig.rsyncOptions?.timeoutSeconds ?? 300;
+    showRsyncOptions = syncMethod === "rsync" && Boolean(spokeConfig.rsyncOptions);
+  }
+
+  // Helper: Reset form to defaults for create mode
+  function resetToDefaults(): void {
+    name = "";
+    syncMethod = "syncthing";
+    path = "";
+    source = "";
+    enabled = true;
+    schedule = "0 * * * *";
+    rsyncBwLimit = 0;
+    rsyncDelete = false;
+    rsyncExtraArgs = "";
+    rsyncTimeoutSeconds = 300;
+    showRsyncOptions = false;
+  }
+
   // Reset form when modal opens/closes or spoke changes
   $effect(() => {
     if (open) {
       if (mode === "edit" && spoke) {
-        ({ name } = spoke);
-        ({ syncMethod } = spoke);
-        ({ path } = spoke);
-        source = spoke.source ?? "";
-        ({ enabled } = spoke);
-        schedule = spoke.schedule ?? "0 * * * *";
-        rsyncBwLimit = spoke.rsyncOptions?.bwLimit ?? 0;
-        rsyncDelete = spoke.rsyncOptions?.delete ?? false;
-        rsyncExtraArgs = spoke.rsyncOptions?.extraArgs?.join(" ") ?? "";
-        rsyncTimeoutSeconds = spoke.rsyncOptions?.timeoutSeconds ?? 300;
-        showRsyncOptions = syncMethod === "rsync" && Boolean(spoke.rsyncOptions);
+        loadFromSpoke(spoke);
       } else {
-        // Reset to defaults for create mode
-        name = "";
-        syncMethod = "syncthing";
-        path = "";
-        source = "";
-        enabled = true;
-        schedule = "0 * * * *";
-        rsyncBwLimit = 0;
-        rsyncDelete = false;
-        rsyncExtraArgs = "";
-        rsyncTimeoutSeconds = 300;
-        showRsyncOptions = false;
+        resetToDefaults();
       }
       errors = {};
     }
   });
 
+  // Helper: Validate name field (create mode only)
+  function validateName(errs: Record<string, string>): void {
+    if (mode !== "create") {
+      return;
+    }
+    if (!name.trim()) {
+      errs.name = "Name is required";
+    } else if (!/^[\w-]+$/.test(name)) {
+      errs.name = "Name can only contain letters, numbers, dashes, and underscores";
+    } else if (name.length > 64) {
+      errs.name = "Name must be 64 characters or less";
+    }
+  }
+
+  // Helper: Validate rsync-specific fields
+  function validateRsyncFields(errs: Record<string, string>): void {
+    if (syncMethod !== "rsync") {
+      return;
+    }
+    if (!source.trim()) {
+      errs.source = "Source is required for rsync method";
+    }
+    if (rsyncBwLimit < 0 || rsyncBwLimit > 1_000_000) {
+      errs.rsyncBwLimit = "Bandwidth limit must be 0-1000000 KB/s";
+    }
+    if (rsyncTimeoutSeconds < 0 || rsyncTimeoutSeconds > 86_400) {
+      errs.rsyncTimeoutSeconds = "Timeout must be 0-86400 seconds";
+    }
+  }
+
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
-
-    // Name validation (only for create)
-    if (mode === "create") {
-      if (!name.trim()) {
-        newErrors.name = "Name is required";
-      } else if (!/^[\w-]+$/.test(name)) {
-        newErrors.name = "Name can only contain letters, numbers, dashes, and underscores";
-      } else if (name.length > 64) {
-        newErrors.name = "Name must be 64 characters or less";
-      }
-    }
-
-    // Path validation
+    validateName(newErrors);
     if (!path.trim()) {
       newErrors.path = "Path is required";
     }
-
-    // Source validation (required for rsync)
-    if (syncMethod === "rsync" && !source.trim()) {
-      newErrors.source = "Source is required for rsync method";
-    }
-
-    // Rsync options validation
-    if (syncMethod === "rsync") {
-      if (rsyncBwLimit < 0 || rsyncBwLimit > 1_000_000) {
-        newErrors.rsyncBwLimit = "Bandwidth limit must be 0-1000000 KB/s";
-      }
-      if (rsyncTimeoutSeconds < 0 || rsyncTimeoutSeconds > 86_400) {
-        newErrors.rsyncTimeoutSeconds = "Timeout must be 0-86400 seconds";
-      }
-    }
-
+    validateRsyncFields(newErrors);
     errors = newErrors;
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleSubmit(event: Event) {
-    event.preventDefault();
-
-    if (!validate()) {
-      return;
+  // Helper: Build rsync options object if applicable
+  function buildRsyncOptions(): RsyncOptions | undefined {
+    if (syncMethod !== "rsync" || !showRsyncOptions) {
+      return undefined;
     }
+    return {
+      bwLimit: rsyncBwLimit || undefined,
+      delete: rsyncDelete || undefined,
+      extraArgs: rsyncExtraArgs.trim() ? rsyncExtraArgs.trim().split(/\s+/) : undefined,
+      timeoutSeconds: rsyncTimeoutSeconds || undefined,
+    };
+  }
 
-    // Build rsync options if applicable
-    let rsyncOptions: RsyncOptions | undefined;
-    if (syncMethod === "rsync" && showRsyncOptions) {
-      rsyncOptions = {
-        bwLimit: rsyncBwLimit || undefined,
-        delete: rsyncDelete || undefined,
-        extraArgs: rsyncExtraArgs.trim() ? rsyncExtraArgs.trim().split(/\s+/) : undefined,
-        timeoutSeconds: rsyncTimeoutSeconds || undefined,
-      };
-    }
-
+  // Helper: Build spoke data object for submission
+  function buildSpokeData(): Partial<SpokeConfig> & { name: string } {
     const spokeData: Partial<SpokeConfig> & { name: string } = {
       name: mode === "edit" && spoke ? spoke.name : name,
       syncMethod,
       path,
       enabled,
     };
-
-    // Add optional fields
     if (syncMethod === "rsync") {
       spokeData.source = source || undefined;
       spokeData.schedule = schedule || undefined;
+      const rsyncOptions = buildRsyncOptions();
       if (rsyncOptions && Object.keys(rsyncOptions).length > 0) {
         spokeData.rsyncOptions = rsyncOptions;
       }
     }
+    return spokeData;
+  }
 
-    onsubmit(spokeData);
+  function handleSubmit(event: Event) {
+    event.preventDefault();
+    if (!validate()) {
+      return;
+    }
+    onsubmit(buildSpokeData());
   }
 
   function handleBackdropClick(event: MouseEvent) {

@@ -353,9 +353,7 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       // Calculate date range
       // Use UTC dates to match SQLite's DATE() function which returns UTC dates
       const now = new Date();
-      const formatDateStr = (d: Date): string => {
-        return d.toISOString().split("T")[0];
-      };
+      const formatDateStr = (d: Date): string => d.toISOString().split("T")[0];
 
       // End date is today in UTC
       const endDateStr = formatDateStr(now);
