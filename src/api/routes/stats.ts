@@ -351,9 +351,18 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       const days = Number.parseInt(request.query.days ?? "7", 10);
 
       // Calculate date range
-      const endDate = new Date();
-      const startDate = new Date();
+      // Use UTC dates to match SQLite's DATE() function which returns UTC dates
+      const now = new Date();
+      const formatDateStr = (d: Date): string => {
+        return d.toISOString().split("T")[0];
+      };
+
+      // End date is today in UTC
+      const endDateStr = formatDateStr(now);
+      // Start date is 'days' ago from today in UTC
+      const startDate = new Date(now);
       startDate.setDate(startDate.getDate() - days);
+      const startDateStr = formatDateStr(startDate);
 
       // Get daily token/cost totals from database
       const stmt = db.prepare(`
@@ -363,12 +372,12 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
           SUM(cost) as cost,
           COUNT(*) as nodes
         FROM nodes
-        WHERE timestamp >= ? AND timestamp <= ?
+        WHERE DATE(timestamp) >= ? AND DATE(timestamp) <= ?
         GROUP BY DATE(timestamp)
         ORDER BY date ASC
       `);
 
-      const rows = stmt.all(startDate.toISOString(), endDate.toISOString()) as {
+      const rows = stmt.all(startDateStr, endDateStr) as {
         date: string;
         tokens: number;
         cost: number;
@@ -378,15 +387,12 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       // Fill in missing dates with zeros
       const result = [];
       const currentDate = new Date(startDate);
-      currentDate.setHours(0, 0, 0, 0);
-
-      const endDateMidnight = new Date(endDate);
-      endDateMidnight.setHours(0, 0, 0, 0);
+      const endDate = new Date(now);
 
       let rowIndex = 0;
 
-      while (currentDate <= endDateMidnight) {
-        const [dateStr] = currentDate.toISOString().split("T");
+      while (currentDate <= endDate) {
+        const dateStr = formatDateStr(currentDate);
 
         if (rowIndex < rows.length && rows[rowIndex].date === dateStr) {
           result.push({
