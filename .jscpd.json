@@ -1,0 +1,28 @@
+{
+  "minLines": 5,
+  "maxLines": 500,
+  "maxSize": "50kb",
+  "minTokens": 50,
+  "threshold": 5,
+  "reporters": ["console", "html", "json"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.git/**",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/migrations/**",
+    "**/*.d.ts",
+    "src/web/app/**",
+    ".codemap/**",
+    "docs/**",
+    "report/**"
+  ],
+  "gitignore": true,
+  "ignoreCase": false,
+  "output": "./reports/jscpd",
+  "absolute": false,
+  "formats": ["typescript", "javascript"]
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/index.ts",
+    "src/cli.ts",
+    "src/daemon/daemon-process.ts",
+    "src/api/index.ts",
+    "src/web/index.ts",
+    "extensions/brain-query/index.ts",
+    "extensions/dashboard/index.ts",
+    "extensions/dashboard/lib/analyzer.ts",
+    "extensions/dashboard/lib/parser.ts",
+    "extensions/dashboard/server.ts",
+    "scripts/launch.js"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "extensions/**/*.{ts,tsx}",
+    "scripts/**/*.{ts,js}"
+  ],
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "dist/**",
+    "node_modules/**",
+    "src/web/app/**",
+    ".codemap/**",
+    "docs/**",
+    "prompts/**",
+    "scripts/refresh-codemap.sh",
+    "extensions/dashboard/lib/types.ts"
+  ],
+  "ignoreDependencies": ["lint-staged", "oxfmt"],
+  "rules": {
+    "exports": "error",
+    "types": "error",
+    "files": "error",
+    "dependencies": "warn",
+    "devDependencies": "warn",
+    "unlisted": "error",
+    "binaries": "off",
+    "enumMembers": "warn",
+    "classMembers": "warn"
+  }
+}

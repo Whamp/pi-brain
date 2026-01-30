@@ -1,5 +1,4 @@
 #!/bin/sh
-# Exit on any error
 set -e
 
 # Check if there are any staged files
@@ -8,16 +7,16 @@ if [ -z "$(git diff --cached --name-only)" ]; then
   exit 0
 fi
 
-# Run linter check (no auto-fix - fail fast if issues found)
-npx ultracite check
-CHECK_EXIT_CODE=$?
+# Build (includes DTS which enforces type correctness)
+npm run build
 
-if [ $CHECK_EXIT_CODE -ne 0 ]; then
-  echo "Linting failed. Run 'npm run fix && npx oxfmt --write .' to fix issues."
-  exit $CHECK_EXIT_CODE
-fi
+# Check formatting
+npx oxfmt --check -c .oxfmtrc.jsonc .
 
-# Run tests (with --run to avoid watch mode)
+# Lint
+npx oxlint -c .oxlintrc.json .
+
+# Run tests
 npm test -- --run
 
 # Refresh codemap documentation
