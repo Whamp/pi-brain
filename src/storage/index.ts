@@ -2,6 +2,7 @@
  * Storage module - SQLite database and JSON file storage
  */
 
+/* eslint-disable oxc/no-barrel-file */
 export * from "./database.js";
 export * from "./node-types.js";
 export * from "./node-storage.js";

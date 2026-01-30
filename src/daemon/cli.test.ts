@@ -61,14 +61,29 @@ describe("daemon CLI", () => {
 
   describe("rebuildEmbeddings", () => {
     it("should fail if daemon is running", async () => {
-      // Setup mock to return true for PID file
+      // Setup mock to return true for PID file and provide a valid PID
       (fs.existsSync as Mock).mockImplementation((p: string) =>
         p.endsWith("daemon.pid")
       );
+      (fs.readFileSync as Mock).mockReturnValue("12345");
 
-      await expect(rebuildEmbeddings(undefined, {})).rejects.toThrow(
-        "Daemon is currently running"
-      );
+      // Mock process.kill to indicate the process is running (no error thrown)
+      const originalKill = process.kill;
+      process.kill = vi.fn().mockImplementation((_pid, signal) => {
+        if (signal === 0) {
+          // Signal 0 checks if process exists - return true (no throw)
+          return true;
+        }
+        return originalKill(_pid, signal);
+      }) as typeof process.kill;
+
+      try {
+        const result = await rebuildEmbeddings(undefined, {});
+        expect(result.success).toBeFalsy();
+        expect(result.message).toContain("Daemon is running");
+      } finally {
+        process.kill = originalKill;
+      }
     });
   });
 });

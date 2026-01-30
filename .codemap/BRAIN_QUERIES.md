@@ -2308,7 +2308,7 @@ src/storage/index.test.ts [1-4087]
     - node:path
     - vitest
 
-src/storage/index.ts [1-22]
+src/storage/index.ts [1-23]
   imports:
     - ./bridge-discovery.js
     - ./database.js
@@ -3567,4 +3567,4 @@ src/storage/tool-error-repository.ts [1-374]
 
 ---
 Files: 65
-Estimated tokens: 47,137 (codebase: ~1,412,048)
+Estimated tokens: 47,137 (codebase: ~1,412,090)

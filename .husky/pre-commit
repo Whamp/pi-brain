@@ -7,17 +7,8 @@ if [ -z "$(git diff --cached --name-only)" ]; then
   exit 0
 fi
 
-# Build (includes DTS which enforces type correctness)
-npm run build
-
-# Check formatting
-npx oxfmt --check -c .oxfmtrc.jsonc .
-
-# Lint
-npx oxlint -c .oxlintrc.json .
-
-# Run tests
-npm test -- --run
+# Run full validation stack (build, format, lint, deadcode, duplicates, tests)
+npm run validate
 
 # Refresh codemap documentation
 ./scripts/refresh-codemap.sh

@@ -29,7 +29,7 @@
     "scripts/refresh-codemap.sh",
     "extensions/dashboard/lib/types.ts"
   ],
-  "ignoreDependencies": [],
+  "ignoreDependencies": ["ultracite"],
   "ignoreExportsUsedInFile": true,
   "rules": {
     "exports": "warn",

@@ -1546,7 +1546,7 @@ src/storage/hybrid-search.ts [1-732]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/index.ts [1-22]
+src/storage/index.ts [1-23]
   imports:
     - ./bridge-discovery.js
     - ./database.js
@@ -2356,4 +2356,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 103
-Estimated tokens: 29,532 (codebase: ~1,411,762)
+Estimated tokens: 29,532 (codebase: ~1,412,058)
