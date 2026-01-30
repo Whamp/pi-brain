@@ -85,7 +85,7 @@
     "@microsoft/api-documenter": "^7.28.6",
     "@microsoft/api-extractor": "^7.56.0",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/chokidar": "^1.7.5",
+    "@types/chokidar": "^2.1.7",
     "@types/node": "^22.10.5",
     "@types/ws": "^8.18.1",
     "@vitest/coverage-v8": "^4.0.18",
