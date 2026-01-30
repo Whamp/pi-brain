@@ -600,3 +600,54 @@ save/reset pattern.
   - Semgrep: 61 findings (logger.ts excluded)
 **Commit**: 43c26688
 **Notes**: Logger infrastructure complete. Ready for Phase 2 (replace console.log in daemon-process.ts and other files).
+
+---
+
+## 2026-01-30 10:30 - Semgrep Phase 2 (Tasks 2.1-2.5)
+
+**Status**: pending → done
+**Validation**:
+  - Replaced all console.log/warn/error calls in:
+    - src/daemon/daemon-process.ts (32 calls → 0)
+    - src/daemon/processor.ts (4 calls → 0)
+    - src/daemon/scheduler.ts (4 calls → 0)
+    - src/api/websocket.ts (3 calls → 0)
+    - src/daemon/insight-aggregation.ts (8 calls → 0)
+  - Added export.ts to semgrep exclusion (CLI user-facing output)
+  - Added nosemgrep comment for browser-side websocket.ts
+  - Build: success
+  - Lint: 0 errors, 0 warnings
+  - Tests: 1396 passed, 4 skipped
+  - Semgrep: 61 → 20 findings (no-console-log eliminated)
+**Commit**: 71f53bc0
+**Notes**: All no-console-log violations fixed. Remaining 20 findings are no-sync-fs-in-async (Phase 3).
+
+---
+
+## 2026-01-30 10:42 - Semgrep Phase 3 (Tasks 3.1-3.4)
+
+**Status**: pending → done
+**Validation**:
+  - Created src/utils/fs-async.ts with async helpers:
+    - fileExists(): async replacement for fs.existsSync
+    - safeReadFile(): async file read with ENOENT handling
+    - safeWriteFile(): async file write
+    - ensureDir(): async mkdir with recursive option
+  - Updated src/api/routes/config.ts:
+    - Converted readRawConfig() and writeRawConfig() to async
+    - Replaced 15 inline sync fs patterns with async helper calls
+    - DRYed up config read/write across 7 route handlers
+  - Updated src/api/routes/daemon.ts:
+    - Replaced fs.existsSync with async fileExists (1 call)
+  - Updated src/daemon/cli.ts:
+    - Replaced fs.existsSync/mkdirSync with async fileExists/mkdir (2 calls)
+  - Updated src/daemon/export.ts:
+    - Replaced fs.existsSync with async fileExists (2 calls)
+  - Fixed lint errors in scripts/analyze-test-perf.js
+  - Build: success
+  - Lint: 0 errors, 0 warnings
+  - Tests: 1396 passed, 4 skipped
+  - Semgrep: 20 no-sync-fs-in-async findings → 0
+**Commit**: cb741fdd
+**Notes**: Phase 3 complete - all sync fs calls in async functions replaced.
+Remaining: Phase 4 (tainted-direct-response) - 1 finding in clusters.ts
