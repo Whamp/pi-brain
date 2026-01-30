@@ -174,8 +174,85 @@ function validateSpokeSchedule(
 }
 
 /**
+ * Dangerous rsync options that could execute arbitrary commands
+ */
+const DANGEROUS_RSYNC_OPTIONS = ["--rsh", "-e"];
+
+/**
+ * Check if an rsync arg is dangerous
+ */
+function isDangerousRsyncArg(arg: string): boolean {
+  return DANGEROUS_RSYNC_OPTIONS.some(
+    (dangerous) => arg === dangerous || arg.startsWith(`${dangerous}=`)
+  );
+}
+
+/**
+ * Validate rsync extra_args field
+ */
+function validateRsyncExtraArgs(
+  spokeName: string,
+  extraArgs: unknown
+): string[] {
+  if (!Array.isArray(extraArgs)) {
+    throw new TypeError(
+      `Spoke "${spokeName}" has invalid rsync_options.extra_args: must be an array`
+    );
+  }
+  if (!extraArgs.every((arg) => typeof arg === "string")) {
+    throw new TypeError(
+      `Spoke "${spokeName}" has invalid rsync_options.extra_args: all elements must be strings`
+    );
+  }
+  for (const arg of extraArgs) {
+    if (isDangerousRsyncArg(arg)) {
+      throw new Error(
+        `Spoke "${spokeName}" has disallowed rsync option "${arg}" in extra_args (security risk)`
+      );
+    }
+  }
+  return extraArgs;
+}
+
+/**
  * Validate rsync options configuration
  */
+/**
+ * Validate and transform bw_limit
+ */
+function transformBwLimit(
+  spokeName: string,
+  bwLimit: number | undefined
+): number | undefined {
+  if (bwLimit === undefined) {
+    return undefined;
+  }
+  if (!Number.isInteger(bwLimit) || bwLimit < 0) {
+    throw new Error(
+      `Spoke "${spokeName}" has invalid rsync_options.bw_limit: must be a non-negative integer`
+    );
+  }
+  return bwLimit;
+}
+
+/**
+ * Validate and transform timeout_seconds
+ */
+function transformTimeoutSeconds(
+  spokeName: string,
+  timeoutSeconds: number | undefined
+): number | undefined {
+  if (timeoutSeconds === undefined) {
+    return undefined;
+  }
+  if (!Number.isInteger(timeoutSeconds) || timeoutSeconds < 1) {
+    throw new Error(
+      `Spoke "${spokeName}" has invalid rsync_options.timeout_seconds: must be a positive integer`
+    );
+  }
+  return timeoutSeconds;
+}
+
 function validateRsyncOptions(
   spokeName: string,
   syncMethod: SyncMethod,
@@ -191,56 +268,28 @@ function validateRsyncOptions(
     );
   }
 
+  const bwLimit = transformBwLimit(spokeName, rawOptions.bw_limit);
+  const timeoutSeconds = transformTimeoutSeconds(
+    spokeName,
+    rawOptions.timeout_seconds
+  );
+  const extraArgs =
+    rawOptions.extra_args === undefined
+      ? undefined
+      : validateRsyncExtraArgs(spokeName, rawOptions.extra_args);
+
   const rsyncOptions: RsyncOptions = {};
-
-  if (rawOptions.bw_limit !== undefined) {
-    if (!Number.isInteger(rawOptions.bw_limit) || rawOptions.bw_limit < 0) {
-      throw new Error(
-        `Spoke "${spokeName}" has invalid rsync_options.bw_limit: must be a non-negative integer`
-      );
-    }
-    rsyncOptions.bwLimit = rawOptions.bw_limit;
+  if (bwLimit !== undefined) {
+    rsyncOptions.bwLimit = bwLimit;
   }
-
   if (rawOptions.delete !== undefined) {
     rsyncOptions.delete = rawOptions.delete;
   }
-
-  if (rawOptions.extra_args !== undefined) {
-    if (!Array.isArray(rawOptions.extra_args)) {
-      throw new TypeError(
-        `Spoke "${spokeName}" has invalid rsync_options.extra_args: must be an array`
-      );
-    }
-    if (!rawOptions.extra_args.every((arg) => typeof arg === "string")) {
-      throw new TypeError(
-        `Spoke "${spokeName}" has invalid rsync_options.extra_args: all elements must be strings`
-      );
-    }
-    // Reject dangerous rsync options that could execute arbitrary commands
-    const dangerousOptions = ["--rsh", "-e"];
-    for (const arg of rawOptions.extra_args) {
-      for (const dangerous of dangerousOptions) {
-        if (arg === dangerous || arg.startsWith(`${dangerous}=`)) {
-          throw new Error(
-            `Spoke "${spokeName}" has disallowed rsync option "${arg}" in extra_args (security risk)`
-          );
-        }
-      }
-    }
-    rsyncOptions.extraArgs = rawOptions.extra_args;
+  if (extraArgs !== undefined) {
+    rsyncOptions.extraArgs = extraArgs;
   }
-
-  if (rawOptions.timeout_seconds !== undefined) {
-    if (
-      !Number.isInteger(rawOptions.timeout_seconds) ||
-      rawOptions.timeout_seconds < 1
-    ) {
-      throw new Error(
-        `Spoke "${spokeName}" has invalid rsync_options.timeout_seconds: must be a positive integer`
-      );
-    }
-    rsyncOptions.timeoutSeconds = rawOptions.timeout_seconds;
+  if (timeoutSeconds !== undefined) {
+    rsyncOptions.timeoutSeconds = timeoutSeconds;
   }
 
   return rsyncOptions;
@@ -368,11 +417,51 @@ function transformHubConfig(
 }
 
 /**
+ * Transform daemon primary scheduling configuration
+ */
+function transformDaemonPrimarySchedules(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  | "reanalysisSchedule"
+  | "connectionDiscoverySchedule"
+  | "patternAggregationSchedule"
+> {
+  return {
+    reanalysisSchedule:
+      rawDaemon?.reanalysis_schedule ?? defaultDaemon.reanalysisSchedule,
+    connectionDiscoverySchedule:
+      rawDaemon?.connection_discovery_schedule ??
+      defaultDaemon.connectionDiscoverySchedule,
+    patternAggregationSchedule:
+      rawDaemon?.pattern_aggregation_schedule ??
+      defaultDaemon.patternAggregationSchedule,
+  };
+}
+
+/**
+ * Transform daemon secondary scheduling configuration
+ */
+function transformDaemonSecondarySchedules(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<DaemonConfig, "clusteringSchedule" | "backfillEmbeddingsSchedule"> {
+  return {
+    clusteringSchedule:
+      rawDaemon?.clustering_schedule ?? defaultDaemon.clusteringSchedule,
+    backfillEmbeddingsSchedule:
+      rawDaemon?.backfill_embeddings_schedule ??
+      defaultDaemon.backfillEmbeddingsSchedule,
+  };
+}
+
+/**
  * Transform daemon scheduling configuration from raw config
  */
 function transformDaemonSchedules(
-  raw: RawConfig,
-  defaults: PiBrainConfig
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
 ): Pick<
   DaemonConfig,
   | "reanalysisSchedule"
@@ -382,19 +471,53 @@ function transformDaemonSchedules(
   | "backfillEmbeddingsSchedule"
 > {
   return {
-    reanalysisSchedule:
-      raw.daemon?.reanalysis_schedule ?? defaults.daemon.reanalysisSchedule,
-    connectionDiscoverySchedule:
-      raw.daemon?.connection_discovery_schedule ??
-      defaults.daemon.connectionDiscoverySchedule,
-    patternAggregationSchedule:
-      raw.daemon?.pattern_aggregation_schedule ??
-      defaults.daemon.patternAggregationSchedule,
-    clusteringSchedule:
-      raw.daemon?.clustering_schedule ?? defaults.daemon.clusteringSchedule,
-    backfillEmbeddingsSchedule:
-      raw.daemon?.backfill_embeddings_schedule ??
-      defaults.daemon.backfillEmbeddingsSchedule,
+    ...transformDaemonPrimarySchedules(rawDaemon, defaultDaemon),
+    ...transformDaemonSecondarySchedules(rawDaemon, defaultDaemon),
+  };
+}
+
+/**
+ * Transform daemon primary limits from raw config
+ */
+function transformDaemonPrimaryLimits(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  "backfillLimit" | "reanalysisLimit" | "connectionDiscoveryLimit"
+> {
+  return {
+    backfillLimit: rawDaemon?.backfill_limit ?? defaultDaemon.backfillLimit,
+    reanalysisLimit:
+      rawDaemon?.reanalysis_limit ?? defaultDaemon.reanalysisLimit,
+    connectionDiscoveryLimit:
+      rawDaemon?.connection_discovery_limit ??
+      defaultDaemon.connectionDiscoveryLimit,
+  };
+}
+
+/**
+ * Transform daemon secondary limits from raw config
+ */
+function transformDaemonSecondaryLimits(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  | "connectionDiscoveryLookbackDays"
+  | "connectionDiscoveryCooldownHours"
+  | "semanticSearchThreshold"
+> {
+  return {
+    connectionDiscoveryLookbackDays:
+      rawDaemon?.connection_discovery_lookback_days ??
+      defaultDaemon.connectionDiscoveryLookbackDays,
+    connectionDiscoveryCooldownHours:
+      rawDaemon?.connection_discovery_cooldown_hours ??
+      defaultDaemon.connectionDiscoveryCooldownHours,
+    semanticSearchThreshold:
+      rawDaemon?.semantic_search_threshold ??
+      defaultDaemon.semanticSearchThreshold,
   };
 }
 
@@ -402,8 +525,8 @@ function transformDaemonSchedules(
  * Transform daemon limits and thresholds from raw config
  */
 function transformDaemonLimits(
-  raw: RawConfig,
-  defaults: PiBrainConfig
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
 ): Pick<
   DaemonConfig,
   | "backfillLimit"
@@ -414,21 +537,8 @@ function transformDaemonLimits(
   | "semanticSearchThreshold"
 > {
   return {
-    backfillLimit: raw.daemon?.backfill_limit ?? defaults.daemon.backfillLimit,
-    reanalysisLimit:
-      raw.daemon?.reanalysis_limit ?? defaults.daemon.reanalysisLimit,
-    connectionDiscoveryLimit:
-      raw.daemon?.connection_discovery_limit ??
-      defaults.daemon.connectionDiscoveryLimit,
-    connectionDiscoveryLookbackDays:
-      raw.daemon?.connection_discovery_lookback_days ??
-      defaults.daemon.connectionDiscoveryLookbackDays,
-    connectionDiscoveryCooldownHours:
-      raw.daemon?.connection_discovery_cooldown_hours ??
-      defaults.daemon.connectionDiscoveryCooldownHours,
-    semanticSearchThreshold:
-      raw.daemon?.semantic_search_threshold ??
-      defaults.daemon.semanticSearchThreshold,
+    ...transformDaemonPrimaryLimits(rawDaemon, defaultDaemon),
+    ...transformDaemonSecondaryLimits(rawDaemon, defaultDaemon),
   };
 }
 
@@ -436,8 +546,8 @@ function transformDaemonLimits(
  * Transform daemon embedding configuration from raw config
  */
 function transformDaemonEmbeddings(
-  raw: RawConfig,
-  defaults: PiBrainConfig
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
 ): Pick<
   DaemonConfig,
   | "embeddingProvider"
@@ -448,12 +558,136 @@ function transformDaemonEmbeddings(
 > {
   return {
     embeddingProvider:
-      raw.daemon?.embedding_provider ?? defaults.daemon.embeddingProvider,
-    embeddingModel:
-      raw.daemon?.embedding_model ?? defaults.daemon.embeddingModel,
-    embeddingApiKey: raw.daemon?.embedding_api_key,
-    embeddingBaseUrl: raw.daemon?.embedding_base_url,
-    embeddingDimensions: raw.daemon?.embedding_dimensions,
+      rawDaemon?.embedding_provider ?? defaultDaemon.embeddingProvider,
+    embeddingModel: rawDaemon?.embedding_model ?? defaultDaemon.embeddingModel,
+    embeddingApiKey: rawDaemon?.embedding_api_key,
+    embeddingBaseUrl: rawDaemon?.embedding_base_url,
+    embeddingDimensions: rawDaemon?.embedding_dimensions,
+  };
+}
+
+/**
+ * Transform daemon timing settings from raw config
+ */
+function transformDaemonTiming(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  "idleTimeoutMinutes" | "parallelWorkers" | "maxRetries" | "retryDelaySeconds"
+> {
+  return {
+    idleTimeoutMinutes:
+      rawDaemon?.idle_timeout_minutes ?? defaultDaemon.idleTimeoutMinutes,
+    parallelWorkers:
+      rawDaemon?.parallel_workers ?? defaultDaemon.parallelWorkers,
+    maxRetries: rawDaemon?.max_retries ?? defaultDaemon.maxRetries,
+    retryDelaySeconds:
+      rawDaemon?.retry_delay_seconds ?? defaultDaemon.retryDelaySeconds,
+  };
+}
+
+/**
+ * Transform daemon provider settings from raw config
+ */
+function transformDaemonProvider(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<DaemonConfig, "provider" | "model" | "promptFile"> {
+  return {
+    provider: rawDaemon?.provider ?? defaultDaemon.provider,
+    model: rawDaemon?.model ?? defaultDaemon.model,
+    promptFile: rawDaemon?.prompt_file
+      ? expandPath(rawDaemon.prompt_file)
+      : defaultDaemon.promptFile,
+  };
+}
+
+/**
+ * Transform daemon core settings from raw config
+ */
+function transformDaemonCore(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  | "idleTimeoutMinutes"
+  | "parallelWorkers"
+  | "maxRetries"
+  | "retryDelaySeconds"
+  | "provider"
+  | "model"
+  | "promptFile"
+> {
+  return {
+    ...transformDaemonTiming(rawDaemon, defaultDaemon),
+    ...transformDaemonProvider(rawDaemon, defaultDaemon),
+  };
+}
+
+/**
+ * Transform daemon queue settings from raw config
+ */
+function transformDaemonQueue(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  "maxConcurrentAnalysis" | "analysisTimeoutMinutes" | "maxQueueSize"
+> {
+  return {
+    maxConcurrentAnalysis:
+      rawDaemon?.max_concurrent_analysis ?? defaultDaemon.maxConcurrentAnalysis,
+    analysisTimeoutMinutes:
+      rawDaemon?.analysis_timeout_minutes ??
+      defaultDaemon.analysisTimeoutMinutes,
+    maxQueueSize: rawDaemon?.max_queue_size ?? defaultDaemon.maxQueueSize,
+  };
+}
+
+/**
+ * Transform daemon decay settings from raw config
+ */
+function transformDaemonDecay(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  | "decaySchedule"
+  | "creativeSchedule"
+  | "baseDecayRate"
+  | "creativeSimilarityThreshold"
+> {
+  return {
+    decaySchedule: rawDaemon?.decay_schedule ?? defaultDaemon.decaySchedule,
+    creativeSchedule:
+      rawDaemon?.creative_schedule ?? defaultDaemon.creativeSchedule,
+    baseDecayRate: rawDaemon?.base_decay_rate ?? defaultDaemon.baseDecayRate,
+    creativeSimilarityThreshold:
+      rawDaemon?.creative_similarity_threshold ??
+      defaultDaemon.creativeSimilarityThreshold,
+  };
+}
+
+/**
+ * Transform daemon analysis settings from raw config
+ */
+function transformDaemonAnalysis(
+  rawDaemon: RawConfig["daemon"],
+  defaultDaemon: DaemonConfig
+): Pick<
+  DaemonConfig,
+  | "maxConcurrentAnalysis"
+  | "analysisTimeoutMinutes"
+  | "maxQueueSize"
+  | "decaySchedule"
+  | "creativeSchedule"
+  | "baseDecayRate"
+  | "creativeSimilarityThreshold"
+> {
+  return {
+    ...transformDaemonQueue(rawDaemon, defaultDaemon),
+    ...transformDaemonDecay(rawDaemon, defaultDaemon),
   };
 }
 
@@ -464,49 +698,45 @@ function transformDaemonConfig(
   raw: RawConfig,
   defaults: PiBrainConfig
 ): DaemonConfig {
-  const schedules = transformDaemonSchedules(raw, defaults);
-  const limits = transformDaemonLimits(raw, defaults);
-  const embeddings = transformDaemonEmbeddings(raw, defaults);
+  const rawDaemon = raw.daemon;
+  const defaultDaemon = defaults.daemon;
 
-  const daemon: DaemonConfig = {
-    idleTimeoutMinutes:
-      raw.daemon?.idle_timeout_minutes ?? defaults.daemon.idleTimeoutMinutes,
-    parallelWorkers:
-      raw.daemon?.parallel_workers ?? defaults.daemon.parallelWorkers,
-    maxRetries: raw.daemon?.max_retries ?? defaults.daemon.maxRetries,
-    retryDelaySeconds:
-      raw.daemon?.retry_delay_seconds ?? defaults.daemon.retryDelaySeconds,
-    ...schedules,
-    ...limits,
-    ...embeddings,
-    provider: raw.daemon?.provider ?? defaults.daemon.provider,
-    model: raw.daemon?.model ?? defaults.daemon.model,
-    promptFile: raw.daemon?.prompt_file
-      ? expandPath(raw.daemon.prompt_file)
-      : defaults.daemon.promptFile,
-    maxConcurrentAnalysis:
-      raw.daemon?.max_concurrent_analysis ??
-      defaults.daemon.maxConcurrentAnalysis,
-    analysisTimeoutMinutes:
-      raw.daemon?.analysis_timeout_minutes ??
-      defaults.daemon.analysisTimeoutMinutes,
-    maxQueueSize: raw.daemon?.max_queue_size ?? defaults.daemon.maxQueueSize,
-    decaySchedule: raw.daemon?.decay_schedule ?? defaults.daemon.decaySchedule,
-    creativeSchedule:
-      raw.daemon?.creative_schedule ?? defaults.daemon.creativeSchedule,
-    baseDecayRate: raw.daemon?.base_decay_rate ?? defaults.daemon.baseDecayRate,
-    creativeSimilarityThreshold:
-      raw.daemon?.creative_similarity_threshold ??
-      defaults.daemon.creativeSimilarityThreshold,
+  return {
+    ...transformDaemonCore(rawDaemon, defaultDaemon),
+    ...transformDaemonSchedules(rawDaemon, defaultDaemon),
+    ...transformDaemonLimits(rawDaemon, defaultDaemon),
+    ...transformDaemonEmbeddings(rawDaemon, defaultDaemon),
+    ...transformDaemonAnalysis(rawDaemon, defaultDaemon),
   };
-
-  return daemon;
 }
 
 /**
- * Validate daemon configuration
+ * Validate a ratio value (0.0 to 1.0)
  */
-function validateDaemonConfig(daemon: DaemonConfig): void {
+function validateRatio(value: number, field: string): void {
+  if (value < 0 || value > 1) {
+    throw new Error(
+      `Invalid value for ${field}: ${value}. Must be between 0.0 and 1.0.`
+    );
+  }
+}
+
+/**
+ * Validate optional cron schedule
+ */
+function validateOptionalCronSchedule(
+  schedule: string | undefined,
+  field: string
+): void {
+  if (schedule) {
+    validateCronSchedule(schedule, field);
+  }
+}
+
+/**
+ * Validate daemon core integers
+ */
+function validateDaemonCoreInts(daemon: DaemonConfig): void {
   validatePositiveInt(daemon.idleTimeoutMinutes, "daemon.idle_timeout_minutes");
   validatePositiveInt(daemon.parallelWorkers, "daemon.parallel_workers");
   validateNonNegativeInt(daemon.maxRetries, "daemon.max_retries");
@@ -514,29 +744,37 @@ function validateDaemonConfig(daemon: DaemonConfig): void {
     daemon.retryDelaySeconds,
     "daemon.retry_delay_seconds"
   );
+}
+
+/**
+ * Validate daemon schedules
+ */
+function validateDaemonSchedules(daemon: DaemonConfig): void {
   validateCronSchedule(daemon.reanalysisSchedule, "daemon.reanalysis_schedule");
   validateCronSchedule(
     daemon.connectionDiscoverySchedule,
     "daemon.connection_discovery_schedule"
   );
-  if (daemon.patternAggregationSchedule) {
-    validateCronSchedule(
-      daemon.patternAggregationSchedule,
-      "daemon.pattern_aggregation_schedule"
-    );
-  }
-  if (daemon.clusteringSchedule) {
-    validateCronSchedule(
-      daemon.clusteringSchedule,
-      "daemon.clustering_schedule"
-    );
-  }
-  if (daemon.backfillEmbeddingsSchedule) {
-    validateCronSchedule(
-      daemon.backfillEmbeddingsSchedule,
-      "daemon.backfill_embeddings_schedule"
-    );
-  }
+  validateOptionalCronSchedule(
+    daemon.patternAggregationSchedule,
+    "daemon.pattern_aggregation_schedule"
+  );
+  validateOptionalCronSchedule(
+    daemon.clusteringSchedule,
+    "daemon.clustering_schedule"
+  );
+  validateOptionalCronSchedule(
+    daemon.backfillEmbeddingsSchedule,
+    "daemon.backfill_embeddings_schedule"
+  );
+  validateCronSchedule(daemon.decaySchedule, "daemon.decay_schedule");
+  validateCronSchedule(daemon.creativeSchedule, "daemon.creative_schedule");
+}
+
+/**
+ * Validate daemon limits
+ */
+function validateDaemonLimits(daemon: DaemonConfig): void {
   validatePositiveInt(
     daemon.maxConcurrentAnalysis,
     "daemon.max_concurrent_analysis"
@@ -562,29 +800,33 @@ function validateDaemonConfig(daemon: DaemonConfig): void {
       "daemon.connection_discovery_cooldown_hours"
     );
   }
-  if (
-    daemon.semanticSearchThreshold !== undefined &&
-    (daemon.semanticSearchThreshold < 0 || daemon.semanticSearchThreshold > 1)
-  ) {
-    throw new Error(
-      `Invalid value for daemon.semantic_search_threshold: ${daemon.semanticSearchThreshold}. Must be between 0.0 and 1.0.`
+}
+
+/**
+ * Validate daemon thresholds
+ */
+function validateDaemonThresholds(daemon: DaemonConfig): void {
+  if (daemon.semanticSearchThreshold !== undefined) {
+    validateRatio(
+      daemon.semanticSearchThreshold,
+      "daemon.semantic_search_threshold"
     );
   }
-  validateCronSchedule(daemon.decaySchedule, "daemon.decay_schedule");
-  validateCronSchedule(daemon.creativeSchedule, "daemon.creative_schedule");
-  if (daemon.baseDecayRate < 0 || daemon.baseDecayRate > 1) {
-    throw new Error(
-      `Invalid value for daemon.base_decay_rate: ${daemon.baseDecayRate}. Must be between 0.0 and 1.0.`
-    );
-  }
-  if (
-    daemon.creativeSimilarityThreshold < 0 ||
-    daemon.creativeSimilarityThreshold > 1
-  ) {
-    throw new Error(
-      `Invalid value for daemon.creative_similarity_threshold: ${daemon.creativeSimilarityThreshold}. Must be between 0.0 and 1.0.`
-    );
-  }
+  validateRatio(daemon.baseDecayRate, "daemon.base_decay_rate");
+  validateRatio(
+    daemon.creativeSimilarityThreshold,
+    "daemon.creative_similarity_threshold"
+  );
+}
+
+/**
+ * Validate daemon configuration
+ */
+function validateDaemonConfig(daemon: DaemonConfig): void {
+  validateDaemonCoreInts(daemon);
+  validateDaemonSchedules(daemon);
+  validateDaemonLimits(daemon);
+  validateDaemonThresholds(daemon);
 }
 
 /**
@@ -671,51 +913,65 @@ export class ConfigError extends Error {
 }
 
 /**
- * Load configuration from a YAML file
+ * Validate config file extension
  */
-export function loadConfig(configPath?: string): PiBrainConfig {
-  const filePath = configPath ?? DEFAULT_CONFIG_PATH;
-
-  // If no config file exists, return defaults
-  if (!fs.existsSync(filePath)) {
-    return getDefaultConfig();
-  }
-
-  // Validate file extension
+function validateConfigExtension(filePath: string): void {
   const ext = path.extname(filePath).toLowerCase();
-  if (ext && ext !== ".yaml" && ext !== ".yml") {
+  const isValidExtension = !ext || ext === ".yaml" || ext === ".yml";
+  if (!isValidExtension) {
     throw new ConfigError(
       `Config file must be YAML format (.yaml or .yml), got: ${ext}`,
       filePath
     );
   }
+}
 
-  let content: string;
+/**
+ * Read config file content
+ */
+function readConfigFile(filePath: string): string {
   try {
-    content = fs.readFileSync(filePath, "utf8");
+    return fs.readFileSync(filePath, "utf8");
   } catch (error) {
     throw new ConfigError(
       `Failed to read config file: ${(error as Error).message}`,
       filePath
     );
   }
+}
 
-  // Empty file returns defaults
-  if (!content.trim()) {
-    return getDefaultConfig();
-  }
-
-  let raw: RawConfig;
+/**
+ * Parse YAML content
+ */
+function parseYamlContent(content: string, filePath: string): RawConfig | null {
   try {
-    raw = yaml.parse(content) as RawConfig;
+    return yaml.parse(content) as RawConfig | null;
   } catch (error) {
     throw new ConfigError(
       `Failed to parse YAML: ${(error as Error).message}`,
       filePath
     );
   }
+}
 
-  // null/undefined from YAML parse returns defaults
+/**
+ * Load configuration from a YAML file
+ */
+export function loadConfig(configPath?: string): PiBrainConfig {
+  const filePath = configPath ?? DEFAULT_CONFIG_PATH;
+
+  if (!fs.existsSync(filePath)) {
+    return getDefaultConfig();
+  }
+
+  validateConfigExtension(filePath);
+
+  const content = readConfigFile(filePath);
+  if (!content.trim()) {
+    return getDefaultConfig();
+  }
+
+  const raw = parseYamlContent(content, filePath);
   if (raw === null || raw === undefined) {
     return getDefaultConfig();
   }
