@@ -70,7 +70,15 @@ function createTestNode(overrides: Partial<Node> = {}): Node {
     },
     lessons: emptyLessons(),
     observations: {
-      modelsUsed: [{ provider: "zai", model: "glm-4.7", tokensUsed: 1000 }],
+      modelsUsed: [
+        {
+          provider: "zai",
+          model: "glm-4.7",
+          tokensInput: 800,
+          tokensOutput: 200,
+          cost: 0.001,
+        },
+      ],
       promptingWins: [],
       promptingFailures: [],
       modelQuirks: [],

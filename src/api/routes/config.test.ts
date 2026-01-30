@@ -1926,7 +1926,7 @@ describe("config api routes", () => {
       const response = await app.inject({
         method: "POST",
         url: "/api/v1/config/spokes",
-        payload: null,
+        payload: undefined,
       });
 
       expect(response.statusCode).toBe(400);

@@ -6,9 +6,6 @@ import type Database from "better-sqlite3";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type * as DatabaseModule from "./database.js";
-import type * as SemanticSearchModule from "./semantic-search.js";
-
 import {
   type HybridSearchResult,
   calculateNodeHybridScore,
@@ -17,11 +14,11 @@ import {
 } from "./hybrid-search.js";
 
 // Mock dependencies
-vi.mock<typeof DatabaseModule>("./database.js", () => ({
+vi.mock("./database.js", () => ({
   isVecLoaded: vi.fn(() => false),
 }));
 
-vi.mock<typeof SemanticSearchModule>("./semantic-search.js", () => ({
+vi.mock("./semantic-search.js", () => ({
   semanticSearch: vi.fn(() => []),
 }));
 

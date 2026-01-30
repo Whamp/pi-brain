@@ -256,7 +256,7 @@ function transformTimeoutSeconds(
 function validateRsyncOptions(
   spokeName: string,
   syncMethod: SyncMethod,
-  rawOptions: RawConfig["spokes"][number]["rsync_options"]
+  rawOptions: NonNullable<RawConfig["spokes"]>[number]["rsync_options"]
 ): RsyncOptions | undefined {
   if (!rawOptions) {
     return undefined;
@@ -298,8 +298,11 @@ function validateRsyncOptions(
 /**
  * Validate spoke configuration
  */
-function validateSpoke(raw: RawConfig["spokes"], index: number): SpokeConfig {
-  const spoke = raw?.[index];
+function validateSpoke(
+  raw: NonNullable<RawConfig["spokes"]>,
+  index: number
+): SpokeConfig {
+  const spoke = raw[index];
   if (!spoke) {
     throw new Error(`Spoke at index ${index} is undefined`);
   }

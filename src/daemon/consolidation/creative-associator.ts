@@ -16,7 +16,8 @@ import type Database from "better-sqlite3";
 
 import { isVecLoaded } from "../../storage/database.js";
 import { createEdge } from "../../storage/edge-repository.js";
-import { semanticSearch } from "../../storage/embedding-utils.js";
+import { getEmbedding } from "../../storage/embedding-utils.js";
+import { semanticSearch } from "../../storage/semantic-search.js";
 
 // =============================================================================
 // Constants
@@ -141,36 +142,34 @@ export class CreativeAssociator {
   /**
    * Find similar nodes using semantic search
    */
-  private async findSimilarNodes(
-    nodeId: string,
-    summary: string | null
-  ): Promise<{ id: string; distance: number }[]> {
-    if (!summary) {
+  private findSimilarNodes(nodeId: string): { id: string; distance: number }[] {
+    // Get the node's embedding
+    const embeddingData = getEmbedding(this.db, nodeId);
+    if (!embeddingData) {
       return [];
     }
 
     // Use semantic search to find similar nodes
-    const results = await semanticSearch(
-      this.db,
-      summary,
-      this.maxEdgesPerNode + 5, // Get extra to account for self and existing edges
-      {
-        excludeNodeIds: [nodeId],
-      }
-    );
+    const results = semanticSearch(this.db, embeddingData.embedding, {
+      limit: this.maxEdgesPerNode + 5, // Get extra to account for self and existing edges
+    });
 
-    // Filter by similarity threshold (distance < threshold means similar)
+    // Filter out self and apply similarity threshold
     // semanticSearch returns distance (lower = more similar)
     // Convert to similarity: similarity = 1 - distance
     return results
-      .filter((r) => 1 - r.distance >= this.similarityThreshold)
+      .filter(
+        (r) =>
+          r.node.id !== nodeId && 1 - r.distance >= this.similarityThreshold
+      )
+      .map((r) => ({ id: r.node.id, distance: r.distance }))
       .slice(0, this.maxEdgesPerNode);
   }
 
   /**
    * Run creative association to discover new connections
    */
-  async run(): Promise<CreativeAssociatorResult> {
+  run(): CreativeAssociatorResult {
     const result: CreativeAssociatorResult = {
       nodesSampled: 0,
       edgesCreated: 0,
@@ -195,7 +194,7 @@ export class CreativeAssociator {
         result.processedNodes.push(node.id);
 
         // Find similar nodes
-        const similar = await this.findSimilarNodes(node.id, node.summary);
+        const similar = this.findSimilarNodes(node.id);
 
         for (const match of similar) {
           // Skip if edge already exists
@@ -205,10 +204,7 @@ export class CreativeAssociator {
 
           // Create RELATES_TO edge with similarity metadata
           const similarity = 1 - match.distance;
-          createEdge(this.db, {
-            sourceNodeId: node.id,
-            targetNodeId: match.id,
-            type: "RELATES_TO",
+          createEdge(this.db, node.id, match.id, "RELATES_TO", {
             createdBy: "daemon",
             metadata: {
               similarity,

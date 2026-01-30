@@ -309,6 +309,8 @@ export interface EdgeMetadata {
   patternId?: string;
   /** Human readable reason for the connection */
   reason?: string;
+  /** For unresolved relationships: description of target to be resolved later */
+  unresolvedTarget?: string;
 }
 
 export interface Edge {

@@ -23,11 +23,25 @@ import { semanticSearch } from "./semantic-search.js";
 // =============================================================================
 
 /**
+ * Type for hybrid search weight keys
+ */
+export interface HybridWeights {
+  vector: number;
+  keyword: number;
+  relation: number;
+  content: number;
+  temporal: number;
+  tag: number;
+  importance: number;
+  recency: number;
+}
+
+/**
  * Weights for each scoring component.
  * Sum should equal ~1.3 to allow strong signals to boost final score.
  * Final scores are normalized to 0..1 range.
  */
-export const HYBRID_WEIGHTS: Record<string, number> = {
+export const HYBRID_WEIGHTS: HybridWeights = {
   vector: 0.25, // Semantic similarity via embeddings
   keyword: 0.15, // FTS5 match score
   relation: 0.25, // Graph centrality / edge count
@@ -108,7 +122,7 @@ export interface HybridSearchOptions {
   /** Tags to boost matching (increases tag score for matches) */
   boostTags?: string[];
   /** Custom weights (overrides defaults) */
-  weights?: Partial<typeof HYBRID_WEIGHTS>;
+  weights?: Partial<HybridWeights>;
   /** Include archived nodes (default: false) */
   includeArchived?: boolean;
 }

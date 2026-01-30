@@ -276,8 +276,8 @@ describe("webSocketManager", () => {
 
       manager.broadcastDaemonStatus({
         running: true,
-        workers: { active: 1, idle: 0 },
-        queue: { pending: 5, running: 1 },
+        workers: { total: 1, active: 1, idle: 0 },
+        queue: { pending: 5, running: 1, completedToday: 0, failedToday: 0 },
       });
 
       expect(socket.send).toHaveBeenCalledOnce();

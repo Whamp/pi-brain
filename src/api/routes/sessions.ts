@@ -251,7 +251,7 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Get project from first node
-      const [{ project }] = sessionNodes;
+      const project = sessionNodes[0]?.classification.project;
 
       const durationMs = Date.now() - startTime;
       return reply.send(

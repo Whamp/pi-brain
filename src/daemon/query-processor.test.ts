@@ -1,17 +1,9 @@
 import type { Database } from "better-sqlite3";
-import type * as ChildProcess from "node:child_process";
-import type * as FsPromises from "node:fs/promises";
 
 import { spawn } from "node:child_process";
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 import type { DaemonConfig } from "../config/types.js";
-import type * as BridgeDiscoveryMod from "../storage/bridge-discovery.js";
-import type * as DatabaseModule from "../storage/database.js";
-import type * as HybridSearchMod from "../storage/hybrid-search.js";
-import type * as NodeQueries from "../storage/node-queries.js";
-import type * as QuirkRepo from "../storage/quirk-repository.js";
-import type * as ToolErrorRepo from "../storage/tool-error-repository.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
 import { findBridgePaths } from "../storage/bridge-discovery.js";
@@ -20,35 +12,35 @@ import { listNodes } from "../storage/node-queries.js";
 import { processQuery, type QueryRequest } from "./query-processor.js";
 
 // Mocks
-vi.mock<typeof DatabaseModule>("../storage/database.js", () => ({
+vi.mock("../storage/database.js", () => ({
   isVecLoaded: vi.fn(() => true),
 }));
 
-vi.mock<typeof HybridSearchMod>("../storage/hybrid-search.js", () => ({
+vi.mock("../storage/hybrid-search.js", () => ({
   hybridSearch: vi.fn(),
 }));
 
-vi.mock<typeof BridgeDiscoveryMod>("../storage/bridge-discovery.js", () => ({
+vi.mock("../storage/bridge-discovery.js", () => ({
   findBridgePaths: vi.fn(() => []),
 }));
 
-vi.mock<typeof NodeQueries>("../storage/node-queries.js", () => ({
+vi.mock("../storage/node-queries.js", () => ({
   listNodes: vi.fn(),
 }));
 
-vi.mock<typeof QuirkRepo>("../storage/quirk-repository.js", () => ({
+vi.mock("../storage/quirk-repository.js", () => ({
   getAggregatedQuirks: vi.fn(() => []),
 }));
 
-vi.mock<typeof ToolErrorRepo>("../storage/tool-error-repository.js", () => ({
+vi.mock("../storage/tool-error-repository.js", () => ({
   getAggregatedToolErrors: vi.fn(() => []),
 }));
 
-vi.mock<typeof ChildProcess>("node:child_process", () => ({
+vi.mock("node:child_process", () => ({
   spawn: vi.fn(),
 }));
 
-vi.mock<typeof FsPromises>("node:fs/promises", () => ({
+vi.mock("node:fs/promises", () => ({
   access: vi.fn(),
 }));
 

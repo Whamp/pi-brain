@@ -106,7 +106,6 @@ describe("clusters api routes", () => {
       port: 0,
       host: "127.0.0.1",
       corsOrigins: [],
-      authEnabled: false,
     });
   });
 

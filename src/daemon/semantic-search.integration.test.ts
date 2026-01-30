@@ -1,5 +1,4 @@
 import type Database from "better-sqlite3";
-import type * as ChildProcess from "node:child_process";
 
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,17 +6,16 @@ import { join } from "node:path";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
 import type { DaemonConfig } from "../config/types.js";
-import type { RepositoryOptions } from "../storage/types.js";
 import type { Node } from "../types/index.js";
 import type { EmbeddingProvider } from "./facet-discovery.js";
 
 import { openDatabase } from "../storage/database.js";
 import { storeEmbeddingWithVec } from "../storage/embedding-utils.js";
-import { createNode } from "../storage/node-crud.js";
+import { createNode, type RepositoryOptions } from "../storage/node-crud.js";
 import { processQuery, type QueryRequest } from "./query-processor.js";
 
 // Mocks
-vi.mock<typeof ChildProcess>("node:child_process", () => ({
+vi.mock("node:child_process", () => ({
   spawn: vi.fn().mockReturnValue({
     stdout: {
       /* eslint-disable promise/prefer-await-to-callbacks */

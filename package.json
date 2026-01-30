@@ -37,7 +37,7 @@
     "test:quiet": "./scripts/test-quiet.sh",
     "check": "npm run build && npx oxfmt --check -c .oxfmtrc.jsonc . && npx oxlint -c .oxlintrc.json .",
     "fix": "npx oxlint -c .oxlintrc.json --fix . && npx oxfmt --write -c .oxfmtrc.jsonc .",
-    "validate": "npm run check && npm run deadcode && npm run duplicates && npm run test:quiet",
+    "validate": "npm run check && npx knip && npx jscpd src && npm run test:quiet",
     "prepublishOnly": "npm run build",
     "prepare": "husky",
     "web:dev": "npm run dev --prefix src/web/app",

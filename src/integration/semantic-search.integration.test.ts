@@ -16,6 +16,7 @@ function createTestNode(id: string, summary: string, type = "coding"): Node {
   return {
     id,
     version: 1,
+    previousVersions: [],
     source: {
       sessionFile: `/sessions/${id}.jsonl`,
       segment: { startEntryId: "1", endEntryId: "10", entryCount: 10 },

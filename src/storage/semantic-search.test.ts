@@ -2,9 +2,6 @@ import type { Database } from "better-sqlite3";
 
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
-import type * as DatabaseModule from "./database.js";
-import type * as EmbeddingUtilsModule from "./embedding-utils.js";
-
 import { isVecLoaded } from "./database.js";
 import { deserializeEmbedding } from "./embedding-utils.js";
 import {
@@ -14,11 +11,11 @@ import {
 } from "./semantic-search.js";
 
 // Mocks
-vi.mock<typeof DatabaseModule>("./database.js", () => ({
+vi.mock("./database.js", () => ({
   isVecLoaded: vi.fn(),
 }));
 
-vi.mock<typeof EmbeddingUtilsModule>("./embedding-utils.js", () => ({
+vi.mock("./embedding-utils.js", () => ({
   deserializeEmbedding: vi.fn(),
 }));
 
@@ -260,7 +257,7 @@ describe("semantic Search", () => {
   describe("findSimilarNodes", () => {
     it("should return empty if node has no embedding", () => {
       mockPrepare.mockReturnValue({
-        get: vi.fn().mockReturnValue(), // No embedding found
+        get: vi.fn().mockReturnValue(null), // No embedding found
       });
 
       const result = findSimilarNodes(mockDb, "missing-node");
@@ -350,7 +347,7 @@ describe("semantic Search", () => {
   describe("getNodeEmbeddingVector", () => {
     it("should return null if node has no embedding", () => {
       mockPrepare.mockReturnValue({
-        get: vi.fn().mockReturnValue(),
+        get: vi.fn().mockReturnValue(null),
       });
 
       const result = getNodeEmbeddingVector(mockDb, "missing-node");
@@ -372,7 +369,7 @@ describe("semantic Search", () => {
 
     it("should query correct table with node_id", () => {
       mockPrepare.mockReturnValue({
-        get: vi.fn().mockReturnValue(),
+        get: vi.fn().mockReturnValue(null),
       });
 
       getNodeEmbeddingVector(mockDb, "test-node-id");

@@ -48,6 +48,10 @@ function getTestDaemonConfig(
     connectionDiscoveryLookbackDays: 7,
     connectionDiscoveryCooldownHours: 24,
     semanticSearchThreshold: 0.5,
+    decaySchedule: "0 3 * * *",
+    creativeSchedule: "0 4 * * 0",
+    baseDecayRate: 0.1,
+    creativeSimilarityThreshold: 0.75,
     ...overrides,
   };
 }

@@ -883,7 +883,13 @@ describe("backfillEmbeddings", () => {
         content: {
           summary: "Test summary from JSON",
           outcome: "success",
-          keyDecisions: [{ what: "Use TypeScript", why: "Type safety" }],
+          keyDecisions: [
+            {
+              what: "Use TypeScript",
+              why: "Type safety",
+              alternativesConsidered: [],
+            },
+          ],
           filesTouched: [],
           toolsUsed: [],
           errorsSeen: [],

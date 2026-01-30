@@ -365,9 +365,13 @@ export async function createServer(
       }
 
       default: {
+        // Exhaustive check - command.type is never at this point
+        const _exhaustiveCheck: never = command;
         ws.send(
           JSON.stringify({
-            data: { message: `Unknown command type: ${command.type}` },
+            data: {
+              message: `Unknown command type: ${(_exhaustiveCheck as { type: string }).type}`,
+            },
             type: "error",
           })
         );

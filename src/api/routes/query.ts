@@ -44,6 +44,15 @@ const DEFAULT_QUERY_CONFIG = {
   maxConcurrentAnalysis: 2,
   maxQueueSize: 100,
   semanticSearchThreshold: 0.5,
+  backfillLimit: 100,
+  reanalysisLimit: 100,
+  connectionDiscoveryLimit: 100,
+  connectionDiscoveryLookbackDays: 7,
+  connectionDiscoveryCooldownHours: 24,
+  decaySchedule: "0 3 * * *",
+  creativeSchedule: "0 4 * * 0",
+  baseDecayRate: 0.1,
+  creativeSimilarityThreshold: 0.75,
 };
 
 /**

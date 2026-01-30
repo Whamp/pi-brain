@@ -376,7 +376,11 @@ describe("connectionDiscoverer", () => {
 
     // 3. Verify both source lessons would match the candidate via FTS
     // (confirms deduplication actually happens, not that only one lesson matched)
-    const sourceLessons = discoverer.getLessons(sourceId);
+    const sourceLessons = (
+      discoverer as unknown as {
+        getLessons: (id: string) => { summary: string }[];
+      }
+    ).getLessons(sourceId);
     expect(sourceLessons).toHaveLength(2);
 
     // Helper function to check if a lesson matches via FTS
@@ -401,7 +405,7 @@ describe("connectionDiscoverer", () => {
       const ftsQuery = `lessons:(${queryTerms})`;
 
       const ftsResults = db
-        .prepare(
+        .prepare<[string, string, string], { id: string }>(
           `
           SELECT n.id
           FROM nodes n
