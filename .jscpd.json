@@ -3,7 +3,7 @@
   "maxLines": 500,
   "maxSize": "50kb",
   "minTokens": 50,
-  "threshold": 5,
+  "threshold": 1,
   "reporters": ["console", "html", "json"],
   "ignore": [
     "**/node_modules/**",
