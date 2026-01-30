@@ -32,7 +32,7 @@
   "ignoreDependencies": ["ultracite"],
   "ignoreExportsUsedInFile": true,
   "rules": {
-    "exports": "warn",
+    "exports": "error",
     "types": "warn",
     "files": "error",
     "dependencies": "warn",

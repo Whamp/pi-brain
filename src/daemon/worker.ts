@@ -29,12 +29,12 @@ import {
   buildEmbeddingText,
   storeEmbeddingWithVec,
 } from "../storage/embedding-utils.js";
+import { agentOutputToNode } from "../storage/node-conversion.js";
 import {
   findPreviousProjectNode,
   linkNodeToPredecessors,
   upsertNode,
-} from "../storage/index.js";
-import { agentOutputToNode } from "../storage/node-conversion.js";
+} from "../storage/node-crud.js";
 import { storeRelationshipEdges } from "../storage/relationship-edges.js";
 import { ConnectionDiscoverer } from "./connection-discovery.js";
 import {
@@ -841,26 +841,6 @@ export class Worker {
  */
 export function createWorker(config: WorkerConfig): Worker {
   return new Worker(config);
-}
-
-/**
- * Process a single job without the full worker loop
- * Useful for one-off processing or testing
- */
-export function processSingleJob(
-  job: AnalysisJob,
-  config: PiBrainConfig,
-  db: Database.Database,
-  logger?: ProcessorLogger
-): Promise<JobProcessingResult> {
-  const worker = new Worker({
-    id: "single-job-worker",
-    config,
-    logger,
-  });
-
-  worker.initialize(db);
-  return worker.processJob(job);
 }
 
 /**

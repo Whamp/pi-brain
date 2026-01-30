@@ -31,7 +31,7 @@ import {
   clearAllData,
   insertNodeToDb,
   linkNodeToPredecessors,
-} from "../storage/index.js";
+} from "../storage/node-crud.js";
 import {
   listNodeFiles,
   parseNodePath,

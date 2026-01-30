@@ -18,7 +18,7 @@ import {
   getEmbedding,
   hasEmbedding,
 } from "../storage/embedding-utils.js";
-import { upsertNode } from "../storage/index.js";
+import { upsertNode } from "../storage/node-crud.js";
 import {
   createMockEmbeddingProvider,
   type EmbeddingProvider,

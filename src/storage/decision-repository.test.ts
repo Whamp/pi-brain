@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
-import type { RepositoryOptions } from "./node-crud.js";
 import type { Node } from "./node-types.js";
 
 import { openDatabase, closeDatabase, migrate } from "./database.js";
@@ -13,7 +12,7 @@ import {
   listDecisions,
   updateDecisionFeedback,
 } from "./decision-repository.js";
-import { createNode } from "./index.js";
+import { createNode, type RepositoryOptions } from "./node-crud.js";
 
 describe("decisionRepository", () => {
   let db: Database.Database;

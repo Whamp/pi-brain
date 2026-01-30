@@ -566,9 +566,9 @@ src/api/routes/nodes.ts [1-261]
         - src/api/routes/nodes.ts:134: type FastifyReply -> external
   imports:
     - ../../storage/graph-repository.js
-    - ../../storage/index.js
     - ../../storage/lesson-repository.js
     - ../../storage/node-conversion.js
+    - ../../storage/node-crud.js
     - ../../storage/node-queries.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
@@ -834,12 +834,9 @@ src/api/routes/stats.ts [1-485]
         - src/api/routes/stats.ts:208: call setDate -> external
         - src/api/routes/stats.ts:208: call getDate -> external
     223-230: getOutcomeCounts(db: Database.Database): OutcomeCounts
-      refs out: 6 [call: 4, type: 2]
+      refs out: 2 [type: 2]
         - src/api/routes/stats.ts:223: type Database -> external
         - src/api/routes/stats.ts:223: type OutcomeCounts -> src/api/routes/stats.ts
-        - src/api/routes/stats.ts:225: call countNodes -> src/storage/node-queries.ts
-        - src/api/routes/stats.ts:226: call countNodes -> src/storage/node-queries.ts
-        - src/api/routes/stats.ts:227: call countNodes -> src/storage/node-queries.ts
     238-276: getVagueGoalTrends(db: Database.Database, dates: DateRanges): VagueGoalTrends
       refs out: 3 [type: 3]
         - src/api/routes/stats.ts:239: type Database -> external
@@ -910,7 +907,7 @@ src/api/server.test.ts [1-778]
   imports:
     - ../config/types.js
     - ../storage/database.js
-    - ../storage/index.js
+    - ../storage/node-crud.js
     - ../storage/node-types.js
     - ./server.js
     - ./websocket.js
@@ -1256,4 +1253,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 29
-Estimated tokens: 15,993 (codebase: ~1,412,058)
+Estimated tokens: 15,929 (codebase: ~1,356,435)

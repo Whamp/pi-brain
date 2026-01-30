@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 41
-- Total symbols: 203
-  - function: 121
+- Total symbols: 202
+  - function: 120
   - interface: 48
   - variable: 16
   - class: 10
@@ -212,7 +212,7 @@ src/daemon/cli.ts [1-1337]
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
-    - ../storage/index.js
+    - ../storage/node-crud.js
     - ../storage/node-storage.js
     - ./facet-discovery.js
     - ./processor.js
@@ -224,22 +224,21 @@ src/daemon/cli.ts [1-1337]
 
 src/daemon/connection-discovery.test.ts [1-446]
   imports:
-    - ../storage/index.js
+    - ../storage/edge-repository.js
     - ./connection-discovery.js
     - better-sqlite3
     - vitest
 
-src/daemon/connection-discovery.ts [1-629]
+src/daemon/connection-discovery.ts [1-628]
   class:
-    159-628: class ConnectionDiscoverer [exported]
+    158-627: class ConnectionDiscoverer [exported]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    138-143: interface ConnectionResult [exported]
+    137-142: interface ConnectionResult [exported]
       refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
+        - src/daemon/connection-discovery.ts:141: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
-    - ../storage/index.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../types/index.js
@@ -492,9 +491,9 @@ src/daemon/graph-export.ts [1-134]
     - node:fs
     - node:path
 
-src/daemon/index.ts [1-182]
+src/daemon/index.ts [1-181]
   variable:
-    181-181: "0.1.0" [exported]
+    180-180: "0.1.0" [exported]
       /** Daemon module version */
   imports:
     - ./cli.js
@@ -1054,7 +1053,7 @@ src/daemon/worker.test.ts [1-1229]
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
-    - ../storage/index.js
+    - ../storage/node-crud.js
     - ../storage/node-types.js
     - ./facet-discovery.js
     - ./queue.js
@@ -1065,7 +1064,7 @@ src/daemon/worker.test.ts [1-1229]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-894]
+src/daemon/worker.ts [1-874]
   class:
     128-833: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
@@ -1100,34 +1099,23 @@ src/daemon/worker.ts [1-894]
         - src/daemon/worker.ts:842: type WorkerConfig -> src/daemon/worker.ts
         - src/daemon/worker.ts:842: type Worker -> src/daemon/worker.ts
         - src/daemon/worker.ts:843: instantiate Worker -> src/daemon/worker.ts
-    850-864: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
-      /** Process a single job without the full worker loop Useful for one-off processing or testing */
-      refs out: 8 [call: 2, type: 6]
-        - src/daemon/worker.ts:851: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:852: type PiBrainConfig -> src/config/types.ts
-        - src/daemon/worker.ts:853: type Database -> external
-        - src/daemon/worker.ts:854: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:855: type Promise -> external
-        - src/daemon/worker.ts:855: type JobProcessingResult -> src/daemon/worker.ts
-        - src/daemon/worker.ts:862: call Worker.initialize -> src/daemon/worker.ts
-        - src/daemon/worker.ts:863: call Worker.processJob -> src/daemon/worker.ts
-    869-893: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    849-873: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:870: type Error -> external
-        - src/daemon/worker.ts:871: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:872: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:877: type ReturnType -> external
-        - src/daemon/worker.ts:889: call ceil -> external
-        - src/daemon/worker.ts:890: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:850: type Error -> external
+        - src/daemon/worker.ts:851: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:852: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:857: type ReturnType -> external
+        - src/daemon/worker.ts:869: call ceil -> external
+        - src/daemon/worker.ts:870: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
     - ../parser/index.js
     - ../prompt/prompt.js
     - ../storage/embedding-utils.js
-    - ../storage/index.js
     - ../storage/node-conversion.js
+    - ../storage/node-crud.js
     - ../storage/node-types.js
     - ../storage/relationship-edges.js
     - ../types/index.js
@@ -1594,4 +1582,4 @@ src/parser/signals.ts [1-1181]
 
 ---
 Files: 41
-Estimated tokens: 21,025 (codebase: ~1,412,090)
+Estimated tokens: 20,796 (codebase: ~1,356,436)

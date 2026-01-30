@@ -102,7 +102,6 @@ export {
 export {
   Worker,
   createWorker,
-  processSingleJob,
   handleJobError,
   type WorkerConfig,
   type WorkerStatus,

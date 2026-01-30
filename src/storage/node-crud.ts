@@ -619,44 +619,6 @@ export function upsertNode(
 }
 
 /**
- * Update a node - writes new JSON version and updates SQLite row.
- * Throws if the node doesn't exist in the database.
- * Returns the updated node.
- */
-export function updateNode(
-  db: Database.Database,
-  node: Node,
-  options: RepositoryOptions = {}
-): Node {
-  return db.transaction(() => {
-    // Verify node exists before any side effects
-    if (!nodeExistsInDb(db, node.id)) {
-      throw new Error(
-        `Cannot update node ${node.id}: node does not exist in database. Use createNode for new nodes.`
-      );
-    }
-
-    // 1. Write new JSON file (version should be incremented)
-    const dataFile = writeNode(node, options);
-
-    // 2. Update nodes table
-    const stmt = db.prepare(UPDATE_NODE_SQL);
-    stmt.run(...buildNodeUpdateParams(node, dataFile));
-
-    // 3. Clear and re-insert related data
-    clearNodeRelatedData(db, node.id);
-    insertNodeRelatedData(db, node);
-
-    // 4. Update FTS index
-    if (!options.skipFts) {
-      indexNodeForSearch(db, node);
-    }
-
-    return node;
-  })();
-}
-
-/**
  * Get a node by ID (returns the row from SQLite - always the latest version)
  */
 export function getNode(db: Database.Database, nodeId: string): NodeRow | null {
@@ -665,23 +627,6 @@ export function getNode(db: Database.Database, nodeId: string): NodeRow | null {
     WHERE id = ?
   `);
   return (stmt.get(nodeId) as NodeRow) ?? null;
-}
-
-/**
- * Get a specific version of a node from SQLite.
- * Note: SQLite only stores the current/latest version. For historical versions,
- * use getAllNodeVersions() which reads from JSON storage.
- */
-export function getNodeVersion(
-  db: Database.Database,
-  nodeId: string,
-  version: number
-): NodeRow | null {
-  const stmt = db.prepare(`
-    SELECT * FROM nodes
-    WHERE id = ? AND version = ?
-  `);
-  return (stmt.get(nodeId, version) as NodeRow) ?? null;
 }
 
 /**
@@ -704,34 +649,8 @@ export function getAllNodeVersions(
 }
 
 /**
- * Delete a node and all related data
- * Note: Due to ON DELETE CASCADE, related records are automatically deleted
- */
-export function deleteNode(db: Database.Database, nodeId: string): boolean {
-  // Also delete from FTS
-  db.prepare("DELETE FROM nodes_fts WHERE node_id = ?").run(nodeId);
-
-  const result = db.prepare("DELETE FROM nodes WHERE id = ?").run(nodeId);
-  return result.changes > 0;
-}
-
-/**
  * Find a node that contains a specific entry ID as its end boundary
  */
-export function findNodeByEndEntryId(
-  db: Database.Database,
-  sessionFile: string,
-  entryId: string
-): NodeRow | null {
-  const stmt = db.prepare(`
-    SELECT * FROM nodes
-    WHERE session_file = ? AND segment_end = ?
-    ORDER BY version DESC
-    LIMIT 1
-  `);
-  return (stmt.get(sessionFile, entryId) as NodeRow) ?? null;
-}
-
 /**
  * Find the latest node for a given session file
  */
@@ -743,22 +662,6 @@ export function findLastNodeInSession(
     SELECT * FROM nodes
     WHERE session_file = ?
     ORDER BY timestamp DESC, version DESC
-    LIMIT 1
-  `);
-  return (stmt.get(sessionFile) as NodeRow) ?? null;
-}
-
-/**
- * Find the first node for a given session file
- */
-export function findFirstNodeInSession(
-  db: Database.Database,
-  sessionFile: string
-): NodeRow | null {
-  const stmt = db.prepare(`
-    SELECT * FROM nodes
-    WHERE session_file = ?
-    ORDER BY timestamp ASC, version ASC
     LIMIT 1
   `);
   return (stmt.get(sessionFile) as NodeRow) ?? null;

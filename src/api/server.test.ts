@@ -11,7 +11,7 @@ import type { ApiConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
 
 import { openDatabase, migrate } from "../storage/database.js";
-import { createNode } from "../storage/index.js";
+import { createNode } from "../storage/node-crud.js";
 import { createServer } from "./server.js";
 
 // =============================================================================

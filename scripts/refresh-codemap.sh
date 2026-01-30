@@ -21,7 +21,7 @@ codemap annotations > .codemap/ANNOTATIONS.md 2>&1 || echo "# No annotations yet
 
 # Dependency Trees
 codemap deps src/daemon/index.ts > .codemap/DAEMON_DEPS.md
-codemap deps src/storage/index.ts > .codemap/STORAGE_DEPS.md
+codemap deps src/storage/database.ts > .codemap/STORAGE_DEPS.md
 
 # Specialized Maps
 codemap "src/parser/*.ts" "src/daemon/*.ts" --exported-only --refs-out --max-refs 10 > .codemap/SESSION_INGESTION.md

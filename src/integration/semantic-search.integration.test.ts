@@ -6,7 +6,7 @@ import type { Node, NodeType } from "../types/index.js";
 
 import { openDatabase, migrate } from "../storage/database.js";
 import { storeEmbeddingWithVec } from "../storage/embedding-utils.js";
-import { insertNodeToDb } from "../storage/index.js";
+import { insertNodeToDb } from "../storage/node-crud.js";
 import {
   semanticSearch,
   findSimilarNodes,

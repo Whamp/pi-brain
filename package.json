@@ -36,7 +36,7 @@
     "test:quiet": "./scripts/test-quiet.sh",
     "check": "npm run build && npx oxfmt --check -c .oxfmtrc.jsonc . && npx oxlint -c .oxlintrc.json .",
     "fix": "npx oxlint -c .oxlintrc.json --fix . && npx oxfmt --write -c .oxfmtrc.jsonc .",
-    "deadcode": "npx knip",
+    "deadcode": "npx knip --tags=-public",
     "duplicates": "npx jscpd src",
     "validate": "npm run check && npm run deadcode && npm run duplicates && npm run test:quiet",
     "prepublishOnly": "npm run build",

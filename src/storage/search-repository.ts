@@ -117,42 +117,6 @@ export function indexNodeForSearch(db: Database.Database, node: Node): void {
 }
 
 // =============================================================================
-// Basic Search
-// =============================================================================
-
-/**
- * Search nodes using full-text search
- * Quotes the query to handle special characters like hyphens
- */
-export function searchNodes(
-  db: Database.Database,
-  query: string,
-  limit = 20
-): NodeRow[] {
-  // Quote each word to handle special FTS5 characters (hyphens, etc.)
-  const words = query.split(/\s+/).filter((w) => w.length > 0);
-
-  // Return empty array for empty/whitespace-only queries
-  if (words.length === 0) {
-    return [];
-  }
-
-  const quotedQuery = words
-    .map((word) => `"${word.replaceAll('"', '""')}"`)
-    .join(" ");
-
-  const stmt = db.prepare(`
-    SELECT n.*
-    FROM nodes n
-    JOIN nodes_fts ON n.id = nodes_fts.node_id
-    WHERE nodes_fts MATCH ?
-    ORDER BY nodes_fts.rank
-    LIMIT ?
-  `);
-  return stmt.all(quotedQuery, limit) as NodeRow[];
-}
-
-// =============================================================================
 // Helper Functions
 // =============================================================================
 
@@ -451,34 +415,4 @@ export function searchNodesAdvanced(
   });
 
   return { results, total, limit, offset };
-}
-
-/**
- * Count total search results (without fetching data)
- */
-export function countSearchResults(
-  db: Database.Database,
-  query: string,
-  options: Pick<SearchOptions, "fields" | "filters"> = {}
-): number {
-  const { fields: rawFields, filters } = options;
-  const fields = rawFields ?? ALL_SEARCH_FIELDS;
-
-  const ftsQuery = buildFieldQuery(query, fields);
-  if (!ftsQuery) {
-    return 0;
-  }
-
-  // Build WHERE clause from filters
-  const { clause: filterClause, params } = buildWhereClause(filters, "n");
-
-  const stmt = db.prepare(`
-    SELECT COUNT(*) as count
-    FROM nodes n
-    JOIN nodes_fts ON n.id = nodes_fts.node_id
-    WHERE nodes_fts MATCH ?
-    ${filterClause}
-  `);
-  const result = stmt.get(ftsQuery, ...params) as { count: number };
-  return result.count;
 }

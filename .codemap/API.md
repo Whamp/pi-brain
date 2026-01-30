@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 103 files
+- typescript: 102 files
 
 ## Statistics
-- Total files: 103
-- Total symbols: 714
-  - function: 387
+- Total files: 102
+- Total symbols: 694
+  - function: 367
   - interface: 229
   - type: 44
   - variable: 39
@@ -108,9 +108,9 @@ src/api/routes/nodes.ts [1-261]
     109-260: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/graph-repository.js
-    - ../../storage/index.js
     - ../../storage/lesson-repository.js
     - ../../storage/node-conversion.js
+    - ../../storage/node-crud.js
     - ../../storage/node-queries.js
     - ../../storage/node-storage.js
     - ../../storage/node-types.js
@@ -436,7 +436,7 @@ src/daemon/cli.ts [1-1337]
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
-    - ../storage/index.js
+    - ../storage/node-crud.js
     - ../storage/node-storage.js
     - ./facet-discovery.js
     - ./processor.js
@@ -446,15 +446,14 @@ src/daemon/cli.ts [1-1337]
     - node:net
     - node:path
 
-src/daemon/connection-discovery.ts [1-629]
+src/daemon/connection-discovery.ts [1-628]
   class:
-    159-628: class ConnectionDiscoverer [exported]
+    158-627: class ConnectionDiscoverer [exported]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
-    138-143: interface ConnectionResult [exported]
+    137-142: interface ConnectionResult [exported]
   imports:
     - ../storage/edge-repository.js
-    - ../storage/index.js
     - ../storage/node-crud.js
     - ../storage/node-queries.js
     - ../types/index.js
@@ -643,9 +642,9 @@ src/daemon/graph-export.ts [1-134]
     - node:fs
     - node:path
 
-src/daemon/index.ts [1-182]
+src/daemon/index.ts [1-181]
   variable:
-    181-181: "0.1.0" [exported]
+    180-180: "0.1.0" [exported]
       /** Daemon module version */
   imports:
     - ./cli.js
@@ -904,7 +903,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-894]
+src/daemon/worker.ts [1-874]
   class:
     128-833: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
@@ -918,9 +917,7 @@ src/daemon/worker.ts [1-894]
   function:
     842-844: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    850-864: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
-      /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    869-893: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    849-873: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -928,8 +925,8 @@ src/daemon/worker.ts [1-894]
     - ../parser/index.js
     - ../prompt/prompt.js
     - ../storage/embedding-utils.js
-    - ../storage/index.js
     - ../storage/node-conversion.js
+    - ../storage/node-crud.js
     - ../storage/node-types.js
     - ../storage/relationship-edges.js
     - ../types/index.js
@@ -1490,7 +1487,7 @@ src/storage/filter-utils.ts [1-272]
   imports:
     - ./node-types.js
 
-src/storage/graph-repository.ts [1-412]
+src/storage/graph-repository.ts [1-416]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
@@ -1504,13 +1501,13 @@ src/storage/graph-repository.ts [1-412]
   function:
     219-271: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    280-317: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    281-318: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    325-379: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    327-381: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    385-395: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    388-398: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    401-411: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    405-415: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
   imports:
     - ./edge-repository.js
@@ -1546,27 +1543,7 @@ src/storage/hybrid-search.ts [1-732]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/index.ts [1-23]
-  imports:
-    - ./bridge-discovery.js
-    - ./database.js
-    - ./edge-repository.js
-    - ./embedding-utils.js
-    - ./graph-repository.js
-    - ./hybrid-search.js
-    - ./lesson-repository.js
-    - ./node-conversion.js
-    - ./node-crud.js
-    - ./node-queries.js
-    - ./node-storage.js
-    - ./node-types.js
-    - ./quirk-repository.js
-    - ./relationship-edges.js
-    - ./search-repository.js
-    - ./semantic-search.js
-    - ./tool-error-repository.js
-
-src/storage/lesson-repository.ts [1-308]
+src/storage/lesson-repository.ts [1-285]
   interface:
     16-25: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
@@ -1592,12 +1569,8 @@ src/storage/lesson-repository.ts [1-308]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
     216-256: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    261-267: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
-      /** Count lessons matching filters (without fetching data) */
-    272-295: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+    261-284: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
-    300-307: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
-      /** Get tags for a specific lesson */
   imports:
     - better-sqlite3
 
@@ -1619,7 +1592,7 @@ src/storage/node-conversion.ts [1-432]
     - ./node-storage.js
     - ./node-types.js
 
-src/storage/node-crud.ts [1-881]
+src/storage/node-crud.ts [1-784]
   interface:
     52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
@@ -1642,27 +1615,17 @@ src/storage/node-crud.ts [1-881]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
     587-619: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    626-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
-      /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
-    662-668: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    624-630: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    675-685: getNodeVersion(db: Database.Database, nodeId: string, version: number): NodeRow [exported]
-      /** Get a specific version of a node from SQLite. Note: SQLite only stores the current/latest version. For historical versions, use getAllNodeVersions() which reads from JSON storage. */
-    690-693: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    635-638: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    698-704: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    643-649: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    710-716: deleteNode(db: Database.Database, nodeId: string): boolean [exported]
-      /** Delete a node and all related data Note: Due to ON DELETE CASCADE, related records are automatically deleted */
-    721-733: findNodeByEndEntryId(db: Database.Database, sessionFile: string, entryId: string): NodeRow [exported]
-      /** Find a node that contains a specific entry ID as its end boundary */
-    738-749: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
-      /** Find the latest node for a given session file */
-    754-765: findFirstNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
-      /** Find the first node for a given session file */
-    774-799: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    657-668: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+      /** Find a node that contains a specific entry ID as its end boundary Find the latest node for a given session file */
+    677-702: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    826-864: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    729-767: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -1674,16 +1637,16 @@ src/storage/node-crud.ts [1-881]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-336]
+src/storage/node-queries.ts [1-255]
   interface:
-    127-136: interface ListNodesOptions [exported]
+    72-81: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-    139-148: interface ListNodesResult [exported]
+    84-93: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    234-246: interface SessionSummaryRow [exported]
+    179-191: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
   type:
-    110-118: NodeSortField = | "timestamp"
+    55-63: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -1692,9 +1655,9 @@ src/storage/node-queries.ts [1-336]
   | "cost"
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
-    121-121: SortOrder = "asc" | "desc" [exported]
+    66-66: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
-    124-124: ListNodesFilters = ExtendedFilters [exported]
+    69-69: ListNodesFilters = ExtendedFilters [exported]
       /** Filters for querying nodes */
   function:
     23-30: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
@@ -1703,25 +1666,13 @@ src/storage/node-queries.ts [1-336]
       /** Get tags for a node */
     44-48: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-    53-63: getAllTags(db: Database.Database): {} [exported]
-      /** Get all unique tags in the system */
-    68-72: getAllTopics(db: Database.Database): {} [exported]
-      /** Get all unique topics in the system */
-    77-87: getNodesByTag(db: Database.Database, tag: string): {} [exported]
-      /** Find nodes by tag (matches both node tags and lesson tags) */
-    92-103: getNodesByTopic(db: Database.Database, topic: string): {} [exported]
-      /** Find nodes by topic */
-    178-225: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+    123-170: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    252-281: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    197-226: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    290-298: getAllProjects(db: Database.Database): {} [exported]
+    235-243: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    303-311: getAllNodeTypes(db: Database.Database): {} [exported]
-      /** Get all unique node types that have been used */
-    316-324: getAllComputers(db: Database.Database): {} [exported]
-      /** Get all unique computers (source machines) */
-    329-335: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    248-254: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -1823,7 +1774,7 @@ src/storage/pattern-repository.ts [1-373]
     - ../types/index.js
     - better-sqlite3
 
-src/storage/quirk-repository.ts [1-310]
+src/storage/quirk-repository.ts [1-287]
   interface:
     19-26: interface ListQuirksFilters [exported]
       /** Filters for querying model quirks */
@@ -1845,13 +1796,9 @@ src/storage/quirk-repository.ts [1-310]
       /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
     170-208: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
       /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    213-219: countQuirks(db: Database.Database, filters: ListQuirksFilters = {}): number [exported]
-      /** Count quirks matching filters (without fetching data) */
-    224-231: getAllQuirkModels(db: Database.Database): {} [exported]
-      /** Get all unique models that have quirks recorded */
-    239-281: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+    216-258: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
       /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
-    286-309: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+    263-286: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
   imports:
     - better-sqlite3
@@ -1879,7 +1826,7 @@ src/storage/relationship-edges.ts [1-290]
     - ./edge-repository.js
     - better-sqlite3
 
-src/storage/search-repository.ts [1-485]
+src/storage/search-repository.ts [1-419]
   interface:
     41-46: interface SearchHighlight [exported]
       /** Highlight match for search results */
@@ -1901,14 +1848,10 @@ src/storage/search-repository.ts [1-485]
   function:
     89-117: indexNodeForSearch(db: Database.Database, node: Node): void [exported]
       /** Index a node for full-text search */
-    127-153: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
-      /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    286-310: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    250-274: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
-    394-454: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    358-418: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    459-484: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
-      /** Count total search results (without fetching data) */
   imports:
     - ./filter-utils.js
     - ./node-crud.js
@@ -1934,7 +1877,7 @@ src/storage/semantic-search.ts [1-214]
     - ./search-repository.js
     - better-sqlite3
 
-src/storage/tool-error-repository.ts [1-374]
+src/storage/tool-error-repository.ts [1-351]
   interface:
     16-25: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
@@ -1963,11 +1906,7 @@ src/storage/tool-error-repository.ts [1-374]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
     280-334: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
-    339-345: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
-      /** Count tool errors matching filters. */
-    350-357: getAllToolsWithErrors(db: Database.Database): {} [exported]
-      /** Get all unique tools that have errors recorded */
-    362-373: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
+    339-350: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
   imports:
     - better-sqlite3
@@ -2355,5 +2294,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 103
-Estimated tokens: 29,532 (codebase: ~1,412,058)
+Files: 102
+Estimated tokens: 28,571 (codebase: ~1,356,435)

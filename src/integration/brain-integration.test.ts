@@ -29,12 +29,10 @@ import {
   vi,
 } from "vitest";
 
-import type { RepositoryOptions } from "../storage/node-crud.js";
-import type { Node } from "../storage/node-types.js";
-
 import { createServer } from "../api/server.js";
 import { migrate } from "../storage/database.js";
-import { createNode, generateNodeId } from "../storage/index.js";
+import { createNode, type RepositoryOptions } from "../storage/node-crud.js";
+import { generateNodeId, type Node } from "../storage/node-types.js";
 
 // Integration tests that invoke pi agent need longer timeout
 const INTEGRATION_TIMEOUT = 60_000; // 60 seconds - agent queries can be slow

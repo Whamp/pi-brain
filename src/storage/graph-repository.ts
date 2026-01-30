@@ -276,6 +276,7 @@ export function getConnectedNodes(
  *
  * Unlike getConnectedNodes, this INCLUDES the root nodes in the result,
  * which is useful for rendering a graph view starting from selected nodes.
+ * @public
  */
 export function getSubgraph(
   db: Database.Database,
@@ -321,6 +322,7 @@ export function getSubgraph(
  * Uses BFS to find the shortest path.
  *
  * Returns null if no path exists.
+ * @public
  */
 export function findPath(
   db: Database.Database,
@@ -381,6 +383,7 @@ export function findPath(
 /**
  * Get all ancestors of a node (nodes that lead TO this node).
  * Follows incoming edges only.
+ * @public
  */
 export function getAncestors(
   db: Database.Database,
@@ -397,6 +400,7 @@ export function getAncestors(
 /**
  * Get all descendants of a node (nodes that this node leads TO).
  * Follows outgoing edges only.
+ * @public
  */
 export function getDescendants(
   db: Database.Database,

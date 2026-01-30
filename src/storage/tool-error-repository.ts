@@ -334,29 +334,6 @@ export function getToolErrorStats(db: Database.Database): ToolErrorStatsResult {
 }
 
 /**
- * Count tool errors matching filters.
- */
-export function countToolErrors(
-  db: Database.Database,
-  filters: ListToolErrorsFilters = {}
-): number {
-  const result = listToolErrors(db, filters, { limit: 1 });
-  return result.total;
-}
-
-/**
- * Get all unique tools that have errors recorded
- */
-export function getAllToolsWithErrors(db: Database.Database): string[] {
-  const stmt = db.prepare(`
-    SELECT DISTINCT tool FROM tool_errors
-    ORDER BY tool
-  `);
-  const rows = stmt.all() as { tool: string }[];
-  return rows.map((r) => r.tool);
-}
-
-/**
  * Get tool errors for a node
  */
 export function getNodeToolErrors(

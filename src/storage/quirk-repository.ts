@@ -208,29 +208,6 @@ export function getQuirksByModel(
 }
 
 /**
- * Count quirks matching filters (without fetching data)
- */
-export function countQuirks(
-  db: Database.Database,
-  filters: ListQuirksFilters = {}
-): number {
-  const result = listQuirks(db, filters, { limit: 1 });
-  return result.total;
-}
-
-/**
- * Get all unique models that have quirks recorded
- */
-export function getAllQuirkModels(db: Database.Database): string[] {
-  const stmt = db.prepare(`
-    SELECT DISTINCT model FROM model_quirks
-    ORDER BY model
-  `);
-  const rows = stmt.all() as { model: string }[];
-  return rows.map((r) => r.model);
-}
-
-/**
  * Get aggregated quirks - similar observations grouped together.
  * Useful for the dashboard "Model Quirks" panel.
  *

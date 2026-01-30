@@ -256,17 +256,6 @@ export function getLessonsByLevel(
 }
 
 /**
- * Count lessons matching filters (without fetching data)
- */
-export function countLessons(
-  db: Database.Database,
-  filters: ListLessonsFilters = {}
-): number {
-  const result = listLessons(db, filters, { limit: 1 });
-  return result.total;
-}
-
-/**
  * Get lessons for a node
  */
 export function getNodeLessons(
@@ -292,16 +281,4 @@ export function getNodeLessons(
     details: string | null;
     confidence: string | null;
   }[];
-}
-
-/**
- * Get tags for a specific lesson
- */
-export function getLessonTags(
-  db: Database.Database,
-  lessonId: string
-): string[] {
-  const stmt = db.prepare("SELECT tag FROM lesson_tags WHERE lesson_id = ?");
-  const rows = stmt.all(lessonId) as { tag: string }[];
-  return rows.map((r) => r.tag);
 }

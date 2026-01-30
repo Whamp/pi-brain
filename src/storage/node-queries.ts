@@ -47,61 +47,6 @@ export function getNodeTopics(db: Database.Database, nodeId: string): string[] {
   return rows.map((r) => r.topic);
 }
 
-/**
- * Get all unique tags in the system
- */
-export function getAllTags(db: Database.Database): string[] {
-  const stmt = db.prepare(`
-    SELECT tag FROM (
-      SELECT tag FROM tags
-      UNION
-      SELECT tag FROM lesson_tags
-    ) ORDER BY tag
-  `);
-  const rows = stmt.all() as { tag: string }[];
-  return rows.map((r) => r.tag);
-}
-
-/**
- * Get all unique topics in the system
- */
-export function getAllTopics(db: Database.Database): string[] {
-  const stmt = db.prepare("SELECT DISTINCT topic FROM topics ORDER BY topic");
-  const rows = stmt.all() as { topic: string }[];
-  return rows.map((r) => r.topic);
-}
-
-/**
- * Find nodes by tag (matches both node tags and lesson tags)
- */
-export function getNodesByTag(db: Database.Database, tag: string): NodeRow[] {
-  const stmt = db.prepare(`
-    SELECT DISTINCT n.* FROM nodes n
-    LEFT JOIN tags t ON n.id = t.node_id
-    LEFT JOIN lessons l ON n.id = l.node_id
-    LEFT JOIN lesson_tags lt ON l.id = lt.lesson_id
-    WHERE t.tag = ? OR lt.tag = ?
-    ORDER BY n.timestamp DESC
-  `);
-  return stmt.all(tag, tag) as NodeRow[];
-}
-
-/**
- * Find nodes by topic
- */
-export function getNodesByTopic(
-  db: Database.Database,
-  topic: string
-): NodeRow[] {
-  const stmt = db.prepare(`
-    SELECT n.* FROM nodes n
-    JOIN topics t ON n.id = t.node_id
-    WHERE t.topic = ?
-    ORDER BY n.timestamp DESC
-  `);
-  return stmt.all(topic) as NodeRow[];
-}
-
 // =============================================================================
 // Query Layer: List Nodes with Filters
 // =============================================================================
@@ -295,32 +240,6 @@ export function getAllProjects(db: Database.Database): string[] {
   `);
   const rows = stmt.all() as { project: string }[];
   return rows.map((r) => r.project);
-}
-
-/**
- * Get all unique node types that have been used
- */
-export function getAllNodeTypes(db: Database.Database): string[] {
-  const stmt = db.prepare(`
-    SELECT DISTINCT type FROM nodes
-    WHERE type IS NOT NULL
-    ORDER BY type
-  `);
-  const rows = stmt.all() as { type: string }[];
-  return rows.map((r) => r.type);
-}
-
-/**
- * Get all unique computers (source machines)
- */
-export function getAllComputers(db: Database.Database): string[] {
-  const stmt = db.prepare(`
-    SELECT DISTINCT computer FROM nodes
-    WHERE computer IS NOT NULL
-    ORDER BY computer
-  `);
-  const rows = stmt.all() as { computer: string }[];
-  return rows.map((r) => r.computer);
 }
 
 /**

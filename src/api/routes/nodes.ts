@@ -8,9 +8,9 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import type { EdgeType } from "../../storage/node-types.js";
 
 import { getConnectedNodes } from "../../storage/graph-repository.js";
-import { getAllNodeVersions, getNode } from "../../storage/index.js";
 import { getNodeLessons } from "../../storage/lesson-repository.js";
 import { nodeRowsToNodes } from "../../storage/node-conversion.js";
+import { getAllNodeVersions, getNode } from "../../storage/node-crud.js";
 import {
   getNodeTags,
   getNodeTopics,
