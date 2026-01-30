@@ -28,6 +28,24 @@ npm run web:dev
 
 This project uses **Ultracite** for code quality and the `writing-clearly-and-concisely` skill for prose.
 
+### Writing Guidelines
+
+**Available skill:** `writing-clearly-and-concisely` at `~/.pi/agent/skills/writing-clearly-and-concisely/SKILL.md`
+
+Use when writing prose humans will read: documentation, commit messages, error messages, explanations, UI text.
+
+**Core rules (from Strunk):**
+
+- **Use active voice** — "The function processes" not "The function is used to process"
+- **Put statements in positive form** — "Always include tests" not "Don't forget tests"
+- **Use definite, specific, concrete language** — Say what it does
+- **Omit needless words** — Cut ruthlessly. Every word earns its place
+- **Place emphatic words at end of sentence** — End with impact
+
+**Avoid AI puffery:** pivotal, crucial, leverage, delve, groundbreaking, seamless, robust, cutting-edge, multifaceted, foster, realm, tapestry.
+
+Be specific, not grandiose.
+
 ### Toolchain
 
 Scripts call oxlint and oxfmt directly:
@@ -129,6 +147,16 @@ Extends ultracite's core config. Project-specific rule overrides:
 #### `.oxfmtrc.jsonc` - Formatter Config
 
 Standard Prettier-compatible options (printWidth, semi, quotes, etc.)
+
+#### Knip Config Errors
+
+If knip fails with "Error loading <file>", override auto-discovery in `knip.json`:
+
+```json
+{ "<tool-name>": { "config": ["<working-config>.ts"] } }
+```
+
+`ignore` won't help—it only excludes files from dead code analysis, not plugin loading.
 
 ---
 

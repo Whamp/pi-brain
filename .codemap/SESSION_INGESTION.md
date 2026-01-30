@@ -1588,4 +1588,4 @@ src/parser/signals.ts [1-1181]
 
 ---
 Files: 42
-Estimated tokens: 20,888 (codebase: ~1,351,431)
+Estimated tokens: 20,888 (codebase: ~1,353,646)
