@@ -11,7 +11,11 @@ import type Database from "better-sqlite3";
 
 import type { NodeRow } from "./node-crud.js";
 
-import { buildWhereClause, type ExtendedFilters } from "./filter-utils.js";
+import {
+  buildWhereClause,
+  normalizePagination,
+  type ExtendedFilters,
+} from "./filter-utils.js";
 
 // =============================================================================
 // Query Helpers
@@ -199,8 +203,7 @@ export function getSessionSummaries(
   project: string,
   options: { limit?: number; offset?: number } = {}
 ): SessionSummaryRow[] {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
 
   const stmt = db.prepare(`
     SELECT

@@ -158,6 +158,24 @@ export class RelevanceCalculator {
   }
 
   /**
+   * Build RelevanceFactors from a node row and current timestamp.
+   */
+  private buildFactors(row: NodeRow, now: number): RelevanceFactors {
+    const createdAt = new Date(row.timestamp).getTime();
+    const lastAccessed = row.last_accessed
+      ? new Date(row.last_accessed).getTime()
+      : createdAt;
+
+    return {
+      ageInDays: (now - createdAt) / MS_PER_DAY,
+      daysSinceAccess: (now - lastAccessed) / MS_PER_DAY,
+      edgeCount: this.getEdgeCount(row.id),
+      importance: row.importance ?? 0.5,
+      confidence: 0.5, // Default confidence, could be extracted from node data
+    };
+  }
+
+  /**
    * Calculate relevance for a single node
    */
   calculateForNode(nodeId: string): RelevanceResult | null {
@@ -175,19 +193,7 @@ export class RelevanceCalculator {
     }
 
     const now = Date.now();
-    const createdAt = new Date(row.timestamp).getTime();
-    const lastAccessed = row.last_accessed
-      ? new Date(row.last_accessed).getTime()
-      : createdAt;
-
-    const factors: RelevanceFactors = {
-      ageInDays: (now - createdAt) / MS_PER_DAY,
-      daysSinceAccess: (now - lastAccessed) / MS_PER_DAY,
-      edgeCount: this.getEdgeCount(nodeId),
-      importance: row.importance ?? 0.5,
-      confidence: 0.5, // Default confidence, could be extracted from node data
-    };
-
+    const factors = this.buildFactors(row, now);
     const newScore = this.calculateRelevance(factors);
     const previousScore = row.relevance_score ?? 1;
 
@@ -255,19 +261,7 @@ export class RelevanceCalculator {
     const now = Date.now();
 
     for (const row of nodes) {
-      const createdAt = new Date(row.timestamp).getTime();
-      const lastAccessed = row.last_accessed
-        ? new Date(row.last_accessed).getTime()
-        : createdAt;
-
-      const factors: RelevanceFactors = {
-        ageInDays: (now - createdAt) / MS_PER_DAY,
-        daysSinceAccess: (now - lastAccessed) / MS_PER_DAY,
-        edgeCount: this.getEdgeCount(row.id),
-        importance: row.importance ?? 0.5,
-        confidence: 0.5,
-      };
-
+      const factors = this.buildFactors(row, now);
       const newScore = this.calculateRelevance(factors);
       const previousScore = row.relevance_score ?? 1;
 

@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 20
-- Total symbols: 197
-  - function: 121
+- Total symbols: 198
+  - function: 122
   - interface: 60
   - type: 11
   - variable: 5
@@ -67,22 +67,23 @@ src/storage/database.ts [1-331]
     - node:url
     - sqlite-vec
 
-src/storage/decision-repository.ts [1-143]
+src/storage/decision-repository.ts [1-144]
   interface:
-    10-19: interface ListDecisionsFilters [exported]
+    12-21: interface ListDecisionsFilters [exported]
       /** Filters for querying daemon decisions */
-    22-27: interface ListDecisionsOptions [exported]
+    24-29: interface ListDecisionsOptions [exported]
       /** Pagination options */
-    30-39: interface DaemonDecisionResult [exported]
+    32-41: interface DaemonDecisionResult [exported]
       /** A daemon decision result with metadata */
-    42-51: interface ListDecisionsResult [exported]
+    44-53: interface ListDecisionsResult [exported]
       /** Result from listDecisions query */
   function:
-    56-124: listDecisions(db: Database.Database, filters: ListDecisionsFilters = {}, options: ListDecisionsOptions = {}): ListDecisionsResult [exported]
+    58-125: listDecisions(db: Database.Database, filters: ListDecisionsFilters = {}, options: ListDecisionsOptions = {}): ListDecisionsResult [exported]
       /** List daemon decisions with filters and pagination. */
-    129-142: updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean [exported]
+    130-143: updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean [exported]
       /** Update user feedback for a daemon decision */
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/edge-repository.ts [1-197]
@@ -162,16 +163,18 @@ src/storage/embedding-utils.ts [1-676]
     - ./database.js
     - better-sqlite3
 
-src/storage/filter-utils.ts [1-272]
+src/storage/filter-utils.ts [1-302]
   interface:
-    17-38: interface BaseFilters [exported]
+    47-68: interface BaseFilters [exported]
       /** Base filter fields shared by all filter types */
-    41-46: interface ExtendedFilters extends BaseFilters [exported]
+    71-76: interface ExtendedFilters extends BaseFilters [exported]
       /** Extended filters with additional fields for listNodes */
-    49-54: interface WhereClauseResult [exported]
+    79-84: interface WhereClauseResult [exported]
       /** Result of building a WHERE clause */
   function:
-    249-271: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
+    32-40: normalizePagination(limit?: number, offset?: number): { limit: number; offset: number; } [exported]
+      /** Normalize pagination options with clamping. */
+    279-301: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
       /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
   imports:
     - ./node-types.js
@@ -232,16 +235,16 @@ src/storage/hybrid-search.ts [1-732]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/lesson-repository.ts [1-285]
+src/storage/lesson-repository.ts [1-286]
   interface:
-    16-25: interface ListLessonsFilters [exported]
+    18-27: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
-    28-33: interface ListLessonsOptions [exported]
+    30-35: interface ListLessonsOptions [exported]
       /** Pagination options for lessons */
-    36-55: interface ListLessonsResult [exported]
+    38-57: interface ListLessonsResult [exported]
       /** Result from listLessons query */
   type:
-    58-68: LessonsByLevelResult = Record<
+    60-70: LessonsByLevelResult = Record<
   string,
   {
     count: number;
@@ -254,13 +257,14 @@ src/storage/lesson-repository.ts [1-285]
 > [exported]
       /** Result from getLessonsByLevel */
   function:
-    156-208: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
+    158-209: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
-    216-256: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
+    217-257: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    261-284: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+    262-285: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/node-conversion.ts [1-432]
@@ -326,16 +330,16 @@ src/storage/node-crud.ts [1-784]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-255]
+src/storage/node-queries.ts [1-258]
   interface:
-    72-81: interface ListNodesOptions [exported]
+    76-85: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-    84-93: interface ListNodesResult [exported]
+    88-97: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    179-191: interface SessionSummaryRow [exported]
+    183-195: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
   type:
-    55-63: NodeSortField = | "timestamp"
+    59-67: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -344,24 +348,24 @@ src/storage/node-queries.ts [1-255]
   | "cost"
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
-    66-66: SortOrder = "asc" | "desc" [exported]
+    70-70: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
-    69-69: ListNodesFilters = ExtendedFilters [exported]
+    73-73: ListNodesFilters = ExtendedFilters [exported]
       /** Filters for querying nodes */
   function:
-    23-30: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+    27-34: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
-    35-39: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+    39-43: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
-    44-48: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+    48-52: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-    123-170: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+    127-174: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    197-226: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    201-229: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    235-243: getAllProjects(db: Database.Database): {} [exported]
+    238-246: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    248-254: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    251-257: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -463,33 +467,34 @@ src/storage/pattern-repository.ts [1-373]
     - ../types/index.js
     - better-sqlite3
 
-src/storage/quirk-repository.ts [1-287]
+src/storage/quirk-repository.ts [1-288]
   interface:
-    19-26: interface ListQuirksFilters [exported]
+    21-28: interface ListQuirksFilters [exported]
       /** Filters for querying model quirks */
-    29-34: interface ListQuirksOptions [exported]
+    31-36: interface ListQuirksOptions [exported]
       /** Pagination options for quirks */
-    37-46: interface QuirkResult [exported]
+    39-48: interface QuirkResult [exported]
       /** A quirk result with metadata */
-    49-58: interface ListQuirksResult [exported]
+    51-60: interface ListQuirksResult [exported]
       /** Result from listQuirks query */
-    61-71: interface ModelQuirkStats [exported]
+    63-73: interface ModelQuirkStats [exported]
       /** Stats for a single model */
   type:
-    16-16: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
+    18-18: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
       /** Frequency values for model quirks */
-    74-74: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
+    76-76: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
       /** Result from getQuirksByModel */
   function:
-    102-162: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
+    104-163: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
       /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
-    170-208: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
+    171-209: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
       /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    216-258: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+    217-259: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
       /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
-    263-286: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+    264-287: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/relationship-edges.ts [1-290]
@@ -568,38 +573,39 @@ src/storage/semantic-search.ts [1-214]
 
 src/storage/tool-error-repository.ts [1-351]
   interface:
-    16-25: interface ListToolErrorsFilters [exported]
+    18-27: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
-    28-33: interface ListToolErrorsOptions [exported]
+    30-35: interface ListToolErrorsOptions [exported]
       /** Pagination options for tool errors */
-    36-45: interface ToolErrorResult [exported]
+    38-47: interface ToolErrorResult [exported]
       /** A tool error result with metadata */
-    48-57: interface ListToolErrorsResult [exported]
+    50-59: interface ListToolErrorsResult [exported]
       /** Result from listToolErrors query */
-    60-64: interface ToolStats [exported]
+    62-66: interface ToolStats [exported]
       /** Stats by tool from getToolErrorStats */
-    67-70: interface ModelErrorStats [exported]
+    69-72: interface ModelErrorStats [exported]
       /** Stats by model from getToolErrorStats */
-    73-77: interface ToolErrorTrends [exported]
+    75-79: interface ToolErrorTrends [exported]
       /** Trend data from getToolErrorStats */
-    80-84: interface ToolErrorStatsResult [exported]
+    82-86: interface ToolErrorStatsResult [exported]
       /** Result from getToolErrorStats */
-    87-94: interface AggregatedToolError [exported]
+    89-96: interface AggregatedToolError [exported]
       /** Aggregated tool error result */
-    97-103: interface NodeToolError [exported]
+    99-105: interface NodeToolError [exported]
       /** A single tool error for a node */
   function:
-    176-213: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    178-214: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    219-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+    220-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
     280-334: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
     339-350: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 ---
 Files: 20
-Estimated tokens: 9,321 (codebase: ~1,356,435)
+Estimated tokens: 9,387 (codebase: ~1,356,299)

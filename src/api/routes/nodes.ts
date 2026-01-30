@@ -21,41 +21,12 @@ import {
 import { readNodeFromPath } from "../../storage/node-storage.js";
 import { getNodeQuirks } from "../../storage/quirk-repository.js";
 import { getNodeToolErrors } from "../../storage/tool-error-repository.js";
+import {
+  parseArrayParam,
+  parseBooleanParam,
+  parseIntParam,
+} from "../query-params.js";
 import { successResponse, errorResponse } from "../responses.js";
-
-/**
- * Parse comma-separated string to array
- */
-function parseArrayParam(value: string | undefined): string[] | undefined {
-  if (!value) {
-    return undefined;
-  }
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-/**
- * Parse boolean query param
- */
-function parseBooleanParam(value: string | undefined): boolean | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  return value === "true" || value === "1";
-}
-
-/**
- * Parse integer query param
- */
-function parseIntParam(value: string | undefined): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const num = Number.parseInt(value, 10);
-  return Number.isNaN(num) ? undefined : num;
-}
 
 // =============================================================================
 // Include Data Fetchers

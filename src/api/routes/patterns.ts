@@ -2,41 +2,15 @@
  * Patterns API routes
  */
 
-import type {
-  FastifyBaseLogger,
-  FastifyInstance,
-  FastifyRequest,
-  FastifyReply,
-} from "fastify";
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import {
   listFailurePatterns,
   listLessonPatterns,
   listModelStats,
 } from "../../storage/pattern-repository.js";
+import { parseIntParam } from "../query-params.js";
 import { successResponse } from "../responses.js";
-
-/**
- * Parse integer query param with optional debug logging for invalid values
- */
-function parseIntParam(
-  value: string | undefined,
-  paramName?: string,
-  logger?: FastifyBaseLogger
-): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const num = Number.parseInt(value, 10);
-  if (Number.isNaN(num)) {
-    logger?.debug(
-      { param: paramName, value },
-      "Invalid integer param, using default"
-    );
-    return undefined;
-  }
-  return num;
-}
 
 export async function patternsRoutes(app: FastifyInstance): Promise<void> {
   /**

@@ -6,6 +6,8 @@
 
 import type Database from "better-sqlite3";
 
+import { normalizePagination } from "./filter-utils.js";
+
 /** Filters for querying daemon decisions */
 export interface ListDecisionsFilters {
   /** Filter by decision type/text (partial match) */
@@ -58,8 +60,7 @@ export function listDecisions(
   filters: ListDecisionsFilters = {},
   options: ListDecisionsOptions = {}
 ): ListDecisionsResult {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
 
   // Build WHERE clause
   const conditions: string[] = ["1=1"];

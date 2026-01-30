@@ -8,6 +8,8 @@
 
 import type Database from "better-sqlite3";
 
+import { normalizePagination } from "./filter-utils.js";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -178,8 +180,7 @@ export function listToolErrors(
   filters: ListToolErrorsFilters = {},
   options: ListToolErrorsOptions = {}
 ): ListToolErrorsResult {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
 
   const { clause: whereClause, params } = buildToolErrorWhereClause(
     filters,
@@ -221,8 +222,7 @@ export function getAggregatedToolErrors(
   filters: ListToolErrorsFilters = {},
   options: { limit?: number; offset?: number; groupByModel?: boolean } = {}
 ): AggregatedToolError[] {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
   const groupByModel = options.groupByModel ?? false;
 
   const { clause: whereClause, params } = buildToolErrorWhereClause(filters);

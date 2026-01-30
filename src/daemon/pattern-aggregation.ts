@@ -267,21 +267,29 @@ export class PatternAggregator {
       { quirkCount: number; errorCount: number; lastUsed: string }
     >();
 
-    for (const row of quirksStmt.iterate() as IterableIterator<{
-      model: string;
-      count: number;
-      last_seen: string;
-    }>) {
+    // Helper to merge row data into statsMap
+    const mergeRow = (
+      row: { model: string; count: number; last_seen: string },
+      field: "quirkCount" | "errorCount"
+    ): void => {
       const stats = statsMap.get(row.model) ?? {
         quirkCount: 0,
         errorCount: 0,
         lastUsed: row.last_seen,
       };
-      stats.quirkCount = row.count;
+      stats[field] = row.count;
       if (row.last_seen > stats.lastUsed) {
         stats.lastUsed = row.last_seen;
       }
       statsMap.set(row.model, stats);
+    };
+
+    for (const row of quirksStmt.iterate() as IterableIterator<{
+      model: string;
+      count: number;
+      last_seen: string;
+    }>) {
+      mergeRow(row, "quirkCount");
     }
 
     for (const row of errorsStmt.iterate() as IterableIterator<{
@@ -289,16 +297,7 @@ export class PatternAggregator {
       count: number;
       last_seen: string;
     }>) {
-      const stats = statsMap.get(row.model) ?? {
-        quirkCount: 0,
-        errorCount: 0,
-        lastUsed: row.last_seen,
-      };
-      stats.errorCount = row.count;
-      if (row.last_seen > stats.lastUsed) {
-        stats.lastUsed = row.last_seen;
-      }
-      statsMap.set(row.model, stats);
+      mergeRow(row, "errorCount");
     }
 
     const insertStmt = this.db.prepare(`

@@ -710,16 +710,22 @@ src/storage/pattern-repository.ts [1-373]
         - src/storage/pattern-repository.ts:213: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/patterns.ts:8: import (module)
+        - src/api/routes/patterns.ts:35: call result
         - src/storage/pattern-repository.test.ts:8: import (module)
         - src/storage/pattern-repository.test.ts:28: call patterns
         - src/storage/pattern-repository.test.ts:35: call rarePatterns
     117-136: listModelStats(db: Database.Database): {} [exported]
-      refs in: 2 [call: 1, import: 1]
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/patterns.ts:10: import (module)
+        - src/api/routes/patterns.ts:57: call result
         - src/storage/pattern-repository.test.ts:11: import (module)
         - src/storage/pattern-repository.test.ts:52: call stats
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/patterns.ts:9: import (module)
+        - src/api/routes/patterns.ts:82: call result
         - src/storage/pattern-repository.test.ts:10: import (module)
         - src/storage/pattern-repository.test.ts:71: call patterns
         - src/storage/pattern-repository.test.ts:76: call projectPatterns
@@ -776,4 +782,4 @@ src/storage/pattern-repository.ts [1-373]
 
 ---
 Files: 14
-Estimated tokens: 10,677 (codebase: ~1,356,436)
+Estimated tokens: 10,759 (codebase: ~1,347,309)

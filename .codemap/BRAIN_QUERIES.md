@@ -5,8 +5,8 @@
 
 ## Statistics
 - Total files: 63
-- Total symbols: 339
-  - function: 192
+- Total symbols: 340
+  - function: 193
   - interface: 100
   - variable: 20
   - type: 18
@@ -657,12 +657,10 @@ src/daemon/pattern-aggregation.test.ts [1-407]
     - better-sqlite3
     - vitest
 
-src/daemon/pattern-aggregation.ts [1-332]
+src/daemon/pattern-aggregation.ts [1-331]
   class:
-    22-331: class PatternAggregator [exported]
-      refs in: 9 [import: 3, instantiate: 3, reexport: 1, type: 2]
-        - src/api/routes/daemon.ts:17: import (module)
-        - src/api/routes/daemon.ts:286: instantiate aggregator
+    22-330: class PatternAggregator [exported]
+      refs in: 7 [import: 2, instantiate: 2, reexport: 1, type: 2]
         - src/daemon/index.ts:164: reexport (module)
         - src/daemon/pattern-aggregation.test.ts:4: import (module)
         - src/daemon/pattern-aggregation.test.ts:21: type aggregator
@@ -1729,31 +1727,31 @@ src/storage/decision-repository.test.ts [1-327]
     - node:path
     - vitest
 
-src/storage/decision-repository.ts [1-143]
+src/storage/decision-repository.ts [1-144]
   interface:
-    10-19: interface ListDecisionsFilters [exported]
+    12-21: interface ListDecisionsFilters [exported]
       /** Filters for querying daemon decisions */
       refs in: 1 [type: 1]
-        - src/storage/decision-repository.ts:58: type listDecisions
-    22-27: interface ListDecisionsOptions [exported]
+        - src/storage/decision-repository.ts:60: type listDecisions
+    24-29: interface ListDecisionsOptions [exported]
       /** Pagination options */
       refs in: 1 [type: 1]
-        - src/storage/decision-repository.ts:59: type listDecisions
-    30-39: interface DaemonDecisionResult [exported]
+        - src/storage/decision-repository.ts:61: type listDecisions
+    32-41: interface DaemonDecisionResult [exported]
       /** A daemon decision result with metadata */
       refs in: 2 [type: 2]
-        - src/storage/decision-repository.ts:44: type ListDecisionsResult
-        - src/storage/decision-repository.ts:121: type decisions
-    42-51: interface ListDecisionsResult [exported]
+        - src/storage/decision-repository.ts:46: type ListDecisionsResult
+        - src/storage/decision-repository.ts:122: type decisions
+    44-53: interface ListDecisionsResult [exported]
       /** Result from listDecisions query */
       refs in: 1 [type: 1]
-        - src/storage/decision-repository.ts:60: type listDecisions
+        - src/storage/decision-repository.ts:62: type listDecisions
   function:
-    56-124: listDecisions(db: Database.Database, filters: ListDecisionsFilters = {}, options: ListDecisionsOptions = {}): ListDecisionsResult [exported]
+    58-125: listDecisions(db: Database.Database, filters: ListDecisionsFilters = {}, options: ListDecisionsOptions = {}): ListDecisionsResult [exported]
       /** List daemon decisions with filters and pagination. */
       refs in: 9 [call: 7, import: 2]
         - src/api/routes/decisions.ts:10: import (module)
-        - src/api/routes/decisions.ts:51: call result
+        - src/api/routes/decisions.ts:41: call result
         - src/storage/decision-repository.test.ts:12: import (module)
         - src/storage/decision-repository.test.ts:105: call result
         - src/storage/decision-repository.test.ts:239: call resA
@@ -1761,15 +1759,16 @@ src/storage/decision-repository.ts [1-143]
         - src/storage/decision-repository.test.ts:312: call [decision]
         - src/storage/decision-repository.test.ts:318: call [updatedDecision]
         - src/storage/decision-repository.test.ts:323: call [clearedDecision]
-    129-142: updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean [exported]
+    130-143: updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean [exported]
       /** Update user feedback for a daemon decision */
       refs in: 5 [call: 3, import: 2]
         - src/api/routes/decisions.ts:11: import (module)
-        - src/api/routes/decisions.ts:79: call updated
+        - src/api/routes/decisions.ts:69: call updated
         - src/storage/decision-repository.test.ts:13: import (module)
         - src/storage/decision-repository.test.ts:315: call updated
         - src/storage/decision-repository.test.ts:322: call (module)
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/edge-repository.ts [1-197]
@@ -1801,7 +1800,7 @@ src/storage/edge-repository.ts [1-197]
       /** Create an edge between two nodes */
       refs in: 24 [call: 18, import: 6]
         - src/api/routes/edges.ts:10: import (module)
-        - src/api/routes/edges.ts:177: call edge
+        - src/api/routes/edges.ts:167: call edge
         - src/daemon/connection-discovery.test.ts:4: import (module)
         - src/daemon/connection-discovery.test.ts:192: call (module)
         - src/daemon/connection-discovery.ts:12: import (module)
@@ -1814,7 +1813,7 @@ src/storage/edge-repository.ts [1-197]
       /** Get edges from a node (outgoing) */
       refs in: 10 [call: 6, import: 4]
         - src/api/routes/edges.ts:13: import (module)
-        - src/api/routes/edges.ts:56: call outgoing
+        - src/api/routes/edges.ts:46: call outgoing
         - src/storage/bridge-discovery.ts:12: import (module)
         - src/storage/bridge-discovery.ts:230: call outgoingEdges
         - src/storage/graph-repository.ts:17: import (module)
@@ -1827,7 +1826,7 @@ src/storage/edge-repository.ts [1-197]
       /** Get edges to a node (incoming) */
       refs in: 4 [call: 2, import: 2]
         - src/api/routes/edges.ts:14: import (module)
-        - src/api/routes/edges.ts:57: call incoming
+        - src/api/routes/edges.ts:47: call incoming
         - src/storage/graph-repository.ts:18: import (module)
         - src/storage/graph-repository.ts:105: call incoming
     121-128: getNodeEdges(db: Database.Database, nodeId: string): {} [exported]
@@ -1844,12 +1843,12 @@ src/storage/edge-repository.ts [1-197]
       /** Get edge by ID */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/edges.ts:12: import (module)
-        - src/api/routes/edges.ts:133: call edge
+        - src/api/routes/edges.ts:123: call edge
     149-152: deleteEdge(db: Database.Database, edgeId: string): boolean [exported]
       /** Delete an edge */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/edges.ts:11: import (module)
-        - src/api/routes/edges.ts:208: call deleted
+        - src/api/routes/edges.ts:198: call deleted
     157-175: edgeExists(db: Database.Database, sourceNodeId: string, targetNodeId: string, type?: EdgeType): boolean [exported]
       /** Check if an edge exists between two nodes */
       refs in: 7 [call: 5, import: 2]
@@ -2044,46 +2043,59 @@ src/storage/embedding-utils.ts [1-676]
     - ./database.js
     - better-sqlite3
 
-src/storage/filter-utils.ts [1-272]
+src/storage/filter-utils.ts [1-302]
   interface:
-    17-38: interface BaseFilters [exported]
+    47-68: interface BaseFilters [exported]
       /** Base filter fields shared by all filter types */
       refs in: 15 [extends: 1, import: 1, type: 13]
-        - src/storage/filter-utils.ts:41: extends ExtendedFilters
-        - src/storage/filter-utils.ts:67: type FilterHandler
-        - src/storage/filter-utils.ts:73: type handleProjectFilter
-        - src/storage/filter-utils.ts:84: type handleExactProjectFilter
-        - src/storage/filter-utils.ts:95: type handleTypeFilter
-        - src/storage/filter-utils.ts:106: type handleOutcomeFilter
-        - src/storage/filter-utils.ts:117: type handleDateRangeFilters
-        - src/storage/filter-utils.ts:132: type handleComputerFilter
-        - src/storage/filter-utils.ts:143: type handleBooleanFilters
-        - src/storage/filter-utils.ts:158: type handleSessionFileFilter
-    41-46: interface ExtendedFilters extends BaseFilters [exported]
+        - src/storage/filter-utils.ts:71: extends ExtendedFilters
+        - src/storage/filter-utils.ts:97: type FilterHandler
+        - src/storage/filter-utils.ts:103: type handleProjectFilter
+        - src/storage/filter-utils.ts:114: type handleExactProjectFilter
+        - src/storage/filter-utils.ts:125: type handleTypeFilter
+        - src/storage/filter-utils.ts:136: type handleOutcomeFilter
+        - src/storage/filter-utils.ts:147: type handleDateRangeFilters
+        - src/storage/filter-utils.ts:162: type handleComputerFilter
+        - src/storage/filter-utils.ts:173: type handleBooleanFilters
+        - src/storage/filter-utils.ts:188: type handleSessionFileFilter
+    71-76: interface ExtendedFilters extends BaseFilters [exported]
       /** Extended filters with additional fields for listNodes */
       refs in: 14 [import: 1, type: 13]
-        - src/storage/filter-utils.ts:67: type FilterHandler
-        - src/storage/filter-utils.ts:73: type handleProjectFilter
-        - src/storage/filter-utils.ts:84: type handleExactProjectFilter
-        - src/storage/filter-utils.ts:95: type handleTypeFilter
-        - src/storage/filter-utils.ts:106: type handleOutcomeFilter
-        - src/storage/filter-utils.ts:117: type handleDateRangeFilters
-        - src/storage/filter-utils.ts:132: type handleComputerFilter
-        - src/storage/filter-utils.ts:143: type handleBooleanFilters
-        - src/storage/filter-utils.ts:158: type handleSessionFileFilter
-        - src/storage/filter-utils.ts:169: type handleTagsFilter
-    49-54: interface WhereClauseResult [exported]
+        - src/storage/filter-utils.ts:97: type FilterHandler
+        - src/storage/filter-utils.ts:103: type handleProjectFilter
+        - src/storage/filter-utils.ts:114: type handleExactProjectFilter
+        - src/storage/filter-utils.ts:125: type handleTypeFilter
+        - src/storage/filter-utils.ts:136: type handleOutcomeFilter
+        - src/storage/filter-utils.ts:147: type handleDateRangeFilters
+        - src/storage/filter-utils.ts:162: type handleComputerFilter
+        - src/storage/filter-utils.ts:173: type handleBooleanFilters
+        - src/storage/filter-utils.ts:188: type handleSessionFileFilter
+        - src/storage/filter-utils.ts:199: type handleTagsFilter
+    79-84: interface WhereClauseResult [exported]
       /** Result of building a WHERE clause */
       refs in: 1 [type: 1]
-        - src/storage/filter-utils.ts:252: type buildWhereClause
+        - src/storage/filter-utils.ts:282: type buildWhereClause
   function:
-    249-271: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
+    32-40: normalizePagination(limit?: number, offset?: number): { limit: number; offset: number; } [exported]
+      /** Normalize pagination options with clamping. */
+      refs in: 12 [call: 7, import: 5]
+        - src/storage/decision-repository.ts:9: import (module)
+        - src/storage/decision-repository.ts:63: call { limit, offset }
+        - src/storage/lesson-repository.ts:11: import (module)
+        - src/storage/lesson-repository.ts:163: call { limit, offset }
+        - src/storage/node-queries.ts:16: import (module)
+        - src/storage/node-queries.ts:206: call { limit, offset }
+        - src/storage/quirk-repository.ts:11: import (module)
+        - src/storage/quirk-repository.ts:109: call { limit, offset }
+        - src/storage/quirk-repository.ts:228: call { limit }
+        - src/storage/tool-error-repository.ts:11: import (module)
+    279-301: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
       /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
       refs in: 8 [call: 4, import: 4]
         - src/storage/hybrid-search.ts:18: import (module)
         - src/storage/hybrid-search.ts:624: call { clause: filterClause, params: filterParams }
-        - src/storage/node-queries.ts:14: import (module)
-        - src/storage/node-queries.ts:143: call { clause, params }
+        - src/storage/node-queries.ts:15: import (module)
+        - src/storage/node-queries.ts:147: call { clause, params }
         - src/storage/search-repository.ts:14: import (module)
         - src/storage/search-repository.ts:380: call { clause: filterClause, params }
         - src/storage/semantic-search.ts:19: import (module)
@@ -2124,8 +2136,8 @@ src/storage/graph-repository.ts [1-416]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
       refs in: 6 [call: 5, import: 1]
         - src/api/routes/nodes.ts:10: import (module)
-        - src/api/routes/nodes.ts:79: call connected
-        - src/api/routes/nodes.ts:245: call result
+        - src/api/routes/nodes.ts:50: call connected
+        - src/api/routes/nodes.ts:216: call result
         - src/storage/graph-repository.ts:296: call result
         - src/storage/graph-repository.ts:393: call getAncestors
         - src/storage/graph-repository.ts:410: call getDescendants
@@ -2220,23 +2232,29 @@ src/storage/hybrid-search.ts [1-732]
     - ./semantic-search.js
     - better-sqlite3
 
-src/storage/lesson-repository.ts [1-285]
+src/storage/lesson-repository.ts [1-286]
   interface:
-    16-25: interface ListLessonsFilters [exported]
+    18-27: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
-      refs in: 2 [type: 2]
-        - src/storage/lesson-repository.ts:77: type buildLessonWhereClause
-        - src/storage/lesson-repository.ts:158: type listLessons
-    28-33: interface ListLessonsOptions [exported]
+      refs in: 6 [import: 1, type: 5]
+        - src/api/routes/lessons.ts:10: import (module)
+        - src/api/routes/lessons.ts:39: type filters
+        - src/api/routes/lessons.ts:40: type filters
+        - src/api/routes/lessons.ts:43: type filters
+        - src/storage/lesson-repository.ts:79: type buildLessonWhereClause
+        - src/storage/lesson-repository.ts:160: type listLessons
+    30-35: interface ListLessonsOptions [exported]
       /** Pagination options for lessons */
-      refs in: 1 [type: 1]
-        - src/storage/lesson-repository.ts:159: type listLessons
-    36-55: interface ListLessonsResult [exported]
+      refs in: 3 [import: 1, type: 2]
+        - src/api/routes/lessons.ts:11: import (module)
+        - src/api/routes/lessons.ts:46: type options
+        - src/storage/lesson-repository.ts:161: type listLessons
+    38-57: interface ListLessonsResult [exported]
       /** Result from listLessons query */
       refs in: 1 [type: 1]
-        - src/storage/lesson-repository.ts:160: type listLessons
+        - src/storage/lesson-repository.ts:162: type listLessons
   type:
-    58-68: LessonsByLevelResult = Record<
+    60-70: LessonsByLevelResult = Record<
   string,
   {
     count: number;
@@ -2249,19 +2267,26 @@ src/storage/lesson-repository.ts [1-285]
 > [exported]
       /** Result from getLessonsByLevel */
       refs in: 2 [type: 2]
-        - src/storage/lesson-repository.ts:219: type getLessonsByLevel
-        - src/storage/lesson-repository.ts:229: type result
+        - src/storage/lesson-repository.ts:220: type getLessonsByLevel
+        - src/storage/lesson-repository.ts:230: type result
   function:
-    156-208: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
+    158-209: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
-    216-256: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/lessons.ts:9: import (module)
+        - src/api/routes/lessons.ts:51: call result
+    217-257: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    261-284: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/lessons.ts:8: import (module)
+        - src/api/routes/lessons.ts:65: call result
+    262-285: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:11: import (module)
-        - src/api/routes/nodes.ts:73: call buildIncludeFetchers
+        - src/api/routes/nodes.ts:44: call buildIncludeFetchers
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/node-conversion.ts [1-432]
@@ -2284,10 +2309,10 @@ src/storage/node-conversion.ts [1-432]
       /** Transform array of NodeRows to Nodes */
       refs in: 5 [call: 3, import: 2]
         - src/api/routes/nodes.ts:12: import (module)
-        - src/api/routes/nodes.ts:163: call transformedResult
-        - src/api/routes/nodes.ts:253: call transformedResult
+        - src/api/routes/nodes.ts:134: call transformedResult
+        - src/api/routes/nodes.ts:224: call transformedResult
         - src/api/routes/sessions.ts:9: import (module)
-        - src/api/routes/sessions.ts:239: call sessionNodes
+        - src/api/routes/sessions.ts:229: call sessionNodes
   imports:
     - ../daemon/processor.js
     - ../daemon/queue.js
@@ -2377,8 +2402,8 @@ src/storage/node-crud.ts [1-784]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
       refs in: 9 [call: 6, import: 3]
         - src/api/routes/nodes.ts:13: import (module)
-        - src/api/routes/nodes.ts:193: call nodeRow
-        - src/api/routes/nodes.ts:238: call nodeRow
+        - src/api/routes/nodes.ts:164: call nodeRow
+        - src/api/routes/nodes.ts:209: call nodeRow
         - src/daemon/connection-discovery.ts:13: import (module)
         - src/daemon/connection-discovery.ts:203: call ConnectionDiscoverer.sourceNode
         - src/daemon/connection-discovery.ts:398: call ConnectionDiscoverer.targetNode
@@ -2393,7 +2418,7 @@ src/storage/node-crud.ts [1-784]
       /** Get all versions of a node from JSON storage */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:13: import (module)
-        - src/api/routes/nodes.ts:83: call allVersions
+        - src/api/routes/nodes.ts:54: call allVersions
     657-668: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
       /** Find a node that contains a specific entry ID as its end boundary Find the latest node for a given session file */
       refs in: 1 [call: 1]
@@ -2420,27 +2445,27 @@ src/storage/node-crud.ts [1-784]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-255]
+src/storage/node-queries.ts [1-258]
   interface:
-    72-81: interface ListNodesOptions [exported]
+    76-85: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
       refs in: 5 [import: 1, type: 4]
         - src/api/routes/nodes.ts:19: import (module)
-        - src/api/routes/nodes.ts:153: type options
-        - src/api/routes/nodes.ts:156: type options
-        - src/api/routes/nodes.ts:157: type options
-        - src/storage/node-queries.ts:126: type listNodes
-    84-93: interface ListNodesResult [exported]
+        - src/api/routes/nodes.ts:124: type options
+        - src/api/routes/nodes.ts:127: type options
+        - src/api/routes/nodes.ts:128: type options
+        - src/storage/node-queries.ts:130: type listNodes
+    88-97: interface ListNodesResult [exported]
       /** Result from listNodes query */
       refs in: 1 [type: 1]
-        - src/storage/node-queries.ts:127: type listNodes
-    179-191: interface SessionSummaryRow [exported]
+        - src/storage/node-queries.ts:131: type listNodes
+    183-195: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
       refs in: 2 [type: 2]
-        - src/storage/node-queries.ts:201: type getSessionSummaries
-        - src/storage/node-queries.ts:225: type getSessionSummaries
+        - src/storage/node-queries.ts:205: type getSessionSummaries
+        - src/storage/node-queries.ts:228: type getSessionSummaries
   type:
-    55-63: NodeSortField = | "timestamp"
+    59-67: NodeSortField = | "timestamp"
   | "analyzed_at"
   | "project"
   | "type"
@@ -2450,62 +2475,72 @@ src/storage/node-queries.ts [1-255]
   | "duration_minutes" [exported]
       /** Valid sort fields for listNodes */
       refs in: 5 [type: 5]
-        - src/storage/node-queries.ts:78: type ListNodesOptions
-        - src/storage/node-queries.ts:96: type ALLOWED_SORT_FIELDS
-        - src/storage/node-queries.ts:133: type sort
-        - src/storage/node-queries.ts:134: type sort
-        - src/storage/node-queries.ts:136: type sort
-    66-66: SortOrder = "asc" | "desc" [exported]
+        - src/storage/node-queries.ts:82: type ListNodesOptions
+        - src/storage/node-queries.ts:100: type ALLOWED_SORT_FIELDS
+        - src/storage/node-queries.ts:137: type sort
+        - src/storage/node-queries.ts:138: type sort
+        - src/storage/node-queries.ts:140: type sort
+    70-70: SortOrder = "asc" | "desc" [exported]
       /** Sort order */
       refs in: 2 [type: 2]
-        - src/storage/node-queries.ts:80: type ListNodesOptions
-        - src/storage/node-queries.ts:138: type order
-    69-69: ListNodesFilters = ExtendedFilters [exported]
+        - src/storage/node-queries.ts:84: type ListNodesOptions
+        - src/storage/node-queries.ts:142: type order
+    73-73: ListNodesFilters = ExtendedFilters [exported]
       /** Filters for querying nodes */
-      refs in: 9 [import: 2, type: 7]
+      refs in: 13 [import: 3, type: 10]
         - src/api/routes/nodes.ts:18: import (module)
-        - src/api/routes/nodes.ts:140: type filters
-        - src/api/routes/nodes.ts:142: type filters
-        - src/api/routes/nodes.ts:143: type filters
+        - src/api/routes/nodes.ts:111: type filters
+        - src/api/routes/nodes.ts:113: type filters
+        - src/api/routes/nodes.ts:114: type filters
+        - src/api/routes/search.ts:7: import (module)
+        - src/api/routes/search.ts:48: type filters
+        - src/api/routes/search.ts:50: type filters
+        - src/api/routes/search.ts:51: type filters
         - src/daemon/query-processor.ts:28: import (module)
         - src/daemon/query-processor.ts:270: type filters
-        - src/daemon/query-processor.ts:348: type listFilters
-        - src/storage/node-queries.ts:125: type listNodes
-        - src/storage/node-queries.ts:250: type countNodes
   function:
-    23-30: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
+    27-34: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
       refs in: 4 [call: 2, import: 2]
         - src/daemon/connection-discovery.ts:14: import (module)
         - src/daemon/connection-discovery.ts:213: call ConnectionDiscoverer.sourceSummary
         - src/daemon/graph-export.ts:13: import (module)
         - src/daemon/graph-export.ts:67: call summary
-    35-39: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
+    39-43: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:15: import (module)
-        - src/api/routes/nodes.ts:76: call buildIncludeFetchers
-    44-48: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
+        - src/api/routes/nodes.ts:47: call buildIncludeFetchers
+    48-52: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:16: import (module)
-        - src/api/routes/nodes.ts:77: call buildIncludeFetchers
-    123-170: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
+        - src/api/routes/nodes.ts:48: call buildIncludeFetchers
+    127-174: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-      refs in: 8 [call: 4, import: 4]
+      refs in: 12 [call: 7, import: 5]
         - src/api/routes/nodes.ts:17: import (module)
-        - src/api/routes/nodes.ts:160: call result
+        - src/api/routes/nodes.ts:131: call result
+        - src/api/routes/sessions.ts:13: import (module)
+        - src/api/routes/sessions.ts:61: call result
+        - src/api/routes/sessions.ts:132: call checkResult
+        - src/api/routes/sessions.ts:224: call result
         - src/daemon/graph-export.ts:13: import (module)
         - src/daemon/graph-export.ts:37: call nodesResult
         - src/daemon/query-processor.test.ts:11: import (module)
         - src/daemon/query-processor.ts:28: import (module)
-        - src/daemon/query-processor.ts:349: call nodes
-        - src/storage/node-queries.ts:252: call result
-    197-226: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    201-229: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    235-243: getAllProjects(db: Database.Database): {} [exported]
+      refs in: 3 [call: 2, import: 1]
+        - src/api/routes/sessions.ts:12: import (module)
+        - src/api/routes/sessions.ts:69: call sessionSummaries
+        - src/api/routes/sessions.ts:152: call allSummaries
+    238-246: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    248-254: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/sessions.ts:11: import (module)
+        - src/api/routes/sessions.ts:56: call projects
+    251-257: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -2577,7 +2612,7 @@ src/storage/node-storage.ts [1-323]
       /** Read a node by file path */
       refs in: 26 [call: 14, import: 12]
         - src/api/routes/nodes.ts:21: import (module)
-        - src/api/routes/nodes.ts:202: call node
+        - src/api/routes/nodes.ts:173: call node
         - src/daemon/cli.ts:38: import (module)
         - src/daemon/cli.ts:1178: call node
         - src/daemon/cli.ts:1203: call node
@@ -2674,13 +2709,13 @@ src/storage/node-types.ts [1-151]
   | "other" [exported]
       /** Node type filter values */
       refs in: 2 [import: 1, type: 1]
-        - src/storage/filter-utils.ts:10: import (module)
-        - src/storage/filter-utils.ts:21: type BaseFilters
+        - src/storage/filter-utils.ts:11: import (module)
+        - src/storage/filter-utils.ts:51: type BaseFilters
     37-37: OutcomeFilter = "success" | "partial" | "failed" | "abandoned" [exported]
       /** Outcome filter values */
       refs in: 2 [import: 1, type: 1]
-        - src/storage/filter-utils.ts:10: import (module)
-        - src/storage/filter-utils.ts:23: type BaseFilters
+        - src/storage/filter-utils.ts:11: import (module)
+        - src/storage/filter-utils.ts:53: type BaseFilters
   function:
     47-49: generateNodeId(): string [exported]
       /** Generate a unique 16-character hex node ID Uses first 16 chars of UUID (64 bits of entropy) */
@@ -2766,16 +2801,22 @@ src/storage/pattern-repository.ts [1-373]
         - src/storage/pattern-repository.ts:213: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/patterns.ts:8: import (module)
+        - src/api/routes/patterns.ts:35: call result
         - src/storage/pattern-repository.test.ts:8: import (module)
         - src/storage/pattern-repository.test.ts:28: call patterns
         - src/storage/pattern-repository.test.ts:35: call rarePatterns
     117-136: listModelStats(db: Database.Database): {} [exported]
-      refs in: 2 [call: 1, import: 1]
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/patterns.ts:10: import (module)
+        - src/api/routes/patterns.ts:57: call result
         - src/storage/pattern-repository.test.ts:11: import (module)
         - src/storage/pattern-repository.test.ts:52: call stats
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
+        - src/api/routes/patterns.ts:9: import (module)
+        - src/api/routes/patterns.ts:82: call result
         - src/storage/pattern-repository.test.ts:10: import (module)
         - src/storage/pattern-repository.test.ts:71: call patterns
         - src/storage/pattern-repository.test.ts:76: call projectPatterns
@@ -2830,55 +2871,69 @@ src/storage/pattern-repository.ts [1-373]
     - ../types/index.js
     - better-sqlite3
 
-src/storage/quirk-repository.ts [1-287]
+src/storage/quirk-repository.ts [1-288]
   interface:
-    19-26: interface ListQuirksFilters [exported]
+    21-28: interface ListQuirksFilters [exported]
       /** Filters for querying model quirks */
-      refs in: 1 [type: 1]
-        - src/storage/quirk-repository.ts:104: type listQuirks
-    29-34: interface ListQuirksOptions [exported]
+      refs in: 4 [import: 1, type: 3]
+        - src/api/routes/quirks.ts:11: import (module)
+        - src/api/routes/quirks.ts:39: type filters
+        - src/api/routes/quirks.ts:41: type filters
+        - src/storage/quirk-repository.ts:106: type listQuirks
+    31-36: interface ListQuirksOptions [exported]
       /** Pagination options for quirks */
-      refs in: 1 [type: 1]
-        - src/storage/quirk-repository.ts:105: type listQuirks
-    37-46: interface QuirkResult [exported]
+      refs in: 3 [import: 1, type: 2]
+        - src/api/routes/quirks.ts:12: import (module)
+        - src/api/routes/quirks.ts:45: type options
+        - src/storage/quirk-repository.ts:107: type listQuirks
+    39-48: interface QuirkResult [exported]
       /** A quirk result with metadata */
       refs in: 2 [type: 2]
-        - src/storage/quirk-repository.ts:51: type ListQuirksResult
-        - src/storage/quirk-repository.ts:159: type quirks
-    49-58: interface ListQuirksResult [exported]
+        - src/storage/quirk-repository.ts:53: type ListQuirksResult
+        - src/storage/quirk-repository.ts:160: type quirks
+    51-60: interface ListQuirksResult [exported]
       /** Result from listQuirks query */
       refs in: 1 [type: 1]
-        - src/storage/quirk-repository.ts:106: type listQuirks
-    61-71: interface ModelQuirkStats [exported]
+        - src/storage/quirk-repository.ts:108: type listQuirks
+    63-73: interface ModelQuirkStats [exported]
       /** Stats for a single model */
       refs in: 1 [type: 1]
-        - src/storage/quirk-repository.ts:74: type QuirksByModelResult
+        - src/storage/quirk-repository.ts:76: type QuirksByModelResult
   type:
-    16-16: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
+    18-18: QuirkFrequency = "once" | "sometimes" | "often" | "always" [exported]
       /** Frequency values for model quirks */
       refs in: 1 [type: 1]
-        - src/storage/quirk-repository.ts:23: type ListQuirksFilters
-    74-74: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
+        - src/storage/quirk-repository.ts:25: type ListQuirksFilters
+    76-76: QuirksByModelResult = Record<string, ModelQuirkStats> [exported]
       /** Result from getQuirksByModel */
       refs in: 2 [type: 2]
-        - src/storage/quirk-repository.ts:173: type getQuirksByModel
-        - src/storage/quirk-repository.ts:180: type result
+        - src/storage/quirk-repository.ts:174: type getQuirksByModel
+        - src/storage/quirk-repository.ts:181: type result
   function:
-    102-162: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
+    104-163: listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult [exported]
       /** List model quirks with filters and pagination. Supports filtering by: - model (exact match) - frequency (minimum frequency ranking) - project (partial match via nodes table) Per specs/api.md GET /api/v1/quirks endpoint. */
-    170-208: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
-      /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
-    216-258: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
-      /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
       refs in: 2 [call: 1, import: 1]
+        - src/api/routes/quirks.ts:10: import (module)
+        - src/api/routes/quirks.ts:50: call result
+    171-209: getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats> [exported]
+      /** Get aggregated quirk stats by model. Returns counts and most recent quirks for each model that has quirks. Per specs/api.md GET /api/v1/stats/models endpoint (quirkCount field). */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/quirks.ts:9: import (module)
+        - src/api/routes/quirks.ts:64: call result
+    217-259: getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {} [exported]
+      /** Get aggregated quirks - similar observations grouped together. Useful for the dashboard "Model Quirks" panel. Per specs/storage.md "Find model quirks by frequency" query. */
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/quirks.ts:8: import (module)
+        - src/api/routes/quirks.ts:88: call result
         - src/daemon/query-processor.ts:29: import (module)
         - src/daemon/query-processor.ts:424: call quirks
-    263-286: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
+    264-287: getNodeQuirks(db: Database.Database, nodeId: string): {} [exported]
       /** Get model quirks for a node */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:22: import (module)
-        - src/api/routes/nodes.ts:74: call buildIncludeFetchers
+        - src/api/routes/nodes.ts:45: call buildIncludeFetchers
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 src/storage/relationship-edges.test.ts [1-409]
@@ -2990,7 +3045,9 @@ src/storage/search-repository.ts [1-419]
         - src/storage/semantic-search.ts:25: extends SemanticSearchResult
     59-68: interface SearchOptions [exported]
       /** Options for enhanced search */
-      refs in: 1 [type: 1]
+      refs in: 3 [import: 1, type: 2]
+        - src/api/routes/search.ts:12: import (module)
+        - src/api/routes/search.ts:58: type options
         - src/storage/search-repository.ts:361: type searchNodesAdvanced
     71-80: interface SearchNodesResult [exported]
       /** Result from enhanced search with pagination metadata */
@@ -3003,7 +3060,9 @@ src/storage/search-repository.ts [1-419]
   | "tags"
   | "topics" [exported]
       /** Fields that can be searched in the FTS index */
-      refs in: 5 [type: 5]
+      refs in: 7 [import: 1, type: 6]
+        - src/api/routes/search.ts:11: import (module)
+        - src/api/routes/search.ts:59: type options
         - src/storage/search-repository.ts:29: type ALL_SEARCH_FIELDS
         - src/storage/search-repository.ts:43: type SearchHighlight
         - src/storage/search-repository.ts:61: type SearchOptions
@@ -3037,6 +3096,9 @@ src/storage/search-repository.ts [1-419]
         - src/storage/search-repository.ts:326: call findHighlights
     358-418: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/search.ts:10: import (module)
+        - src/api/routes/search.ts:65: call result
   imports:
     - ./filter-utils.js
     - ./node-crud.js
@@ -3106,70 +3168,83 @@ src/storage/sqlite-vec.test.ts [1-98]
 
 src/storage/tool-error-repository.ts [1-351]
   interface:
-    16-25: interface ListToolErrorsFilters [exported]
+    18-27: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
-      refs in: 4 [type: 4]
-        - src/storage/tool-error-repository.ts:118: type buildToolErrorWhereClause
-        - src/storage/tool-error-repository.ts:126: type filterDefs
-        - src/storage/tool-error-repository.ts:178: type listToolErrors
-        - src/storage/tool-error-repository.ts:221: type getAggregatedToolErrors
-    28-33: interface ListToolErrorsOptions [exported]
+      refs in: 6 [import: 1, type: 5]
+        - src/api/routes/tool-errors.ts:11: import (module)
+        - src/api/routes/tool-errors.ts:40: type filters
+        - src/storage/tool-error-repository.ts:120: type buildToolErrorWhereClause
+        - src/storage/tool-error-repository.ts:128: type filterDefs
+        - src/storage/tool-error-repository.ts:180: type listToolErrors
+        - src/storage/tool-error-repository.ts:222: type getAggregatedToolErrors
+    30-35: interface ListToolErrorsOptions [exported]
       /** Pagination options for tool errors */
-      refs in: 1 [type: 1]
-        - src/storage/tool-error-repository.ts:179: type listToolErrors
-    36-45: interface ToolErrorResult [exported]
+      refs in: 3 [import: 1, type: 2]
+        - src/api/routes/tool-errors.ts:12: import (module)
+        - src/api/routes/tool-errors.ts:47: type options
+        - src/storage/tool-error-repository.ts:181: type listToolErrors
+    38-47: interface ToolErrorResult [exported]
       /** A tool error result with metadata */
       refs in: 2 [type: 2]
-        - src/storage/tool-error-repository.ts:50: type ListToolErrorsResult
-        - src/storage/tool-error-repository.ts:210: type errors
-    48-57: interface ListToolErrorsResult [exported]
+        - src/storage/tool-error-repository.ts:52: type ListToolErrorsResult
+        - src/storage/tool-error-repository.ts:211: type errors
+    50-59: interface ListToolErrorsResult [exported]
       /** Result from listToolErrors query */
       refs in: 1 [type: 1]
-        - src/storage/tool-error-repository.ts:180: type listToolErrors
-    60-64: interface ToolStats [exported]
+        - src/storage/tool-error-repository.ts:182: type listToolErrors
+    62-66: interface ToolStats [exported]
       /** Stats by tool from getToolErrorStats */
       refs in: 1 [type: 1]
-        - src/storage/tool-error-repository.ts:81: type ToolErrorStatsResult
-    67-70: interface ModelErrorStats [exported]
+        - src/storage/tool-error-repository.ts:83: type ToolErrorStatsResult
+    69-72: interface ModelErrorStats [exported]
       /** Stats by model from getToolErrorStats */
       refs in: 1 [type: 1]
-        - src/storage/tool-error-repository.ts:82: type ToolErrorStatsResult
-    73-77: interface ToolErrorTrends [exported]
+        - src/storage/tool-error-repository.ts:84: type ToolErrorStatsResult
+    75-79: interface ToolErrorTrends [exported]
       /** Trend data from getToolErrorStats */
       refs in: 1 [type: 1]
-        - src/storage/tool-error-repository.ts:83: type ToolErrorStatsResult
-    80-84: interface ToolErrorStatsResult [exported]
+        - src/storage/tool-error-repository.ts:85: type ToolErrorStatsResult
+    82-86: interface ToolErrorStatsResult [exported]
       /** Result from getToolErrorStats */
       refs in: 1 [type: 1]
         - src/storage/tool-error-repository.ts:280: type getToolErrorStats
-    87-94: interface AggregatedToolError [exported]
+    89-96: interface AggregatedToolError [exported]
       /** Aggregated tool error result */
       refs in: 2 [type: 2]
-        - src/storage/tool-error-repository.ts:223: type getAggregatedToolErrors
+        - src/storage/tool-error-repository.ts:224: type getAggregatedToolErrors
         - src/storage/tool-error-repository.ts:259: type result
-    97-103: interface NodeToolError [exported]
+    99-105: interface NodeToolError [exported]
       /** A single tool error for a node */
       refs in: 2 [type: 2]
         - src/storage/tool-error-repository.ts:342: type getNodeToolErrors
         - src/storage/tool-error-repository.ts:349: type getNodeToolErrors
   function:
-    176-213: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    178-214: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    219-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
-      /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
       refs in: 2 [call: 1, import: 1]
+        - src/api/routes/tool-errors.ts:8: import (module)
+        - src/api/routes/tool-errors.ts:52: call result
+    220-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+      /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
+      refs in: 4 [call: 2, import: 2]
+        - src/api/routes/tool-errors.ts:9: import (module)
+        - src/api/routes/tool-errors.ts:80: call result
         - src/daemon/query-processor.ts:30: import (module)
         - src/daemon/query-processor.ts:445: call errors
     280-334: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/tool-errors.ts:10: import (module)
+        - src/api/routes/tool-errors.ts:105: call stats
     339-350: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/nodes.ts:23: import (module)
-        - src/api/routes/nodes.ts:75: call buildIncludeFetchers
+        - src/api/routes/nodes.ts:46: call buildIncludeFetchers
   imports:
+    - ./filter-utils.js
     - better-sqlite3
 
 ---
 Files: 63
-Estimated tokens: 41,846 (codebase: ~1,356,436)
+Estimated tokens: 42,863 (codebase: ~1,347,309)

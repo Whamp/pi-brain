@@ -11,31 +11,8 @@ import {
   type SearchField,
   type SearchOptions,
 } from "../../storage/search-repository.js";
+import { parseArrayParam, parseIntParam } from "../query-params.js";
 import { successResponse } from "../responses.js";
-
-/**
- * Parse comma-separated string to array
- */
-function parseArrayParam(value: string | undefined): string[] | undefined {
-  if (!value) {
-    return undefined;
-  }
-  return value
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-/**
- * Parse integer query param
- */
-function parseIntParam(value: string | undefined): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const num = Number.parseInt(value, 10);
-  return Number.isNaN(num) ? undefined : num;
-}
 
 export async function searchRoutes(app: FastifyInstance): Promise<void> {
   /**

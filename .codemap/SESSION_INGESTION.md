@@ -534,9 +534,9 @@ src/daemon/pattern-aggregation.test.ts [1-407]
     - better-sqlite3
     - vitest
 
-src/daemon/pattern-aggregation.ts [1-332]
+src/daemon/pattern-aggregation.ts [1-331]
   class:
-    22-331: class PatternAggregator [exported]
+    22-330: class PatternAggregator [exported]
   imports:
     - better-sqlite3
     - node:crypto
@@ -1582,4 +1582,4 @@ src/parser/signals.ts [1-1181]
 
 ---
 Files: 41
-Estimated tokens: 20,796 (codebase: ~1,356,436)
+Estimated tokens: 20,796 (codebase: ~1,347,309)

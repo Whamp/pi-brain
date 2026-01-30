@@ -8,6 +8,8 @@
 
 import type Database from "better-sqlite3";
 
+import { normalizePagination } from "./filter-utils.js";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -104,8 +106,7 @@ export function listQuirks(
   filters: ListQuirksFilters = {},
   options: ListQuirksOptions = {}
 ): ListQuirksResult {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
 
   // Build WHERE clause
   const conditions: string[] = ["1=1"];
@@ -224,7 +225,7 @@ export function getAggregatedQuirks(
   nodeIds: string[];
 }[] {
   const minOccurrences = options.minOccurrences ?? 1;
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  const { limit } = normalizePagination(options.limit);
 
   const stmt = db.prepare(`
     SELECT 

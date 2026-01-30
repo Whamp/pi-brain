@@ -12,18 +12,8 @@ import {
   getSessionSummaries,
   listNodes,
 } from "../../storage/node-queries.js";
+import { parseIntParam } from "../query-params.js";
 import { successResponse, errorResponse } from "../responses.js";
-
-/**
- * Parse integer query param
- */
-function parseIntParam(value: string | undefined): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const num = Number.parseInt(value, 10);
-  return Number.isNaN(num) ? undefined : num;
-}
 
 /**
  * Session summary for the file browser

@@ -1,13 +1,43 @@
 /**
- * Filter Utils - Shared filter building logic for node queries
+ * Filter Utils - Shared filter building and pagination logic for queries
  *
- * Provides a unified `buildWhereClause` function used by both
- * `node-queries.ts` (listNodes) and `search-repository.ts` (searchNodesAdvanced).
+ * Provides:
+ * - `buildWhereClause` for unified filter building
+ * - `normalizePagination` for consistent limit/offset clamping
  *
- * This eliminates code duplication and ensures consistent filter behavior.
+ * Used by node-queries.ts, search-repository.ts, and various repositories.
  */
 
 import type { NodeTypeFilter, OutcomeFilter } from "./node-types.js";
+
+// =============================================================================
+// Pagination Utilities
+// =============================================================================
+
+/** Default and max limits for pagination */
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 500;
+
+/**
+ * Normalize pagination options with clamping.
+ *
+ * @param {number} [limit] - Requested limit (default: 50, max: 500)
+ * @param {number} [offset] - Requested offset (default: 0, min: 0)
+ * @returns {{ limit: number, offset: number }} Normalized limit/offset values
+ *
+ * @example
+ * const { limit, offset } = normalizePagination(1000, -5);
+ * // { limit: 500, offset: 0 }
+ */
+export function normalizePagination(
+  limit?: number,
+  offset?: number
+): { limit: number; offset: number } {
+  return {
+    limit: Math.min(Math.max(limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT),
+    offset: Math.max(offset ?? 0, 0),
+  };
+}
 
 // =============================================================================
 // Types

@@ -8,6 +8,8 @@
 
 import type Database from "better-sqlite3";
 
+import { normalizePagination } from "./filter-utils.js";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -158,8 +160,7 @@ export function listLessons(
   filters: ListLessonsFilters = {},
   options: ListLessonsOptions = {}
 ): ListLessonsResult {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
+  const { limit, offset } = normalizePagination(options.limit, options.offset);
 
   const { whereClause, params } = buildLessonWhereClause(filters);
 

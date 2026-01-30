@@ -1,24 +1,24 @@
 {
   "stats": {
-    "totalFiles": 102,
-    "totalSymbols": 1553,
+    "totalFiles": 103,
+    "totalSymbols": 1547,
     "byLanguage": {
-      "typescript": 102
+      "typescript": 103
     },
     "bySymbolKind": {
-      "function": 744,
+      "function": 735,
       "type": 48,
       "interface": 323,
-      "variable": 159,
+      "variable": 161,
       "class": 15,
       "property": 62,
       "constructor": 14,
-      "method": 186,
+      "method": 187,
       "getter": 2
     }
   },
-  "total_tokens": 53966,
-  "codebase_tokens": 1356436,
+  "total_tokens": 53913,
+  "codebase_tokens": 1347309,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -36,6 +36,81 @@
       "imports": [
         "./server.js",
         "./websocket.js"
+      ]
+    },
+    {
+      "path": "src/api/query-params.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        65
+      ],
+      "detail_level": "full",
+      "token_estimate": 120,
+      "symbols": [
+        {
+          "name": "parseIntParam",
+          "kind": "function",
+          "signature": "parseIntParam(value: string | undefined, paramName?: string, logger?: FastifyBaseLogger): number",
+          "lines": [
+            16,
+            33
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Parse an integer query parameter",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "parseArrayParam",
+          "kind": "function",
+          "signature": "parseArrayParam(value: string | undefined): {}",
+          "lines": [
+            40,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Parse a comma-separated string into an array",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "parseBooleanParam",
+          "kind": "function",
+          "signature": "parseBooleanParam(value: string | undefined): boolean",
+          "lines": [
+            57,
+            64
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Parse a boolean query parameter",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "fastify"
       ]
     },
     {
@@ -1442,37 +1517,18 @@
       "language": "typescript",
       "lines": [
         1,
-        94
+        84
       ],
       "detail_level": "full",
-      "token_estimate": 79,
+      "token_estimate": 61,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            18,
-            24
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "decisionsRoutes",
           "kind": "function",
           "signature": "async decisionsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            26,
-            93
+            16,
+            83
           ],
           "exported": true,
           "is_default": false,
@@ -1491,6 +1547,7 @@
       "code_blocks": null,
       "imports": [
         "../../storage/decision-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -1500,37 +1557,18 @@
       "language": "typescript",
       "lines": [
         1,
-        221
+        211
       ],
       "detail_level": "full",
-      "token_estimate": 85,
+      "token_estimate": 67,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            21,
-            27
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "edgesRoutes",
           "kind": "function",
           "signature": "async edgesRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            29,
-            220
+            19,
+            210
           ],
           "exported": true,
           "is_default": false,
@@ -1550,6 +1588,7 @@
       "imports": [
         "../../storage/edge-repository.js",
         "../../storage/node-types.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -1559,56 +1598,18 @@
       "language": "typescript",
       "lines": [
         1,
-        94
+        71
       ],
       "detail_level": "full",
-      "token_estimate": 105,
+      "token_estimate": 59,
       "symbols": [
-        {
-          "name": "parseArrayParam",
-          "kind": "function",
-          "signature": "parseArrayParam(value: string | undefined): {}",
-          "lines": [
-            18,
-            26
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse comma-separated string to array",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            31,
-            37
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "lessonsRoutes",
           "kind": "function",
           "signature": "async lessonsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            39,
-            93
+            16,
+            70
           ],
           "exported": true,
           "is_default": false,
@@ -1627,6 +1628,7 @@
       "code_blocks": null,
       "imports": [
         "../../storage/lesson-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -1636,75 +1638,18 @@
       "language": "typescript",
       "lines": [
         1,
-        261
+        232
       ],
       "detail_level": "full",
-      "token_estimate": 314,
+      "token_estimate": 241,
       "symbols": [
-        {
-          "name": "parseArrayParam",
-          "kind": "function",
-          "signature": "parseArrayParam(value: string | undefined): {}",
-          "lines": [
-            29,
-            37
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse comma-separated string to array",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "parseBooleanParam",
-          "kind": "function",
-          "signature": "parseBooleanParam(value: string | undefined): boolean",
-          "lines": [
-            42,
-            47
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse boolean query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            52,
-            58
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "buildIncludeFetchers",
           "kind": "function",
           "signature": "buildIncludeFetchers(db: Database.Database, id: string): Record<string, () => unknown>",
           "lines": [
-            68,
-            90
+            39,
+            61
           ],
           "exported": false,
           "is_default": false,
@@ -1722,8 +1667,8 @@
           "kind": "function",
           "signature": "populateIncludeData(responseData: Record<string, unknown>, includes: string[], fetchers: Record<string, () => unknown>): void",
           "lines": [
-            95,
-            107
+            66,
+            78
           ],
           "exported": false,
           "is_default": false,
@@ -1741,8 +1686,8 @@
           "kind": "function",
           "signature": "async nodesRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            109,
-            260
+            80,
+            231
           ],
           "exported": true,
           "is_default": false,
@@ -1769,6 +1714,7 @@
         "../../storage/node-types.js",
         "../../storage/quirk-repository.js",
         "../../storage/tool-error-repository.js",
+        "../query-params.js",
         "../responses.js",
         "better-sqlite3",
         "fastify"
@@ -1779,37 +1725,18 @@
       "language": "typescript",
       "lines": [
         1,
-        119
+        93
       ],
       "detail_level": "full",
-      "token_estimate": 103,
+      "token_estimate": 60,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined, paramName?: string, logger?: FastifyBaseLogger): number",
-          "lines": [
-            22,
-            39
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param with optional debug logging for invalid values",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "patternsRoutes",
           "kind": "function",
           "signature": "async patternsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            41,
-            118
+            15,
+            92
           ],
           "exported": true,
           "is_default": false,
@@ -1828,6 +1755,7 @@
       "code_blocks": null,
       "imports": [
         "../../storage/pattern-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -1996,37 +1924,18 @@
       "language": "typescript",
       "lines": [
         1,
-        108
+        98
       ],
       "detail_level": "full",
-      "token_estimate": 78,
+      "token_estimate": 59,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            19,
-            25
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "quirksRoutes",
           "kind": "function",
           "signature": "async quirksRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            27,
-            107
+            17,
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -2045,6 +1954,7 @@
       "code_blocks": null,
       "imports": [
         "../../storage/quirk-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -2054,56 +1964,18 @@
       "language": "typescript",
       "lines": [
         1,
-        105
+        82
       ],
       "detail_level": "full",
-      "token_estimate": 114,
+      "token_estimate": 68,
       "symbols": [
-        {
-          "name": "parseArrayParam",
-          "kind": "function",
-          "signature": "parseArrayParam(value: string | undefined): {}",
-          "lines": [
-            19,
-            27
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse comma-separated string to array",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            32,
-            38
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "searchRoutes",
           "kind": "function",
           "signature": "async searchRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            40,
-            104
+            17,
+            81
           ],
           "exported": true,
           "is_default": false,
@@ -2123,6 +1995,7 @@
       "imports": [
         "../../storage/node-queries.js",
         "../../storage/search-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -2132,37 +2005,18 @@
       "language": "typescript",
       "lines": [
         1,
-        273
+        263
       ],
       "detail_level": "full",
-      "token_estimate": 134,
+      "token_estimate": 115,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            20,
-            26
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "SessionSummary",
           "kind": "interface",
           "signature": "SessionSummary",
           "lines": [
-            31,
-            45
+            21,
+            35
           ],
           "exported": false,
           "is_default": false,
@@ -2180,8 +2034,8 @@
           "kind": "interface",
           "signature": "ProjectSummary",
           "lines": [
-            50,
-            55
+            40,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -2199,8 +2053,8 @@
           "kind": "function",
           "signature": "async sessionsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            57,
-            272
+            47,
+            262
           ],
           "exported": true,
           "is_default": false,
@@ -2220,6 +2074,7 @@
       "imports": [
         "../../storage/node-conversion.js",
         "../../storage/node-queries.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -2728,37 +2583,18 @@
       "language": "typescript",
       "lines": [
         1,
-        121
+        111
       ],
       "detail_level": "full",
-      "token_estimate": 81,
+      "token_estimate": 63,
       "symbols": [
-        {
-          "name": "parseIntParam",
-          "kind": "function",
-          "signature": "parseIntParam(value: string | undefined): number",
-          "lines": [
-            19,
-            25
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Parse integer query param",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "toolErrorsRoutes",
           "kind": "function",
           "signature": "async toolErrorsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            27,
-            120
+            17,
+            110
           ],
           "exported": true,
           "is_default": false,
@@ -2777,6 +2613,7 @@
       "code_blocks": null,
       "imports": [
         "../../storage/tool-error-repository.js",
+        "../query-params.js",
         "../responses.js",
         "fastify"
       ]
@@ -7234,10 +7071,10 @@
       "language": "typescript",
       "lines": [
         1,
-        346
+        340
       ],
       "detail_level": "full",
-      "token_estimate": 630,
+      "token_estimate": 668,
       "symbols": [
         {
           "name": "DEFAULT_BASE_DECAY_RATE",
@@ -7378,7 +7215,7 @@
           "signature": "RelevanceCalculator",
           "lines": [
             83,
-            345
+            339
           ],
           "exported": true,
           "is_default": false,
@@ -7506,12 +7343,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "buildFactors",
+          "kind": "method",
+          "signature": "buildFactors(row: NodeRow, now: number): RelevanceFactors",
+          "lines": [
+            163,
+            176
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": "RelevanceCalculator",
+          "annotation": null,
+          "comment": "Build RelevanceFactors from a node row and current timestamp.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "calculateForNode",
           "kind": "method",
           "signature": "calculateForNode(nodeId: string): RelevanceResult",
           "lines": [
-            163,
-            202
+            181,
+            208
           ],
           "exported": false,
           "is_default": false,
@@ -7529,8 +7385,8 @@
           "kind": "method",
           "signature": "updateNodeRelevance(nodeId: string): RelevanceResult",
           "lines": [
-            207,
-            222
+            213,
+            228
           ],
           "exported": false,
           "is_default": false,
@@ -7548,8 +7404,8 @@
           "kind": "method",
           "signature": "runDecay(): { updated: number; archived: number; deleted: number; results: {}; }",
           "lines": [
-            228,
-            301
+            234,
+            295
           ],
           "exported": false,
           "is_default": false,
@@ -7567,8 +7423,8 @@
           "kind": "method",
           "signature": "touchNode(nodeId: string): void",
           "lines": [
-            307,
-            315
+            301,
+            309
           ],
           "exported": false,
           "is_default": false,
@@ -7586,8 +7442,8 @@
           "kind": "method",
           "signature": "unarchiveNode(nodeId: string): void",
           "lines": [
-            321,
-            330
+            315,
+            324
           ],
           "exported": false,
           "is_default": false,
@@ -7605,8 +7461,8 @@
           "kind": "method",
           "signature": "getArchiveThreshold(): number",
           "lines": [
-            335,
-            337
+            329,
+            331
           ],
           "exported": false,
           "is_default": false,
@@ -7624,8 +7480,8 @@
           "kind": "method",
           "signature": "getDeleteThreshold(): number",
           "lines": [
-            342,
-            344
+            336,
+            338
           ],
           "exported": false,
           "is_default": false,
@@ -10499,7 +10355,7 @@
       "language": "typescript",
       "lines": [
         1,
-        332
+        331
       ],
       "detail_level": "full",
       "token_estimate": 201,
@@ -10548,7 +10404,7 @@
           "signature": "PatternAggregator",
           "lines": [
             22,
-            331
+            330
           ],
           "exported": true,
           "is_default": false,
@@ -10643,7 +10499,7 @@
           "signature": "aggregateModelStats(): number",
           "lines": [
             251,
-            330
+            329
           ],
           "exported": false,
           "is_default": false,
@@ -21292,18 +21148,18 @@
       "language": "typescript",
       "lines": [
         1,
-        143
+        144
       ],
       "detail_level": "full",
-      "token_estimate": 222,
+      "token_estimate": 228,
       "symbols": [
         {
           "name": "ListDecisionsFilters",
           "kind": "interface",
           "signature": "ListDecisionsFilters",
           "lines": [
-            10,
-            19
+            12,
+            21
           ],
           "exported": true,
           "is_default": false,
@@ -21321,8 +21177,8 @@
           "kind": "interface",
           "signature": "ListDecisionsOptions",
           "lines": [
-            22,
-            27
+            24,
+            29
           ],
           "exported": true,
           "is_default": false,
@@ -21340,8 +21196,8 @@
           "kind": "interface",
           "signature": "DaemonDecisionResult",
           "lines": [
-            30,
-            39
+            32,
+            41
           ],
           "exported": true,
           "is_default": false,
@@ -21359,8 +21215,8 @@
           "kind": "interface",
           "signature": "ListDecisionsResult",
           "lines": [
-            42,
-            51
+            44,
+            53
           ],
           "exported": true,
           "is_default": false,
@@ -21378,8 +21234,8 @@
           "kind": "function",
           "signature": "listDecisions(db: Database.Database, filters: ListDecisionsFilters = {}, options: ListDecisionsOptions = {}): ListDecisionsResult",
           "lines": [
-            56,
-            124
+            58,
+            125
           ],
           "exported": true,
           "is_default": false,
@@ -21397,8 +21253,8 @@
           "kind": "function",
           "signature": "updateDecisionFeedback(db: Database.Database, decisionId: string, feedback: string | null): boolean",
           "lines": [
-            129,
-            142
+            130,
+            143
           ],
           "exported": true,
           "is_default": false,
@@ -21416,6 +21272,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "better-sqlite3"
       ]
     },
@@ -22128,18 +21985,75 @@
       "language": "typescript",
       "lines": [
         1,
-        272
+        302
       ],
       "detail_level": "full",
-      "token_estimate": 677,
+      "token_estimate": 741,
       "symbols": [
+        {
+          "name": "DEFAULT_LIMIT",
+          "kind": "variable",
+          "signature": "50",
+          "lines": [
+            18,
+            18
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Default and max limits for pagination",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "MAX_LIMIT",
+          "kind": "variable",
+          "signature": "500",
+          "lines": [
+            19,
+            19
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "normalizePagination",
+          "kind": "function",
+          "signature": "normalizePagination(limit?: number, offset?: number): { limit: number; offset: number; }",
+          "lines": [
+            32,
+            40
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Normalize pagination options with clamping.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "BaseFilters",
           "kind": "interface",
           "signature": "BaseFilters",
           "lines": [
-            17,
-            38
+            47,
+            68
           ],
           "exported": true,
           "is_default": false,
@@ -22157,8 +22071,8 @@
           "kind": "interface",
           "signature": "ExtendedFilters extends BaseFilters",
           "lines": [
-            41,
-            46
+            71,
+            76
           ],
           "exported": true,
           "is_default": false,
@@ -22176,8 +22090,8 @@
           "kind": "interface",
           "signature": "WhereClauseResult",
           "lines": [
-            49,
-            54
+            79,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -22195,8 +22109,8 @@
           "kind": "interface",
           "signature": "FilterContext",
           "lines": [
-            60,
-            64
+            90,
+            94
           ],
           "exported": false,
           "is_default": false,
@@ -22214,8 +22128,8 @@
           "kind": "type",
           "signature": "FilterHandler = (\n  filters: BaseFilters | ExtendedFilters,\n  ctx: FilterContext\n) => void",
           "lines": [
-            66,
-            69
+            96,
+            99
           ],
           "exported": false,
           "is_default": false,
@@ -22233,8 +22147,8 @@
           "kind": "function",
           "signature": "handleProjectFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            72,
-            80
+            102,
+            110
           ],
           "exported": false,
           "is_default": false,
@@ -22252,8 +22166,8 @@
           "kind": "function",
           "signature": "handleExactProjectFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            83,
-            91
+            113,
+            121
           ],
           "exported": false,
           "is_default": false,
@@ -22271,8 +22185,8 @@
           "kind": "function",
           "signature": "handleTypeFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            94,
-            102
+            124,
+            132
           ],
           "exported": false,
           "is_default": false,
@@ -22290,8 +22204,8 @@
           "kind": "function",
           "signature": "handleOutcomeFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            105,
-            113
+            135,
+            143
           ],
           "exported": false,
           "is_default": false,
@@ -22309,8 +22223,8 @@
           "kind": "function",
           "signature": "handleDateRangeFilters(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            116,
-            128
+            146,
+            158
           ],
           "exported": false,
           "is_default": false,
@@ -22328,8 +22242,8 @@
           "kind": "function",
           "signature": "handleComputerFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            131,
-            139
+            161,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -22347,8 +22261,8 @@
           "kind": "function",
           "signature": "handleBooleanFilters(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            142,
-            154
+            172,
+            184
           ],
           "exported": false,
           "is_default": false,
@@ -22366,8 +22280,8 @@
           "kind": "function",
           "signature": "handleSessionFileFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            157,
-            165
+            187,
+            195
           ],
           "exported": false,
           "is_default": false,
@@ -22385,8 +22299,8 @@
           "kind": "function",
           "signature": "handleTagsFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            168,
-            186
+            198,
+            216
           ],
           "exported": false,
           "is_default": false,
@@ -22404,8 +22318,8 @@
           "kind": "function",
           "signature": "handleTopicsFilter(filters: BaseFilters | ExtendedFilters, ctx: FilterContext): void",
           "lines": [
-            189,
-            201
+            219,
+            231
           ],
           "exported": false,
           "is_default": false,
@@ -22423,8 +22337,8 @@
           "kind": "variable",
           "signature": "FilterHandler[]",
           "lines": [
-            204,
-            215
+            234,
+            245
           ],
           "exported": false,
           "is_default": false,
@@ -22442,8 +22356,8 @@
           "kind": "function",
           "signature": "buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = \"n\"): WhereClauseResult",
           "lines": [
-            249,
-            271
+            279,
+            301
           ],
           "exported": true,
           "is_default": false,
@@ -23292,18 +23206,18 @@
       "language": "typescript",
       "lines": [
         1,
-        285
+        286
       ],
       "detail_level": "full",
-      "token_estimate": 436,
+      "token_estimate": 442,
       "symbols": [
         {
           "name": "ListLessonsFilters",
           "kind": "interface",
           "signature": "ListLessonsFilters",
           "lines": [
-            16,
-            25
+            18,
+            27
           ],
           "exported": true,
           "is_default": false,
@@ -23321,8 +23235,8 @@
           "kind": "interface",
           "signature": "ListLessonsOptions",
           "lines": [
-            28,
-            33
+            30,
+            35
           ],
           "exported": true,
           "is_default": false,
@@ -23340,8 +23254,8 @@
           "kind": "interface",
           "signature": "ListLessonsResult",
           "lines": [
-            36,
-            55
+            38,
+            57
           ],
           "exported": true,
           "is_default": false,
@@ -23359,8 +23273,8 @@
           "kind": "type",
           "signature": "LessonsByLevelResult = Record<\n  string,\n  {\n    count: number;\n    recent: {\n      id: string;\n      summary: string;\n      createdAt: string;\n    }[];\n  }\n>",
           "lines": [
-            58,
-            68
+            60,
+            70
           ],
           "exported": true,
           "is_default": false,
@@ -23378,8 +23292,8 @@
           "kind": "function",
           "signature": "buildLessonWhereClause(filters: ListLessonsFilters): { whereClause: string; params: {}; }",
           "lines": [
-            77,
-            109
+            79,
+            111
           ],
           "exported": false,
           "is_default": false,
@@ -23397,8 +23311,8 @@
           "kind": "function",
           "signature": "fetchLessonTagsMap(db: Database.Database, lessonIds: string[]): Map<string, {}>",
           "lines": [
-            114,
-            143
+            116,
+            145
           ],
           "exported": false,
           "is_default": false,
@@ -23416,8 +23330,8 @@
           "kind": "function",
           "signature": "listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult",
           "lines": [
-            156,
-            208
+            158,
+            209
           ],
           "exported": true,
           "is_default": false,
@@ -23435,8 +23349,8 @@
           "kind": "function",
           "signature": "getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }>",
           "lines": [
-            216,
-            256
+            217,
+            257
           ],
           "exported": true,
           "is_default": false,
@@ -23454,8 +23368,8 @@
           "kind": "function",
           "signature": "getNodeLessons(db: Database.Database, nodeId: string): {}",
           "lines": [
-            261,
-            284
+            262,
+            285
           ],
           "exported": true,
           "is_default": false,
@@ -23473,6 +23387,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "better-sqlite3"
       ]
     },
@@ -24381,18 +24296,18 @@
       "language": "typescript",
       "lines": [
         1,
-        255
+        258
       ],
       "detail_level": "full",
-      "token_estimate": 597,
+      "token_estimate": 598,
       "symbols": [
         {
           "name": "getNodeSummary",
           "kind": "function",
           "signature": "getNodeSummary(db: Database.Database, nodeId: string): string",
           "lines": [
-            23,
-            30
+            27,
+            34
           ],
           "exported": true,
           "is_default": false,
@@ -24410,8 +24325,8 @@
           "kind": "function",
           "signature": "getNodeTags(db: Database.Database, nodeId: string): {}",
           "lines": [
-            35,
-            39
+            39,
+            43
           ],
           "exported": true,
           "is_default": false,
@@ -24429,8 +24344,8 @@
           "kind": "function",
           "signature": "getNodeTopics(db: Database.Database, nodeId: string): {}",
           "lines": [
-            44,
-            48
+            48,
+            52
           ],
           "exported": true,
           "is_default": false,
@@ -24448,8 +24363,8 @@
           "kind": "type",
           "signature": "NodeSortField = | \"timestamp\"\n  | \"analyzed_at\"\n  | \"project\"\n  | \"type\"\n  | \"outcome\"\n  | \"tokens_used\"\n  | \"cost\"\n  | \"duration_minutes\"",
           "lines": [
-            55,
-            63
+            59,
+            67
           ],
           "exported": true,
           "is_default": false,
@@ -24467,8 +24382,8 @@
           "kind": "type",
           "signature": "SortOrder = \"asc\" | \"desc\"",
           "lines": [
-            66,
-            66
+            70,
+            70
           ],
           "exported": true,
           "is_default": false,
@@ -24486,8 +24401,8 @@
           "kind": "type",
           "signature": "ListNodesFilters = ExtendedFilters",
           "lines": [
-            69,
-            69
+            73,
+            73
           ],
           "exported": true,
           "is_default": false,
@@ -24505,8 +24420,8 @@
           "kind": "interface",
           "signature": "ListNodesOptions",
           "lines": [
-            72,
-            81
+            76,
+            85
           ],
           "exported": true,
           "is_default": false,
@@ -24524,8 +24439,8 @@
           "kind": "interface",
           "signature": "ListNodesResult",
           "lines": [
-            84,
-            93
+            88,
+            97
           ],
           "exported": true,
           "is_default": false,
@@ -24543,8 +24458,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            96,
-            105
+            100,
+            109
           ],
           "exported": false,
           "is_default": false,
@@ -24562,8 +24477,8 @@
           "kind": "function",
           "signature": "listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult",
           "lines": [
-            123,
-            170
+            127,
+            174
           ],
           "exported": true,
           "is_default": false,
@@ -24581,8 +24496,8 @@
           "kind": "interface",
           "signature": "SessionSummaryRow",
           "lines": [
-            179,
-            191
+            183,
+            195
           ],
           "exported": true,
           "is_default": false,
@@ -24600,8 +24515,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            197,
-            226
+            201,
+            229
           ],
           "exported": true,
           "is_default": false,
@@ -24619,8 +24534,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            235,
-            243
+            238,
+            246
           ],
           "exported": true,
           "is_default": false,
@@ -24638,8 +24553,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            248,
-            254
+            251,
+            257
           ],
           "exported": true,
           "is_default": false,
@@ -25600,18 +25515,18 @@
       "language": "typescript",
       "lines": [
         1,
-        287
+        288
       ],
       "detail_level": "full",
-      "token_estimate": 509,
+      "token_estimate": 515,
       "symbols": [
         {
           "name": "QuirkFrequency",
           "kind": "type",
           "signature": "QuirkFrequency = \"once\" | \"sometimes\" | \"often\" | \"always\"",
           "lines": [
-            16,
-            16
+            18,
+            18
           ],
           "exported": true,
           "is_default": false,
@@ -25629,8 +25544,8 @@
           "kind": "interface",
           "signature": "ListQuirksFilters",
           "lines": [
-            19,
-            26
+            21,
+            28
           ],
           "exported": true,
           "is_default": false,
@@ -25648,8 +25563,8 @@
           "kind": "interface",
           "signature": "ListQuirksOptions",
           "lines": [
-            29,
-            34
+            31,
+            36
           ],
           "exported": true,
           "is_default": false,
@@ -25667,8 +25582,8 @@
           "kind": "interface",
           "signature": "QuirkResult",
           "lines": [
-            37,
-            46
+            39,
+            48
           ],
           "exported": true,
           "is_default": false,
@@ -25686,8 +25601,8 @@
           "kind": "interface",
           "signature": "ListQuirksResult",
           "lines": [
-            49,
-            58
+            51,
+            60
           ],
           "exported": true,
           "is_default": false,
@@ -25705,8 +25620,8 @@
           "kind": "interface",
           "signature": "ModelQuirkStats",
           "lines": [
-            61,
-            71
+            63,
+            73
           ],
           "exported": true,
           "is_default": false,
@@ -25724,8 +25639,8 @@
           "kind": "type",
           "signature": "QuirksByModelResult = Record<string, ModelQuirkStats>",
           "lines": [
-            74,
-            74
+            76,
+            76
           ],
           "exported": true,
           "is_default": false,
@@ -25743,8 +25658,8 @@
           "kind": "variable",
           "signature": "Record<string, number>",
           "lines": [
-            81,
-            86
+            83,
+            88
           ],
           "exported": false,
           "is_default": false,
@@ -25762,8 +25677,8 @@
           "kind": "function",
           "signature": "listQuirks(db: Database.Database, filters: ListQuirksFilters = {}, options: ListQuirksOptions = {}): ListQuirksResult",
           "lines": [
-            102,
-            162
+            104,
+            163
           ],
           "exported": true,
           "is_default": false,
@@ -25781,8 +25696,8 @@
           "kind": "function",
           "signature": "getQuirksByModel(db: Database.Database, recentLimit = 5): Record<string, ModelQuirkStats>",
           "lines": [
-            170,
-            208
+            171,
+            209
           ],
           "exported": true,
           "is_default": false,
@@ -25800,8 +25715,8 @@
           "kind": "function",
           "signature": "getAggregatedQuirks(db: Database.Database, options: { minOccurrences?: number; limit?: number } = {}): {}",
           "lines": [
-            216,
-            258
+            217,
+            259
           ],
           "exported": true,
           "is_default": false,
@@ -25819,8 +25734,8 @@
           "kind": "function",
           "signature": "getNodeQuirks(db: Database.Database, nodeId: string): {}",
           "lines": [
-            263,
-            286
+            264,
+            287
           ],
           "exported": true,
           "is_default": false,
@@ -25838,6 +25753,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "better-sqlite3"
       ]
     },
@@ -26484,15 +26400,15 @@
         351
       ],
       "detail_level": "full",
-      "token_estimate": 608,
+      "token_estimate": 614,
       "symbols": [
         {
           "name": "ListToolErrorsFilters",
           "kind": "interface",
           "signature": "ListToolErrorsFilters",
           "lines": [
-            16,
-            25
+            18,
+            27
           ],
           "exported": true,
           "is_default": false,
@@ -26510,8 +26426,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsOptions",
           "lines": [
-            28,
-            33
+            30,
+            35
           ],
           "exported": true,
           "is_default": false,
@@ -26529,8 +26445,8 @@
           "kind": "interface",
           "signature": "ToolErrorResult",
           "lines": [
-            36,
-            45
+            38,
+            47
           ],
           "exported": true,
           "is_default": false,
@@ -26548,8 +26464,8 @@
           "kind": "interface",
           "signature": "ListToolErrorsResult",
           "lines": [
-            48,
-            57
+            50,
+            59
           ],
           "exported": true,
           "is_default": false,
@@ -26567,8 +26483,8 @@
           "kind": "interface",
           "signature": "ToolStats",
           "lines": [
-            60,
-            64
+            62,
+            66
           ],
           "exported": true,
           "is_default": false,
@@ -26586,8 +26502,8 @@
           "kind": "interface",
           "signature": "ModelErrorStats",
           "lines": [
-            67,
-            70
+            69,
+            72
           ],
           "exported": true,
           "is_default": false,
@@ -26605,8 +26521,8 @@
           "kind": "interface",
           "signature": "ToolErrorTrends",
           "lines": [
-            73,
-            77
+            75,
+            79
           ],
           "exported": true,
           "is_default": false,
@@ -26624,8 +26540,8 @@
           "kind": "interface",
           "signature": "ToolErrorStatsResult",
           "lines": [
-            80,
-            84
+            82,
+            86
           ],
           "exported": true,
           "is_default": false,
@@ -26643,8 +26559,8 @@
           "kind": "interface",
           "signature": "AggregatedToolError",
           "lines": [
-            87,
-            94
+            89,
+            96
           ],
           "exported": true,
           "is_default": false,
@@ -26662,8 +26578,8 @@
           "kind": "interface",
           "signature": "NodeToolError",
           "lines": [
-            97,
-            103
+            99,
+            105
           ],
           "exported": true,
           "is_default": false,
@@ -26681,8 +26597,8 @@
           "kind": "interface",
           "signature": "WhereClauseResult",
           "lines": [
-            109,
-            112
+            111,
+            114
           ],
           "exported": false,
           "is_default": false,
@@ -26700,8 +26616,8 @@
           "kind": "function",
           "signature": "buildToolErrorWhereClause(filters: ListToolErrorsFilters, includeProject = false): WhereClauseResult",
           "lines": [
-            117,
-            150
+            119,
+            152
           ],
           "exported": false,
           "is_default": false,
@@ -26719,8 +26635,8 @@
           "kind": "function",
           "signature": "parseRecentNodes(nodeIdsList: string | null, limit = 5): {}",
           "lines": [
-            155,
-            160
+            157,
+            162
           ],
           "exported": false,
           "is_default": false,
@@ -26738,8 +26654,8 @@
           "kind": "function",
           "signature": "parseCommaSeparated(list: string | null): {}",
           "lines": [
-            165,
-            167
+            167,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -26757,8 +26673,8 @@
           "kind": "function",
           "signature": "listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult",
           "lines": [
-            176,
-            213
+            178,
+            214
           ],
           "exported": true,
           "is_default": false,
@@ -26776,7 +26692,7 @@
           "kind": "function",
           "signature": "getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {}",
           "lines": [
-            219,
+            220,
             274
           ],
           "exported": true,
@@ -26833,6 +26749,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./filter-utils.js",
         "better-sqlite3"
       ]
     },

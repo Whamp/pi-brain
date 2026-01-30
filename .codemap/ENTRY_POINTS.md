@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 29 files
+- typescript: 30 files
 
 ## Statistics
-- Total files: 29
-- Total symbols: 171
-  - function: 104
+- Total files: 30
+- Total symbols: 161
+  - function: 94
   - interface: 30
   - variable: 15
   - method: 12
@@ -21,6 +21,26 @@ src/api/index.ts [1-22]
   imports:
     - ./server.js
     - ./websocket.js
+
+src/api/query-params.ts [1-65]
+  function:
+    16-33: parseIntParam(value: string | undefined, paramName?: string, logger?: FastifyBaseLogger): number [exported]
+      /** Parse an integer query parameter */
+      refs out: 3 [call: 2, type: 1]
+        - src/api/query-params.ts:19: type FastifyBaseLogger -> external
+        - src/api/query-params.ts:25: call isNaN -> external
+        - src/api/query-params.ts:26: call debug -> external
+    40-50: parseArrayParam(value: string | undefined): {} [exported]
+      /** Parse a comma-separated string into an array */
+      refs out: 4 [call: 4]
+        - src/api/query-params.ts:46: call filter -> external
+        - src/api/query-params.ts:46: call map -> external
+        - src/api/query-params.ts:46: call split -> external
+        - src/api/query-params.ts:48: call trim -> external
+    57-64: parseBooleanParam(value: string | undefined): boolean [exported]
+      /** Parse a boolean query parameter */
+  imports:
+    - fastify
 
 src/api/responses.ts [1-52]
   type:
@@ -464,106 +484,77 @@ src/api/routes/daemon.ts [1-385]
     - node:fs
     - node:path
 
-src/api/routes/decisions.ts [1-94]
+src/api/routes/decisions.ts [1-84]
   function:
-    18-24: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/decisions.ts:23: call isNaN -> external
-    26-93: async decisionsRoutes(app: FastifyInstance): Promise<void> [exported]
+    16-83: async decisionsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 15 [call: 9, type: 6]
-        - src/api/routes/decisions.ts:26: type FastifyInstance -> external
-        - src/api/routes/decisions.ts:26: type Promise -> external
-        - src/api/routes/decisions.ts:30: call get -> external
-        - src/api/routes/decisions.ts:33: type FastifyRequest -> external
-        - src/api/routes/decisions.ts:43: type FastifyReply -> external
+        - src/api/routes/decisions.ts:16: type FastifyInstance -> external
+        - src/api/routes/decisions.ts:16: type Promise -> external
+        - src/api/routes/decisions.ts:20: call get -> external
+        - src/api/routes/decisions.ts:23: type FastifyRequest -> external
+        - src/api/routes/decisions.ts:33: type FastifyReply -> external
   imports:
     - ../../storage/decision-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
-src/api/routes/edges.ts [1-221]
+src/api/routes/edges.ts [1-211]
   function:
-    21-27: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/edges.ts:26: call isNaN -> external
-    29-220: async edgesRoutes(app: FastifyInstance): Promise<void> [exported]
+    19-210: async edgesRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 40 [call: 29, type: 11]
-        - src/api/routes/edges.ts:29: type FastifyInstance -> external
-        - src/api/routes/edges.ts:29: type Promise -> external
-        - src/api/routes/edges.ts:33: call get -> external
-        - src/api/routes/edges.ts:36: type FastifyRequest -> external
-        - src/api/routes/edges.ts:45: type FastifyReply -> external
+        - src/api/routes/edges.ts:19: type FastifyInstance -> external
+        - src/api/routes/edges.ts:19: type Promise -> external
+        - src/api/routes/edges.ts:23: call get -> external
+        - src/api/routes/edges.ts:26: type FastifyRequest -> external
+        - src/api/routes/edges.ts:35: type FastifyReply -> external
   imports:
     - ../../storage/edge-repository.js
     - ../../storage/node-types.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
-src/api/routes/lessons.ts [1-94]
+src/api/routes/lessons.ts [1-71]
   function:
-    18-26: parseArrayParam(value: string | undefined): {}
-      /** Parse comma-separated string to array */
-      refs out: 4 [call: 4]
-        - src/api/routes/lessons.ts:22: call filter -> external
-        - src/api/routes/lessons.ts:22: call map -> external
-        - src/api/routes/lessons.ts:22: call split -> external
-        - src/api/routes/lessons.ts:24: call trim -> external
-    31-37: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/lessons.ts:36: call isNaN -> external
-    39-93: async lessonsRoutes(app: FastifyInstance): Promise<void> [exported]
+    16-70: async lessonsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 12 [call: 6, type: 6]
-        - src/api/routes/lessons.ts:39: type FastifyInstance -> external
-        - src/api/routes/lessons.ts:39: type Promise -> external
-        - src/api/routes/lessons.ts:43: call get -> external
-        - src/api/routes/lessons.ts:46: type FastifyRequest -> external
-        - src/api/routes/lessons.ts:56: type FastifyReply -> external
+        - src/api/routes/lessons.ts:16: type FastifyInstance -> external
+        - src/api/routes/lessons.ts:16: type Promise -> external
+        - src/api/routes/lessons.ts:20: call get -> external
+        - src/api/routes/lessons.ts:23: type FastifyRequest -> external
+        - src/api/routes/lessons.ts:33: type FastifyReply -> external
   imports:
     - ../../storage/lesson-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-261]
+src/api/routes/nodes.ts [1-232]
   function:
-    29-37: parseArrayParam(value: string | undefined): {}
-      /** Parse comma-separated string to array */
-      refs out: 4 [call: 4]
-        - src/api/routes/nodes.ts:33: call filter -> external
-        - src/api/routes/nodes.ts:33: call map -> external
-        - src/api/routes/nodes.ts:33: call split -> external
-        - src/api/routes/nodes.ts:35: call trim -> external
-    42-47: parseBooleanParam(value: string | undefined): boolean
-      /** Parse boolean query param */
-    52-58: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/nodes.ts:57: call isNaN -> external
-    68-90: buildIncludeFetchers(db: Database.Database, id: string): Record<string, () => unknown>
+    39-61: buildIncludeFetchers(db: Database.Database, id: string): Record<string, () => unknown>
       /** Lookup table for include data fetchers Each key maps to a function that fetches the relevant data */
       refs out: 8 [call: 6, type: 2]
-        - src/api/routes/nodes.ts:69: type Database -> external
-        - src/api/routes/nodes.ts:71: type Record -> external
-        - src/api/routes/nodes.ts:73: call getNodeLessons -> src/storage/lesson-repository.ts
-        - src/api/routes/nodes.ts:74: call getNodeQuirks -> src/storage/quirk-repository.ts
-        - src/api/routes/nodes.ts:75: call getNodeToolErrors -> src/storage/tool-error-repository.ts
-    95-107: populateIncludeData(responseData: Record<string, unknown>, includes: string[], fetchers: Record<string, () => unknown>): void
+        - src/api/routes/nodes.ts:40: type Database -> external
+        - src/api/routes/nodes.ts:42: type Record -> external
+        - src/api/routes/nodes.ts:44: call getNodeLessons -> src/storage/lesson-repository.ts
+        - src/api/routes/nodes.ts:45: call getNodeQuirks -> src/storage/quirk-repository.ts
+        - src/api/routes/nodes.ts:46: call getNodeToolErrors -> src/storage/tool-error-repository.ts
+    66-78: populateIncludeData(responseData: Record<string, unknown>, includes: string[], fetchers: Record<string, () => unknown>): void
       /** Populate response data based on include params */
       refs out: 5 [call: 3, type: 2]
-        - src/api/routes/nodes.ts:96: type Record -> external
-        - src/api/routes/nodes.ts:98: type Record -> external
-        - src/api/routes/nodes.ts:102: call entries -> external
-        - src/api/routes/nodes.ts:103: call includes -> external
-        - src/api/routes/nodes.ts:104: call fetcher -> src/api/routes/nodes.ts
-    109-260: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+        - src/api/routes/nodes.ts:67: type Record -> external
+        - src/api/routes/nodes.ts:69: type Record -> external
+        - src/api/routes/nodes.ts:73: call entries -> external
+        - src/api/routes/nodes.ts:74: call includes -> external
+        - src/api/routes/nodes.ts:75: call fetcher -> src/api/routes/nodes.ts
+    80-231: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 24 [call: 16, type: 8]
-        - src/api/routes/nodes.ts:109: type FastifyInstance -> external
-        - src/api/routes/nodes.ts:109: type Promise -> external
-        - src/api/routes/nodes.ts:113: call get -> external
-        - src/api/routes/nodes.ts:116: type FastifyRequest -> external
-        - src/api/routes/nodes.ts:134: type FastifyReply -> external
+        - src/api/routes/nodes.ts:80: type FastifyInstance -> external
+        - src/api/routes/nodes.ts:80: type Promise -> external
+        - src/api/routes/nodes.ts:84: call get -> external
+        - src/api/routes/nodes.ts:87: type FastifyRequest -> external
+        - src/api/routes/nodes.ts:105: type FastifyReply -> external
   imports:
     - ../../storage/graph-repository.js
     - ../../storage/lesson-repository.js
@@ -574,27 +565,23 @@ src/api/routes/nodes.ts [1-261]
     - ../../storage/node-types.js
     - ../../storage/quirk-repository.js
     - ../../storage/tool-error-repository.js
+    - ../query-params.js
     - ../responses.js
     - better-sqlite3
     - fastify
 
-src/api/routes/patterns.ts [1-119]
+src/api/routes/patterns.ts [1-93]
   function:
-    22-39: parseIntParam(value: string | undefined, paramName?: string, logger?: FastifyBaseLogger): number
-      /** Parse integer query param with optional debug logging for invalid values */
-      refs out: 3 [call: 2, type: 1]
-        - src/api/routes/patterns.ts:25: type FastifyBaseLogger -> external
-        - src/api/routes/patterns.ts:31: call isNaN -> external
-        - src/api/routes/patterns.ts:32: call debug -> external
-    41-118: async patternsRoutes(app: FastifyInstance): Promise<void> [exported]
+    15-92: async patternsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 17 [call: 9, type: 8]
-        - src/api/routes/patterns.ts:41: type FastifyInstance -> external
-        - src/api/routes/patterns.ts:41: type Promise -> external
-        - src/api/routes/patterns.ts:45: call get -> external
-        - src/api/routes/patterns.ts:48: type FastifyRequest -> external
-        - src/api/routes/patterns.ts:55: type FastifyReply -> external
+        - src/api/routes/patterns.ts:15: type FastifyInstance -> external
+        - src/api/routes/patterns.ts:15: type Promise -> external
+        - src/api/routes/patterns.ts:19: call get -> external
+        - src/api/routes/patterns.ts:22: type FastifyRequest -> external
+        - src/api/routes/patterns.ts:29: type FastifyReply -> external
   imports:
     - ../../storage/pattern-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
@@ -662,71 +649,55 @@ src/api/routes/query.ts [1-291]
     - node:os
     - node:path
 
-src/api/routes/quirks.ts [1-108]
+src/api/routes/quirks.ts [1-98]
   function:
-    19-25: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/quirks.ts:24: call isNaN -> external
-    27-107: async quirksRoutes(app: FastifyInstance): Promise<void> [exported]
+    17-97: async quirksRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 17 [call: 9, type: 8]
-        - src/api/routes/quirks.ts:27: type FastifyInstance -> external
-        - src/api/routes/quirks.ts:27: type Promise -> external
-        - src/api/routes/quirks.ts:31: call get -> external
-        - src/api/routes/quirks.ts:34: type FastifyRequest -> external
-        - src/api/routes/quirks.ts:43: type FastifyReply -> external
+        - src/api/routes/quirks.ts:17: type FastifyInstance -> external
+        - src/api/routes/quirks.ts:17: type Promise -> external
+        - src/api/routes/quirks.ts:21: call get -> external
+        - src/api/routes/quirks.ts:24: type FastifyRequest -> external
+        - src/api/routes/quirks.ts:33: type FastifyReply -> external
   imports:
     - ../../storage/quirk-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
-src/api/routes/search.ts [1-105]
+src/api/routes/search.ts [1-82]
   function:
-    19-27: parseArrayParam(value: string | undefined): {}
-      /** Parse comma-separated string to array */
-      refs out: 4 [call: 4]
-        - src/api/routes/search.ts:23: call filter -> external
-        - src/api/routes/search.ts:23: call map -> external
-        - src/api/routes/search.ts:23: call split -> external
-        - src/api/routes/search.ts:25: call trim -> external
-    32-38: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/search.ts:37: call isNaN -> external
-    40-104: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
+    17-81: async searchRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 7 [call: 3, type: 4]
-        - src/api/routes/search.ts:40: type FastifyInstance -> external
-        - src/api/routes/search.ts:40: type Promise -> external
-        - src/api/routes/search.ts:44: call get -> external
-        - src/api/routes/search.ts:47: type FastifyRequest -> external
-        - src/api/routes/search.ts:62: type FastifyReply -> external
+        - src/api/routes/search.ts:17: type FastifyInstance -> external
+        - src/api/routes/search.ts:17: type Promise -> external
+        - src/api/routes/search.ts:21: call get -> external
+        - src/api/routes/search.ts:24: type FastifyRequest -> external
+        - src/api/routes/search.ts:39: type FastifyReply -> external
   imports:
     - ../../storage/node-queries.js
     - ../../storage/search-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
-src/api/routes/sessions.ts [1-273]
+src/api/routes/sessions.ts [1-263]
   interface:
-    31-45: interface SessionSummary
+    21-35: interface SessionSummary
       /** Session summary for the file browser */
-    50-55: interface ProjectSummary
+    40-45: interface ProjectSummary
       /** Project summary for the file browser */
   function:
-    20-26: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/sessions.ts:25: call isNaN -> external
-    57-272: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
+    47-262: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 34 [call: 24, instantiate: 2, type: 8]
-        - src/api/routes/sessions.ts:57: type FastifyInstance -> external
-        - src/api/routes/sessions.ts:57: type Promise -> external
-        - src/api/routes/sessions.ts:61: call get -> external
-        - src/api/routes/sessions.ts:61: type FastifyRequest -> external
-        - src/api/routes/sessions.ts:61: type FastifyReply -> external
+        - src/api/routes/sessions.ts:47: type FastifyInstance -> external
+        - src/api/routes/sessions.ts:47: type Promise -> external
+        - src/api/routes/sessions.ts:51: call get -> external
+        - src/api/routes/sessions.ts:51: type FastifyRequest -> external
+        - src/api/routes/sessions.ts:51: type FastifyReply -> external
   imports:
     - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
@@ -867,21 +838,18 @@ src/api/routes/stats.ts [1-485]
     - better-sqlite3
     - fastify
 
-src/api/routes/tool-errors.ts [1-121]
+src/api/routes/tool-errors.ts [1-111]
   function:
-    19-25: parseIntParam(value: string | undefined): number
-      /** Parse integer query param */
-      refs out: 1 [call: 1]
-        - src/api/routes/tool-errors.ts:24: call isNaN -> external
-    27-120: async toolErrorsRoutes(app: FastifyInstance): Promise<void> [exported]
+    17-110: async toolErrorsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 17 [call: 9, type: 8]
-        - src/api/routes/tool-errors.ts:27: type FastifyInstance -> external
-        - src/api/routes/tool-errors.ts:27: type Promise -> external
-        - src/api/routes/tool-errors.ts:31: call get -> external
-        - src/api/routes/tool-errors.ts:34: type FastifyRequest -> external
-        - src/api/routes/tool-errors.ts:44: type FastifyReply -> external
+        - src/api/routes/tool-errors.ts:17: type FastifyInstance -> external
+        - src/api/routes/tool-errors.ts:17: type Promise -> external
+        - src/api/routes/tool-errors.ts:21: call get -> external
+        - src/api/routes/tool-errors.ts:24: type FastifyRequest -> external
+        - src/api/routes/tool-errors.ts:34: type FastifyReply -> external
   imports:
     - ../../storage/tool-error-repository.js
+    - ../query-params.js
     - ../responses.js
     - fastify
 
@@ -1252,5 +1220,5 @@ src/cli.ts [1-1165]
     - open
 
 ---
-Files: 29
-Estimated tokens: 15,929 (codebase: ~1,356,435)
+Files: 30
+Estimated tokens: 15,424 (codebase: ~1,356,299)
