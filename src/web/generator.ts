@@ -5,6 +5,7 @@
 
 import type {
   SessionInfo,
+  SessionEntry,
   ForkRelationship,
   TreeNode,
   SessionMessageEntry,
@@ -77,70 +78,93 @@ function compressSession(session: SessionInfo): CompactSessionInfo {
   };
 }
 
+/** Result of extracting entry metadata */
+interface EntryMetadata {
+  role?: string;
+  label: string;
+  content?: string;
+  model?: string;
+  usage?: { input: number; output: number; cost?: number };
+}
+
+/** Extract metadata from a message entry */
+function extractMessageMetadata(entry: SessionMessageEntry): EntryMetadata {
+  const msg = entry.message;
+  const result: EntryMetadata = { role: msg.role, label: "" };
+
+  if (msg.role === "user") {
+    result.label = truncateContent(msg.content);
+    result.content = truncateContent(msg.content, 500);
+  } else if (msg.role === "assistant") {
+    const assistantMsg = msg as AssistantMessage;
+    result.label = truncateContent(assistantMsg.content);
+    result.content = truncateContent(assistantMsg.content, 500);
+    result.model = `${assistantMsg.provider}/${assistantMsg.model}`;
+    if (assistantMsg.usage) {
+      result.usage = {
+        cost: assistantMsg.usage.cost?.total,
+        input: assistantMsg.usage.input || 0,
+        output: assistantMsg.usage.output || 0,
+      };
+    }
+  } else if (msg.role === "toolResult") {
+    result.label = `[${msg.toolName}]`;
+    result.content = truncateContent(msg.content, 200);
+  }
+
+  return result;
+}
+
+/** Entry type to label/content extractors */
+const ENTRY_TYPE_HANDLERS: Record<
+  string,
+  (entry: SessionEntry) => { label: string; content?: string }
+> = {
+  compaction: (entry) => ({
+    label: "[Compaction]",
+    content: (entry as CompactionEntry).summary?.slice(0, 300),
+  }),
+  branch_summary: (entry) => ({
+    label: "[Branch Summary]",
+    content: (entry as BranchSummaryEntry).summary?.slice(0, 300),
+  }),
+  model_change: (entry) => {
+    const mc = entry as ModelChangeEntry;
+    return { label: `Model → ${mc.provider}/${mc.modelId}` };
+  },
+  thinking_level_change: (entry) => ({
+    label: `Thinking → ${(entry as ThinkingLevelChangeEntry).thinkingLevel}`,
+  }),
+};
+
 /**
  * Compress tree node
  */
 function compressTree(node: TreeNode): CompactTreeNode {
   const { entry } = node;
-  let role: string | undefined;
-  let label = "";
-  let content: string | undefined;
-  let model: string | undefined;
-  let usage: { input: number; output: number; cost?: number } | undefined;
+  let metadata: EntryMetadata;
 
   if (entry.type === "message") {
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
-    ({ role } = msg);
-
-    if (msg.role === "user") {
-      label = truncateContent(msg.content);
-      content = truncateContent(msg.content, 500);
-    } else if (msg.role === "assistant") {
-      const assistantMsg = msg as AssistantMessage;
-      label = truncateContent(assistantMsg.content);
-      content = truncateContent(assistantMsg.content, 500);
-      model = `${assistantMsg.provider}/${assistantMsg.model}`;
-      if (assistantMsg.usage) {
-        usage = {
-          cost: assistantMsg.usage.cost?.total,
-          input: assistantMsg.usage.input || 0,
-          output: assistantMsg.usage.output || 0,
-        };
-      }
-    } else if (msg.role === "toolResult") {
-      label = `[${msg.toolName}]`;
-      content = truncateContent(msg.content, 200);
-    }
-  } else if (entry.type === "compaction") {
-    label = "[Compaction]";
-    content = (entry as CompactionEntry).summary?.slice(0, 300);
-  } else if (entry.type === "branch_summary") {
-    label = "[Branch Summary]";
-    content = (entry as BranchSummaryEntry).summary?.slice(0, 300);
-  } else if (entry.type === "model_change") {
-    const mc = entry as ModelChangeEntry;
-    label = `Model → ${mc.provider}/${mc.modelId}`;
-  } else if (entry.type === "thinking_level_change") {
-    label = `Thinking → ${(entry as ThinkingLevelChangeEntry).thinkingLevel}`;
+    metadata = extractMessageMetadata(entry as SessionMessageEntry);
   } else {
-    label = entry.type;
+    const handler = ENTRY_TYPE_HANDLERS[entry.type];
+    metadata = handler ? { ...handler(entry) } : { label: entry.type };
   }
 
   return {
     children: node.children.map(compressTree),
-    content,
+    content: metadata.content,
     id: entry.id,
     isBranchPoint: node.isBranchPoint,
     isLeaf: node.isLeaf,
-    label: label.slice(0, 100),
+    label: metadata.label.slice(0, 100),
     labels: node.labels,
-    model,
+    model: metadata.model,
     parentId: entry.parentId,
-    role,
+    role: metadata.role,
     timestamp: entry.timestamp,
     type: entry.type,
-    usage,
+    usage: metadata.usage,
   };
 }
 

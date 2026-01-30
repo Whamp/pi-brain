@@ -261,49 +261,118 @@ export function agentOutputToNode(
 }
 
 /**
- * Transform a NodeRow (flat SQLite row) to Node (nested structure).
- * For listings, constructs Node from row data without reading JSON.
- * For full details, reads the JSON file.
+ * Attempt to load full node from JSON file and merge DB-only fields
  */
-export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
-  // If full data requested, read from JSON file
-  if (loadFull && row.data_file) {
-    try {
-      const fullNode = readNodeFromPath(row.data_file);
-      // Merge in database-only fields that may be more up-to-date
-      return {
-        ...fullNode,
-        relevanceScore: row.relevance_score ?? fullNode.relevanceScore,
-        lastAccessed: row.last_accessed ?? fullNode.lastAccessed,
-        archived: row.archived === 1 ? true : fullNode.archived,
-        importance: row.importance ?? fullNode.importance,
-      };
-    } catch {
-      // Fall through to construct from row
-    }
+function tryLoadFullNode(row: NodeRow): Node | null {
+  if (!row.data_file) {
+    return null;
   }
+  try {
+    const fullNode = readNodeFromPath(row.data_file);
+    return {
+      ...fullNode,
+      relevanceScore: row.relevance_score ?? fullNode.relevanceScore,
+      lastAccessed: row.last_accessed ?? fullNode.lastAccessed,
+      archived: row.archived === 1 ? true : fullNode.archived,
+      importance: row.importance ?? fullNode.importance,
+    };
+  } catch {
+    return null;
+  }
+}
 
-  // Construct minimal Node from row data for listings
+/**
+ * Build source fields from row data
+ */
+function buildSourceFromRow(row: NodeRow): Node["source"] {
+  return {
+    sessionFile: row.session_file,
+    segment: {
+      startEntryId: row.segment_start ?? "",
+      endEntryId: row.segment_end ?? "",
+      entryCount: 0,
+    },
+    computer: row.computer ?? "",
+    sessionId: "",
+  };
+}
+
+/**
+ * Build classification fields from row data
+ */
+function buildClassificationFromRow(row: NodeRow): Node["classification"] {
+  return {
+    type: (row.type as Node["classification"]["type"]) ?? "other",
+    project: row.project ?? "",
+    isNewProject: Boolean(row.is_new_project),
+    hadClearGoal: Boolean(row.had_clear_goal),
+  };
+}
+
+/**
+ * Build core metadata fields from row data
+ */
+function buildCoreMetadata(
+  row: NodeRow
+): Pick<
+  Node["metadata"],
+  | "tokensUsed"
+  | "cost"
+  | "durationMinutes"
+  | "timestamp"
+  | "analyzedAt"
+  | "analyzerVersion"
+> {
+  return {
+    tokensUsed: row.tokens_used ?? 0,
+    cost: row.cost ?? 0,
+    durationMinutes: row.duration_minutes ?? 0,
+    timestamp: row.timestamp ?? "",
+    analyzedAt: row.analyzed_at ?? "",
+    analyzerVersion: row.analyzer_version ?? "",
+  };
+}
+
+/**
+ * Build message count metadata fields from row data
+ */
+function buildMessageCountMetadata(
+  row: NodeRow
+): Pick<
+  Node["metadata"],
+  | "userMessageCount"
+  | "assistantMessageCount"
+  | "clarifyingQuestionCount"
+  | "promptedQuestionCount"
+> {
+  return {
+    userMessageCount: row.user_message_count ?? undefined,
+    assistantMessageCount: row.assistant_message_count ?? undefined,
+    clarifyingQuestionCount: row.clarifying_question_count ?? undefined,
+    promptedQuestionCount: row.prompted_question_count ?? undefined,
+  };
+}
+
+/**
+ * Build metadata fields from row data
+ */
+function buildMetadataFromRow(row: NodeRow): Node["metadata"] {
+  return {
+    ...buildCoreMetadata(row),
+    ...buildMessageCountMetadata(row),
+  };
+}
+
+/**
+ * Construct minimal node from row data for listings
+ */
+function buildMinimalNodeFromRow(row: NodeRow): Node {
   return {
     id: row.id,
     version: row.version,
     previousVersions: [],
-    source: {
-      sessionFile: row.session_file,
-      segment: {
-        startEntryId: row.segment_start ?? "",
-        endEntryId: row.segment_end ?? "",
-        entryCount: 0,
-      },
-      computer: row.computer ?? "",
-      sessionId: "",
-    },
-    classification: {
-      type: (row.type as Node["classification"]["type"]) ?? "other",
-      project: row.project ?? "",
-      isNewProject: Boolean(row.is_new_project),
-      hadClearGoal: Boolean(row.had_clear_goal),
-    },
+    source: buildSourceFromRow(row),
+    classification: buildClassificationFromRow(row),
     content: {
       summary: `Session from ${row.timestamp}`,
       outcome: (row.outcome as Node["content"]["outcome"]) ?? "abandoned",
@@ -328,27 +397,30 @@ export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
       modelQuirks: [],
       toolUseErrors: [],
     },
-    metadata: {
-      tokensUsed: row.tokens_used ?? 0,
-      cost: row.cost ?? 0,
-      durationMinutes: row.duration_minutes ?? 0,
-      timestamp: row.timestamp ?? "",
-      analyzedAt: row.analyzed_at ?? "",
-      analyzerVersion: row.analyzer_version ?? "",
-      userMessageCount: row.user_message_count ?? undefined,
-      assistantMessageCount: row.assistant_message_count ?? undefined,
-      clarifyingQuestionCount: row.clarifying_question_count ?? undefined,
-      promptedQuestionCount: row.prompted_question_count ?? undefined,
-    },
+    metadata: buildMetadataFromRow(row),
     semantic: { tags: [], topics: [] },
     daemonMeta: { decisions: [], rlmUsed: false },
     ...(row.signals ? { signals: JSON.parse(row.signals) } : {}),
-    // AutoMem consolidation fields
     relevanceScore: row.relevance_score ?? 1,
     lastAccessed: row.last_accessed ?? undefined,
     archived: row.archived === 1,
     importance: row.importance ?? 0.5,
   };
+}
+
+/**
+ * Transform a NodeRow (flat SQLite row) to Node (nested structure).
+ * For listings, constructs Node from row data without reading JSON.
+ * For full details, reads the JSON file.
+ */
+export function nodeRowToNode(row: NodeRow, loadFull = false): Node {
+  if (loadFull) {
+    const fullNode = tryLoadFullNode(row);
+    if (fullNode) {
+      return fullNode;
+    }
+  }
+  return buildMinimalNodeFromRow(row);
 }
 
 /**

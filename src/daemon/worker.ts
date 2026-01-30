@@ -13,6 +13,7 @@ import { join } from "node:path";
 
 import type { PiBrainConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
+import type { SessionEntry } from "../types.js";
 
 import { getComputerFromPath } from "../config/config.js";
 import {
@@ -230,6 +231,50 @@ export class Worker {
   }
 
   /**
+   * Log environment validation warning
+   */
+  private logEnvironmentWarning(envStatus: {
+    missingSkills: string[];
+    missingPromptFile?: string;
+  }): void {
+    if (envStatus.missingSkills.length > 0) {
+      this.logger.warn(
+        `Missing skills: ${envStatus.missingSkills.join(", ")}. Worker will idle until skills are installed.`
+      );
+    } else if (envStatus.missingPromptFile) {
+      this.logger.warn(
+        `Prompt file not found: ${envStatus.missingPromptFile}. Worker will idle until file exists.`
+      );
+    } else {
+      this.logger.warn("Environment validation failed. Worker will idle.");
+    }
+  }
+
+  /**
+   * Wait for environment to become valid (interruptible)
+   */
+  private async waitForValidEnvironment(): Promise<void> {
+    if (!this.processor) {
+      return;
+    }
+
+    while (this.running) {
+      // Use shorter sleep intervals (1s) for faster shutdown
+      for (let i = 0; i < 30 && this.running; i++) {
+        await this.sleep(1000);
+      }
+      if (!this.running) {
+        break;
+      }
+      const recheck = await this.processor.validateEnvironment();
+      if (recheck.valid) {
+        this.logger.info("Environment now valid. Resuming job processing.");
+        break;
+      }
+    }
+  }
+
+  /**
    * Start the worker loop
    */
   async start(): Promise<void> {
@@ -249,33 +294,8 @@ export class Worker {
     // Validate environment
     const envStatus = await this.processor.validateEnvironment();
     if (!envStatus.valid) {
-      if (envStatus.missingSkills.length > 0) {
-        this.logger.warn(
-          `Missing skills: ${envStatus.missingSkills.join(", ")}. Worker will idle until skills are installed.`
-        );
-      } else if (envStatus.missingPromptFile) {
-        this.logger.warn(
-          `Prompt file not found: ${envStatus.missingPromptFile}. Worker will idle until file exists.`
-        );
-      } else {
-        this.logger.warn("Environment validation failed. Worker will idle.");
-      }
-      // Worker stays running but doesn't process jobs - allows API to still work
-      // Re-check environment periodically with interruptible sleep
-      while (this.running) {
-        // Use shorter sleep intervals (1s) for faster shutdown, check 30 times for ~30s total
-        for (let i = 0; i < 30 && this.running; i++) {
-          await this.sleep(1000);
-        }
-        if (!this.running) {
-          break;
-        }
-        const recheck = await this.processor.validateEnvironment();
-        if (recheck.valid) {
-          this.logger.info("Environment now valid. Resuming job processing.");
-          break;
-        }
-      }
+      this.logEnvironmentWarning(envStatus);
+      await this.waitForValidEnvironment();
     }
 
     // Main loop
@@ -285,7 +305,6 @@ export class Worker {
       if (job) {
         await this.processJob(job);
       } else {
-        // No work available, wait before polling again
         await this.sleep(this.pollIntervalMs);
       }
     }
@@ -435,6 +454,58 @@ export class Worker {
   }
 
   /**
+   * Detect signals (friction, delight, manual flags) from segment entries
+   */
+  private detectSignals(
+    segmentEntries: Awaited<ReturnType<typeof parseSession>>["entries"],
+    job: AnalysisJob,
+    outcome: string,
+    abandonedRestart: boolean
+  ): {
+    friction: ReturnType<typeof detectFrictionSignals>;
+    delight: ReturnType<typeof detectDelightSignals>;
+    manualFlags: ReturnType<typeof extractManualFlags>;
+  } {
+    return {
+      friction: detectFrictionSignals(segmentEntries, {
+        isLastSegment: !job.segmentEnd,
+        wasResumed: job.context?.boundaryType === "resume",
+        abandonedRestart,
+      }),
+      delight: detectDelightSignals(segmentEntries, { outcome }),
+      manualFlags: extractManualFlags(segmentEntries),
+    };
+  }
+
+  /**
+   * Store relationship edges and log results
+   */
+  private storeRelationships(
+    nodeId: string,
+    relationships: NonNullable<
+      Awaited<ReturnType<JobProcessor["process"]>>["nodeData"]
+    >["relationships"]
+  ): void {
+    if (!relationships || relationships.length === 0 || !this.db) {
+      return;
+    }
+
+    const relResult = storeRelationshipEdges(this.db, nodeId, relationships);
+
+    if (relResult.edgesCreated > 0) {
+      this.logger.info(
+        `Created ${relResult.edgesCreated} relationship edges ` +
+          `(${relResult.resolvedCount} resolved, ${relResult.unresolvedCount} unresolved)`
+      );
+    }
+    if (relResult.errors.length > 0) {
+      this.logger.warn(
+        `Relationship edge errors: ${relResult.errors.join(", ")}`
+      );
+    }
+  }
+
+  /**
    * Process successful analysis result and create/update node
    */
   private async processAnalysisResult(
@@ -463,50 +534,31 @@ export class Worker {
       ...getFilesTouched(segmentEntries),
       ...result.nodeData.content.filesTouched,
     ];
-    const { project } = result.nodeData.classification;
 
     const abandonedRestart = this.detectAbandonedRestart(
-      project,
+      result.nodeData.classification.project,
       segmentStartTime,
       currentFilesTouched
     );
 
-    // 4. Detect friction and delight signals from segment entries
-    const frictionSignals = detectFrictionSignals(segmentEntries, {
-      isLastSegment: !job.segmentEnd,
-      wasResumed: job.context?.boundaryType === "resume",
-      abandonedRestart,
-    });
-    const delightSignals = detectDelightSignals(segmentEntries, {
-      outcome: result.nodeData.content.outcome,
-    });
-    const manualFlags = extractManualFlags(segmentEntries);
-
-    // 5. Convert AgentNodeOutput to Node
-    const promptVersion = getOrCreatePromptVersion(
-      this.db,
-      this.config.daemon.promptFile
+    // 4. Detect signals from segment entries
+    const signals = this.detectSignals(
+      segmentEntries,
+      job,
+      result.nodeData.content.outcome,
+      abandonedRestart
     );
 
-    // Determine computer name from session path
-    const computer = getComputerFromPath(job.sessionFile, this.config);
-
-    const node = agentOutputToNode(result.nodeData, {
+    // 5. Convert AgentNodeOutput to Node
+    const node = this.createNodeFromResult(
       job,
-      computer,
-      sessionId: session.header.id,
-      parentSession: session.header.parentSession,
+      session,
+      result,
       entryCount,
-      analysisDurationMs: result.durationMs,
-      analyzerVersion: promptVersion.version,
-      signals: {
-        friction: frictionSignals,
-        delight: delightSignals,
-        manualFlags,
-      },
-    });
+      signals
+    );
 
-    // 6. Store node in SQLite and JSON (upsert for idempotent ingestion)
+    // 6. Store node in SQLite and JSON
     const { created } = upsertNode(this.db, node, {
       nodesDir: join(this.config.hub.databaseDir, "nodes"),
     });
@@ -522,26 +574,54 @@ export class Worker {
     await this.generateNodeEmbedding(node);
 
     // 9. Store typed relationship edges from analyzer output
-    if (
-      result.nodeData.relationships &&
-      result.nodeData.relationships.length > 0
-    ) {
-      const relResult = storeRelationshipEdges(
-        this.db,
-        node.id,
-        result.nodeData.relationships
-      );
-      if (relResult.edgesCreated > 0) {
-        this.logger.info(
-          `Created ${relResult.edgesCreated} relationship edges ` +
-            `(${relResult.resolvedCount} resolved, ${relResult.unresolvedCount} unresolved)`
-        );
-      }
-      if (relResult.errors.length > 0) {
-        this.logger.warn(
-          `Relationship edge errors: ${relResult.errors.join(", ")}`
-        );
-      }
+    this.storeRelationships(node.id, result.nodeData.relationships);
+
+    return this.finalizeJobSuccess(job, node, created, startTime);
+  }
+
+  /**
+   * Create a Node from analysis result
+   */
+  private createNodeFromResult(
+    job: AnalysisJob,
+    session: Awaited<ReturnType<typeof parseSession>>,
+    result: Awaited<ReturnType<JobProcessor["process"]>>,
+    entryCount: number,
+    signals: ReturnType<Worker["detectSignals"]>
+  ): Node {
+    if (!this.db || !result.nodeData) {
+      throw new Error("Worker not initialized or no node data");
+    }
+
+    const promptVersion = getOrCreatePromptVersion(
+      this.db,
+      this.config.daemon.promptFile
+    );
+    const computer = getComputerFromPath(job.sessionFile, this.config);
+
+    return agentOutputToNode(result.nodeData, {
+      job,
+      computer,
+      sessionId: session.header.id,
+      parentSession: session.header.parentSession,
+      entryCount,
+      analysisDurationMs: result.durationMs,
+      analyzerVersion: promptVersion.version,
+      signals,
+    });
+  }
+
+  /**
+   * Finalize a successful job and return result
+   */
+  private async finalizeJobSuccess(
+    job: AnalysisJob,
+    node: Node,
+    created: boolean,
+    startTime: number
+  ): Promise<JobProcessingResult> {
+    if (!this.queue) {
+      throw new Error("Worker not initialized");
     }
 
     this.queue.complete(job.id, node.id);
@@ -551,7 +631,6 @@ export class Worker {
       `Job ${job.id} completed successfully, ${created ? "created" : "updated"} node ${node.id}`
     );
 
-    // Call callback if provided
     if (this.onNodeCreated) {
       await this.onNodeCreated(job, node);
     }
@@ -569,10 +648,10 @@ export class Worker {
    * Extract segment entries and count from session entries
    */
   private extractSegment(
-    entries: { id: string; timestamp?: string }[],
+    entries: SessionEntry[],
     segmentStart?: string,
     segmentEnd?: string
-  ): { segmentEntries: typeof entries; entryCount: number } {
+  ): { segmentEntries: SessionEntry[]; entryCount: number } {
     let segmentEntries = entries;
     let entryCount = entries.length;
 

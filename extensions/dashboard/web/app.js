@@ -185,6 +185,70 @@ class Dashboard {
     }
   }
 
+  /**
+   * Build HTML for a single session item
+   */
+  buildSessionItemHtml(session, forksByParent) {
+    const isCurrent =
+      this.sessionData && this.sessionData.sessionFile === session.path;
+    const date = new Date(session.header.timestamp);
+    const timeStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    const name = session.name || session.path.split("/").pop();
+
+    // Check if this session is a parent of others (has forks)
+    const childForks = forksByParent.get(session.path);
+    const forkBadge = childForks
+      ? `<span class="fork-badge" title="${childForks.length} forks">⑂ ${childForks.length}</span>`
+      : "";
+
+    // Check if this session is a fork itself
+    const parentBadge = session.header.parentSession
+      ? `<span class="fork-source" title="Forked from another session">↳</span>`
+      : "";
+
+    // Topics
+    const topicsHtml =
+      session.topics && session.topics.length > 0
+        ? `<div class="session-topics">${session.topics.map((t) => `<span class="topic-tag">${this.escapeHtml(t)}</span>`).join("")}</div>`
+        : "";
+
+    const previewHtml = session.firstMessage
+      ? `<div class="session-preview">${this.escapeHtml(session.firstMessage)}</div>`
+      : "";
+
+    return `
+      <div class="session-item ${isCurrent ? "active" : ""}" data-path="${this.escapeHtml(session.path)}">
+        <div class="session-main">
+          ${parentBadge}
+          <span class="session-name">${this.escapeHtml(name)}</span>
+          ${forkBadge}
+        </div>
+        <div class="session-meta">
+          <span class="session-time">${timeStr}</span>
+          <span class="session-entries">${session.stats.entryCount} entries</span>
+        </div>
+        ${topicsHtml}
+        ${previewHtml}
+      </div>
+    `;
+  }
+
+  /**
+   * Build forks lookup map
+   */
+  buildForksByParentMap(forks) {
+    const forksByParent = new Map();
+    if (forks) {
+      for (const fork of forks) {
+        if (!forksByParent.has(fork.parentPath)) {
+          forksByParent.set(fork.parentPath, []);
+        }
+        forksByParent.get(fork.parentPath).push(fork);
+      }
+    }
+    return forksByParent;
+  }
+
   renderSessionList(projects, forks) {
     const el = this.elements.sessionList;
     if (!projects || projects.length === 0) {
@@ -196,18 +260,8 @@ class Dashboard {
       return;
     }
 
+    const forksByParent = this.buildForksByParentMap(forks);
     let html = "";
-
-    // Group forks by parent for quick lookup
-    const forksByParent = new Map();
-    if (forks) {
-      for (const fork of forks) {
-        if (!forksByParent.has(fork.parentPath)) {
-          forksByParent.set(fork.parentPath, []);
-        }
-        forksByParent.get(fork.parentPath).push(fork);
-      }
-    }
 
     for (const project of projects) {
       const projectName = project.cwd.split("/").pop() || project.cwd;
@@ -223,44 +277,7 @@ class Dashboard {
       `;
 
       for (const session of project.sessions) {
-        const isCurrent =
-          this.sessionData && this.sessionData.sessionFile === session.path;
-        const date = new Date(session.header.timestamp);
-        const timeStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-        const name = session.name || session.path.split("/").pop();
-
-        // Check if this session is a parent of others (has forks)
-        const childForks = forksByParent.get(session.path);
-        const forkBadge = childForks
-          ? `<span class="fork-badge" title="${childForks.length} forks">⑂ ${childForks.length}</span>`
-          : "";
-
-        // Check if this session is a fork itself
-        const parentBadge = session.header.parentSession
-          ? `<span class="fork-source" title="Forked from another session">↳</span>`
-          : "";
-
-        // Topics
-        const topicsHtml =
-          session.topics && session.topics.length > 0
-            ? `<div class="session-topics">${session.topics.map((t) => `<span class="topic-tag">${this.escapeHtml(t)}</span>`).join("")}</div>`
-            : "";
-
-        html += `
-          <div class="session-item ${isCurrent ? "active" : ""}" data-path="${this.escapeHtml(session.path)}">
-            <div class="session-main">
-              ${parentBadge}
-              <span class="session-name">${this.escapeHtml(name)}</span>
-              ${forkBadge}
-            </div>
-            <div class="session-meta">
-              <span class="session-time">${timeStr}</span>
-              <span class="session-entries">${session.stats.entryCount} entries</span>
-            </div>
-            ${topicsHtml}
-            ${session.firstMessage ? `<div class="session-preview">${this.escapeHtml(session.firstMessage)}</div>` : ""}
-          </div>
-        `;
+        html += this.buildSessionItemHtml(session, forksByParent);
       }
 
       html += `</div></div>`;
@@ -632,12 +649,11 @@ class Dashboard {
     this.elements.entryActions.classList.add("hidden");
   }
 
-  renderEntryDetails(entry) {
-    const el = this.elements.entryDetails;
-    let html = "";
-
-    // Basic info
-    html += `
+  /**
+   * Render basic entry info section
+   */
+  renderEntryInfoSection(entry) {
+    return `
       <div class="detail-section">
         <h4>Entry Info</h4>
         <div class="detail-row"><span class="label">ID</span><span class="value">${entry.id}</span></div>
@@ -646,45 +662,70 @@ class Dashboard {
         <div class="detail-row"><span class="label">Parent</span><span class="value">${entry.parentId || "none"}</span></div>
       </div>
     `;
+  }
+
+  /**
+   * Render content for user/assistant messages
+   */
+  renderMessageContent(msg) {
+    const content = this.extractFullContent(msg.content);
+    return `<div class="detail-content">${this.escapeHtml(content)}</div>`;
+  }
+
+  /**
+   * Render tool result details
+   */
+  renderToolResultDetails(msg) {
+    const content = this.extractFullContent(msg.content);
+    return `<div class="detail-row"><span class="label">Tool</span><span class="value">${msg.toolName}</span></div>
+      <div class="detail-content">${this.escapeHtml(content)}</div>`;
+  }
+
+  /**
+   * Render assistant metadata (model and usage)
+   */
+  renderAssistantMetadata(msg) {
+    let html = `<div class="detail-row"><span class="label">Model</span><span class="value">${msg.provider}/${msg.model}</span></div>`;
+
+    if (msg.usage) {
+      html += `<div class="detail-row"><span class="label">Tokens</span><span class="value">${msg.usage.input?.toLocaleString() || 0} in / ${msg.usage.output?.toLocaleString() || 0} out</span></div>`;
+      if (msg.usage.cost?.total) {
+        html += `<div class="detail-row"><span class="label">Cost</span><span class="value">$${msg.usage.cost.total.toFixed(4)}</span></div>`;
+      }
+    }
+    return html;
+  }
+
+  /**
+   * Render message entry details
+   */
+  renderMessageDetails(msg) {
+    let html = `
+      <div class="detail-section">
+        <h4>${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}</h4>
+    `;
+
+    if (msg.role === "user" || msg.role === "assistant") {
+      html += this.renderMessageContent(msg);
+    } else if (msg.role === "toolResult") {
+      html += this.renderToolResultDetails(msg);
+    }
+
+    if (msg.role === "assistant") {
+      html += this.renderAssistantMetadata(msg);
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  renderEntryDetails(entry) {
+    const el = this.elements.entryDetails;
+    let html = this.renderEntryInfoSection(entry);
 
     // Message content
-    if (entry.type === "message") {
-      const msg = entry.message;
-      if (msg) {
-        html += `
-          <div class="detail-section">
-            <h4>${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}</h4>
-        `;
-
-        if (msg.role === "user" || msg.role === "assistant") {
-          const content = this.extractFullContent(msg.content);
-          html += `<div class="detail-content">${this.escapeHtml(content)}</div>`;
-        } else if (msg.role === "toolResult") {
-          html += `<div class="detail-row"><span class="label">Tool</span><span class="value">${msg.toolName}</span></div>`;
-          const content = this.extractFullContent(msg.content);
-          html += `<div class="detail-content">${this.escapeHtml(content)}</div>`;
-        }
-
-        // Model and usage for assistant
-        if (msg.role === "assistant") {
-          html += `
-            <div class="detail-row"><span class="label">Model</span><span class="value">${msg.provider}/${msg.model}</span></div>
-          `;
-
-          if (msg.usage) {
-            html += `
-              <div class="detail-row"><span class="label">Tokens</span><span class="value">${msg.usage.input?.toLocaleString() || 0} in / ${msg.usage.output?.toLocaleString() || 0} out</span></div>
-            `;
-            if (msg.usage.cost?.total) {
-              html += `
-                <div class="detail-row"><span class="label">Cost</span><span class="value">$${msg.usage.cost.total.toFixed(4)}</span></div>
-              `;
-            }
-          }
-        }
-
-        html += `</div>`;
-      }
+    if (entry.type === "message" && entry.message) {
+      html += this.renderMessageDetails(entry.message);
     } else if (entry.type === "compaction") {
       html += `
         <div class="detail-section">

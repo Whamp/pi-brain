@@ -79,44 +79,28 @@
     }
   });
 
+  // Outcome icon lookup table
+  const outcomeIconMap: Record<string, typeof CheckCircle> = {
+    success: CheckCircle,
+    partial: AlertCircle,
+    failed: XCircle,
+    abandoned: Circle,
+  };
+
   function getOutcomeIcon(outcome: string) {
-    switch (outcome) {
-      case "success": {
-        return CheckCircle;
-      }
-      case "partial": {
-        return AlertCircle;
-      }
-      case "failed": {
-        return XCircle;
-      }
-      case "abandoned": {
-        return Circle;
-      }
-      default: {
-        return Circle;
-      }
-    }
+    return outcomeIconMap[outcome] ?? Circle;
   }
 
+  // Outcome class lookup table
+  const outcomeClassMap: Record<string, string> = {
+    success: "outcome-success",
+    partial: "outcome-partial",
+    failed: "outcome-failed",
+    abandoned: "outcome-abandoned",
+  };
+
   function getOutcomeClass(outcome: string): string {
-    switch (outcome) {
-      case "success": {
-        return "outcome-success";
-      }
-      case "partial": {
-        return "outcome-partial";
-      }
-      case "failed": {
-        return "outcome-failed";
-      }
-      case "abandoned": {
-        return "outcome-abandoned";
-      }
-      default: {
-        return "";
-      }
-    }
+    return outcomeClassMap[outcome] ?? "";
   }
 
   function formatDate(isoString: string): string {
@@ -167,45 +151,23 @@
     return path.split("/").at(-1) ?? path;
   }
 
+  // Edge type to label lookup table
+  const edgeLabelMap: Record<string, string> = {
+    fork: "fork",
+    branch: "branch",
+    tree_jump: "jump",
+    continuation: "continues",
+    resume: "resume",
+    compaction: "compact",
+    semantic: "related",
+    reference: "refs",
+    lesson_application: "applies",
+    failure_pattern: "same pattern",
+    handoff: "handoff",
+  };
+
   function getEdgeLabel(edge: Edge): string {
-    switch (edge.type) {
-      case "fork": {
-        return "fork";
-      }
-      case "branch": {
-        return "branch";
-      }
-      case "tree_jump": {
-        return "jump";
-      }
-      case "continuation": {
-        return "continues";
-      }
-      case "resume": {
-        return "resume";
-      }
-      case "compaction": {
-        return "compact";
-      }
-      case "semantic": {
-        return "related";
-      }
-      case "reference": {
-        return "refs";
-      }
-      case "lesson_application": {
-        return "applies";
-      }
-      case "failure_pattern": {
-        return "same pattern";
-      }
-      case "handoff": {
-        return "handoff";
-      }
-      default: {
-        return edge.type;
-      }
-    }
+    return edgeLabelMap[edge.type] ?? edge.type;
   }
 
   const levelIcons: Record<LessonLevel, string> = {

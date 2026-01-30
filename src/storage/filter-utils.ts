@@ -54,6 +54,167 @@ export interface WhereClauseResult {
 }
 
 // =============================================================================
+// Filter Handlers
+// =============================================================================
+
+interface FilterContext {
+  conditions: string[];
+  params: (string | number)[];
+  tableAlias: string;
+}
+
+type FilterHandler = (
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+) => void;
+
+/** Handle project partial match filter */
+function handleProjectFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.project !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.project LIKE ?`);
+    ctx.params.push(`%${filters.project}%`);
+  }
+}
+
+/** Handle exact project filter (ExtendedFilters only) */
+function handleExactProjectFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if ("exactProject" in filters && filters.exactProject !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.project = ?`);
+    ctx.params.push(filters.exactProject);
+  }
+}
+
+/** Handle type filter */
+function handleTypeFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.type !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.type = ?`);
+    ctx.params.push(filters.type);
+  }
+}
+
+/** Handle outcome filter */
+function handleOutcomeFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.outcome !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.outcome = ?`);
+    ctx.params.push(filters.outcome);
+  }
+}
+
+/** Handle date range filters */
+function handleDateRangeFilters(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.from !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.timestamp >= ?`);
+    ctx.params.push(filters.from);
+  }
+  if (filters.to !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.timestamp <= ?`);
+    ctx.params.push(filters.to);
+  }
+}
+
+/** Handle computer filter */
+function handleComputerFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.computer !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.computer = ?`);
+    ctx.params.push(filters.computer);
+  }
+}
+
+/** Handle boolean filters (hadClearGoal, isNewProject) */
+function handleBooleanFilters(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.hadClearGoal !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.had_clear_goal = ?`);
+    ctx.params.push(filters.hadClearGoal ? 1 : 0);
+  }
+  if (filters.isNewProject !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.is_new_project = ?`);
+    ctx.params.push(filters.isNewProject ? 1 : 0);
+  }
+}
+
+/** Handle session file filter (ExtendedFilters only) */
+function handleSessionFileFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if ("sessionFile" in filters && filters.sessionFile !== undefined) {
+    ctx.conditions.push(`${ctx.tableAlias}.session_file = ?`);
+    ctx.params.push(filters.sessionFile);
+  }
+}
+
+/** Handle tags filter with AND logic */
+function handleTagsFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.tags !== undefined && filters.tags.length > 0) {
+    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
+    ctx.conditions.push(`${ctx.tableAlias}.id IN (
+      SELECT node_id FROM (
+        SELECT node_id, tag FROM tags
+        UNION
+        SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
+      )
+      WHERE tag IN (${tagPlaceholders})
+      GROUP BY node_id
+      HAVING COUNT(DISTINCT tag) = ?
+    )`);
+    ctx.params.push(...filters.tags, filters.tags.length);
+  }
+}
+
+/** Handle topics filter with AND logic */
+function handleTopicsFilter(
+  filters: BaseFilters | ExtendedFilters,
+  ctx: FilterContext
+): void {
+  if (filters.topics !== undefined && filters.topics.length > 0) {
+    const topicPlaceholders = filters.topics.map(() => "?").join(", ");
+    ctx.conditions.push(`(
+      SELECT COUNT(DISTINCT tp.topic) FROM topics tp
+      WHERE tp.node_id = ${ctx.tableAlias}.id AND tp.topic IN (${topicPlaceholders})
+    ) = ?`);
+    ctx.params.push(...filters.topics, filters.topics.length);
+  }
+}
+
+/** All filter handlers in order */
+const FILTER_HANDLERS: FilterHandler[] = [
+  handleProjectFilter,
+  handleExactProjectFilter,
+  handleTypeFilter,
+  handleOutcomeFilter,
+  handleDateRangeFilters,
+  handleComputerFilter,
+  handleBooleanFilters,
+  handleSessionFileFilter,
+  handleTagsFilter,
+  handleTopicsFilter,
+];
+
+// =============================================================================
 // WHERE Clause Builder
 // =============================================================================
 
@@ -89,102 +250,22 @@ export function buildWhereClause(
   filters: BaseFilters | ExtendedFilters | undefined,
   tableAlias = "n"
 ): WhereClauseResult {
-  const conditions: string[] = [];
-  const params: (string | number)[] = [];
-
-  // Handle undefined filters
   if (filters === undefined) {
     return { clause: "", params: [] };
   }
 
-  // Project partial match
-  if (filters.project !== undefined) {
-    conditions.push(`${tableAlias}.project LIKE ?`);
-    params.push(`%${filters.project}%`);
+  const ctx: FilterContext = {
+    conditions: [],
+    params: [],
+    tableAlias,
+  };
+
+  for (const handler of FILTER_HANDLERS) {
+    handler(filters, ctx);
   }
 
-  // Project exact match (ExtendedFilters only)
-  if ("exactProject" in filters && filters.exactProject !== undefined) {
-    conditions.push(`${tableAlias}.project = ?`);
-    params.push(filters.exactProject);
-  }
+  const clause =
+    ctx.conditions.length > 0 ? `AND ${ctx.conditions.join(" AND ")}` : "";
 
-  // Type filter
-  if (filters.type !== undefined) {
-    conditions.push(`${tableAlias}.type = ?`);
-    params.push(filters.type);
-  }
-
-  // Outcome filter
-  if (filters.outcome !== undefined) {
-    conditions.push(`${tableAlias}.outcome = ?`);
-    params.push(filters.outcome);
-  }
-
-  // Date range: from
-  if (filters.from !== undefined) {
-    conditions.push(`${tableAlias}.timestamp >= ?`);
-    params.push(filters.from);
-  }
-
-  // Date range: to
-  if (filters.to !== undefined) {
-    conditions.push(`${tableAlias}.timestamp <= ?`);
-    params.push(filters.to);
-  }
-
-  // Computer filter
-  if (filters.computer !== undefined) {
-    conditions.push(`${tableAlias}.computer = ?`);
-    params.push(filters.computer);
-  }
-
-  // Had clear goal filter
-  if (filters.hadClearGoal !== undefined) {
-    conditions.push(`${tableAlias}.had_clear_goal = ?`);
-    params.push(filters.hadClearGoal ? 1 : 0);
-  }
-
-  // Is new project filter
-  if (filters.isNewProject !== undefined) {
-    conditions.push(`${tableAlias}.is_new_project = ?`);
-    params.push(filters.isNewProject ? 1 : 0);
-  }
-
-  // Session file filter (ExtendedFilters only)
-  if ("sessionFile" in filters && filters.sessionFile !== undefined) {
-    conditions.push(`${tableAlias}.session_file = ?`);
-    params.push(filters.sessionFile);
-  }
-
-  // Tags filter: nodes must have ALL specified tags (AND logic)
-  // Considers both node-level tags and lesson-level tags
-  if (filters.tags !== undefined && filters.tags.length > 0) {
-    const tagPlaceholders = filters.tags.map(() => "?").join(", ");
-    conditions.push(`${tableAlias}.id IN (
-      SELECT node_id FROM (
-        SELECT node_id, tag FROM tags
-        UNION
-        SELECT l.node_id, lt.tag FROM lesson_tags lt JOIN lessons l ON lt.lesson_id = l.id
-      )
-      WHERE tag IN (${tagPlaceholders})
-      GROUP BY node_id
-      HAVING COUNT(DISTINCT tag) = ?
-    )`);
-    params.push(...filters.tags, filters.tags.length);
-  }
-
-  // Topics filter: nodes must have ALL specified topics (AND logic)
-  if (filters.topics !== undefined && filters.topics.length > 0) {
-    const topicPlaceholders = filters.topics.map(() => "?").join(", ");
-    conditions.push(`(
-      SELECT COUNT(DISTINCT tp.topic) FROM topics tp
-      WHERE tp.node_id = ${tableAlias}.id AND tp.topic IN (${topicPlaceholders})
-    ) = ?`);
-    params.push(...filters.topics, filters.topics.length);
-  }
-
-  const clause = conditions.length > 0 ? `AND ${conditions.join(" AND ")}` : "";
-
-  return { clause, params };
+  return { clause, params: ctx.params };
 }

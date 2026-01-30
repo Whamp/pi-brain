@@ -4,7 +4,7 @@
   "ignorePatterns": ["docs/"],
   "rules": {
     "eslint/max-statements": ["warn", { "max": 60 }],
-    "eslint/complexity": ["warn", { "max": 30 }],
+    "eslint/complexity": ["warn", { "max": 10 }],
     "eslint/func-style": "off",
     "eslint/class-methods-use-this": "off",
     "eslint/no-alert": "off",

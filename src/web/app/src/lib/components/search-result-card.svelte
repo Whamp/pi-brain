@@ -34,45 +34,24 @@
     }
   }
 
+  const NODE_ICONS: Record<NodeType, string> = {
+    coding: "💻",
+    debugging: "🐛",
+    research: "🔍",
+    planning: "📋",
+    refactoring: "🔄",
+    documentation: "📝",
+    configuration: "🔧",
+    sysadmin: "⚙️",
+    qa: "✅",
+    brainstorm: "💡",
+    handoff: "🤝",
+    data: "📦",
+    other: "📦",
+  };
+
   function getNodeIcon(type: NodeType): string {
-    switch (type) {
-      case "coding": {
-        return "💻";
-      }
-      case "debugging": {
-        return "🐛";
-      }
-      case "research": {
-        return "🔍";
-      }
-      case "planning": {
-        return "📋";
-      }
-      case "refactoring": {
-        return "🔄";
-      }
-      case "documentation": {
-        return "📝";
-      }
-      case "configuration": {
-        return "🔧";
-      }
-      case "sysadmin": {
-        return "⚙️";
-      }
-      case "qa": {
-        return "✅";
-      }
-      case "brainstorm": {
-        return "💡";
-      }
-      case "handoff": {
-        return "🤝";
-      }
-      default: {
-        return "📦";
-      }
-    }
+    return NODE_ICONS[type] ?? "📦";
   }
 
   const projectName = $derived(node.classification.project.split("/").pop() ?? "unknown");

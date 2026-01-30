@@ -170,6 +170,34 @@ function toQueryString(params: Record<string, unknown>): string {
   return query ? `?${query}` : "";
 }
 
+function validateJsonResponse(contentType: string, status: number): void {
+  if (!contentType.includes("application/json")) {
+    throw createContentTypeError(status, contentType);
+  }
+}
+
+function handleApiResponse<T>(json: ApiResponse<T>): T {
+  if (json.status === "error" && json.error) {
+    throw createApiError({
+      code: json.error.code,
+      message: json.error.message,
+      details: json.error.details,
+    });
+  }
+  return json.data as T;
+}
+
+function handleFetchError(error: unknown, timeoutMs: number): never {
+  if (error instanceof Error && error.name === "AbortError") {
+    throw createTimeoutError(timeoutMs);
+  }
+  // Handle network errors (e.g., server unreachable)
+  if (error instanceof TypeError && error.message.includes("fetch")) {
+    throw createNetworkError("Unable to connect to the server");
+  }
+  throw error;
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
@@ -189,32 +217,13 @@ async function request<T>(
       },
     });
 
-    // Check content-type before parsing JSON
     const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.includes("application/json")) {
-      throw createContentTypeError(response.status, contentType);
-    }
+    validateJsonResponse(contentType, response.status);
 
     const json: ApiResponse<T> = await response.json();
-
-    if (json.status === "error" && json.error) {
-      throw createApiError({
-        code: json.error.code,
-        message: json.error.message,
-        details: json.error.details,
-      });
-    }
-
-    return json.data as T;
+    return handleApiResponse(json);
   } catch (error) {
-    if (error instanceof Error && error.name === "AbortError") {
-      throw createTimeoutError(timeoutMs);
-    }
-    // Handle network errors (e.g., server unreachable)
-    if (error instanceof TypeError && error.message.includes("fetch")) {
-      throw createNetworkError("Unable to connect to the server");
-    }
-    throw error;
+    handleFetchError(error, timeoutMs);
   } finally {
     clearTimeout(timeoutId);
   }

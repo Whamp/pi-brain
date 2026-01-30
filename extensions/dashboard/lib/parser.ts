@@ -84,20 +84,11 @@ export function parseSessionContent(
 }
 
 /**
- * Build a tree structure from entries
+ * Build parent → children map from entries
  */
-export function buildTree(entries: SessionEntry[]): TreeNode | null {
-  if (entries.length === 0) {
-    return null;
-  }
-
-  // Index entries by ID
-  const entriesById = new Map<string, SessionEntry>();
-  for (const entry of entries) {
-    entriesById.set(entry.id, entry);
-  }
-
-  // Build parent → children map
+function buildChildrenMap(
+  entries: SessionEntry[]
+): Map<string | null, SessionEntry[]> {
   const childrenMap = new Map<string | null, SessionEntry[]>();
   for (const entry of entries) {
     const { parentId } = entry;
@@ -115,7 +106,13 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
     children.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
   }
 
-  // Collect labels
+  return childrenMap;
+}
+
+/**
+ * Collect labels from label entries
+ */
+function collectLabels(entries: SessionEntry[]): Map<string, string[]> {
   const labelsMap = new Map<string, string[]>();
   for (const entry of entries) {
     if (entry.type === "label") {
@@ -131,8 +128,19 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
       }
     }
   }
+  return labelsMap;
+}
 
-  // Find leaf
+/**
+ * Build a tree structure from entries
+ */
+export function buildTree(entries: SessionEntry[]): TreeNode | null {
+  if (entries.length === 0) {
+    return null;
+  }
+
+  const childrenMap = buildChildrenMap(entries);
+  const labelsMap = collectLabels(entries);
   const leafId = findLeaf(entries);
 
   // Build tree recursively
@@ -158,12 +166,7 @@ export function buildTree(entries: SessionEntry[]): TreeNode | null {
     return null;
   }
 
-  // If multiple roots, create a virtual root
-  if (roots.length === 1) {
-    return buildNode(roots[0], 0);
-  }
-
-  // Multiple roots - return first one (shouldn't happen in valid sessions)
+  // If multiple roots, return first one (shouldn't happen in valid sessions)
   return buildNode(roots[0], 0);
 }
 
@@ -215,60 +218,66 @@ export function findBranchPoints(entries: SessionEntry[]): string[] {
 }
 
 /**
+ * Process a message entry for statistics
+ */
+function processMessageEntry(
+  entry: SessionMessageEntry,
+  stats: {
+    userMessageCount: number;
+    assistantMessageCount: number;
+    toolResultCount: number;
+    totalTokens: number;
+    totalCost: number;
+    modelsUsed: Set<string>;
+  }
+): void {
+  const msg = entry.message;
+
+  if (msg.role === "user") {
+    stats.userMessageCount++;
+  } else if (msg.role === "assistant") {
+    stats.assistantMessageCount++;
+    const assistantMsg = msg as AssistantMessage;
+    stats.modelsUsed.add(`${assistantMsg.provider}/${assistantMsg.model}`);
+    if (assistantMsg.usage) {
+      stats.totalTokens +=
+        (assistantMsg.usage.input || 0) + (assistantMsg.usage.output || 0);
+      if (assistantMsg.usage.cost) {
+        stats.totalCost += assistantMsg.usage.cost.total || 0;
+      }
+    }
+  } else if (msg.role === "toolResult") {
+    stats.toolResultCount++;
+  }
+}
+
+/**
  * Calculate session statistics
  */
 export function calculateStats(
   entries: SessionEntry[],
   tree: TreeNode | null
 ): SessionStats {
-  let messageCount = 0;
-  let userMessageCount = 0;
-  let assistantMessageCount = 0;
-  let toolResultCount = 0;
-  let compactionCount = 0;
-  let branchSummaryCount = 0;
-  let totalTokens = 0;
-  let totalCost = 0;
-  const modelsUsed = new Set<string>();
+  const stats = {
+    messageCount: 0,
+    userMessageCount: 0,
+    assistantMessageCount: 0,
+    toolResultCount: 0,
+    compactionCount: 0,
+    branchSummaryCount: 0,
+    totalTokens: 0,
+    totalCost: 0,
+    modelsUsed: new Set<string>(),
+  };
 
   for (const entry of entries) {
-    switch (entry.type) {
-      case "message": {
-        messageCount++;
-        const msgEntry = entry as SessionMessageEntry;
-        const msg = msgEntry.message;
-
-        if (msg.role === "user") {
-          userMessageCount++;
-        } else if (msg.role === "assistant") {
-          assistantMessageCount++;
-          const assistantMsg = msg as AssistantMessage;
-          modelsUsed.add(`${assistantMsg.provider}/${assistantMsg.model}`);
-          if (assistantMsg.usage) {
-            totalTokens +=
-              (assistantMsg.usage.input || 0) +
-              (assistantMsg.usage.output || 0);
-            if (assistantMsg.usage.cost) {
-              totalCost += assistantMsg.usage.cost.total || 0;
-            }
-          }
-        } else if (msg.role === "toolResult") {
-          toolResultCount++;
-        }
-        break;
-      }
-      case "compaction": {
-        compactionCount++;
-        break;
-      }
-      case "branch_summary": {
-        branchSummaryCount++;
-        break;
-      }
-      default: {
-        // Ignore other entry types (e.g., session_start, config)
-        break;
-      }
+    if (entry.type === "message") {
+      stats.messageCount++;
+      processMessageEntry(entry as SessionMessageEntry, stats);
+    } else if (entry.type === "compaction") {
+      stats.compactionCount++;
+    } else if (entry.type === "branch_summary") {
+      stats.branchSummaryCount++;
     }
   }
 
@@ -276,18 +285,18 @@ export function calculateStats(
   const maxDepth = tree ? calculateMaxDepth(tree) : 0;
 
   return {
-    assistantMessageCount,
+    assistantMessageCount: stats.assistantMessageCount,
     branchPointCount,
-    branchSummaryCount,
-    compactionCount,
+    branchSummaryCount: stats.branchSummaryCount,
+    compactionCount: stats.compactionCount,
     entryCount: entries.length,
     maxDepth,
-    messageCount,
-    modelsUsed: [...modelsUsed],
-    toolResultCount,
-    totalCost,
-    totalTokens,
-    userMessageCount,
+    messageCount: stats.messageCount,
+    modelsUsed: [...stats.modelsUsed],
+    toolResultCount: stats.toolResultCount,
+    totalCost: stats.totalCost,
+    totalTokens: stats.totalTokens,
+    userMessageCount: stats.userMessageCount,
   };
 }
 

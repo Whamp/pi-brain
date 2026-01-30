@@ -325,47 +325,49 @@ export function clearAllData(db: Database.Database): void {
 }
 
 /**
- * Insert a node into the database (without writing JSON file)
- * Used by createNode and rebuild-index CLI
+ * Convert boolean to SQLite integer
  */
-export function insertNodeToDb(
-  db: Database.Database,
-  node: Node,
-  dataFile: string,
-  options: { skipFts?: boolean } = {}
-): void {
-  const insertNode = db.prepare(`
-    INSERT INTO nodes (
-      id, version, session_file, segment_start, segment_end, computer,
-      type, project, is_new_project, had_clear_goal, outcome,
-      tokens_used, cost, duration_minutes,
-      timestamp, analyzed_at, analyzer_version, data_file, signals,
-      relevance_score, last_accessed, archived, importance,
-      user_message_count, assistant_message_count,
-      clarifying_question_count, prompted_question_count
-    ) VALUES (
-      ?, ?, ?, ?, ?, ?,
-      ?, ?, ?, ?, ?,
-      ?, ?, ?,
-      ?, ?, ?, ?, ?,
-      ?, ?, ?, ?,
-      ?, ?,
-      ?, ?
-    )
-  `);
+function boolToInt(value: boolean | undefined): number {
+  return value ? 1 : 0;
+}
 
-  insertNode.run(
+/**
+ * Build source-related params for node insert
+ */
+function buildSourceParams(node: Node): (string | number | null)[] {
+  return [
     node.id,
     node.version,
     node.source.sessionFile,
     node.source.segment.startEntryId,
     node.source.segment.endEntryId,
     node.source.computer,
+  ];
+}
+
+/**
+ * Build classification and content params for node insert
+ */
+function buildClassificationContentParams(
+  node: Node
+): (string | number | null)[] {
+  return [
     node.classification.type,
     node.classification.project,
-    node.classification.isNewProject ? 1 : 0,
-    node.classification.hadClearGoal ? 1 : 0,
+    boolToInt(node.classification.isNewProject),
+    boolToInt(node.classification.hadClearGoal),
     node.content.outcome,
+  ];
+}
+
+/**
+ * Build metadata params for node insert
+ */
+function buildMetadataParams(
+  node: Node,
+  dataFile: string
+): (string | number | null)[] {
+  return [
     node.metadata.tokensUsed,
     node.metadata.cost,
     node.metadata.durationMinutes,
@@ -374,20 +376,85 @@ export function insertNodeToDb(
     node.metadata.analyzerVersion,
     dataFile,
     node.signals ? JSON.stringify(node.signals) : null,
-    // AutoMem consolidation fields - default values for new nodes
-    node.relevanceScore ?? 1, // New nodes start at max relevance
+  ];
+}
+
+/**
+ * Build AutoMem consolidation params for node insert
+ */
+function buildAutoMemParams(node: Node): (string | number | null)[] {
+  return [
+    node.relevanceScore ?? 1,
     node.lastAccessed ?? null,
-    node.archived ? 1 : 0,
-    node.importance ?? 0.5, // Default importance
-    // Message count fields
+    boolToInt(node.archived),
+    node.importance ?? 0.5,
+  ];
+}
+
+/**
+ * Build message count params for node insert
+ */
+function buildMessageCountParams(node: Node): (number | null)[] {
+  return [
     node.metadata.userMessageCount ?? null,
     node.metadata.assistantMessageCount ?? null,
-    // Clarifying question count fields
     node.metadata.clarifyingQuestionCount ?? null,
-    node.metadata.promptedQuestionCount ?? null
-  );
+    node.metadata.promptedQuestionCount ?? null,
+  ];
+}
 
-  // Insert related data
+/**
+ * Build the array of parameters for node insertion
+ */
+function buildNodeInsertParams(
+  node: Node,
+  dataFile: string
+): (string | number | null)[] {
+  return [
+    ...buildSourceParams(node),
+    ...buildClassificationContentParams(node),
+    ...buildMetadataParams(node, dataFile),
+    ...buildAutoMemParams(node),
+    ...buildMessageCountParams(node),
+  ];
+}
+
+const INSERT_NODE_SQL = `
+  INSERT INTO nodes (
+    id, version, session_file, segment_start, segment_end, computer,
+    type, project, is_new_project, had_clear_goal, outcome,
+    tokens_used, cost, duration_minutes,
+    timestamp, analyzed_at, analyzer_version, data_file, signals,
+    relevance_score, last_accessed, archived, importance,
+    user_message_count, assistant_message_count,
+    clarifying_question_count, prompted_question_count
+  ) VALUES (
+    ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?, ?,
+    ?, ?, ?,
+    ?, ?, ?, ?, ?,
+    ?, ?, ?, ?,
+    ?, ?,
+    ?, ?
+  )
+`;
+
+/**
+ * Insert a node row into the nodes table
+ */
+function insertNodeRow(
+  db: Database.Database,
+  node: Node,
+  dataFile: string
+): void {
+  const insertNode = db.prepare(INSERT_NODE_SQL);
+  insertNode.run(...buildNodeInsertParams(node, dataFile));
+}
+
+/**
+ * Insert tags and topics for a node
+ */
+function insertTagsAndTopics(db: Database.Database, node: Node): void {
   const insertTag = db.prepare(
     "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
   );
@@ -401,13 +468,25 @@ export function insertNodeToDb(
   for (const topic of node.semantic.topics) {
     insertTopic.run(node.id, topic);
   }
+}
 
+/**
+ * Insert a node into the database (without writing JSON file)
+ * Used by createNode and rebuild-index CLI
+ */
+export function insertNodeToDb(
+  db: Database.Database,
+  node: Node,
+  dataFile: string,
+  options: { skipFts?: boolean } = {}
+): void {
+  insertNodeRow(db, node, dataFile);
+  insertTagsAndTopics(db, node);
   insertLessons(db, node.id, node.lessons);
   insertModelQuirks(db, node.id, node.observations.modelQuirks);
   insertToolErrors(db, node.id, node.observations.toolUseErrors);
   insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
 
-  // Update FTS index
   if (!options.skipFts) {
     indexNodeForSearch(db, node);
   }
@@ -431,6 +510,69 @@ export function createNode(
 
     return node;
   })();
+}
+
+/**
+ * Build the array of parameters for node update
+ */
+function buildNodeUpdateParams(
+  node: Node,
+  dataFile: string
+): (string | number | null)[] {
+  return [
+    node.version,
+    ...buildClassificationContentParams(node),
+    ...buildMetadataParams(node, dataFile),
+    ...buildMessageCountParams(node),
+    node.id,
+  ];
+}
+
+const UPDATE_NODE_SQL = `
+  UPDATE nodes SET
+    version = ?,
+    type = ?,
+    project = ?,
+    is_new_project = ?,
+    had_clear_goal = ?,
+    outcome = ?,
+    tokens_used = ?,
+    cost = ?,
+    duration_minutes = ?,
+    timestamp = ?,
+    analyzed_at = ?,
+    analyzer_version = ?,
+    data_file = ?,
+    signals = ?,
+    user_message_count = ?,
+    assistant_message_count = ?,
+    clarifying_question_count = ?,
+    prompted_question_count = ?,
+    updated_at = datetime('now')
+  WHERE id = ?
+`;
+
+/**
+ * Clear all related data for a node (for re-insertion)
+ */
+function clearNodeRelatedData(db: Database.Database, nodeId: string): void {
+  db.prepare("DELETE FROM tags WHERE node_id = ?").run(nodeId);
+  db.prepare("DELETE FROM topics WHERE node_id = ?").run(nodeId);
+  db.prepare("DELETE FROM lessons WHERE node_id = ?").run(nodeId);
+  db.prepare("DELETE FROM model_quirks WHERE node_id = ?").run(nodeId);
+  db.prepare("DELETE FROM tool_errors WHERE node_id = ?").run(nodeId);
+  db.prepare("DELETE FROM daemon_decisions WHERE node_id = ?").run(nodeId);
+}
+
+/**
+ * Insert all related data for a node
+ */
+function insertNodeRelatedData(db: Database.Database, node: Node): void {
+  insertTagsAndTopics(db, node);
+  insertLessons(db, node.id, node.lessons);
+  insertModelQuirks(db, node.id, node.observations.modelQuirks);
+  insertToolErrors(db, node.id, node.observations.toolUseErrors);
+  insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
 }
 
 /**
@@ -460,97 +602,14 @@ export function upsertNode(
     }
 
     // 2b. Update existing node in database
-    // Note: source fields (session_file, segment_start, segment_end, computer) are
-    // intentionally omitted. The node ID is deterministic from these values, so they
-    // are guaranteed to be identical on retry. Only analysis-derived fields are updated.
-    const stmt = db.prepare(`
-      UPDATE nodes SET
-        version = ?,
-        type = ?,
-        project = ?,
-        is_new_project = ?,
-        had_clear_goal = ?,
-        outcome = ?,
-        tokens_used = ?,
-        cost = ?,
-        duration_minutes = ?,
-        timestamp = ?,
-        analyzed_at = ?,
-        analyzer_version = ?,
-        data_file = ?,
-        signals = ?,
-        user_message_count = ?,
-        assistant_message_count = ?,
-        clarifying_question_count = ?,
-        prompted_question_count = ?,
-        updated_at = datetime('now')
-      WHERE id = ?
-    `);
-
-    stmt.run(
-      node.version,
-      node.classification.type,
-      node.classification.project,
-      node.classification.isNewProject ? 1 : 0,
-      node.classification.hadClearGoal ? 1 : 0,
-      node.content.outcome,
-      node.metadata.tokensUsed,
-      node.metadata.cost,
-      node.metadata.durationMinutes,
-      node.metadata.timestamp,
-      node.metadata.analyzedAt,
-      node.metadata.analyzerVersion,
-      dataFile,
-      node.signals ? JSON.stringify(node.signals) : null,
-      node.metadata.userMessageCount ?? null,
-      node.metadata.assistantMessageCount ?? null,
-      node.metadata.clarifyingQuestionCount ?? null,
-      node.metadata.promptedQuestionCount ?? null,
-      node.id
-    );
+    const stmt = db.prepare(UPDATE_NODE_SQL);
+    stmt.run(...buildNodeUpdateParams(node, dataFile));
 
     // 3. Clear and re-insert related data
-    const deleteTags = db.prepare("DELETE FROM tags WHERE node_id = ?");
-    const deleteTopics = db.prepare("DELETE FROM topics WHERE node_id = ?");
-    const deleteLessons = db.prepare("DELETE FROM lessons WHERE node_id = ?");
-    const deleteModelQuirks = db.prepare(
-      "DELETE FROM model_quirks WHERE node_id = ?"
-    );
-    const deleteToolErrors = db.prepare(
-      "DELETE FROM tool_errors WHERE node_id = ?"
-    );
-    const deleteDaemonDecisions = db.prepare(
-      "DELETE FROM daemon_decisions WHERE node_id = ?"
-    );
+    clearNodeRelatedData(db, node.id);
+    insertNodeRelatedData(db, node);
 
-    deleteTags.run(node.id);
-    deleteTopics.run(node.id);
-    deleteLessons.run(node.id);
-    deleteModelQuirks.run(node.id);
-    deleteToolErrors.run(node.id);
-    deleteDaemonDecisions.run(node.id);
-
-    // 4. Re-insert related data
-    const insertTag = db.prepare(
-      "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
-    );
-    for (const tag of node.semantic.tags) {
-      insertTag.run(node.id, tag);
-    }
-
-    const insertTopic = db.prepare(
-      "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
-    );
-    for (const topic of node.semantic.topics) {
-      insertTopic.run(node.id, topic);
-    }
-
-    insertLessons(db, node.id, node.lessons);
-    insertModelQuirks(db, node.id, node.observations.modelQuirks);
-    insertToolErrors(db, node.id, node.observations.toolUseErrors);
-    insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
-
-    // 5. Update FTS index
+    // 4. Update FTS index
     if (!options.skipFts) {
       indexNodeForSearch(db, node);
     }
@@ -581,73 +640,14 @@ export function updateNode(
     const dataFile = writeNode(node, options);
 
     // 2. Update nodes table
-    const stmt = db.prepare(`
-      UPDATE nodes SET
-        version = ?,
-        type = ?,
-        project = ?,
-        is_new_project = ?,
-        had_clear_goal = ?,
-        outcome = ?,
-        tokens_used = ?,
-        cost = ?,
-        duration_minutes = ?,
-        timestamp = ?,
-        analyzed_at = ?,
-        analyzer_version = ?,
-        data_file = ?,
-        signals = ?,
-        updated_at = datetime('now')
-      WHERE id = ?
-    `);
+    const stmt = db.prepare(UPDATE_NODE_SQL);
+    stmt.run(...buildNodeUpdateParams(node, dataFile));
 
-    stmt.run(
-      node.version,
-      node.classification.type,
-      node.classification.project,
-      node.classification.isNewProject ? 1 : 0,
-      node.classification.hadClearGoal ? 1 : 0,
-      node.content.outcome,
-      node.metadata.tokensUsed,
-      node.metadata.cost,
-      node.metadata.durationMinutes,
-      node.metadata.timestamp,
-      node.metadata.analyzedAt,
-      node.metadata.analyzerVersion,
-      dataFile,
-      node.signals ? JSON.stringify(node.signals) : null,
-      node.id
-    );
+    // 3. Clear and re-insert related data
+    clearNodeRelatedData(db, node.id);
+    insertNodeRelatedData(db, node);
 
-    // 3. Clear and re-insert related data (tags, topics, lessons, etc.)
-    db.prepare("DELETE FROM tags WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM topics WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM lessons WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM model_quirks WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM tool_errors WHERE node_id = ?").run(node.id);
-    db.prepare("DELETE FROM daemon_decisions WHERE node_id = ?").run(node.id);
-
-    // 4. Re-insert
-    const insertTag = db.prepare(
-      "INSERT OR IGNORE INTO tags (node_id, tag) VALUES (?, ?)"
-    );
-    for (const tag of node.semantic.tags) {
-      insertTag.run(node.id, tag);
-    }
-
-    const insertTopic = db.prepare(
-      "INSERT OR IGNORE INTO topics (node_id, topic) VALUES (?, ?)"
-    );
-    for (const topic of node.semantic.topics) {
-      insertTopic.run(node.id, topic);
-    }
-
-    insertLessons(db, node.id, node.lessons);
-    insertModelQuirks(db, node.id, node.observations.modelQuirks);
-    insertToolErrors(db, node.id, node.observations.toolUseErrors);
-    insertDaemonDecisions(db, node.id, node.daemonMeta.decisions);
-
-    // 5. Update FTS index
+    // 4. Update FTS index
     if (!options.skipFts) {
       indexNodeForSearch(db, node);
     }

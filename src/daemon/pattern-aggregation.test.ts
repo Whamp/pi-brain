@@ -297,9 +297,47 @@ describe("patternAggregator", () => {
     last_seen: string;
   }
 
-  it("should aggregate lessons correctly", () => {
-    // Insert test data
-    const lessons = [
+  interface TestLesson {
+    id: string;
+    node_id: string;
+    level: string;
+    summary: string;
+    tags: string[];
+    created_at: string;
+  }
+
+  function insertTestLessons(lessons: TestLesson[]): void {
+    const insertLesson = db.prepare(`
+      INSERT INTO lessons (id, node_id, level, summary, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    const insertTag = db.prepare(`
+      INSERT INTO lesson_tags (lesson_id, tag) VALUES (?, ?)
+    `);
+
+    for (const lesson of lessons) {
+      insertLesson.run(
+        lesson.id,
+        lesson.node_id,
+        lesson.level,
+        lesson.summary,
+        lesson.created_at
+      );
+      for (const tag of lesson.tags) {
+        insertTag.run(lesson.id, tag);
+      }
+    }
+  }
+
+  function getPatternByLevel(level: string): LessonPatternRow | undefined {
+    return db
+      .prepare("SELECT * FROM lesson_patterns WHERE level = ?")
+      .get(level) as LessonPatternRow | undefined;
+  }
+
+  function setupLessonTestData(): void {
+    const lessons: TestLesson[] = [
       {
         id: "1",
         node_id: "n1",
@@ -326,58 +364,43 @@ describe("patternAggregator", () => {
       },
     ];
 
-    const insertLesson = db.prepare(`
-      INSERT INTO lessons (id, node_id, level, summary, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `);
-
-    const insertTag = db.prepare(`
-      INSERT INTO lesson_tags (lesson_id, tag) VALUES (?, ?)
-    `);
-
-    for (const lesson of lessons) {
-      insertLesson.run(
-        lesson.id,
-        lesson.node_id,
-        lesson.level,
-        lesson.summary,
-        lesson.created_at
-      );
-      for (const tag of lesson.tags) {
-        insertTag.run(lesson.id, tag);
-      }
-    }
-
-    // Run aggregation
+    insertTestLessons(lessons);
     aggregator.aggregateLessons();
+  }
 
-    // Verify results
+  it("should aggregate project-level lessons correctly", () => {
+    setupLessonTestData();
+
     const patterns = db
       .prepare("SELECT * FROM lesson_patterns ORDER BY pattern")
       .all() as LessonPatternRow[];
 
     expect(patterns).toHaveLength(2);
 
-    // Check project pattern
-    const projectPattern = patterns.find((p) => p.level === "project");
+    const projectPattern = getPatternByLevel("project");
     expect(projectPattern).toBeDefined();
     expect(projectPattern?.pattern).toBe("Architecture is modular");
     expect(projectPattern?.occurrences).toBe(1);
-    expect(JSON.parse(projectPattern?.tags || "[]")).toContain("architecture");
 
-    // Check tool pattern
-    const toolPattern = patterns.find((p) => p.level === "tool");
+    const tags: string[] = JSON.parse(projectPattern?.tags ?? "[]");
+    expect(tags).toContain("architecture");
+  });
+
+  it("should aggregate tool-level lessons correctly", () => {
+    setupLessonTestData();
+
+    const toolPattern = getPatternByLevel("tool");
     expect(toolPattern).toBeDefined();
     expect(toolPattern?.pattern).toBe("Use --run with npm test");
     expect(toolPattern?.occurrences).toBe(2);
     expect(toolPattern?.last_seen).toBe("2026-01-02T10:00:00Z");
 
-    const tags = JSON.parse(toolPattern?.tags || "[]");
+    const tags: string[] = JSON.parse(toolPattern?.tags ?? "[]");
     expect(tags).toContain("testing");
     expect(tags).toContain("npm");
     expect(tags).toContain("vitest");
 
-    const examples = JSON.parse(toolPattern?.example_nodes || "[]");
+    const examples: string[] = JSON.parse(toolPattern?.example_nodes ?? "[]");
     expect(examples).toStrictEqual(["n2", "n1"]);
   });
 });

@@ -4,7 +4,7 @@
  * Endpoints for cluster management from facet discovery pipeline.
  */
 
-import type Database from "better-sqlite3";
+import type { Database } from "better-sqlite3";
 import type { FastifyInstance } from "fastify";
 
 import type { Cluster, ClusterNode, ClusterStatus } from "../../types/index.js";
@@ -136,6 +136,60 @@ function fetchRepresentativeNodes(
 }
 
 // =============================================================================
+// Query Builder Helpers
+// =============================================================================
+
+interface ClusterFilterParams {
+  status?: ClusterStatus;
+  signalType?: "friction" | "delight" | null;
+}
+
+/**
+ * Build WHERE clause fragments for cluster filters
+ */
+function buildClusterWhereClause(filters: ClusterFilterParams): {
+  sql: string;
+  params: unknown[];
+} {
+  let sql = "";
+  const params: unknown[] = [];
+
+  if (filters.status) {
+    sql += " AND status = ?";
+    params.push(filters.status);
+  }
+
+  if (filters.signalType !== undefined) {
+    if (filters.signalType === null) {
+      sql += " AND signal_type IS NULL";
+    } else {
+      sql += " AND signal_type = ?";
+      params.push(filters.signalType);
+    }
+  }
+
+  return { sql, params };
+}
+
+/**
+ * Attach representative nodes to clusters
+ */
+function attachRepresentativeNodes(
+  db: Database,
+  clusters: ClusterWithNodes[],
+  limitPerCluster: number
+): void {
+  if (clusters.length === 0) {
+    return;
+  }
+  const clusterIds = clusters.map((c) => c.id);
+  const nodesMap = fetchRepresentativeNodes(db, clusterIds, limitPerCluster);
+  for (const cluster of clusters) {
+    cluster.nodes = nodesMap.get(cluster.id) ?? [];
+  }
+}
+
+// =============================================================================
 // Route Registration
 // =============================================================================
 
@@ -162,48 +216,16 @@ export async function clustersRoutes(app: FastifyInstance): Promise<void> {
       includeNodes = false,
     } = request.query;
 
-    // Build query
-    let sql = "SELECT * FROM clusters WHERE 1=1";
-    const params: unknown[] = [];
+    // Build query with shared WHERE clause helper
+    const whereClause = buildClusterWhereClause({ status, signalType });
 
-    if (status) {
-      sql += " AND status = ?";
-      params.push(status);
-    }
-
-    if (signalType !== undefined) {
-      if (signalType === null) {
-        sql += " AND signal_type IS NULL";
-      } else {
-        sql += " AND signal_type = ?";
-        params.push(signalType);
-      }
-    }
-
-    sql += " ORDER BY created_at DESC LIMIT ? OFFSET ?";
-    params.push(limit, offset);
-
+    const sql = `SELECT * FROM clusters WHERE 1=1${whereClause.sql} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    const params = [...whereClause.params, limit, offset];
     const rows = db.prepare(sql).all(...params) as ClusterRow[];
 
-    // Get total count
-    let countSql = "SELECT COUNT(*) as total FROM clusters WHERE 1=1";
-    const countParams: unknown[] = [];
-
-    if (status) {
-      countSql += " AND status = ?";
-      countParams.push(status);
-    }
-
-    if (signalType !== undefined) {
-      if (signalType === null) {
-        countSql += " AND signal_type IS NULL";
-      } else {
-        countSql += " AND signal_type = ?";
-        countParams.push(signalType);
-      }
-    }
-
-    const totalRow = db.prepare(countSql).get(...countParams) as {
+    // Get total count using same WHERE clause
+    const countSql = `SELECT COUNT(*) as total FROM clusters WHERE 1=1${whereClause.sql}`;
+    const totalRow = db.prepare(countSql).get(...whereClause.params) as {
       total: number;
     };
 
@@ -211,12 +233,8 @@ export async function clustersRoutes(app: FastifyInstance): Promise<void> {
     const clusters: ClusterWithNodes[] = rows.map(mapClusterRow);
 
     // Optionally include representative nodes (batched query)
-    if (includeNodes && clusters.length > 0) {
-      const clusterIds = clusters.map((c) => c.id);
-      const nodesMap = fetchRepresentativeNodes(db, clusterIds, 5);
-      for (const cluster of clusters) {
-        cluster.nodes = nodesMap.get(cluster.id) ?? [];
-      }
+    if (includeNodes) {
+      attachRepresentativeNodes(db, clusters, 5);
     }
 
     return {

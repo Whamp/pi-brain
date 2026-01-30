@@ -13,6 +13,13 @@ import {
 import { getToolErrorStats } from "../../storage/tool-error-repository.js";
 import { successResponse } from "../responses.js";
 
+/**
+ * Format a date to UTC date string (YYYY-MM-DD)
+ */
+function formatDateToUTC(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
 /** Message engagement stats from aggregating user/assistant message counts */
 interface MessageEngagement {
   /** Total user messages across all nodes */
@@ -181,6 +188,112 @@ function getContextWindowUsage(db: Database.Database): ContextWindowUsage {
   };
 }
 
+// =============================================================================
+// Stats Helper Functions
+// =============================================================================
+
+interface DateRanges {
+  oneWeekAgo: Date;
+  twoWeeksAgo: Date;
+  todayStart: Date;
+}
+
+function getDateRanges(): DateRanges {
+  const now = new Date();
+
+  const oneWeekAgo = new Date(now);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const twoWeeksAgo = new Date(now);
+  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  return { oneWeekAgo, twoWeeksAgo, todayStart };
+}
+
+interface OutcomeCounts {
+  success: number;
+  partial: number;
+  failed: number;
+  abandoned: number;
+}
+
+function getOutcomeCounts(db: Database.Database): OutcomeCounts {
+  return {
+    success: countNodes(db, { outcome: "success" }),
+    partial: countNodes(db, { outcome: "partial" }),
+    failed: countNodes(db, { outcome: "failed" }),
+    abandoned: countNodes(db, { outcome: "abandoned" }),
+  };
+}
+
+interface VagueGoalTrends {
+  thisWeek: number;
+  lastWeek: number;
+  change: number;
+}
+
+function getVagueGoalTrends(
+  db: Database.Database,
+  dates: DateRanges
+): VagueGoalTrends {
+  const vagueThisWeek = countNodes(db, {
+    from: dates.oneWeekAgo.toISOString(),
+    hadClearGoal: false,
+  });
+  const clearThisWeek = countNodes(db, {
+    from: dates.oneWeekAgo.toISOString(),
+    hadClearGoal: true,
+  });
+
+  const vagueLastWeek = countNodes(db, {
+    from: dates.twoWeeksAgo.toISOString(),
+    to: dates.oneWeekAgo.toISOString(),
+    hadClearGoal: false,
+  });
+  const clearLastWeek = countNodes(db, {
+    from: dates.twoWeeksAgo.toISOString(),
+    to: dates.oneWeekAgo.toISOString(),
+    hadClearGoal: true,
+  });
+
+  const vagueRatioThisWeek =
+    clearThisWeek + vagueThisWeek > 0
+      ? vagueThisWeek / (clearThisWeek + vagueThisWeek)
+      : 0;
+  const vagueRatioLastWeek =
+    clearLastWeek + vagueLastWeek > 0
+      ? vagueLastWeek / (clearLastWeek + vagueLastWeek)
+      : 0;
+
+  return {
+    thisWeek: vagueRatioThisWeek,
+    lastWeek: vagueRatioLastWeek,
+    change: vagueRatioThisWeek - vagueRatioLastWeek,
+  };
+}
+
+interface UsageTotals {
+  totalTokens: number;
+  totalCost: number;
+  byModel: Record<string, { tokens: number; cost: number }>;
+}
+
+function getUsageTotals(db: Database.Database): UsageTotals {
+  const recentNodes = listNodes(db, {}, { limit: 500 });
+  let totalTokens = 0;
+  let totalCost = 0;
+
+  for (const node of recentNodes.nodes) {
+    totalTokens += node.tokens_used ?? 0;
+    totalCost += node.cost ?? 0;
+  }
+
+  return { totalTokens, totalCost, byModel: {} };
+}
+
 export async function statsRoutes(app: FastifyInstance): Promise<void> {
   /**
    * GET /stats - Dashboard statistics
@@ -189,91 +302,36 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
     const startTime = request.startTime ?? Date.now();
     const { db } = app.ctx;
 
+    const dates = getDateRanges();
+
     // Total counts
     const totalNodes = countNodes(db, {});
     const totalEdges = countEdges(db);
 
-    // This week's nodes
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    // This week's and today's nodes
     const nodesThisWeek = countNodes(db, {
-      from: oneWeekAgo.toISOString(),
+      from: dates.oneWeekAgo.toISOString(),
     });
+    const nodesToday = countNodes(db, { from: dates.todayStart.toISOString() });
 
-    // Today's nodes
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const nodesToday = countNodes(db, {
-      from: todayStart.toISOString(),
-    });
-
-    // Outcomes breakdown
-    const successCount = countNodes(db, { outcome: "success" });
-    const partialCount = countNodes(db, { outcome: "partial" });
-    const failedCount = countNodes(db, { outcome: "failed" });
-    const abandonedCount = countNodes(db, { outcome: "abandoned" });
+    // Outcomes and trends
+    const outcomes = getOutcomeCounts(db);
+    const vagueGoals = getVagueGoalTrends(db, dates);
+    const usage = getUsageTotals(db);
 
     // Top projects (get all projects and count nodes for each)
     const allProjects = getAllProjects(db);
     const projectCounts = allProjects
-      .slice(0, 10) // Limit to top 10
+      .slice(0, 10)
       .map((project) => ({
         project,
         nodeCount: countNodes(db, { project }),
       }))
       .toSorted((a, b) => b.nodeCount - a.nodeCount);
 
-    // Vague goal tracking
-    const vagueThisWeek = countNodes(db, {
-      from: oneWeekAgo.toISOString(),
-      hadClearGoal: false,
-    });
-    const clearThisWeek = countNodes(db, {
-      from: oneWeekAgo.toISOString(),
-      hadClearGoal: true,
-    });
-
-    const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-    const vagueLastWeek = countNodes(db, {
-      from: twoWeeksAgo.toISOString(),
-      to: oneWeekAgo.toISOString(),
-      hadClearGoal: false,
-    });
-    const clearLastWeek = countNodes(db, {
-      from: twoWeeksAgo.toISOString(),
-      to: oneWeekAgo.toISOString(),
-      hadClearGoal: true,
-    });
-
-    const vagueRatioThisWeek =
-      clearThisWeek + vagueThisWeek > 0
-        ? vagueThisWeek / (clearThisWeek + vagueThisWeek)
-        : 0;
-    const vagueRatioLastWeek =
-      clearLastWeek + vagueLastWeek > 0
-        ? vagueLastWeek / (clearLastWeek + vagueLastWeek)
-        : 0;
-
-    // Token and cost totals (from recent nodes)
-    const recentNodes = listNodes(db, {}, { limit: 500 });
-    let totalTokens = 0;
-    let totalCost = 0;
-    const byModel: Record<string, { tokens: number; cost: number }> = {};
-
-    for (const node of recentNodes.nodes) {
-      totalTokens += node.tokens_used ?? 0;
-      totalCost += node.cost ?? 0;
-      // Note: we don't have model info in the node row, would need to read JSON
-    }
-
-    // Message engagement metrics
+    // Aggregate metrics
     const messageEngagement = getMessageEngagement(db);
-
-    // Clarifying questions metrics
     const clarifyingQuestions = getClarifyingQuestions(db);
-
-    // Context window usage metrics
     const contextWindowUsage = getContextWindowUsage(db);
 
     const durationMs = Date.now() - startTime;
@@ -283,30 +341,17 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
           totals: {
             nodes: totalNodes,
             edges: totalEdges,
-            sessions: totalNodes, // Approximate: 1 node per session segment
+            sessions: totalNodes,
           },
           recent: {
             nodesThisWeek,
             nodesToday,
           },
-          usage: {
-            totalTokens,
-            totalCost,
-            byModel,
-          },
-          outcomes: {
-            success: successCount,
-            partial: partialCount,
-            failed: failedCount,
-            abandoned: abandonedCount,
-          },
+          usage,
+          outcomes,
           topProjects: projectCounts,
           trends: {
-            vagueGoals: {
-              thisWeek: vagueRatioThisWeek,
-              lastWeek: vagueRatioLastWeek,
-              change: vagueRatioThisWeek - vagueRatioLastWeek,
-            },
+            vagueGoals,
           },
           messageEngagement,
           clarifyingQuestions,
@@ -353,14 +398,13 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       // Calculate date range
       // Use UTC dates to match SQLite's DATE() function which returns UTC dates
       const now = new Date();
-      const formatDateStr = (d: Date): string => d.toISOString().split("T")[0];
 
       // End date is today in UTC
-      const endDateStr = formatDateStr(now);
+      const endDateStr = formatDateToUTC(now);
       // Start date is 'days' ago from today in UTC
       const startDate = new Date(now);
       startDate.setDate(startDate.getDate() - days);
-      const startDateStr = formatDateStr(startDate);
+      const startDateStr = formatDateToUTC(startDate);
 
       // Get daily token/cost totals from database
       const stmt = db.prepare(`
@@ -390,7 +434,7 @@ export async function statsRoutes(app: FastifyInstance): Promise<void> {
       let rowIndex = 0;
 
       while (currentDate <= endDate) {
-        const dateStr = formatDateStr(currentDate);
+        const dateStr = formatDateToUTC(currentDate);
 
         if (rowIndex < rows.length && rows[rowIndex].date === dateStr) {
           result.push({

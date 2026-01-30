@@ -608,40 +608,59 @@ function computeMutualReachability(
   return reachability;
 }
 
-function extractClusters(
+/**
+ * Find the minimum edge connecting MST to a node not yet in MST
+ */
+function findMinMstEdge(
+  inMst: Set<number>,
   reachability: number[][],
-  n: number,
-  minClusterSize: number
-): number[] {
+  n: number
+): { from: number; to: number; weight: number } | null {
+  let minEdge: { from: number; to: number; weight: number } | null = null;
+  let minWeight = Number.POSITIVE_INFINITY;
+
+  for (const node of inMst) {
+    for (let j = 0; j < n; j++) {
+      if (!inMst.has(j) && reachability[node][j] < minWeight) {
+        minWeight = reachability[node][j];
+        minEdge = { from: node, to: j, weight: minWeight };
+      }
+    }
+  }
+
+  return minEdge;
+}
+
+/**
+ * Build minimum spanning tree edges from reachability matrix
+ */
+function buildMstEdges(
+  reachability: number[][],
+  n: number
+): { from: number; to: number; weight: number }[] {
   const mstEdges: { from: number; to: number; weight: number }[] = [];
   const inMst = new Set<number>([0]);
 
   while (inMst.size < n) {
-    let minEdge: { from: number; to: number; weight: number } | null = null;
-    let minWeight = Number.POSITIVE_INFINITY;
-
-    for (const node of inMst) {
-      for (let j = 0; j < n; j++) {
-        if (!inMst.has(j) && reachability[node][j] < minWeight) {
-          minWeight = reachability[node][j];
-          minEdge = { from: node, to: j, weight: minWeight };
-        }
-      }
-    }
-
+    const minEdge = findMinMstEdge(inMst, reachability, n);
     if (!minEdge) {
       break;
     }
-
     mstEdges.push(minEdge);
     inMst.add(minEdge.to);
   }
 
-  mstEdges.sort((a, b) => b.weight - a.weight);
+  return mstEdges;
+}
 
-  const thresholdIdx = Math.floor(mstEdges.length * 0.1);
-  const threshold = mstEdges[thresholdIdx]?.weight ?? Number.POSITIVE_INFINITY;
-
+/**
+ * Build adjacency list from MST edges, filtering by threshold
+ */
+function buildAdjacencyFromMst(
+  mstEdges: { from: number; to: number; weight: number }[],
+  n: number,
+  threshold: number
+): Set<number>[] {
   const adj: Set<number>[] = Array.from({ length: n }, () => new Set());
   for (const edge of mstEdges) {
     if (edge.weight < threshold) {
@@ -649,7 +668,55 @@ function extractClusters(
       adj[edge.to].add(edge.from);
     }
   }
+  return adj;
+}
 
+/**
+ * Extract a connected component starting from a node using BFS
+ */
+function extractComponent(
+  startNode: number,
+  adj: Set<number>[],
+  labels: number[],
+  clusterId: number
+): number[] {
+  const component: number[] = [];
+  const queue = [startNode];
+
+  while (queue.length > 0) {
+    const node = queue.shift();
+    if (node === undefined || labels[node] !== -1) {
+      continue;
+    }
+
+    labels[node] = clusterId;
+    component.push(node);
+
+    for (const neighbor of adj[node]) {
+      if (labels[neighbor] === -1) {
+        queue.push(neighbor);
+      }
+    }
+  }
+
+  return component;
+}
+
+/**
+ * Extract clusters from MST using threshold-based edge cutting
+ */
+function extractClusters(
+  reachability: number[][],
+  n: number,
+  minClusterSize: number
+): number[] {
+  const mstEdges = buildMstEdges(reachability, n);
+  mstEdges.sort((a, b) => b.weight - a.weight);
+
+  const thresholdIdx = Math.floor(mstEdges.length * 0.1);
+  const threshold = mstEdges[thresholdIdx]?.weight ?? Number.POSITIVE_INFINITY;
+
+  const adj = buildAdjacencyFromMst(mstEdges, n, threshold);
   const labels = Array.from<number>({ length: n }).fill(-1);
   let clusterId = 0;
 
@@ -658,24 +725,7 @@ function extractClusters(
       continue;
     }
 
-    const component: number[] = [];
-    const queue = [i];
-
-    while (queue.length > 0) {
-      const node = queue.shift();
-      if (node === undefined || labels[node] !== -1) {
-        continue;
-      }
-
-      labels[node] = clusterId;
-      component.push(node);
-
-      for (const neighbor of adj[node]) {
-        if (labels[neighbor] === -1) {
-          queue.push(neighbor);
-        }
-      }
-    }
+    const component = extractComponent(i, adj, labels, clusterId);
 
     if (component.length < minClusterSize) {
       for (const node of component) {
@@ -744,10 +794,26 @@ export class FacetDiscovery {
     maxNodes?: number;
   }): Promise<FacetDiscoveryResult> {
     const runId = generateId();
-    const startedAt = new Date().toISOString();
 
     this.logger.info(`Starting facet discovery run ${runId}`);
+    this.insertClusteringRun(runId);
 
+    try {
+      return await this.executeClusteringRun(runId, options);
+    } catch (error) {
+      this.failRun(
+        runId,
+        error instanceof Error ? error.message : String(error)
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Insert initial clustering run record
+   */
+  private insertClusteringRun(runId: string): void {
+    const startedAt = new Date().toISOString();
     this.db
       .prepare(
         `INSERT INTO clustering_runs (id, started_at, embedding_model, algorithm, parameters, status)
@@ -760,52 +826,56 @@ export class FacetDiscovery {
         this.clusteringConfig.algorithm,
         JSON.stringify(this.clusteringConfig)
       );
+  }
 
-    try {
-      const nodes = this.getNodesForClustering(
-        options?.maxNodes ??
-          this.clusteringConfig.maxNodes ??
-          DEFAULT_MAX_NODES,
-        options?.signalType,
-        options?.model
-      );
-
-      this.logger.info(`Found ${nodes.length} nodes to process`);
-
-      if (nodes.length === 0) {
-        return this.completeRun(runId, [], 0, 0, 0);
-      }
-
-      const embeddings = await this.embedNodes(nodes, runId);
-      this.logger.info(`Embedded ${embeddings.length} nodes`);
-
-      const labels = this.clusterEmbeddings(embeddings);
-
-      const clusters = this.createClusters(
-        nodes,
-        embeddings,
-        labels,
-        runId,
-        options?.signalType,
-        options?.model
-      );
-
-      this.logger.info(`Created ${clusters.length} clusters`);
-
-      return this.completeRun(
-        runId,
-        clusters,
-        nodes.length,
-        embeddings.length,
-        clusters.length
-      );
-    } catch (error) {
-      this.failRun(
-        runId,
-        error instanceof Error ? error.message : String(error)
-      );
-      throw error;
+  /**
+   * Execute the clustering pipeline
+   */
+  private async executeClusteringRun(
+    runId: string,
+    options?: {
+      signalType?: ClusterSignalType;
+      model?: string;
+      maxNodes?: number;
     }
+  ): Promise<FacetDiscoveryResult> {
+    const maxNodes =
+      options?.maxNodes ?? this.clusteringConfig.maxNodes ?? DEFAULT_MAX_NODES;
+    const nodes = this.getNodesForClustering(
+      maxNodes,
+      options?.signalType,
+      options?.model
+    );
+
+    this.logger.info(`Found ${nodes.length} nodes to process`);
+
+    if (nodes.length === 0) {
+      return this.completeRun(runId, [], 0, 0, 0);
+    }
+
+    const embeddings = await this.embedNodes(nodes, runId);
+    this.logger.info(`Embedded ${embeddings.length} nodes`);
+
+    const labels = this.clusterEmbeddings(embeddings);
+
+    const clusters = this.createClusters(
+      nodes,
+      embeddings,
+      labels,
+      runId,
+      options?.signalType,
+      options?.model
+    );
+
+    this.logger.info(`Created ${clusters.length} clusters`);
+
+    return this.completeRun(
+      runId,
+      clusters,
+      nodes.length,
+      embeddings.length,
+      clusters.length
+    );
   }
 
   private getNodesForClustering(
@@ -1296,21 +1366,10 @@ export class FacetDiscovery {
     config: ClusterAnalysisConfig,
     options?: { limit?: number }
   ): Promise<ClusterAnalysisBatchResult> {
-    // Validate config
-    if (!config.provider || typeof config.provider !== "string") {
-      throw new Error(
-        "ClusterAnalysisConfig.provider must be a non-empty string"
-      );
-    }
-    if (!config.model || typeof config.model !== "string") {
-      throw new Error("ClusterAnalysisConfig.model must be a non-empty string");
-    }
+    this.validateClusterAnalysisConfig(config);
 
     const limit = options?.limit ?? 10;
-
-    // Get pending clusters that need analysis
-    const pendingClusters = this.getClusters({ status: "pending", limit });
-    const unnamedClusters = pendingClusters.filter((c) => c.name === null);
+    const unnamedClusters = this.getUnnamedClusters(limit);
 
     this.logger.info(
       `Found ${unnamedClusters.length} unnamed clusters to analyze`
@@ -1324,16 +1383,11 @@ export class FacetDiscovery {
       const result = await this.analyzeCluster(cluster, config);
       results.push(result);
 
-      if (result.success && result.name && result.description) {
+      const wasSuccessful = this.processAnalysisResult(result, cluster.id);
+      if (wasSuccessful) {
         succeeded++;
-        this.updateClusterDetails(cluster.id, result.name, result.description);
       } else {
         failed++;
-        // Mark as failed if success was true but name/description missing
-        if (result.success) {
-          result.success = false;
-          result.error = "LLM returned empty name or description";
-        }
       }
     }
 
@@ -1347,6 +1401,49 @@ export class FacetDiscovery {
       failed,
       results,
     };
+  }
+
+  /**
+   * Validate cluster analysis configuration
+   */
+  private validateClusterAnalysisConfig(config: ClusterAnalysisConfig): void {
+    if (!config.provider || typeof config.provider !== "string") {
+      throw new Error(
+        "ClusterAnalysisConfig.provider must be a non-empty string"
+      );
+    }
+    if (!config.model || typeof config.model !== "string") {
+      throw new Error("ClusterAnalysisConfig.model must be a non-empty string");
+    }
+  }
+
+  /**
+   * Get unnamed pending clusters
+   */
+  private getUnnamedClusters(limit: number): Cluster[] {
+    const pendingClusters = this.getClusters({ status: "pending", limit });
+    return pendingClusters.filter((c) => c.name === null);
+  }
+
+  /**
+   * Process analysis result and update cluster if successful
+   * Returns true if the result was successful with valid data
+   */
+  private processAnalysisResult(
+    result: ClusterAnalysisResult,
+    clusterId: string
+  ): boolean {
+    if (result.success && result.name && result.description) {
+      this.updateClusterDetails(clusterId, result.name, result.description);
+      return true;
+    }
+
+    // Mark as failed if success was true but name/description missing
+    if (result.success) {
+      result.success = false;
+      result.error = "LLM returned empty name or description";
+    }
+    return false;
   }
 
   /**
@@ -1704,7 +1801,18 @@ export class FacetDiscovery {
     reasoning?: string;
     error?: string;
   } {
-    // Pi JSON mode outputs newline-delimited JSON events
+    const textContent = this.extractAssistantTextFromOutput(stdout);
+    if (textContent === null) {
+      return { success: false, error: "No assistant message found" };
+    }
+
+    return this.parseClusterJsonFromText(textContent);
+  }
+
+  /**
+   * Extract assistant text content from pi JSON output
+   */
+  private extractAssistantTextFromOutput(stdout: string): string | null {
     const lines = stdout.trim().split("\n");
     const events: {
       type: string;
@@ -1722,26 +1830,34 @@ export class FacetDiscovery {
       }
     }
 
-    // Find the agent_end event
     const endEvent = events.find((e) => e.type === "agent_end");
     if (!endEvent?.messages) {
-      return { success: false, error: "No agent_end event found" };
+      return null;
     }
 
-    // Find the assistant message
     const assistantMsg = endEvent.messages.find((m) => m.role === "assistant");
     if (!assistantMsg) {
-      return { success: false, error: "No assistant message found" };
+      return null;
     }
 
-    // Extract text content
-    const textContent = assistantMsg.content
+    return assistantMsg.content
       .filter((b) => b.type === "text" && b.text)
       .map((b) => b.text)
       .join("\n");
+  }
 
-    // Try to extract JSON from the response
-    // Priority: fenced code block > bare JSON object (non-greedy, matching balanced braces)
+  /**
+   * Parse cluster analysis JSON from text content
+   */
+  private parseClusterJsonFromText(textContent: string): {
+    success: boolean;
+    name?: string;
+    description?: string;
+    confidence?: "high" | "medium" | "low";
+    reasoning?: string;
+    error?: string;
+  } {
+    // Priority: fenced code block > bare JSON object
     const jsonMatch =
       textContent.match(/```json\n([\s\S]*?)\n```/) ||
       textContent.match(

@@ -46,16 +46,35 @@
     source = spokeConfig.source ?? "";
     ({ enabled } = spokeConfig);
     schedule = spokeConfig.schedule ?? "0 * * * *";
-    loadRsyncOptions(spokeConfig);
+    loadRsyncOptions(spokeConfig.rsyncOptions);
+  }
+
+  // Default values for rsync options
+  const RSYNC_DEFAULTS: Required<RsyncOptions> = {
+    bwLimit: 0,
+    delete: false,
+    extraArgs: [],
+    timeoutSeconds: 300,
+  };
+
+  // Helper: Get resolved rsync options with defaults
+  function resolveRsyncOptions(opts: RsyncOptions | undefined): Required<RsyncOptions> {
+    return {
+      bwLimit: opts?.bwLimit ?? RSYNC_DEFAULTS.bwLimit,
+      delete: opts?.delete ?? RSYNC_DEFAULTS.delete,
+      extraArgs: opts?.extraArgs ?? RSYNC_DEFAULTS.extraArgs,
+      timeoutSeconds: opts?.timeoutSeconds ?? RSYNC_DEFAULTS.timeoutSeconds,
+    };
   }
 
   // Helper: Load rsync options from spoke config
-  function loadRsyncOptions(spokeConfig: SpokeConfig): void {
-    rsyncBwLimit = spokeConfig.rsyncOptions?.bwLimit ?? 0;
-    rsyncDelete = spokeConfig.rsyncOptions?.delete ?? false;
-    rsyncExtraArgs = spokeConfig.rsyncOptions?.extraArgs?.join(" ") ?? "";
-    rsyncTimeoutSeconds = spokeConfig.rsyncOptions?.timeoutSeconds ?? 300;
-    showRsyncOptions = syncMethod === "rsync" && Boolean(spokeConfig.rsyncOptions);
+  function loadRsyncOptions(rsyncOptions: RsyncOptions | undefined): void {
+    const resolved = resolveRsyncOptions(rsyncOptions);
+    rsyncBwLimit = resolved.bwLimit;
+    rsyncDelete = resolved.delete;
+    rsyncExtraArgs = resolved.extraArgs.join(" ");
+    rsyncTimeoutSeconds = resolved.timeoutSeconds;
+    showRsyncOptions = syncMethod === "rsync" && rsyncOptions !== undefined;
   }
 
   // Helper: Reset form to defaults for create mode

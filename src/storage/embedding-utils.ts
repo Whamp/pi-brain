@@ -442,6 +442,117 @@ export function findNodesNeedingEmbedding(
     ) as NodeNeedingEmbeddingRow[];
 }
 
+// =============================================================================
+// Backfill Helper Functions
+// =============================================================================
+
+interface BatchText {
+  nodeId: string;
+  text: string;
+}
+
+interface BackfillState {
+  successCount: number;
+  failureCount: number;
+  failedNodeIds: string[];
+}
+
+/**
+ * Build embedding texts for a batch of nodes
+ * @internal
+ */
+function buildBatchTexts(
+  batch: NodeNeedingEmbeddingRow[],
+  readNodeFromPath: (dataFile: string) => Node,
+  logger: BackfillLogger,
+  state: BackfillState
+): BatchText[] {
+  const batchTexts: BatchText[] = [];
+
+  for (const node of batch) {
+    try {
+      const fullNode = readNodeFromPath(node.data_file);
+      const text = buildEmbeddingText(fullNode);
+      batchTexts.push({ nodeId: node.id, text });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.warn(`Failed to load node ${node.id}: ${message}`);
+      state.failedNodeIds.push(node.id);
+      state.failureCount++;
+    }
+  }
+
+  return batchTexts;
+}
+
+/**
+ * Store embeddings for a batch of successfully embedded nodes
+ * @internal
+ */
+function storeBatchEmbeddings(
+  db: Database.Database,
+  batchTexts: BatchText[],
+  embeddings: number[][],
+  provider: BackfillEmbeddingProvider,
+  logger: BackfillLogger,
+  state: BackfillState
+): void {
+  for (let j = 0; j < batchTexts.length; j++) {
+    const { nodeId, text } = batchTexts[j];
+    const embedding = embeddings[j];
+
+    if (!embedding || embedding.length === 0) {
+      logger.warn(`Empty embedding returned for node ${nodeId}`);
+      state.failedNodeIds.push(nodeId);
+      state.failureCount++;
+      continue;
+    }
+
+    try {
+      storeEmbeddingWithVec(db, nodeId, embedding, provider.modelName, text);
+      state.successCount++;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.warn(`Failed to store embedding for ${nodeId}: ${message}`);
+      state.failedNodeIds.push(nodeId);
+      state.failureCount++;
+    }
+  }
+}
+
+/**
+ * Process a single batch of nodes for embedding
+ * @internal
+ */
+async function processBatch(
+  db: Database.Database,
+  batch: NodeNeedingEmbeddingRow[],
+  provider: BackfillEmbeddingProvider,
+  readNodeFromPath: (dataFile: string) => Node,
+  logger: BackfillLogger,
+  state: BackfillState
+): Promise<void> {
+  const batchTexts = buildBatchTexts(batch, readNodeFromPath, logger, state);
+
+  if (batchTexts.length === 0) {
+    return;
+  }
+
+  try {
+    const texts = batchTexts.map((bt) => bt.text);
+    const embeddings = await provider.embed(texts);
+    storeBatchEmbeddings(db, batchTexts, embeddings, provider, logger, state);
+  } catch (error) {
+    // Batch embedding failed - mark all nodes in batch as failed
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error(`Batch embedding failed: ${message}`);
+    for (const { nodeId } of batchTexts) {
+      state.failedNodeIds.push(nodeId);
+      state.failureCount++;
+    }
+  }
+}
+
 /**
  * Backfill embeddings for nodes that are missing or have outdated embeddings.
  *
@@ -491,95 +602,35 @@ export async function backfillEmbeddings(
     `Found ${totalNodes} nodes needing embedding (limit: ${limit}, force: ${force})`
   );
 
-  let successCount = 0;
-  let failureCount = 0;
-  const failedNodeIds: string[] = [];
+  const state: BackfillState = {
+    successCount: 0,
+    failureCount: 0,
+    failedNodeIds: [],
+  };
 
   // Process in batches
   for (let i = 0; i < nodes.length; i += batchSize) {
     const batch = nodes.slice(i, i + batchSize);
-    const batchTexts: { nodeId: string; text: string }[] = [];
-
-    // Build embedding text for each node in the batch
-    for (const node of batch) {
-      try {
-        const fullNode = readNodeFromPath(node.data_file);
-        const text = buildEmbeddingText(fullNode);
-        batchTexts.push({ nodeId: node.id, text });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        logger.warn(`Failed to load node ${node.id}: ${message}`);
-        failedNodeIds.push(node.id);
-        failureCount++;
-      }
-    }
-
-    if (batchTexts.length === 0) {
-      continue;
-    }
-
-    // Generate embeddings for the batch
-    try {
-      const texts = batchTexts.map((bt) => bt.text);
-      const embeddings = await provider.embed(texts);
-
-      // Store each embedding
-      for (let j = 0; j < batchTexts.length; j++) {
-        const { nodeId, text } = batchTexts[j];
-        const embedding = embeddings[j];
-
-        if (!embedding || embedding.length === 0) {
-          logger.warn(`Empty embedding returned for node ${nodeId}`);
-          failedNodeIds.push(nodeId);
-          failureCount++;
-          continue;
-        }
-
-        try {
-          storeEmbeddingWithVec(
-            db,
-            nodeId,
-            embedding,
-            provider.modelName,
-            text
-          );
-          successCount++;
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : String(error);
-          logger.warn(`Failed to store embedding for ${nodeId}: ${message}`);
-          failedNodeIds.push(nodeId);
-          failureCount++;
-        }
-      }
-    } catch (error) {
-      // Batch embedding failed - mark all nodes in batch as failed
-      const message = error instanceof Error ? error.message : String(error);
-      logger.error(`Batch embedding failed: ${message}`);
-      for (const { nodeId } of batchTexts) {
-        failedNodeIds.push(nodeId);
-        failureCount++;
-      }
-    }
+    await processBatch(db, batch, provider, readNodeFromPath, logger, state);
 
     // Progress callback
     const processed = Math.min(i + batchSize, nodes.length);
     onProgress?.(processed, totalNodes);
     logger.debug?.(
-      `Processed ${processed}/${totalNodes} nodes (${successCount} success, ${failureCount} failed)`
+      `Processed ${processed}/${totalNodes} nodes (${state.successCount} success, ${state.failureCount} failed)`
     );
   }
 
   const durationMs = Date.now() - startTime;
   logger.info(
-    `Backfill complete: ${successCount}/${totalNodes} successful in ${durationMs}ms`
+    `Backfill complete: ${state.successCount}/${totalNodes} successful in ${durationMs}ms`
   );
 
   return {
     totalNodes,
-    successCount,
-    failureCount,
-    failedNodeIds,
+    successCount: state.successCount,
+    failureCount: state.failureCount,
+    failedNodeIds: state.failedNodeIds,
     durationMs,
   };
 }

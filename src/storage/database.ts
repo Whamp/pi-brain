@@ -31,6 +31,8 @@ export interface DatabaseOptions {
    * - 'optional': Load extension but don't throw on failure
    */
   loadVec?: boolean | "optional";
+  /** Skip the test environment check (allows opening production DB in tests) */
+  skipTestCheck?: boolean;
 }
 
 export interface MigrationInfo {
@@ -41,41 +43,72 @@ export interface MigrationInfo {
 }
 
 /**
- * Open or create the pi-brain database
+ * Guard against test code opening production database
  */
-export function openDatabase(options: DatabaseOptions = {}): Database.Database {
-  const dbPath = options.path ?? DEFAULT_DB_PATH;
+function guardTestAccess(options: DatabaseOptions, dbPath: string): void {
+  if (
+    !options.skipTestCheck &&
+    process.env.VITEST &&
+    dbPath === DEFAULT_DB_PATH
+  ) {
+    throw new Error("Test code attempted to open production database");
+  }
+}
 
-  // Ensure directory exists
+/**
+ * Ensure database directory exists
+ */
+function ensureDatabaseDir(dbPath: string): void {
   const dir = dirname(dbPath);
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
+}
 
-  // Open database
+/**
+ * Configure database pragmas for performance
+ */
+function configurePragmas(db: Database.Database): void {
+  db.pragma("journal_mode = WAL");
+  db.pragma("synchronous = NORMAL");
+  db.pragma("foreign_keys = ON");
+}
+
+/**
+ * Handle sqlite-vec extension loading based on options
+ */
+function handleVecExtension(
+  db: Database.Database,
+  loadVecOption: boolean | "optional"
+): void {
+  if (loadVecOption === false) {
+    return;
+  }
+  const loaded = loadVecExtension(db);
+  if (!loaded && loadVecOption === true) {
+    db.close();
+    throw new Error(
+      "Failed to load sqlite-vec extension. Semantic search will not work. " +
+        "Set loadVec: false to disable, or loadVec: 'optional' to continue without it."
+    );
+  }
+}
+
+/**
+ * Open or create the pi-brain database
+ */
+export function openDatabase(options: DatabaseOptions = {}): Database.Database {
+  const dbPath = options.path ?? DEFAULT_DB_PATH;
+  guardTestAccess(options, dbPath);
+  ensureDatabaseDir(dbPath);
+
   const db = new Database(dbPath, {
     verbose: options.verbose ? console.log : undefined,
   });
 
-  // Configure for performance
-  db.pragma("journal_mode = WAL");
-  db.pragma("synchronous = NORMAL");
-  db.pragma("foreign_keys = ON");
+  configurePragmas(db);
+  handleVecExtension(db, options.loadVec ?? true);
 
-  // Load sqlite-vec extension
-  const loadVecOption = options.loadVec ?? true;
-  if (loadVecOption !== false) {
-    const loaded = loadVecExtension(db);
-    if (!loaded && loadVecOption === true) {
-      db.close();
-      throw new Error(
-        "Failed to load sqlite-vec extension. Semantic search will not work. " +
-          "Set loadVec: false to disable, or loadVec: 'optional' to continue without it."
-      );
-    }
-  }
-
-  // Run migrations if requested (default: true)
   if (options.migrate !== false) {
     migrate(db);
   }

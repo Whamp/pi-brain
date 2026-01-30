@@ -59,17 +59,18 @@ function saveThemePreference(theme: Theme): void {
   }
 }
 
+// Helper to get initial system theme
+function getInitialSystemTheme(): "light" | "dark" {
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 // System theme store - tracks the actual system preference
 const createSystemThemeStore = () => {
-  const getInitialSystemTheme = (): "light" | "dark" => {
-    if (typeof window === "undefined") {
-      return "dark";
-    }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  };
-
   const { subscribe, set } = writable<"light" | "dark">(
     getInitialSystemTheme()
   );
@@ -158,13 +159,21 @@ export function applyTheme(theme: "light" | "dark"): void {
 // Helper to toggle between light and dark
 export function toggleTheme(): void {
   const current = get(themePreference);
-  if (current === "light") {
-    themePreference.set("dark");
-  } else if (current === "dark") {
-    themePreference.set("light");
-  } else {
+
+  // Lookup table for next theme based on current preference
+  const nextThemeMap: Record<Theme, Theme | null> = {
+    light: "dark",
+    dark: "light",
+    system: null, // Handle separately
+  };
+
+  const nextTheme = nextThemeMap[current];
+
+  if (nextTheme === null) {
     // If system, switch to the opposite of current active theme
     const active = get(activeTheme);
     themePreference.set(active === "light" ? "dark" : "light");
+  } else {
+    themePreference.set(nextTheme);
   }
 }

@@ -48,16 +48,7 @@
     !typeFilter
   );
 
-  // Load connected graph from a node, or list nodes if no selection
-  async function loadGraph(): Promise<void> {
-    const nodeId = $nodesStore.selectedNodeId;
-
-    if (nodeId) {
-      await nodesStore.loadConnected(nodeId, depth);
-      hasLoadedOnce = true;
-      return;
-    }
-    // Load recent nodes when no selection
+  function buildFiltersFromState(): NodeFilters {
     const filters: NodeFilters = {};
     if (projectFilter) {
       filters.project = projectFilter;
@@ -65,40 +56,65 @@
     if (typeFilter) {
       filters.type = typeFilter;
     }
+    return filters;
+  }
 
-    // Try progressively wider date ranges if empty and no specific date filter set by user
-    // (If user manually changed the filter, respect it)
-    const dateRanges = ["7", "30", "90", ""]; // 7 days, 30 days, 90 days, all time
+  function shouldAutoExpandDateRange(): boolean {
+    return dateRangeFilter === "7" && !projectFilter && !typeFilter;
+  }
 
-    // If this is a manual filter change, only use the selected range
-    const rangesToTry = (dateRangeFilter === "7" && !projectFilter && !typeFilter) 
-      ? dateRanges 
-      : [dateRangeFilter];
+  function applyDateRangeToFilters(filters: NodeFilters, range: string): void {
+    if (range) {
+      const from = new Date();
+      from.setDate(from.getDate() - Number.parseInt(range, 10));
+      filters.from = from.toISOString();
+    } else {
+      delete filters.from;
+    }
+  }
+
+  async function loadConnectedGraph(nodeId: string): Promise<void> {
+    await nodesStore.loadConnected(nodeId, depth);
+    hasLoadedOnce = true;
+  }
+
+  async function tryLoadWithDateRange(filters: NodeFilters, range: string): Promise<boolean> {
+    applyDateRangeToFilters(filters, range);
+    await nodesStore.loadNodes(filters, { limit: 100 });
+    
+    if ($nodesStore.nodes.length > 0) {
+      if (dateRangeFilter !== (range || "")) {
+        dateRangeFilter = range || "";
+      }
+      return true;
+    }
+    return false;
+  }
+
+  async function loadRecentNodes(): Promise<void> {
+    const filters = buildFiltersFromState();
+    const dateRanges = ["7", "30", "90", ""];
+    const rangesToTry = shouldAutoExpandDateRange() ? dateRanges : [dateRangeFilter];
 
     for (const range of rangesToTry) {
-      if (range) {
-        const from = new Date();
-        from.setDate(from.getDate() - Number.parseInt(range, 10));
-        filters.from = from.toISOString();
-      } else {
-        delete filters.from;
-      }
-
-      await nodesStore.loadNodes(filters, { limit: 100 });
-
-      // If we got results, update the UI filter to match and stop
-      if ($nodesStore.nodes.length > 0) {
-        if (dateRangeFilter !== (range || "")) {
-          dateRangeFilter = range || "";
-        }
+      const foundResults = await tryLoadWithDateRange(filters, range);
+      if (foundResults || range === "") {
         break;
       }
+    }
+    hasLoadedOnce = true;
+  }
 
-      // If we tried everything and still empty, we're done
-      if (range === "") {break;}
+  // Load connected graph from a node, or list nodes if no selection
+  async function loadGraph(): Promise<void> {
+    const nodeId = $nodesStore.selectedNodeId;
+
+    if (nodeId) {
+      await loadConnectedGraph(nodeId);
+      return;
     }
 
-    hasLoadedOnce = true;
+    await loadRecentNodes();
   }
 
   async function handleNodeClick(nodeId: string): Promise<void> {

@@ -248,16 +248,18 @@
       .force("collision", d3.forceCollide().radius(NODE_RADIUS + 5));
   }
 
-  function applyHierarchicalLayout(simNodes: NodeDatum[], width: number, height: number): void {
-    // Create a hierarchy based on node types and connections
-    const nodeSet = new Set(simNodes.map((n) => n.id));
-    const nodeMap = new Map<string, NodeDatum>();
+  interface HierarchyData {
+    nodeSet: Set<string>;
+    adjacency: Map<string, string[]>;
+    hasIncoming: Set<string>;
+  }
 
-    // Build adjacency list
+  function buildHierarchyData(simNodes: NodeDatum[]): HierarchyData {
+    const nodeSet = new Set(simNodes.map((n) => n.id));
     const adjacency = new Map<string, string[]>();
+
     for (const node of simNodes) {
       adjacency.set(node.id, []);
-      nodeMap.set(node.id, node);
     }
 
     for (const edge of edges) {
@@ -266,7 +268,6 @@
       }
     }
 
-    // Find root nodes (nodes with no incoming edges)
     const hasIncoming = new Set<string>();
     for (const edge of edges) {
       if (nodeSet.has(edge.targetNodeId)) {
@@ -274,9 +275,13 @@
       }
     }
 
-    const root = simNodes.find((n) => !hasIncoming.has(n.id)) ?? simNodes[0];
+    return { nodeSet, adjacency, hasIncoming };
+  }
 
-    // Assign levels using BFS
+  function assignNodeLevels(
+    rootId: string,
+    adjacency: Map<string, string[]>
+  ): Map<string, number> {
     const levels = new Map<string, number>();
     const visited = new Set<string>();
 
@@ -293,9 +298,16 @@
       }
     }
 
-    assignLevel(root.id, 0);
+    assignLevel(rootId, 0);
+    return levels;
+  }
 
-    // Position nodes by level
+  function positionNodesInLevels(
+    simNodes: NodeDatum[],
+    levels: Map<string, number>,
+    width: number,
+    height: number
+  ): void {
     const maxLevel = Math.max(...levels.values());
     const levelHeight = height / (maxLevel + 2);
 
@@ -308,7 +320,6 @@
       levelGroups.get(level)?.push(node);
     }
 
-    // Assign positions
     for (const [level, nodesInLevel] of levelGroups.entries()) {
       const y = (level + 1) * levelHeight;
       const levelWidth = width / (nodesInLevel.length + 1);
@@ -321,11 +332,20 @@
         node.fy = node.y;
       }
     }
+  }
 
-    // Disable physics forces for hierarchical layout
+  function disablePhysicsForces(): void {
     simulation.force("charge", null);
     simulation.force("center", null);
     simulation.force("collision", null);
+  }
+
+  function applyHierarchicalLayout(simNodes: NodeDatum[], width: number, height: number): void {
+    const { adjacency, hasIncoming } = buildHierarchyData(simNodes);
+    const root = simNodes.find((n) => !hasIncoming.has(n.id)) ?? simNodes[0];
+    const levels = assignNodeLevels(root.id, adjacency);
+    positionNodesInLevels(simNodes, levels, width, height);
+    disablePhysicsForces();
   }
 
   function applyRadialLayout(simNodes: NodeDatum[], width: number, height: number): void {
@@ -402,15 +422,14 @@
       .style("cursor", "move");
   }
 
-  function updateMinimap(): void {
-    if (!minimapSelection || !minimapG || !container || nodes.length === 0) {
-      return;
-    }
+  interface BoundingBox {
+    minX: number;
+    minY: number;
+    maxX: number;
+    maxY: number;
+  }
 
-    const minimapWidth = container.clientWidth * MINIMAP_SCALE;
-    const minimapHeight = container.clientHeight * MINIMAP_SCALE;
-
-    // Calculate bounding box of all nodes
+  function calculateNodeBounds(): BoundingBox {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -424,21 +443,20 @@
       maxY = Math.max(maxY, d.y ?? 0);
     }
 
-    // Add padding to bounding box
     const padding = 100;
-    minX -= padding;
-    maxX += padding;
-    minY -= padding;
-    maxY += padding;
+    return {
+      minX: minX - padding,
+      minY: minY - padding,
+      maxX: maxX + padding,
+      maxY: maxY + padding,
+    };
+  }
 
-    const contentWidth = Math.max(maxX - minX, 100);
-    const contentHeight = Math.max(maxY - minY, 100);
-
-    // Update minimap SVG viewBox to show the whole graph
-    minimapSvg.attr("viewBox", `${minX} ${minY} ${contentWidth} ${contentHeight}`);
-
-    // Update edges
-    const minimapEdgeGroup = minimapG.select(".minimap-edges");
+  function updateMinimapEdges(
+    minimapEdgeGroup: d3.Selection<d3.BaseType, unknown, null, undefined>,
+    contentWidth: number,
+    minimapWidth: number
+  ): void {
     const edgeSelection = minimapEdgeGroup
       .selectAll<SVGLineElement, EdgeDatum>("line")
       .data(edges);
@@ -456,9 +474,13 @@
       .attr("y1", (d) => (nodes.find((n) => n.id === d.sourceNodeId) as NodeDatum)?.y ?? 0)
       .attr("x2", (d) => (nodes.find((n) => n.id === d.targetNodeId) as NodeDatum)?.x ?? 0)
       .attr("y2", (d) => (nodes.find((n) => n.id === d.targetNodeId) as NodeDatum)?.y ?? 0);
+  }
 
-    // Update nodes
-    const minimapNodeGroup = minimapG.select(".minimap-nodes");
+  function updateMinimapNodes(
+    minimapNodeGroup: d3.Selection<d3.BaseType, unknown, null, undefined>,
+    contentWidth: number,
+    minimapWidth: number
+  ): void {
     const nodeSelection = minimapNodeGroup
       .selectAll<SVGCircleElement, Node>("circle")
       .data(nodes);
@@ -480,22 +502,42 @@
         event.stopPropagation();
         onNodeClick?.(d.id, d);
       });
+  }
 
-    // Update viewport indicator
-    if (svgElement && minimapViewport) {
-      const transform = d3.zoomTransform(svgElement);
-      const worldX = -transform.x / transform.k;
-      const worldY = -transform.y / transform.k;
-      const worldWidth = container.clientWidth / transform.k;
-      const worldHeight = container.clientHeight / transform.k;
-
-      minimapViewport
-        .attr("x", worldX)
-        .attr("y", worldY)
-        .attr("width", worldWidth)
-        .attr("height", worldHeight)
-        .attr("stroke-width", (contentWidth / minimapWidth) * 2);
+  function updateMinimapViewport(contentWidth: number, minimapWidth: number): void {
+    if (!svgElement || !minimapViewport || !container) {
+      return;
     }
+    const transform = d3.zoomTransform(svgElement);
+    const worldX = -transform.x / transform.k;
+    const worldY = -transform.y / transform.k;
+    const worldWidth = container.clientWidth / transform.k;
+    const worldHeight = container.clientHeight / transform.k;
+
+    minimapViewport
+      .attr("x", worldX)
+      .attr("y", worldY)
+      .attr("width", worldWidth)
+      .attr("height", worldHeight)
+      .attr("stroke-width", (contentWidth / minimapWidth) * 2);
+  }
+
+  function updateMinimap(): void {
+    if (!minimapSelection || !minimapG || !container || nodes.length === 0) {
+      return;
+    }
+
+    const minimapWidth = container.clientWidth * MINIMAP_SCALE;
+
+    const bounds = calculateNodeBounds();
+    const contentWidth = Math.max(bounds.maxX - bounds.minX, 100);
+    const contentHeight = Math.max(bounds.maxY - bounds.minY, 100);
+
+    minimapSvg.attr("viewBox", `${bounds.minX} ${bounds.minY} ${contentWidth} ${contentHeight}`);
+
+    updateMinimapEdges(minimapG.select(".minimap-edges"), contentWidth, minimapWidth);
+    updateMinimapNodes(minimapG.select(".minimap-nodes"), contentWidth, minimapWidth);
+    updateMinimapViewport(contentWidth, minimapWidth);
   }
 
   function handleMinimapClick(event: MouseEvent): void {
@@ -558,78 +600,41 @@
     return outcome.charAt(0).toUpperCase() + outcome.slice(1);
   }
 
-  function getEdgeStyle(edge: EdgeDatum): { dasharray: string | null; width: number } {
-    const {type} = edge;
-    let width = 2;
-    let dasharray: string | null = null;
+  interface EdgeStyleConfig {
+    width: number;
+    dasharray: string | null;
+  }
 
-    switch (type) {
-      case "fork":
-      case "branch":
-      case "continuation": {
-        width = 2;
-        dasharray = null;
-        break;
-      }
-      case "handoff": {
-        width = 3;
-        dasharray = null;
-        break;
-      }
-      case "tree_jump": {
-        width = 1.5;
-        dasharray = "5,5";
-        break;
-      }
-      case "resume": {
-        width = 1.5;
-        dasharray = "8,4";
-        break;
-      }
-      case "compaction": {
-        width = 4;
-        dasharray = "4,2";
-        break;
-      }
-      case "semantic": {
-        // Similarity 0.0-1.0
-        const similarity = edge.metadata?.similarity ?? 0.5;
-        width = 0.5 + similarity * 3;
-        dasharray = "1,3";
-        break;
-      }
-      case "reference": {
-        width = 1.5;
-        dasharray = "5,2";
-        break;
-      }
-      case "lesson_application": {
-        width = 2;
-        dasharray = "2,2";
-        break;
-      }
-      case "failure_pattern": {
-        width = 2;
-        dasharray = "1,1";
-        break;
-      }
-      case "project_related": {
-        width = 1.2;
-        dasharray = "4,4";
-        break;
-      }
-      case "technique_shared": {
-        width = 1.2;
-        dasharray = "2,4";
-        break;
-      }
-      default: {
-        width = 2;
-        dasharray = null;
-      }
+  const EDGE_STYLE_MAP: Record<string, EdgeStyleConfig> = {
+    fork: { width: 2, dasharray: null },
+    branch: { width: 2, dasharray: null },
+    continuation: { width: 2, dasharray: null },
+    handoff: { width: 3, dasharray: null },
+    tree_jump: { width: 1.5, dasharray: "5,5" },
+    resume: { width: 1.5, dasharray: "8,4" },
+    compaction: { width: 4, dasharray: "4,2" },
+    reference: { width: 1.5, dasharray: "5,2" },
+    lesson_application: { width: 2, dasharray: "2,2" },
+    failure_pattern: { width: 2, dasharray: "1,1" },
+    project_related: { width: 1.2, dasharray: "4,4" },
+    technique_shared: { width: 1.2, dasharray: "2,4" },
+  };
+
+  const DEFAULT_EDGE_STYLE: EdgeStyleConfig = { width: 2, dasharray: null };
+
+  function getSemanticEdgeStyle(edge: EdgeDatum): EdgeStyleConfig {
+    const similarity = edge.metadata?.similarity ?? 0.5;
+    return { width: 0.5 + similarity * 3, dasharray: "1,3" };
+  }
+
+  function getEdgeStyle(edge: EdgeDatum): { dasharray: string | null; width: number } {
+    const { type } = edge;
+
+    if (type === "semantic") {
+      return getSemanticEdgeStyle(edge);
     }
 
-    return { width, dasharray };
+    return EDGE_STYLE_MAP[type] ?? DEFAULT_EDGE_STYLE;
   }
 
   function initGraph(): void {

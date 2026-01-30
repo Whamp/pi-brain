@@ -2,6 +2,7 @@
  * Nodes API routes
  */
 
+import type Database from "better-sqlite3";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 
 import type { EdgeType } from "../../storage/node-types.js";
@@ -54,6 +55,55 @@ function parseIntParam(value: string | undefined): number | undefined {
   }
   const num = Number.parseInt(value, 10);
   return Number.isNaN(num) ? undefined : num;
+}
+
+// =============================================================================
+// Include Data Fetchers
+// =============================================================================
+
+/**
+ * Lookup table for include data fetchers
+ * Each key maps to a function that fetches the relevant data
+ */
+function buildIncludeFetchers(
+  db: Database.Database,
+  id: string
+): Record<string, () => unknown> {
+  return {
+    lessons: () => getNodeLessons(db, id),
+    quirks: () => getNodeQuirks(db, id),
+    errors: () => getNodeToolErrors(db, id),
+    tags: () => getNodeTags(db, id),
+    topics: () => getNodeTopics(db, id),
+    edges: () => {
+      const connected = getConnectedNodes(db, id, { depth: 1 });
+      return connected.edges;
+    },
+    versions: () => {
+      const allVersions = getAllNodeVersions(id);
+      return allVersions.map((v) => ({
+        version: v.version,
+        analyzedAt: v.metadata.analyzedAt,
+      }));
+    },
+  };
+}
+
+/**
+ * Populate response data based on include params
+ */
+function populateIncludeData(
+  responseData: Record<string, unknown>,
+  includes: string[],
+  fetchers: Record<string, () => unknown>
+): void {
+  const isFull = includes.includes("full");
+
+  for (const [key, fetcher] of Object.entries(fetchers)) {
+    if (isFull || includes.includes(key)) {
+      responseData[key] = fetcher();
+    }
+  }
 }
 
 export async function nodesRoutes(app: FastifyInstance): Promise<void> {
@@ -155,40 +205,8 @@ export async function nodesRoutes(app: FastifyInstance): Promise<void> {
 
       // Include related data based on include param
       const includes = parseArrayParam(include) ?? [];
-
-      if (includes.includes("lessons") || includes.includes("full")) {
-        responseData.lessons = getNodeLessons(db, id);
-      }
-
-      if (includes.includes("quirks") || includes.includes("full")) {
-        responseData.quirks = getNodeQuirks(db, id);
-      }
-
-      if (includes.includes("errors") || includes.includes("full")) {
-        responseData.errors = getNodeToolErrors(db, id);
-      }
-
-      if (includes.includes("tags") || includes.includes("full")) {
-        responseData.tags = getNodeTags(db, id);
-      }
-
-      if (includes.includes("topics") || includes.includes("full")) {
-        responseData.topics = getNodeTopics(db, id);
-      }
-
-      if (includes.includes("edges") || includes.includes("full")) {
-        const connected = getConnectedNodes(db, id, { depth: 1 });
-        responseData.edges = connected.edges;
-      }
-
-      if (includes.includes("versions") || includes.includes("full")) {
-        // Return version metadata only (not full node data)
-        const allVersions = getAllNodeVersions(id);
-        responseData.versions = allVersions.map((v) => ({
-          version: v.version,
-          analyzedAt: v.metadata.analyzedAt,
-        }));
-      }
+      const fetchers = buildIncludeFetchers(db, id);
+      populateIncludeData(responseData, includes, fetchers);
 
       const durationMs = Date.now() - startTime;
       return reply.send(successResponse(responseData, durationMs));

@@ -76,45 +76,86 @@
     return h;
   }
 
-  // Human-readable description of cron expression
-  function describeCron(cron: string): string {
+  function formatAmPm(h: number): string {
+    return h < 12 ? "am" : "pm";
+  }
+
+  function formatTimeDisplay(h: number): string {
+    return `${to12Hour(h)}${formatAmPm(h)}`;
+  }
+
+  const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+  interface CronParts {
+    minute: string;
+    hour: string;
+    dayOfMonth: string;
+    month: string;
+    dayOfWeek: string;
+  }
+
+  function parseCronParts(cron: string): CronParts | null {
     const parts = cron.split(/\s+/);
     if (parts.length !== 5) {
+      return null;
+    }
+    return {
+      minute: parts[0],
+      hour: parts[1],
+      dayOfMonth: parts[2],
+      month: parts[3],
+      dayOfWeek: parts[4],
+    };
+  }
+
+  function isAllWildcards(p: CronParts): boolean {
+    return p.dayOfMonth === "*" && p.month === "*" && p.dayOfWeek === "*";
+  }
+
+  function describeEveryHour(p: CronParts): string | null {
+    if (p.minute === "0" && p.hour === "*" && isAllWildcards(p)) {
+      return "Runs at the start of every hour";
+    }
+    return null;
+  }
+
+  function describeEveryNHours(p: CronParts): string | null {
+    if (p.minute === "0" && p.hour.startsWith("*/") && isAllWildcards(p)) {
+      const interval = p.hour.slice(2);
+      return `Runs every ${interval} hours`;
+    }
+    return null;
+  }
+
+  function describeDailyAtHour(p: CronParts): string | null {
+    if (p.minute === "0" && /^\d+$/.test(p.hour) && isAllWildcards(p)) {
+      const h = Number.parseInt(p.hour, 10);
+      return `Runs daily at ${formatTimeDisplay(h)}`;
+    }
+    return null;
+  }
+
+  function describeWeekly(p: CronParts): string | null {
+    if (p.minute === "0" && /^\d+$/.test(p.hour) && p.dayOfMonth === "*" && p.month === "*" && /^\d+$/.test(p.dayOfWeek)) {
+      const h = Number.parseInt(p.hour, 10);
+      const d = Number.parseInt(p.dayOfWeek, 10);
+      return `Runs ${DAY_NAMES[d] ?? `day ${d}`} at ${formatTimeDisplay(h)}`;
+    }
+    return null;
+  }
+
+  // Human-readable description of cron expression
+  function describeCron(cron: string): string {
+    const parts = parseCronParts(cron);
+    if (!parts) {
       return cron;
     }
 
-    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
-
-    // Every hour
-    if (minute === "0" && hour === "*" && dayOfMonth === "*" && month === "*" && dayOfWeek === "*") {
-      return "Runs at the start of every hour";
-    }
-
-    // Every N hours
-    if (minute === "0" && hour.startsWith("*/") && dayOfMonth === "*" && month === "*" && dayOfWeek === "*") {
-      const interval = hour.slice(2);
-      return `Runs every ${interval} hours`;
-    }
-
-    // Daily at specific hour
-    if (minute === "0" && /^\d+$/.test(hour) && dayOfMonth === "*" && month === "*" && dayOfWeek === "*") {
-      const h = Number.parseInt(hour, 10);
-      const ampm = h < 12 ? "am" : "pm";
-      const displayHour = to12Hour(h);
-      return `Runs daily at ${displayHour}${ampm}`;
-    }
-
-    // Weekly
-    if (minute === "0" && /^\d+$/.test(hour) && dayOfMonth === "*" && month === "*" && /^\d+$/.test(dayOfWeek)) {
-      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      const h = Number.parseInt(hour, 10);
-      const d = Number.parseInt(dayOfWeek, 10);
-      const ampm = h < 12 ? "am" : "pm";
-      const displayHour = to12Hour(h);
-      return `Runs ${days[d] ?? `day ${d}`} at ${displayHour}${ampm}`;
-    }
-
-    return cron;
+    return describeEveryHour(parts)
+      ?? describeEveryNHours(parts)
+      ?? describeDailyAtHour(parts)
+      ?? describeWeekly(parts)
+      ?? cron;
   }
 
   const cronDescription = $derived(describeCron(value));

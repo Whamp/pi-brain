@@ -395,107 +395,182 @@ export class InsightAggregator {
       }
 
       for (const row of rows) {
-        let node: Node;
-        try {
-          node = readNodeFromPath(row.data_file);
-        } catch {
-          // Skip nodes with missing/invalid JSON files
+        const result = this.processNodePromptingPatterns(
+          row,
+          insights,
+          hitLimit
+        );
+        if (result.error) {
           errorsEncountered++;
-          continue;
-        }
-
-        nodesProcessed++;
-
-        // Extract model from the node's observations
-        const primaryModel = node.observations.modelsUsed[0]?.model;
-        const nodeTimestamp = node.metadata.timestamp;
-
-        // Process prompting wins
-        for (const win of node.observations.promptingWins) {
-          if (insights.size >= MAX_PATTERNS && !hitLimit) {
-            console.warn(
-              `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
-            );
-            hitLimit = true;
-          }
-
-          const id = generateInsightId("win", win, primaryModel);
-          let group = insights.get(id);
-
-          if (!group && !hitLimit) {
-            group = {
-              type: "win",
-              model: primaryModel,
-              pattern: win,
-              frequency: 0,
-              confidence: 0.6,
-              severity: "low",
-              examples: [],
-              firstSeen: nodeTimestamp,
-              lastSeen: nodeTimestamp,
-            };
-            insights.set(id, group);
-          }
-
-          if (group) {
-            group.frequency++;
-            group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
-            group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
-
-            if (group.examples.length < MAX_EXAMPLES) {
-              group.examples.push(row.id);
-            }
-          }
-        }
-
-        // Process prompting failures
-        for (const failure of node.observations.promptingFailures) {
-          if (insights.size >= MAX_PATTERNS && !hitLimit) {
-            console.warn(
-              `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`
-            );
-            hitLimit = true;
-          }
-
-          const id = generateInsightId("failure", failure, primaryModel);
-          let group = insights.get(id);
-
-          if (!group && !hitLimit) {
-            group = {
-              type: "failure",
-              model: primaryModel,
-              pattern: failure,
-              frequency: 0,
-              confidence: 0.6,
-              severity: "medium",
-              examples: [],
-              firstSeen: nodeTimestamp,
-              lastSeen: nodeTimestamp,
-            };
-            insights.set(id, group);
-          }
-
-          if (group) {
-            group.frequency++;
-            group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
-            group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
-
-            // Failures that repeat are more severe - boost once at threshold
-            if (group.frequency === 3) {
-              group.severity = "high";
-              group.confidence = Math.min(group.confidence + 0.15, 0.95);
-            }
-
-            if (group.examples.length < MAX_EXAMPLES) {
-              group.examples.push(row.id);
-            }
-          }
+        } else {
+          nodesProcessed++;
+          ({ hitLimit } = result);
         }
       }
 
       offset += NODE_BATCH_SIZE;
     }
 
+    this.logPromptingPatternsSummary(nodesProcessed, errorsEncountered);
+  }
+
+  /**
+   * Process prompting patterns from a single node
+   */
+  private processNodePromptingPatterns(
+    row: NodeRow,
+    insights: Map<string, InsightGroup>,
+    initialHitLimit: boolean
+  ): { error: boolean; hitLimit: boolean } {
+    let node: Node;
+    try {
+      node = readNodeFromPath(row.data_file);
+    } catch {
+      return { error: true, hitLimit: initialHitLimit };
+    }
+
+    const primaryModel = node.observations.modelsUsed[0]?.model;
+    const nodeTimestamp = node.metadata.timestamp;
+    let currentHitLimit = initialHitLimit;
+
+    for (const win of node.observations.promptingWins) {
+      currentHitLimit = this.aggregatePromptingWin(
+        win,
+        primaryModel,
+        nodeTimestamp,
+        row.id,
+        insights,
+        currentHitLimit
+      );
+    }
+
+    for (const failure of node.observations.promptingFailures) {
+      currentHitLimit = this.aggregatePromptingFailure(
+        failure,
+        primaryModel,
+        nodeTimestamp,
+        row.id,
+        insights,
+        currentHitLimit
+      );
+    }
+
+    return { error: false, hitLimit: currentHitLimit };
+  }
+
+  /**
+   * Aggregate a single prompting win
+   */
+  private aggregatePromptingWin(
+    win: string,
+    primaryModel: string | undefined,
+    nodeTimestamp: string,
+    nodeId: string,
+    insights: Map<string, InsightGroup>,
+    currentHitLimit: boolean
+  ): boolean {
+    let hitLimit = currentHitLimit;
+    if (insights.size >= MAX_PATTERNS && !hitLimit) {
+      console.warn(`[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`);
+      hitLimit = true;
+    }
+
+    const id = generateInsightId("win", win, primaryModel);
+    let group = insights.get(id);
+
+    if (!group && !hitLimit) {
+      group = {
+        type: "win",
+        model: primaryModel,
+        pattern: win,
+        frequency: 0,
+        confidence: 0.6,
+        severity: "low",
+        examples: [],
+        firstSeen: nodeTimestamp,
+        lastSeen: nodeTimestamp,
+      };
+      insights.set(id, group);
+    }
+
+    if (group) {
+      this.updateInsightGroup(group, nodeTimestamp, nodeId);
+    }
+
+    return hitLimit;
+  }
+
+  /**
+   * Aggregate a single prompting failure
+   */
+  private aggregatePromptingFailure(
+    failure: string,
+    primaryModel: string | undefined,
+    nodeTimestamp: string,
+    nodeId: string,
+    insights: Map<string, InsightGroup>,
+    currentHitLimit: boolean
+  ): boolean {
+    let hitLimit = currentHitLimit;
+    if (insights.size >= MAX_PATTERNS && !hitLimit) {
+      console.warn(`[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`);
+      hitLimit = true;
+    }
+
+    const id = generateInsightId("failure", failure, primaryModel);
+    let group = insights.get(id);
+
+    if (!group && !hitLimit) {
+      group = {
+        type: "failure",
+        model: primaryModel,
+        pattern: failure,
+        frequency: 0,
+        confidence: 0.6,
+        severity: "medium",
+        examples: [],
+        firstSeen: nodeTimestamp,
+        lastSeen: nodeTimestamp,
+      };
+      insights.set(id, group);
+    }
+
+    if (group) {
+      this.updateInsightGroup(group, nodeTimestamp, nodeId);
+      // Failures that repeat are more severe - boost once at threshold
+      if (group.frequency === 3) {
+        group.severity = "high";
+        group.confidence = Math.min(group.confidence + 0.15, 0.95);
+      }
+    }
+
+    return hitLimit;
+  }
+
+  /**
+   * Update insight group with new occurrence
+   */
+  private updateInsightGroup(
+    group: InsightGroup,
+    nodeTimestamp: string,
+    nodeId: string
+  ): void {
+    group.frequency++;
+    group.lastSeen = maxDate(group.lastSeen, nodeTimestamp);
+    group.firstSeen = minDate(group.firstSeen, nodeTimestamp);
+
+    if (group.examples.length < MAX_EXAMPLES) {
+      group.examples.push(nodeId);
+    }
+  }
+
+  /**
+   * Log prompting patterns processing summary
+   */
+  private logPromptingPatternsSummary(
+    nodesProcessed: number,
+    errorsEncountered: number
+  ): void {
     if (errorsEncountered > 0) {
       console.warn(
         `[insight-aggregation] Skipped ${errorsEncountered} nodes due to missing/invalid JSON files`

@@ -41,6 +41,215 @@ export interface BridgeDiscoveryOptions {
 }
 
 // =============================================================================
+// Internal Types
+// =============================================================================
+
+interface QueueItem {
+  nodeId: string;
+  pathNodeIds: string[];
+  pathEdges: EdgeRow[];
+  score: number;
+}
+
+interface TraversalState {
+  nodesMap: Map<string, NodeRow>;
+  queue: QueueItem[];
+  discoveredPaths: BridgePath[];
+}
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+/**
+ * Initialize seed nodes and queue for traversal
+ * @internal
+ */
+function initializeTraversal(
+  db: Database.Database,
+  seedNodeIds: string[]
+): TraversalState {
+  const nodesMap = new Map<string, NodeRow>();
+  const queue: QueueItem[] = [];
+
+  for (const id of seedNodeIds) {
+    const node = getNode(db, id);
+    if (node) {
+      nodesMap.set(id, node);
+      queue.push({
+        nodeId: node.id,
+        pathNodeIds: [node.id],
+        pathEdges: [],
+        score: 1,
+      });
+    }
+  }
+
+  return { nodesMap, queue, discoveredPaths: [] };
+}
+
+/**
+ * Load a node, caching in nodesMap
+ * @internal
+ */
+function loadNode(
+  db: Database.Database,
+  nodeId: string,
+  nodesMap: Map<string, NodeRow>
+): NodeRow | undefined {
+  let node = nodesMap.get(nodeId);
+  if (!node) {
+    const fetched = getNode(db, nodeId);
+    if (fetched) {
+      nodesMap.set(nodeId, fetched);
+      node = fetched;
+    }
+  }
+  return node;
+}
+
+/**
+ * Build a complete BridgePath from node IDs and edges
+ * @internal
+ */
+function buildBridgePath(
+  db: Database.Database,
+  pathNodeIds: string[],
+  pathEdges: EdgeRow[],
+  score: number,
+  nodesMap: Map<string, NodeRow>
+): BridgePath | null {
+  const pathNodes: NodeRow[] = [];
+
+  for (const id of pathNodeIds) {
+    const node = loadNode(db, id, nodesMap);
+    if (!node) {
+      return null; // Missing node, skip this path
+    }
+    pathNodes.push(node);
+  }
+
+  return {
+    nodes: pathNodes,
+    edges: pathEdges,
+    score,
+    description: generatePathDescription(pathNodes, pathEdges),
+  };
+}
+
+/**
+ * Process a completed path (length > 1) and add to discoveries
+ * @internal
+ */
+function processCompletePath(
+  db: Database.Database,
+  current: QueueItem,
+  state: TraversalState
+): void {
+  if (current.pathNodeIds.length <= 1) {
+    return;
+  }
+
+  const path = buildBridgePath(
+    db,
+    current.pathNodeIds,
+    current.pathEdges,
+    current.score,
+    state.nodesMap
+  );
+
+  if (path) {
+    state.discoveredPaths.push(path);
+  }
+}
+
+/**
+ * Check if traversal should stop early
+ * @internal
+ */
+function shouldStopTraversal(state: TraversalState, limit: number): boolean {
+  return state.discoveredPaths.length >= limit * 2;
+}
+
+/**
+ * Process a single iteration of the traversal loop
+ * Returns true if traversal should continue, false to stop
+ * @internal
+ */
+function processTraversalStep(
+  db: Database.Database,
+  state: TraversalState,
+  maxDepth: number,
+  minScore: number,
+  limit: number
+): boolean {
+  // Sort queue by score (descending) to prioritize promising paths
+  state.queue.sort((a, b) => b.score - a.score);
+
+  const current = state.queue.shift();
+  if (!current) {
+    return false;
+  }
+
+  // Add completed paths (length > 1)
+  processCompletePath(db, current, state);
+
+  // Stop if we found enough paths
+  if (shouldStopTraversal(state, limit)) {
+    return false;
+  }
+
+  // Expand if not at max depth
+  if (current.pathNodeIds.length <= maxDepth) {
+    expandEdges(db, current, minScore, state);
+  }
+
+  return true;
+}
+
+/**
+ * Calculate score for traversing an edge
+ * @internal
+ */
+function calculateEdgeScore(currentScore: number, edge: EdgeRow): number {
+  const confidence = edge.confidence ?? 0.7;
+  const hopPenalty = 0.9;
+  return currentScore * confidence * hopPenalty;
+}
+
+/**
+ * Expand edges from current node and add valid paths to queue
+ * @internal
+ */
+function expandEdges(
+  db: Database.Database,
+  current: QueueItem,
+  minScore: number,
+  state: TraversalState
+): void {
+  const outgoingEdges = getEdgesFrom(db, current.nodeId);
+
+  for (const edge of outgoingEdges) {
+    // Avoid cycles
+    if (current.pathNodeIds.includes(edge.target_node_id)) {
+      continue;
+    }
+
+    const newScore = calculateEdgeScore(current.score, edge);
+    if (newScore < minScore) {
+      continue;
+    }
+
+    state.queue.push({
+      nodeId: edge.target_node_id,
+      pathNodeIds: [...current.pathNodeIds, edge.target_node_id],
+      pathEdges: [...current.pathEdges, edge],
+      score: newScore,
+    });
+  }
+}
+
+// =============================================================================
 // Discovery Functions
 // =============================================================================
 
@@ -67,154 +276,23 @@ export function findBridgePaths(
     return [];
   }
 
-  // Fetch seed nodes
-  const nodesMap = new Map<string, NodeRow>();
-  const seedNodes: NodeRow[] = [];
-
-  for (const id of seedNodeIds) {
-    const node = getNode(db, id);
-    if (node) {
-      nodesMap.set(id, node);
-      seedNodes.push(node);
-    }
-  }
-
-  // Priority queue for paths (highest score first)
-  // Each item is [currentNodeId, pathNodeIds, pathEdges, currentScore]
-  const queue: {
-    nodeId: string;
-    pathNodeIds: string[];
-    pathEdges: EdgeRow[];
-    score: number;
-  }[] = [];
-
-  // Initialize queue with seed nodes
-  for (const node of seedNodes) {
-    // Initial score based on node's own importance/relevance if available
-    // Default to 1.0 for the start of a path
-    const initialScore = 1;
-    queue.push({
-      nodeId: node.id,
-      pathNodeIds: [node.id],
-      pathEdges: [],
-      score: initialScore,
-    });
-  }
-
-  const discoveredPaths: BridgePath[] = [];
-
-  // Perform traversal
-  // We use a simplified BFS/search. To get "best" paths, we might want to prioritize
-  // expanding high-scoring paths.
-
-  // Track visited nodes per path to avoid cycles?
-  // Actually, queue contains full path state, so we just check pathNodeIds for cycles.
+  const state = initializeTraversal(db, seedNodeIds);
 
   // Limit iterations to prevent infinite loops in large graphs
   let iterations = 0;
   const MAX_ITERATIONS = 1000;
 
-  while (queue.length > 0 && iterations < MAX_ITERATIONS) {
+  while (state.queue.length > 0 && iterations < MAX_ITERATIONS) {
     iterations++;
-
-    // Sort queue by score (descending) to prioritize promising paths
-    queue.sort((a, b) => b.score - a.score);
-
-    // Pop best path
-    const current = queue.shift();
-    if (!current) {
+    if (!processTraversalStep(db, state, maxDepth, minScore, limit)) {
       break;
-    }
-
-    const { nodeId, pathNodeIds, pathEdges, score } = current;
-
-    // If we have a valid path (length > 1), add to results
-    if (pathNodeIds.length > 1) {
-      // Check if we already have this exact path (shouldn't happen with tree search but good safety)
-      // Or maybe check if we have a path ending at this node with higher score?
-
-      // Ensure all nodes are loaded
-      const pathNodes: NodeRow[] = [];
-      let missingNode = false;
-      for (const id of pathNodeIds) {
-        let n = nodesMap.get(id);
-        if (!n) {
-          n = getNode(db, id) || undefined;
-          if (n) {
-            nodesMap.set(id, n);
-          }
-        }
-        if (n) {
-          pathNodes.push(n);
-        } else {
-          missingNode = true;
-          break;
-        }
-      }
-
-      if (!missingNode) {
-        discoveredPaths.push({
-          nodes: pathNodes,
-          edges: pathEdges,
-          score,
-          description: generatePathDescription(pathNodes, pathEdges),
-        });
-      }
-    }
-
-    // Stop if we found enough paths (heuristic: checking discovered count)
-    // Note: this might stop early before finding deeper but better paths,
-    // but with score sorting, we prioritize high confidence short paths.
-    // If we want exactly 'limit' paths, we should collect more and filter/sort at end.
-    if (discoveredPaths.length >= limit * 2) {
-      // Heuristic: collect 2x limit then trim
-      break;
-    }
-
-    // Stop if max depth reached
-    if (pathNodeIds.length > maxDepth) {
-      continue;
-    }
-
-    // Expand outgoing edges
-    // We strictly follow outgoing edges as per "LEADS_TO", "DERIVED_FROM" logic
-    // but maybe we should allow some incoming types?
-    // For now, stick to outgoing edges as per spec.
-    const outgoingEdges = getEdgesFrom(db, nodeId);
-
-    for (const edge of outgoingEdges) {
-      // Avoid cycles
-      if (pathNodeIds.includes(edge.target_node_id)) {
-        continue;
-      }
-
-      const nextNodeId = edge.target_node_id;
-
-      // Calculate new score
-      // Score = currentScore * edgeConfidence * edgeSimilarity (if relevant)
-      // Default confidence to 0.7 if missing
-      const confidence = edge.confidence ?? 0.7;
-
-      // Penalize each hop slightly to prefer shorter paths unless strong signal
-      const hopPenalty = 0.9;
-
-      const newScore = score * confidence * hopPenalty;
-
-      if (newScore < minScore) {
-        continue;
-      }
-
-      queue.push({
-        nodeId: nextNodeId,
-        pathNodeIds: [...pathNodeIds, nextNodeId],
-        pathEdges: [...pathEdges, edge],
-        score: newScore,
-      });
     }
   }
 
   // Sort by score and limit
-  return discoveredPaths.toSorted((a, b) => b.score - a.score).slice(0, limit);
+  return state.discoveredPaths
+    .toSorted((a, b) => b.score - a.score)
+    .slice(0, limit);
 }
 
 /**

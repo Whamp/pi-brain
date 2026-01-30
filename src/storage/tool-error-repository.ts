@@ -103,6 +103,70 @@ export interface NodeToolError {
 }
 
 // =============================================================================
+// Internal Helpers
+// =============================================================================
+
+interface WhereClauseResult {
+  clause: string;
+  params: (string | number)[];
+}
+
+/**
+ * Build WHERE clause for tool error queries using a lookup table
+ */
+function buildToolErrorWhereClause(
+  filters: ListToolErrorsFilters,
+  includeProject = false
+): WhereClauseResult {
+  const conditions: string[] = ["1=1"];
+  const params: (string | number)[] = [];
+
+  // Lookup table: filter key -> { column, transform? }
+  const filterDefs: {
+    key: keyof ListToolErrorsFilters;
+    column: string;
+    transform?: (v: string) => string;
+  }[] = [
+    { key: "tool", column: "te.tool" },
+    { key: "model", column: "te.model" },
+    { key: "errorType", column: "te.error_type" },
+  ];
+
+  for (const def of filterDefs) {
+    const value = filters[def.key];
+    if (value !== undefined) {
+      conditions.push(`${def.column} = ?`);
+      params.push(def.transform ? def.transform(value) : value);
+    }
+  }
+
+  // Project filter needs LIKE and nodes table join
+  if (includeProject && filters.project !== undefined) {
+    conditions.push("n.project LIKE ?");
+    params.push(`%${filters.project}%`);
+  }
+
+  return { clause: conditions.join(" AND "), params };
+}
+
+/**
+ * Parse comma-separated node IDs to unique array, limited to N items
+ */
+function parseRecentNodes(nodeIdsList: string | null, limit = 5): string[] {
+  if (!nodeIdsList) {
+    return [];
+  }
+  return [...new Set(nodeIdsList.split(","))].slice(0, limit);
+}
+
+/**
+ * Parse comma-separated string to array
+ */
+function parseCommaSeparated(list: string | null): string[] {
+  return list ? list.split(",") : [];
+}
+
+// =============================================================================
 // Query Functions
 // =============================================================================
 
@@ -117,31 +181,10 @@ export function listToolErrors(
   const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
   const offset = Math.max(options.offset ?? 0, 0);
 
-  // Build WHERE clause
-  const conditions: string[] = ["1=1"];
-  const params: (string | number)[] = [];
-
-  if (filters.tool) {
-    conditions.push("te.tool = ?");
-    params.push(filters.tool);
-  }
-
-  if (filters.model) {
-    conditions.push("te.model = ?");
-    params.push(filters.model);
-  }
-
-  if (filters.errorType) {
-    conditions.push("te.error_type = ?");
-    params.push(filters.errorType);
-  }
-
-  if (filters.project) {
-    conditions.push("n.project LIKE ?");
-    params.push(`%${filters.project}%`);
-  }
-
-  const whereClause = conditions.join(" AND ");
+  const { clause: whereClause, params } = buildToolErrorWhereClause(
+    filters,
+    true
+  );
 
   // Count total
   const countStmt = db.prepare(`
@@ -182,26 +225,7 @@ export function getAggregatedToolErrors(
   const offset = Math.max(options.offset ?? 0, 0);
   const groupByModel = options.groupByModel ?? false;
 
-  // Build WHERE clause
-  const conditions: string[] = ["1=1"];
-  const params: (string | number)[] = [];
-
-  if (filters.tool) {
-    conditions.push("te.tool = ?");
-    params.push(filters.tool);
-  }
-
-  if (filters.model) {
-    conditions.push("te.model = ?");
-    params.push(filters.model);
-  }
-
-  if (filters.errorType) {
-    conditions.push("te.error_type = ?");
-    params.push(filters.errorType);
-  }
-
-  const whereClause = conditions.join(" AND ");
+  const { clause: whereClause, params } = buildToolErrorWhereClause(filters);
 
   const groupBy = groupByModel ? "model, tool, errorType" : "tool, errorType";
   const selectModel = groupByModel
@@ -236,15 +260,13 @@ export function getAggregatedToolErrors(
       tool: row.tool,
       errorType: row.errorType,
       count: row.count,
-      recentNodes: row.nodeIdsList
-        ? [...new Set(row.nodeIdsList.split(","))].slice(0, 5)
-        : [],
+      recentNodes: parseRecentNodes(row.nodeIdsList),
     };
 
     if (groupByModel) {
       result.model = row.model;
     } else {
-      result.models = row.modelsList ? row.modelsList.split(",") : [];
+      result.models = parseCommaSeparated(row.modelsList ?? null);
     }
 
     return result;
@@ -274,7 +296,7 @@ export function getToolErrorStats(db: Database.Database): ToolErrorStatsResult {
   const byTool = toolRows.map((r) => ({
     tool: r.tool,
     count: r.count,
-    models: r.modelsList ? r.modelsList.split(",") : [],
+    models: parseCommaSeparated(r.modelsList),
   }));
 
   // Stats by model

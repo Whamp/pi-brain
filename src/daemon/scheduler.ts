@@ -186,6 +186,35 @@ export class Scheduler {
   }
 
   /**
+   * Create a cron job with error handling
+   */
+  private createCronJob(
+    name: string,
+    displayName: string,
+    schedule: string,
+    handler: () => Promise<void | ScheduledJobResult>
+  ): Cron | null {
+    try {
+      const job = new Cron(schedule, { name }, async () => {
+        try {
+          await handler();
+        } catch (error) {
+          this.logger.error(`${displayName} cron error: ${error}`);
+        }
+      });
+      this.logger.info(
+        `${displayName} scheduled: ${schedule} (next: ${job.nextRun()?.toISOString() ?? "unknown"})`
+      );
+      return job;
+    } catch (error) {
+      this.logger.error(
+        `Invalid ${displayName.toLowerCase()} schedule "${schedule}": ${error}`
+      );
+      return null;
+    }
+  }
+
+  /**
    * Start the scheduler - creates cron jobs for each configured schedule
    */
   start(): void {
@@ -196,123 +225,67 @@ export class Scheduler {
 
     this.running = true;
 
-    // Start reanalysis job if schedule is configured
-    if (this.config.reanalysisSchedule) {
-      try {
-        this.reanalysisJob = new Cron(
-          this.config.reanalysisSchedule,
-          { name: "reanalysis" },
-          async () => {
-            try {
-              await this.runReanalysis();
-            } catch (error) {
-              this.logger.error(`Reanalysis cron error: ${error}`);
-            }
-          }
-        );
-        this.logger.info(
-          `Reanalysis scheduled: ${this.config.reanalysisSchedule} (next: ${this.reanalysisJob.nextRun()?.toISOString() ?? "unknown"})`
-        );
-      } catch (error) {
-        this.logger.error(
-          `Invalid reanalysis schedule "${this.config.reanalysisSchedule}": ${error}`
-        );
-      }
-    }
+    // Job configurations: [schedule, setter, handler]
+    const jobConfigs: {
+      schedule: string | undefined;
+      name: string;
+      displayName: string;
+      handler: () => Promise<void | ScheduledJobResult>;
+      setter: (job: Cron | null) => void;
+    }[] = [
+      {
+        schedule: this.config.reanalysisSchedule,
+        name: "reanalysis",
+        displayName: "Reanalysis",
+        handler: () => this.runReanalysis(),
+        setter: (job) => {
+          this.reanalysisJob = job;
+        },
+      },
+      {
+        schedule: this.config.connectionDiscoverySchedule,
+        name: "connection_discovery",
+        displayName: "Connection discovery",
+        handler: () => this.runConnectionDiscovery(),
+        setter: (job) => {
+          this.connectionDiscoveryJob = job;
+        },
+      },
+      {
+        schedule: this.config.patternAggregationSchedule,
+        name: "pattern_aggregation",
+        displayName: "Pattern aggregation",
+        handler: () => {
+          this.runPatternAggregation();
+          return Promise.resolve();
+        },
+        setter: (job) => {
+          this.patternAggregationJob = job;
+        },
+      },
+      {
+        schedule: this.config.clusteringSchedule,
+        name: "clustering",
+        displayName: "Clustering",
+        handler: () => this.runClustering(),
+        setter: (job) => {
+          this.clusteringJob = job;
+        },
+      },
+      {
+        schedule: this.config.backfillEmbeddingsSchedule,
+        name: "backfill_embeddings",
+        displayName: "Backfill embeddings",
+        handler: () => this.runBackfillEmbeddings(),
+        setter: (job) => {
+          this.backfillEmbeddingsJob = job;
+        },
+      },
+    ];
 
-    // Start connection discovery job if schedule is configured
-    if (this.config.connectionDiscoverySchedule) {
-      try {
-        this.connectionDiscoveryJob = new Cron(
-          this.config.connectionDiscoverySchedule,
-          { name: "connection_discovery" },
-          async () => {
-            try {
-              await this.runConnectionDiscovery();
-            } catch (error) {
-              this.logger.error(`Connection discovery cron error: ${error}`);
-            }
-          }
-        );
-        this.logger.info(
-          `Connection discovery scheduled: ${this.config.connectionDiscoverySchedule} (next: ${this.connectionDiscoveryJob.nextRun()?.toISOString() ?? "unknown"})`
-        );
-      } catch (error) {
-        this.logger.error(
-          `Invalid connection discovery schedule "${this.config.connectionDiscoverySchedule}": ${error}`
-        );
-      }
-    }
-
-    // Start pattern aggregation job if schedule is configured
-    if (this.config.patternAggregationSchedule) {
-      try {
-        this.patternAggregationJob = new Cron(
-          this.config.patternAggregationSchedule,
-          { name: "pattern_aggregation" },
-          async () => {
-            try {
-              await this.runPatternAggregation();
-            } catch (error) {
-              this.logger.error(`Pattern aggregation cron error: ${error}`);
-            }
-          }
-        );
-        this.logger.info(
-          `Pattern aggregation scheduled: ${this.config.patternAggregationSchedule} (next: ${this.patternAggregationJob.nextRun()?.toISOString() ?? "unknown"})`
-        );
-      } catch (error) {
-        this.logger.error(
-          `Invalid pattern aggregation schedule "${this.config.patternAggregationSchedule}": ${error}`
-        );
-      }
-    }
-
-    // Start clustering job if schedule is configured
-    if (this.config.clusteringSchedule) {
-      try {
-        this.clusteringJob = new Cron(
-          this.config.clusteringSchedule,
-          { name: "clustering" },
-          async () => {
-            try {
-              await this.runClustering();
-            } catch (error) {
-              this.logger.error(`Clustering cron error: ${error}`);
-            }
-          }
-        );
-        this.logger.info(
-          `Clustering scheduled: ${this.config.clusteringSchedule} (next: ${this.clusteringJob.nextRun()?.toISOString() ?? "unknown"})`
-        );
-      } catch (error) {
-        this.logger.error(
-          `Invalid clustering schedule "${this.config.clusteringSchedule}": ${error}`
-        );
-      }
-    }
-
-    // Start backfill embeddings job if schedule is configured
-    if (this.config.backfillEmbeddingsSchedule) {
-      try {
-        this.backfillEmbeddingsJob = new Cron(
-          this.config.backfillEmbeddingsSchedule,
-          { name: "backfill_embeddings" },
-          async () => {
-            try {
-              await this.runBackfillEmbeddings();
-            } catch (error) {
-              this.logger.error(`Backfill embeddings cron error: ${error}`);
-            }
-          }
-        );
-        this.logger.info(
-          `Backfill embeddings scheduled: ${this.config.backfillEmbeddingsSchedule} (next: ${this.backfillEmbeddingsJob.nextRun()?.toISOString() ?? "unknown"})`
-        );
-      } catch (error) {
-        this.logger.error(
-          `Invalid backfill embeddings schedule "${this.config.backfillEmbeddingsSchedule}": ${error}`
-        );
+    for (const { schedule, name, displayName, handler, setter } of jobConfigs) {
+      if (schedule) {
+        setter(this.createCronJob(name, displayName, schedule, handler));
       }
     }
 
@@ -403,7 +376,7 @@ export class Scheduler {
 
     const jobs: SchedulerStatus["jobs"] = jobConfigs
       .filter(
-        (config) =>
+        (config): config is typeof config & { schedule: string } =>
           config.schedule !== null &&
           config.schedule !== undefined &&
           config.schedule !== ""

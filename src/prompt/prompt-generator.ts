@@ -129,6 +129,83 @@ export function filterActionableInsights(
 }
 
 /**
+ * Format quirks section for a model
+ */
+function formatQuirksSection(
+  insights: AggregatedInsight[],
+  maxQuirks: number
+): string[] {
+  const quirks = insights
+    .filter((i) => i.type === "quirk")
+    .toSorted((a, b) => b.frequency - a.frequency)
+    .slice(0, maxQuirks);
+
+  if (quirks.length === 0) {
+    return [];
+  }
+
+  const lines = ["### Known quirks to avoid:\n"];
+  for (const quirk of quirks) {
+    lines.push(`- **${quirk.pattern}**`);
+    if (quirk.workaround) {
+      lines.push(`  - Workaround: ${quirk.workaround}`);
+    }
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
+ * Format wins section for a model
+ */
+function formatWinsSection(
+  insights: AggregatedInsight[],
+  maxWins: number
+): string[] {
+  const wins = insights
+    .filter((i) => i.type === "win")
+    .toSorted((a, b) => b.frequency - a.frequency)
+    .slice(0, maxWins);
+
+  if (wins.length === 0) {
+    return [];
+  }
+
+  const lines = ["### Effective techniques:\n"];
+  for (const win of wins) {
+    lines.push(`- ${win.pattern}`);
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
+ * Format tool issues section for a model
+ */
+function formatToolIssuesSection(
+  insights: AggregatedInsight[],
+  maxToolIssues: number
+): string[] {
+  const toolIssues = insights
+    .filter((i) => i.type === "tool_error" || i.type === "failure")
+    .filter((i) => i.tool || i.pattern.toLowerCase().includes("tool"))
+    .toSorted((a, b) => b.frequency - a.frequency)
+    .slice(0, maxToolIssues);
+
+  if (toolIssues.length === 0) {
+    return [];
+  }
+
+  const lines = ["### Tool usage reminders:\n"];
+  for (const issue of toolIssues) {
+    const prefix = issue.tool ? `${issue.tool}: ` : "";
+    lines.push(`- ${prefix}${issue.pattern}`);
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
  * Format a model-specific prompt section
  */
 export function formatModelSection(
@@ -142,57 +219,11 @@ export function formatModelSection(
     maxToolIssues = DEFAULT_MAX_TOOL_ISSUES,
   } = options;
 
-  const lines: string[] = [];
-
-  // Quirks to avoid
-  const quirks = insights
-    .filter((i) => i.type === "quirk")
-    .toSorted((a, b) => b.frequency - a.frequency)
-    .slice(0, maxQuirks);
-
-  if (quirks.length > 0) {
-    lines.push("### Known quirks to avoid:\n");
-    for (const quirk of quirks) {
-      lines.push(`- **${quirk.pattern}**`);
-      if (quirk.workaround) {
-        lines.push(`  - Workaround: ${quirk.workaround}`);
-      }
-    }
-    lines.push("");
-  }
-
-  // Effective techniques (wins)
-  const wins = insights
-    .filter((i) => i.type === "win")
-    .toSorted((a, b) => b.frequency - a.frequency)
-    .slice(0, maxWins);
-
-  if (wins.length > 0) {
-    lines.push("### Effective techniques:\n");
-    for (const win of wins) {
-      lines.push(`- ${win.pattern}`);
-    }
-    lines.push("");
-  }
-
-  // Tool usage reminders (failures and tool errors)
-  const toolIssues = insights
-    .filter((i) => i.type === "tool_error" || i.type === "failure")
-    .filter((i) => i.tool || i.pattern.toLowerCase().includes("tool"))
-    .toSorted((a, b) => b.frequency - a.frequency)
-    .slice(0, maxToolIssues);
-
-  if (toolIssues.length > 0) {
-    lines.push("### Tool usage reminders:\n");
-    for (const issue of toolIssues) {
-      if (issue.tool) {
-        lines.push(`- ${issue.tool}: ${issue.pattern}`);
-      } else {
-        lines.push(`- ${issue.pattern}`);
-      }
-    }
-    lines.push("");
-  }
+  const lines: string[] = [
+    ...formatQuirksSection(insights, maxQuirks),
+    ...formatWinsSection(insights, maxWins),
+    ...formatToolIssuesSection(insights, maxToolIssues),
+  ];
 
   return lines.join("\n").trim();
 }

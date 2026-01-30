@@ -169,6 +169,20 @@ function ensureDestinationExists(spoke: SpokeConfig): void {
   }
 }
 
+/** Resolve option with fallback to spoke options then default */
+function resolveOption<T>(
+  optionValue: T | undefined,
+  spokeValue: T | undefined,
+  defaultValue: T
+): T {
+  return optionValue ?? spokeValue ?? defaultValue;
+}
+
+/** Ensure path ends with trailing slash */
+function ensureTrailingSlash(path: string): string {
+  return path.endsWith("/") ? path : `${path}/`;
+}
+
 /**
  * Build rsync command arguments from options
  */
@@ -178,24 +192,22 @@ function buildRsyncArgs(
 ): { args: string[]; source: string; dest: string } {
   // Merge spoke's rsyncOptions with passed options (passed options take precedence)
   const spokeOpts = spoke.rsyncOptions ?? {};
-  const bwLimit = options.bwLimit ?? spokeOpts.bwLimit ?? 0;
-  const dryRun = options.dryRun ?? false;
-  const doDelete = options.delete ?? spokeOpts.delete ?? false;
-  const extraArgs = options.extraArgs ?? spokeOpts.extraArgs ?? [];
+  const bwLimit = resolveOption(options.bwLimit, spokeOpts.bwLimit, 0);
+  const doDelete = resolveOption(options.delete, spokeOpts.delete, false);
+  const extraArgs = resolveOption(options.extraArgs, spokeOpts.extraArgs, []);
 
   const args: string[] = [
     "-avz", // archive, verbose, compress
     "--stats", // show transfer statistics
   ];
 
+  // Add conditional flags
   if (bwLimit > 0) {
     args.push(`--bwlimit=${bwLimit}`);
   }
-
-  if (dryRun) {
+  if (options.dryRun) {
     args.push("--dry-run");
   }
-
   if (doDelete) {
     args.push("--delete");
   }
@@ -203,17 +215,9 @@ function buildRsyncArgs(
   // Add extra args (validated in config to reject dangerous options like --rsh)
   args.push(...extraArgs);
 
-  // Ensure source ends with / to sync contents, not the directory itself
-  let source = spoke.source ?? "";
-  if (!source.endsWith("/")) {
-    source = `${source}/`;
-  }
-
-  // Ensure destination ends with /
-  let dest = spoke.path;
-  if (!dest.endsWith("/")) {
-    dest = `${dest}/`;
-  }
+  // Ensure paths end with / for correct rsync behavior
+  const source = ensureTrailingSlash(spoke.source ?? "");
+  const dest = ensureTrailingSlash(spoke.path);
 
   args.push(source, dest);
 

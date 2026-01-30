@@ -383,6 +383,37 @@ program
   });
 
 // =============================================================================
+// Sync command helpers
+// =============================================================================
+
+/**
+ * Print error message when no rsync spokes are configured
+ */
+function printNoRsyncSpokesError(): void {
+  console.error("No spokes configured with rsync sync method.");
+  console.error("\nTo configure rsync spokes, add to ~/.pi-brain/config.yaml:");
+  console.error("  spokes:");
+  console.error("    - name: laptop");
+  console.error("      sync_method: rsync");
+  console.error("      source: user@laptop:~/.pi/agent/sessions");
+  console.error("      path: ~/.pi-brain/synced/laptop");
+}
+
+/**
+ * Print error message when spoke not found
+ */
+function printSpokeNotFoundError(
+  spokeName: string,
+  availableSpokes: { name: string }[]
+): void {
+  console.error(`Spoke "${spokeName}" not found or not configured for rsync.`);
+  console.error("\nAvailable rsync spokes:");
+  for (const s of availableSpokes) {
+    console.error(`  - ${s.name}`);
+  }
+}
+
+// =============================================================================
 // Sync command
 // =============================================================================
 
@@ -425,15 +456,7 @@ syncCmd
       const rsyncSpokes = config.spokes.filter((s) => s.syncMethod === "rsync");
 
       if (rsyncSpokes.length === 0) {
-        console.error("No spokes configured with rsync sync method.");
-        console.error(
-          "\nTo configure rsync spokes, add to ~/.pi-brain/config.yaml:"
-        );
-        console.error("  spokes:");
-        console.error("    - name: laptop");
-        console.error("      sync_method: rsync");
-        console.error("      source: user@laptop:~/.pi/agent/sessions");
-        console.error("      path: ~/.pi-brain/synced/laptop");
+        printNoRsyncSpokesError();
         process.exit(1);
       }
 
@@ -442,13 +465,7 @@ syncCmd
       if (options.spoke) {
         spokesToSync = rsyncSpokes.filter((s) => s.name === options.spoke);
         if (spokesToSync.length === 0) {
-          console.error(
-            `Spoke "${options.spoke}" not found or not configured for rsync.`
-          );
-          console.error("\nAvailable rsync spokes:");
-          for (const s of rsyncSpokes) {
-            console.error(`  - ${s.name}`);
-          }
+          printSpokeNotFoundError(options.spoke, rsyncSpokes);
           process.exit(1);
         }
       }

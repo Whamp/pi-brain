@@ -30,6 +30,86 @@ export function getSegmentEntries(
 }
 
 /**
+ * Check if a node has complete segment info for export
+ */
+function hasCompleteSegmentInfo(node: {
+  source: {
+    segment?: { startEntryId?: string; endEntryId?: string };
+    sessionFile: string;
+  };
+}): node is {
+  source: {
+    segment: { startEntryId: string; endEntryId: string };
+    sessionFile: string;
+  };
+} {
+  return Boolean(
+    node.source.segment?.startEntryId && node.source.segment?.endEntryId
+  );
+}
+
+/**
+ * Create a fine-tuning example from segment entries and node
+ */
+function createFineTuneExample(
+  segmentEntries: SessionEntry[],
+  node: unknown
+): object {
+  return {
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an expert session analyzer. Analyze the following session segment and produce a structured JSON analysis.",
+      },
+      {
+        role: "user",
+        content: JSON.stringify(segmentEntries),
+      },
+      {
+        role: "assistant",
+        content: JSON.stringify(node),
+      },
+    ],
+  };
+}
+
+/**
+ * Process a single node file and write fine-tuning example if valid
+ * Returns 1 if example was written, 0 otherwise
+ */
+async function processNodeFile(
+  file: string,
+  outStream: fs.WriteStream
+): Promise<number> {
+  const node = readNodeFromPath(file);
+
+  if (!hasCompleteSegmentInfo(node)) {
+    return 0;
+  }
+
+  const sessionPath = node.source.sessionFile;
+  if (!fs.existsSync(sessionPath)) {
+    return 0;
+  }
+
+  const session = await parseSession(sessionPath);
+  const segmentEntries = getSegmentEntries(
+    session.entries,
+    node.source.segment.startEntryId,
+    node.source.segment.endEntryId
+  );
+
+  if (segmentEntries.length === 0) {
+    return 0;
+  }
+
+  const example = createFineTuneExample(segmentEntries, node);
+  outStream.write(`${JSON.stringify(example)}\n`);
+  return 1;
+}
+
+/**
  * Export fine-tuning data to JSONL
  *
  * Format:
@@ -62,66 +142,13 @@ export async function exportFineTuneData(
 
     for (const file of files) {
       try {
-        const node = readNodeFromPath(file);
+        count += await processNodeFile(file, outStream);
 
-        // Skip nodes without complete segment info
-        if (
-          !node.source.segment ||
-          !node.source.segment.startEntryId ||
-          !node.source.segment.endEntryId
-        ) {
-          continue;
-        }
-
-        // Read session
-        const sessionPath = node.source.sessionFile;
-        if (!fs.existsSync(sessionPath)) {
-          // Try resolving relative to sessions dir if absolute path fails
-          // This handles cases where session_file stored might be relative or moved
-          continue;
-        }
-
-        const session = await parseSession(sessionPath);
-        const segmentEntries = getSegmentEntries(
-          session.entries,
-          node.source.segment.startEntryId,
-          node.source.segment.endEntryId
-        );
-
-        if (segmentEntries.length === 0) {
-          continue;
-        }
-
-        // Create fine-tuning example
-        // Input: The raw session segment
-        // Output: The structured node analysis
-        const example = {
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are an expert session analyzer. Analyze the following session segment and produce a structured JSON analysis.",
-            },
-            {
-              role: "user",
-              content: JSON.stringify(segmentEntries),
-            },
-            {
-              role: "assistant",
-              content: JSON.stringify(node),
-            },
-          ],
-        };
-
-        outStream.write(`${JSON.stringify(example)}\n`);
-        count++;
-
-        if (count % 100 === 0) {
+        if (count > 0 && count % 100 === 0) {
           process.stdout.write(`\rExported ${count} examples...`);
         }
       } catch {
         // Skip malformed nodes or sessions
-        continue;
       }
     }
 

@@ -189,6 +189,39 @@ export class QueueManager {
   }
 
   /**
+   * Convert a JobInput to SQL parameters for insertion
+   */
+  private jobToInsertParams(
+    job: JobInput
+  ): [
+    string,
+    string,
+    number,
+    string,
+    string | null,
+    string | null,
+    string | null,
+    number,
+    string | null,
+  ] {
+    const id = generateJobId();
+    const targetNodeId =
+      job.context?.existingNodeId ?? job.context?.nodeId ?? null;
+
+    return [
+      id,
+      job.type,
+      job.priority ?? PRIORITY.INITIAL,
+      job.sessionFile,
+      job.segmentStart ?? null,
+      job.segmentEnd ?? null,
+      job.context ? JSON.stringify(job.context) : null,
+      job.maxRetries ?? DEFAULT_MAX_RETRIES,
+      targetNodeId,
+    ];
+  }
+
+  /**
    * Add multiple jobs to the queue in a single transaction
    */
   enqueueMany(jobs: JobInput[]): string[] {
@@ -203,22 +236,9 @@ export class QueueManager {
 
     const transaction = this.db.transaction(() => {
       for (const job of jobs) {
-        const id = generateJobId();
-        // Extract target_node_id from context for denormalized index
-        const targetNodeId =
-          job.context?.existingNodeId ?? job.context?.nodeId ?? null;
-        insert.run(
-          id,
-          job.type,
-          job.priority ?? PRIORITY.INITIAL,
-          job.sessionFile,
-          job.segmentStart ?? null,
-          job.segmentEnd ?? null,
-          job.context ? JSON.stringify(job.context) : null,
-          job.maxRetries ?? DEFAULT_MAX_RETRIES,
-          targetNodeId
-        );
-        ids.push(id);
+        const params = this.jobToInsertParams(job);
+        insert.run(...params);
+        ids.push(params[0]); // id is first param
       }
     });
 

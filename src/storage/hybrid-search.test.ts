@@ -10,6 +10,7 @@ import type * as DatabaseModule from "./database.js";
 import type * as SemanticSearchModule from "./semantic-search.js";
 
 import {
+  type HybridSearchResult,
   calculateNodeHybridScore,
   hybridSearch,
   HYBRID_WEIGHTS,
@@ -114,107 +115,135 @@ function createMockDb(): Database.Database {
   tagData.push({ node_id: "node-1", tag: "jwt" });
   tagData.push({ node_id: "node-2", tag: "database" });
 
+  // Handler for GET queries
+  function handleGet(
+    sql: string,
+    params: unknown[]
+  ): Record<string, unknown> | null {
+    // Node lookup
+    if (sql.includes("SELECT * FROM nodes WHERE id")) {
+      const nodeId = params[0] as string;
+      return nodeData.get(nodeId) ?? null;
+    }
+
+    // Edge count for single node
+    if (sql.includes("COUNT(*)") && sql.includes("edges")) {
+      const nodeId = params[0] as string;
+      const count = edgeData.filter(
+        (e) => e.source_node_id === nodeId || e.target_node_id === nodeId
+      ).length;
+      return { count };
+    }
+
+    // Tag count - both `calculateNodeHybridScore` and batch queries
+    if (
+      sql.includes("COUNT(*)") &&
+      sql.includes("tags") &&
+      sql.includes("node_id")
+    ) {
+      const nodeId = params[0] as string;
+      const requestedTags = params.slice(1) as string[];
+      const count = tagData.filter(
+        (t) => t.node_id === nodeId && requestedTags.includes(t.tag)
+      ).length;
+      return { count };
+    }
+
+    return null;
+  }
+
+  // Handler for FTS search
+  function handleFtsSearch(params: unknown[]): Record<string, unknown>[] {
+    const query = (params[0] as string).toLowerCase();
+    const results: Record<string, unknown>[] = [];
+
+    for (const [nodeId, fts] of ftsData.entries()) {
+      const fullText = Object.values(fts).join(" ").toLowerCase();
+      // Simple substring match for testing
+      if (fullText.includes(query.replaceAll('"', ""))) {
+        const node = nodeData.get(nodeId);
+        if (node) {
+          results.push({ ...node, fts_rank: -5 });
+        }
+      }
+    }
+    return results;
+  }
+
+  // Handler for edge count batch
+  function handleEdgeCountBatch(
+    params: unknown[]
+  ): { node_id: string; edge_count: number }[] {
+    const nodeIds = new Set(params as string[]);
+    const counts = new Map<string, number>();
+
+    for (const edge of edgeData) {
+      if (nodeIds.has(edge.source_node_id)) {
+        counts.set(
+          edge.source_node_id,
+          (counts.get(edge.source_node_id) ?? 0) + 1
+        );
+      }
+      if (nodeIds.has(edge.target_node_id)) {
+        counts.set(
+          edge.target_node_id,
+          (counts.get(edge.target_node_id) ?? 0) + 1
+        );
+      }
+    }
+
+    return [...counts.entries()].map(([node_id, edge_count]) => ({
+      node_id,
+      edge_count,
+    }));
+  }
+
+  // Handler for tag count batch
+  function handleTagCountBatch(
+    params: unknown[]
+  ): { node_id: string; tag_count: number }[] {
+    const [nodeIds, boostTags] = [
+      params.slice(0, params.length / 2),
+      params.slice(params.length / 2),
+    ] as [string[], string[]];
+
+    const counts = new Map<string, number>();
+    for (const tag of tagData) {
+      if (nodeIds.includes(tag.node_id) && boostTags.includes(tag.tag)) {
+        counts.set(tag.node_id, (counts.get(tag.node_id) ?? 0) + 1);
+      }
+    }
+
+    return [...counts.entries()].map(([node_id, tag_count]) => ({
+      node_id,
+      tag_count,
+    }));
+  }
+
+  // Handler for ALL queries
+  function handleAll(
+    sql: string,
+    params: unknown[]
+  ): Record<string, unknown>[] {
+    if (sql.includes("nodes_fts")) {
+      return handleFtsSearch(params);
+    }
+
+    if (sql.includes("UNION ALL") && sql.includes("edges")) {
+      return handleEdgeCountBatch(params);
+    }
+
+    if (sql.includes("tags") && sql.includes("GROUP BY node_id")) {
+      return handleTagCountBatch(params);
+    }
+
+    return [];
+  }
+
   return {
     prepare: vi.fn((sql: string) => ({
-      get: vi.fn((...params: unknown[]) => {
-        // Node lookup
-        if (sql.includes("SELECT * FROM nodes WHERE id")) {
-          const nodeId = params[0] as string;
-          return nodeData.get(nodeId);
-        }
-
-        // Edge count for single node
-        if (sql.includes("COUNT(*)") && sql.includes("edges")) {
-          const nodeId = params[0] as string;
-          const count = edgeData.filter(
-            (e) => e.source_node_id === nodeId || e.target_node_id === nodeId
-          ).length;
-          return { count };
-        }
-
-        // Tag count - both `calculateNodeHybridScore` and batch queries
-        if (
-          sql.includes("COUNT(*)") &&
-          sql.includes("tags") &&
-          sql.includes("node_id")
-        ) {
-          const nodeId = params[0] as string;
-          const requestedTags = params.slice(1) as string[];
-          const count = tagData.filter(
-            (t) => t.node_id === nodeId && requestedTags.includes(t.tag)
-          ).length;
-          return { count };
-        }
-
-        return null;
-      }),
-      all: vi.fn((...params: unknown[]) => {
-        // FTS search
-        if (sql.includes("nodes_fts")) {
-          const query = (params[0] as string).toLowerCase();
-          const results: Record<string, unknown>[] = [];
-
-          for (const [nodeId, fts] of ftsData.entries()) {
-            const fullText = Object.values(fts).join(" ").toLowerCase();
-            // Simple substring match for testing
-            if (fullText.includes(query.replaceAll('"', ""))) {
-              const node = nodeData.get(nodeId);
-              if (node) {
-                results.push({ ...node, fts_rank: -5 });
-              }
-            }
-          }
-          return results;
-        }
-
-        // Edge count batch
-        if (sql.includes("UNION ALL") && sql.includes("edges")) {
-          const nodeIds = new Set(params as string[]);
-          const counts = new Map<string, number>();
-
-          for (const edge of edgeData) {
-            if (nodeIds.has(edge.source_node_id)) {
-              counts.set(
-                edge.source_node_id,
-                (counts.get(edge.source_node_id) ?? 0) + 1
-              );
-            }
-            if (nodeIds.has(edge.target_node_id)) {
-              counts.set(
-                edge.target_node_id,
-                (counts.get(edge.target_node_id) ?? 0) + 1
-              );
-            }
-          }
-
-          return [...counts.entries()].map(([node_id, edge_count]) => ({
-            node_id,
-            edge_count,
-          }));
-        }
-
-        // Tag count batch
-        if (sql.includes("tags") && sql.includes("GROUP BY node_id")) {
-          const [nodeIds, boostTags] = [
-            params.slice(0, params.length / 2),
-            params.slice(params.length / 2),
-          ] as [string[], string[]];
-
-          const counts = new Map<string, number>();
-          for (const tag of tagData) {
-            if (nodeIds.includes(tag.node_id) && boostTags.includes(tag.tag)) {
-              counts.set(tag.node_id, (counts.get(tag.node_id) ?? 0) + 1);
-            }
-          }
-
-          return [...counts.entries()].map(([node_id, tag_count]) => ({
-            node_id,
-            tag_count,
-          }));
-        }
-
-        return [];
-      }),
+      get: vi.fn((...params: unknown[]) => handleGet(sql, params)),
+      all: vi.fn((...params: unknown[]) => handleAll(sql, params)),
       run: vi.fn(),
     })),
   } as unknown as Database.Database;
@@ -371,10 +400,7 @@ describe("hybrid-search", () => {
     });
 
     // Helper to find a node by ID and throw if not found
-    function findNode(
-      results: { node: { id: string }; breakdown: Record<string, number> }[],
-      nodeId: string
-    ) {
+    function findNode(results: HybridSearchResult[], nodeId: string) {
       const result = results.find((r) => r.node.id === nodeId);
       if (!result) {
         throw new Error(`Node ${nodeId} not found in results`);

@@ -264,6 +264,32 @@ export async function validateRequiredSkills(): Promise<EnvironmentValidationRes
 }
 
 /**
+ * Check if RLM should be included based on session file size.
+ * Returns true for files larger than RLM_SIZE_THRESHOLD.
+ */
+async function shouldIncludeRlm(sessionFile?: string): Promise<boolean> {
+  if (!sessionFile) {
+    return false;
+  }
+  try {
+    const stat = await fs.stat(sessionFile);
+    return stat.size >= RLM_SIZE_THRESHOLD;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Collect available skills from a list
+ */
+function collectAvailableSkills(
+  skillNames: readonly string[],
+  skillAvailability: Map<string, SkillInfo>
+): string[] {
+  return skillNames.filter((name) => skillAvailability.get(name)?.available);
+}
+
+/**
  * Build the skills argument for pi invocation
  * Returns comma-separated list of available skills
  *
@@ -272,36 +298,13 @@ export async function validateRequiredSkills(): Promise<EnvironmentValidationRes
  */
 export async function buildSkillsArg(sessionFile?: string): Promise<string> {
   const skills = await getSkillAvailability();
+  const includeRlm = await shouldIncludeRlm(sessionFile);
 
-  // Check if we should include RLM (only for large files)
-  let includeRlm = false;
-  if (sessionFile) {
-    try {
-      const stat = await fs.stat(sessionFile);
-      includeRlm = stat.size >= RLM_SIZE_THRESHOLD;
-    } catch {
-      // If we can't stat the file, don't include RLM
-      includeRlm = false;
-    }
-  }
+  const skillsToInclude = [
+    ...collectAvailableSkills(REQUIRED_SKILLS, skills),
+    ...collectAvailableSkills(OPTIONAL_SKILLS, skills),
+  ];
 
-  const skillsToInclude: string[] = [];
-
-  // Add required skills
-  for (const skill of REQUIRED_SKILLS) {
-    if (skills.get(skill)?.available) {
-      skillsToInclude.push(skill);
-    }
-  }
-
-  // Add optional skills
-  for (const skill of OPTIONAL_SKILLS) {
-    if (skills.get(skill)?.available) {
-      skillsToInclude.push(skill);
-    }
-  }
-
-  // Add conditional skills (RLM) only for large files
   if (includeRlm && skills.get("rlm")?.available) {
     skillsToInclude.push("rlm");
   }
@@ -706,54 +709,72 @@ export function extractNodeFromText(
 }
 
 /**
+ * Required top-level object fields for AgentNodeOutput
+ */
+const REQUIRED_OBJECT_FIELDS = [
+  "classification",
+  "content",
+  "lessons",
+  "observations",
+  "semantic",
+  "daemonMeta",
+] as const;
+
+/**
+ * Check if a value is a non-null object
+ */
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+/**
+ * Validate required top-level object fields exist
+ */
+function hasRequiredObjectFields(
+  node: Record<string, unknown>
+): node is Record<(typeof REQUIRED_OBJECT_FIELDS)[number], object> {
+  return REQUIRED_OBJECT_FIELDS.every((field) => isObject(node[field]));
+}
+
+/**
+ * Validate classification has required string fields
+ */
+function hasValidClassification(
+  classification: Record<string, unknown>
+): boolean {
+  return (
+    typeof classification.type === "string" &&
+    typeof classification.project === "string"
+  );
+}
+
+/**
+ * Validate content has required string fields
+ */
+function hasValidContent(content: Record<string, unknown>): boolean {
+  return (
+    typeof content.summary === "string" && typeof content.outcome === "string"
+  );
+}
+
+/**
  * Basic validation that output matches expected schema
  */
 export function isValidNodeOutput(obj: unknown): obj is AgentNodeOutput {
-  if (typeof obj !== "object" || obj === null) {
+  if (!isObject(obj)) {
     return false;
   }
 
   const node = obj as Record<string, unknown>;
 
-  // Check required top-level fields
-  if (!node.classification || typeof node.classification !== "object") {
-    return false;
-  }
-  if (!node.content || typeof node.content !== "object") {
-    return false;
-  }
-  if (!node.lessons || typeof node.lessons !== "object") {
-    return false;
-  }
-  if (!node.observations || typeof node.observations !== "object") {
-    return false;
-  }
-  if (!node.semantic || typeof node.semantic !== "object") {
-    return false;
-  }
-  if (!node.daemonMeta || typeof node.daemonMeta !== "object") {
+  if (!hasRequiredObjectFields(node)) {
     return false;
   }
 
-  // Check classification fields
   const classification = node.classification as Record<string, unknown>;
-  if (typeof classification.type !== "string") {
-    return false;
-  }
-  if (typeof classification.project !== "string") {
-    return false;
-  }
-
-  // Check content fields
   const content = node.content as Record<string, unknown>;
-  if (typeof content.summary !== "string") {
-    return false;
-  }
-  if (typeof content.outcome !== "string") {
-    return false;
-  }
 
-  return true;
+  return hasValidClassification(classification) && hasValidContent(content);
 }
 
 // =============================================================================

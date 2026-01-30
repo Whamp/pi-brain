@@ -71,38 +71,46 @@
   // Debounce timer
   let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  function shouldKeepFieldDropdownOpen(target: Node): boolean {
+    return (
+      (dropdownTriggerRef?.contains(target) ?? false) ||
+      (fieldDropdownMenuRef?.contains(target) ?? false)
+    );
+  }
+
+  function isClickOutsideFieldDropdown(target: Node): boolean {
+    return showFieldDropdown && fieldDropdownRef !== null && !fieldDropdownRef.contains(target);
+  }
+
+  function isClickOutsideSuggestions(target: Node): boolean {
+    return (
+      showSuggestions &&
+      suggestionsRef !== null &&
+      !suggestionsRef.contains(target) &&
+      searchInputRef !== null &&
+      !searchInputRef.contains(target)
+    );
+  }
+
+  function closeSuggestions(): void {
+    showSuggestions = false;
+    selectedSuggestionIndex = -1;
+  }
+
   // Click outside handler for field dropdown and suggestions
   function handleClickOutside(event: MouseEvent) {
     const target = event.target as Node;
     
-    // Don't close field dropdown if clicking the trigger button itself
-    if (dropdownTriggerRef?.contains(target)) {
+    if (shouldKeepFieldDropdownOpen(target)) {
       return;
     }
     
-    // Don't close if clicking inside the dropdown menu
-    if (fieldDropdownMenuRef?.contains(target)) {
-      return;
-    }
-    
-    if (
-      showFieldDropdown &&
-      fieldDropdownRef &&
-      !fieldDropdownRef.contains(target)
-    ) {
+    if (isClickOutsideFieldDropdown(target)) {
       closeFieldDropdown();
     }
     
-    // Close suggestions if clicking outside
-    if (
-      showSuggestions &&
-      suggestionsRef &&
-      !suggestionsRef.contains(target) &&
-      searchInputRef &&
-      !searchInputRef.contains(target)
-    ) {
-      showSuggestions = false;
-      selectedSuggestionIndex = -1;
+    if (isClickOutsideSuggestions(target)) {
+      closeSuggestions();
     }
   }
 
@@ -201,47 +209,47 @@
     searchHistory.removeSearch(query);
   }
 
+  function openSuggestionsOnArrowDown(event: KeyboardEvent): boolean {
+    if (event.key === "ArrowDown" && $searchHistory.entries.length > 0) {
+      showSuggestions = true;
+      selectedSuggestionIndex = 0;
+      event.preventDefault();
+      return true;
+    }
+    return false;
+  }
+
+  // Lookup table for keyboard navigation actions
+  const keydownHandlers: Record<string, (suggestions: ReturnType<typeof getSuggestions>) => void> = {
+    ArrowDown: (suggestions) => {
+      selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
+    },
+    ArrowUp: () => {
+      selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+    },
+    Enter: (suggestions) => {
+      if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+        selectSuggestion(suggestions[selectedSuggestionIndex].query);
+      }
+    },
+    Escape: () => {
+      closeSuggestions();
+    },
+  };
+
   // Handle keyboard navigation in suggestions
   function handleSearchKeydown(event: KeyboardEvent): void {
     const suggestions = getSuggestions();
     
     if (!showSuggestions || suggestions.length === 0) {
-      if (event.key === "ArrowDown" && $searchHistory.entries.length > 0) {
-        // Open suggestions on arrow down when closed
-        showSuggestions = true;
-        selectedSuggestionIndex = 0;
-        event.preventDefault();
-      }
+      openSuggestionsOnArrowDown(event);
       return;
     }
 
-    switch (event.key) {
-      case "ArrowDown": {
-        event.preventDefault();
-        selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
-        break;
-      }
-      case "ArrowUp": {
-        event.preventDefault();
-        selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
-        break;
-      }
-      case "Enter": {
-        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
-          event.preventDefault();
-          selectSuggestion(suggestions[selectedSuggestionIndex].query);
-        }
-        break;
-      }
-      case "Escape": {
-        event.preventDefault();
-        showSuggestions = false;
-        selectedSuggestionIndex = -1;
-        break;
-      }
-      default: {
-        break;
-      }
+    const handler = keydownHandlers[event.key];
+    if (handler) {
+      event.preventDefault();
+      handler(suggestions);
     }
   }
 

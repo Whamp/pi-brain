@@ -18,6 +18,20 @@ interface KeyboardShortcutsState {
   pendingPrefix: string | null;
 }
 
+function isEditableElement(target: HTMLElement): boolean {
+  const tagName = target.tagName.toLowerCase();
+  return (
+    tagName === "input" ||
+    tagName === "textarea" ||
+    tagName === "select" ||
+    target.isContentEditable
+  );
+}
+
+function hasModifiers(event: KeyboardEvent): boolean {
+  return event.ctrlKey || event.metaKey || event.altKey;
+}
+
 function createKeyboardShortcutsStore() {
   const { subscribe, update } = writable<KeyboardShortcutsState>({
     helpModalOpen: false,
@@ -74,33 +88,48 @@ function createKeyboardShortcutsStore() {
     });
   }
 
+  function handleEscape(
+    event: KeyboardEvent,
+    state: KeyboardShortcutsState,
+    isEditable: boolean
+  ): boolean {
+    if (state.helpModalOpen) {
+      event.preventDefault();
+      update((s) => ({ ...s, helpModalOpen: false }));
+      return true;
+    }
+    if (state.pendingPrefix) {
+      event.preventDefault();
+      clearPendingPrefix();
+      return true;
+    }
+    if (isEditable && document.activeElement instanceof HTMLElement) {
+      event.preventDefault();
+      document.activeElement.blur();
+    }
+    return true;
+  }
+
+  function handleGPrefix(event: KeyboardEvent): boolean {
+    const destination = gotoMap[event.key];
+    if (destination) {
+      event.preventDefault();
+      clearPendingPrefix();
+      goto(destination);
+      return true;
+    }
+    clearPendingPrefix();
+    return true;
+  }
+
   function handleKeydown(event: KeyboardEvent) {
     const state = get({ subscribe });
     const target = event.target as HTMLElement;
-    const tagName = target.tagName.toLowerCase();
-    const isEditable =
-      tagName === "input" ||
-      tagName === "textarea" ||
-      tagName === "select" ||
-      target.isContentEditable;
+    const isEditable = isEditableElement(target);
 
     // Always handle Escape
     if (event.key === "Escape") {
-      if (state.helpModalOpen) {
-        event.preventDefault();
-        update((s) => ({ ...s, helpModalOpen: false }));
-        return;
-      }
-      if (state.pendingPrefix) {
-        event.preventDefault();
-        clearPendingPrefix();
-        return;
-      }
-      // Blur active element if in a form field
-      if (isEditable && document.activeElement instanceof HTMLElement) {
-        event.preventDefault();
-        document.activeElement.blur();
-      }
+      handleEscape(event, state, isEditable);
       return;
     }
 
@@ -110,24 +139,14 @@ function createKeyboardShortcutsStore() {
     }
 
     // Handle ? for help modal
-    if (
-      event.key === "?" &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey
-    ) {
+    if (event.key === "?" && !hasModifiers(event)) {
       event.preventDefault();
       update((s) => ({ ...s, helpModalOpen: !s.helpModalOpen }));
       return;
     }
 
     // Handle / for search focus
-    if (
-      event.key === "/" &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey
-    ) {
+    if (event.key === "/" && !hasModifiers(event)) {
       event.preventDefault();
       focusSearchInput();
       return;
@@ -135,25 +154,12 @@ function createKeyboardShortcutsStore() {
 
     // Handle g prefix for navigation
     if (state.pendingPrefix === "g") {
-      const destination = gotoMap[event.key];
-      if (destination) {
-        event.preventDefault();
-        clearPendingPrefix();
-        goto(destination);
-        return;
-      }
-      // Invalid follow-up key, clear prefix
-      clearPendingPrefix();
+      handleGPrefix(event);
       return;
     }
 
     // Start g prefix
-    if (
-      event.key === "g" &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey
-    ) {
+    if (event.key === "g" && !hasModifiers(event)) {
       event.preventDefault();
       update((s) => ({ ...s, pendingPrefix: "g" }));
       // Clear prefix after 1.5 seconds if no follow-up

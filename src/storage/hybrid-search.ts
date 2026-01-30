@@ -27,7 +27,7 @@ import { semanticSearch } from "./semantic-search.js";
  * Sum should equal ~1.3 to allow strong signals to boost final score.
  * Final scores are normalized to 0..1 range.
  */
-export const HYBRID_WEIGHTS = {
+export const HYBRID_WEIGHTS: Record<string, number> = {
   vector: 0.25, // Semantic similarity via embeddings
   keyword: 0.15, // FTS5 match score
   relation: 0.25, // Graph centrality / edge count
@@ -36,7 +36,7 @@ export const HYBRID_WEIGHTS = {
   tag: 0.1, // Tag match count
   importance: 0.05, // Node importance field
   recency: 0.1, // How recent is the node
-} as const;
+};
 
 /** Max edges to consider for relation score (diminishing returns after) */
 const MAX_EDGES_FOR_SCORE = 10;
@@ -331,6 +331,249 @@ function calculateHybridScore(
 }
 
 // =============================================================================
+// Candidate Collection Helpers
+// =============================================================================
+
+/**
+ * Add vector search candidates to the candidate map
+ * @internal
+ */
+function addVectorCandidates(
+  db: Database.Database,
+  candidateMap: Map<string, CandidateNode>,
+  queryEmbedding: number[],
+  limit: number,
+  filters: SearchFilters | undefined,
+  boostTags: string[]
+): void {
+  const vectorResults = semanticSearch(db, queryEmbedding, {
+    limit: limit * 3, // Overfetch for merging
+    filters,
+  });
+
+  for (const result of vectorResults) {
+    candidateMap.set(result.node.id, {
+      nodeRow: result.node,
+      ftsRank: null,
+      vectorDistance: result.distance,
+      edgeCount: 0,
+      matchedTags: 0,
+      totalBoostTags: boostTags.length,
+    });
+  }
+}
+
+/**
+ * Add FTS search candidates to the candidate map
+ * @internal
+ */
+function addFtsCandidates(
+  db: Database.Database,
+  candidateMap: Map<string, CandidateNode>,
+  query: string,
+  limit: number,
+  filterClause: string,
+  filterParams: (string | number)[],
+  archivedClause: string,
+  boostTags: string[]
+): void {
+  const words = query.split(/\s+/).filter((w) => w.length > 0);
+  if (words.length === 0) {
+    return;
+  }
+
+  const quotedQuery = words
+    .map((word) => `"${word.replaceAll('"', '""')}"`)
+    .join(" ");
+
+  try {
+    const ftsStmt = db.prepare(`
+      SELECT n.*, nodes_fts.rank as fts_rank
+      FROM nodes n
+      JOIN nodes_fts ON n.id = nodes_fts.node_id
+      WHERE nodes_fts MATCH ?
+        ${filterClause}
+        ${archivedClause}
+      ORDER BY nodes_fts.rank
+      LIMIT ?
+    `);
+
+    const ftsRows = ftsStmt.all(
+      quotedQuery,
+      ...filterParams,
+      limit * 3
+    ) as (NodeRow & {
+      fts_rank: number;
+    })[];
+
+    for (const row of ftsRows) {
+      const existing = candidateMap.get(row.id);
+      if (existing) {
+        // Merge: keep vector distance, add FTS rank
+        existing.ftsRank = row.fts_rank;
+      } else {
+        candidateMap.set(row.id, {
+          nodeRow: row,
+          ftsRank: row.fts_rank,
+          vectorDistance: null,
+          edgeCount: 0,
+          matchedTags: 0,
+          totalBoostTags: boostTags.length,
+        });
+      }
+    }
+  } catch {
+    // FTS might fail on malformed queries; ignore and continue
+  }
+}
+
+/**
+ * Enrich candidates with edge counts from the graph
+ * @internal
+ */
+function enrichWithEdgeCounts(
+  db: Database.Database,
+  candidateMap: Map<string, CandidateNode>,
+  nodeIds: string[]
+): void {
+  if (nodeIds.length === 0) {
+    return;
+  }
+
+  const placeholders = nodeIds.map(() => "?").join(",");
+  const edgeStmt = db.prepare(`
+    SELECT node_id, COUNT(*) as edge_count FROM (
+      SELECT source_node_id as node_id FROM edges WHERE source_node_id IN (${placeholders})
+      UNION ALL
+      SELECT target_node_id as node_id FROM edges WHERE target_node_id IN (${placeholders})
+    ) GROUP BY node_id
+  `);
+
+  const edgeRows = edgeStmt.all(...nodeIds, ...nodeIds) as {
+    node_id: string;
+    edge_count: number;
+  }[];
+
+  for (const row of edgeRows) {
+    const candidate = candidateMap.get(row.node_id);
+    if (candidate) {
+      candidate.edgeCount = row.edge_count;
+    }
+  }
+}
+
+/**
+ * Enrich candidates with tag match counts
+ * @internal
+ */
+function enrichWithTagMatches(
+  db: Database.Database,
+  candidateMap: Map<string, CandidateNode>,
+  nodeIds: string[],
+  boostTags: string[]
+): void {
+  if (boostTags.length === 0 || nodeIds.length === 0) {
+    return;
+  }
+
+  const nodePlaceholders = nodeIds.map(() => "?").join(",");
+  const tagPlaceholders = boostTags.map(() => "?").join(",");
+
+  const tagStmt = db.prepare(`
+    SELECT node_id, COUNT(DISTINCT tag) as tag_count
+    FROM tags
+    WHERE node_id IN (${nodePlaceholders}) AND tag IN (${tagPlaceholders})
+    GROUP BY node_id
+  `);
+
+  const tagRows = tagStmt.all(...nodeIds, ...boostTags) as {
+    node_id: string;
+    tag_count: number;
+  }[];
+
+  for (const row of tagRows) {
+    const candidate = candidateMap.get(row.node_id);
+    if (candidate) {
+      candidate.matchedTags = row.tag_count;
+    }
+  }
+}
+
+/**
+ * Build scored results from candidates
+ * @internal
+ */
+function buildScoredResults(
+  candidateMap: Map<string, CandidateNode>,
+  query: string,
+  options: HybridSearchOptions
+): HybridSearchResult[] {
+  const results: HybridSearchResult[] = [];
+
+  for (const candidate of candidateMap.values()) {
+    const breakdown = calculateHybridScore(candidate, query, options);
+
+    results.push({
+      node: candidate.nodeRow,
+      score: breakdown.final,
+      breakdown,
+      highlights: [], // Could add FTS highlights here
+      vectorDistance: candidate.vectorDistance ?? undefined,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Collect candidates from vector and FTS sources
+ * @internal
+ */
+function collectCandidates(
+  db: Database.Database,
+  query: string,
+  queryEmbedding: number[] | undefined,
+  limit: number,
+  filters: SearchFilters | undefined,
+  filterClause: string,
+  filterParams: (string | number)[],
+  archivedClause: string,
+  boostTags: string[]
+): { candidateMap: Map<string, CandidateNode>; usedVectorSearch: boolean } {
+  const candidateMap = new Map<string, CandidateNode>();
+  let usedVectorSearch = false;
+
+  // Vector Search (if embedding provided and sqlite-vec loaded)
+  if (queryEmbedding && isVecLoaded(db)) {
+    usedVectorSearch = true;
+    addVectorCandidates(
+      db,
+      candidateMap,
+      queryEmbedding,
+      limit,
+      filters,
+      boostTags
+    );
+  }
+
+  // FTS Search (keyword matching)
+  if (query.trim().length > 0) {
+    addFtsCandidates(
+      db,
+      candidateMap,
+      query,
+      limit,
+      filterClause,
+      filterParams,
+      archivedClause,
+      boostTags
+    );
+  }
+
+  return { candidateMap, usedVectorSearch };
+}
+
+// =============================================================================
 // Main Hybrid Search Function
 // =============================================================================
 
@@ -371,84 +614,18 @@ export function hybridSearch(
     ? ""
     : "AND (n.archived IS NULL OR n.archived = 0)";
 
-  // Collect candidates from multiple sources
-  const candidateMap = new Map<string, CandidateNode>();
-
-  // -------------------------------------------------------------------------
-  // Step 1: Vector Search (if embedding provided and sqlite-vec loaded)
-  // -------------------------------------------------------------------------
-  let usedVectorSearch = false;
-  if (queryEmbedding && isVecLoaded(db)) {
-    usedVectorSearch = true;
-    const vectorResults = semanticSearch(db, queryEmbedding, {
-      limit: limit * 3, // Overfetch for merging
-      filters,
-    });
-
-    for (const result of vectorResults) {
-      candidateMap.set(result.node.id, {
-        nodeRow: result.node,
-        ftsRank: null,
-        vectorDistance: result.distance,
-        edgeCount: 0,
-        matchedTags: 0,
-        totalBoostTags: boostTags.length,
-      });
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Step 2: FTS Search (keyword matching)
-  // -------------------------------------------------------------------------
-  if (query.trim().length > 0) {
-    // Quote query words for FTS5
-    const words = query.split(/\s+/).filter((w) => w.length > 0);
-    if (words.length > 0) {
-      const quotedQuery = words
-        .map((word) => `"${word.replaceAll('"', '""')}"`)
-        .join(" ");
-
-      try {
-        const ftsStmt = db.prepare(`
-          SELECT n.*, nodes_fts.rank as fts_rank
-          FROM nodes n
-          JOIN nodes_fts ON n.id = nodes_fts.node_id
-          WHERE nodes_fts MATCH ?
-            ${filterClause}
-            ${archivedClause}
-          ORDER BY nodes_fts.rank
-          LIMIT ?
-        `);
-
-        const ftsRows = ftsStmt.all(
-          quotedQuery,
-          ...filterParams,
-          limit * 3
-        ) as (NodeRow & {
-          fts_rank: number;
-        })[];
-
-        for (const row of ftsRows) {
-          const existing = candidateMap.get(row.id);
-          if (existing) {
-            // Merge: keep vector distance, add FTS rank
-            existing.ftsRank = row.fts_rank;
-          } else {
-            candidateMap.set(row.id, {
-              nodeRow: row,
-              ftsRank: row.fts_rank,
-              vectorDistance: null,
-              edgeCount: 0,
-              matchedTags: 0,
-              totalBoostTags: boostTags.length,
-            });
-          }
-        }
-      } catch {
-        // FTS might fail on malformed queries; ignore and continue
-      }
-    }
-  }
+  // Step 1-2: Collect candidates from vector and FTS sources
+  const { candidateMap, usedVectorSearch } = collectCandidates(
+    db,
+    query,
+    queryEmbedding,
+    limit,
+    filters,
+    filterClause,
+    filterParams,
+    archivedClause,
+    boostTags
+  );
 
   // If no candidates at all, return empty
   if (candidateMap.size === 0) {
@@ -461,80 +638,15 @@ export function hybridSearch(
     };
   }
 
-  // -------------------------------------------------------------------------
   // Step 3: Enrich candidates with edge counts and tag matches
-  // -------------------------------------------------------------------------
   const nodeIds = [...candidateMap.keys()];
+  enrichWithEdgeCounts(db, candidateMap, nodeIds);
+  enrichWithTagMatches(db, candidateMap, nodeIds, boostTags);
 
-  // Get edge counts for all candidates in batch
-  if (nodeIds.length > 0) {
-    const placeholders = nodeIds.map(() => "?").join(",");
-    const edgeStmt = db.prepare(`
-      SELECT node_id, COUNT(*) as edge_count FROM (
-        SELECT source_node_id as node_id FROM edges WHERE source_node_id IN (${placeholders})
-        UNION ALL
-        SELECT target_node_id as node_id FROM edges WHERE target_node_id IN (${placeholders})
-      ) GROUP BY node_id
-    `);
-
-    const edgeRows = edgeStmt.all(...nodeIds, ...nodeIds) as {
-      node_id: string;
-      edge_count: number;
-    }[];
-
-    for (const row of edgeRows) {
-      const candidate = candidateMap.get(row.node_id);
-      if (candidate) {
-        candidate.edgeCount = row.edge_count;
-      }
-    }
-  }
-
-  // Get tag matches for boost tags
-  if (boostTags.length > 0 && nodeIds.length > 0) {
-    const nodePlaceholders = nodeIds.map(() => "?").join(",");
-    const tagPlaceholders = boostTags.map(() => "?").join(",");
-
-    const tagStmt = db.prepare(`
-      SELECT node_id, COUNT(DISTINCT tag) as tag_count
-      FROM tags
-      WHERE node_id IN (${nodePlaceholders}) AND tag IN (${tagPlaceholders})
-      GROUP BY node_id
-    `);
-
-    const tagRows = tagStmt.all(...nodeIds, ...boostTags) as {
-      node_id: string;
-      tag_count: number;
-    }[];
-
-    for (const row of tagRows) {
-      const candidate = candidateMap.get(row.node_id);
-      if (candidate) {
-        candidate.matchedTags = row.tag_count;
-      }
-    }
-  }
-
-  // -------------------------------------------------------------------------
   // Step 4: Calculate hybrid scores for all candidates
-  // -------------------------------------------------------------------------
-  const scoredResults: HybridSearchResult[] = [];
+  const scoredResults = buildScoredResults(candidateMap, query, options);
 
-  for (const candidate of candidateMap.values()) {
-    const breakdown = calculateHybridScore(candidate, query, options);
-
-    scoredResults.push({
-      node: candidate.nodeRow,
-      score: breakdown.final,
-      breakdown,
-      highlights: [], // Could add FTS highlights here
-      vectorDistance: candidate.vectorDistance ?? undefined,
-    });
-  }
-
-  // -------------------------------------------------------------------------
   // Step 5: Sort by final score (descending) and apply pagination
-  // -------------------------------------------------------------------------
   scoredResults.sort((a, b) => b.score - a.score);
 
   const total = scoredResults.length;

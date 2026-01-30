@@ -32,6 +32,18 @@ import { successResponse, errorResponse } from "../responses.js";
 type ValidationResult = string | null;
 
 /**
+ * Run validation checks and return first error
+ */
+function firstError(validations: ValidationResult[]): ValidationResult {
+  for (const error of validations) {
+    if (error !== null) {
+      return error;
+    }
+  }
+  return null;
+}
+
+/**
  * Validate an integer field is within a range
  */
 function validateIntRange(
@@ -50,6 +62,25 @@ function validateIntRange(
 }
 
 /**
+ * Validate a nullable integer field is within a range
+ * Allows undefined and null to pass, validates numbers
+ */
+function validateNullableIntRange(
+  value: number | null | undefined,
+  field: string,
+  min: number,
+  max: number
+): ValidationResult {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  if (!Number.isInteger(value) || value < min || value > max) {
+    return `${field} must be a positive integer between ${min} and ${max}`;
+  }
+  return null;
+}
+
+/**
  * Validate a float field is within a range
  */
 function validateFloatRange(
@@ -63,6 +94,55 @@ function validateFloatRange(
   }
   if (typeof value !== "number" || value < min || value > max) {
     return `${field} must be a number between ${min} and ${max}`;
+  }
+  return null;
+}
+
+/**
+ * Validate a non-empty string field
+ */
+function validateNonEmptyString(
+  value: string | undefined,
+  field: string
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  if (!value || typeof value !== "string") {
+    return `${field} must be a non-empty string`;
+  }
+  return null;
+}
+
+/**
+ * Validate a nullable non-empty string field (allows null to clear)
+ */
+function validateNullableNonEmptyString(
+  value: string | null | undefined,
+  field: string
+): ValidationResult {
+  if (value === undefined || value === null) {
+    return null;
+  }
+  if (!value || typeof value !== "string") {
+    return `${field} must be a non-empty string or null`;
+  }
+  return null;
+}
+
+/**
+ * Validate a value is one of allowed options
+ */
+function validateOneOf<T>(
+  value: T | undefined,
+  field: string,
+  allowed: readonly T[]
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  if (!allowed.includes(value)) {
+    return `${field} must be one of: ${allowed.join(", ")}`;
   }
   return null;
 }
@@ -203,6 +283,36 @@ interface SpokeResponse {
 }
 
 /**
+ * Validate embedding configuration fields
+ */
+function validateEmbeddingFields(
+  body: DaemonConfigUpdateBody
+): ValidationResult {
+  const {
+    embeddingProvider,
+    embeddingModel,
+    embeddingBaseUrl,
+    embeddingDimensions,
+  } = body;
+
+  return firstError([
+    validateOneOf(
+      embeddingProvider,
+      "embeddingProvider",
+      VALID_EMBEDDING_PROVIDERS
+    ),
+    validateNonEmptyString(embeddingModel, "embeddingModel"),
+    validateNullableNonEmptyString(embeddingBaseUrl, "embeddingBaseUrl"),
+    validateNullableIntRange(
+      embeddingDimensions,
+      "embeddingDimensions",
+      1,
+      10_000
+    ),
+  ]);
+}
+
+/**
  * Validate daemon configuration update fields
  */
 function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
@@ -220,10 +330,6 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
     connectionDiscoveryLookbackDays,
     connectionDiscoveryCooldownHours,
     semanticSearchThreshold,
-    embeddingProvider,
-    embeddingModel,
-    embeddingBaseUrl,
-    embeddingDimensions,
     reanalysisSchedule,
     connectionDiscoverySchedule,
     patternAggregationSchedule,
@@ -280,51 +386,11 @@ function validateDaemonUpdate(body: DaemonConfigUpdateBody): ValidationResult {
       backfillEmbeddingsSchedule,
       "backfillEmbeddingsSchedule"
     ),
+    // Embedding validations
+    validateEmbeddingFields(body),
   ];
 
-  for (const error of validations) {
-    if (error !== null) {
-      return error;
-    }
-  }
-
-  // Validate embeddingProvider is one of the allowed values
-  if (
-    embeddingProvider !== undefined &&
-    !VALID_EMBEDDING_PROVIDERS.includes(embeddingProvider)
-  ) {
-    return `embeddingProvider must be one of: ${VALID_EMBEDDING_PROVIDERS.join(", ")}`;
-  }
-
-  // Validate embeddingModel is non-empty string
-  if (
-    embeddingModel !== undefined &&
-    (!embeddingModel || typeof embeddingModel !== "string")
-  ) {
-    return "embeddingModel must be a non-empty string";
-  }
-
-  // Validate embeddingBaseUrl is non-empty string or null
-  if (
-    embeddingBaseUrl !== undefined &&
-    embeddingBaseUrl !== null &&
-    (!embeddingBaseUrl || typeof embeddingBaseUrl !== "string")
-  ) {
-    return "embeddingBaseUrl must be a non-empty string or null";
-  }
-
-  // Validate embeddingDimensions is positive integer or null
-  if (embeddingDimensions !== undefined && embeddingDimensions !== null) {
-    if (
-      !Number.isInteger(embeddingDimensions) ||
-      embeddingDimensions < 1 ||
-      embeddingDimensions > 10_000
-    ) {
-      return "embeddingDimensions must be a positive integer between 1 and 10000";
-    }
-  }
-
-  return null;
+  return firstError(validations);
 }
 
 /**
@@ -436,6 +502,28 @@ function applyScheduleUpdates(
 }
 
 /**
+ * Mapping of body field names to raw config field names for simple daemon updates
+ */
+const DAEMON_FIELD_MAP: Record<string, keyof NonNullable<RawConfig["daemon"]>> =
+  {
+    provider: "provider",
+    model: "model",
+    idleTimeoutMinutes: "idle_timeout_minutes",
+    parallelWorkers: "parallel_workers",
+    maxRetries: "max_retries",
+    retryDelaySeconds: "retry_delay_seconds",
+    analysisTimeoutMinutes: "analysis_timeout_minutes",
+    maxConcurrentAnalysis: "max_concurrent_analysis",
+    maxQueueSize: "max_queue_size",
+    backfillLimit: "backfill_limit",
+    reanalysisLimit: "reanalysis_limit",
+    connectionDiscoveryLimit: "connection_discovery_limit",
+    connectionDiscoveryLookbackDays: "connection_discovery_lookback_days",
+    connectionDiscoveryCooldownHours: "connection_discovery_cooldown_hours",
+    semanticSearchThreshold: "semantic_search_threshold",
+  };
+
+/**
  * Apply daemon config updates to raw config object
  */
 function applyDaemonUpdates(
@@ -449,53 +537,13 @@ function applyDaemonUpdates(
 
   const { daemon } = rawConfig;
 
-  // Simple field mappings
-  if (body.provider !== undefined) {
-    daemon.provider = body.provider;
-  }
-  if (body.model !== undefined) {
-    daemon.model = body.model;
-  }
-  if (body.idleTimeoutMinutes !== undefined) {
-    daemon.idle_timeout_minutes = body.idleTimeoutMinutes;
-  }
-  if (body.parallelWorkers !== undefined) {
-    daemon.parallel_workers = body.parallelWorkers;
-  }
-  if (body.maxRetries !== undefined) {
-    daemon.max_retries = body.maxRetries;
-  }
-  if (body.retryDelaySeconds !== undefined) {
-    daemon.retry_delay_seconds = body.retryDelaySeconds;
-  }
-  if (body.analysisTimeoutMinutes !== undefined) {
-    daemon.analysis_timeout_minutes = body.analysisTimeoutMinutes;
-  }
-  if (body.maxConcurrentAnalysis !== undefined) {
-    daemon.max_concurrent_analysis = body.maxConcurrentAnalysis;
-  }
-  if (body.maxQueueSize !== undefined) {
-    daemon.max_queue_size = body.maxQueueSize;
-  }
-  if (body.backfillLimit !== undefined) {
-    daemon.backfill_limit = body.backfillLimit;
-  }
-  if (body.reanalysisLimit !== undefined) {
-    daemon.reanalysis_limit = body.reanalysisLimit;
-  }
-  if (body.connectionDiscoveryLimit !== undefined) {
-    daemon.connection_discovery_limit = body.connectionDiscoveryLimit;
-  }
-  if (body.connectionDiscoveryLookbackDays !== undefined) {
-    daemon.connection_discovery_lookback_days =
-      body.connectionDiscoveryLookbackDays;
-  }
-  if (body.connectionDiscoveryCooldownHours !== undefined) {
-    daemon.connection_discovery_cooldown_hours =
-      body.connectionDiscoveryCooldownHours;
-  }
-  if (body.semanticSearchThreshold !== undefined) {
-    daemon.semantic_search_threshold = body.semanticSearchThreshold;
+  // Apply simple field mappings using lookup table
+  for (const [bodyKey, daemonKey] of Object.entries(DAEMON_FIELD_MAP)) {
+    const value = body[bodyKey as keyof DaemonConfigUpdateBody];
+    if (value !== undefined) {
+      // Use type assertion since we've verified the mapping is correct
+      (daemon as Record<string, unknown>)[daemonKey] = value;
+    }
   }
 
   // Delegate to specialized update functions
@@ -584,42 +632,33 @@ function validatePath(p: string, field: string): ValidationResult {
 }
 
 /**
+ * Validate a directory path field (non-empty string + valid path)
+ */
+function validateDirPath(
+  value: string | undefined,
+  field: string
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  const stringError = validateNonEmptyString(value, field);
+  if (stringError) {
+    return stringError;
+  }
+  return validatePath(value, field);
+}
+
+/**
  * Validate hub configuration update fields
  */
 function validateHubUpdate(body: HubConfigUpdateBody): ValidationResult {
   const { sessionsDir, databaseDir, webUiPort } = body;
 
-  // Validate sessionsDir is non-empty string and valid path
-  if (sessionsDir !== undefined) {
-    if (!sessionsDir || typeof sessionsDir !== "string") {
-      return "sessionsDir must be a non-empty string";
-    }
-    const pathError = validatePath(sessionsDir, "sessionsDir");
-    if (pathError) {
-      return pathError;
-    }
-  }
-
-  // Validate databaseDir is non-empty string and valid path
-  if (databaseDir !== undefined) {
-    if (!databaseDir || typeof databaseDir !== "string") {
-      return "databaseDir must be a non-empty string";
-    }
-    const pathError = validatePath(databaseDir, "databaseDir");
-    if (pathError) {
-      return pathError;
-    }
-  }
-
-  // Validate webUiPort range
-  if (webUiPort !== undefined) {
-    const portError = validateIntRange(webUiPort, "webUiPort", 1024, 65_535);
-    if (portError !== null) {
-      return portError;
-    }
-  }
-
-  return null;
+  return firstError([
+    validateDirPath(sessionsDir, "sessionsDir"),
+    validateDirPath(databaseDir, "databaseDir"),
+    validateIntRange(webUiPort, "webUiPort", 1024, 65_535),
+  ]);
 }
 
 /**
@@ -639,6 +678,27 @@ function validateSpokeName(name: string): ValidationResult {
 }
 
 /**
+ * Validate a string array field
+ */
+function validateStringArray(
+  value: string[] | undefined,
+  field: string
+): ValidationResult {
+  if (value === undefined) {
+    return null;
+  }
+  if (!Array.isArray(value)) {
+    return `${field} must be an array`;
+  }
+  for (const item of value) {
+    if (typeof item !== "string") {
+      return `${field} must be an array of strings`;
+    }
+  }
+  return null;
+}
+
+/**
  * Validate rsync options
  */
 function validateRsyncOptions(
@@ -651,34 +711,11 @@ function validateRsyncOptions(
 
   const { bwLimit, timeoutSeconds, extraArgs } = options;
 
-  if (bwLimit !== undefined) {
-    if (!Number.isInteger(bwLimit) || bwLimit < 0 || bwLimit > 1_000_000) {
-      return `${field}.bwLimit must be an integer between 0 and 1000000`;
-    }
-  }
-
-  if (timeoutSeconds !== undefined) {
-    if (
-      !Number.isInteger(timeoutSeconds) ||
-      timeoutSeconds < 0 ||
-      timeoutSeconds > 86_400
-    ) {
-      return `${field}.timeoutSeconds must be an integer between 0 and 86400`;
-    }
-  }
-
-  if (extraArgs !== undefined) {
-    if (!Array.isArray(extraArgs)) {
-      return `${field}.extraArgs must be an array`;
-    }
-    for (const arg of extraArgs) {
-      if (typeof arg !== "string") {
-        return `${field}.extraArgs must be an array of strings`;
-      }
-    }
-  }
-
-  return null;
+  return firstError([
+    validateIntRange(bwLimit, `${field}.bwLimit`, 0, 1_000_000),
+    validateIntRange(timeoutSeconds, `${field}.timeoutSeconds`, 0, 86_400),
+    validateStringArray(extraArgs, `${field}.extraArgs`),
+  ]);
 }
 
 /**
@@ -694,47 +731,32 @@ function validateSpokeCreate(body: SpokeCreateBody): ValidationResult {
     rsyncOptions,
   } = body;
 
-  // Validate name
-  const nameError = validateSpokeName(name);
-  if (nameError !== null) {
-    return nameError;
+  // Basic validations using helper array
+  const basicErrors = firstError([
+    validateSpokeName(name),
+    validateOneOf(syncMethod, "syncMethod", VALID_SYNC_METHODS),
+    validateDirPath(spokePath, "path"),
+    validateCronSchedule(schedule, "schedule"),
+    validateRsyncOptions(rsyncOptions, "rsyncOptions"),
+  ]);
+
+  if (basicErrors !== null) {
+    return basicErrors;
   }
 
-  // Validate syncMethod
-  if (!syncMethod || !VALID_SYNC_METHODS.includes(syncMethod)) {
+  // Validate syncMethod is provided (required field)
+  if (!syncMethod) {
     return `syncMethod must be one of: ${VALID_SYNC_METHODS.join(", ")}`;
   }
 
-  // Validate path is non-empty string
+  // Validate path is provided (required field)
   if (!spokePath || typeof spokePath !== "string") {
     return "path must be a non-empty string";
   }
 
-  // Validate path exists or has writable parent
-  const pathError = validatePath(spokePath, "path");
-  if (pathError !== null) {
-    return pathError;
-  }
-
   // Validate source for rsync
-  if (syncMethod === "rsync") {
-    if (!source || typeof source !== "string") {
-      return "source is required for rsync sync method";
-    }
-  }
-
-  // Validate schedule is a valid cron expression if provided
-  if (schedule !== undefined && schedule !== null && schedule !== "") {
-    const scheduleError = validateCronSchedule(schedule, "schedule");
-    if (scheduleError !== null) {
-      return scheduleError;
-    }
-  }
-
-  // Validate rsyncOptions
-  const rsyncError = validateRsyncOptions(rsyncOptions, "rsyncOptions");
-  if (rsyncError !== null) {
-    return rsyncError;
+  if (syncMethod === "rsync" && (!source || typeof source !== "string")) {
+    return "source is required for rsync sync method";
   }
 
   return null;
@@ -746,44 +768,169 @@ function validateSpokeCreate(body: SpokeCreateBody): ValidationResult {
 function validateSpokeUpdate(body: SpokeUpdateBody): ValidationResult {
   const { syncMethod, path: spokePath, source, schedule, rsyncOptions } = body;
 
-  // Validate syncMethod if provided
-  if (syncMethod !== undefined && !VALID_SYNC_METHODS.includes(syncMethod)) {
-    return `syncMethod must be one of: ${VALID_SYNC_METHODS.join(", ")}`;
+  return firstError([
+    validateOneOf(syncMethod, "syncMethod", VALID_SYNC_METHODS),
+    validateDirPath(spokePath, "path"),
+    validateNullableNonEmptyString(source, "source"),
+    validateCronSchedule(schedule, "schedule"),
+    rsyncOptions === null
+      ? null
+      : validateRsyncOptions(rsyncOptions, "rsyncOptions"),
+  ]);
+}
+
+// =============================================================================
+// Config File I/O Helpers
+// =============================================================================
+
+/**
+ * Read raw config from YAML file
+ */
+function readRawConfig(): RawConfig {
+  if (!fs.existsSync(DEFAULT_CONFIG_PATH)) {
+    return {};
+  }
+  const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
+  if (!content.trim()) {
+    return {};
+  }
+  return yaml.parse(content) as RawConfig;
+}
+
+/**
+ * Write raw config to YAML file
+ */
+function writeRawConfig(rawConfig: RawConfig): void {
+  const yamlContent = yaml.stringify(rawConfig, {
+    indent: 2,
+    lineWidth: 0,
+  });
+  fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+}
+
+/**
+ * Build raw rsync options from body rsync options
+ */
+function buildRawRsyncOptions(
+  options: RsyncOptionsBody
+): NonNullable<NonNullable<RawConfig["spokes"]>[number]["rsync_options"]> {
+  const raw: NonNullable<
+    NonNullable<RawConfig["spokes"]>[number]["rsync_options"]
+  > = {};
+
+  if (options.bwLimit !== undefined) {
+    raw.bw_limit = options.bwLimit;
+  }
+  if (options.delete !== undefined) {
+    raw.delete = options.delete;
+  }
+  if (options.extraArgs !== undefined) {
+    raw.extra_args = options.extraArgs;
+  }
+  if (options.timeoutSeconds !== undefined) {
+    raw.timeout_seconds = options.timeoutSeconds;
   }
 
-  // Validate path if provided
-  if (spokePath !== undefined) {
-    if (!spokePath || typeof spokePath !== "string") {
-      return "path must be a non-empty string";
+  return raw;
+}
+
+/**
+ * Build raw spoke config from create body
+ */
+function buildRawSpokeFromBody(
+  body: SpokeCreateBody
+): NonNullable<RawConfig["spokes"]>[number] {
+  const rawSpoke: NonNullable<RawConfig["spokes"]>[number] = {
+    name: body.name,
+    sync_method: body.syncMethod,
+    path: body.path,
+    enabled: body.enabled ?? true,
+  };
+
+  if (body.source !== undefined) {
+    rawSpoke.source = body.source;
+  }
+  if (body.schedule !== undefined) {
+    rawSpoke.schedule = body.schedule;
+  }
+  if (body.rsyncOptions !== undefined) {
+    rawSpoke.rsync_options = buildRawRsyncOptions(body.rsyncOptions);
+  }
+
+  return rawSpoke;
+}
+
+/**
+ * Apply rsync options update to raw spoke
+ */
+function applyRsyncOptionsUpdate(
+  rawSpoke: NonNullable<RawConfig["spokes"]>[number],
+  options: RsyncOptionsBody
+): void {
+  if (!rawSpoke.rsync_options) {
+    rawSpoke.rsync_options = {};
+  }
+  const fieldMap: Record<keyof RsyncOptionsBody, string> = {
+    bwLimit: "bw_limit",
+    delete: "delete",
+    extraArgs: "extra_args",
+    timeoutSeconds: "timeout_seconds",
+  };
+  for (const [bodyKey, rawKey] of Object.entries(fieldMap)) {
+    const value = options[bodyKey as keyof RsyncOptionsBody];
+    if (value !== undefined) {
+      (rawSpoke.rsync_options as Record<string, unknown>)[rawKey] = value;
     }
-    const pathError = validatePath(spokePath, "path");
-    if (pathError !== null) {
-      return pathError;
-    }
+  }
+}
+
+/**
+ * Apply a nullable string field (null clears, string sets)
+ */
+function applyNullableField(
+  target: Record<string, unknown>,
+  key: string,
+  value: string | null | undefined
+): void {
+  if (value === undefined) {
+    return;
+  }
+  if (value === null || value === "") {
+    // Remove key by using Reflect.deleteProperty (allowed alternative to dynamic delete)
+    Reflect.deleteProperty(target, key);
+  } else {
+    target[key] = value;
+  }
+}
+
+/**
+ * Apply spoke update fields to raw spoke config
+ */
+function applySpokeUpdates(
+  rawSpoke: NonNullable<RawConfig["spokes"]>[number],
+  body: SpokeUpdateBody
+): void {
+  if (body.syncMethod !== undefined) {
+    rawSpoke.sync_method = body.syncMethod;
+  }
+  if (body.path !== undefined) {
+    rawSpoke.path = body.path;
+  }
+  if (body.enabled !== undefined) {
+    rawSpoke.enabled = body.enabled;
   }
 
-  // Validate source if provided (string or null)
-  if (source !== undefined && source !== null && typeof source !== "string") {
-    return "source must be a string or null";
-  }
+  // Handle nullable fields
+  const target = rawSpoke as unknown as Record<string, unknown>;
+  applyNullableField(target, "source", body.source);
+  applyNullableField(target, "schedule", body.schedule);
 
-  // Validate schedule if provided
-  if (schedule !== undefined && schedule !== null && schedule !== "") {
-    const scheduleError = validateCronSchedule(schedule, "schedule");
-    if (scheduleError !== null) {
-      return scheduleError;
-    }
+  // Handle rsyncOptions specially (null clears, object updates)
+  if (body.rsyncOptions === null) {
+    delete rawSpoke.rsync_options;
+  } else if (body.rsyncOptions !== undefined) {
+    applyRsyncOptionsUpdate(rawSpoke, body.rsyncOptions);
   }
-
-  // Validate rsyncOptions if provided
-  if (rsyncOptions !== null) {
-    const rsyncError = validateRsyncOptions(rsyncOptions, "rsyncOptions");
-    if (rsyncError !== null) {
-      return rsyncError;
-    }
-  }
-
-  return null;
 }
 
 /**
@@ -1442,13 +1589,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = readRawConfig();
 
       // Initialize spokes array if needed
       if (!rawConfig.spokes) {
@@ -1466,45 +1607,13 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Build raw spoke config
-      const rawSpoke: NonNullable<RawConfig["spokes"]>[number] = {
-        name: body.name,
-        sync_method: body.syncMethod,
-        path: body.path,
-        enabled: body.enabled ?? true,
-      };
-
-      if (body.source !== undefined) {
-        rawSpoke.source = body.source;
-      }
-      if (body.schedule !== undefined) {
-        rawSpoke.schedule = body.schedule;
-      }
-      if (body.rsyncOptions !== undefined) {
-        rawSpoke.rsync_options = {};
-        if (body.rsyncOptions.bwLimit !== undefined) {
-          rawSpoke.rsync_options.bw_limit = body.rsyncOptions.bwLimit;
-        }
-        if (body.rsyncOptions.delete !== undefined) {
-          rawSpoke.rsync_options.delete = body.rsyncOptions.delete;
-        }
-        if (body.rsyncOptions.extraArgs !== undefined) {
-          rawSpoke.rsync_options.extra_args = body.rsyncOptions.extraArgs;
-        }
-        if (body.rsyncOptions.timeoutSeconds !== undefined) {
-          rawSpoke.rsync_options.timeout_seconds =
-            body.rsyncOptions.timeoutSeconds;
-        }
-      }
+      const rawSpoke = buildRawSpokeFromBody(body);
 
       // Add to spokes array
       rawConfig.spokes.push(rawSpoke);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      writeRawConfig(rawConfig);
 
       // Reload and return created spoke
       const updatedConfig = loadConfig();
@@ -1553,13 +1662,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       const body = request.body ?? {};
 
       // Check if at least one field is provided
-      const hasAnyField =
-        body.syncMethod !== undefined ||
-        body.path !== undefined ||
-        body.source !== undefined ||
-        body.enabled !== undefined ||
-        body.schedule !== undefined ||
-        body.rsyncOptions !== undefined;
+      const hasAnyField = Object.values(body).some((v) => v !== undefined);
 
       if (!hasAnyField) {
         return reply
@@ -1581,13 +1684,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = readRawConfig();
 
       // Find spoke by name
       if (!rawConfig.spokes) {
@@ -1603,59 +1700,11 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
 
       const rawSpoke = rawConfig.spokes[spokeIndex];
 
-      // Apply updates
-      if (body.syncMethod !== undefined) {
-        rawSpoke.sync_method = body.syncMethod;
-      }
-      if (body.path !== undefined) {
-        rawSpoke.path = body.path;
-      }
-      if (body.source !== undefined) {
-        if (body.source === null) {
-          delete rawSpoke.source;
-        } else {
-          rawSpoke.source = body.source;
-        }
-      }
-      if (body.enabled !== undefined) {
-        rawSpoke.enabled = body.enabled;
-      }
-      if (body.schedule !== undefined) {
-        if (body.schedule === null || body.schedule === "") {
-          delete rawSpoke.schedule;
-        } else {
-          rawSpoke.schedule = body.schedule;
-        }
-      }
-      if (body.rsyncOptions !== undefined) {
-        if (body.rsyncOptions === null) {
-          delete rawSpoke.rsync_options;
-        } else {
-          if (!rawSpoke.rsync_options) {
-            rawSpoke.rsync_options = {};
-          }
-          if (body.rsyncOptions.bwLimit !== undefined) {
-            rawSpoke.rsync_options.bw_limit = body.rsyncOptions.bwLimit;
-          }
-          if (body.rsyncOptions.delete !== undefined) {
-            rawSpoke.rsync_options.delete = body.rsyncOptions.delete;
-          }
-          if (body.rsyncOptions.extraArgs !== undefined) {
-            rawSpoke.rsync_options.extra_args = body.rsyncOptions.extraArgs;
-          }
-          if (body.rsyncOptions.timeoutSeconds !== undefined) {
-            rawSpoke.rsync_options.timeout_seconds =
-              body.rsyncOptions.timeoutSeconds;
-          }
-        }
-      }
+      // Apply updates using helper
+      applySpokeUpdates(rawSpoke, body);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      writeRawConfig(rawConfig);
 
       // Reload and return updated spoke
       const updatedConfig = loadConfig();

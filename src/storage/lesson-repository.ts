@@ -72,25 +72,12 @@ export type LessonsByLevelResult = Record<
 // =============================================================================
 
 /**
- * List lessons with filters and pagination.
- *
- * Supports filtering by:
- * - level (exact match)
- * - project (partial match via nodes table)
- * - tags (AND logic via lesson_tags table)
- * - confidence (exact match)
- *
- * Per specs/api.md GET /api/v1/lessons endpoint.
+ * Build WHERE clause and params from filters
  */
-export function listLessons(
-  db: Database.Database,
-  filters: ListLessonsFilters = {},
-  options: ListLessonsOptions = {}
-): ListLessonsResult {
-  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
-  const offset = Math.max(options.offset ?? 0, 0);
-
-  // Build WHERE clause
+function buildLessonWhereClause(filters: ListLessonsFilters): {
+  whereClause: string;
+  params: (string | number)[];
+} {
   const conditions: string[] = ["1=1"];
   const params: (string | number)[] = [];
 
@@ -118,7 +105,63 @@ export function listLessons(
     params.push(...filters.tags, filters.tags.length);
   }
 
-  const whereClause = conditions.join(" AND ");
+  return { whereClause: conditions.join(" AND "), params };
+}
+
+/**
+ * Fetch tags for a list of lesson IDs and return as a map
+ */
+function fetchLessonTagsMap(
+  db: Database.Database,
+  lessonIds: string[]
+): Map<string, string[]> {
+  const lessonMap = new Map<string, string[]>();
+  if (lessonIds.length === 0) {
+    return lessonMap;
+  }
+
+  const placeholders = lessonIds.map(() => "?").join(", ");
+  const tagsStmt = db.prepare(`
+    SELECT lesson_id, tag FROM lesson_tags
+    WHERE lesson_id IN (${placeholders})
+  `);
+  const allTags = tagsStmt.all(...lessonIds) as {
+    lesson_id: string;
+    tag: string;
+  }[];
+
+  for (const { lesson_id, tag } of allTags) {
+    let tags = lessonMap.get(lesson_id);
+    if (!tags) {
+      tags = [];
+      lessonMap.set(lesson_id, tags);
+    }
+    tags.push(tag);
+  }
+
+  return lessonMap;
+}
+
+/**
+ * List lessons with filters and pagination.
+ *
+ * Supports filtering by:
+ * - level (exact match)
+ * - project (partial match via nodes table)
+ * - tags (AND logic via lesson_tags table)
+ * - confidence (exact match)
+ *
+ * Per specs/api.md GET /api/v1/lessons endpoint.
+ */
+export function listLessons(
+  db: Database.Database,
+  filters: ListLessonsFilters = {},
+  options: ListLessonsOptions = {}
+): ListLessonsResult {
+  const limit = Math.min(Math.max(options.limit ?? 50, 1), 500);
+  const offset = Math.max(options.offset ?? 0, 0);
+
+  const { whereClause, params } = buildLessonWhereClause(filters);
 
   // Count total
   const countStmt = db.prepare(`
@@ -129,7 +172,7 @@ export function listLessons(
   `);
   const total = (countStmt.get(...params) as { count: number }).count;
 
-  // Fetch lessons with tags and project info
+  // Fetch lessons with project info
   const dataStmt = db.prepare(`
     SELECT 
       l.id, l.node_id as nodeId, l.level, l.summary, l.details, l.confidence, l.created_at as createdAt,
@@ -152,28 +195,9 @@ export function listLessons(
     sourceProject: string | null;
   }[];
 
-  // Attach tags to each lesson efficiently
+  // Attach tags to each lesson
   const lessonIds = rows.map((r) => r.id);
-  const lessonMap = new Map<string, string[]>();
-  if (lessonIds.length > 0) {
-    const placeholders = lessonIds.map(() => "?").join(", ");
-    const tagsStmt = db.prepare(`
-      SELECT lesson_id, tag FROM lesson_tags
-      WHERE lesson_id IN (${placeholders})
-    `);
-    const allTags = tagsStmt.all(...lessonIds) as {
-      lesson_id: string;
-      tag: string;
-    }[];
-    for (const { lesson_id, tag } of allTags) {
-      let tags = lessonMap.get(lesson_id);
-      if (!tags) {
-        tags = [];
-        lessonMap.set(lesson_id, tags);
-      }
-      tags.push(tag);
-    }
-  }
+  const lessonMap = fetchLessonTagsMap(db, lessonIds);
 
   const lessons = rows.map((row) => ({
     ...row,

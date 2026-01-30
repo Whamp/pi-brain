@@ -1,6 +1,9 @@
 // extensions/brain-query/index.ts
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type {
+  ExtensionAPI,
+  ExtensionContext,
+} from "@mariozechner/pi-coding-agent";
 
 import { Type } from "@sinclair/typebox";
 import * as fs from "node:fs";
@@ -187,6 +190,141 @@ function parseGenerateCommand(input: string): {
   return { isGenerate: true, model };
 }
 
+/**
+ * Handle flag command: record a manual flag entry
+ */
+function handleFlagCommand(
+  flagResult: { type?: FlagType; message?: string; error?: string },
+  ctx: ExtensionContext,
+  pi: ExtensionAPI
+): void {
+  if (flagResult.error) {
+    ctx.ui.notify(flagResult.error, "error");
+    return;
+  }
+
+  pi.appendEntry("brain_flag", {
+    type: flagResult.type,
+    message: flagResult.message,
+  });
+
+  ctx.ui.notify(`Recorded ${flagResult.type}: ${flagResult.message}`, "info");
+}
+
+/**
+ * Handle generate agents.md command
+ */
+async function handleGenerateCommand(
+  model: string,
+  apiBase: string,
+  ctx: ExtensionContext,
+  pi: ExtensionAPI
+): Promise<void> {
+  ctx.ui.notify(`Generating AGENTS.md for ${model}...`, "info");
+
+  try {
+    const response = await fetch(
+      `${apiBase}/api/v1/agents/generate/${encodeURIComponent(model)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      }
+    );
+
+    const result = (await response.json()) as AgentsGenerateResponse;
+
+    if (result.status === "success") {
+      ctx.ui.notify(`Generated AGENTS.md at ${result.outputPath}`, "info");
+      sendGenerateSuccessMessage(result, pi);
+    } else {
+      ctx.ui.notify(`Failed: ${result.error}`, "error");
+    }
+  } catch (error) {
+    ctx.ui.notify(`Generation failed: ${(error as Error).message}`, "error");
+  }
+}
+
+/**
+ * Send follow-up message with generation stats
+ */
+function sendGenerateSuccessMessage(
+  result: AgentsGenerateResponse,
+  pi: ExtensionAPI
+): void {
+  const { stats } = result;
+  if (!stats) {
+    return;
+  }
+
+  const total =
+    stats.quirksIncluded +
+    stats.winsIncluded +
+    stats.toolErrorsIncluded +
+    stats.failuresIncluded +
+    stats.lessonsIncluded +
+    stats.clustersIncluded;
+
+  pi.sendUserMessage(
+    `AGENTS.md generated for ${result.model} with ${total} insights:\n` +
+      `- Quirks: ${stats.quirksIncluded}\n` +
+      `- Wins: ${stats.winsIncluded}\n` +
+      `- Tool errors: ${stats.toolErrorsIncluded}\n` +
+      `- Failures: ${stats.failuresIncluded}\n` +
+      `- Lessons: ${stats.lessonsIncluded}\n` +
+      `- Friction clusters: ${stats.clustersIncluded}\n\n` +
+      `Output: ${result.outputPath}`,
+    { deliverAs: "followUp" }
+  );
+}
+
+/**
+ * Handle brain query command
+ */
+async function handleQueryCommand(
+  query: string,
+  apiBase: string,
+  ctx: ExtensionContext,
+  pi: ExtensionAPI
+): Promise<void> {
+  try {
+    const response = await fetch(`${apiBase}/api/v1/query`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query,
+        context: {
+          project: ctx.cwd,
+          model: ctx.model
+            ? `${ctx.model.provider}/${ctx.model.id}`
+            : undefined,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = (await response.json()) as BrainQueryResponse;
+
+    if (result.status === "success" && result.data) {
+      ctx.ui.notify(result.data.summary || "Query successful", "info");
+
+      if (result.data.answer) {
+        pi.sendUserMessage(
+          `Based on pi-brain analysis:\n\n${result.data.answer}`,
+          { deliverAs: "followUp" }
+        );
+      }
+    } else {
+      ctx.ui.notify("Query failed: Invalid response format", "error");
+    }
+  } catch (error) {
+    ctx.ui.notify(`Query failed: ${(error as Error).message}`, "error");
+  }
+}
+
 export default function brainExtension(pi: ExtensionAPI) {
   // Read port from config once at startup
   const port = getApiPort();
@@ -211,142 +349,28 @@ export default function brainExtension(pi: ExtensionAPI) {
 
       // Check if this is a --flag command
       const flagResult = parseFlagCommand(input);
-
       if (flagResult.isFlag) {
-        // Handle --flag command
-        if (flagResult.error) {
-          ctx.ui.notify(flagResult.error, "error");
-          return;
-        }
-
-        // Write the flag as a custom entry to the session
-        pi.appendEntry("brain_flag", {
-          type: flagResult.type,
-          message: flagResult.message,
-        });
-
-        ctx.ui.notify(
-          `Recorded ${flagResult.type}: ${flagResult.message}`,
-          "info"
-        );
+        handleFlagCommand(flagResult, ctx, pi);
         return;
       }
 
       // Check if this is a generate agents.md command
       const generateResult = parseGenerateCommand(input);
-
       if (generateResult.isGenerate) {
         if (generateResult.error) {
           ctx.ui.notify(generateResult.error, "error");
           return;
         }
-
-        const modelToGenerate = generateResult.model;
-        if (!modelToGenerate) {
+        if (!generateResult.model) {
           ctx.ui.notify("Missing model name", "error");
           return;
         }
-
-        ctx.ui.notify(`Generating AGENTS.md for ${modelToGenerate}...`, "info");
-
-        try {
-          // Call the agents generate API
-          const response = await fetch(
-            `${API_BASE}/api/v1/agents/generate/${encodeURIComponent(modelToGenerate)}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({}),
-            }
-          );
-
-          const result = (await response.json()) as AgentsGenerateResponse;
-
-          if (result.status === "success") {
-            ctx.ui.notify(
-              `Generated AGENTS.md at ${result.outputPath}`,
-              "info"
-            );
-
-            // Provide details via a follow-up message
-            const { stats } = result;
-            if (stats) {
-              const total =
-                stats.quirksIncluded +
-                stats.winsIncluded +
-                stats.toolErrorsIncluded +
-                stats.failuresIncluded +
-                stats.lessonsIncluded +
-                stats.clustersIncluded;
-
-              pi.sendUserMessage(
-                `AGENTS.md generated for ${result.model} with ${total} insights:\n` +
-                  `- Quirks: ${stats.quirksIncluded}\n` +
-                  `- Wins: ${stats.winsIncluded}\n` +
-                  `- Tool errors: ${stats.toolErrorsIncluded}\n` +
-                  `- Failures: ${stats.failuresIncluded}\n` +
-                  `- Lessons: ${stats.lessonsIncluded}\n` +
-                  `- Friction clusters: ${stats.clustersIncluded}\n\n` +
-                  `Output: ${result.outputPath}`,
-                { deliverAs: "followUp" }
-              );
-            }
-          } else {
-            ctx.ui.notify(`Failed: ${result.error}`, "error");
-          }
-        } catch (error) {
-          ctx.ui.notify(
-            `Generation failed: ${(error as Error).message}`,
-            "error"
-          );
-        }
+        await handleGenerateCommand(generateResult.model, API_BASE, ctx, pi);
         return;
       }
 
       // Otherwise, treat as a query
-      const query = input;
-
-      try {
-        // Query the brain API
-        const response = await fetch(`${API_BASE}/api/v1/query`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            query,
-            context: {
-              project: ctx.cwd,
-              model: ctx.model
-                ? `${ctx.model.provider}/${ctx.model.id}`
-                : undefined,
-            },
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `API Error: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const result = (await response.json()) as BrainQueryResponse;
-
-        // Display summary notification
-        if (result.status === "success" && result.data) {
-          ctx.ui.notify(result.data.summary || "Query successful", "info");
-
-          // Inject detailed answer into conversation as a follow-up message
-          if (result.data.answer) {
-            pi.sendUserMessage(
-              `Based on pi-brain analysis:\n\n${result.data.answer}`,
-              { deliverAs: "followUp" }
-            );
-          }
-        } else {
-          ctx.ui.notify("Query failed: Invalid response format", "error");
-        }
-      } catch (error) {
-        ctx.ui.notify(`Query failed: ${(error as Error).message}`, "error");
-      }
+      await handleQueryCommand(input, API_BASE, ctx, pi);
     },
   });
 

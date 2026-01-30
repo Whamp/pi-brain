@@ -200,6 +200,85 @@ function buildFieldQuery(query: string, fields: SearchField[]): string {
 const escapeRegExp = (str: string) =>
   str.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 
+// =============================================================================
+// Snippet Extraction Helpers
+// =============================================================================
+
+/**
+ * Find the first match position in text for any query word
+ * @internal
+ */
+function findFirstMatchIndex(lowerText: string, queryWords: string[]): number {
+  let matchIndex = -1;
+  for (const word of queryWords) {
+    const idx = lowerText.indexOf(word);
+    if (idx !== -1 && (matchIndex === -1 || idx < matchIndex)) {
+      matchIndex = idx;
+    }
+  }
+  return matchIndex;
+}
+
+/**
+ * Calculate snippet window boundaries, avoiding word breaks
+ * @internal
+ */
+function calculateSnippetBounds(
+  text: string,
+  matchIndex: number,
+  maxLength: number
+): { start: number; end: number } {
+  const halfWindow = Math.floor(maxLength / 2);
+  let start = Math.max(0, matchIndex - halfWindow);
+  let end = Math.min(text.length, matchIndex + halfWindow);
+
+  // Adjust start to avoid cutting words
+  if (start > 0) {
+    const nextSpace = text.indexOf(" ", start);
+    if (nextSpace !== -1 && nextSpace < matchIndex) {
+      start = nextSpace + 1;
+    }
+  }
+
+  // Adjust end to avoid cutting words
+  if (end < text.length) {
+    const prevSpace = text.lastIndexOf(" ", end);
+    if (prevSpace > matchIndex) {
+      end = prevSpace;
+    }
+  }
+
+  return { start, end };
+}
+
+/**
+ * Apply highlight markers and ellipsis to snippet
+ * @internal
+ */
+function formatSnippet(
+  text: string,
+  start: number,
+  end: number,
+  queryWords: string[]
+): string {
+  const pattern = new RegExp(
+    `(${queryWords.map(escapeRegExp).join("|")})`,
+    "gi"
+  );
+
+  let snippet = text.slice(start, end);
+  snippet = snippet.replace(pattern, "<mark>$1</mark>");
+
+  if (start > 0) {
+    snippet = `...${snippet}`;
+  }
+  if (end < text.length) {
+    snippet = `${snippet}...`;
+  }
+
+  return snippet;
+}
+
 /**
  * Extract a highlight snippet from text containing a match
  * @internal
@@ -219,58 +298,15 @@ export function extractSnippet(
     .split(/\s+/)
     .filter((w) => w.length > 0);
 
-  // Find the first matching word
-  let matchIndex = -1;
-  for (const word of queryWords) {
-    const idx = lowerText.indexOf(word);
-    if (idx !== -1 && (matchIndex === -1 || idx < matchIndex)) {
-      matchIndex = idx;
-    }
-  }
+  const matchIndex = findFirstMatchIndex(lowerText, queryWords);
 
+  // No match found - return start of text
   if (matchIndex === -1) {
-    // No match found, return start of text
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   }
 
-  // Calculate snippet window
-  const halfWindow = Math.floor(maxLength / 2);
-  let start = Math.max(0, matchIndex - halfWindow);
-  let end = Math.min(text.length, matchIndex + halfWindow);
-
-  // Adjust to avoid cutting words
-  if (start > 0) {
-    const nextSpace = text.indexOf(" ", start);
-    if (nextSpace !== -1 && nextSpace < matchIndex) {
-      start = nextSpace + 1;
-    }
-  }
-  if (end < text.length) {
-    const prevSpace = text.lastIndexOf(" ", end);
-    if (prevSpace > matchIndex) {
-      end = prevSpace;
-    }
-  }
-
-  // Handle regex characters
-  const pattern = new RegExp(
-    `(${queryWords.map(escapeRegExp).join("|")})`,
-    "gi"
-  );
-
-  let snippet = text.slice(start, end);
-
-  // Highlight terms within the snippet
-  snippet = snippet.replace(pattern, "<mark>$1</mark>");
-
-  if (start > 0) {
-    snippet = `...${snippet}`;
-  }
-  if (end < text.length) {
-    snippet = `${snippet}...`;
-  }
-
-  return snippet;
+  const { start, end } = calculateSnippetBounds(text, matchIndex, maxLength);
+  return formatSnippet(text, start, end, queryWords);
 }
 
 /**

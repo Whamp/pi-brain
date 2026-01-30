@@ -226,73 +226,102 @@ function getFrictionClustersForModel(
 }
 
 /**
+ * Format a section of insights for prompt data
+ */
+function formatInsightSection(
+  title: string,
+  insights: AggregatedInsight[],
+  formatItem: (item: AggregatedInsight) => string[]
+): string[] {
+  if (insights.length === 0) {
+    return [];
+  }
+  const lines = [`## ${title}\n`];
+  for (const insight of insights) {
+    lines.push(...formatItem(insight));
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
+ * Format friction clusters section
+ */
+function formatClusterSection(clusters: Cluster[]): string[] {
+  if (clusters.length === 0) {
+    return [];
+  }
+  const lines = ["## Friction Patterns (from clustering)\n"];
+  for (const cluster of clusters) {
+    lines.push(
+      `- **${cluster.name}**: ${cluster.description ?? "No description"}`
+    );
+    lines.push(`  - Occurrences: ${cluster.nodeCount} sessions`);
+  }
+  lines.push("");
+  return lines;
+}
+
+/**
  * Format model data into a structured prompt for LLM synthesis
  */
 export function formatDataForPrompt(data: ModelInsightData): string {
+  // Quirks with workarounds and frequency
+  const quirkLines = formatInsightSection(
+    "Known Quirks",
+    data.quirks,
+    (quirk) => {
+      const result = [`- **${quirk.pattern}** (seen ${quirk.frequency} times)`];
+      if (quirk.workaround) {
+        result.push(`  - Workaround: ${quirk.workaround}`);
+      }
+      return result;
+    }
+  );
+
+  // Wins with frequency
+  const winLines = formatInsightSection(
+    "Effective Techniques",
+    data.wins,
+    (win) => [`- ${win.pattern} (seen ${win.frequency} times)`]
+  );
+
+  // Tool errors with frequency
+  const toolErrorLines = formatInsightSection(
+    "Common Tool Errors",
+    data.toolErrors,
+    (item) => {
+      const tool = item.tool ? `[${item.tool}] ` : "";
+      return [`- ${tool}${item.pattern} (seen ${item.frequency} times)`];
+    }
+  );
+
+  // Failures with frequency
+  const failureLines = formatInsightSection(
+    "Prompting Failures",
+    data.failures,
+    (failure) => [`- ${failure.pattern} (seen ${failure.frequency} times)`]
+  );
+
+  // Lessons (no frequency)
+  const lessonLines = formatInsightSection(
+    "Learned Lessons",
+    data.lessons,
+    (lesson) => [`- ${lesson.pattern}`]
+  );
+
+  // Friction clusters
+  const clusterLines = formatClusterSection(data.frictionClusters);
+
   const lines: string[] = [
     `# Model Data for ${data.displayName} (${data.model})\n`,
+    ...quirkLines,
+    ...winLines,
+    ...toolErrorLines,
+    ...failureLines,
+    ...lessonLines,
+    ...clusterLines,
   ];
-
-  // Quirks
-  if (data.quirks.length > 0) {
-    lines.push("## Known Quirks\n");
-    for (const quirk of data.quirks) {
-      lines.push(`- **${quirk.pattern}** (seen ${quirk.frequency} times)`);
-      if (quirk.workaround) {
-        lines.push(`  - Workaround: ${quirk.workaround}`);
-      }
-    }
-    lines.push("");
-  }
-
-  // Wins
-  if (data.wins.length > 0) {
-    lines.push("## Effective Techniques\n");
-    for (const win of data.wins) {
-      lines.push(`- ${win.pattern} (seen ${win.frequency} times)`);
-    }
-    lines.push("");
-  }
-
-  // Tool Errors
-  if (data.toolErrors.length > 0) {
-    lines.push("## Common Tool Errors\n");
-    for (const error of data.toolErrors) {
-      const tool = error.tool ? `[${error.tool}] ` : "";
-      lines.push(`- ${tool}${error.pattern} (seen ${error.frequency} times)`);
-    }
-    lines.push("");
-  }
-
-  // Failures
-  if (data.failures.length > 0) {
-    lines.push("## Prompting Failures\n");
-    for (const failure of data.failures) {
-      lines.push(`- ${failure.pattern} (seen ${failure.frequency} times)`);
-    }
-    lines.push("");
-  }
-
-  // Lessons
-  if (data.lessons.length > 0) {
-    lines.push("## Learned Lessons\n");
-    for (const lesson of data.lessons) {
-      lines.push(`- ${lesson.pattern}`);
-    }
-    lines.push("");
-  }
-
-  // Friction Clusters
-  if (data.frictionClusters.length > 0) {
-    lines.push("## Friction Patterns (from clustering)\n");
-    for (const cluster of data.frictionClusters) {
-      lines.push(
-        `- **${cluster.name}**: ${cluster.description ?? "No description"}`
-      );
-      lines.push(`  - Occurrences: ${cluster.nodeCount} sessions`);
-    }
-    lines.push("");
-  }
 
   return lines.join("\n");
 }
@@ -304,51 +333,56 @@ export function formatDataForPrompt(data: ModelInsightData): string {
 export function generateFallbackAgents(data: ModelInsightData): string {
   const totalPatterns =
     data.quirks.length + data.wins.length + data.toolErrors.length;
+
+  // Quirks section (with workarounds, no frequency)
+  const quirkLines = formatInsightSection(
+    "Known Quirks to Avoid",
+    data.quirks,
+    (quirk) => {
+      const result = [`- **${quirk.pattern}**`];
+      if (quirk.workaround) {
+        result.push(`  - Workaround: ${quirk.workaround}`);
+      }
+      return result;
+    }
+  );
+
+  // Effective techniques
+  const winLines = formatInsightSection(
+    "Effective Techniques",
+    data.wins,
+    (win) => [`- ${win.pattern}`]
+  );
+
+  // Tool reminders
+  const toolLines = formatInsightSection(
+    "Tool Usage Reminders",
+    data.toolErrors,
+    (item) => {
+      const tool = item.tool ? `**${item.tool}**: ` : "";
+      return [`- ${tool}${item.pattern}`];
+    }
+  );
+
+  // Friction patterns
+  const frictionLines: string[] = [];
+  if (data.frictionClusters.length > 0) {
+    frictionLines.push("## Common Friction Patterns\n");
+    frictionLines.push("These patterns have been observed causing issues:\n");
+    for (const cluster of data.frictionClusters) {
+      frictionLines.push(`- **${cluster.name}**: ${cluster.description ?? ""}`);
+    }
+    frictionLines.push("");
+  }
+
   const lines: string[] = [
     `# AGENTS.md for ${data.displayName}\n`,
     `Auto-generated guidance based on ${totalPatterns} analyzed patterns.\n`,
+    ...quirkLines,
+    ...winLines,
+    ...toolLines,
+    ...frictionLines,
   ];
-
-  // Quirks section
-  if (data.quirks.length > 0) {
-    lines.push("## Known Quirks to Avoid\n");
-    for (const quirk of data.quirks) {
-      lines.push(`- **${quirk.pattern}**`);
-      if (quirk.workaround) {
-        lines.push(`  - Workaround: ${quirk.workaround}`);
-      }
-    }
-    lines.push("");
-  }
-
-  // Effective techniques
-  if (data.wins.length > 0) {
-    lines.push("## Effective Techniques\n");
-    for (const win of data.wins) {
-      lines.push(`- ${win.pattern}`);
-    }
-    lines.push("");
-  }
-
-  // Tool reminders
-  if (data.toolErrors.length > 0) {
-    lines.push("## Tool Usage Reminders\n");
-    for (const error of data.toolErrors) {
-      const tool = error.tool ? `**${error.tool}**: ` : "";
-      lines.push(`- ${tool}${error.pattern}`);
-    }
-    lines.push("");
-  }
-
-  // Friction patterns
-  if (data.frictionClusters.length > 0) {
-    lines.push("## Common Friction Patterns\n");
-    lines.push("These patterns have been observed causing issues:\n");
-    for (const cluster of data.frictionClusters) {
-      lines.push(`- **${cluster.name}**: ${cluster.description ?? ""}`);
-    }
-    lines.push("");
-  }
 
   return lines.join("\n");
 }

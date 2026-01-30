@@ -294,6 +294,170 @@ export class LeafTracker {
 // Boundary Detection
 // =============================================================================
 
+/** Context for boundary detection */
+interface BoundaryContext {
+  leafTracker: LeafTracker;
+  previousNonMetadataEntry: SessionEntry | null;
+  previousEntryForGap: SessionEntry | null;
+  resumeGapMinutes: number;
+}
+
+/** Check for branch_summary boundary */
+function checkBranchBoundary(entry: SessionEntry): Boundary | null {
+  if (entry.type !== "branch_summary") {
+    return null;
+  }
+  const branchEntry = entry as BranchSummaryEntry;
+  return {
+    type: "branch",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    previousEntryId: branchEntry.fromId,
+    metadata: { summary: branchEntry.summary },
+  };
+}
+
+/** Check for compaction boundary */
+function checkCompactionBoundary(entry: SessionEntry): Boundary | null {
+  if (entry.type !== "compaction") {
+    return null;
+  }
+  const compactionEntry = entry as CompactionEntry;
+  return {
+    type: "compaction",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    metadata: {
+      tokensBefore: compactionEntry.tokensBefore,
+      summary: compactionEntry.summary,
+    },
+  };
+}
+
+/** Check for explicit handoff boundary */
+function checkExplicitHandoff(
+  entry: SessionEntry,
+  leafTracker: LeafTracker
+): Boundary | null {
+  const explicitHandoff = isExplicitHandoffEntry(entry);
+  if (!explicitHandoff.isHandoff) {
+    return null;
+  }
+  return {
+    type: "handoff",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    previousEntryId: leafTracker.getCurrentLeaf() ?? undefined,
+    metadata: { handoffTarget: explicitHandoff.target },
+  };
+}
+
+/** Check for message-based handoff heuristic */
+function checkMessageHandoff(
+  entry: SessionEntry,
+  leafTracker: LeafTracker
+): Boundary | null {
+  if (entry.type !== "message") {
+    return null;
+  }
+  const msgEntry = entry as SessionMessageEntry;
+  const messageText = extractUserMessageText(msgEntry);
+  if (!messageText) {
+    return null;
+  }
+  const handoffTarget = detectHandoffFromMessage(messageText);
+  if (!handoffTarget) {
+    return null;
+  }
+  return {
+    type: "handoff",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    previousEntryId: leafTracker.getPreviousEntryId() ?? undefined,
+    metadata: { handoffTarget },
+  };
+}
+
+/** Check for tree jump boundary */
+function checkTreeJump(
+  entry: SessionEntry,
+  leafTracker: LeafTracker,
+  previousNonMetadataEntry: SessionEntry | null
+): Boundary | null {
+  if (entry.type !== "message") {
+    return null;
+  }
+  const currentLeaf = leafTracker.getCurrentLeaf();
+  const previousWasBranchSummary =
+    previousNonMetadataEntry?.type === "branch_summary";
+  // A tree jump occurs when parent doesn't match expected leaf
+  if (
+    !currentLeaf ||
+    entry.parentId === currentLeaf ||
+    entry.parentId === null ||
+    previousWasBranchSummary
+  ) {
+    return null;
+  }
+  return {
+    type: "tree_jump",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    previousEntryId: currentLeaf,
+    metadata: {
+      expectedParentId: currentLeaf,
+      actualParentId: entry.parentId ?? undefined,
+    },
+  };
+}
+
+/** Check for resume boundary (10+ minute gap) */
+function checkResumeBoundary(
+  entry: SessionEntry,
+  previousEntryForGap: SessionEntry | null,
+  resumeGapMinutes: number
+): Boundary | null {
+  if (!previousEntryForGap) {
+    return null;
+  }
+  const gapMs =
+    new Date(entry.timestamp).getTime() -
+    new Date(previousEntryForGap.timestamp).getTime();
+  const gapMinutes = gapMs / (1000 * 60);
+  // Use >= to match original logic (NaN >= X is false, so NaN gaps are ignored)
+  if (!(gapMinutes >= resumeGapMinutes)) {
+    return null;
+  }
+  return {
+    type: "resume",
+    entryId: entry.id,
+    timestamp: entry.timestamp,
+    previousEntryId: previousEntryForGap.id,
+    metadata: { gapMinutes: Math.round(gapMinutes * 100) / 100 },
+  };
+}
+
+/** Process message entry for handoff and tree jump boundaries */
+function processMessageEntry(
+  entry: SessionEntry,
+  ctx: BoundaryContext
+): Boundary[] {
+  const results: Boundary[] = [];
+  const handoff = checkMessageHandoff(entry, ctx.leafTracker);
+  if (handoff) {
+    results.push(handoff);
+  }
+  const treeJump = checkTreeJump(
+    entry,
+    ctx.leafTracker,
+    ctx.previousNonMetadataEntry
+  );
+  if (treeJump) {
+    results.push(treeJump);
+  }
+  return results;
+}
+
 /**
  * Detect all boundaries in a list of session entries
  *
@@ -308,135 +472,53 @@ export function detectBoundaries(
   const resumeGapMinutes =
     options.resumeGapMinutes ?? DEFAULT_RESUME_GAP_MINUTES;
   const boundaries: Boundary[] = [];
-  const leafTracker = new LeafTracker();
-
-  let previousEntryForGap: SessionEntry | null = null;
-  let previousNonMetadataEntry: SessionEntry | null = null;
+  const ctx: BoundaryContext = {
+    leafTracker: new LeafTracker(),
+    previousNonMetadataEntry: null,
+    previousEntryForGap: null,
+    resumeGapMinutes,
+  };
 
   for (const entry of entries) {
-    // Skip metadata-only entries for boundary detection
     if (METADATA_ENTRY_TYPES.has(entry.type)) {
       continue;
     }
 
-    // 1. Branch summary (explicit tree navigation with summary)
-    if (entry.type === "branch_summary") {
-      const branchEntry = entry as BranchSummaryEntry;
-      boundaries.push({
-        type: "branch",
-        entryId: entry.id,
-        timestamp: entry.timestamp,
-        previousEntryId: branchEntry.fromId,
-        metadata: {
-          summary: branchEntry.summary,
-        },
-      });
-    }
-
-    // 2. Compaction
-    else if (entry.type === "compaction") {
-      const compactionEntry = entry as CompactionEntry;
-      boundaries.push({
-        type: "compaction",
-        entryId: entry.id,
-        timestamp: entry.timestamp,
-        metadata: {
-          tokensBefore: compactionEntry.tokensBefore,
-          summary: compactionEntry.summary,
-        },
-      });
-    }
-
-    // 3. Handoff detection (explicit marker or heuristic)
-    // Check custom entries for explicit handoff markers
-    const explicitHandoff = isExplicitHandoffEntry(entry);
-    if (explicitHandoff.isHandoff) {
-      boundaries.push({
-        type: "handoff",
-        entryId: entry.id,
-        timestamp: entry.timestamp,
-        previousEntryId: leafTracker.getCurrentLeaf() ?? undefined,
-        metadata: {
-          handoffTarget: explicitHandoff.target,
-        },
-      });
-    }
-
-    // 4. Tree jump (parentId doesn't match current leaf)
-    // Only check for message entries since they're the main conversation flow
-    // Skip if the previous entry was a branch_summary (that's already captured as a branch boundary)
-    else if (entry.type === "message") {
-      const msgEntry = entry as SessionMessageEntry;
-      const currentLeaf = leafTracker.getCurrentLeaf();
-      const previousWasBranchSummary =
-        previousNonMetadataEntry?.type === "branch_summary";
-
-      // Check for handoff heuristic in user messages
-      const messageText = extractUserMessageText(msgEntry);
-      if (messageText) {
-        const handoffTarget = detectHandoffFromMessage(messageText);
-        if (handoffTarget) {
-          boundaries.push({
-            type: "handoff",
-            entryId: entry.id,
-            timestamp: entry.timestamp,
-            previousEntryId: leafTracker.getPreviousEntryId() ?? undefined,
-            metadata: {
-              handoffTarget,
-            },
-          });
+    // 1. Branch summary (mutually exclusive with compaction and message checks)
+    const branch = checkBranchBoundary(entry);
+    if (branch) {
+      boundaries.push(branch);
+    } else {
+      // 2. Compaction (mutually exclusive with branch and message checks)
+      const compaction = checkCompactionBoundary(entry);
+      if (compaction) {
+        boundaries.push(compaction);
+      } else {
+        // 3. Explicit handoff (can happen independently)
+        const explicitHandoff = checkExplicitHandoff(entry, ctx.leafTracker);
+        if (explicitHandoff) {
+          boundaries.push(explicitHandoff);
+        } else {
+          // 4. Message-based handoff and tree jump
+          boundaries.push(...processMessageEntry(entry, ctx));
         }
       }
-
-      // A tree jump occurs when:
-      // - We have a current leaf
-      // - The new entry's parent is NOT the current leaf
-      // - The new entry's parent is also NOT null (would be first entry)
-      // - The previous entry was NOT a branch_summary (that's already a branch boundary)
-      if (
-        currentLeaf &&
-        entry.parentId !== currentLeaf &&
-        entry.parentId !== null &&
-        !previousWasBranchSummary
-      ) {
-        boundaries.push({
-          type: "tree_jump",
-          entryId: entry.id,
-          timestamp: entry.timestamp,
-          previousEntryId: currentLeaf,
-          metadata: {
-            expectedParentId: currentLeaf,
-            actualParentId: entry.parentId ?? undefined,
-          },
-        });
-      }
     }
 
-    // 5. Resume detection (10+ minute gap)
-    // Check against the previous non-metadata entry
-    if (previousEntryForGap) {
-      const gapMs =
-        new Date(entry.timestamp).getTime() -
-        new Date(previousEntryForGap.timestamp).getTime();
-      const gapMinutes = gapMs / (1000 * 60);
-
-      if (gapMinutes >= resumeGapMinutes) {
-        boundaries.push({
-          type: "resume",
-          entryId: entry.id,
-          timestamp: entry.timestamp,
-          previousEntryId: previousEntryForGap.id,
-          metadata: {
-            gapMinutes: Math.round(gapMinutes * 100) / 100, // Round to 2 decimal places
-          },
-        });
-      }
+    // 5. Resume detection (independent - always check)
+    const resume = checkResumeBoundary(
+      entry,
+      ctx.previousEntryForGap,
+      resumeGapMinutes
+    );
+    if (resume) {
+      boundaries.push(resume);
     }
 
     // Update tracking state
-    leafTracker.update(entry);
-    previousEntryForGap = entry;
-    previousNonMetadataEntry = entry;
+    ctx.leafTracker.update(entry);
+    ctx.previousEntryForGap = entry;
+    ctx.previousNonMetadataEntry = entry;
   }
 
   return boundaries;

@@ -29,6 +29,84 @@ import {
 const DEFAULT_PORT = 8765;
 
 /**
+ * Handle navigate action
+ */
+async function handleNavigateAction(
+  action: DashboardAction,
+  ctx: ExtensionCommandContext
+): Promise<void> {
+  if (!action.entryId) {
+    ctx.ui.notify("Navigate action missing entryId", "error");
+    return;
+  }
+  try {
+    await ctx.navigateTree(action.entryId, {
+      summarize: action.summarize ?? false,
+    });
+    ctx.ui.notify(`Navigated to ${action.entryId.slice(0, 8)}...`, "info");
+  } catch (error) {
+    ctx.ui.notify(`Navigation failed: ${error}`, "error");
+  }
+}
+
+/**
+ * Handle fork action
+ */
+async function handleForkAction(
+  action: DashboardAction,
+  ctx: ExtensionCommandContext
+): Promise<void> {
+  if (!action.entryId) {
+    ctx.ui.notify("Fork action missing entryId", "error");
+    return;
+  }
+  try {
+    await ctx.fork(action.entryId);
+    ctx.ui.notify(`Forked from ${action.entryId.slice(0, 8)}...`, "info");
+  } catch (error) {
+    ctx.ui.notify(`Fork failed: ${error}`, "error");
+  }
+}
+
+/**
+ * Handle switch action
+ */
+function handleSwitchAction(
+  action: DashboardAction,
+  ctx: ExtensionCommandContext,
+  pi: ExtensionAPI
+): void {
+  if (!action.sessionPath) {
+    ctx.ui.notify("Switch action missing sessionPath", "error");
+    return;
+  }
+  pi.sendUserMessage(`/resume ${action.sessionPath}`, { deliverAs: "steer" });
+  ctx.ui.notify("Switching to session...", "info");
+}
+
+/**
+ * Handle summarize action
+ */
+async function handleSummarizeAction(
+  action: DashboardAction,
+  ctx: ExtensionCommandContext
+): Promise<void> {
+  if (!action.entryId) {
+    ctx.ui.notify("Summarize action missing entryId", "error");
+    return;
+  }
+  try {
+    await ctx.navigateTree(action.entryId, { summarize: true });
+    ctx.ui.notify(
+      `Summarized and navigated to ${action.entryId.slice(0, 8)}...`,
+      "info"
+    );
+  } catch (error) {
+    ctx.ui.notify(`Summarization failed: ${error}`, "error");
+  }
+}
+
+/**
  * Build session data for the dashboard
  */
 function buildSessionData(ctx: ExtensionContext) {
@@ -204,76 +282,21 @@ export default function dashboardExtension(pi: ExtensionAPI) {
 
       switch (action.type) {
         case "navigate": {
-          if (!action.entryId) {
-            ctx.ui.notify("Navigate action missing entryId", "error");
-            return;
-          }
-          try {
-            await ctx.navigateTree(action.entryId, {
-              summarize: action.summarize ?? false,
-            });
-            ctx.ui.notify(
-              `Navigated to ${action.entryId.slice(0, 8)}...`,
-              "info"
-            );
-          } catch (error) {
-            ctx.ui.notify(`Navigation failed: ${error}`, "error");
-          }
+          await handleNavigateAction(action, ctx);
           break;
         }
-
         case "fork": {
-          if (!action.entryId) {
-            ctx.ui.notify("Fork action missing entryId", "error");
-            return;
-          }
-          try {
-            await ctx.fork(action.entryId);
-            ctx.ui.notify(
-              `Forked from ${action.entryId.slice(0, 8)}...`,
-              "info"
-            );
-          } catch (error) {
-            ctx.ui.notify(`Fork failed: ${error}`, "error");
-          }
+          await handleForkAction(action, ctx);
           break;
         }
-
         case "switch": {
-          // Session switching via /resume command
-          if (!action.sessionPath) {
-            ctx.ui.notify("Switch action missing sessionPath", "error");
-            return;
-          }
-          // Use pi.sendUserMessage to trigger /resume command
-          // This switches to the specified session
-          pi.sendUserMessage(`/resume ${action.sessionPath}`, {
-            deliverAs: "steer",
-          });
-          ctx.ui.notify(`Switching to session...`, "info");
+          handleSwitchAction(action, ctx, pi);
           break;
         }
-
         case "summarize": {
-          // Standalone summarization of a branch
-          if (!action.entryId) {
-            ctx.ui.notify("Summarize action missing entryId", "error");
-            return;
-          }
-          // Navigate to the entry with summarize flag
-          // This uses Pi's built-in summarization during navigation
-          try {
-            await ctx.navigateTree(action.entryId, { summarize: true });
-            ctx.ui.notify(
-              `Summarized and navigated to ${action.entryId.slice(0, 8)}...`,
-              "info"
-            );
-          } catch (error) {
-            ctx.ui.notify(`Summarization failed: ${error}`, "error");
-          }
+          await handleSummarizeAction(action, ctx);
           break;
         }
-
         default: {
           ctx.ui.notify(`Unknown action type: ${action.type}`, "error");
           break;

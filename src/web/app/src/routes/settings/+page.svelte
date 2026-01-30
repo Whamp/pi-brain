@@ -243,66 +243,100 @@
     loading = false;
   });
 
+  function applyCoreConfig(config: Awaited<ReturnType<typeof api.getDaemonConfig>>) {
+    ({ provider } = config);
+    ({ model } = config);
+    ({ idleTimeoutMinutes } = config);
+    ({ parallelWorkers } = config);
+    maxRetries = config.maxRetries ?? 3;
+    retryDelaySeconds = config.retryDelaySeconds ?? 60;
+    analysisTimeoutMinutes = config.analysisTimeoutMinutes ?? 10;
+    maxConcurrentAnalysis = config.maxConcurrentAnalysis ?? 1;
+    maxQueueSize = config.maxQueueSize ?? 100;
+  }
+
+  function applyConnectionConfig(config: Awaited<ReturnType<typeof api.getDaemonConfig>>) {
+    backfillLimit = config.backfillLimit ?? 50;
+    reanalysisLimit = config.reanalysisLimit ?? 20;
+    connectionDiscoveryLimit = config.connectionDiscoveryLimit ?? 20;
+    connectionDiscoveryLookbackDays = config.connectionDiscoveryLookbackDays ?? 7;
+    connectionDiscoveryCooldownHours = config.connectionDiscoveryCooldownHours ?? 24;
+    semanticSearchThreshold = config.semanticSearchThreshold ?? 0.6;
+  }
+
+  function applyEmbeddingConfig(config: Awaited<ReturnType<typeof api.getDaemonConfig>>) {
+    embeddingProvider = config.embeddingProvider ?? "ollama";
+    embeddingModel = config.embeddingModel ?? "nomic-embed-text";
+    hasApiKey = config.hasApiKey ?? false;
+    embeddingBaseUrl = config.embeddingBaseUrl ?? "";
+    embeddingDimensions = config.embeddingDimensions ?? null;
+    embeddingApiKey = ""; // Always clear - write-only field
+  }
+
+  function applyScheduleConfig(config: Awaited<ReturnType<typeof api.getDaemonConfig>>) {
+    reanalysisSchedule = config.reanalysisSchedule ?? config.defaults.reanalysisSchedule;
+    connectionDiscoverySchedule = config.connectionDiscoverySchedule ?? config.defaults.connectionDiscoverySchedule;
+    patternAggregationSchedule = config.patternAggregationSchedule ?? config.defaults.patternAggregationSchedule;
+    clusteringSchedule = config.clusteringSchedule ?? config.defaults.clusteringSchedule;
+    backfillEmbeddingsSchedule = config.backfillEmbeddingsSchedule ?? config.defaults.backfillEmbeddingsSchedule;
+  }
+
+  function applyDaemonConfig(config: Awaited<ReturnType<typeof api.getDaemonConfig>>) {
+    applyCoreConfig(config);
+    applyConnectionConfig(config);
+    applyEmbeddingConfig(config);
+    applyScheduleConfig(config);
+  }
+
+  function storeOriginalCoreConfig() {
+    originalProvider = provider;
+    originalModel = model;
+    originalIdleTimeoutMinutes = idleTimeoutMinutes;
+    originalParallelWorkers = parallelWorkers;
+    originalMaxRetries = maxRetries;
+    originalRetryDelaySeconds = retryDelaySeconds;
+    originalAnalysisTimeoutMinutes = analysisTimeoutMinutes;
+    originalMaxConcurrentAnalysis = maxConcurrentAnalysis;
+    originalMaxQueueSize = maxQueueSize;
+  }
+
+  function storeOriginalConnectionConfig() {
+    originalBackfillLimit = backfillLimit;
+    originalReanalysisLimit = reanalysisLimit;
+    originalConnectionDiscoveryLimit = connectionDiscoveryLimit;
+    originalConnectionDiscoveryLookbackDays = connectionDiscoveryLookbackDays;
+    originalConnectionDiscoveryCooldownHours = connectionDiscoveryCooldownHours;
+    originalSemanticSearchThreshold = semanticSearchThreshold;
+  }
+
+  function storeOriginalEmbeddingConfig() {
+    originalEmbeddingProvider = embeddingProvider;
+    originalEmbeddingModel = embeddingModel;
+    originalHasApiKey = hasApiKey;
+    originalEmbeddingBaseUrl = embeddingBaseUrl;
+    originalEmbeddingDimensions = embeddingDimensions;
+  }
+
+  function storeOriginalScheduleConfig() {
+    originalReanalysisSchedule = reanalysisSchedule;
+    originalConnectionDiscoverySchedule = connectionDiscoverySchedule;
+    originalPatternAggregationSchedule = patternAggregationSchedule;
+    originalClusteringSchedule = clusteringSchedule;
+    originalBackfillEmbeddingsSchedule = backfillEmbeddingsSchedule;
+  }
+
+  function storeOriginalDaemonConfig() {
+    storeOriginalCoreConfig();
+    storeOriginalConnectionConfig();
+    storeOriginalEmbeddingConfig();
+    storeOriginalScheduleConfig();
+  }
+
   async function loadConfig() {
     try {
       const config = await api.getDaemonConfig();
-      ({ provider } = config);
-      ({ model } = config);
-      ({ idleTimeoutMinutes } = config);
-      ({ parallelWorkers } = config);
-      maxRetries = config.maxRetries ?? 3;
-      retryDelaySeconds = config.retryDelaySeconds ?? 60;
-      analysisTimeoutMinutes = config.analysisTimeoutMinutes ?? 10;
-      maxConcurrentAnalysis = config.maxConcurrentAnalysis ?? 1;
-      maxQueueSize = config.maxQueueSize ?? 100;
-      backfillLimit = config.backfillLimit ?? 50;
-      reanalysisLimit = config.reanalysisLimit ?? 20;
-      connectionDiscoveryLimit = config.connectionDiscoveryLimit ?? 20;
-      connectionDiscoveryLookbackDays = config.connectionDiscoveryLookbackDays ?? 7;
-      connectionDiscoveryCooldownHours = config.connectionDiscoveryCooldownHours ?? 24;
-      semanticSearchThreshold = config.semanticSearchThreshold ?? 0.6;
-
-      // Embedding config
-      embeddingProvider = config.embeddingProvider ?? "ollama";
-      embeddingModel = config.embeddingModel ?? "nomic-embed-text";
-      hasApiKey = config.hasApiKey ?? false;
-      embeddingBaseUrl = config.embeddingBaseUrl ?? "";
-      embeddingDimensions = config.embeddingDimensions ?? null;
-      embeddingApiKey = ""; // Always clear - write-only field
-
-      // Schedule config
-      reanalysisSchedule = config.reanalysisSchedule ?? config.defaults.reanalysisSchedule;
-      connectionDiscoverySchedule = config.connectionDiscoverySchedule ?? config.defaults.connectionDiscoverySchedule;
-      patternAggregationSchedule = config.patternAggregationSchedule ?? config.defaults.patternAggregationSchedule;
-      clusteringSchedule = config.clusteringSchedule ?? config.defaults.clusteringSchedule;
-      backfillEmbeddingsSchedule = config.backfillEmbeddingsSchedule ?? config.defaults.backfillEmbeddingsSchedule;
-
-      // Store originals
-      originalProvider = provider;
-      originalModel = model;
-      originalIdleTimeoutMinutes = idleTimeoutMinutes;
-      originalParallelWorkers = parallelWorkers;
-      originalMaxRetries = maxRetries;
-      originalRetryDelaySeconds = retryDelaySeconds;
-      originalAnalysisTimeoutMinutes = analysisTimeoutMinutes;
-      originalMaxConcurrentAnalysis = maxConcurrentAnalysis;
-      originalMaxQueueSize = maxQueueSize;
-      originalBackfillLimit = backfillLimit;
-      originalReanalysisLimit = reanalysisLimit;
-      originalConnectionDiscoveryLimit = connectionDiscoveryLimit;
-      originalConnectionDiscoveryLookbackDays = connectionDiscoveryLookbackDays;
-      originalConnectionDiscoveryCooldownHours = connectionDiscoveryCooldownHours;
-      originalSemanticSearchThreshold = semanticSearchThreshold;
-      originalEmbeddingProvider = embeddingProvider;
-      originalEmbeddingModel = embeddingModel;
-      originalHasApiKey = hasApiKey;
-      originalEmbeddingBaseUrl = embeddingBaseUrl;
-      originalEmbeddingDimensions = embeddingDimensions;
-      originalReanalysisSchedule = reanalysisSchedule;
-      originalConnectionDiscoverySchedule = connectionDiscoverySchedule;
-      originalPatternAggregationSchedule = patternAggregationSchedule;
-      originalClusteringSchedule = clusteringSchedule;
-      originalBackfillEmbeddingsSchedule = backfillEmbeddingsSchedule;
+      applyDaemonConfig(config);
+      storeOriginalDaemonConfig();
     } catch (error) {
       console.error("Failed to load config:", error);
       toastStore.error(

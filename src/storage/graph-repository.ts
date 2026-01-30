@@ -75,6 +75,115 @@ export interface ConnectedNodesResult {
 }
 
 // =============================================================================
+// Traversal Helpers
+// =============================================================================
+
+interface EdgeWithDirection {
+  edge: EdgeRow;
+  edgeDirection: "incoming" | "outgoing";
+}
+
+/**
+ * Get edges to process based on traversal direction
+ * @internal
+ */
+function getEdgesToProcess(
+  db: Database.Database,
+  nodeId: string,
+  direction: TraversalDirection
+): EdgeWithDirection[] {
+  const edgesToProcess: EdgeWithDirection[] = [];
+
+  if (direction === "outgoing" || direction === "both") {
+    const outgoing = getEdgesFrom(db, nodeId);
+    for (const edge of outgoing) {
+      edgesToProcess.push({ edge, edgeDirection: "outgoing" });
+    }
+  }
+
+  if (direction === "incoming" || direction === "both") {
+    const incoming = getEdgesTo(db, nodeId);
+    for (const edge of incoming) {
+      edgesToProcess.push({ edge, edgeDirection: "incoming" });
+    }
+  }
+
+  return edgesToProcess;
+}
+
+/**
+ * Convert EdgeRow to TraversalEdge
+ * @internal
+ */
+function toTraversalEdge(
+  edge: EdgeRow,
+  edgeDirection: "incoming" | "outgoing",
+  hopDistance: number
+): TraversalEdge {
+  return {
+    id: edge.id,
+    sourceNodeId: edge.source_node_id,
+    targetNodeId: edge.target_node_id,
+    type: edge.type as EdgeType,
+    metadata: edge.metadata ? JSON.parse(edge.metadata) : {},
+    direction: edgeDirection,
+    hopDistance,
+  };
+}
+
+/**
+ * Process a single edge during traversal
+ * @internal
+ */
+function processEdge(
+  edgeInfo: EdgeWithDirection,
+  currentHop: number,
+  edgeTypes: EdgeType[] | undefined,
+  visitedNodeIds: Set<string>,
+  traversalEdges: TraversalEdge[],
+  nextFrontier: Set<string>
+): void {
+  const { edge, edgeDirection } = edgeInfo;
+
+  // Apply edge type filter if specified
+  if (edgeTypes && !edgeTypes.includes(edge.type as EdgeType)) {
+    return;
+  }
+
+  // Determine the "other" node in this edge
+  const otherNodeId =
+    edgeDirection === "outgoing" ? edge.target_node_id : edge.source_node_id;
+
+  // Add edge if not seen (deduplicate by edge ID)
+  if (!traversalEdges.some((te) => te.id === edge.id)) {
+    traversalEdges.push(toTraversalEdge(edge, edgeDirection, currentHop));
+  }
+
+  // Add to next frontier if not visited
+  if (!visitedNodeIds.has(otherNodeId)) {
+    visitedNodeIds.add(otherNodeId);
+    nextFrontier.add(otherNodeId);
+  }
+}
+
+/**
+ * Fetch node data for a list of node IDs
+ * @internal
+ */
+function fetchNodes(db: Database.Database, nodeIds: string[]): NodeRow[] {
+  if (nodeIds.length === 0) {
+    return [];
+  }
+  const placeholders = nodeIds.map(() => "?").join(", ");
+  const stmt = db.prepare(`
+    SELECT * FROM nodes
+    WHERE id IN (${placeholders})
+    ORDER BY timestamp DESC
+  `);
+  return stmt.all(...nodeIds) as NodeRow[];
+}
+
+// =============================================================================
 // Graph Traversal Functions
 // =============================================================================
 
@@ -117,95 +226,42 @@ export function getConnectedNodes(
   const direction = options.direction ?? "both";
   const { edgeTypes } = options;
 
-  // Track visited nodes and edges to avoid duplicates in multi-hop traversal
-  const visitedNodeIds = new Set<string>([nodeId]); // Root already "visited"
+  // Track visited nodes and edges
+  const visitedNodeIds = new Set<string>([nodeId]);
   const traversalEdges: TraversalEdge[] = [];
 
-  // BFS frontier: nodes to explore at each depth level
+  // BFS frontier
   let currentFrontier = new Set<string>([nodeId]);
 
   // Traverse up to requested depth
   for (let currentHop = 1; currentHop <= depth; currentHop++) {
     if (currentFrontier.size === 0) {
-      break; // No more nodes to explore
+      break;
     }
 
     const nextFrontier = new Set<string>();
 
-    // Process each node in the current frontier
     for (const currentNodeId of currentFrontier) {
-      // Get edges based on direction
-      const edgesToProcess: {
-        edge: EdgeRow;
-        edgeDirection: "incoming" | "outgoing";
-      }[] = [];
+      const edgesToProcess = getEdgesToProcess(db, currentNodeId, direction);
 
-      if (direction === "outgoing" || direction === "both") {
-        const outgoing = getEdgesFrom(db, currentNodeId);
-        for (const edge of outgoing) {
-          edgesToProcess.push({ edge, edgeDirection: "outgoing" });
-        }
-      }
-
-      if (direction === "incoming" || direction === "both") {
-        const incoming = getEdgesTo(db, currentNodeId);
-        for (const edge of incoming) {
-          edgesToProcess.push({ edge, edgeDirection: "incoming" });
-        }
-      }
-
-      // Process each edge
-      for (const { edge, edgeDirection } of edgesToProcess) {
-        // Apply edge type filter if specified
-        if (edgeTypes && !edgeTypes.includes(edge.type as EdgeType)) {
-          continue;
-        }
-
-        // Determine the "other" node in this edge
-        const otherNodeId =
-          edgeDirection === "outgoing"
-            ? edge.target_node_id
-            : edge.source_node_id;
-
-        // Add the edge to results if we haven't seen it yet
-        // Note: multiple edges might exist between the same nodes
-        if (!traversalEdges.some((te) => te.id === edge.id)) {
-          traversalEdges.push({
-            id: edge.id,
-            sourceNodeId: edge.source_node_id,
-            targetNodeId: edge.target_node_id,
-            type: edge.type as EdgeType,
-            metadata: edge.metadata ? JSON.parse(edge.metadata) : {},
-            direction: edgeDirection,
-            hopDistance: currentHop,
-          });
-        }
-
-        // Add to next frontier if we haven't visited this node yet
-        if (!visitedNodeIds.has(otherNodeId)) {
-          visitedNodeIds.add(otherNodeId);
-          nextFrontier.add(otherNodeId);
-        }
+      for (const edgeInfo of edgesToProcess) {
+        processEdge(
+          edgeInfo,
+          currentHop,
+          edgeTypes,
+          visitedNodeIds,
+          traversalEdges,
+          nextFrontier
+        );
       }
     }
 
     currentFrontier = nextFrontier;
   }
 
-  // Collect all connected node IDs (excluding root)
+  // Collect connected node IDs (excluding root)
   const connectedNodeIds = [...visitedNodeIds].filter((id) => id !== nodeId);
-
-  // Fetch node data for all connected nodes
-  let nodes: NodeRow[] = [];
-  if (connectedNodeIds.length > 0) {
-    const placeholders = connectedNodeIds.map(() => "?").join(", ");
-    const stmt = db.prepare(`
-      SELECT * FROM nodes
-      WHERE id IN (${placeholders})
-      ORDER BY timestamp DESC
-    `);
-    nodes = stmt.all(...connectedNodeIds) as NodeRow[];
-  }
+  const nodes = fetchNodes(db, connectedNodeIds);
 
   return {
     rootNodeId: nodeId,
@@ -251,17 +307,7 @@ export function getSubgraph(
   }
 
   // Fetch all nodes (including roots)
-  const nodeIdsArray = [...allNodeIds];
-  let nodes: NodeRow[] = [];
-  if (nodeIdsArray.length > 0) {
-    const placeholders = nodeIdsArray.map(() => "?").join(", ");
-    const stmt = db.prepare(`
-      SELECT * FROM nodes
-      WHERE id IN (${placeholders})
-      ORDER BY timestamp DESC
-    `);
-    nodes = stmt.all(...nodeIdsArray) as NodeRow[];
-  }
+  const nodes = fetchNodes(db, [...allNodeIds]);
 
   return {
     rootNodeId: rootNodeIds[0], // Use first root as "primary"

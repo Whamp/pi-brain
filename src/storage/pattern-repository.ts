@@ -196,6 +196,18 @@ export interface ListInsightsOptions {
   promptIncluded?: boolean;
 }
 
+/**
+ * Convert promptIncluded boolean to database integer representation
+ */
+function toPromptIncludedParam(
+  promptIncluded: boolean | undefined
+): number | null {
+  if (promptIncluded === undefined) {
+    return null;
+  }
+  return promptIncluded ? 1 : 0;
+}
+
 export function listInsights(
   db: Database.Database,
   options: ListInsightsOptions = {}
@@ -227,11 +239,7 @@ export function listInsights(
   const typeParam = type ?? null;
   const modelParam = model ?? null;
   const toolParam = tool ?? null;
-
-  let promptIncludedParam: number | null = null;
-  if (promptIncluded !== undefined) {
-    promptIncludedParam = promptIncluded ? 1 : 0;
-  }
+  const promptIncludedParam = toPromptIncludedParam(promptIncluded);
 
   const rows = stmt.all(
     minFrequency,
@@ -309,11 +317,7 @@ export function countInsights(
 
   const typeParam = type ?? null;
   const modelParam = model ?? null;
-
-  let promptIncludedParam: number | null = null;
-  if (promptIncluded !== undefined) {
-    promptIncludedParam = promptIncluded ? 1 : 0;
-  }
+  const promptIncludedParam = toPromptIncludedParam(promptIncluded);
 
   const result = stmt.get(
     typeParam,

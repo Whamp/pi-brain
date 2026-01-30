@@ -122,7 +122,6 @@ export async function processQuery(
 
   logger.info(`Processing query: "${request.query.slice(0, 100)}..."`);
 
-  // Step 1: Search for relevant nodes (Hybrid Search)
   const relevantNodes = await findRelevantNodes(
     config.db,
     request.query,
@@ -134,46 +133,23 @@ export async function processQuery(
 
   logger.info(`Found ${relevantNodes.length} relevant nodes`);
 
-  // Step 2: If no nodes found, return early
   if (relevantNodes.length === 0) {
-    return {
-      answer:
-        "I couldn't find any sessions in the knowledge graph matching your query. " +
-        "This could mean:\n" +
-        "- The work hasn't been done yet\n" +
-        "- Sessions haven't been analyzed yet\n" +
-        "- Try rephrasing your question with different terms",
-      summary: "No matching sessions found",
-      confidence: "high",
-      relatedNodes: [],
-      sources: [],
-    };
+    return buildNoResultsResponse();
   }
 
-  // Step 3: Find context bridges (multi-hop paths)
-  let bridgePaths: BridgePath[] = [];
-  if (request.options?.enableBridgeDiscovery !== false) {
-    // Use top 3 relevant nodes as seeds
-    const seedNodeIds = relevantNodes.slice(0, 3).map((n) => n.id);
-    bridgePaths = findBridgePaths(config.db, seedNodeIds, {
-      maxDepth: 2,
-      limit: 5,
-      minScore: 0.1,
-    });
+  const bridgePaths = discoverBridgePaths(
+    config.db,
+    relevantNodes,
+    request.options?.enableBridgeDiscovery,
+    logger
+  );
 
-    if (bridgePaths.length > 0) {
-      logger.info(`Found ${bridgePaths.length} bridge paths for context`);
-    }
-  }
-
-  // Step 4: Check for model quirks and tool errors if query seems related
   const additionalContext = gatherAdditionalContext(
     config.db,
     request.query,
     logger
   );
 
-  // Step 5: Invoke pi agent to synthesize answer
   const result = await invokeQueryAgent(
     request.query,
     relevantNodes,
@@ -185,29 +161,83 @@ export async function processQuery(
 
   if (!result.success || !result.response) {
     logger.error(`Query agent failed: ${result.error}`);
-    return {
-      answer: `Failed to process query: ${result.error}`,
-      summary: "Query processing failed",
-      confidence: "low",
-      relatedNodes: relevantNodes.map((n) => ({
-        id: n.id,
-        relevance: 0.5,
-        summary: n.summary,
-      })),
-      sources: [],
-    };
+    return buildFailedQueryResponse(result.error, relevantNodes);
   }
 
-  // Step 5: Enhance response with node metadata
   const { response } = result;
   response.relatedNodes = relevantNodes.map((n, idx) => ({
     id: n.id,
-    relevance: Math.max(0.1, 1 - idx * 0.1), // Simple relevance decay, min 0.1
+    relevance: Math.max(0.1, 1 - idx * 0.1),
     summary: n.summary,
   }));
 
   logger.info(`Query completed in ${result.durationMs}ms`);
   return response;
+}
+
+/**
+ * Build response when no matching sessions found
+ */
+function buildNoResultsResponse(): QueryResponse {
+  return {
+    answer:
+      "I couldn't find any sessions in the knowledge graph matching your query. " +
+      "This could mean:\n" +
+      "- The work hasn't been done yet\n" +
+      "- Sessions haven't been analyzed yet\n" +
+      "- Try rephrasing your question with different terms",
+    summary: "No matching sessions found",
+    confidence: "high",
+    relatedNodes: [],
+    sources: [],
+  };
+}
+
+/**
+ * Build response when query agent fails
+ */
+function buildFailedQueryResponse(
+  error: string | undefined,
+  relevantNodes: RelevantNode[]
+): QueryResponse {
+  return {
+    answer: `Failed to process query: ${error}`,
+    summary: "Query processing failed",
+    confidence: "low",
+    relatedNodes: relevantNodes.map((n) => ({
+      id: n.id,
+      relevance: 0.5,
+      summary: n.summary,
+    })),
+    sources: [],
+  };
+}
+
+/**
+ * Discover bridge paths if enabled
+ */
+function discoverBridgePaths(
+  db: Database,
+  relevantNodes: RelevantNode[],
+  enableBridgeDiscovery: boolean | undefined,
+  logger: ProcessorLogger
+): BridgePath[] {
+  if (enableBridgeDiscovery === false) {
+    return [];
+  }
+
+  const seedNodeIds = relevantNodes.slice(0, 3).map((n) => n.id);
+  const bridgePaths = findBridgePaths(db, seedNodeIds, {
+    maxDepth: 2,
+    limit: 5,
+    minScore: 0.1,
+  });
+
+  if (bridgePaths.length > 0) {
+    logger.info(`Found ${bridgePaths.length} bridge paths for context`);
+  }
+
+  return bridgePaths;
 }
 
 // =============================================================================
@@ -241,27 +271,17 @@ async function findRelevantNodes(
     ? { project }
     : undefined;
 
-  // Generate embedding if provider available
-  let queryEmbedding: number[] | undefined;
-  if (embeddingProvider && isVecLoaded(db)) {
-    try {
-      const [embedding] = await embeddingProvider.embed([query]);
-      if (embedding) {
-        queryEmbedding = [...embedding]; // Convert Float32Array to number[]
-      }
-    } catch (error) {
-      logger.warn(
-        `Embedding generation failed: ${error instanceof Error ? error.message : String(error)}`
-      );
-    }
-  }
+  const queryEmbedding = await generateQueryEmbedding(
+    db,
+    query,
+    embeddingProvider,
+    logger
+  );
 
-  // Perform Hybrid Search
   const searchResponse = hybridSearch(db, query, {
     limit: maxNodes,
     filters,
     queryEmbedding,
-    // Add archived filter handling implicitly via options if needed, defaults to false
   });
 
   if (searchResponse.results.length > 0) {
@@ -275,33 +295,63 @@ async function findRelevantNodes(
     }));
   }
 
-  // Fallback: list recent nodes if absolutely nothing found (and no query provided? No, query is required)
-  // If hybrid search returns nothing (e.g. strict filters or no matches), we might just return empty.
-  // The original logic fell back to recent nodes if search failed.
-  // Hybrid search handles "no matches" by returning empty.
-  // Let's keep the fallback for now if query was empty-ish or something went wrong?
-  // Actually, hybrid search with empty query + filters acts as a list.
-  // But hybridSearch requires non-empty query OR embedding OR filters.
-  // If we have filters but no query/embedding, hybridSearch might work if designed so.
-  // Looking at hybridSearch impl: "If no candidates at all, return empty".
-  // Candidates come from vector search OR FTS.
-  // If no query and no embedding, no candidates.
+  return fallbackToRecentNodes(
+    db,
+    query,
+    queryEmbedding,
+    project,
+    maxNodes,
+    logger
+  );
+}
 
-  if (!query && !queryEmbedding) {
-    logger.info("No query or embedding, returning recent nodes");
-    const listFilters: ListNodesFilters = {};
-    if (project) {
-      listFilters.project = project;
-    }
-    const nodes = listNodes(db, listFilters, {
-      sort: "timestamp",
-      order: "desc",
-      limit: maxNodes,
-    });
-    return nodes.nodes.map(nodeRowToRelevant);
+/**
+ * Generate query embedding if provider is available
+ */
+async function generateQueryEmbedding(
+  db: Database,
+  query: string,
+  embeddingProvider: EmbeddingProvider | undefined,
+  logger: ProcessorLogger
+): Promise<number[] | undefined> {
+  if (!embeddingProvider || !isVecLoaded(db)) {
+    return undefined;
   }
 
-  return [];
+  try {
+    const [embedding] = await embeddingProvider.embed([query]);
+    return embedding ? [...embedding] : undefined;
+  } catch (error) {
+    logger.warn(
+      `Embedding generation failed: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return undefined;
+  }
+}
+
+/**
+ * Fallback to listing recent nodes when no search results
+ */
+function fallbackToRecentNodes(
+  db: Database,
+  query: string,
+  queryEmbedding: number[] | undefined,
+  project: string | undefined,
+  maxNodes: number,
+  logger: ProcessorLogger
+): RelevantNode[] {
+  if (query || queryEmbedding) {
+    return [];
+  }
+
+  logger.info("No query or embedding, returning recent nodes");
+  const listFilters: ListNodesFilters = project ? { project } : {};
+  const nodes = listNodes(db, listFilters, {
+    sort: "timestamp",
+    order: "desc",
+    limit: maxNodes,
+  });
+  return nodes.nodes.map(nodeRowToRelevant);
 }
 
 /**
@@ -328,6 +378,19 @@ interface AdditionalContext {
   toolErrors?: string[];
 }
 
+/** Keywords that indicate model-related queries */
+const MODEL_KEYWORDS = ["model", "quirk", "claude", "glm", "gemini"];
+
+/** Keywords that indicate tool-related queries */
+const TOOL_KEYWORDS = ["tool", "error", "fail", "edit", "bash"];
+
+/**
+ * Check if query contains any of the given keywords
+ */
+function queryContainsKeyword(lowerQuery: string, keywords: string[]): boolean {
+  return keywords.some((keyword) => lowerQuery.includes(keyword));
+}
+
 /**
  * Gather additional context based on query keywords
  */
@@ -339,48 +402,56 @@ function gatherAdditionalContext(
   const context: AdditionalContext = {};
   const lowerQuery = query.toLowerCase();
 
-  // Check for model-related queries
-  if (
-    lowerQuery.includes("model") ||
-    lowerQuery.includes("quirk") ||
-    lowerQuery.includes("claude") ||
-    lowerQuery.includes("glm") ||
-    lowerQuery.includes("gemini")
-  ) {
-    try {
-      const quirks = getAggregatedQuirks(db, { limit: 10 });
-      if (quirks.length > 0) {
-        context.modelQuirks = quirks.map(
-          (q) =>
-            `${q.model}: ${q.observation} (${q.frequency ?? "unknown"}, ${q.occurrences}x)`
-        );
-      }
-    } catch (error) {
-      logger.warn(`Failed to get model quirks: ${error}`);
-    }
+  if (queryContainsKeyword(lowerQuery, MODEL_KEYWORDS)) {
+    context.modelQuirks = gatherModelQuirks(db, logger);
   }
 
-  // Check for tool-related queries
-  if (
-    lowerQuery.includes("tool") ||
-    lowerQuery.includes("error") ||
-    lowerQuery.includes("fail") ||
-    lowerQuery.includes("edit") ||
-    lowerQuery.includes("bash")
-  ) {
-    try {
-      const errors = getAggregatedToolErrors(db, {}, { limit: 10 });
-      if (errors.length > 0) {
-        context.toolErrors = errors.map(
-          (e) => `${e.tool} - ${e.errorType}: ${e.count} occurrences`
-        );
-      }
-    } catch (error) {
-      logger.warn(`Failed to get tool errors: ${error}`);
-    }
+  if (queryContainsKeyword(lowerQuery, TOOL_KEYWORDS)) {
+    context.toolErrors = gatherToolErrors(db, logger);
   }
 
   return context;
+}
+
+/**
+ * Gather model quirks for context
+ */
+function gatherModelQuirks(
+  db: Database,
+  logger: ProcessorLogger
+): string[] | undefined {
+  try {
+    const quirks = getAggregatedQuirks(db, { limit: 10 });
+    if (quirks.length > 0) {
+      return quirks.map(
+        (q) =>
+          `${q.model}: ${q.observation} (${q.frequency ?? "unknown"}, ${q.occurrences}x)`
+      );
+    }
+  } catch (error) {
+    logger.warn(`Failed to get model quirks: ${error}`);
+  }
+  return undefined;
+}
+
+/**
+ * Gather tool errors for context
+ */
+function gatherToolErrors(
+  db: Database,
+  logger: ProcessorLogger
+): string[] | undefined {
+  try {
+    const errors = getAggregatedToolErrors(db, {}, { limit: 10 });
+    if (errors.length > 0) {
+      return errors.map(
+        (e) => `${e.tool} - ${e.errorType}: ${e.count} occurrences`
+      );
+    }
+  } catch (error) {
+    logger.warn(`Failed to get tool errors: ${error}`);
+  }
+  return undefined;
 }
 
 // =============================================================================
@@ -516,7 +587,20 @@ function buildQueryPrompt(
     "",
     "## Relevant Sessions",
     "",
+    ...formatSessionNodes(nodes),
+    ...formatBridgePaths(bridgePaths),
+    ...formatAdditionalContext(additionalContext),
+    ...formatInstructions(),
   ];
+
+  return parts.join("\n");
+}
+
+/**
+ * Format session nodes for prompt
+ */
+function formatSessionNodes(nodes: RelevantNode[]): string[] {
+  const parts: string[] = [];
 
   for (const node of nodes) {
     parts.push(`### Session ${node.id}`);
@@ -534,53 +618,72 @@ function buildQueryPrompt(
     parts.push("");
   }
 
-  // Add bridge paths (Context Connections)
-  if (bridgePaths.length > 0) {
-    parts.push("## Context Connections");
-    parts.push(
-      "The following paths explain potential relationships between sessions:"
-    );
-    parts.push("");
-    for (const path of bridgePaths) {
-      parts.push(`- ${path.description} (Score: ${path.score.toFixed(2)})`);
-    }
-    parts.push("");
+  return parts;
+}
+
+/**
+ * Format bridge paths for prompt
+ */
+function formatBridgePaths(bridgePaths: BridgePath[]): string[] {
+  if (bridgePaths.length === 0) {
+    return [];
   }
 
-  // Add additional context if available
-  if (
-    additionalContext.modelQuirks &&
-    additionalContext.modelQuirks.length > 0
-  ) {
+  const parts: string[] = [
+    "## Context Connections",
+    "The following paths explain potential relationships between sessions:",
+    "",
+  ];
+
+  for (const path of bridgePaths) {
+    parts.push(`- ${path.description} (Score: ${path.score.toFixed(2)})`);
+  }
+  parts.push("");
+
+  return parts;
+}
+
+/**
+ * Format additional context for prompt
+ */
+function formatAdditionalContext(context: AdditionalContext): string[] {
+  const parts: string[] = [];
+
+  if (context.modelQuirks && context.modelQuirks.length > 0) {
     parts.push("## Known Model Quirks");
-    for (const quirk of additionalContext.modelQuirks) {
+    for (const quirk of context.modelQuirks) {
       parts.push(`- ${quirk}`);
     }
     parts.push("");
   }
 
-  if (additionalContext.toolErrors && additionalContext.toolErrors.length > 0) {
+  if (context.toolErrors && context.toolErrors.length > 0) {
     parts.push("## Known Tool Errors");
-    for (const error of additionalContext.toolErrors) {
+    for (const error of context.toolErrors) {
       parts.push(`- ${error}`);
     }
     parts.push("");
   }
 
-  parts.push("## Instructions");
-  parts.push(
-    "Provide your response as a JSON object with the following structure:"
-  );
-  parts.push("```json");
-  parts.push("{");
-  parts.push('  "answer": "Your detailed answer",');
-  parts.push('  "summary": "One-sentence summary",');
-  parts.push('  "confidence": "high" | "medium" | "low",');
-  parts.push('  "sources": [{"nodeId": "...", "excerpt": "..."}]');
-  parts.push("}");
-  parts.push("```");
+  return parts;
+}
 
-  return parts.join("\n");
+/**
+ * Format instructions section for prompt
+ */
+function formatInstructions(): string[] {
+  return [
+    "## Instructions",
+    "Provide your response as a JSON object with the following structure:",
+    "```json",
+    "{",
+    '  "answer": "Your detailed answer",',
+    '  "summary": "One-sentence summary",',
+    '  "confidence": "high" | "medium" | "low",',
+    '  "sources": [{"nodeId": "...", "excerpt": "..."}]',
+    "}",
+    "```",
+  ];
 }
 
 // =============================================================================

@@ -197,30 +197,23 @@ export class ConnectionDiscoverer {
       daysToLookBack?: number;
     } = {}
   ): ConnectionResult {
-    const threshold = options.threshold ?? 0.2; // Similarity threshold (0-1)
-    const limit = options.limit ?? 50; // Max candidates to check
+    const threshold = options.threshold ?? 0.2;
+    const limit = options.limit ?? 50;
     const daysToLookBack = options.daysToLookBack ?? 30;
 
-    // 1. Get source node
     const sourceNode = getNode(this.db, nodeId);
     if (!sourceNode) {
       throw new Error(`Node ${nodeId} not found`);
     }
 
-    // 2. Get source node metadata (tags, topics, summary)
-    // We need to fetch tags/topics separately since they aren't in NodeRow
     const sourceMeta = this.getNodeMetadata(nodeId);
     if (!sourceMeta) {
-      // Should handle this better, but for now assume no metadata
       return { sourceNodeId: nodeId, edges: [] };
     }
 
-    // Use summary from FTS if available
     const sourceSummary = getNodeSummary(this.db, nodeId) || "";
     const fullText = this.getNodeFullText(nodeId) || sourceSummary;
 
-    // 3. Find candidates
-    // Look for nodes older than the source node but within the lookback window
     const candidates = this.findCandidates(
       nodeId,
       sourceNode.timestamp,
@@ -228,24 +221,40 @@ export class ConnectionDiscoverer {
       limit
     );
 
-    const newEdges: Edge[] = [];
-
-    // 3b. Detect references (Explicit Node IDs)
     const referenceEdges = this.detectReferences(nodeId, fullText);
-    newEdges.push(...referenceEdges);
-
-    // 3c. Detect lesson reinforcement
     const lessonEdges = this.detectLessonReinforcement(
       nodeId,
       sourceNode.timestamp,
       threshold,
       limit
     );
-    newEdges.push(...lessonEdges);
+    const semanticEdges = this.discoverSemanticEdges(
+      nodeId,
+      candidates,
+      sourceMeta,
+      sourceSummary,
+      threshold
+    );
 
-    // 4. Compare and create edges
+    return {
+      sourceNodeId: nodeId,
+      edges: [...referenceEdges, ...lessonEdges, ...semanticEdges],
+    };
+  }
+
+  /**
+   * Discover semantic edges between source node and candidates
+   */
+  private discoverSemanticEdges(
+    nodeId: string,
+    candidates: (NodeRow & { summary: string | null })[],
+    sourceMeta: { tags: Set<string>; topics: Set<string> },
+    sourceSummary: string,
+    threshold: number
+  ): Edge[] {
+    const edges: Edge[] = [];
+
     for (const candidate of candidates) {
-      // Skip if edge already exists
       if (edgeExists(this.db, nodeId, candidate.id)) {
         continue;
       }
@@ -276,11 +285,11 @@ export class ConnectionDiscoverer {
           },
           createdBy: "daemon",
         });
-        newEdges.push(edge);
+        edges.push(edge);
       }
     }
 
-    return { sourceNodeId: nodeId, edges: newEdges };
+    return edges;
   }
 
   private getNodeMetadata(

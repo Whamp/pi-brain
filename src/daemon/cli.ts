@@ -285,63 +285,50 @@ export interface StopOptions {
   timeoutMs?: number;
 }
 
-/**
- * Start the daemon process
- */
-export async function startDaemon(options: StartOptions = {}): Promise<{
+/** Result interface for daemon operations */
+interface DaemonResult {
   success: boolean;
   message: string;
   pid?: number;
-}> {
-  const { foreground = false, configPath, force = false } = options;
+}
 
-  // Check if already running
-  const status = isDaemonRunning();
-  if (status.running && !force) {
-    return {
-      success: false,
-      message: `Daemon is already running with PID ${status.pid}`,
-    };
-  }
+/**
+ * Handle port conflict during daemon start
+ */
+async function handlePortConflict(
+  port: number,
+  force: boolean
+): Promise<DaemonResult | null> {
+  const existingPid = findProcessOnPort(port);
 
-  // Load and validate config
-  let config: PiBrainConfig;
-  try {
-    config = loadConfig(configPath);
-  } catch (error) {
-    return {
-      success: false,
-      message: `Failed to load config: ${(error as Error).message}`,
-    };
-  }
-
-  // Check port availability
-  const portAvailable = await isPortAvailable(config.api.port);
-  if (!portAvailable) {
-    const existingPid = findProcessOnPort(config.api.port);
-    if (force && existingPid) {
-      console.log(
-        `Killing process ${existingPid} on port ${config.api.port}...`
-      );
-      try {
-        process.kill(existingPid, "SIGKILL");
-        await sleep(500); // Wait for cleanup
-      } catch (error) {
-        return {
-          success: false,
-          message: `Failed to kill process on port ${config.api.port}: ${(error as Error).message}`,
-        };
-      }
-    } else {
+  if (force && existingPid) {
+    console.log(`Killing process ${existingPid} on port ${port}...`);
+    try {
+      process.kill(existingPid, "SIGKILL");
+      await sleep(500);
+      return null; // Success, continue
+    } catch (error) {
       return {
         success: false,
-        message: `Port ${config.api.port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`,
+        message: `Failed to kill process on port ${port}: ${(error as Error).message}`,
       };
     }
   }
 
-  // If force was used and daemon was running according to PID file, kill it too
-  if (force && status.running && status.pid) {
+  return {
+    success: false,
+    message: `Port ${port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`,
+  };
+}
+
+/**
+ * Kill existing daemon if force mode and running
+ */
+function killExistingDaemon(status: {
+  running: boolean;
+  pid: number | null;
+}): void {
+  if (status.running && status.pid) {
     try {
       process.kill(status.pid, "SIGKILL");
       removePidFile();
@@ -349,53 +336,76 @@ export async function startDaemon(options: StartOptions = {}): Promise<{
       // Ignore if already dead
     }
   }
+}
 
-  // Ensure directories exist
+/**
+ * Spawn the daemon process in background mode
+ */
+function spawnDaemonProcess(
+  configPath: string | undefined,
+  logStream: number
+): ChildProcess {
+  const daemonScript = path.join(import.meta.dirname, "daemon-process.js");
+  const args = ["--daemon"];
+  if (configPath) {
+    args.push("--config", configPath);
+  }
+
+  return spawn(process.execPath, [daemonScript, ...args], {
+    detached: true,
+    stdio: ["ignore", logStream, logStream],
+    env: {
+      ...process.env,
+      PI_BRAIN_DAEMON: "1",
+    },
+  });
+}
+
+/**
+ * Load config with error handling
+ */
+function tryLoadConfig(
+  configPath?: string
+): { config: PiBrainConfig } | { error: string } {
+  try {
+    return { config: loadConfig(configPath) };
+  } catch (error) {
+    return { error: `Failed to load config: ${(error as Error).message}` };
+  }
+}
+
+/**
+ * Ensure directories exist with error handling
+ */
+function tryEnsureDirectories(
+  config: PiBrainConfig
+): { success: true } | { error: string } {
   try {
     ensureDirectories(config);
+    return { success: true };
   } catch (error) {
     return {
-      success: false,
-      message: `Failed to create directories: ${(error as Error).message}`,
+      error: `Failed to create directories: ${(error as Error).message}`,
     };
   }
+}
 
-  if (foreground) {
-    // Run in foreground - don't detach
-    writePidFile(process.pid);
-    return {
-      success: true,
-      message: "Daemon starting in foreground mode...",
-      pid: process.pid,
-    };
-  }
-
-  // Spawn detached daemon process
-  const daemonScript = path.join(import.meta.dirname, "daemon-process.js");
-
-  // Ensure log directory exists
+/**
+ * Spawn background daemon and verify it started
+ */
+async function spawnBackgroundDaemon(
+  configPath: string | undefined
+): Promise<DaemonResult> {
   const logDir = path.dirname(LOG_FILE);
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
   const logStream = fs.openSync(LOG_FILE, "a");
-
-  const args = ["--daemon"];
-  if (configPath) {
-    args.push("--config", configPath);
-  }
-
   let child: ChildProcess;
+
   try {
-    child = spawn(process.execPath, [daemonScript, ...args], {
-      detached: true,
-      stdio: ["ignore", logStream, logStream],
-      env: {
-        ...process.env,
-        PI_BRAIN_DAEMON: "1",
-      },
-    });
+    child = spawnDaemonProcess(configPath, logStream);
   } catch (error) {
     fs.closeSync(logStream);
     return {
@@ -406,20 +416,15 @@ export async function startDaemon(options: StartOptions = {}): Promise<{
 
   if (!child.pid) {
     fs.closeSync(logStream);
-    return {
-      success: false,
-      message: "Failed to get daemon PID",
-    };
+    return { success: false, message: "Failed to get daemon PID" };
   }
 
   writePidFile(child.pid);
   child.unref();
   fs.closeSync(logStream);
 
-  // Give it a moment to start
   await sleep(500);
 
-  // Verify it's running
   if (!isProcessRunning(child.pid)) {
     removePidFile();
     return {
@@ -436,6 +441,113 @@ export async function startDaemon(options: StartOptions = {}): Promise<{
 }
 
 /**
+ * Prepare the daemon environment (load config, check port, kill existing)
+ */
+async function prepareDaemonStart(
+  configPath: string | undefined,
+  force: boolean,
+  status: { running: boolean; pid: number | null }
+): Promise<{ config: PiBrainConfig } | DaemonResult> {
+  // Load and validate config
+  const configResult = tryLoadConfig(configPath);
+  if ("error" in configResult) {
+    return { success: false, message: configResult.error };
+  }
+  const { config } = configResult;
+
+  // Check port availability
+  const portAvailable = await isPortAvailable(config.api.port);
+  if (!portAvailable) {
+    const result = await handlePortConflict(config.api.port, force);
+    if (result) {
+      return result;
+    }
+  }
+
+  // Kill existing daemon if force mode
+  if (force) {
+    killExistingDaemon(status);
+  }
+
+  // Ensure directories exist
+  const dirResult = tryEnsureDirectories(config);
+  if ("error" in dirResult) {
+    return { success: false, message: dirResult.error };
+  }
+
+  return { config };
+}
+
+/**
+ * Start the daemon process
+ */
+export async function startDaemon(
+  options: StartOptions = {}
+): Promise<DaemonResult> {
+  const { foreground = false, configPath, force = false } = options;
+
+  // Check if already running
+  const status = isDaemonRunning();
+  if (status.running && !force) {
+    return {
+      success: false,
+      message: `Daemon is already running with PID ${status.pid}`,
+    };
+  }
+
+  // Prepare environment
+  const prepResult = await prepareDaemonStart(configPath, force, status);
+  if ("success" in prepResult) {
+    return prepResult;
+  }
+
+  if (foreground) {
+    writePidFile(process.pid);
+    return {
+      success: true,
+      message: "Daemon starting in foreground mode...",
+      pid: process.pid,
+    };
+  }
+
+  return spawnBackgroundDaemon(configPath);
+}
+
+/**
+ * Wait for process to stop with timeout
+ */
+async function waitForProcessStop(
+  pid: number,
+  timeoutMs: number
+): Promise<boolean> {
+  const startTime = Date.now();
+  while (Date.now() - startTime < timeoutMs) {
+    if (!isProcessRunning(pid)) {
+      return true;
+    }
+    await sleep(100);
+  }
+  return false;
+}
+
+/**
+ * Handle process kill error
+ */
+function handleKillError(error: NodeJS.ErrnoException): {
+  success: boolean;
+  message: string;
+} {
+  if (error.code === "ESRCH") {
+    removePidFile();
+    return {
+      success: true,
+      message: "Daemon was not running (stale PID file removed)",
+    };
+  }
+  return { success: false, message: `Failed to stop daemon: ${error.message}` };
+}
+
+/**
  * Stop the daemon process
  */
 export async function stopDaemon(options: StopOptions = {}): Promise<{
@@ -446,60 +558,33 @@ export async function stopDaemon(options: StopOptions = {}): Promise<{
 
   const status = isDaemonRunning();
   if (!status.running || status.pid === null) {
-    return {
-      success: true,
-      message: "Daemon is not running",
-    };
+    return { success: true, message: "Daemon is not running" };
   }
 
   const { pid } = status;
+  const signal = force ? "SIGKILL" : "SIGTERM";
 
   try {
-    // Send appropriate signal
-    const signal = force ? "SIGKILL" : "SIGTERM";
     process.kill(pid, signal);
-
-    if (force) {
-      removePidFile();
-      return {
-        success: true,
-        message: `Daemon forcefully stopped (PID ${pid})`,
-      };
-    }
-
-    // Wait for graceful shutdown
-    const startTime = Date.now();
-    while (Date.now() - startTime < timeoutMs) {
-      if (!isProcessRunning(pid)) {
-        removePidFile();
-        return {
-          success: true,
-          message: `Daemon stopped gracefully (PID ${pid})`,
-        };
-      }
-      await sleep(100);
-    }
-
-    // Timeout - process still running
-    return {
-      success: false,
-      message: `Daemon did not stop within ${timeoutMs / 1000}s. Use --force to kill immediately.`,
-    };
   } catch (error) {
-    const err = error as NodeJS.ErrnoException;
-    if (err.code === "ESRCH") {
-      // Process not found
-      removePidFile();
-      return {
-        success: true,
-        message: "Daemon was not running (stale PID file removed)",
-      };
-    }
-    return {
-      success: false,
-      message: `Failed to stop daemon: ${err.message}`,
-    };
+    return handleKillError(error as NodeJS.ErrnoException);
   }
+
+  if (force) {
+    removePidFile();
+    return { success: true, message: `Daemon forcefully stopped (PID ${pid})` };
+  }
+
+  const stopped = await waitForProcessStop(pid, timeoutMs);
+  if (stopped) {
+    removePidFile();
+    return { success: true, message: `Daemon stopped gracefully (PID ${pid})` };
+  }
+
+  return {
+    success: false,
+    message: `Daemon did not stop within ${timeoutMs / 1000}s. Use --force to kill immediately.`,
+  };
 }
 
 /**
@@ -896,6 +981,52 @@ export function formatDaemonStatus(
 }
 
 /**
+ * Format a job for display
+ */
+function formatJobLine(
+  job: AnalysisJob,
+  pathLen: number,
+  showType: boolean
+): string {
+  const session = truncatePath(job.sessionFile, pathLen);
+  const prefix = `  ${job.id.slice(0, 8)}`;
+
+  if (showType) {
+    return `${prefix}  ${job.type.padEnd(12)}  ${session}`;
+  }
+
+  const error = job.error ? truncateString(job.error, 30) : "Unknown error";
+  return `${prefix}  ${session}  ${error}`;
+}
+
+/**
+ * Append job section to lines array
+ */
+function appendJobSection(
+  lines: string[],
+  title: string,
+  jobs: AnalysisJob[],
+  pathLen: number,
+  showType: boolean,
+  extraCount?: number
+): void {
+  if (jobs.length === 0) {
+    return;
+  }
+
+  lines.push("");
+  lines.push(`${title}:`);
+
+  for (const job of jobs) {
+    lines.push(formatJobLine(job, pathLen, showType));
+  }
+
+  if (extraCount !== undefined && extraCount > 0) {
+    lines.push(`  ... and ${extraCount} more`);
+  }
+}
+
+/**
  * Format queue status for display
  */
 export function formatQueueStatus(
@@ -914,38 +1045,22 @@ export function formatQueueStatus(
     lines.push(`Avg duration: ${stats.avgDurationMinutes.toFixed(1)} min`);
   }
 
-  if (queueStatus.runningJobs.length > 0) {
-    lines.push("");
-    lines.push("Running:");
-    for (const job of queueStatus.runningJobs) {
-      const session = truncatePath(job.sessionFile, 50);
-      lines.push(`  ${job.id.slice(0, 8)}  ${job.type.padEnd(12)}  ${session}`);
-    }
-  }
-
-  if (queueStatus.pendingJobs.length > 0) {
-    lines.push("");
-    lines.push("Pending:");
-    for (const job of queueStatus.pendingJobs) {
-      const session = truncatePath(job.sessionFile, 50);
-      lines.push(`  ${job.id.slice(0, 8)}  ${job.type.padEnd(12)}  ${session}`);
-    }
-    if (stats.pending > queueStatus.pendingJobs.length) {
-      lines.push(
-        `  ... and ${stats.pending - queueStatus.pendingJobs.length} more`
-      );
-    }
-  }
-
-  if (queueStatus.recentFailed.length > 0) {
-    lines.push("");
-    lines.push("Recent failures:");
-    for (const job of queueStatus.recentFailed) {
-      const session = truncatePath(job.sessionFile, 40);
-      const error = job.error ? truncateString(job.error, 30) : "Unknown error";
-      lines.push(`  ${job.id.slice(0, 8)}  ${session}  ${error}`);
-    }
-  }
+  appendJobSection(lines, "Running", queueStatus.runningJobs, 50, true);
+  appendJobSection(
+    lines,
+    "Pending",
+    queueStatus.pendingJobs,
+    50,
+    true,
+    stats.pending - queueStatus.pendingJobs.length
+  );
+  appendJobSection(
+    lines,
+    "Recent failures",
+    queueStatus.recentFailed,
+    40,
+    false
+  );
 
   return lines.join("\n");
 }
