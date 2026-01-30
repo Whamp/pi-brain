@@ -20,193 +20,193 @@ src/daemon/cli.test.ts [1-90]
     - node:fs
     - vitest
 
-src/daemon/cli.ts [1-1337]
+src/daemon/cli.ts [1-1340]
   interface:
-    114-120: interface DaemonStatus [exported]
+    117-123: interface DaemonStatus [exported]
       /** Daemon status info */
-    123-128: interface QueueStatus [exported]
+    126-131: interface QueueStatus [exported]
       /** Queue status info */
       refs out: 4 [type: 4]
-        - src/daemon/cli.ts:124: type QueueStats -> src/daemon/queue.ts
-        - src/daemon/cli.ts:125: type AnalysisJob -> src/daemon/types.ts
-        - src/daemon/cli.ts:126: type AnalysisJob -> src/daemon/types.ts
-        - src/daemon/cli.ts:127: type AnalysisJob -> src/daemon/types.ts
-    131-136: interface HealthCheckResult [exported]
+        - src/daemon/cli.ts:127: type QueueStats -> src/daemon/queue.ts
+        - src/daemon/cli.ts:128: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/cli.ts:129: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/cli.ts:130: type AnalysisJob -> src/daemon/types.ts
+    134-139: interface HealthCheckResult [exported]
       /** Health check result */
-    139-143: interface HealthStatus [exported]
+    142-146: interface HealthStatus [exported]
       /** Overall health status */
       refs out: 1 [type: 1]
-        - src/daemon/cli.ts:142: type HealthCheckResult -> src/daemon/cli.ts
-    146-149: interface OutputOptions [exported]
+        - src/daemon/cli.ts:145: type HealthCheckResult -> src/daemon/cli.ts
+    149-152: interface OutputOptions [exported]
       /** CLI output options */
-    276-280: interface StartOptions [exported]
+    279-283: interface StartOptions [exported]
       /** Start options */
-    283-286: interface StopOptions [exported]
+    286-289: interface StopOptions [exported]
       /** Stop options */
   function:
-    61-70: isPortAvailable(port: number): Promise<boolean> [exported]
+    64-73: isPortAvailable(port: number): Promise<boolean> [exported]
       /** Check if a port is available */
       refs out: 8 [call: 6, instantiate: 1, type: 1]
-        - src/daemon/cli.ts:61: type Promise -> external
-        - src/daemon/cli.ts:62: instantiate Promise -> external
-        - src/daemon/cli.ts:64: call Server.once -> external
-        - src/daemon/cli.ts:64: call resolve -> src/daemon/cli.ts
-        - src/daemon/cli.ts:65: call Server.once -> external
-        - src/daemon/cli.ts:66: call Server.close -> external
-        - src/daemon/cli.ts:66: call resolve -> src/daemon/cli.ts
-        - src/daemon/cli.ts:68: call Server.listen -> external
-    75-88: findProcessOnPort(port: number): number [exported]
+        - src/daemon/cli.ts:64: type Promise -> external
+        - src/daemon/cli.ts:65: instantiate Promise -> external
+        - src/daemon/cli.ts:67: call Server.once -> external
+        - src/daemon/cli.ts:67: call resolve -> src/daemon/cli.ts
+        - src/daemon/cli.ts:68: call Server.once -> external
+        - src/daemon/cli.ts:69: call Server.close -> external
+        - src/daemon/cli.ts:69: call resolve -> src/daemon/cli.ts
+        - src/daemon/cli.ts:71: call Server.listen -> external
+    78-91: findProcessOnPort(port: number): number [exported]
       /** Find process using a port (Linux/macOS) */
       refs out: 1 [call: 1]
-        - src/daemon/cli.ts:84: call isNaN -> external
-    158-169: readPidFile(): number [exported]
+        - src/daemon/cli.ts:87: call isNaN -> external
+    161-172: readPidFile(): number [exported]
       /** Read the daemon PID from the PID file */
       refs out: 2 [call: 2]
-        - src/daemon/cli.ts:160: call existsSync -> external
-        - src/daemon/cli.ts:165: call isNaN -> external
-    174-180: writePidFile(pid: number): void [exported]
+        - src/daemon/cli.ts:163: call existsSync -> external
+        - src/daemon/cli.ts:168: call isNaN -> external
+    177-183: writePidFile(pid: number): void [exported]
       /** Write the daemon PID to the PID file */
       refs out: 4 [call: 4]
-        - src/daemon/cli.ts:176: call existsSync -> external
-        - src/daemon/cli.ts:177: call mkdirSync -> external
-        - src/daemon/cli.ts:179: call writeFileSync -> external
-        - src/daemon/cli.ts:179: call String -> external
-    185-193: removePidFile(): void [exported]
+        - src/daemon/cli.ts:179: call existsSync -> external
+        - src/daemon/cli.ts:180: call mkdirSync -> external
+        - src/daemon/cli.ts:182: call writeFileSync -> external
+        - src/daemon/cli.ts:182: call String -> external
+    188-196: removePidFile(): void [exported]
       /** Remove the PID file */
       refs out: 2 [call: 2]
-        - src/daemon/cli.ts:187: call existsSync -> external
-        - src/daemon/cli.ts:188: call unlinkSync -> external
-    198-206: isProcessRunning(pid: number): boolean [exported]
+        - src/daemon/cli.ts:190: call existsSync -> external
+        - src/daemon/cli.ts:191: call unlinkSync -> external
+    201-209: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
       refs out: 1 [call: 1]
-        - src/daemon/cli.ts:201: call kill -> external
-    211-224: isDaemonRunning(): { running: boolean; pid: number; } [exported]
+        - src/daemon/cli.ts:204: call kill -> external
+    214-227: isDaemonRunning(): { running: boolean; pid: number; } [exported]
       /** Check if the daemon is currently running */
       refs out: 2 [call: 2]
-        - src/daemon/cli.ts:217: call isProcessRunning -> src/daemon/cli.ts
-        - src/daemon/cli.ts:222: call removePidFile -> src/daemon/cli.ts
-    233-254: formatUptime(seconds: number): string [exported]
+        - src/daemon/cli.ts:220: call isProcessRunning -> src/daemon/cli.ts
+        - src/daemon/cli.ts:225: call removePidFile -> src/daemon/cli.ts
+    236-257: formatUptime(seconds: number): string [exported]
       /** Format uptime in a human-readable way */
       refs out: 5 [call: 5]
-        - src/daemon/cli.ts:235: call floor -> external
-        - src/daemon/cli.ts:244: call push -> external
+        - src/daemon/cli.ts:238: call floor -> external
         - src/daemon/cli.ts:247: call push -> external
         - src/daemon/cli.ts:250: call push -> external
-        - src/daemon/cli.ts:253: call join -> external
-    259-269: getProcessUptime(): number [exported]
+        - src/daemon/cli.ts:253: call push -> external
+        - src/daemon/cli.ts:256: call join -> external
+    262-272: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
       refs out: 2 [call: 2]
-        - src/daemon/cli.ts:261: call existsSync -> external
-        - src/daemon/cli.ts:265: call now -> external
-    484-514: async startDaemon(options: StartOptions = {}): Promise<DaemonResult> [exported]
+        - src/daemon/cli.ts:264: call existsSync -> external
+        - src/daemon/cli.ts:268: call now -> external
+    487-517: async startDaemon(options: StartOptions = {}): Promise<DaemonResult> [exported]
       /** Start the daemon process */
       refs out: 5 [call: 2, type: 3]
-        - src/daemon/cli.ts:485: type StartOptions -> src/daemon/cli.ts
-        - src/daemon/cli.ts:486: type Promise -> external
-        - src/daemon/cli.ts:486: type DaemonResult -> src/daemon/cli.ts
-        - src/daemon/cli.ts:505: call writePidFile -> src/daemon/cli.ts
-        - src/daemon/cli.ts:513: call spawnBackgroundDaemon -> src/daemon/cli.ts
-    553-588: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
+        - src/daemon/cli.ts:488: type StartOptions -> src/daemon/cli.ts
+        - src/daemon/cli.ts:489: type Promise -> external
+        - src/daemon/cli.ts:489: type DaemonResult -> src/daemon/cli.ts
+        - src/daemon/cli.ts:508: call writePidFile -> src/daemon/cli.ts
+        - src/daemon/cli.ts:516: call spawnBackgroundDaemon -> src/daemon/cli.ts
+    556-591: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
       refs out: 7 [call: 4, type: 3]
-        - src/daemon/cli.ts:553: type StopOptions -> src/daemon/cli.ts
-        - src/daemon/cli.ts:553: type Promise -> external
-        - src/daemon/cli.ts:568: call kill -> external
-        - src/daemon/cli.ts:570: call handleKillError -> src/daemon/cli.ts
-        - src/daemon/cli.ts:570: type ErrnoException -> external
-        - src/daemon/cli.ts:574: call removePidFile -> src/daemon/cli.ts
-        - src/daemon/cli.ts:580: call removePidFile -> src/daemon/cli.ts
-    593-605: getDaemonStatus(configPath?: string): DaemonStatus [exported]
+        - src/daemon/cli.ts:556: type StopOptions -> src/daemon/cli.ts
+        - src/daemon/cli.ts:556: type Promise -> external
+        - src/daemon/cli.ts:571: call kill -> external
+        - src/daemon/cli.ts:573: call handleKillError -> src/daemon/cli.ts
+        - src/daemon/cli.ts:573: type ErrnoException -> external
+        - src/daemon/cli.ts:577: call removePidFile -> src/daemon/cli.ts
+        - src/daemon/cli.ts:583: call removePidFile -> src/daemon/cli.ts
+    596-608: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
       refs out: 2 [call: 1, type: 1]
-        - src/daemon/cli.ts:593: type DaemonStatus -> src/daemon/cli.ts
-        - src/daemon/cli.ts:603: call join -> external
-    614-643: getQueueStatus(configPath?: string): QueueStatus [exported]
+        - src/daemon/cli.ts:596: type DaemonStatus -> src/daemon/cli.ts
+        - src/daemon/cli.ts:606: call join -> external
+    617-646: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/cli.ts:614: type QueueStatus -> src/daemon/cli.ts
-        - src/daemon/cli.ts:619: call existsSync -> external
-        - src/daemon/cli.ts:636: call migrate -> src/storage/database.ts
-        - src/daemon/cli.ts:639: call getQueueStatusSummary -> src/daemon/queue.ts
-        - src/daemon/cli.ts:641: call close -> external
-    648-701: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
+        - src/daemon/cli.ts:617: type QueueStatus -> src/daemon/cli.ts
+        - src/daemon/cli.ts:622: call existsSync -> external
+        - src/daemon/cli.ts:639: call migrate -> src/storage/database.ts
+        - src/daemon/cli.ts:642: call getQueueStatusSummary -> src/daemon/queue.ts
+        - src/daemon/cli.ts:644: call close -> external
+    651-704: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
       refs out: 5 [call: 5]
-        - src/daemon/cli.ts:654: call existsSync -> external
-        - src/daemon/cli.ts:661: call endsWith -> external
-        - src/daemon/cli.ts:673: call migrate -> src/storage/database.ts
-        - src/daemon/cli.ts:678: call QueueManager.hasExistingJob -> src/daemon/queue.ts
-        - src/daemon/cli.ts:699: call close -> external
-    921-951: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
+        - src/daemon/cli.ts:657: call existsSync -> external
+        - src/daemon/cli.ts:664: call endsWith -> external
+        - src/daemon/cli.ts:676: call migrate -> src/storage/database.ts
+        - src/daemon/cli.ts:681: call QueueManager.hasExistingJob -> src/daemon/queue.ts
+        - src/daemon/cli.ts:702: call close -> external
+    924-954: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
       refs out: 2 [type: 2]
-        - src/daemon/cli.ts:923: type Promise -> external
-        - src/daemon/cli.ts:923: type HealthStatus -> src/daemon/cli.ts
-    960-981: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
+        - src/daemon/cli.ts:926: type Promise -> external
+        - src/daemon/cli.ts:926: type HealthStatus -> src/daemon/cli.ts
+    963-984: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
       refs out: 6 [call: 4, type: 2]
-        - src/daemon/cli.ts:961: type DaemonStatus -> src/daemon/cli.ts
-        - src/daemon/cli.ts:962: type OutputOptions -> src/daemon/cli.ts
-        - src/daemon/cli.ts:971: call push -> external
-        - src/daemon/cli.ts:975: call push -> external
+        - src/daemon/cli.ts:964: type DaemonStatus -> src/daemon/cli.ts
+        - src/daemon/cli.ts:965: type OutputOptions -> src/daemon/cli.ts
+        - src/daemon/cli.ts:974: call push -> external
         - src/daemon/cli.ts:978: call push -> external
-        - src/daemon/cli.ts:980: call join -> external
-    1032-1066: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
+        - src/daemon/cli.ts:981: call push -> external
+        - src/daemon/cli.ts:983: call join -> external
+    1035-1069: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
       refs out: 8 [call: 6, type: 2]
-        - src/daemon/cli.ts:1033: type QueueStatus -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1034: type OutputOptions -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1045: call push -> external
-        - src/daemon/cli.ts:1045: call toFixed -> external
-        - src/daemon/cli.ts:1048: call appendJobSection -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1049: call appendJobSection -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1057: call appendJobSection -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1065: call join -> external
-    1081-1104: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
+        - src/daemon/cli.ts:1036: type QueueStatus -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1037: type OutputOptions -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1048: call push -> external
+        - src/daemon/cli.ts:1048: call toFixed -> external
+        - src/daemon/cli.ts:1051: call appendJobSection -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1052: call appendJobSection -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1060: call appendJobSection -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1068: call join -> external
+    1084-1107: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
       refs out: 7 [call: 5, type: 2]
-        - src/daemon/cli.ts:1082: type HealthStatus -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1083: type OutputOptions -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1089: call push -> external
+        - src/daemon/cli.ts:1085: type HealthStatus -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1086: type OutputOptions -> src/daemon/cli.ts
         - src/daemon/cli.ts:1092: call push -> external
-        - src/daemon/cli.ts:1098: call push -> external
-        - src/daemon/cli.ts:1100: call push -> external
-        - src/daemon/cli.ts:1103: call join -> external
-    1119-1239: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
+        - src/daemon/cli.ts:1095: call push -> external
+        - src/daemon/cli.ts:1101: call push -> external
+        - src/daemon/cli.ts:1103: call push -> external
+        - src/daemon/cli.ts:1106: call join -> external
+    1122-1242: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
       refs out: 17 [call: 16, type: 1]
-        - src/daemon/cli.ts:1139: call migrate -> src/storage/database.ts
-        - src/daemon/cli.ts:1142: call log -> external
-        - src/daemon/cli.ts:1158: call set -> external
-        - src/daemon/cli.ts:1162: call log -> external
+        - src/daemon/cli.ts:1142: call migrate -> src/storage/database.ts
+        - src/daemon/cli.ts:1145: call log -> external
+        - src/daemon/cli.ts:1161: call set -> external
         - src/daemon/cli.ts:1165: call log -> external
-        - src/daemon/cli.ts:1167: call clearAllData -> src/storage/node-crud.ts
-        - src/daemon/cli.ts:1170: call log -> external
-        - src/daemon/cli.ts:1189: call processInsertBatch -> src/daemon/cli.ts
-        - src/daemon/cli.ts:1190: call Socket.write -> external
-        - src/daemon/cli.ts:1194: call log -> external
-    1244-1326: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
+        - src/daemon/cli.ts:1168: call log -> external
+        - src/daemon/cli.ts:1170: call clearAllData -> src/storage/node-crud.ts
+        - src/daemon/cli.ts:1173: call log -> external
+        - src/daemon/cli.ts:1192: call processInsertBatch -> src/daemon/cli.ts
+        - src/daemon/cli.ts:1193: call Socket.write -> external
+        - src/daemon/cli.ts:1197: call log -> external
+    1247-1329: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
       refs out: 12 [call: 10, type: 2]
-        - src/daemon/cli.ts:1247: type Promise -> external
-        - src/daemon/cli.ts:1268: call migrate -> src/storage/database.ts
-        - src/daemon/cli.ts:1287: call log -> external
-        - src/daemon/cli.ts:1288: call log -> external
-        - src/daemon/cli.ts:1300: call log -> external
-        - src/daemon/cli.ts:1301: call log -> external
-        - src/daemon/cli.ts:1302: call log -> external
+        - src/daemon/cli.ts:1250: type Promise -> external
+        - src/daemon/cli.ts:1271: call migrate -> src/storage/database.ts
+        - src/daemon/cli.ts:1290: call log -> external
+        - src/daemon/cli.ts:1291: call log -> external
+        - src/daemon/cli.ts:1303: call log -> external
+        - src/daemon/cli.ts:1304: call log -> external
         - src/daemon/cli.ts:1305: call log -> external
-        - src/daemon/cli.ts:1307: call join -> external
-        - src/daemon/cli.ts:1307: call slice -> external
+        - src/daemon/cli.ts:1308: call log -> external
+        - src/daemon/cli.ts:1310: call join -> external
+        - src/daemon/cli.ts:1310: call slice -> external
   variable:
-    108-108: any [exported]
+    111-111: any [exported]
       /** PID file location */
       refs out: 1 [call: 1]
-        - src/daemon/cli.ts:108: call join -> external
-    111-111: any [exported]
+        - src/daemon/cli.ts:111: call join -> external
+    114-114: any [exported]
       /** Log file location */
       refs out: 1 [call: 1]
-        - src/daemon/cli.ts:111: call join -> external
+        - src/daemon/cli.ts:114: call join -> external
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -214,11 +214,13 @@ src/daemon/cli.ts [1-1337]
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
     - ../storage/node-storage.js
+    - ../utils/fs-async.js
     - ./facet-discovery.js
     - ./processor.js
     - ./queue.js
     - node:child_process
     - node:fs
+    - node:fs/promises
     - node:net
     - node:path
 
@@ -244,11 +246,12 @@ src/daemon/connection-discovery.ts [1-628]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-339]
+src/daemon/daemon-process.ts [1-341]
   imports:
     - ../api/server.js
     - ../config/config.js
     - ../storage/database.js
+    - ../utils/logger.js
     - ./cli.js
     - ./consolidation/index.js
     - ./queue.js
@@ -376,32 +379,33 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/export.ts [1-175]
+src/daemon/export.ts [1-176]
   function:
-    17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
+    18-31: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
       /** Extract entries within a segment range */
       refs out: 3 [call: 1, type: 2]
-        - src/daemon/export.ts:18: type SessionEntry -> src/types/session.ts
-        - src/daemon/export.ts:21: type SessionEntry -> src/types/session.ts
-        - src/daemon/export.ts:29: call slice -> external
-    121-174: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+        - src/daemon/export.ts:19: type SessionEntry -> src/types/session.ts
+        - src/daemon/export.ts:22: type SessionEntry -> src/types/session.ts
+        - src/daemon/export.ts:30: call slice -> external
+    122-175: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
       refs out: 10 [call: 7, instantiate: 1, type: 2]
-        - src/daemon/export.ts:124: type Promise -> external
-        - src/daemon/export.ts:129: call existsSync -> external
-        - src/daemon/export.ts:141: call log -> external
-        - src/daemon/export.ts:145: call processNodeFile -> src/daemon/export.ts
-        - src/daemon/export.ts:148: call Socket.write -> external
-        - src/daemon/export.ts:155: call Writable.end -> external
-        - src/daemon/export.ts:156: instantiate Promise -> external
-        - src/daemon/export.ts:157: call WriteStream.on -> external
-        - src/daemon/export.ts:160: call log -> external
-        - src/daemon/export.ts:170: type Error -> external
+        - src/daemon/export.ts:125: type Promise -> external
+        - src/daemon/export.ts:130: call fileExists -> src/utils/fs-async.ts
+        - src/daemon/export.ts:142: call log -> external
+        - src/daemon/export.ts:146: call processNodeFile -> src/daemon/export.ts
+        - src/daemon/export.ts:149: call Socket.write -> external
+        - src/daemon/export.ts:156: call Writable.end -> external
+        - src/daemon/export.ts:157: instantiate Promise -> external
+        - src/daemon/export.ts:158: call WriteStream.on -> external
+        - src/daemon/export.ts:161: call log -> external
+        - src/daemon/export.ts:171: type Error -> external
   imports:
     - ../config/index.js
     - ../parser/session.js
     - ../storage/node-storage.js
     - ../types/index.js
+    - ../utils/fs-async.js
     - node:fs
     - node:path
 
@@ -519,12 +523,13 @@ src/daemon/insight-aggregation.test.ts [1-559]
     - node:path
     - vitest
 
-src/daemon/insight-aggregation.ts [1-628]
+src/daemon/insight-aggregation.ts [1-632]
   class:
-    149-627: class InsightAggregator [exported]
+    153-631: class InsightAggregator [exported]
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
+    - ../utils/logger.js
     - better-sqlite3
     - node:crypto
 
@@ -550,144 +555,144 @@ src/daemon/processor.test.ts [1-733]
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-741]
+src/daemon/processor.ts [1-744]
   class:
-    679-733: class JobProcessor [exported]
+    682-736: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
-    23-36: interface AgentResult [exported]
+    25-38: interface AgentResult [exported]
       /** Result from invoking the pi agent */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:29: type AgentNodeOutput -> src/daemon/types.ts
-    39-43: interface SkillInfo [exported]
+        - src/daemon/processor.ts:31: type AgentNodeOutput -> src/daemon/types.ts
+    41-45: interface SkillInfo [exported]
       /** Skill availability information */
-    46-51: interface ProcessorLogger [exported]
+    48-53: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    123-130: interface EnvironmentValidationResult [exported]
+    126-133: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    669-674: interface ProcessorConfig [exported]
+    672-677: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:671: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:673: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:674: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:676: type ProcessorLogger -> src/daemon/processor.ts
   function:
-    87-95: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    90-98: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
       refs out: 2 [call: 1, type: 1]
-        - src/daemon/processor.ts:87: type Promise -> external
-        - src/daemon/processor.ts:90: call access -> external
-    100-120: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+        - src/daemon/processor.ts:90: type Promise -> external
+        - src/daemon/processor.ts:93: call access -> external
+    103-123: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
       refs out: 4 [call: 1, type: 3]
-        - src/daemon/processor.ts:100: type Promise -> external
-        - src/daemon/processor.ts:100: type Map -> external
-        - src/daemon/processor.ts:100: type SkillInfo -> src/daemon/processor.ts
-        - src/daemon/processor.ts:112: call set -> external
-    136-148: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+        - src/daemon/processor.ts:103: type Promise -> external
+        - src/daemon/processor.ts:103: type Map -> external
+        - src/daemon/processor.ts:103: type SkillInfo -> src/daemon/processor.ts
+        - src/daemon/processor.ts:115: call set -> external
+    139-151: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:136: type Promise -> external
-        - src/daemon/processor.ts:136: type EnvironmentValidationResult -> src/daemon/processor.ts
-    183-197: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+        - src/daemon/processor.ts:139: type Promise -> external
+        - src/daemon/processor.ts:139: type EnvironmentValidationResult -> src/daemon/processor.ts
+    186-200: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/processor.ts:183: type Promise -> external
-        - src/daemon/processor.ts:192: call get -> external
-        - src/daemon/processor.ts:193: call push -> external
-        - src/daemon/processor.ts:196: call join -> external
-    206-238: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.ts:186: type Promise -> external
+        - src/daemon/processor.ts:195: call get -> external
+        - src/daemon/processor.ts:196: call push -> external
+        - src/daemon/processor.ts:199: call join -> external
+    209-241: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs out: 10 [call: 9, type: 1]
-        - src/daemon/processor.ts:206: type AnalysisJob -> src/daemon/types.ts
-        - src/daemon/processor.ts:214: call push -> external
-        - src/daemon/processor.ts:218: call push -> external
-        - src/daemon/processor.ts:220: call push -> external
-        - src/daemon/processor.ts:226: call push -> external
-        - src/daemon/processor.ts:227: call push -> external
-        - src/daemon/processor.ts:228: call push -> external
-        - src/daemon/processor.ts:232: call push -> external
-        - src/daemon/processor.ts:233: call push -> external
-        - src/daemon/processor.ts:237: call join -> external
-    271-379: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.ts:209: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/processor.ts:217: call push -> external
+        - src/daemon/processor.ts:221: call push -> external
+        - src/daemon/processor.ts:223: call push -> external
+        - src/daemon/processor.ts:229: call push -> external
+        - src/daemon/processor.ts:230: call push -> external
+        - src/daemon/processor.ts:231: call push -> external
+        - src/daemon/processor.ts:235: call push -> external
+        - src/daemon/processor.ts:236: call push -> external
+        - src/daemon/processor.ts:240: call join -> external
+    274-382: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs out: 13 [call: 8, type: 5]
-        - src/daemon/processor.ts:272: type AnalysisJob -> src/daemon/types.ts
-        - src/daemon/processor.ts:273: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:274: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:275: type Promise -> external
-        - src/daemon/processor.ts:275: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:280: call access -> external
-        - src/daemon/processor.ts:287: call now -> external
-        - src/daemon/processor.ts:293: call access -> external
-        - src/daemon/processor.ts:300: call now -> external
-        - src/daemon/processor.ts:328: call debug -> src/daemon/processor.ts
-    485-554: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:275: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/processor.ts:276: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:277: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:278: type Promise -> external
+        - src/daemon/processor.ts:278: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:283: call access -> external
+        - src/daemon/processor.ts:290: call now -> external
+        - src/daemon/processor.ts:296: call access -> external
+        - src/daemon/processor.ts:303: call now -> external
+        - src/daemon/processor.ts:331: call debug -> src/daemon/processor.ts
+    488-557: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
-        - src/daemon/processor.ts:487: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:488: type Omit -> external
-        - src/daemon/processor.ts:488: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:494: call trim -> external
-        - src/daemon/processor.ts:498: call push -> external
-        - src/daemon/processor.ts:498: call parse -> external
-        - src/daemon/processor.ts:498: type PiJsonEvent -> src/daemon/processor.ts
-        - src/daemon/processor.ts:501: call debug -> src/daemon/processor.ts
-        - src/daemon/processor.ts:501: call slice -> external
-    560-593: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
+        - src/daemon/processor.ts:490: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:491: type Omit -> external
+        - src/daemon/processor.ts:491: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:497: call trim -> external
+        - src/daemon/processor.ts:501: call push -> external
+        - src/daemon/processor.ts:501: call parse -> external
+        - src/daemon/processor.ts:501: type PiJsonEvent -> src/daemon/processor.ts
+        - src/daemon/processor.ts:504: call debug -> src/daemon/processor.ts
+        - src/daemon/processor.ts:504: call slice -> external
+    563-596: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs out: 8 [call: 6, type: 2]
-        - src/daemon/processor.ts:562: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:563: type AgentNodeOutput -> src/daemon/types.ts
-        - src/daemon/processor.ts:569: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:572: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:574: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:583: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:586: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:588: call warn -> src/daemon/processor.ts
-    647-662: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.ts:565: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:566: type AgentNodeOutput -> src/daemon/types.ts
+        - src/daemon/processor.ts:572: call isValidNodeOutput -> src/daemon/processor.ts
+        - src/daemon/processor.ts:575: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:577: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:586: call isValidNodeOutput -> src/daemon/processor.ts
+        - src/daemon/processor.ts:589: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:591: call warn -> src/daemon/processor.ts
+    650-665: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/processor.ts:647: type AgentNodeOutput -> src/daemon/types.ts
-        - src/daemon/processor.ts:648: call isObject -> src/daemon/processor.ts
-        - src/daemon/processor.ts:654: call hasRequiredObjectFields -> src/daemon/processor.ts
-        - src/daemon/processor.ts:661: call hasValidClassification -> src/daemon/processor.ts
-        - src/daemon/processor.ts:661: call hasValidContent -> src/daemon/processor.ts
-    738-740: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+        - src/daemon/processor.ts:650: type AgentNodeOutput -> src/daemon/types.ts
+        - src/daemon/processor.ts:651: call isObject -> src/daemon/processor.ts
+        - src/daemon/processor.ts:657: call hasRequiredObjectFields -> src/daemon/processor.ts
+        - src/daemon/processor.ts:664: call hasValidClassification -> src/daemon/processor.ts
+        - src/daemon/processor.ts:664: call hasValidContent -> src/daemon/processor.ts
+    741-743: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/processor.ts:738: type ProcessorConfig -> src/daemon/processor.ts
-        - src/daemon/processor.ts:738: type JobProcessor -> src/daemon/processor.ts
-        - src/daemon/processor.ts:739: instantiate JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:741: type ProcessorConfig -> src/daemon/processor.ts
+        - src/daemon/processor.ts:741: type JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:742: instantiate JobProcessor -> src/daemon/processor.ts
   variable:
-    54-59: ProcessorLogger [exported]
-      /** Default console logger */
+    57-62: ProcessorLogger [exported]
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/processor.ts:54: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:55: call debug -> external
-        - src/daemon/processor.ts:56: call log -> external
-        - src/daemon/processor.ts:57: call warn -> external
-        - src/daemon/processor.ts:58: call error -> external
-    66-66: readonly [] [exported]
+        - src/daemon/processor.ts:57: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:58: call debug -> src/utils/logger.ts
+        - src/daemon/processor.ts:59: call info -> src/utils/logger.ts
+        - src/daemon/processor.ts:60: call warn -> src/utils/logger.ts
+        - src/daemon/processor.ts:61: call error -> src/utils/logger.ts
+    69-69: readonly [] [exported]
       /** Required skills for analysis - must be available */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:66: type const -> external
-    69-69: readonly ["codemap"] [exported]
+        - src/daemon/processor.ts:69: type const -> external
+    72-72: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:69: type const -> external
-    72-72: readonly ["rlm"] [exported]
+        - src/daemon/processor.ts:72: type const -> external
+    75-75: readonly ["rlm"] [exported]
       /** Skills that are conditionally included based on file size */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:72: type const -> external
-    75-75: number [exported]
+        - src/daemon/processor.ts:75: type const -> external
+    78-78: number [exported]
       /** File size threshold (in bytes) for including RLM skill */
-    78-78: any [exported]
+    81-81: any [exported]
       /** Skills directory location */
       refs out: 2 [call: 2]
-        - src/daemon/processor.ts:78: call join -> external
-        - src/daemon/processor.ts:78: call homedir -> external
+        - src/daemon/processor.ts:81: call join -> external
+        - src/daemon/processor.ts:81: call homedir -> external
   imports:
     - ../config/types.js
+    - ../utils/logger.js
     - ./queue.js
     - ./types.js
     - node:child_process
@@ -804,75 +809,75 @@ src/daemon/scheduler.test.ts [1-961]
     - better-sqlite3
     - vitest
 
-src/daemon/scheduler.ts [1-945]
+src/daemon/scheduler.ts [1-947]
   class:
-    163-871: class Scheduler [exported]
+    165-873: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
-    59-66: interface ScheduledJobResult [exported]
+    60-67: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
       refs out: 3 [type: 3]
-        - src/daemon/scheduler.ts:60: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:61: type Date -> external
+        - src/daemon/scheduler.ts:61: type ScheduledJobType -> src/daemon/scheduler.ts
         - src/daemon/scheduler.ts:62: type Date -> external
-    69-74: interface SchedulerLogger [exported]
+        - src/daemon/scheduler.ts:63: type Date -> external
+    70-75: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    95-146: interface SchedulerConfig [exported]
+    97-148: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    149-158: interface SchedulerStatus [exported]
+    151-160: interface SchedulerStatus [exported]
       /** Scheduler state */
       refs out: 4 [type: 4]
-        - src/daemon/scheduler.ts:152: type ScheduledJobType -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:154: type Date -> external
-        - src/daemon/scheduler.ts:155: type Date -> external
-        - src/daemon/scheduler.ts:156: type ScheduledJobResult -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:154: type ScheduledJobType -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:156: type Date -> external
+        - src/daemon/scheduler.ts:157: type Date -> external
+        - src/daemon/scheduler.ts:158: type ScheduledJobResult -> src/daemon/scheduler.ts
   type:
-    51-56: ScheduledJobType = | "reanalysis"
+    52-57: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
   | "pattern_aggregation"
   | "clustering"
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    876-906: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    878-908: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
       refs out: 6 [instantiate: 1, type: 5]
-        - src/daemon/scheduler.ts:877: type DaemonConfig -> src/config/types.ts
-        - src/daemon/scheduler.ts:878: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/scheduler.ts:879: type Database -> external
-        - src/daemon/scheduler.ts:880: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:881: type Scheduler -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:882: instantiate Scheduler -> src/daemon/scheduler.ts
-    912-922: isValidCronExpression(expression: string): boolean [exported]
+        - src/daemon/scheduler.ts:879: type DaemonConfig -> src/config/types.ts
+        - src/daemon/scheduler.ts:880: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/scheduler.ts:881: type Database -> external
+        - src/daemon/scheduler.ts:882: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:883: type Scheduler -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:884: instantiate Scheduler -> src/daemon/scheduler.ts
+    914-924: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
       refs out: 1 [call: 1]
-        - src/daemon/scheduler.ts:917: call Cron.stop -> external
-    927-944: getNextRunTimes(expression: string, count = 5): {} [exported]
+        - src/daemon/scheduler.ts:919: call Cron.stop -> external
+    929-946: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/scheduler.ts:927: type Date -> external
-        - src/daemon/scheduler.ts:935: call push -> external
-        - src/daemon/scheduler.ts:936: call Cron.nextRun -> external
-        - src/daemon/scheduler.ts:939: call Cron.stop -> external
+        - src/daemon/scheduler.ts:929: type Date -> external
+        - src/daemon/scheduler.ts:937: call push -> external
+        - src/daemon/scheduler.ts:938: call Cron.nextRun -> external
+        - src/daemon/scheduler.ts:941: call Cron.stop -> external
   variable:
-    78-83: SchedulerLogger [exported]
+    79-84: SchedulerLogger [exported]
       /** Default no-op logger */
       refs out: 1 [type: 1]
-        - src/daemon/scheduler.ts:78: type SchedulerLogger -> src/daemon/scheduler.ts
-    87-92: SchedulerLogger [exported]
-      /** Console logger for production use */
+        - src/daemon/scheduler.ts:79: type SchedulerLogger -> src/daemon/scheduler.ts
+    89-94: SchedulerLogger [exported]
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/scheduler.ts:87: type SchedulerLogger -> src/daemon/scheduler.ts
-        - src/daemon/scheduler.ts:88: call log -> external
-        - src/daemon/scheduler.ts:89: call warn -> external
-        - src/daemon/scheduler.ts:90: call error -> external
-        - src/daemon/scheduler.ts:91: call debug -> external
+        - src/daemon/scheduler.ts:89: type SchedulerLogger -> src/daemon/scheduler.ts
+        - src/daemon/scheduler.ts:90: call info -> src/utils/logger.ts
+        - src/daemon/scheduler.ts:91: call warn -> src/utils/logger.ts
+        - src/daemon/scheduler.ts:92: call error -> src/utils/logger.ts
+        - src/daemon/scheduler.ts:93: call debug -> src/utils/logger.ts
   imports:
     - ../config/types.js
     - ../prompt/effectiveness.js
     - ../prompt/prompt.js
     - ../storage/embedding-utils.js
     - ../storage/node-storage.js
+    - ../utils/logger.js
     - ./facet-discovery.js
     - ./insight-aggregation.js
     - ./pattern-aggregation.js
@@ -1581,4 +1586,4 @@ src/parser/signals.ts [1-1181]
 
 ---
 Files: 42
-Estimated tokens: 20,744 (codebase: ~1,369,273)
+Estimated tokens: 20,795 (codebase: ~1,385,805)

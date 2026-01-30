@@ -21,6 +21,7 @@ import {
   PRIORITY,
   type AnalysisJob,
 } from "../../daemon/queue.js";
+import { fileExists } from "../../utils/fs-async.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 export async function daemonRoutes(app: FastifyInstance): Promise<void> {
@@ -172,7 +173,7 @@ export async function daemonRoutes(app: FastifyInstance): Promise<void> {
 
       // Validate session file
       const resolvedPath = path.resolve(sessionFile);
-      if (!fs.existsSync(resolvedPath)) {
+      if (!(await fileExists(resolvedPath))) {
         return reply
           .status(400)
           .send(

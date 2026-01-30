@@ -1,15 +1,15 @@
 # Project Overview
 
 ## Languages
-- typescript: 107 files
+- typescript: 109 files
 
 ## Statistics
-- Total files: 107
-- Total symbols: 699
-  - function: 372
-  - interface: 229
-  - type: 44
-  - variable: 39
+- Total files: 109
+- Total symbols: 711
+  - function: 377
+  - interface: 230
+  - type: 45
+  - variable: 44
   - class: 15
 
 ---
@@ -62,27 +62,29 @@ src/api/routes/clusters.ts [1-393]
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-1792]
+src/api/routes/config.ts [1-1740]
   function:
-    1043-1791: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    1041-1739: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
     - ../../daemon/scheduler.js
+    - ../../utils/fs-async.js
     - ../responses.js
     - fastify
     - node:fs
     - node:path
     - yaml
 
-src/api/routes/daemon.ts [1-385]
+src/api/routes/daemon.ts [1-386]
   function:
-    26-317: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+    27-318: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/cli.js
     - ../../daemon/errors.js
     - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
+    - ../../utils/fs-async.js
     - ../responses.js
     - better-sqlite3
     - fastify
@@ -266,17 +268,17 @@ src/api/types.ts [1-21]
     - ../config/types.js
     - better-sqlite3
 
-src/api/websocket.ts [1-404]
+src/api/websocket.ts [1-406]
   class:
-    74-359: class WebSocketManager [exported]
+    76-361: class WebSocketManager [exported]
       /** Manages WebSocket connections and broadcasts events */
   interface:
-    45-49: interface WSMessage [exported]
+    47-51: interface WSMessage [exported]
       /** Message format for WebSocket events */
   type:
-    31-31: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
+    33-33: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
       /** Available subscription channels */
-    34-42: WSEventType = | "daemon.status"
+    36-44: WSEventType = | "daemon.status"
   | "analysis.started"
   | "analysis.completed"
   | "analysis.failed"
@@ -286,15 +288,16 @@ src/api/websocket.ts [1-404]
   | "error" [exported]
       /** WebSocket message types from server to client */
   function:
-    368-380: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+    370-382: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
       /** Register the WebSocket route on a Fastify instance */
-    391-396: getWebSocketManager(): WebSocketManager [exported]
+    393-398: getWebSocketManager(): WebSocketManager [exported]
       /** Get or create the global WebSocket manager */
-    401-403: setWebSocketManager(manager: WebSocketManager): void [exported]
+    403-405: setWebSocketManager(manager: WebSocketManager): void [exported]
       /** Set the global WebSocket manager (for testing or custom config) */
   imports:
     - ../daemon/queue.js
     - ../storage/node-types.js
+    - ../utils/logger.js
     - fastify
     - ws
 
@@ -396,67 +399,67 @@ src/config/types.ts [1-280]
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
       /** Configuration types for pi-brain Configuration is loaded from ~/.pi-brain/config.yaml All paths support ~ expansion for home directory Spoke sync method options */
 
-src/daemon/cli.ts [1-1337]
+src/daemon/cli.ts [1-1340]
   interface:
-    114-120: interface DaemonStatus [exported]
+    117-123: interface DaemonStatus [exported]
       /** Daemon status info */
-    123-128: interface QueueStatus [exported]
+    126-131: interface QueueStatus [exported]
       /** Queue status info */
-    131-136: interface HealthCheckResult [exported]
+    134-139: interface HealthCheckResult [exported]
       /** Health check result */
-    139-143: interface HealthStatus [exported]
+    142-146: interface HealthStatus [exported]
       /** Overall health status */
-    146-149: interface OutputOptions [exported]
+    149-152: interface OutputOptions [exported]
       /** CLI output options */
-    276-280: interface StartOptions [exported]
+    279-283: interface StartOptions [exported]
       /** Start options */
-    283-286: interface StopOptions [exported]
+    286-289: interface StopOptions [exported]
       /** Stop options */
   function:
-    61-70: isPortAvailable(port: number): Promise<boolean> [exported]
+    64-73: isPortAvailable(port: number): Promise<boolean> [exported]
       /** Check if a port is available */
-    75-88: findProcessOnPort(port: number): number [exported]
+    78-91: findProcessOnPort(port: number): number [exported]
       /** Find process using a port (Linux/macOS) */
-    158-169: readPidFile(): number [exported]
+    161-172: readPidFile(): number [exported]
       /** Read the daemon PID from the PID file */
-    174-180: writePidFile(pid: number): void [exported]
+    177-183: writePidFile(pid: number): void [exported]
       /** Write the daemon PID to the PID file */
-    185-193: removePidFile(): void [exported]
+    188-196: removePidFile(): void [exported]
       /** Remove the PID file */
-    198-206: isProcessRunning(pid: number): boolean [exported]
+    201-209: isProcessRunning(pid: number): boolean [exported]
       /** Check if a process with the given PID is running */
-    211-224: isDaemonRunning(): { running: boolean; pid: number; } [exported]
+    214-227: isDaemonRunning(): { running: boolean; pid: number; } [exported]
       /** Check if the daemon is currently running */
-    233-254: formatUptime(seconds: number): string [exported]
+    236-257: formatUptime(seconds: number): string [exported]
       /** Format uptime in a human-readable way */
-    259-269: getProcessUptime(): number [exported]
+    262-272: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
-    484-514: async startDaemon(options: StartOptions = {}): Promise<DaemonResult> [exported]
+    487-517: async startDaemon(options: StartOptions = {}): Promise<DaemonResult> [exported]
       /** Start the daemon process */
-    553-588: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
+    556-591: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-    593-605: getDaemonStatus(configPath?: string): DaemonStatus [exported]
+    596-608: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-    614-643: getQueueStatus(configPath?: string): QueueStatus [exported]
+    617-646: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-    648-701: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
+    651-704: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-    921-951: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
+    924-954: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-    960-981: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
+    963-984: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-    1032-1066: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
+    1035-1069: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-    1081-1104: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
+    1084-1107: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-    1119-1239: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
+    1122-1242: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-    1244-1326: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
+    1247-1329: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
   variable:
-    108-108: any [exported]
-      /** PID file location */
     111-111: any [exported]
+      /** PID file location */
+    114-114: any [exported]
       /** Log file location */
   imports:
     - ../config/config.js
@@ -465,11 +468,13 @@ src/daemon/cli.ts [1-1337]
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
     - ../storage/node-storage.js
+    - ../utils/fs-async.js
     - ./facet-discovery.js
     - ./processor.js
     - ./queue.js
     - node:child_process
     - node:fs
+    - node:fs/promises
     - node:net
     - node:path
 
@@ -538,11 +543,12 @@ src/daemon/consolidation/relevance.ts [1-340]
   imports:
     - better-sqlite3
 
-src/daemon/daemon-process.ts [1-339]
+src/daemon/daemon-process.ts [1-341]
   imports:
     - ../api/server.js
     - ../config/config.js
     - ../storage/database.js
+    - ../utils/logger.js
     - ./cli.js
     - ./consolidation/index.js
     - ./queue.js
@@ -606,17 +612,18 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/export.ts [1-175]
+src/daemon/export.ts [1-176]
   function:
-    17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
+    18-31: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
       /** Extract entries within a segment range */
-    121-174: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+    122-175: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
   imports:
     - ../config/index.js
     - ../parser/session.js
     - ../storage/node-storage.js
     - ../types/index.js
+    - ../utils/fs-async.js
     - node:fs
     - node:path
 
@@ -686,12 +693,13 @@ src/daemon/index.ts [1-181]
     - ./watcher.js
     - ./worker.js
 
-src/daemon/insight-aggregation.ts [1-628]
+src/daemon/insight-aggregation.ts [1-632]
   class:
-    149-627: class InsightAggregator [exported]
+    153-631: class InsightAggregator [exported]
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
+    - ../utils/logger.js
     - better-sqlite3
     - node:crypto
 
@@ -702,57 +710,57 @@ src/daemon/pattern-aggregation.ts [1-331]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-741]
+src/daemon/processor.ts [1-744]
   class:
-    679-733: class JobProcessor [exported]
+    682-736: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
-    23-36: interface AgentResult [exported]
+    25-38: interface AgentResult [exported]
       /** Result from invoking the pi agent */
-    39-43: interface SkillInfo [exported]
+    41-45: interface SkillInfo [exported]
       /** Skill availability information */
-    46-51: interface ProcessorLogger [exported]
+    48-53: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    123-130: interface EnvironmentValidationResult [exported]
+    126-133: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    669-674: interface ProcessorConfig [exported]
+    672-677: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
-    87-95: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    90-98: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-    100-120: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+    103-123: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    136-148: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    139-151: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    183-197: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+    186-200: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
-    206-238: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    209-241: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    271-379: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    274-382: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    485-554: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    488-557: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    560-593: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
+    563-596: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    647-662: isValidNodeOutput(obj: unknown): boolean [exported]
+    650-665: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    738-740: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    741-743: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
-    54-59: ProcessorLogger [exported]
-      /** Default console logger */
-    66-66: readonly [] [exported]
+    57-62: ProcessorLogger [exported]
+    69-69: readonly [] [exported]
       /** Required skills for analysis - must be available */
-    69-69: readonly ["codemap"] [exported]
+    72-72: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
-    72-72: readonly ["rlm"] [exported]
+    75-75: readonly ["rlm"] [exported]
       /** Skills that are conditionally included based on file size */
-    75-75: number [exported]
+    78-78: number [exported]
       /** File size threshold (in bytes) for including RLM skill */
-    78-78: any [exported]
+    81-81: any [exported]
       /** Skills directory location */
   imports:
     - ../config/types.js
+    - ../utils/logger.js
     - ./queue.js
     - ./types.js
     - node:child_process
@@ -808,44 +816,44 @@ src/daemon/queue.ts [1-746]
     - ./types.js
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-945]
+src/daemon/scheduler.ts [1-947]
   class:
-    163-871: class Scheduler [exported]
+    165-873: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
-    59-66: interface ScheduledJobResult [exported]
+    60-67: interface ScheduledJobResult [exported]
       /** Result of a scheduled job execution */
-    69-74: interface SchedulerLogger [exported]
+    70-75: interface SchedulerLogger [exported]
       /** Logger interface for scheduler */
-    95-146: interface SchedulerConfig [exported]
+    97-148: interface SchedulerConfig [exported]
       /** Scheduler configuration */
-    149-158: interface SchedulerStatus [exported]
+    151-160: interface SchedulerStatus [exported]
       /** Scheduler state */
   type:
-    51-56: ScheduledJobType = | "reanalysis"
+    52-57: ScheduledJobType = | "reanalysis"
   | "connection_discovery"
   | "pattern_aggregation"
   | "clustering"
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    876-906: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    878-908: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    912-922: isValidCronExpression(expression: string): boolean [exported]
+    914-924: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    927-944: getNextRunTimes(expression: string, count = 5): {} [exported]
+    929-946: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
-    78-83: SchedulerLogger [exported]
+    79-84: SchedulerLogger [exported]
       /** Default no-op logger */
-    87-92: SchedulerLogger [exported]
-      /** Console logger for production use */
+    89-94: SchedulerLogger [exported]
   imports:
     - ../config/types.js
     - ../prompt/effectiveness.js
     - ../prompt/prompt.js
     - ../storage/embedding-utils.js
     - ../storage/node-storage.js
+    - ../utils/logger.js
     - ./facet-discovery.js
     - ./insight-aggregation.js
     - ./pattern-aggregation.js
@@ -970,7 +978,7 @@ src/daemon/worker.ts [1-882]
     - better-sqlite3
     - node:path
 
-src/index.ts [1-58]
+src/index.ts [1-69]
   imports:
     - ./config/index.js
     - ./daemon/index.js
@@ -983,6 +991,7 @@ src/index.ts [1-58]
     - ./storage/node-storage.js
     - ./storage/node-types.js
     - ./types/index.js
+    - ./utils/logger.js
     - ./web/generator.js
 
 src/parser/analyzer.ts [1-312]
@@ -2163,6 +2172,36 @@ src/types/session.ts [1-298]
   | ToolCallContent
   | ImageContent [exported]
 
+src/utils/fs-async.ts [1-95]
+  function:
+    23-30: async fileExists(path: string): Promise<boolean> [exported]
+      /** Check if a file or directory exists asynchronously. */
+    47-59: async safeReadFile(path: string, encoding: BufferEncoding = "utf8"): Promise<string> [exported]
+      /** Read a file if it exists, returning undefined if not. */
+    73-79: async safeWriteFile(path: string, content: string, encoding: BufferEncoding = "utf8"): Promise<void> [exported]
+      /** Write a file, creating parent directories if needed. */
+    92-94: async ensureDir(path: string): Promise<void> [exported]
+      /** Ensure a directory exists, creating it if needed. */
+  imports:
+    - node:fs/promises
+
+src/utils/logger.ts [1-104]
+  interface:
+    11-16: interface Logger [exported]
+  type:
+    9-9: LogLevel = "debug" | "info" | "warn" | "error" [exported]
+      /** Structured logger for pi-brain daemon and components. This module intentionally wraps console.log to provide structured, timestamped logging with prefixes. It's excluded from the no-console-log semgrep rule since it's the canonical logging implementation. */
+  function:
+    50-93: createLogger(prefix: string): Logger [exported]
+      /** Creates a logger instance with a specific prefix. */
+  variable:
+    99-99: Logger [exported]
+      /** Pre-configured logger instances for common components. Use these for consistency, or create custom loggers with createLogger(). */
+    100-100: Logger [exported]
+    101-101: Logger [exported]
+    102-102: Logger [exported]
+    103-103: Logger [exported]
+
 src/utils/session-utils.ts [1-46]
   function:
     13-45: groupByProject(sessions: SessionInfo[]): {} [exported]
@@ -2259,9 +2298,9 @@ src/web/app/src/lib/stores/toast.ts [1-114]
   imports:
     - svelte/store
 
-src/web/app/src/lib/stores/websocket.ts [1-179]
+src/web/app/src/lib/stores/websocket.ts [1-180]
   variable:
-    178-178: wsStore [exported]
+    179-179: wsStore [exported]
   imports:
     - ./daemon
     - ./nodes
@@ -2343,5 +2382,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 107
-Estimated tokens: 29,000 (codebase: ~1,348,622)
+Files: 109
+Estimated tokens: 29,443 (codebase: ~1,370,356)

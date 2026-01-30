@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 107,
-    "totalSymbols": 1549,
+    "totalFiles": 109,
+    "totalSymbols": 1566,
     "byLanguage": {
-      "typescript": 107
+      "typescript": 109
     },
     "bySymbolKind": {
-      "function": 737,
-      "type": 48,
-      "interface": 323,
-      "variable": 161,
+      "function": 743,
+      "type": 49,
+      "interface": 324,
+      "variable": 170,
       "class": 15,
       "property": 62,
       "constructor": 14,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 54153,
-  "codebase_tokens": 1369273,
+  "total_tokens": 54682,
+  "codebase_tokens": 1385805,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -459,18 +459,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1792
+        1740
       ],
       "detail_level": "full",
-      "token_estimate": 1848,
+      "token_estimate": 1863,
       "symbols": [
         {
           "name": "ValidationResult",
           "kind": "type",
           "signature": "ValidationResult = string | null",
           "lines": [
-            32,
-            32
+            33,
+            33
           ],
           "exported": false,
           "is_default": false,
@@ -488,8 +488,8 @@
           "kind": "function",
           "signature": "firstError(validations: ValidationResult[]): string",
           "lines": [
-            37,
-            44
+            38,
+            45
           ],
           "exported": false,
           "is_default": false,
@@ -507,8 +507,8 @@
           "kind": "function",
           "signature": "validateIntRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            49,
-            62
+            50,
+            63
           ],
           "exported": false,
           "is_default": false,
@@ -526,8 +526,8 @@
           "kind": "function",
           "signature": "validateNullableIntRange(value: number | null | undefined, field: string, min: number, max: number): string",
           "lines": [
-            68,
-            81
+            69,
+            82
           ],
           "exported": false,
           "is_default": false,
@@ -545,8 +545,8 @@
           "kind": "function",
           "signature": "validateFloatRange(value: number | undefined, field: string, min: number, max: number): string",
           "lines": [
-            86,
-            99
+            87,
+            100
           ],
           "exported": false,
           "is_default": false,
@@ -564,8 +564,8 @@
           "kind": "function",
           "signature": "validateNonEmptyString(value: string | undefined, field: string): string",
           "lines": [
-            104,
-            115
+            105,
+            116
           ],
           "exported": false,
           "is_default": false,
@@ -583,8 +583,8 @@
           "kind": "function",
           "signature": "validateNullableNonEmptyString(value: string | null | undefined, field: string): string",
           "lines": [
-            120,
-            131
+            121,
+            132
           ],
           "exported": false,
           "is_default": false,
@@ -602,8 +602,8 @@
           "kind": "function",
           "signature": "validateOneOf<T>(value: T | undefined, field: string, allowed: readonly T[]): string",
           "lines": [
-            136,
-            148
+            137,
+            149
           ],
           "exported": false,
           "is_default": false,
@@ -621,8 +621,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(value: string | null | undefined, field: string): string",
           "lines": [
-            154,
-            165
+            155,
+            166
           ],
           "exported": false,
           "is_default": false,
@@ -640,8 +640,8 @@
           "kind": "variable",
           "signature": "readonly [\"ollama\", \"openai\", \"openrouter\"]",
           "lines": [
-            170,
-            170
+            171,
+            171
           ],
           "exported": false,
           "is_default": false,
@@ -659,8 +659,8 @@
           "kind": "type",
           "signature": "EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]",
           "lines": [
-            171,
-            171
+            172,
+            172
           ],
           "exported": false,
           "is_default": false,
@@ -678,8 +678,8 @@
           "kind": "interface",
           "signature": "DaemonConfigUpdateBody",
           "lines": [
-            176,
-            204
+            177,
+            205
           ],
           "exported": false,
           "is_default": false,
@@ -697,8 +697,8 @@
           "kind": "interface",
           "signature": "QueryConfigUpdateBody",
           "lines": [
-            209,
-            212
+            210,
+            213
           ],
           "exported": false,
           "is_default": false,
@@ -716,8 +716,8 @@
           "kind": "interface",
           "signature": "ApiConfigUpdateBody",
           "lines": [
-            217,
-            221
+            218,
+            222
           ],
           "exported": false,
           "is_default": false,
@@ -735,8 +735,8 @@
           "kind": "interface",
           "signature": "HubConfigUpdateBody",
           "lines": [
-            226,
-            230
+            227,
+            231
           ],
           "exported": false,
           "is_default": false,
@@ -754,8 +754,8 @@
           "kind": "variable",
           "signature": "SyncMethod[]",
           "lines": [
-            235,
-            235
+            236,
+            236
           ],
           "exported": false,
           "is_default": false,
@@ -773,8 +773,8 @@
           "kind": "interface",
           "signature": "RsyncOptionsBody",
           "lines": [
-            240,
-            245
+            241,
+            246
           ],
           "exported": false,
           "is_default": false,
@@ -792,8 +792,8 @@
           "kind": "interface",
           "signature": "SpokeCreateBody",
           "lines": [
-            250,
-            258
+            251,
+            259
           ],
           "exported": false,
           "is_default": false,
@@ -811,8 +811,8 @@
           "kind": "interface",
           "signature": "SpokeUpdateBody",
           "lines": [
-            263,
-            270
+            264,
+            271
           ],
           "exported": false,
           "is_default": false,
@@ -830,8 +830,8 @@
           "kind": "interface",
           "signature": "SpokeResponse",
           "lines": [
-            275,
-            283
+            276,
+            284
           ],
           "exported": false,
           "is_default": false,
@@ -849,8 +849,8 @@
           "kind": "function",
           "signature": "validateEmbeddingFields(body: DaemonConfigUpdateBody): string",
           "lines": [
-            288,
-            313
+            289,
+            314
           ],
           "exported": false,
           "is_default": false,
@@ -868,8 +868,8 @@
           "kind": "function",
           "signature": "validateDaemonUpdate(body: DaemonConfigUpdateBody): string",
           "lines": [
-            318,
-            394
+            319,
+            395
           ],
           "exported": false,
           "is_default": false,
@@ -887,8 +887,8 @@
           "kind": "function",
           "signature": "hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean",
           "lines": [
-            399,
-            401
+            400,
+            402
           ],
           "exported": false,
           "is_default": false,
@@ -906,8 +906,8 @@
           "kind": "function",
           "signature": "applyNullableString(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: string | null | undefined): void",
           "lines": [
-            407,
-            422
+            408,
+            423
           ],
           "exported": false,
           "is_default": false,
@@ -925,8 +925,8 @@
           "kind": "function",
           "signature": "applyNullableNumber(target: NonNullable<RawConfig[\"daemon\"]>, key: keyof NonNullable<RawConfig[\"daemon\"]>, value: number | null | undefined): void",
           "lines": [
-            428,
-            442
+            429,
+            443
           ],
           "exported": false,
           "is_default": false,
@@ -944,8 +944,8 @@
           "kind": "function",
           "signature": "applyEmbeddingUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
           "lines": [
-            447,
-            468
+            448,
+            469
           ],
           "exported": false,
           "is_default": false,
@@ -963,8 +963,8 @@
           "kind": "function",
           "signature": "applyScheduleUpdates(daemon: NonNullable<RawConfig[\"daemon\"]>, body: DaemonConfigUpdateBody): void",
           "lines": [
-            473,
-            502
+            474,
+            503
           ],
           "exported": false,
           "is_default": false,
@@ -982,8 +982,8 @@
           "kind": "variable",
           "signature": "Record<string, keyof NonNullable<RawConfig[\"daemon\"]>>",
           "lines": [
-            507,
-            524
+            508,
+            525
           ],
           "exported": false,
           "is_default": false,
@@ -1001,8 +1001,8 @@
           "kind": "function",
           "signature": "applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void",
           "lines": [
-            529,
-            552
+            530,
+            553
           ],
           "exported": false,
           "is_default": false,
@@ -1020,8 +1020,8 @@
           "kind": "function",
           "signature": "validateQueryUpdate(body: QueryConfigUpdateBody): string",
           "lines": [
-            557,
-            571
+            558,
+            572
           ],
           "exported": false,
           "is_default": false,
@@ -1039,8 +1039,8 @@
           "kind": "function",
           "signature": "validateApiUpdate(body: ApiConfigUpdateBody): string",
           "lines": [
-            576,
-            605
+            577,
+            606
           ],
           "exported": false,
           "is_default": false,
@@ -1058,8 +1058,8 @@
           "kind": "function",
           "signature": "validatePath(p: string, field: string): string",
           "lines": [
-            610,
-            632
+            611,
+            633
           ],
           "exported": false,
           "is_default": false,
@@ -1077,8 +1077,8 @@
           "kind": "function",
           "signature": "validateDirPath(value: string | undefined, field: string): string",
           "lines": [
-            637,
-            649
+            638,
+            650
           ],
           "exported": false,
           "is_default": false,
@@ -1096,8 +1096,8 @@
           "kind": "function",
           "signature": "validateHubUpdate(body: HubConfigUpdateBody): string",
           "lines": [
-            654,
-            662
+            655,
+            663
           ],
           "exported": false,
           "is_default": false,
@@ -1115,8 +1115,8 @@
           "kind": "function",
           "signature": "validateSpokeName(name: string): string",
           "lines": [
-            667,
-            678
+            668,
+            679
           ],
           "exported": false,
           "is_default": false,
@@ -1134,8 +1134,8 @@
           "kind": "function",
           "signature": "validateStringArray(value: string[] | undefined, field: string): string",
           "lines": [
-            683,
-            699
+            684,
+            700
           ],
           "exported": false,
           "is_default": false,
@@ -1153,8 +1153,8 @@
           "kind": "function",
           "signature": "validateRsyncOptions(options: RsyncOptionsBody | undefined, field: string): string",
           "lines": [
-            704,
-            719
+            705,
+            720
           ],
           "exported": false,
           "is_default": false,
@@ -1172,8 +1172,8 @@
           "kind": "function",
           "signature": "validateSpokeCreate(body: SpokeCreateBody): string",
           "lines": [
-            724,
-            763
+            725,
+            764
           ],
           "exported": false,
           "is_default": false,
@@ -1191,8 +1191,8 @@
           "kind": "function",
           "signature": "validateSpokeUpdate(body: SpokeUpdateBody): string",
           "lines": [
-            768,
-            780
+            769,
+            781
           ],
           "exported": false,
           "is_default": false,
@@ -1208,14 +1208,14 @@
         {
           "name": "readRawConfig",
           "kind": "function",
-          "signature": "readRawConfig(): RawConfig",
+          "signature": "async readRawConfig(): Promise<RawConfig>",
           "lines": [
-            789,
-            798
+            790,
+            796
           ],
           "exported": false,
           "is_default": false,
-          "is_async": false,
+          "is_async": true,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -1227,14 +1227,14 @@
         {
           "name": "writeRawConfig",
           "kind": "function",
-          "signature": "writeRawConfig(rawConfig: RawConfig): void",
+          "signature": "async writeRawConfig(rawConfig: RawConfig): Promise<void>",
           "lines": [
-            803,
-            809
+            801,
+            807
           ],
           "exported": false,
           "is_default": false,
-          "is_async": false,
+          "is_async": true,
           "is_static": false,
           "is_abstract": false,
           "parent_name": null,
@@ -1248,8 +1248,8 @@
           "kind": "function",
           "signature": "buildRawRsyncOptions(options: RsyncOptionsBody): NonNullable<NonNullable<RawConfig>>",
           "lines": [
-            814,
-            835
+            812,
+            833
           ],
           "exported": false,
           "is_default": false,
@@ -1267,8 +1267,8 @@
           "kind": "function",
           "signature": "buildRawSpokeFromBody(body: SpokeCreateBody): NonNullable<RawConfig>",
           "lines": [
-            840,
-            861
+            838,
+            859
           ],
           "exported": false,
           "is_default": false,
@@ -1286,8 +1286,8 @@
           "kind": "function",
           "signature": "applyRsyncOptionsUpdate(rawSpoke: NonNullable<RawConfig[\"spokes\"]>[number], options: RsyncOptionsBody): void",
           "lines": [
-            866,
-            885
+            864,
+            883
           ],
           "exported": false,
           "is_default": false,
@@ -1305,8 +1305,8 @@
           "kind": "function",
           "signature": "applyNullableField(target: Record<string, unknown>, key: string, value: string | null | undefined): void",
           "lines": [
-            890,
-            904
+            888,
+            902
           ],
           "exported": false,
           "is_default": false,
@@ -1324,8 +1324,8 @@
           "kind": "function",
           "signature": "applySpokeUpdates(rawSpoke: NonNullable<RawConfig[\"spokes\"]>[number], body: SpokeUpdateBody): void",
           "lines": [
-            909,
-            934
+            907,
+            932
           ],
           "exported": false,
           "is_default": false,
@@ -1343,8 +1343,8 @@
           "kind": "function",
           "signature": "spokeToResponse(spoke: {\n  name: string;\n  syncMethod: SyncMethod;\n  path: string;\n  source?: string;\n  enabled: boolean;\n  schedule?: string;\n  rsyncOptions?: RsyncOptions;\n}): SpokeResponse",
           "lines": [
-            939,
-            966
+            937,
+            964
           ],
           "exported": false,
           "is_default": false,
@@ -1362,8 +1362,8 @@
           "kind": "function",
           "signature": "applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void",
           "lines": [
-            971,
-            989
+            969,
+            987
           ],
           "exported": false,
           "is_default": false,
@@ -1381,8 +1381,8 @@
           "kind": "function",
           "signature": "applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void",
           "lines": [
-            994,
-            1015
+            992,
+            1013
           ],
           "exported": false,
           "is_default": false,
@@ -1400,8 +1400,8 @@
           "kind": "function",
           "signature": "applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void",
           "lines": [
-            1020,
-            1041
+            1018,
+            1039
           ],
           "exported": false,
           "is_default": false,
@@ -1419,8 +1419,8 @@
           "kind": "function",
           "signature": "async configRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            1043,
-            1791
+            1041,
+            1739
           ],
           "exported": true,
           "is_default": false,
@@ -1441,6 +1441,7 @@
         "../../config/config.js",
         "../../config/types.js",
         "../../daemon/scheduler.js",
+        "../../utils/fs-async.js",
         "../responses.js",
         "fastify",
         "node:fs",
@@ -1453,18 +1454,18 @@
       "language": "typescript",
       "lines": [
         1,
-        385
+        386
       ],
       "detail_level": "full",
-      "token_estimate": 165,
+      "token_estimate": 172,
       "symbols": [
         {
           "name": "daemonRoutes",
           "kind": "function",
           "signature": "async daemonRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            26,
-            317
+            27,
+            318
           ],
           "exported": true,
           "is_default": false,
@@ -1482,8 +1483,8 @@
           "kind": "function",
           "signature": "getAverageProcessingRate(db: Database.Database): number",
           "lines": [
-            325,
-            384
+            326,
+            385
           ],
           "exported": false,
           "is_default": false,
@@ -1505,6 +1506,7 @@
         "../../daemon/errors.js",
         "../../daemon/pattern-aggregation.js",
         "../../daemon/queue.js",
+        "../../utils/fs-async.js",
         "../responses.js",
         "better-sqlite3",
         "fastify",
@@ -2760,18 +2762,18 @@
       "language": "typescript",
       "lines": [
         1,
-        404
+        406
       ],
       "detail_level": "full",
-      "token_estimate": 942,
+      "token_estimate": 948,
       "symbols": [
         {
           "name": "WS_READY_STATE",
           "kind": "variable",
           "signature": "{ readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }",
           "lines": [
-            19,
-            24
+            21,
+            26
           ],
           "exported": false,
           "is_default": false,
@@ -2789,8 +2791,8 @@
           "kind": "type",
           "signature": "WSChannel = \"daemon\" | \"analysis\" | \"node\" | \"queue\"",
           "lines": [
-            31,
-            31
+            33,
+            33
           ],
           "exported": true,
           "is_default": false,
@@ -2808,8 +2810,8 @@
           "kind": "type",
           "signature": "WSEventType = | \"daemon.status\"\n  | \"analysis.started\"\n  | \"analysis.completed\"\n  | \"analysis.failed\"\n  | \"node.created\"\n  | \"queue.updated\"\n  | \"subscribed\"\n  | \"error\"",
           "lines": [
-            34,
-            42
+            36,
+            44
           ],
           "exported": true,
           "is_default": false,
@@ -2827,8 +2829,8 @@
           "kind": "interface",
           "signature": "WSMessage",
           "lines": [
-            45,
-            49
+            47,
+            51
           ],
           "exported": true,
           "is_default": false,
@@ -2846,8 +2848,8 @@
           "kind": "interface",
           "signature": "SubscribeMessage",
           "lines": [
-            52,
-            55
+            54,
+            57
           ],
           "exported": false,
           "is_default": false,
@@ -2865,8 +2867,8 @@
           "kind": "type",
           "signature": "ClientMessage = SubscribeMessage",
           "lines": [
-            58,
-            58
+            60,
+            60
           ],
           "exported": false,
           "is_default": false,
@@ -2884,8 +2886,8 @@
           "kind": "interface",
           "signature": "WSClient",
           "lines": [
-            61,
-            65
+            63,
+            67
           ],
           "exported": false,
           "is_default": false,
@@ -2903,8 +2905,8 @@
           "kind": "class",
           "signature": "WebSocketManager",
           "lines": [
-            74,
-            359
+            76,
+            361
           ],
           "exported": true,
           "is_default": false,
@@ -2922,8 +2924,8 @@
           "kind": "property",
           "signature": "clients",
           "lines": [
-            75,
-            75
+            77,
+            77
           ],
           "exported": false,
           "is_default": false,
@@ -2941,8 +2943,8 @@
           "kind": "property",
           "signature": "logger: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  }",
           "lines": [
-            76,
-            80
+            78,
+            82
           ],
           "exported": false,
           "is_default": false,
@@ -2960,8 +2962,8 @@
           "kind": "constructor",
           "signature": "constructor(logger?: {\n    info: (msg: string) => void;\n    error: (msg: string) => void;\n    debug: (msg: string) => void;\n  })",
           "lines": [
-            82,
-            92
+            84,
+            94
           ],
           "exported": false,
           "is_default": false,
@@ -2979,8 +2981,8 @@
           "kind": "method",
           "signature": "handleConnection(socket: WebSocket): void",
           "lines": [
-            97,
-            124
+            99,
+            126
           ],
           "exported": false,
           "is_default": false,
@@ -2998,8 +3000,8 @@
           "kind": "method",
           "signature": "handleMessage(client: WSClient, data: Buffer | string): void",
           "lines": [
-            129,
-            158
+            131,
+            160
           ],
           "exported": false,
           "is_default": false,
@@ -3017,8 +3019,8 @@
           "kind": "method",
           "signature": "handleSubscribe(client: WSClient, message: SubscribeMessage): void",
           "lines": [
-            163,
-            196
+            165,
+            198
           ],
           "exported": false,
           "is_default": false,
@@ -3036,8 +3038,8 @@
           "kind": "method",
           "signature": "sendToClient(client: WSClient, message: WSMessage): void",
           "lines": [
-            201,
-            211
+            203,
+            213
           ],
           "exported": false,
           "is_default": false,
@@ -3055,8 +3057,8 @@
           "kind": "method",
           "signature": "broadcast(channel: WSChannel, message: WSMessage): void",
           "lines": [
-            216,
-            229
+            218,
+            231
           ],
           "exported": false,
           "is_default": false,
@@ -3074,8 +3076,8 @@
           "kind": "method",
           "signature": "getClientCount(): number",
           "lines": [
-            234,
-            236
+            236,
+            238
           ],
           "exported": false,
           "is_default": false,
@@ -3093,8 +3095,8 @@
           "kind": "method",
           "signature": "closeAll(): void",
           "lines": [
-            241,
-            246
+            243,
+            248
           ],
           "exported": false,
           "is_default": false,
@@ -3112,8 +3114,8 @@
           "kind": "method",
           "signature": "broadcastDaemonStatus(status: {\n    running: boolean;\n    pid?: number;\n    uptime?: number;\n    workers?: {\n      total: number;\n      active: number;\n      idle: number;\n    };\n    queue?: {\n      pending: number;\n      running: number;\n      completedToday: number;\n      failedToday: number;\n    };\n    lastAnalysis?: string;\n    nextScheduled?: {\n      reanalysis?: string;\n      connectionDiscovery?: string;\n    };\n  }): void",
           "lines": [
-            255,
-            281
+            257,
+            283
           ],
           "exported": false,
           "is_default": false,
@@ -3131,8 +3133,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void",
           "lines": [
-            286,
-            296
+            288,
+            298
           ],
           "exported": false,
           "is_default": false,
@@ -3150,8 +3152,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void",
           "lines": [
-            301,
-            323
+            303,
+            325
           ],
           "exported": false,
           "is_default": false,
@@ -3169,8 +3171,8 @@
           "kind": "method",
           "signature": "broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void",
           "lines": [
-            328,
-            342
+            330,
+            344
           ],
           "exported": false,
           "is_default": false,
@@ -3188,8 +3190,8 @@
           "kind": "method",
           "signature": "broadcastQueueUpdate(stats: {\n    pending: number;\n    running: number;\n    completed: number;\n    failed: number;\n  }): void",
           "lines": [
-            347,
-            358
+            349,
+            360
           ],
           "exported": false,
           "is_default": false,
@@ -3207,8 +3209,8 @@
           "kind": "function",
           "signature": "registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void",
           "lines": [
-            368,
-            380
+            370,
+            382
           ],
           "exported": true,
           "is_default": false,
@@ -3226,8 +3228,8 @@
           "kind": "variable",
           "signature": "WebSocketManager | null",
           "lines": [
-            386,
-            386
+            388,
+            388
           ],
           "exported": false,
           "is_default": false,
@@ -3245,8 +3247,8 @@
           "kind": "function",
           "signature": "getWebSocketManager(): WebSocketManager",
           "lines": [
-            391,
-            396
+            393,
+            398
           ],
           "exported": true,
           "is_default": false,
@@ -3264,8 +3266,8 @@
           "kind": "function",
           "signature": "setWebSocketManager(manager: WebSocketManager): void",
           "lines": [
-            401,
-            403
+            403,
+            405
           ],
           "exported": true,
           "is_default": false,
@@ -3285,6 +3287,7 @@
       "imports": [
         "../daemon/queue.js",
         "../storage/node-types.js",
+        "../utils/logger.js",
         "fastify",
         "ws"
       ]
@@ -4849,18 +4852,18 @@
       "language": "typescript",
       "lines": [
         1,
-        1337
+        1340
       ],
       "detail_level": "full",
-      "token_estimate": 1667,
+      "token_estimate": 1680,
       "symbols": [
         {
           "name": "isPortAvailable",
           "kind": "function",
           "signature": "isPortAvailable(port: number): Promise<boolean>",
           "lines": [
-            61,
-            70
+            64,
+            73
           ],
           "exported": true,
           "is_default": false,
@@ -4878,8 +4881,8 @@
           "kind": "function",
           "signature": "findProcessOnPort(port: number): number",
           "lines": [
-            75,
-            88
+            78,
+            91
           ],
           "exported": true,
           "is_default": false,
@@ -4897,8 +4900,8 @@
           "kind": "function",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            97,
-            101
+            100,
+            104
           ],
           "exported": false,
           "is_default": false,
@@ -4916,8 +4919,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            108,
-            108
+            111,
+            111
           ],
           "exported": true,
           "is_default": false,
@@ -4935,8 +4938,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            111,
-            111
+            114,
+            114
           ],
           "exported": true,
           "is_default": false,
@@ -4954,8 +4957,8 @@
           "kind": "interface",
           "signature": "DaemonStatus",
           "lines": [
-            114,
-            120
+            117,
+            123
           ],
           "exported": true,
           "is_default": false,
@@ -4973,8 +4976,8 @@
           "kind": "interface",
           "signature": "QueueStatus",
           "lines": [
-            123,
-            128
+            126,
+            131
           ],
           "exported": true,
           "is_default": false,
@@ -4992,8 +4995,8 @@
           "kind": "interface",
           "signature": "HealthCheckResult",
           "lines": [
-            131,
-            136
+            134,
+            139
           ],
           "exported": true,
           "is_default": false,
@@ -5011,8 +5014,8 @@
           "kind": "interface",
           "signature": "HealthStatus",
           "lines": [
-            139,
-            143
+            142,
+            146
           ],
           "exported": true,
           "is_default": false,
@@ -5030,8 +5033,8 @@
           "kind": "interface",
           "signature": "OutputOptions",
           "lines": [
-            146,
-            149
+            149,
+            152
           ],
           "exported": true,
           "is_default": false,
@@ -5049,8 +5052,8 @@
           "kind": "function",
           "signature": "readPidFile(): number",
           "lines": [
-            158,
-            169
+            161,
+            172
           ],
           "exported": true,
           "is_default": false,
@@ -5068,8 +5071,8 @@
           "kind": "function",
           "signature": "writePidFile(pid: number): void",
           "lines": [
-            174,
-            180
+            177,
+            183
           ],
           "exported": true,
           "is_default": false,
@@ -5087,8 +5090,8 @@
           "kind": "function",
           "signature": "removePidFile(): void",
           "lines": [
-            185,
-            193
+            188,
+            196
           ],
           "exported": true,
           "is_default": false,
@@ -5106,8 +5109,8 @@
           "kind": "function",
           "signature": "isProcessRunning(pid: number): boolean",
           "lines": [
-            198,
-            206
+            201,
+            209
           ],
           "exported": true,
           "is_default": false,
@@ -5125,8 +5128,8 @@
           "kind": "function",
           "signature": "isDaemonRunning(): { running: boolean; pid: number; }",
           "lines": [
-            211,
-            224
+            214,
+            227
           ],
           "exported": true,
           "is_default": false,
@@ -5144,8 +5147,8 @@
           "kind": "function",
           "signature": "formatUptime(seconds: number): string",
           "lines": [
-            233,
-            254
+            236,
+            257
           ],
           "exported": true,
           "is_default": false,
@@ -5163,8 +5166,8 @@
           "kind": "function",
           "signature": "getProcessUptime(): number",
           "lines": [
-            259,
-            269
+            262,
+            272
           ],
           "exported": true,
           "is_default": false,
@@ -5182,8 +5185,8 @@
           "kind": "interface",
           "signature": "StartOptions",
           "lines": [
-            276,
-            280
+            279,
+            283
           ],
           "exported": true,
           "is_default": false,
@@ -5201,8 +5204,8 @@
           "kind": "interface",
           "signature": "StopOptions",
           "lines": [
-            283,
-            286
+            286,
+            289
           ],
           "exported": true,
           "is_default": false,
@@ -5220,8 +5223,8 @@
           "kind": "interface",
           "signature": "DaemonResult",
           "lines": [
-            289,
-            293
+            292,
+            296
           ],
           "exported": false,
           "is_default": false,
@@ -5239,8 +5242,8 @@
           "kind": "function",
           "signature": "async handlePortConflict(port: number, force: boolean): Promise<DaemonResult>",
           "lines": [
-            298,
-            322
+            301,
+            325
           ],
           "exported": false,
           "is_default": false,
@@ -5258,8 +5261,8 @@
           "kind": "function",
           "signature": "killExistingDaemon(status: {\n  running: boolean;\n  pid: number | null;\n}): void",
           "lines": [
-            327,
-            339
+            330,
+            342
           ],
           "exported": false,
           "is_default": false,
@@ -5277,8 +5280,8 @@
           "kind": "function",
           "signature": "spawnDaemonProcess(configPath: string | undefined, logStream: number): ChildProcess",
           "lines": [
-            344,
-            362
+            347,
+            365
           ],
           "exported": false,
           "is_default": false,
@@ -5296,8 +5299,8 @@
           "kind": "function",
           "signature": "tryLoadConfig(configPath?: string): { config: PiBrainConfig; } | { error: string; }",
           "lines": [
-            367,
-            375
+            370,
+            378
           ],
           "exported": false,
           "is_default": false,
@@ -5315,8 +5318,8 @@
           "kind": "function",
           "signature": "tryEnsureDirectories(config: PiBrainConfig): { success: true; } | { error: string; }",
           "lines": [
-            380,
-            391
+            383,
+            394
           ],
           "exported": false,
           "is_default": false,
@@ -5334,8 +5337,8 @@
           "kind": "function",
           "signature": "async spawnBackgroundDaemon(configPath: string | undefined): Promise<DaemonResult>",
           "lines": [
-            396,
-            441
+            399,
+            444
           ],
           "exported": false,
           "is_default": false,
@@ -5353,8 +5356,8 @@
           "kind": "function",
           "signature": "async prepareDaemonStart(configPath: string | undefined, force: boolean, status: { running: boolean; pid: number | null }): Promise<DaemonResult | { config: PiBrainConfig; }>",
           "lines": [
-            446,
-            479
+            449,
+            482
           ],
           "exported": false,
           "is_default": false,
@@ -5372,8 +5375,8 @@
           "kind": "function",
           "signature": "async startDaemon(options: StartOptions = {}): Promise<DaemonResult>",
           "lines": [
-            484,
-            514
+            487,
+            517
           ],
           "exported": true,
           "is_default": false,
@@ -5391,8 +5394,8 @@
           "kind": "function",
           "signature": "async waitForProcessStop(pid: number, timeoutMs: number): Promise<boolean>",
           "lines": [
-            519,
-            531
+            522,
+            534
           ],
           "exported": false,
           "is_default": false,
@@ -5410,8 +5413,8 @@
           "kind": "function",
           "signature": "handleKillError(error: NodeJS.ErrnoException): { success: boolean; message: string; }",
           "lines": [
-            536,
-            548
+            539,
+            551
           ],
           "exported": false,
           "is_default": false,
@@ -5429,8 +5432,8 @@
           "kind": "function",
           "signature": "async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }>",
           "lines": [
-            553,
-            588
+            556,
+            591
           ],
           "exported": true,
           "is_default": false,
@@ -5448,8 +5451,8 @@
           "kind": "function",
           "signature": "getDaemonStatus(configPath?: string): DaemonStatus",
           "lines": [
-            593,
-            605
+            596,
+            608
           ],
           "exported": true,
           "is_default": false,
@@ -5467,8 +5470,8 @@
           "kind": "function",
           "signature": "getQueueStatus(configPath?: string): QueueStatus",
           "lines": [
-            614,
-            643
+            617,
+            646
           ],
           "exported": true,
           "is_default": false,
@@ -5486,8 +5489,8 @@
           "kind": "function",
           "signature": "queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; }",
           "lines": [
-            648,
-            701
+            651,
+            704
           ],
           "exported": true,
           "is_default": false,
@@ -5505,8 +5508,8 @@
           "kind": "function",
           "signature": "checkPiCli(): Promise<HealthCheckResult>",
           "lines": [
-            710,
-            747
+            713,
+            750
           ],
           "exported": false,
           "is_default": false,
@@ -5524,8 +5527,8 @@
           "kind": "function",
           "signature": "async checkRequiredSkills(): Promise<HealthCheckResult>",
           "lines": [
-            752,
-            777
+            755,
+            780
           ],
           "exported": false,
           "is_default": false,
@@ -5543,8 +5546,8 @@
           "kind": "function",
           "signature": "async checkOptionalSkills(): Promise<HealthCheckResult>",
           "lines": [
-            782,
-            807
+            785,
+            810
           ],
           "exported": false,
           "is_default": false,
@@ -5562,8 +5565,8 @@
           "kind": "function",
           "signature": "checkSessionsDir(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            812,
-            862
+            815,
+            865
           ],
           "exported": false,
           "is_default": false,
@@ -5581,8 +5584,8 @@
           "kind": "function",
           "signature": "checkDatabaseAccess(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            867,
-            895
+            870,
+            898
           ],
           "exported": false,
           "is_default": false,
@@ -5600,8 +5603,8 @@
           "kind": "function",
           "signature": "checkPromptFile(config: PiBrainConfig): HealthCheckResult",
           "lines": [
-            900,
-            916
+            903,
+            919
           ],
           "exported": false,
           "is_default": false,
@@ -5619,8 +5622,8 @@
           "kind": "function",
           "signature": "async runHealthChecks(configPath?: string): Promise<HealthStatus>",
           "lines": [
-            921,
-            951
+            924,
+            954
           ],
           "exported": true,
           "is_default": false,
@@ -5638,8 +5641,8 @@
           "kind": "function",
           "signature": "formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string",
           "lines": [
-            960,
-            981
+            963,
+            984
           ],
           "exported": true,
           "is_default": false,
@@ -5657,8 +5660,8 @@
           "kind": "function",
           "signature": "formatJobLine(job: AnalysisJob, pathLen: number, showType: boolean): string",
           "lines": [
-            986,
-            1000
+            989,
+            1003
           ],
           "exported": false,
           "is_default": false,
@@ -5676,8 +5679,8 @@
           "kind": "function",
           "signature": "appendJobSection(lines: string[], title: string, jobs: AnalysisJob[], pathLen: number, showType: boolean, extraCount?: number): void",
           "lines": [
-            1005,
-            1027
+            1008,
+            1030
           ],
           "exported": false,
           "is_default": false,
@@ -5695,8 +5698,8 @@
           "kind": "function",
           "signature": "formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string",
           "lines": [
-            1032,
-            1066
+            1035,
+            1069
           ],
           "exported": true,
           "is_default": false,
@@ -5714,8 +5717,8 @@
           "kind": "function",
           "signature": "getHealthIcon(result: HealthCheckResult): string",
           "lines": [
-            1071,
-            1076
+            1074,
+            1079
           ],
           "exported": false,
           "is_default": false,
@@ -5733,8 +5736,8 @@
           "kind": "function",
           "signature": "formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string",
           "lines": [
-            1081,
-            1104
+            1084,
+            1107
           ],
           "exported": true,
           "is_default": false,
@@ -5752,8 +5755,8 @@
           "kind": "function",
           "signature": "truncatePath(filePath: string, maxLen: number): string",
           "lines": [
-            1109,
-            1114
+            1112,
+            1117
           ],
           "exported": false,
           "is_default": false,
@@ -5771,8 +5774,8 @@
           "kind": "function",
           "signature": "rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; }",
           "lines": [
-            1119,
-            1239
+            1122,
+            1242
           ],
           "exported": true,
           "is_default": false,
@@ -5790,8 +5793,8 @@
           "kind": "function",
           "signature": "async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }>",
           "lines": [
-            1244,
-            1326
+            1247,
+            1329
           ],
           "exported": true,
           "is_default": false,
@@ -5809,8 +5812,8 @@
           "kind": "function",
           "signature": "truncateString(str: string, maxLen: number): string",
           "lines": [
-            1331,
-            1336
+            1334,
+            1339
           ],
           "exported": false,
           "is_default": false,
@@ -5834,11 +5837,13 @@
         "../storage/embedding-utils.js",
         "../storage/node-crud.js",
         "../storage/node-storage.js",
+        "../utils/fs-async.js",
         "./facet-discovery.js",
         "./processor.js",
         "./queue.js",
         "node:child_process",
         "node:fs",
+        "node:fs/promises",
         "node:net",
         "node:path"
       ]
@@ -7527,18 +7532,18 @@
       "language": "typescript",
       "lines": [
         1,
-        339
+        341
       ],
       "detail_level": "full",
-      "token_estimate": 120,
+      "token_estimate": 126,
       "symbols": [
         {
           "name": "args",
           "kind": "variable",
           "signature": "any",
           "lines": [
-            31,
-            31
+            38,
+            38
           ],
           "exported": false,
           "is_default": false,
@@ -7556,8 +7561,8 @@
           "kind": "variable",
           "signature": "string | undefined",
           "lines": [
-            32,
-            32
+            39,
+            39
           ],
           "exported": false,
           "is_default": false,
@@ -7575,8 +7580,8 @@
           "kind": "variable",
           "signature": "boolean",
           "lines": [
-            33,
-            33
+            40,
+            40
           ],
           "exported": false,
           "is_default": false,
@@ -7594,8 +7599,8 @@
           "kind": "variable",
           "signature": "(event: Event): void",
           "lines": [
-            48,
-            51
+            55,
+            58
           ],
           "exported": false,
           "is_default": false,
@@ -7613,8 +7618,8 @@
           "kind": "variable",
           "signature": "(ms: number): any",
           "lines": [
-            53,
-            56
+            60,
+            63
           ],
           "exported": false,
           "is_default": false,
@@ -7632,8 +7637,8 @@
           "kind": "function",
           "signature": "async main(): Promise<void>",
           "lines": [
-            62,
-            327
+            69,
+            329
           ],
           "exported": false,
           "is_default": false,
@@ -7654,6 +7659,7 @@
         "../api/server.js",
         "../config/config.js",
         "../storage/database.js",
+        "../utils/logger.js",
         "./cli.js",
         "./consolidation/index.js",
         "./queue.js",
@@ -8086,18 +8092,18 @@
       "language": "typescript",
       "lines": [
         1,
-        175
+        176
       ],
       "detail_level": "full",
-      "token_estimate": 310,
+      "token_estimate": 316,
       "symbols": [
         {
           "name": "getSegmentEntries",
           "kind": "function",
           "signature": "getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {}",
           "lines": [
-            17,
-            30
+            18,
+            31
           ],
           "exported": true,
           "is_default": false,
@@ -8115,8 +8121,8 @@
           "kind": "function",
           "signature": "hasCompleteSegmentInfo(node: {\n  source: {\n    segment?: { startEntryId?: string; endEntryId?: string };\n    sessionFile: string;\n  };\n}): boolean",
           "lines": [
-            35,
-            49
+            36,
+            50
           ],
           "exported": false,
           "is_default": false,
@@ -8134,8 +8140,8 @@
           "kind": "function",
           "signature": "createFineTuneExample(segmentEntries: SessionEntry[], node: unknown): object",
           "lines": [
-            54,
-            75
+            55,
+            76
           ],
           "exported": false,
           "is_default": false,
@@ -8151,10 +8157,10 @@
         {
           "name": "processNodeFile",
           "kind": "function",
-          "signature": "async processNodeFile(file: string, outStream: fs.WriteStream): Promise<number>",
+          "signature": "async processNodeFile(file: string, outStream: WriteStream): Promise<number>",
           "lines": [
-            81,
-            110
+            82,
+            111
           ],
           "exported": false,
           "is_default": false,
@@ -8172,8 +8178,8 @@
           "kind": "function",
           "signature": "async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }>",
           "lines": [
-            121,
-            174
+            122,
+            175
           ],
           "exported": true,
           "is_default": false,
@@ -8195,6 +8201,7 @@
         "../parser/session.js",
         "../storage/node-storage.js",
         "../types/index.js",
+        "../utils/fs-async.js",
         "node:fs",
         "node:path"
       ]
@@ -9860,18 +9867,18 @@
       "language": "typescript",
       "lines": [
         1,
-        628
+        632
       ],
       "detail_level": "full",
-      "token_estimate": 762,
+      "token_estimate": 772,
       "symbols": [
         {
           "name": "InsightGroup",
           "kind": "interface",
           "signature": "InsightGroup",
           "lines": [
-            26,
-            38
+            27,
+            39
           ],
           "exported": false,
           "is_default": false,
@@ -9889,8 +9896,8 @@
           "kind": "interface",
           "signature": "ModelQuirkRow",
           "lines": [
-            40,
-            48
+            41,
+            49
           ],
           "exported": false,
           "is_default": false,
@@ -9908,8 +9915,8 @@
           "kind": "interface",
           "signature": "ToolErrorRow",
           "lines": [
-            50,
-            57
+            51,
+            58
           ],
           "exported": false,
           "is_default": false,
@@ -9927,8 +9934,8 @@
           "kind": "interface",
           "signature": "LessonRow",
           "lines": [
-            59,
-            66
+            60,
+            67
           ],
           "exported": false,
           "is_default": false,
@@ -9946,8 +9953,8 @@
           "kind": "interface",
           "signature": "NodeRow",
           "lines": [
-            68,
-            71
+            69,
+            72
           ],
           "exported": false,
           "is_default": false,
@@ -9965,8 +9972,8 @@
           "kind": "variable",
           "signature": "10000",
           "lines": [
-            77,
-            77
+            78,
+            78
           ],
           "exported": false,
           "is_default": false,
@@ -9984,8 +9991,8 @@
           "kind": "variable",
           "signature": "10",
           "lines": [
-            78,
-            78
+            79,
+            79
           ],
           "exported": false,
           "is_default": false,
@@ -10003,8 +10010,27 @@
           "kind": "variable",
           "signature": "1000",
           "lines": [
-            79,
-            79
+            80,
+            80
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "log",
+          "kind": "variable",
+          "signature": "any",
+          "lines": [
+            83,
+            83
           ],
           "exported": false,
           "is_default": false,
@@ -10022,8 +10048,8 @@
           "kind": "function",
           "signature": "normalizePattern(text: string): string",
           "lines": [
-            88,
-            90
+            92,
+            94
           ],
           "exported": false,
           "is_default": false,
@@ -10041,8 +10067,8 @@
           "kind": "function",
           "signature": "frequencyToConfidence(freq: string | null): number",
           "lines": [
-            95,
-            113
+            99,
+            117
           ],
           "exported": false,
           "is_default": false,
@@ -10060,8 +10086,8 @@
           "kind": "function",
           "signature": "generateInsightId(type: InsightType, pattern: string, model?: string, tool?: string): string",
           "lines": [
-            118,
-            129
+            122,
+            133
           ],
           "exported": false,
           "is_default": false,
@@ -10079,8 +10105,8 @@
           "kind": "function",
           "signature": "maxDate(a: string, b: string): string",
           "lines": [
-            134,
-            136
+            138,
+            140
           ],
           "exported": false,
           "is_default": false,
@@ -10098,8 +10124,8 @@
           "kind": "function",
           "signature": "minDate(a: string, b: string): string",
           "lines": [
-            141,
-            143
+            145,
+            147
           ],
           "exported": false,
           "is_default": false,
@@ -10117,8 +10143,8 @@
           "kind": "class",
           "signature": "InsightAggregator",
           "lines": [
-            149,
-            627
+            153,
+            631
           ],
           "exported": true,
           "is_default": false,
@@ -10136,8 +10162,8 @@
           "kind": "constructor",
           "signature": "constructor(private db: Database.Database)",
           "lines": [
-            150,
-            150
+            154,
+            154
           ],
           "exported": false,
           "is_default": false,
@@ -10155,8 +10181,8 @@
           "kind": "method",
           "signature": "aggregateAll(): void",
           "lines": [
-            156,
-            169
+            160,
+            173
           ],
           "exported": false,
           "is_default": false,
@@ -10174,8 +10200,8 @@
           "kind": "method",
           "signature": "aggregateModelQuirks(insights: Map<string, InsightGroup>): void",
           "lines": [
-            174,
-            236
+            178,
+            240
           ],
           "exported": false,
           "is_default": false,
@@ -10193,8 +10219,8 @@
           "kind": "method",
           "signature": "aggregateToolErrors(insights: Map<string, InsightGroup>): void",
           "lines": [
-            241,
-            303
+            245,
+            307
           ],
           "exported": false,
           "is_default": false,
@@ -10212,8 +10238,8 @@
           "kind": "method",
           "signature": "aggregateLessons(insights: Map<string, InsightGroup>): void",
           "lines": [
-            308,
-            367
+            312,
+            371
           ],
           "exported": false,
           "is_default": false,
@@ -10231,8 +10257,8 @@
           "kind": "method",
           "signature": "aggregatePromptingPatterns(insights: Map<string, InsightGroup>): void",
           "lines": [
-            373,
-            415
+            377,
+            419
           ],
           "exported": false,
           "is_default": false,
@@ -10250,8 +10276,8 @@
           "kind": "method",
           "signature": "processNodePromptingPatterns(row: NodeRow, insights: Map<string, InsightGroup>, initialHitLimit: boolean): { error: boolean; hitLimit: boolean; }",
           "lines": [
-            420,
-            459
+            424,
+            463
           ],
           "exported": false,
           "is_default": false,
@@ -10269,8 +10295,8 @@
           "kind": "method",
           "signature": "aggregatePromptingWin(win: string, primaryModel: string | undefined, nodeTimestamp: string, nodeId: string, insights: Map<string, InsightGroup>, currentHitLimit: boolean): boolean",
           "lines": [
-            464,
-            501
+            468,
+            505
           ],
           "exported": false,
           "is_default": false,
@@ -10288,8 +10314,8 @@
           "kind": "method",
           "signature": "aggregatePromptingFailure(failure: string, primaryModel: string | undefined, nodeTimestamp: string, nodeId: string, insights: Map<string, InsightGroup>, currentHitLimit: boolean): boolean",
           "lines": [
-            506,
-            548
+            510,
+            552
           ],
           "exported": false,
           "is_default": false,
@@ -10307,8 +10333,8 @@
           "kind": "method",
           "signature": "updateInsightGroup(group: InsightGroup, nodeTimestamp: string, nodeId: string): void",
           "lines": [
-            553,
-            565
+            557,
+            569
           ],
           "exported": false,
           "is_default": false,
@@ -10326,8 +10352,8 @@
           "kind": "method",
           "signature": "logPromptingPatternsSummary(nodesProcessed: number, errorsEncountered: number): void",
           "lines": [
-            570,
-            582
+            574,
+            586
           ],
           "exported": false,
           "is_default": false,
@@ -10345,8 +10371,8 @@
           "kind": "method",
           "signature": "storeInsights(insights: Map<string, InsightGroup>): void",
           "lines": [
-            587,
-            626
+            591,
+            630
           ],
           "exported": false,
           "is_default": false,
@@ -10366,6 +10392,7 @@
       "imports": [
         "../storage/node-storage.js",
         "../types/index.js",
+        "../utils/logger.js",
         "better-sqlite3",
         "node:crypto"
       ]
@@ -10546,18 +10573,18 @@
       "language": "typescript",
       "lines": [
         1,
-        741
+        744
       ],
       "detail_level": "full",
-      "token_estimate": 1278,
+      "token_estimate": 1288,
       "symbols": [
         {
           "name": "AgentResult",
           "kind": "interface",
           "signature": "AgentResult",
           "lines": [
-            23,
-            36
+            25,
+            38
           ],
           "exported": true,
           "is_default": false,
@@ -10575,8 +10602,8 @@
           "kind": "interface",
           "signature": "SkillInfo",
           "lines": [
-            39,
-            43
+            41,
+            45
           ],
           "exported": true,
           "is_default": false,
@@ -10594,8 +10621,8 @@
           "kind": "interface",
           "signature": "ProcessorLogger",
           "lines": [
-            46,
-            51
+            48,
+            53
           ],
           "exported": true,
           "is_default": false,
@@ -10609,14 +10636,14 @@
           "outgoing_refs": null
         },
         {
-          "name": "consoleLogger",
+          "name": "defaultLogger",
           "kind": "variable",
-          "signature": "ProcessorLogger",
+          "signature": "any",
           "lines": [
-            54,
-            59
+            56,
+            56
           ],
-          "exported": true,
+          "exported": false,
           "is_default": false,
           "is_async": false,
           "is_static": false,
@@ -10628,12 +10655,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "consoleLogger",
+          "kind": "variable",
+          "signature": "ProcessorLogger",
+          "lines": [
+            57,
+            62
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "REQUIRED_SKILLS",
           "kind": "variable",
           "signature": "readonly []",
           "lines": [
-            66,
-            66
+            69,
+            69
           ],
           "exported": true,
           "is_default": false,
@@ -10651,8 +10697,8 @@
           "kind": "variable",
           "signature": "readonly [\"codemap\"]",
           "lines": [
-            69,
-            69
+            72,
+            72
           ],
           "exported": true,
           "is_default": false,
@@ -10670,8 +10716,8 @@
           "kind": "variable",
           "signature": "readonly [\"rlm\"]",
           "lines": [
-            72,
-            72
+            75,
+            75
           ],
           "exported": true,
           "is_default": false,
@@ -10689,8 +10735,8 @@
           "kind": "variable",
           "signature": "number",
           "lines": [
-            75,
-            75
+            78,
+            78
           ],
           "exported": true,
           "is_default": false,
@@ -10708,8 +10754,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            78,
-            78
+            81,
+            81
           ],
           "exported": true,
           "is_default": false,
@@ -10727,8 +10773,8 @@
           "kind": "function",
           "signature": "async checkSkillAvailable(skillName: string): Promise<boolean>",
           "lines": [
-            87,
-            95
+            90,
+            98
           ],
           "exported": true,
           "is_default": false,
@@ -10746,8 +10792,8 @@
           "kind": "function",
           "signature": "async getSkillAvailability(): Promise<Map<string, SkillInfo>>",
           "lines": [
-            100,
-            120
+            103,
+            123
           ],
           "exported": true,
           "is_default": false,
@@ -10765,8 +10811,8 @@
           "kind": "interface",
           "signature": "EnvironmentValidationResult",
           "lines": [
-            123,
-            130
+            126,
+            133
           ],
           "exported": true,
           "is_default": false,
@@ -10784,8 +10830,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            136,
-            148
+            139,
+            151
           ],
           "exported": true,
           "is_default": false,
@@ -10803,8 +10849,8 @@
           "kind": "function",
           "signature": "async shouldIncludeRlm(sessionFile?: string): Promise<boolean>",
           "lines": [
-            154,
-            164
+            157,
+            167
           ],
           "exported": false,
           "is_default": false,
@@ -10822,8 +10868,8 @@
           "kind": "function",
           "signature": "collectAvailableSkills(skillNames: readonly string[], skillAvailability: Map<string, SkillInfo>): {}",
           "lines": [
-            169,
-            174
+            172,
+            177
           ],
           "exported": false,
           "is_default": false,
@@ -10841,8 +10887,8 @@
           "kind": "function",
           "signature": "async buildSkillsArg(sessionFile?: string): Promise<string>",
           "lines": [
-            183,
-            197
+            186,
+            200
           ],
           "exported": true,
           "is_default": false,
@@ -10860,8 +10906,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            206,
-            238
+            209,
+            241
           ],
           "exported": true,
           "is_default": false,
@@ -10879,8 +10925,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            243,
-            262
+            246,
+            265
           ],
           "exported": false,
           "is_default": false,
@@ -10898,8 +10944,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            271,
-            379
+            274,
+            382
           ],
           "exported": true,
           "is_default": false,
@@ -10917,8 +10963,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            382,
-            388
+            385,
+            391
           ],
           "exported": false,
           "is_default": false,
@@ -10936,8 +10982,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            393,
-            457
+            396,
+            460
           ],
           "exported": false,
           "is_default": false,
@@ -10955,8 +11001,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            464,
-            469
+            467,
+            472
           ],
           "exported": false,
           "is_default": false,
@@ -10974,8 +11020,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            471,
-            474
+            474,
+            477
           ],
           "exported": false,
           "is_default": false,
@@ -10993,8 +11039,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            476,
-            480
+            479,
+            483
           ],
           "exported": false,
           "is_default": false,
@@ -11012,8 +11058,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            485,
-            554
+            488,
+            557
           ],
           "exported": true,
           "is_default": false,
@@ -11031,8 +11077,8 @@
           "kind": "function",
           "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any",
           "lines": [
-            560,
-            593
+            563,
+            596
           ],
           "exported": true,
           "is_default": false,
@@ -11050,8 +11096,8 @@
           "kind": "variable",
           "signature": "readonly [\"classification\", \"content\", \"lessons\", \"observations\", \"semantic\", \"daemonMeta\"]",
           "lines": [
-            598,
-            605
+            601,
+            608
           ],
           "exported": false,
           "is_default": false,
@@ -11069,8 +11115,8 @@
           "kind": "function",
           "signature": "isObject(value: unknown): boolean",
           "lines": [
-            610,
-            612
+            613,
+            615
           ],
           "exported": false,
           "is_default": false,
@@ -11088,8 +11134,8 @@
           "kind": "function",
           "signature": "hasRequiredObjectFields(node: Record<string, unknown>): boolean",
           "lines": [
-            617,
-            621
+            620,
+            624
           ],
           "exported": false,
           "is_default": false,
@@ -11107,8 +11153,8 @@
           "kind": "function",
           "signature": "hasValidClassification(classification: Record<string, unknown>): boolean",
           "lines": [
-            626,
-            633
+            629,
+            636
           ],
           "exported": false,
           "is_default": false,
@@ -11126,8 +11172,8 @@
           "kind": "function",
           "signature": "hasValidContent(content: Record<string, unknown>): boolean",
           "lines": [
-            638,
-            642
+            641,
+            645
           ],
           "exported": false,
           "is_default": false,
@@ -11145,8 +11191,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            647,
-            662
+            650,
+            665
           ],
           "exported": true,
           "is_default": false,
@@ -11164,8 +11210,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            669,
-            674
+            672,
+            677
           ],
           "exported": true,
           "is_default": false,
@@ -11183,8 +11229,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            679,
-            733
+            682,
+            736
           ],
           "exported": true,
           "is_default": false,
@@ -11202,8 +11248,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            680,
-            680
+            683,
+            683
           ],
           "exported": false,
           "is_default": false,
@@ -11221,8 +11267,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            681,
-            681
+            684,
+            684
           ],
           "exported": false,
           "is_default": false,
@@ -11240,8 +11286,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            683,
-            686
+            686,
+            689
           ],
           "exported": false,
           "is_default": false,
@@ -11259,8 +11305,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            691,
-            707
+            694,
+            710
           ],
           "exported": false,
           "is_default": false,
@@ -11278,8 +11324,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            713,
-            732
+            716,
+            735
           ],
           "exported": false,
           "is_default": false,
@@ -11297,8 +11343,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            738,
-            740
+            741,
+            743
           ],
           "exported": true,
           "is_default": false,
@@ -11317,6 +11363,7 @@
       "code_blocks": null,
       "imports": [
         "../config/types.js",
+        "../utils/logger.js",
         "./queue.js",
         "./types.js",
         "node:child_process",
@@ -12711,18 +12758,18 @@
       "language": "typescript",
       "lines": [
         1,
-        945
+        947
       ],
       "detail_level": "full",
-      "token_estimate": 1257,
+      "token_estimate": 1267,
       "symbols": [
         {
           "name": "EFFECTIVENESS_BEFORE_PERIOD_DAYS",
           "kind": "variable",
           "signature": "14",
           "lines": [
-            42,
-            42
+            43,
+            43
           ],
           "exported": false,
           "is_default": false,
@@ -12740,8 +12787,8 @@
           "kind": "variable",
           "signature": "7",
           "lines": [
-            45,
-            45
+            46,
+            46
           ],
           "exported": false,
           "is_default": false,
@@ -12759,8 +12806,8 @@
           "kind": "variable",
           "signature": "number",
           "lines": [
-            48,
-            48
+            49,
+            49
           ],
           "exported": false,
           "is_default": false,
@@ -12778,8 +12825,8 @@
           "kind": "type",
           "signature": "ScheduledJobType = | \"reanalysis\"\n  | \"connection_discovery\"\n  | \"pattern_aggregation\"\n  | \"clustering\"\n  | \"backfill_embeddings\"",
           "lines": [
-            51,
-            56
+            52,
+            57
           ],
           "exported": true,
           "is_default": false,
@@ -12797,8 +12844,8 @@
           "kind": "interface",
           "signature": "ScheduledJobResult",
           "lines": [
-            59,
-            66
+            60,
+            67
           ],
           "exported": true,
           "is_default": false,
@@ -12816,8 +12863,8 @@
           "kind": "interface",
           "signature": "SchedulerLogger",
           "lines": [
-            69,
-            74
+            70,
+            75
           ],
           "exported": true,
           "is_default": false,
@@ -12835,8 +12882,8 @@
           "kind": "variable",
           "signature": "SchedulerLogger",
           "lines": [
-            78,
-            83
+            79,
+            84
           ],
           "exported": true,
           "is_default": false,
@@ -12850,14 +12897,14 @@
           "outgoing_refs": null
         },
         {
-          "name": "consoleLogger",
+          "name": "defaultLogger",
           "kind": "variable",
-          "signature": "SchedulerLogger",
+          "signature": "any",
           "lines": [
-            87,
-            92
+            88,
+            88
           ],
-          "exported": true,
+          "exported": false,
           "is_default": false,
           "is_async": false,
           "is_static": false,
@@ -12869,12 +12916,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "consoleLogger",
+          "kind": "variable",
+          "signature": "SchedulerLogger",
+          "lines": [
+            89,
+            94
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "SchedulerConfig",
           "kind": "interface",
           "signature": "SchedulerConfig",
           "lines": [
-            95,
-            146
+            97,
+            148
           ],
           "exported": true,
           "is_default": false,
@@ -12892,8 +12958,8 @@
           "kind": "interface",
           "signature": "SchedulerStatus",
           "lines": [
-            149,
-            158
+            151,
+            160
           ],
           "exported": true,
           "is_default": false,
@@ -12911,8 +12977,8 @@
           "kind": "class",
           "signature": "Scheduler",
           "lines": [
-            163,
-            871
+            165,
+            873
           ],
           "exported": true,
           "is_default": false,
@@ -12930,8 +12996,8 @@
           "kind": "property",
           "signature": "reanalysisJob: Cron | null",
           "lines": [
-            164,
-            164
+            166,
+            166
           ],
           "exported": false,
           "is_default": false,
@@ -12949,8 +13015,8 @@
           "kind": "property",
           "signature": "connectionDiscoveryJob: Cron | null",
           "lines": [
-            165,
-            165
+            167,
+            167
           ],
           "exported": false,
           "is_default": false,
@@ -12968,8 +13034,8 @@
           "kind": "property",
           "signature": "patternAggregationJob: Cron | null",
           "lines": [
-            166,
-            166
+            168,
+            168
           ],
           "exported": false,
           "is_default": false,
@@ -12987,8 +13053,8 @@
           "kind": "property",
           "signature": "clusteringJob: Cron | null",
           "lines": [
-            167,
-            167
+            169,
+            169
           ],
           "exported": false,
           "is_default": false,
@@ -13006,8 +13072,8 @@
           "kind": "property",
           "signature": "backfillEmbeddingsJob: Cron | null",
           "lines": [
-            168,
-            168
+            170,
+            170
           ],
           "exported": false,
           "is_default": false,
@@ -13025,8 +13091,8 @@
           "kind": "property",
           "signature": "running",
           "lines": [
-            169,
-            169
+            171,
+            171
           ],
           "exported": false,
           "is_default": false,
@@ -13044,8 +13110,8 @@
           "kind": "property",
           "signature": "lastReanalysisResult: ScheduledJobResult | null",
           "lines": [
-            170,
-            170
+            172,
+            172
           ],
           "exported": false,
           "is_default": false,
@@ -13063,8 +13129,8 @@
           "kind": "property",
           "signature": "lastConnectionDiscoveryResult: ScheduledJobResult | null",
           "lines": [
-            171,
-            171
+            173,
+            173
           ],
           "exported": false,
           "is_default": false,
@@ -13082,8 +13148,8 @@
           "kind": "property",
           "signature": "lastPatternAggregationResult: ScheduledJobResult | null",
           "lines": [
-            172,
-            172
+            174,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -13101,8 +13167,8 @@
           "kind": "property",
           "signature": "lastClusteringResult: ScheduledJobResult | null",
           "lines": [
-            173,
-            173
+            175,
+            175
           ],
           "exported": false,
           "is_default": false,
@@ -13120,8 +13186,8 @@
           "kind": "property",
           "signature": "lastBackfillEmbeddingsResult: ScheduledJobResult | null",
           "lines": [
-            174,
-            174
+            176,
+            176
           ],
           "exported": false,
           "is_default": false,
@@ -13139,8 +13205,8 @@
           "kind": "property",
           "signature": "patternAggregator: PatternAggregator",
           "lines": [
-            175,
-            175
+            177,
+            177
           ],
           "exported": false,
           "is_default": false,
@@ -13158,8 +13224,8 @@
           "kind": "property",
           "signature": "insightAggregator: InsightAggregator",
           "lines": [
-            176,
-            176
+            178,
+            178
           ],
           "exported": false,
           "is_default": false,
@@ -13177,8 +13243,8 @@
           "kind": "constructor",
           "signature": "constructor(private config: SchedulerConfig, private queue: QueueManager, private db: Database.Database, private logger: SchedulerLogger = noopLogger)",
           "lines": [
-            178,
-            186
+            180,
+            188
           ],
           "exported": false,
           "is_default": false,
@@ -13196,8 +13262,8 @@
           "kind": "method",
           "signature": "createCronJob(name: string, displayName: string, schedule: string, handler: () => Promise<void | ScheduledJobResult>): any",
           "lines": [
-            191,
-            215
+            193,
+            217
           ],
           "exported": false,
           "is_default": false,
@@ -13215,8 +13281,8 @@
           "kind": "method",
           "signature": "start(): void",
           "lines": [
-            220,
-            293
+            222,
+            295
           ],
           "exported": false,
           "is_default": false,
@@ -13234,8 +13300,8 @@
           "kind": "method",
           "signature": "stop(): void",
           "lines": [
-            298,
-            331
+            300,
+            333
           ],
           "exported": false,
           "is_default": false,
@@ -13253,8 +13319,8 @@
           "kind": "method",
           "signature": "isRunning(): boolean",
           "lines": [
-            336,
-            338
+            338,
+            340
           ],
           "exported": false,
           "is_default": false,
@@ -13272,8 +13338,8 @@
           "kind": "method",
           "signature": "getStatus(): SchedulerStatus",
           "lines": [
-            343,
-            396
+            345,
+            398
           ],
           "exported": false,
           "is_default": false,
@@ -13291,8 +13357,8 @@
           "kind": "method",
           "signature": "triggerReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            401,
-            403
+            403,
+            405
           ],
           "exported": false,
           "is_default": false,
@@ -13310,8 +13376,8 @@
           "kind": "method",
           "signature": "triggerConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            408,
-            410
+            410,
+            412
           ],
           "exported": false,
           "is_default": false,
@@ -13329,8 +13395,8 @@
           "kind": "method",
           "signature": "triggerPatternAggregation(): ScheduledJobResult",
           "lines": [
-            415,
-            417
+            417,
+            419
           ],
           "exported": false,
           "is_default": false,
@@ -13348,8 +13414,8 @@
           "kind": "method",
           "signature": "triggerClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            422,
-            424
+            424,
+            426
           ],
           "exported": false,
           "is_default": false,
@@ -13367,8 +13433,8 @@
           "kind": "method",
           "signature": "triggerBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            429,
-            431
+            431,
+            433
           ],
           "exported": false,
           "is_default": false,
@@ -13386,8 +13452,8 @@
           "kind": "method",
           "signature": "async runReanalysis(): Promise<ScheduledJobResult>",
           "lines": [
-            436,
-            525
+            438,
+            527
           ],
           "exported": false,
           "is_default": false,
@@ -13405,8 +13471,8 @@
           "kind": "method",
           "signature": "async runConnectionDiscovery(): Promise<ScheduledJobResult>",
           "lines": [
-            530,
-            606
+            532,
+            608
           ],
           "exported": false,
           "is_default": false,
@@ -13424,8 +13490,8 @@
           "kind": "method",
           "signature": "runPatternAggregation(): ScheduledJobResult",
           "lines": [
-            612,
-            701
+            614,
+            703
           ],
           "exported": false,
           "is_default": false,
@@ -13443,8 +13509,8 @@
           "kind": "method",
           "signature": "createSchedulerEmbeddingProvider(): any",
           "lines": [
-            706,
-            726
+            708,
+            728
           ],
           "exported": false,
           "is_default": false,
@@ -13462,8 +13528,8 @@
           "kind": "method",
           "signature": "async runBackfillEmbeddings(): Promise<ScheduledJobResult>",
           "lines": [
-            732,
-            790
+            734,
+            792
           ],
           "exported": false,
           "is_default": false,
@@ -13481,8 +13547,8 @@
           "kind": "method",
           "signature": "async runClustering(): Promise<ScheduledJobResult>",
           "lines": [
-            796,
-            870
+            798,
+            872
           ],
           "exported": false,
           "is_default": false,
@@ -13500,8 +13566,8 @@
           "kind": "function",
           "signature": "createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler",
           "lines": [
-            876,
-            906
+            878,
+            908
           ],
           "exported": true,
           "is_default": false,
@@ -13519,8 +13585,8 @@
           "kind": "function",
           "signature": "isValidCronExpression(expression: string): boolean",
           "lines": [
-            912,
-            922
+            914,
+            924
           ],
           "exported": true,
           "is_default": false,
@@ -13538,8 +13604,8 @@
           "kind": "function",
           "signature": "getNextRunTimes(expression: string, count = 5): {}",
           "lines": [
-            927,
-            944
+            929,
+            946
           ],
           "exported": true,
           "is_default": false,
@@ -13562,6 +13628,7 @@
         "../prompt/prompt.js",
         "../storage/embedding-utils.js",
         "../storage/node-storage.js",
+        "../utils/logger.js",
         "./facet-discovery.js",
         "./insight-aggregation.js",
         "./pattern-aggregation.js",
@@ -15641,10 +15708,10 @@
       "language": "typescript",
       "lines": [
         1,
-        58
+        69
       ],
       "detail_level": "full",
-      "token_estimate": 86,
+      "token_estimate": 92,
       "symbols": [],
       "annotation": null,
       "headings": null,
@@ -15661,6 +15728,7 @@
         "./storage/node-storage.js",
         "./storage/node-types.js",
         "./types/index.js",
+        "./utils/logger.js",
         "./web/generator.js"
       ]
     },
@@ -28975,6 +29043,306 @@
       "imports": []
     },
     {
+      "path": "src/utils/fs-async.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        95
+      ],
+      "detail_level": "full",
+      "token_estimate": 176,
+      "symbols": [
+        {
+          "name": "fileExists",
+          "kind": "function",
+          "signature": "async fileExists(path: string): Promise<boolean>",
+          "lines": [
+            23,
+            30
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a file or directory exists asynchronously.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "safeReadFile",
+          "kind": "function",
+          "signature": "async safeReadFile(path: string, encoding: BufferEncoding = \"utf8\"): Promise<string>",
+          "lines": [
+            47,
+            59
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Read a file if it exists, returning undefined if not.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "safeWriteFile",
+          "kind": "function",
+          "signature": "async safeWriteFile(path: string, content: string, encoding: BufferEncoding = \"utf8\"): Promise<void>",
+          "lines": [
+            73,
+            79
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Write a file, creating parent directories if needed.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "ensureDir",
+          "kind": "function",
+          "signature": "async ensureDir(path: string): Promise<void>",
+          "lines": [
+            92,
+            94
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": true,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Ensure a directory exists, creating it if needed.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "node:fs/promises"
+      ]
+    },
+    {
+      "path": "src/utils/logger.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        104
+      ],
+      "detail_level": "full",
+      "token_estimate": 264,
+      "symbols": [
+        {
+          "name": "LogLevel",
+          "kind": "type",
+          "signature": "LogLevel = \"debug\" | \"info\" | \"warn\" | \"error\"",
+          "lines": [
+            9,
+            9
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Structured logger for pi-brain daemon and components.\n\nThis module intentionally wraps console.log to provide structured,\ntimestamped logging with prefixes. It's excluded from the no-console-log\nsemgrep rule since it's the canonical logging implementation.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "Logger",
+          "kind": "interface",
+          "signature": "Logger",
+          "lines": [
+            11,
+            16
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "LOG_LEVELS",
+          "kind": "variable",
+          "signature": "Record<LogLevel, number>",
+          "lines": [
+            22,
+            27
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Global log level. Set via LOG_LEVEL environment variable.\nOnly messages at or above this level will be output.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "getLogLevel",
+          "kind": "function",
+          "signature": "getLogLevel(): number",
+          "lines": [
+            29,
+            32
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "createLogger",
+          "kind": "function",
+          "signature": "createLogger(prefix: string): Logger",
+          "lines": [
+            50,
+            93
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Creates a logger instance with a specific prefix.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "daemonLogger",
+          "kind": "variable",
+          "signature": "Logger",
+          "lines": [
+            99,
+            99
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Pre-configured logger instances for common components.\nUse these for consistency, or create custom loggers with createLogger().",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "workerLogger",
+          "kind": "variable",
+          "signature": "Logger",
+          "lines": [
+            100,
+            100
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "schedulerLogger",
+          "kind": "variable",
+          "signature": "Logger",
+          "lines": [
+            101,
+            101
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "websocketLogger",
+          "kind": "variable",
+          "signature": "Logger",
+          "lines": [
+            102,
+            102
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "apiLogger",
+          "kind": "variable",
+          "signature": "Logger",
+          "lines": [
+            103,
+            103
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
+    },
+    {
       "path": "src/utils/session-utils.ts",
       "language": "typescript",
       "lines": [
@@ -30455,7 +30823,7 @@
       "language": "typescript",
       "lines": [
         1,
-        179
+        180
       ],
       "detail_level": "full",
       "token_estimate": 110,
@@ -30542,7 +30910,7 @@
           "signature": "createWebSocketStore(): { subscribe: any; connect: (url?: string) => void; disconnect: () => void; send: (message: Record<string, unknown>) => void; }",
           "lines": [
             41,
-            176
+            177
           ],
           "exported": false,
           "is_default": false,
@@ -30560,8 +30928,8 @@
           "kind": "variable",
           "signature": "wsStore",
           "lines": [
-            178,
-            178
+            179,
+            179
           ],
           "exported": true,
           "is_default": false,

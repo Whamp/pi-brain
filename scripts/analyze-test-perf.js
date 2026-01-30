@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Analyze test performance from vitest JSON output
+// oxlint-disable-next-line eslint-plugin-jest/prefer-each -- not a test file
 
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync } from "node:fs";
 
 const RESULTS_FILE = "./reports/test-results.json";
 const SLOW_THRESHOLD_MS = 300;
@@ -12,7 +13,7 @@ if (!existsSync(RESULTS_FILE)) {
   process.exit(1);
 }
 
-const results = JSON.parse(readFileSync(RESULTS_FILE, "utf-8"));
+const results = JSON.parse(readFileSync(RESULTS_FILE, "utf8"));
 
 // Extract all tests with timing
 const tests = [];
@@ -46,11 +47,13 @@ console.log(`Slow tests (>${SLOW_THRESHOLD_MS}ms): ${slow}\n`);
 // Top 10 slowest tests
 console.log("🐢 Top 10 Slowest Tests:\n");
 console.log("Duration  | Test");
-console.log("----------|" + "-".repeat(60));
+console.log(`----------${"-".repeat(60)}`);
 
+// oxlint-disable-next-line eslint-plugin-jest/prefer-each -- not a test file
 for (const test of tests.slice(0, 10)) {
   const duration = `${test.duration}ms`.padEnd(8);
-  const name = test.name.length > 55 ? test.name.slice(0, 52) + "..." : test.name;
+  const name =
+    test.name.length > 55 ? `${test.name.slice(0, 52)}...` : test.name;
   const marker = test.duration > SLOW_THRESHOLD_MS ? "⚠️ " : "  ";
   console.log(`${marker}${duration} | ${name}`);
 }

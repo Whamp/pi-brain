@@ -42,6 +42,7 @@ src/daemon/index.ts
         - src/daemon/types.ts
         - [external] better-sqlite3
       - src/daemon/types.ts
+      - src/utils/logger.ts
       - [builtin] child_process
       - [builtin] fs/promises
       - [builtin] os
@@ -109,8 +110,11 @@ src/daemon/index.ts
       - [builtin] fs
       - [builtin] os
       - [builtin] path
+    - src/utils/fs-async.ts
+      - [builtin] fs/promises
     - [builtin] child_process
     - [builtin] fs
+    - [builtin] fs/promises
     - [builtin] net
     - [builtin] path
   - src/daemon/connection-discovery.ts
@@ -240,6 +244,7 @@ src/daemon/index.ts
       - src/daemon/types.ts
       - [external] better-sqlite3
     - src/daemon/types.ts
+    - src/utils/logger.ts
     - [builtin] child_process
     - [builtin] fs/promises
     - [builtin] os
@@ -289,6 +294,7 @@ src/daemon/index.ts
         - [builtin] path
       - src/types/index.ts
         - src/types/session.ts
+      - src/utils/logger.ts
       - [external] better-sqlite3
       - [builtin] crypto
     - src/daemon/pattern-aggregation.ts
@@ -341,6 +347,7 @@ src/daemon/index.ts
       - [builtin] fs
       - [builtin] os
       - [builtin] path
+    - src/utils/logger.ts
     - [external] better-sqlite3
     - [external] croner
   - src/daemon/watcher-events.ts
@@ -489,6 +496,7 @@ src/daemon/index.ts
         - src/daemon/types.ts
         - [external] better-sqlite3
       - src/daemon/types.ts
+      - src/utils/logger.ts
       - [builtin] child_process
       - [builtin] fs/promises
       - [builtin] os

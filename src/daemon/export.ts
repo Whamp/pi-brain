@@ -2,7 +2,7 @@
  * Export utilities for fine-tuning and data analysis
  */
 
-import * as fs from "node:fs";
+import { createWriteStream, type WriteStream } from "node:fs";
 import * as path from "node:path";
 
 import type { SessionEntry } from "../types/index.js";
@@ -10,6 +10,7 @@ import type { SessionEntry } from "../types/index.js";
 import { loadConfig } from "../config/index.js";
 import { parseSession } from "../parser/session.js";
 import { listNodeFiles, readNodeFromPath } from "../storage/node-storage.js";
+import { fileExists } from "../utils/fs-async.js";
 
 /**
  * Extract entries within a segment range
@@ -80,7 +81,7 @@ function createFineTuneExample(
  */
 async function processNodeFile(
   file: string,
-  outStream: fs.WriteStream
+  outStream: WriteStream
 ): Promise<number> {
   const node = readNodeFromPath(file);
 
@@ -89,7 +90,7 @@ async function processNodeFile(
   }
 
   const sessionPath = node.source.sessionFile;
-  if (!fs.existsSync(sessionPath)) {
+  if (!(await fileExists(sessionPath))) {
     return 0;
   }
 
@@ -126,7 +127,7 @@ export async function exportFineTuneData(
     const config = loadConfig(configPath);
     const nodesDir = path.join(config.hub.databaseDir, "nodes");
 
-    if (!fs.existsSync(nodesDir)) {
+    if (!(await fileExists(nodesDir))) {
       return {
         success: false,
         message: `Nodes directory not found: ${nodesDir}`,
@@ -135,7 +136,7 @@ export async function exportFineTuneData(
     }
 
     const files = listNodeFiles({ nodesDir });
-    const outStream = fs.createWriteStream(outputPath, { encoding: "utf8" });
+    const outStream = createWriteStream(outputPath, { encoding: "utf8" });
     let count = 0;
 
     console.log(`Scanning ${files.length} node files...`);

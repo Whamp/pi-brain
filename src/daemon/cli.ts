@@ -14,6 +14,8 @@
 
 import { spawn, execSync, type ChildProcess } from "node:child_process";
 import * as fs from "node:fs";
+import { openSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
 import { createServer } from "node:net";
 import * as path from "node:path";
 
@@ -37,6 +39,7 @@ import {
   parseNodePath,
   readNodeFromPath,
 } from "../storage/node-storage.js";
+import { fileExists } from "../utils/fs-async.js";
 import { createEmbeddingProvider } from "./facet-discovery.js";
 import {
   checkSkillAvailable,
@@ -397,11 +400,11 @@ async function spawnBackgroundDaemon(
   configPath: string | undefined
 ): Promise<DaemonResult> {
   const logDir = path.dirname(LOG_FILE);
-  if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
+  if (!(await fileExists(logDir))) {
+    await mkdir(logDir, { recursive: true });
   }
 
-  const logStream = fs.openSync(LOG_FILE, "a");
+  const logStream = openSync(LOG_FILE, "a");
   let child: ChildProcess;
 
   try {

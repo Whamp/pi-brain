@@ -24,6 +24,7 @@ import {
   expandPath,
 } from "../../config/config.js";
 import { isValidCronExpression } from "../../daemon/scheduler.js";
+import { safeReadFile, safeWriteFile } from "../../utils/fs-async.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**
@@ -786,12 +787,9 @@ function validateSpokeUpdate(body: SpokeUpdateBody): ValidationResult {
 /**
  * Read raw config from YAML file
  */
-function readRawConfig(): RawConfig {
-  if (!fs.existsSync(DEFAULT_CONFIG_PATH)) {
-    return {};
-  }
-  const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-  if (!content.trim()) {
+async function readRawConfig(): Promise<RawConfig> {
+  const content = await safeReadFile(DEFAULT_CONFIG_PATH);
+  if (content === undefined || !content.trim()) {
     return {};
   }
   return yaml.parse(content) as RawConfig;
@@ -800,12 +798,12 @@ function readRawConfig(): RawConfig {
 /**
  * Write raw config to YAML file
  */
-function writeRawConfig(rawConfig: RawConfig): void {
+async function writeRawConfig(rawConfig: RawConfig): Promise<void> {
   const yamlContent = yaml.stringify(rawConfig, {
     indent: 2,
     lineWidth: 0,
   });
-  fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+  await safeWriteFile(DEFAULT_CONFIG_PATH, yamlContent);
 }
 
 /**
@@ -1135,23 +1133,13 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = await readRawConfig();
 
       // Apply updates
       applyDaemonUpdates(rawConfig, body);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      await writeRawConfig(rawConfig);
 
       // Reload and return updated config
       const updatedConfig = loadConfig();
@@ -1264,23 +1252,13 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = await readRawConfig();
 
       // Apply updates
       applyQueryUpdates(rawConfig, body);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      await writeRawConfig(rawConfig);
 
       // Reload and return updated config
       const updatedConfig = loadConfig();
@@ -1407,23 +1385,13 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = await readRawConfig();
 
       // Apply updates
       applyApiUpdates(rawConfig, body);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      await writeRawConfig(rawConfig);
 
       // Reload and return updated config
       const updatedConfig = loadConfig();
@@ -1511,23 +1479,13 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = await readRawConfig();
 
       // Apply updates
       applyHubUpdates(rawConfig, body);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      await writeRawConfig(rawConfig);
 
       // Reload and return updated config
       const updatedConfig = loadConfig();
@@ -1589,7 +1547,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      const rawConfig = readRawConfig();
+      const rawConfig = await readRawConfig();
 
       // Initialize spokes array if needed
       if (!rawConfig.spokes) {
@@ -1613,7 +1571,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       rawConfig.spokes.push(rawSpoke);
 
       // Write updated config
-      writeRawConfig(rawConfig);
+      await writeRawConfig(rawConfig);
 
       // Reload and return created spoke
       const updatedConfig = loadConfig();
@@ -1684,7 +1642,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       }
 
       // Read existing config file
-      const rawConfig = readRawConfig();
+      const rawConfig = await readRawConfig();
 
       // Find spoke by name
       if (!rawConfig.spokes) {
@@ -1704,7 +1662,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       applySpokeUpdates(rawSpoke, body);
 
       // Write updated config
-      writeRawConfig(rawConfig);
+      await writeRawConfig(rawConfig);
 
       // Reload and return updated spoke
       const updatedConfig = loadConfig();
@@ -1747,13 +1705,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       const { name } = request.params;
 
       // Read existing config file
-      let rawConfig: RawConfig = {};
-      if (fs.existsSync(DEFAULT_CONFIG_PATH)) {
-        const content = fs.readFileSync(DEFAULT_CONFIG_PATH, "utf8");
-        if (content.trim()) {
-          rawConfig = yaml.parse(content) as RawConfig;
-        }
-      }
+      const rawConfig = await readRawConfig();
 
       // Find spoke by name
       if (!rawConfig.spokes) {
@@ -1771,11 +1723,7 @@ export async function configRoutes(app: FastifyInstance): Promise<void> {
       rawConfig.spokes.splice(spokeIndex, 1);
 
       // Write updated config
-      const yamlContent = yaml.stringify(rawConfig, {
-        indent: 2,
-        lineWidth: 0,
-      });
-      fs.writeFileSync(DEFAULT_CONFIG_PATH, yamlContent, "utf8");
+      await writeRawConfig(rawConfig);
 
       const durationMs = Date.now() - startTime;
       return reply.send(

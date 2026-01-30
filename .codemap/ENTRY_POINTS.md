@@ -154,251 +154,252 @@ src/api/routes/config.test.ts [1-2365]
     - node:fs
     - vitest
 
-src/api/routes/config.ts [1-1792]
+src/api/routes/config.ts [1-1740]
   interface:
-    176-204: interface DaemonConfigUpdateBody
+    177-205: interface DaemonConfigUpdateBody
       /** Daemon configuration update request body */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:193: type EmbeddingProvider -> src/api/routes/config.ts
-    209-212: interface QueryConfigUpdateBody
+        - src/api/routes/config.ts:194: type EmbeddingProvider -> src/api/routes/config.ts
+    210-213: interface QueryConfigUpdateBody
       /** Query configuration update request body */
-    217-221: interface ApiConfigUpdateBody
+    218-222: interface ApiConfigUpdateBody
       /** API configuration update request body */
-    226-230: interface HubConfigUpdateBody
+    227-231: interface HubConfigUpdateBody
       /** Hub configuration update request body */
-    240-245: interface RsyncOptionsBody
+    241-246: interface RsyncOptionsBody
       /** Spoke rsync options request body */
-    250-258: interface SpokeCreateBody
+    251-259: interface SpokeCreateBody
       /** Spoke configuration create request body */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:252: type SyncMethod -> src/config/types.ts
-        - src/api/routes/config.ts:257: type RsyncOptionsBody -> src/api/routes/config.ts
-    263-270: interface SpokeUpdateBody
+        - src/api/routes/config.ts:253: type SyncMethod -> src/config/types.ts
+        - src/api/routes/config.ts:258: type RsyncOptionsBody -> src/api/routes/config.ts
+    264-271: interface SpokeUpdateBody
       /** Spoke configuration update request body */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:264: type SyncMethod -> src/config/types.ts
-        - src/api/routes/config.ts:269: type RsyncOptionsBody -> src/api/routes/config.ts
-    275-283: interface SpokeResponse
+        - src/api/routes/config.ts:265: type SyncMethod -> src/config/types.ts
+        - src/api/routes/config.ts:270: type RsyncOptionsBody -> src/api/routes/config.ts
+    276-284: interface SpokeResponse
       /** Spoke response format */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:277: type SyncMethod -> src/config/types.ts
-        - src/api/routes/config.ts:282: type RsyncOptions -> src/config/types.ts
+        - src/api/routes/config.ts:278: type SyncMethod -> src/config/types.ts
+        - src/api/routes/config.ts:283: type RsyncOptions -> src/config/types.ts
   type:
-    32-32: ValidationResult = string | null
+    33-33: ValidationResult = string | null
       /** Validation result - either success (null) or error message */
-    171-171: EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]
+    172-172: EmbeddingProvider = (typeof VALID_EMBEDDING_PROVIDERS)[number]
   function:
-    37-44: firstError(validations: ValidationResult[]): string
+    38-45: firstError(validations: ValidationResult[]): string
       /** Run validation checks and return first error */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:37: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:37: type ValidationResult -> src/api/routes/config.ts
-    49-62: validateIntRange(value: number | undefined, field: string, min: number, max: number): string
+        - src/api/routes/config.ts:38: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:38: type ValidationResult -> src/api/routes/config.ts
+    50-63: validateIntRange(value: number | undefined, field: string, min: number, max: number): string
       /** Validate an integer field is within a range */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:54: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:58: call isInteger -> external
-    68-81: validateNullableIntRange(value: number | null | undefined, field: string, min: number, max: number): string
+        - src/api/routes/config.ts:55: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:59: call isInteger -> external
+    69-82: validateNullableIntRange(value: number | null | undefined, field: string, min: number, max: number): string
       /** Validate a nullable integer field is within a range Allows undefined and null to pass, validates numbers */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:73: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:77: call isInteger -> external
-    86-99: validateFloatRange(value: number | undefined, field: string, min: number, max: number): string
+        - src/api/routes/config.ts:74: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:78: call isInteger -> external
+    87-100: validateFloatRange(value: number | undefined, field: string, min: number, max: number): string
       /** Validate a float field is within a range */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:91: type ValidationResult -> src/api/routes/config.ts
-    104-115: validateNonEmptyString(value: string | undefined, field: string): string
+        - src/api/routes/config.ts:92: type ValidationResult -> src/api/routes/config.ts
+    105-116: validateNonEmptyString(value: string | undefined, field: string): string
       /** Validate a non-empty string field */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:107: type ValidationResult -> src/api/routes/config.ts
-    120-131: validateNullableNonEmptyString(value: string | null | undefined, field: string): string
+        - src/api/routes/config.ts:108: type ValidationResult -> src/api/routes/config.ts
+    121-132: validateNullableNonEmptyString(value: string | null | undefined, field: string): string
       /** Validate a nullable non-empty string field (allows null to clear) */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:123: type ValidationResult -> src/api/routes/config.ts
-    136-148: validateOneOf<T>(value: T | undefined, field: string, allowed: readonly T[]): string
+        - src/api/routes/config.ts:124: type ValidationResult -> src/api/routes/config.ts
+    137-149: validateOneOf<T>(value: T | undefined, field: string, allowed: readonly T[]): string
       /** Validate a value is one of allowed options */
       refs out: 5 [call: 2, type: 3]
-        - src/api/routes/config.ts:137: type T -> src/api/routes/config.ts
-        - src/api/routes/config.ts:139: type T -> src/api/routes/config.ts
-        - src/api/routes/config.ts:140: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:144: call includes -> external
-        - src/api/routes/config.ts:145: call join -> external
-    154-165: validateCronSchedule(value: string | null | undefined, field: string): string
+        - src/api/routes/config.ts:138: type T -> src/api/routes/config.ts
+        - src/api/routes/config.ts:140: type T -> src/api/routes/config.ts
+        - src/api/routes/config.ts:141: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:145: call includes -> external
+        - src/api/routes/config.ts:146: call join -> external
+    155-166: validateCronSchedule(value: string | null | undefined, field: string): string
       /** Validate a cron schedule expression Returns error message if invalid, null if valid or undefined */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:157: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:161: call isValidCronExpression -> src/daemon/scheduler.ts
-    288-313: validateEmbeddingFields(body: DaemonConfigUpdateBody): string
+        - src/api/routes/config.ts:158: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:162: call isValidCronExpression -> src/daemon/scheduler.ts
+    289-314: validateEmbeddingFields(body: DaemonConfigUpdateBody): string
       /** Validate embedding configuration fields */
       refs out: 7 [call: 5, type: 2]
-        - src/api/routes/config.ts:289: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:290: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:298: call firstError -> src/api/routes/config.ts
-        - src/api/routes/config.ts:299: call validateOneOf -> src/api/routes/config.ts
-        - src/api/routes/config.ts:304: call validateNonEmptyString -> src/api/routes/config.ts
-    318-394: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
+        - src/api/routes/config.ts:290: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:291: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:299: call firstError -> src/api/routes/config.ts
+        - src/api/routes/config.ts:300: call validateOneOf -> src/api/routes/config.ts
+        - src/api/routes/config.ts:305: call validateNonEmptyString -> src/api/routes/config.ts
+    319-395: validateDaemonUpdate(body: DaemonConfigUpdateBody): string
       /** Validate daemon configuration update fields */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/config.ts:318: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:318: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:393: call firstError -> src/api/routes/config.ts
-    399-401: hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean
+        - src/api/routes/config.ts:319: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:319: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:394: call firstError -> src/api/routes/config.ts
+    400-402: hasAnyDaemonField(body: DaemonConfigUpdateBody): boolean
       /** Check if daemon config update body has at least one field defined */
       refs out: 3 [call: 2, type: 1]
-        - src/api/routes/config.ts:399: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:400: call some -> external
-        - src/api/routes/config.ts:400: call values -> external
-    407-422: applyNullableString(target: NonNullable<RawConfig["daemon"]>, key: keyof NonNullable<RawConfig["daemon"]>, value: string | null | undefined): void
+        - src/api/routes/config.ts:400: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:401: call some -> external
+        - src/api/routes/config.ts:401: call values -> external
+    408-423: applyNullableString(target: NonNullable<RawConfig["daemon"]>, key: keyof NonNullable<RawConfig["daemon"]>, value: string | null | undefined): void
       /** Apply an optional nullable string field to a raw config object null/empty clears the field, undefined skips, string sets */
       refs out: 4 [type: 4]
-        - src/api/routes/config.ts:408: type NonNullable -> external
-        - src/api/routes/config.ts:408: type RawConfig -> src/config/types.ts
         - src/api/routes/config.ts:409: type NonNullable -> external
         - src/api/routes/config.ts:409: type RawConfig -> src/config/types.ts
-    428-442: applyNullableNumber(target: NonNullable<RawConfig["daemon"]>, key: keyof NonNullable<RawConfig["daemon"]>, value: number | null | undefined): void
+        - src/api/routes/config.ts:410: type NonNullable -> external
+        - src/api/routes/config.ts:410: type RawConfig -> src/config/types.ts
+    429-443: applyNullableNumber(target: NonNullable<RawConfig["daemon"]>, key: keyof NonNullable<RawConfig["daemon"]>, value: number | null | undefined): void
       /** Apply an optional nullable numeric field to a raw config object null clears the field, undefined skips, number sets */
       refs out: 4 [type: 4]
-        - src/api/routes/config.ts:429: type NonNullable -> external
-        - src/api/routes/config.ts:429: type RawConfig -> src/config/types.ts
         - src/api/routes/config.ts:430: type NonNullable -> external
         - src/api/routes/config.ts:430: type RawConfig -> src/config/types.ts
-    447-468: applyEmbeddingUpdates(daemon: NonNullable<RawConfig["daemon"]>, body: DaemonConfigUpdateBody): void
+        - src/api/routes/config.ts:431: type NonNullable -> external
+        - src/api/routes/config.ts:431: type RawConfig -> src/config/types.ts
+    448-469: applyEmbeddingUpdates(daemon: NonNullable<RawConfig["daemon"]>, body: DaemonConfigUpdateBody): void
       /** Apply embedding config updates to raw config object */
       refs out: 6 [call: 3, type: 3]
-        - src/api/routes/config.ts:448: type NonNullable -> external
-        - src/api/routes/config.ts:448: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:449: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:465: call applyNullableString -> src/api/routes/config.ts
+        - src/api/routes/config.ts:449: type NonNullable -> external
+        - src/api/routes/config.ts:449: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:450: type DaemonConfigUpdateBody -> src/api/routes/config.ts
         - src/api/routes/config.ts:466: call applyNullableString -> src/api/routes/config.ts
-    473-502: applyScheduleUpdates(daemon: NonNullable<RawConfig["daemon"]>, body: DaemonConfigUpdateBody): void
+        - src/api/routes/config.ts:467: call applyNullableString -> src/api/routes/config.ts
+    474-503: applyScheduleUpdates(daemon: NonNullable<RawConfig["daemon"]>, body: DaemonConfigUpdateBody): void
       /** Apply schedule config updates to raw config object */
       refs out: 8 [call: 5, type: 3]
-        - src/api/routes/config.ts:474: type NonNullable -> external
-        - src/api/routes/config.ts:474: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:475: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:485: call applyNullableString -> src/api/routes/config.ts
+        - src/api/routes/config.ts:475: type NonNullable -> external
+        - src/api/routes/config.ts:475: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:476: type DaemonConfigUpdateBody -> src/api/routes/config.ts
         - src/api/routes/config.ts:486: call applyNullableString -> src/api/routes/config.ts
-    529-552: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
+        - src/api/routes/config.ts:487: call applyNullableString -> src/api/routes/config.ts
+    530-553: applyDaemonUpdates(rawConfig: RawConfig, body: DaemonConfigUpdateBody): void
       /** Apply daemon config updates to raw config object */
       refs out: 6 [call: 3, type: 3]
-        - src/api/routes/config.ts:530: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:531: type DaemonConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:541: call entries -> external
-        - src/api/routes/config.ts:545: type Record -> external
-        - src/api/routes/config.ts:550: call applyEmbeddingUpdates -> src/api/routes/config.ts
-    557-571: validateQueryUpdate(body: QueryConfigUpdateBody): string
+        - src/api/routes/config.ts:531: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:532: type DaemonConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:542: call entries -> external
+        - src/api/routes/config.ts:546: type Record -> external
+        - src/api/routes/config.ts:551: call applyEmbeddingUpdates -> src/api/routes/config.ts
+    558-572: validateQueryUpdate(body: QueryConfigUpdateBody): string
       /** Validate query configuration update fields */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:557: type QueryConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:557: type ValidationResult -> src/api/routes/config.ts
-    576-605: validateApiUpdate(body: ApiConfigUpdateBody): string
+        - src/api/routes/config.ts:558: type QueryConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:558: type ValidationResult -> src/api/routes/config.ts
+    577-606: validateApiUpdate(body: ApiConfigUpdateBody): string
       /** Validate API configuration update fields */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/config.ts:576: type ApiConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:576: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:594: call isArray -> external
-    610-632: validatePath(p: string, field: string): string
+        - src/api/routes/config.ts:577: type ApiConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:577: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:595: call isArray -> external
+    611-633: validatePath(p: string, field: string): string
       /** Validate a path exists or has a writable parent */
       refs out: 7 [call: 5, type: 2]
-        - src/api/routes/config.ts:610: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:612: call existsSync -> external
-        - src/api/routes/config.ts:614: call isDirectory -> external
-        - src/api/routes/config.ts:614: call statSync -> external
-        - src/api/routes/config.ts:618: type Error -> external
-    637-649: validateDirPath(value: string | undefined, field: string): string
+        - src/api/routes/config.ts:611: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:613: call existsSync -> external
+        - src/api/routes/config.ts:615: call isDirectory -> external
+        - src/api/routes/config.ts:615: call statSync -> external
+        - src/api/routes/config.ts:619: type Error -> external
+    638-650: validateDirPath(value: string | undefined, field: string): string
       /** Validate a directory path field (non-empty string + valid path) */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:640: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:648: call validatePath -> src/api/routes/config.ts
-    654-662: validateHubUpdate(body: HubConfigUpdateBody): string
+        - src/api/routes/config.ts:641: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:649: call validatePath -> src/api/routes/config.ts
+    655-663: validateHubUpdate(body: HubConfigUpdateBody): string
       /** Validate hub configuration update fields */
       refs out: 6 [call: 4, type: 2]
-        - src/api/routes/config.ts:654: type HubConfigUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:654: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:657: call firstError -> src/api/routes/config.ts
-        - src/api/routes/config.ts:658: call validateDirPath -> src/api/routes/config.ts
+        - src/api/routes/config.ts:655: type HubConfigUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:655: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:658: call firstError -> src/api/routes/config.ts
         - src/api/routes/config.ts:659: call validateDirPath -> src/api/routes/config.ts
-    667-678: validateSpokeName(name: string): string
+        - src/api/routes/config.ts:660: call validateDirPath -> src/api/routes/config.ts
+    668-679: validateSpokeName(name: string): string
       /** Validate spoke name is valid (alphanumeric, dash, underscore) */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:667: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:671: call test -> external
-    683-699: validateStringArray(value: string[] | undefined, field: string): string
+        - src/api/routes/config.ts:668: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:672: call test -> external
+    684-700: validateStringArray(value: string[] | undefined, field: string): string
       /** Validate a string array field */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:686: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:690: call isArray -> external
-    704-719: validateRsyncOptions(options: RsyncOptionsBody | undefined, field: string): string
+        - src/api/routes/config.ts:687: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:691: call isArray -> external
+    705-720: validateRsyncOptions(options: RsyncOptionsBody | undefined, field: string): string
       /** Validate rsync options */
       refs out: 6 [call: 4, type: 2]
-        - src/api/routes/config.ts:705: type RsyncOptionsBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:707: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:714: call firstError -> src/api/routes/config.ts
-        - src/api/routes/config.ts:715: call validateIntRange -> src/api/routes/config.ts
+        - src/api/routes/config.ts:706: type RsyncOptionsBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:708: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:715: call firstError -> src/api/routes/config.ts
         - src/api/routes/config.ts:716: call validateIntRange -> src/api/routes/config.ts
-    724-763: validateSpokeCreate(body: SpokeCreateBody): string
+        - src/api/routes/config.ts:717: call validateIntRange -> src/api/routes/config.ts
+    725-764: validateSpokeCreate(body: SpokeCreateBody): string
       /** Validate spoke create request body */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/config.ts:724: type SpokeCreateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:724: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:749: call join -> external
-    768-780: validateSpokeUpdate(body: SpokeUpdateBody): string
+        - src/api/routes/config.ts:725: type SpokeCreateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:725: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:750: call join -> external
+    769-781: validateSpokeUpdate(body: SpokeUpdateBody): string
       /** Validate spoke update request body */
       refs out: 8 [call: 6, type: 2]
-        - src/api/routes/config.ts:768: type SpokeUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:768: type ValidationResult -> src/api/routes/config.ts
-        - src/api/routes/config.ts:771: call firstError -> src/api/routes/config.ts
-        - src/api/routes/config.ts:772: call validateOneOf -> src/api/routes/config.ts
-        - src/api/routes/config.ts:773: call validateDirPath -> src/api/routes/config.ts
-    789-798: readRawConfig(): RawConfig
+        - src/api/routes/config.ts:769: type SpokeUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:769: type ValidationResult -> src/api/routes/config.ts
+        - src/api/routes/config.ts:772: call firstError -> src/api/routes/config.ts
+        - src/api/routes/config.ts:773: call validateOneOf -> src/api/routes/config.ts
+        - src/api/routes/config.ts:774: call validateDirPath -> src/api/routes/config.ts
+    790-796: async readRawConfig(): Promise<RawConfig>
       /** Read raw config from YAML file */
-      refs out: 5 [call: 3, type: 2]
-        - src/api/routes/config.ts:789: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:790: call existsSync -> external
-        - src/api/routes/config.ts:794: call trim -> external
-        - src/api/routes/config.ts:797: call parse -> external
-        - src/api/routes/config.ts:797: type RawConfig -> src/config/types.ts
-    803-809: writeRawConfig(rawConfig: RawConfig): void
+      refs out: 5 [call: 2, type: 3]
+        - src/api/routes/config.ts:790: type Promise -> external
+        - src/api/routes/config.ts:790: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:792: call trim -> external
+        - src/api/routes/config.ts:795: call parse -> external
+        - src/api/routes/config.ts:795: type RawConfig -> src/config/types.ts
+    801-807: async writeRawConfig(rawConfig: RawConfig): Promise<void>
       /** Write raw config to YAML file */
-      refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:803: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:808: call writeFileSync -> external
-    814-835: buildRawRsyncOptions(options: RsyncOptionsBody): NonNullable<NonNullable<RawConfig>>
+      refs out: 3 [call: 1, type: 2]
+        - src/api/routes/config.ts:801: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:801: type Promise -> external
+        - src/api/routes/config.ts:806: call safeWriteFile -> src/utils/fs-async.ts
+    812-833: buildRawRsyncOptions(options: RsyncOptionsBody): NonNullable<NonNullable<RawConfig>>
       /** Build raw rsync options from body rsync options */
       refs out: 4 [type: 4]
-        - src/api/routes/config.ts:815: type RsyncOptionsBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:816: type NonNullable -> external
-        - src/api/routes/config.ts:816: type NonNullable -> external
-        - src/api/routes/config.ts:816: type RawConfig -> src/config/types.ts
-    840-861: buildRawSpokeFromBody(body: SpokeCreateBody): NonNullable<RawConfig>
+        - src/api/routes/config.ts:813: type RsyncOptionsBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:814: type NonNullable -> external
+        - src/api/routes/config.ts:814: type NonNullable -> external
+        - src/api/routes/config.ts:814: type RawConfig -> src/config/types.ts
+    838-859: buildRawSpokeFromBody(body: SpokeCreateBody): NonNullable<RawConfig>
       /** Build raw spoke config from create body */
       refs out: 4 [call: 1, type: 3]
-        - src/api/routes/config.ts:841: type SpokeCreateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:842: type NonNullable -> external
-        - src/api/routes/config.ts:842: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:857: call buildRawRsyncOptions -> src/api/routes/config.ts
-    866-885: applyRsyncOptionsUpdate(rawSpoke: NonNullable<RawConfig["spokes"]>[number], options: RsyncOptionsBody): void
+        - src/api/routes/config.ts:839: type SpokeCreateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:840: type NonNullable -> external
+        - src/api/routes/config.ts:840: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:855: call buildRawRsyncOptions -> src/api/routes/config.ts
+    864-883: applyRsyncOptionsUpdate(rawSpoke: NonNullable<RawConfig["spokes"]>[number], options: RsyncOptionsBody): void
       /** Apply rsync options update to raw spoke */
       refs out: 5 [call: 1, type: 4]
-        - src/api/routes/config.ts:867: type NonNullable -> external
-        - src/api/routes/config.ts:867: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:868: type RsyncOptionsBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:879: call entries -> external
-        - src/api/routes/config.ts:882: type Record -> external
-    890-904: applyNullableField(target: Record<string, unknown>, key: string, value: string | null | undefined): void
+        - src/api/routes/config.ts:865: type NonNullable -> external
+        - src/api/routes/config.ts:865: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:866: type RsyncOptionsBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:877: call entries -> external
+        - src/api/routes/config.ts:880: type Record -> external
+    888-902: applyNullableField(target: Record<string, unknown>, key: string, value: string | null | undefined): void
       /** Apply a nullable string field (null clears, string sets) */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/config.ts:891: type Record -> external
-        - src/api/routes/config.ts:900: call deleteProperty -> external
-    909-934: applySpokeUpdates(rawSpoke: NonNullable<RawConfig["spokes"]>[number], body: SpokeUpdateBody): void
+        - src/api/routes/config.ts:889: type Record -> external
+        - src/api/routes/config.ts:898: call deleteProperty -> external
+    907-932: applySpokeUpdates(rawSpoke: NonNullable<RawConfig["spokes"]>[number], body: SpokeUpdateBody): void
       /** Apply spoke update fields to raw spoke config */
       refs out: 6 [call: 3, type: 3]
-        - src/api/routes/config.ts:910: type NonNullable -> external
-        - src/api/routes/config.ts:910: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:911: type SpokeUpdateBody -> src/api/routes/config.ts
-        - src/api/routes/config.ts:925: call applyNullableField -> src/api/routes/config.ts
-        - src/api/routes/config.ts:926: call applyNullableField -> src/api/routes/config.ts
-    939-966: spokeToResponse(spoke: {
+        - src/api/routes/config.ts:908: type NonNullable -> external
+        - src/api/routes/config.ts:908: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:909: type SpokeUpdateBody -> src/api/routes/config.ts
+        - src/api/routes/config.ts:923: call applyNullableField -> src/api/routes/config.ts
+        - src/api/routes/config.ts:924: call applyNullableField -> src/api/routes/config.ts
+    937-964: spokeToResponse(spoke: {
   name: string;
   syncMethod: SyncMethod;
   path: string;
@@ -409,75 +410,77 @@ src/api/routes/config.ts [1-1792]
 }): SpokeResponse
       /** Convert a spoke config to response format */
       refs out: 3 [type: 3]
-        - src/api/routes/config.ts:941: type SyncMethod -> src/config/types.ts
-        - src/api/routes/config.ts:946: type RsyncOptions -> src/config/types.ts
-        - src/api/routes/config.ts:947: type SpokeResponse -> src/api/routes/config.ts
-    971-989: applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void
+        - src/api/routes/config.ts:939: type SyncMethod -> src/config/types.ts
+        - src/api/routes/config.ts:944: type RsyncOptions -> src/config/types.ts
+        - src/api/routes/config.ts:945: type SpokeResponse -> src/api/routes/config.ts
+    969-987: applyQueryUpdates(rawConfig: RawConfig, body: QueryConfigUpdateBody): void
       /** Apply query config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:972: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:973: type QueryConfigUpdateBody -> src/api/routes/config.ts
-    994-1015: applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void
+        - src/api/routes/config.ts:970: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:971: type QueryConfigUpdateBody -> src/api/routes/config.ts
+    992-1013: applyApiUpdates(rawConfig: RawConfig, body: ApiConfigUpdateBody): void
       /** Apply API config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:995: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:996: type ApiConfigUpdateBody -> src/api/routes/config.ts
-    1020-1041: applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void
+        - src/api/routes/config.ts:993: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:994: type ApiConfigUpdateBody -> src/api/routes/config.ts
+    1018-1039: applyHubUpdates(rawConfig: RawConfig, body: HubConfigUpdateBody): void
       /** Apply hub config updates to raw config object */
       refs out: 2 [type: 2]
-        - src/api/routes/config.ts:1021: type RawConfig -> src/config/types.ts
-        - src/api/routes/config.ts:1022: type HubConfigUpdateBody -> src/api/routes/config.ts
-    1043-1791: async configRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 162 [call: 123, type: 39]
-        - src/api/routes/config.ts:1043: type FastifyInstance -> external
-        - src/api/routes/config.ts:1043: type Promise -> external
-        - src/api/routes/config.ts:1047: call get -> external
-        - src/api/routes/config.ts:1047: type FastifyRequest -> external
-        - src/api/routes/config.ts:1047: type FastifyReply -> external
+        - src/api/routes/config.ts:1019: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:1020: type HubConfigUpdateBody -> src/api/routes/config.ts
+    1041-1739: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 142 [call: 108, type: 34]
+        - src/api/routes/config.ts:1041: type FastifyInstance -> external
+        - src/api/routes/config.ts:1041: type Promise -> external
+        - src/api/routes/config.ts:1045: call get -> external
+        - src/api/routes/config.ts:1045: type FastifyRequest -> external
+        - src/api/routes/config.ts:1045: type FastifyReply -> external
   variable:
-    170-170: readonly ["ollama", "openai", "openrouter"]
+    171-171: readonly ["ollama", "openai", "openrouter"]
       /** Valid embedding providers */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:170: type const -> external
-    235-235: SyncMethod[]
+        - src/api/routes/config.ts:171: type const -> external
+    236-236: SyncMethod[]
       /** Valid sync methods for spokes */
       refs out: 1 [type: 1]
-        - src/api/routes/config.ts:235: type SyncMethod -> src/config/types.ts
-    507-524: Record<string, keyof NonNullable<RawConfig["daemon"]>>
+        - src/api/routes/config.ts:236: type SyncMethod -> src/config/types.ts
+    508-525: Record<string, keyof NonNullable<RawConfig["daemon"]>>
       /** Mapping of body field names to raw config field names for simple daemon updates */
       refs out: 3 [type: 3]
-        - src/api/routes/config.ts:507: type Record -> external
-        - src/api/routes/config.ts:507: type NonNullable -> external
-        - src/api/routes/config.ts:507: type RawConfig -> src/config/types.ts
+        - src/api/routes/config.ts:508: type Record -> external
+        - src/api/routes/config.ts:508: type NonNullable -> external
+        - src/api/routes/config.ts:508: type RawConfig -> src/config/types.ts
   imports:
     - ../../config/config.js
     - ../../config/types.js
     - ../../daemon/scheduler.js
+    - ../../utils/fs-async.js
     - ../responses.js
     - fastify
     - node:fs
     - node:path
     - yaml
 
-src/api/routes/daemon.ts [1-385]
+src/api/routes/daemon.ts [1-386]
   function:
-    26-317: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 45 [call: 33, type: 12]
-        - src/api/routes/daemon.ts:26: type FastifyInstance -> external
-        - src/api/routes/daemon.ts:26: type Promise -> external
-        - src/api/routes/daemon.ts:30: call get -> external
-        - src/api/routes/daemon.ts:30: type FastifyRequest -> external
-        - src/api/routes/daemon.ts:30: type FastifyReply -> external
-    325-384: getAverageProcessingRate(db: Database.Database): number
+    27-318: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 46 [call: 34, type: 12]
+        - src/api/routes/daemon.ts:27: type FastifyInstance -> external
+        - src/api/routes/daemon.ts:27: type Promise -> external
+        - src/api/routes/daemon.ts:31: call get -> external
+        - src/api/routes/daemon.ts:31: type FastifyRequest -> external
+        - src/api/routes/daemon.ts:31: type FastifyReply -> external
+    326-385: getAverageProcessingRate(db: Database.Database): number
       /** Calculate average processing rate (bytes per second) from historical completed jobs Looks at recently completed jobs to estimate how long processing takes based on session file size. Returns 0 if no historical data is available. */
       refs out: 2 [call: 1, type: 1]
-        - src/api/routes/daemon.ts:325: type Database -> external
-        - src/api/routes/daemon.ts:380: call round -> external
+        - src/api/routes/daemon.ts:326: type Database -> external
+        - src/api/routes/daemon.ts:381: call round -> external
   imports:
     - ../../daemon/cli.js
     - ../../daemon/errors.js
     - ../../daemon/pattern-aggregation.js
     - ../../daemon/queue.js
+    - ../../utils/fs-async.js
     - ../responses.js
     - better-sqlite3
     - fastify
@@ -974,76 +977,76 @@ src/api/websocket.test.ts [1-463]
     - vitest
     - ws
 
-src/api/websocket.ts [1-404]
+src/api/websocket.ts [1-406]
   class:
-    74-359: class WebSocketManager [exported]
+    76-361: class WebSocketManager [exported]
       /** Manages WebSocket connections and broadcasts events */
-      75-75: clients
+      77-77: clients
         refs out: 2 [instantiate: 1, type: 1]
-          - src/api/websocket.ts:75: instantiate Set -> external
-          - src/api/websocket.ts:75: type WSClient -> src/api/websocket.ts
-      76-80: logger: {
+          - src/api/websocket.ts:77: instantiate Set -> external
+          - src/api/websocket.ts:77: type WSClient -> src/api/websocket.ts
+      78-82: logger: {
     info: (msg: string) => void;
     error: (msg: string) => void;
     debug: (msg: string) => void;
   }
-      82-92: constructor(logger?: {
+      84-94: constructor(logger?: {
     info: (msg: string) => void;
     error: (msg: string) => void;
     debug: (msg: string) => void;
   })
         refs out: 3 [call: 3]
-          - src/api/websocket.ts:88: call log -> external
-          - src/api/websocket.ts:89: call error -> external
-          - src/api/websocket.ts:90: call debug -> external
-      97-124: handleConnection(socket: WebSocket): void
+          - src/api/websocket.ts:90: call info -> src/utils/logger.ts
+          - src/api/websocket.ts:91: call error -> src/utils/logger.ts
+          - src/api/websocket.ts:92: call debug -> src/utils/logger.ts
+      99-126: handleConnection(socket: WebSocket): void
         /** Handle a new WebSocket connection */
         refs out: 12 [call: 10, type: 2]
-          - src/api/websocket.ts:97: type WebSocket -> external
-          - src/api/websocket.ts:104: call add -> external
-          - src/api/websocket.ts:105: call WebSocketManager.info -> src/api/websocket.ts
-          - src/api/websocket.ts:109: call WebSocket.on -> external
-          - src/api/websocket.ts:109: type Buffer -> external
-      129-158: handleMessage(client: WSClient, data: Buffer | string): void
+          - src/api/websocket.ts:99: type WebSocket -> external
+          - src/api/websocket.ts:106: call add -> external
+          - src/api/websocket.ts:107: call WebSocketManager.info -> src/api/websocket.ts
+          - src/api/websocket.ts:111: call WebSocket.on -> external
+          - src/api/websocket.ts:111: type Buffer -> external
+      131-160: handleMessage(client: WSClient, data: Buffer | string): void
         /** Handle incoming message from client */
         refs out: 11 [call: 7, instantiate: 2, type: 2]
-          - src/api/websocket.ts:129: type WSClient -> src/api/websocket.ts
-          - src/api/websocket.ts:129: type Buffer -> external
-          - src/api/websocket.ts:135: call WebSocketManager.handleSubscribe -> src/api/websocket.ts
-          - src/api/websocket.ts:139: call WebSocketManager.sendToClient -> src/api/websocket.ts
-          - src/api/websocket.ts:144: call toISOString -> external
-      163-196: handleSubscribe(client: WSClient, message: SubscribeMessage): void
+          - src/api/websocket.ts:131: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:131: type Buffer -> external
+          - src/api/websocket.ts:137: call WebSocketManager.handleSubscribe -> src/api/websocket.ts
+          - src/api/websocket.ts:141: call WebSocketManager.sendToClient -> src/api/websocket.ts
+          - src/api/websocket.ts:146: call toISOString -> external
+      165-198: handleSubscribe(client: WSClient, message: SubscribeMessage): void
         /** Handle subscription request */
         refs out: 13 [call: 9, instantiate: 2, type: 2]
-          - src/api/websocket.ts:163: type WSClient -> src/api/websocket.ts
-          - src/api/websocket.ts:163: type SubscribeMessage -> src/api/websocket.ts
-          - src/api/websocket.ts:172: call isArray -> external
-          - src/api/websocket.ts:173: call WebSocketManager.sendToClient -> src/api/websocket.ts
-          - src/api/websocket.ts:176: call toISOString -> external
-      201-211: sendToClient(client: WSClient, message: WSMessage): void
+          - src/api/websocket.ts:165: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:165: type SubscribeMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:174: call isArray -> external
+          - src/api/websocket.ts:175: call WebSocketManager.sendToClient -> src/api/websocket.ts
+          - src/api/websocket.ts:178: call toISOString -> external
+      203-213: sendToClient(client: WSClient, message: WSMessage): void
         /** Send message to a specific client */
         refs out: 6 [call: 4, type: 2]
-          - src/api/websocket.ts:201: type WSClient -> src/api/websocket.ts
-          - src/api/websocket.ts:201: type WSMessage -> src/api/websocket.ts
-          - src/api/websocket.ts:204: call WebSocket.send -> external
-          - src/api/websocket.ts:204: call stringify -> external
-          - src/api/websocket.ts:206: call WebSocketManager.error -> src/api/websocket.ts
-      216-229: broadcast(channel: WSChannel, message: WSMessage): void
+          - src/api/websocket.ts:203: type WSClient -> src/api/websocket.ts
+          - src/api/websocket.ts:203: type WSMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:206: call WebSocket.send -> external
+          - src/api/websocket.ts:206: call stringify -> external
+          - src/api/websocket.ts:208: call WebSocketManager.error -> src/api/websocket.ts
+      218-231: broadcast(channel: WSChannel, message: WSMessage): void
         /** Broadcast message to all subscribed clients */
         refs out: 5 [call: 3, type: 2]
-          - src/api/websocket.ts:216: type WSChannel -> src/api/websocket.ts
-          - src/api/websocket.ts:216: type WSMessage -> src/api/websocket.ts
-          - src/api/websocket.ts:220: call has -> external
-          - src/api/websocket.ts:221: call WebSocketManager.sendToClient -> src/api/websocket.ts
-          - src/api/websocket.ts:226: call WebSocketManager.debug -> src/api/websocket.ts
-      234-236: getClientCount(): number
+          - src/api/websocket.ts:218: type WSChannel -> src/api/websocket.ts
+          - src/api/websocket.ts:218: type WSMessage -> src/api/websocket.ts
+          - src/api/websocket.ts:222: call has -> external
+          - src/api/websocket.ts:223: call WebSocketManager.sendToClient -> src/api/websocket.ts
+          - src/api/websocket.ts:228: call WebSocketManager.debug -> src/api/websocket.ts
+      236-238: getClientCount(): number
         /** Get connected client count */
-      241-246: closeAll(): void
+      243-248: closeAll(): void
         /** Close all connections */
         refs out: 2 [call: 2]
-          - src/api/websocket.ts:243: call WebSocket.close -> external
-          - src/api/websocket.ts:245: call clear -> external
-      255-281: broadcastDaemonStatus(status: {
+          - src/api/websocket.ts:245: call WebSocket.close -> external
+          - src/api/websocket.ts:247: call clear -> external
+      257-283: broadcastDaemonStatus(status: {
     running: boolean;
     pid?: number;
     uptime?: number;
@@ -1066,31 +1069,33 @@ src/api/websocket.ts [1-404]
   }): void
         /** Broadcast daemon status update */
         refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:276: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:279: call toISOString -> external
-          - src/api/websocket.ts:279: instantiate Date -> external
-      286-296: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
+          - src/api/websocket.ts:278: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:281: call toISOString -> external
+          - src/api/websocket.ts:281: instantiate Date -> external
+      288-298: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
         /** Broadcast analysis started event */
-        refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:287: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:294: call toISOString -> external
-          - src/api/websocket.ts:294: instantiate Date -> external
-      301-323: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
-        /** Broadcast analysis completed event */
-        refs out: 6 [call: 4, instantiate: 2]
-          - src/api/websocket.ts:302: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:309: call toISOString -> external
-          - src/api/websocket.ts:309: instantiate Date -> external
-          - src/api/websocket.ts:313: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:321: call toISOString -> external
-      328-342: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
-        /** Broadcast analysis failed event */
         refs out: 4 [call: 2, instantiate: 1, type: 1]
-          - src/api/websocket.ts:330: type Error -> external
-          - src/api/websocket.ts:333: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:340: call toISOString -> external
-          - src/api/websocket.ts:340: instantiate Date -> external
-      347-358: broadcastQueueUpdate(stats: {
+          - src/api/websocket.ts:288: type AnalysisJob -> src/daemon/types.ts
+          - src/api/websocket.ts:289: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:296: call toISOString -> external
+          - src/api/websocket.ts:296: instantiate Date -> external
+      303-325: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
+        /** Broadcast analysis completed event */
+        refs out: 8 [call: 4, instantiate: 2, type: 2]
+          - src/api/websocket.ts:303: type AnalysisJob -> src/daemon/types.ts
+          - src/api/websocket.ts:303: type Node -> src/types/index.ts
+          - src/api/websocket.ts:304: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:311: call toISOString -> external
+          - src/api/websocket.ts:311: instantiate Date -> external
+      330-344: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
+        /** Broadcast analysis failed event */
+        refs out: 5 [call: 2, instantiate: 1, type: 2]
+          - src/api/websocket.ts:331: type AnalysisJob -> src/daemon/types.ts
+          - src/api/websocket.ts:332: type Error -> external
+          - src/api/websocket.ts:335: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:342: call toISOString -> external
+          - src/api/websocket.ts:342: instantiate Date -> external
+      349-360: broadcastQueueUpdate(stats: {
     pending: number;
     running: number;
     completed: number;
@@ -1098,29 +1103,29 @@ src/api/websocket.ts [1-404]
   }): void
         /** Broadcast queue update event */
         refs out: 3 [call: 2, instantiate: 1]
-          - src/api/websocket.ts:353: call WebSocketManager.broadcast -> src/api/websocket.ts
-          - src/api/websocket.ts:356: call toISOString -> external
-          - src/api/websocket.ts:356: instantiate Date -> external
+          - src/api/websocket.ts:355: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:358: call toISOString -> external
+          - src/api/websocket.ts:358: instantiate Date -> external
   interface:
-    45-49: interface WSMessage [exported]
+    47-51: interface WSMessage [exported]
       /** Message format for WebSocket events */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:46: type WSEventType -> src/api/websocket.ts
-    52-55: interface SubscribeMessage
+        - src/api/websocket.ts:48: type WSEventType -> src/api/websocket.ts
+    54-57: interface SubscribeMessage
       /** Client subscription request */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:54: type WSChannel -> src/api/websocket.ts
-    61-65: interface WSClient
+        - src/api/websocket.ts:56: type WSChannel -> src/api/websocket.ts
+    63-67: interface WSClient
       /** Connected client with subscriptions */
       refs out: 4 [type: 4]
-        - src/api/websocket.ts:62: type WebSocket -> external
-        - src/api/websocket.ts:63: type Set -> external
-        - src/api/websocket.ts:63: type WSChannel -> src/api/websocket.ts
-        - src/api/websocket.ts:64: type Date -> external
+        - src/api/websocket.ts:64: type WebSocket -> external
+        - src/api/websocket.ts:65: type Set -> external
+        - src/api/websocket.ts:65: type WSChannel -> src/api/websocket.ts
+        - src/api/websocket.ts:66: type Date -> external
   type:
-    31-31: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
+    33-33: WSChannel = "daemon" | "analysis" | "node" | "queue" [exported]
       /** Available subscription channels */
-    34-42: WSEventType = | "daemon.status"
+    36-44: WSEventType = | "daemon.status"
   | "analysis.started"
   | "analysis.completed"
   | "analysis.failed"
@@ -1129,39 +1134,40 @@ src/api/websocket.ts [1-404]
   | "subscribed"
   | "error" [exported]
       /** WebSocket message types from server to client */
-    58-58: ClientMessage = SubscribeMessage
+    60-60: ClientMessage = SubscribeMessage
       /** Client message union type */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:58: type SubscribeMessage -> src/api/websocket.ts
+        - src/api/websocket.ts:60: type SubscribeMessage -> src/api/websocket.ts
   function:
-    368-380: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
+    370-382: registerWebSocketRoute(app: FastifyInstance, wsManager: WebSocketManager): void [exported]
       /** Register the WebSocket route on a Fastify instance */
       refs out: 6 [call: 2, type: 4]
-        - src/api/websocket.ts:369: type FastifyInstance -> external
-        - src/api/websocket.ts:370: type WebSocketManager -> src/api/websocket.ts
-        - src/api/websocket.ts:373: call get -> external
-        - src/api/websocket.ts:376: type WebSocket -> external
-        - src/api/websocket.ts:376: type FastifyRequest -> external
-    391-396: getWebSocketManager(): WebSocketManager [exported]
+        - src/api/websocket.ts:371: type FastifyInstance -> external
+        - src/api/websocket.ts:372: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:375: call get -> external
+        - src/api/websocket.ts:378: type WebSocket -> external
+        - src/api/websocket.ts:378: type FastifyRequest -> external
+    393-398: getWebSocketManager(): WebSocketManager [exported]
       /** Get or create the global WebSocket manager */
       refs out: 2 [instantiate: 1, type: 1]
-        - src/api/websocket.ts:391: type WebSocketManager -> src/api/websocket.ts
-        - src/api/websocket.ts:393: instantiate WebSocketManager -> src/api/websocket.ts
-    401-403: setWebSocketManager(manager: WebSocketManager): void [exported]
+        - src/api/websocket.ts:393: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:395: instantiate WebSocketManager -> src/api/websocket.ts
+    403-405: setWebSocketManager(manager: WebSocketManager): void [exported]
       /** Set the global WebSocket manager (for testing or custom config) */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:401: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:403: type WebSocketManager -> src/api/websocket.ts
   variable:
-    19-24: { readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }
+    21-26: { readonly CONNECTING: 0; readonly OPEN: 1; readonly CLOSING: 2; readonly CLOSED: 3; }
       /** WebSocket ready state values (mirrors WebSocket.OPEN, etc.) */
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:24: type const -> external
-    386-386: WebSocketManager | null
+        - src/api/websocket.ts:26: type const -> external
+    388-388: WebSocketManager | null
       refs out: 1 [type: 1]
-        - src/api/websocket.ts:386: type WebSocketManager -> src/api/websocket.ts
+        - src/api/websocket.ts:388: type WebSocketManager -> src/api/websocket.ts
   imports:
     - ../daemon/queue.js
     - ../storage/node-types.js
+    - ../utils/logger.js
     - fastify
     - ws
 
@@ -1228,4 +1234,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 31
-Estimated tokens: 15,451 (codebase: ~1,348,622)
+Estimated tokens: 15,548 (codebase: ~1,370,356)
