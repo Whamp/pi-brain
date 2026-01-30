@@ -81,7 +81,7 @@
     "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@mariozechner/pi-coding-agent": "^0.50.0",
+    "@mariozechner/pi-coding-agent": "^0.50.5",
     "@microsoft/api-documenter": "^7.28.6",
     "@microsoft/api-extractor": "^7.56.0",
     "@types/better-sqlite3": "^7.6.13",
@@ -92,11 +92,11 @@
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^16.9.0",
     "husky": "^9.1.7",
-    "oxfmt": "^0.26.0",
-    "oxlint": "^1.41.0",
+    "oxfmt": "^0.27.0",
+    "oxlint": "^1.42.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "ultracite": "^7.0.12",
+    "ultracite": "^7.1.1",
     "vitest": "^4.0.18"
   },
   "engines": {
