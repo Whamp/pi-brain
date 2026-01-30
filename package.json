@@ -90,7 +90,7 @@
     "@types/ws": "^8.18.1",
     "@vitest/coverage-v8": "^4.0.18",
     "concurrently": "^9.2.1",
-    "dependency-cruiser": "^16.9.0",
+    "dependency-cruiser": "^17.3.7",
     "husky": "^9.1.7",
     "oxfmt": "^0.26.0",
     "oxlint": "^1.41.0",
