@@ -1,19 +1,19 @@
 # pi-brain
 
-A "second brain" for the pi coding agent that analyzes, connects, and learns from every interaction.
+A "second brain" for the pi coding agent—analyzes, connects, and learns from every interaction.
 
 ## What It Does
 
-pi-brain runs in the background to build a knowledge graph from your coding sessions. It ingests session files, extracts decisions, errors, patterns, and lessons, then stores them in a SQLite database with vector embeddings for semantic search.
+pi-brain builds a knowledge graph from your coding sessions. It ingests session files, extracts decisions, errors, patterns, and lessons, and stores them in SQLite with vector embeddings for semantic search.
 
-Query the brain to recall past decisions, avoid recurring mistakes, and learn model quirks. Explore the SvelteKit web dashboard to visualize session history, trace connections between decisions, and understand agent behavior over time.
+The brain recalls past decisions, surfaces recurring mistakes, and exposes model quirks. The web dashboard visualizes session history, traces connections between decisions, and shows agent behavior over time.
 
 ## Components
 
-- **Daemon**: Background service that watches session files and analyzes them with LLMs
-- **Knowledge Graph**: SQLite database with `better-sqlite3` and `sqlite-vec` for vector search
+- **Daemon**: Watches session files, analyzes them with LLMs
+- **Knowledge Graph**: SQLite database with `better-sqlite3` and `sqlite-vec`
 - **Web Dashboard**: SvelteKit app for graph visualization and session exploration
-- **Pi Integration**: `brain-query` extension that lets agents query the knowledge graph
+- **Pi Integration**: `brain-query` extension for agents to query the knowledge graph
 
 ## Quick Start
 
@@ -24,95 +24,69 @@ npm run web:dev
 # Open http://localhost:5173/
 ```
 
----
-
 ## Code Standards
 
-### Quick Start: Launching the UI
-
-1. **Build**: `npm run build`
-2. **Start Daemon**: `node dist/src/daemon/daemon-process.js --force`
-3. **Start Web UI**: `npm run web:dev`
-4. **Access**: [http://localhost:5173/](http://localhost:5173/)
-
-This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
-
-### Important Writing Standards
-
-**available skill** `writing-clearly-and-concisely`
+This project uses **Ultracite** for code quality and the `writing-clearly-and-concisely` skill for prose.
 
 ### Toolchain
 
-Ultracite wraps two tools:
+Scripts call oxlint and oxfmt directly:
 
-- **oxlint** - Fast linter (rules configured in `.oxlintrc.json`)
-- **oxfmt** - Fast formatter (configured in `.oxfmtrc.jsonc`)
+- **oxlint** - Linter (configured in `.oxlintrc.json`)
+- **oxfmt** - Formatter (configured in `.oxfmtrc.jsonc`)
 
 ### Commands
 
-**Critical Principle:** Always run read-only checks before applying any auto-fixes. Never skip exploration by running fix commands directly.
-
-#### 📖 Read-Only Commands
-
-| Command                | What it does                                          |
-| ---------------------- | ----------------------------------------------------- |
-| `npm run check`        | Runs linter + formatter check. Fails if issues exist. |
-| `npx ultracite doctor` | Diagnoses Ultracite setup issues.                     |
-
-#### ✏️ Auto-Modify Commands
-
-Run `npm run check` first to understand what will change.
-
-| Command               | What it does                                |
-| --------------------- | ------------------------------------------- |
-| `npm run fix`         | **MODIFIES FILES.** Auto-fixes lint issues. |
-| `npx oxfmt --write .` | **MODIFIES FILES.** Auto-fixes formatting.  |
-
-#### 🔄 Blocking Commands
-
-Use tmux—these never exit on their own.
-
-| Command           | What it does                                                           |
-| ----------------- | ---------------------------------------------------------------------- |
-| `npm test`        | **BLOCKS.** Vitest watch mode. Use `npm test -- --run` for single run. |
-| `npm run dev`     | **BLOCKS.** tsup watch mode.                                           |
-| `npm run web:dev` | **BLOCKS.** Vite dev server for web app.                               |
-
-#### 🏗️ Build Commands
-
-Safe to run directly—these exit when done.
-
-| Command             | What it does                    |
-| ------------------- | ------------------------------- |
-| `npm run build`     | Builds with tsup. Output: dist/ |
-| `npm run web:build` | Builds the web app.             |
+**Principle:** Run read-only checks first. Explore issues before running fix commands.
 
 #### Workflow
 
 ```bash
-npm run check                    # See issues (no changes)
-npm run fix && npx oxfmt --write . # Apply fixes
-npm run check                    # Verify
-npm test -- --run                # Test (non-blocking)
+npm run check                    # Build + format + lint (read-only)
+npm run fix                      # Auto-fix lint and format issues
+npm run validate                 # Full validation before commit
 ```
 
-#### When to Use tmux
+#### Additional Commands
 
-Commands that never exit block your session. Use tmux for:
+| Command                | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `npm run deadcode`     | Find unused exports and dependencies.       |
+| `npm run duplicates`   | Find duplicate code blocks.                 |
+| `npm start`            | Launch daemon and web UI together.          |
+| `npm run dev:all`      | Concurrent dev mode (daemon + web + watch). |
+| `npm run web:check`    | Lint the web app.                           |
+| `npx ultracite doctor` | Diagnose Ultracite setup issues.            |
 
-- Watch modes: `npm run dev`, `npm test`, `tsc --watch`
-- Dev servers: `npm run web:dev`, `vite`
-- Log streaming: `tail -f`, `docker logs -f`
-- REPLs: `node`, `python3`, `psql`
+#### Blocking Commands
+
+These block indefinitely—use tmux:
+
+| Command           | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `npm run dev`     | tsup watch mode.                                          |
+| `npm run web:dev` | Vite dev server.                                          |
+| `npx vitest`      | Vitest watch mode. Use `npx vitest --run` for single run. |
+
+#### Build Commands
+
+These exit when done:
+
+| Command             | Description                    |
+| ------------------- | ------------------------------ |
+| `npm run build`     | Build with tsup. Output: dist/ |
+| `npm run web:build` | Build the web app.             |
 
 #### Pre-commit Hook
 
-The pre-commit hook runs:
+The pre-commit hook (`.husky/pre-commit`) validates all changes:
 
-1. `npm run fix` - Auto-fix lint issues
-2. `npx oxfmt --write .` - Auto-fix formatting
-3. `npm test -- --run` - Run tests
-4. `./scripts/refresh-codemap.sh` - Refresh agent navigation maps
+1. `npm run validate`:
+   - Build + format check + lint
+   - Unused exports/dependencies
+   - Duplicate code detection
+   - Tests (quiet output on success)
+2. `./scripts/refresh-codemap.sh` - Refresh agent navigation maps
 
 If any step fails, the commit is blocked.
 
@@ -160,14 +134,14 @@ Standard Prettier-compatible options (printWidth, semi, quotes, etc.)
 
 ### Core Principles
 
-Write code that is **accessible, performant, type-safe, and maintainable**. Focus on clarity and explicit intent over brevity.
+Write **accessible, performant, type-safe, and maintainable** code. Prefer clarity and explicit intent over brevity.
 
 #### Type Safety & Explicitness
 
 - Use explicit types for function parameters and return values when they enhance clarity
 - Prefer `unknown` over `any` when the type is genuinely unknown
 - Use const assertions (`as const`) for immutable values and literal types
-- Leverage TypeScript's type narrowing instead of type assertions
+- Use TypeScript's type narrowing instead of type assertions
 - Use meaningful variable names instead of magic numbers - extract constants with descriptive names
 
 #### Modern JavaScript/TypeScript
@@ -184,7 +158,7 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 - Always `await` promises in async functions - don't forget to use the return value
 - Use `async/await` syntax instead of promise chains for better readability
 - Handle errors appropriately in async code with try-catch blocks
-- Don't use async functions as Promise executors
+- Avoid async functions as Promise executors
 
 #### Svelte & SvelteKit
 
@@ -215,7 +189,7 @@ The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 
 - Add `rel="noopener"` when using `target="_blank"` on links
 - Use `{@html}` sparingly in Svelte—sanitize untrusted content
-- Don't use `eval()` or assign directly to `document.cookie`
+- Avoid `eval()` and direct assignment to `document.cookie`
 - Validate and sanitize user input
 
 #### Performance
@@ -231,7 +205,7 @@ The web app (`src/web/app`) uses Svelte 5 and SvelteKit:
 
 - Write assertions inside `it()` or `test()` blocks
 - Avoid done callbacks in async tests—use async/await
-- Don't use `.only` or `.skip` in committed code
+- Avoid `.only` or `.skip` in committed code
 - Keep test suites reasonably flat—avoid excessive `describe` nesting
 
 ### What Linting Can't Catch

@@ -5,9 +5,9 @@
 
 ## Statistics
 - Total files: 21
-- Total symbols: 215
+- Total symbols: 216
   - function: 140
-  - interface: 59
+  - interface: 60
   - type: 11
   - variable: 5
 
@@ -204,23 +204,25 @@ src/storage/graph-repository.ts [1-412]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/hybrid-search.ts [1-718]
+src/storage/hybrid-search.ts [1-732]
   interface:
-    57-76: interface HybridScoreBreakdown [exported]
+    28-37: interface HybridWeights [exported]
+      /** Type for hybrid search weight keys */
+    71-90: interface HybridScoreBreakdown [exported]
       /** Breakdown of scores for transparency and debugging. */
-    81-92: interface HybridSearchResult [exported]
+    95-106: interface HybridSearchResult [exported]
       /** Enhanced search result with hybrid scoring. */
-    97-114: interface HybridSearchOptions [exported]
+    111-128: interface HybridSearchOptions [exported]
       /** Options for hybrid search. */
-    119-130: interface HybridSearchResponse [exported]
+    133-144: interface HybridSearchResponse [exported]
       /** Result from hybrid search with pagination metadata. */
   function:
-    591-662: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+    605-676: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
       /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
-    671-717: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+    685-731: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
       /** Calculate hybrid score for a single node (useful for re-ranking). */
   variable:
-    30-39: Record<string, number> [exported]
+    44-53: HybridWeights [exported]
       /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
     - ./database.js
@@ -658,4 +660,4 @@ src/storage/tool-error-repository.ts [1-374]
 
 ---
 Files: 21
-Estimated tokens: 10,190 (codebase: ~1,345,870)
+Estimated tokens: 10,212 (codebase: ~1,376,061)

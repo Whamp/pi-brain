@@ -14,16 +14,10 @@
 
 ---
 
-src/daemon/cli.test.ts [1-166]
+src/daemon/cli.test.ts [1-90]
   imports:
-    - ../config/config.js
-    - ../storage/database.js
-    - ../storage/embedding-utils.js
-    - ../storage/node-storage.js
     - ./cli.js
-    - ./facet-discovery.js
     - node:fs
-    - node:path
     - vitest
 
 src/daemon/cli.ts [1-1337]
@@ -228,7 +222,7 @@ src/daemon/cli.ts [1-1337]
     - node:net
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-442]
+src/daemon/connection-discovery.test.ts [1-446]
   imports:
     - ../storage/index.js
     - ./connection-discovery.js
@@ -241,8 +235,6 @@ src/daemon/connection-discovery.ts [1-629]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
     138-143: interface ConnectionResult [exported]
-      refs out: 1 [type: 1]
-        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
     - ../storage/index.js
@@ -443,8 +435,7 @@ src/daemon/facet-discovery.ts [1-1925]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 8 [call: 3, instantiate: 3, type: 2]
-        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
+      refs out: 7 [call: 3, instantiate: 3, type: 1]
         - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:174: instantiate Error -> external
@@ -485,8 +476,9 @@ src/daemon/graph-export.ts [1-134]
   function:
     25-92: exportGraphviz(outputPath: string, configPath?: string, options: GraphExportOptions = {}): { success: boolean; message: string; } [exported]
       /** Export knowledge graph to Graphviz DOT format */
-      refs out: 3 [call: 2, type: 1]
+      refs out: 4 [call: 3, type: 1]
         - src/daemon/graph-export.ts:28: type GraphExportOptions -> src/daemon/graph-export.ts
+        - src/daemon/graph-export.ts:33: call migrate -> src/storage/database.ts
         - src/daemon/graph-export.ts:83: call writeFileSync -> external
         - src/daemon/graph-export.ts:90: call close -> external
   imports:
@@ -548,7 +540,7 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-729]
+src/daemon/processor.test.ts [1-733]
   imports:
     - ./processor.js
     - ./queue.js
@@ -714,20 +706,16 @@ src/daemon/processor.ts [1-857]
     - node:os
     - node:path
 
-src/daemon/query-processor.test.ts [1-411]
+src/daemon/query-processor.test.ts [1-403]
   imports:
     - ../config/types.js
     - ../storage/bridge-discovery.js
-    - ../storage/database.js
     - ../storage/hybrid-search.js
     - ../storage/node-queries.js
-    - ../storage/quirk-repository.js
-    - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
     - node:child_process
-    - node:fs/promises
     - vitest
 
 src/daemon/query-processor.ts [1-926]
@@ -926,18 +914,16 @@ src/daemon/scheduler.ts [1-945]
     - better-sqlite3
     - croner
 
-src/daemon/semantic-search.integration.test.ts [1-340]
+src/daemon/semantic-search.integration.test.ts [1-338]
   imports:
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
-    - ../storage/types.js
     - ../types/index.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
-    - node:child_process
     - node:fs
     - node:os
     - node:path
@@ -1008,7 +994,7 @@ src/daemon/watcher-events.ts [1-117]
       refs out: 1 [type: 1]
         - src/daemon/watcher-events.ts:37: type const -> external
 
-src/daemon/watcher.test.ts [1-826]
+src/daemon/watcher.test.ts [1-830]
   imports:
     - ../config/types.js
     - ./index.js
@@ -1061,7 +1047,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-1180]
+src/daemon/worker.test.ts [1-1229]
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -1084,17 +1070,17 @@ src/daemon/worker.ts [1-894]
   interface:
     68-85: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 11 [type: 11]
+      refs out: 10 [type: 10]
         - src/daemon/worker.ts:72: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:74: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:76: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:78: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:78: type Promise -> external
         - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:80: type Node -> src/types/index.ts
         - src/daemon/worker.ts:80: type Promise -> external
         - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:82: type Error -> external
+        - src/daemon/worker.ts:82: type Promise -> external
     88-103: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1515,25 +1501,21 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:458: type SessionEntry -> src/types/session.ts
     514-542: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 2 [call: 1, type: 1]
         - src/parser/signals.ts:514: type SessionEntry -> src/types/session.ts
-        - src/parser/signals.ts:514: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:532: call push -> external
-        - src/parser/signals.ts:533: type ManualFlag -> src/types/index.ts
     553-581: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 5 [call: 4, type: 1]
-        - src/parser/signals.ts:553: type FrictionSignals -> src/types/index.ts
+      refs out: 4 [call: 4]
         - src/parser/signals.ts:557: call min -> external
         - src/parser/signals.ts:560: call min -> external
         - src/parser/signals.ts:563: call min -> external
         - src/parser/signals.ts:580: call min -> external
     604-636: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:605: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:606: type FrictionDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:607: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:633: call calculateFrictionScore -> src/parser/signals.ts
     676-690: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1597,19 +1579,17 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:1084: call hasGenuinePraise -> src/parser/signals.ts
     1125-1144: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:1125: type DelightSignals -> src/types/index.ts
+      refs out: 1 [call: 1]
         - src/parser/signals.ts:1143: call min -> external
     1161-1180: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:1162: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:1163: type DelightDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:1164: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1177: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types/index.js
 
 ---
 Files: 41
-Estimated tokens: 21,236 (codebase: ~1,375,884)
+Estimated tokens: 20,997 (codebase: ~1,411,762)

@@ -5,9 +5,9 @@
 
 ## Statistics
 - Total files: 103
-- Total symbols: 713
+- Total symbols: 714
   - function: 387
-  - interface: 228
+  - interface: 229
   - type: 44
   - variable: 39
   - class: 15
@@ -137,9 +137,9 @@ src/api/routes/prompt-learning.ts [1-166]
     - ../responses.js
     - fastify
 
-src/api/routes/query.ts [1-282]
+src/api/routes/query.ts [1-291]
   function:
-    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+    115-290: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -293,9 +293,9 @@ src/cli.ts [1-1165]
     - node:path
     - open
 
-src/config/config.ts [1-1187]
+src/config/config.ts [1-1190]
   class:
-    905-913: class ConfigError extends Error [exported]
+    908-916: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
@@ -310,25 +310,25 @@ src/config/config.ts [1-1187]
       /** Default API configuration */
     127-135: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    866-900: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    869-903: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    960-987: loadConfig(configPath?: string): PiBrainConfig [exported]
+    963-990: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    992-997: ensureConfigDir(configDir?: string): void [exported]
+    995-1000: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    1002-1037: ensureDirectories(config: PiBrainConfig): void [exported]
+    1005-1040: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    1042-1105: writeDefaultConfig(configPath?: string): void [exported]
+    1045-1108: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    1110-1118: getSessionDirs(config: PiBrainConfig): {} [exported]
+    1113-1121: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    1123-1125: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    1126-1128: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    1130-1134: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    1133-1137: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    1139-1146: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    1142-1149: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    1157-1186: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    1160-1189: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -460,19 +460,20 @@ src/daemon/connection-discovery.ts [1-629]
     - ../types/index.js
     - better-sqlite3
 
-src/daemon/consolidation/creative-associator.ts [1-245]
+src/daemon/consolidation/creative-associator.ts [1-241]
   class:
-    82-244: class CreativeAssociator [exported]
+    83-240: class CreativeAssociator [exported]
       /** Discovers and creates non-obvious connections between nodes */
   interface:
-    41-50: interface CreativeAssociatorConfig [exported]
+    42-51: interface CreativeAssociatorConfig [exported]
       /** Configuration for the creative associator */
-    55-64: interface CreativeAssociatorResult [exported]
+    56-65: interface CreativeAssociatorResult [exported]
       /** Result of a creative association run */
   imports:
     - ../../storage/database.js
     - ../../storage/edge-repository.js
     - ../../storage/embedding-utils.js
+    - ../../storage/semantic-search.js
     - better-sqlite3
 
 src/daemon/consolidation/decay-scheduler.ts [1-351]
@@ -1517,23 +1518,25 @@ src/storage/graph-repository.ts [1-412]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/hybrid-search.ts [1-718]
+src/storage/hybrid-search.ts [1-732]
   interface:
-    57-76: interface HybridScoreBreakdown [exported]
+    28-37: interface HybridWeights [exported]
+      /** Type for hybrid search weight keys */
+    71-90: interface HybridScoreBreakdown [exported]
       /** Breakdown of scores for transparency and debugging. */
-    81-92: interface HybridSearchResult [exported]
+    95-106: interface HybridSearchResult [exported]
       /** Enhanced search result with hybrid scoring. */
-    97-114: interface HybridSearchOptions [exported]
+    111-128: interface HybridSearchOptions [exported]
       /** Options for hybrid search. */
-    119-130: interface HybridSearchResponse [exported]
+    133-144: interface HybridSearchResponse [exported]
       /** Result from hybrid search with pagination metadata. */
   function:
-    591-662: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+    605-676: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
       /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
-    671-717: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+    685-731: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
       /** Calculate hybrid score for a single node (useful for re-ranking). */
   variable:
-    30-39: Record<string, number> [exported]
+    44-53: HybridWeights [exported]
       /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
     - ./database.js
@@ -2021,7 +2024,7 @@ src/sync/status.ts [1-182]
     - node:fs
     - node:os
 
-src/types/index.ts [1-728]
+src/types/index.ts [1-730]
   interface:
     12-40: interface Node [exported]
       /** Shared type definitions for pi-brain This file contains pure type definitions (no runtime code) shared between the daemon/storage backend and the web frontend. */
@@ -2040,41 +2043,41 @@ src/types/index.ts [1-728]
     232-241: interface SemanticData [exported]
     243-250: interface DaemonDecision [exported]
     252-262: interface DaemonMeta [exported]
-    299-312: interface EdgeMetadata [exported]
-    314-327: interface Edge [exported]
-    360-367: interface NodeVersion [exported]
-    373-383: interface AggregatedFailurePattern [exported]
-    385-394: interface AggregatedModelStats [exported]
-    396-405: interface AggregatedLessonPattern [exported]
-    414-441: interface AggregatedInsight [exported]
-    447-458: interface PromptAddition [exported]
-    467-472: interface DateRange [exported]
+    299-314: interface EdgeMetadata [exported]
+    316-329: interface Edge [exported]
+    362-369: interface NodeVersion [exported]
+    375-385: interface AggregatedFailurePattern [exported]
+    387-396: interface AggregatedModelStats [exported]
+    398-407: interface AggregatedLessonPattern [exported]
+    416-443: interface AggregatedInsight [exported]
+    449-460: interface PromptAddition [exported]
+    469-474: interface DateRange [exported]
       /** Date range for measuring effectiveness before/after prompt addition */
-    477-495: interface EffectivenessResult [exported]
+    479-497: interface EffectivenessResult [exported]
       /** Result of measuring prompt effectiveness for a single insight */
-    500-536: interface PromptEffectiveness [exported]
+    502-538: interface PromptEffectiveness [exported]
       /** Full effectiveness measurement record stored in database */
-    545-552: interface ManualFlag [exported]
+    547-554: interface ManualFlag [exported]
       /** Manual flag recorded by user via /brain --flag command */
-    557-572: interface FrictionSignals [exported]
+    559-574: interface FrictionSignals [exported]
       /** Friction signals detected in a session segment */
-    577-586: interface DelightSignals [exported]
+    579-588: interface DelightSignals [exported]
       /** Delight signals detected in a session segment */
-    591-595: interface NodeSignals [exported]
+    593-597: interface NodeSignals [exported]
       /** Combined signals for a node */
-    614-636: interface Cluster [exported]
+    616-638: interface Cluster [exported]
       /** A discovered cluster from facet discovery */
-    641-648: interface ClusterNode [exported]
+    643-650: interface ClusterNode [exported]
       /** Node membership in a cluster */
-    653-663: interface NodeEmbedding [exported]
+    655-665: interface NodeEmbedding [exported]
       /** Cached embedding for a node */
-    668-681: interface ClusteringRun [exported]
+    670-683: interface ClusteringRun [exported]
       /** Record of a clustering run */
-    686-697: interface EmbeddingConfig [exported]
+    688-699: interface EmbeddingConfig [exported]
       /** Configuration for the embedding provider */
-    702-713: interface ClusteringConfig [exported]
+    704-715: interface ClusteringConfig [exported]
       /** Configuration for clustering algorithm */
-    718-721: interface FacetDiscoveryResult [exported]
+    720-723: interface FacetDiscoveryResult [exported]
       /** Result of facet discovery pipeline */
   type:
     61-74: NodeType = | "coding"
@@ -2113,20 +2116,20 @@ src/types/index.ts [1-728]
   | "lesson_application"
   | ... [exported]
     297-297: EdgeCreator = "boundary" | "daemon" | "user" [exported]
-    347-347: AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number] [exported]
-    353-358: VersionTrigger = | "initial"
+    349-349: AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number] [exported]
+    355-360: VersionTrigger = | "initial"
   | "prompt_update"
   | "connection_found"
   | "user_feedback"
   | "schema_migration" [exported]
-    411-411: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
-    412-412: InsightSeverity = "low" | "medium" | "high" [exported]
-    604-604: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
+    413-413: InsightType = "quirk" | "win" | "failure" | "tool_error" | "lesson" [exported]
+    414-414: InsightSeverity = "low" | "medium" | "high" [exported]
+    606-606: ClusterStatus = "pending" | "confirmed" | "dismissed" [exported]
       /** Cluster status for user feedback */
-    609-609: ClusterSignalType = "friction" | "delight" | null [exported]
+    611-611: ClusterSignalType = "friction" | "delight" | null [exported]
       /** Signal type a cluster relates to */
   variable:
-    333-345: AUTOMEM_EDGE_TYPES [exported]
+    335-347: AUTOMEM_EDGE_TYPES [exported]
       /** AutoMem typed relationship edge types (per automem-features.md) These enable semantic reasoning ("why" queries, causal chains) */
   imports:
     - ./session.js
@@ -2353,4 +2356,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 103
-Estimated tokens: 29,500 (codebase: ~1,345,870)
+Estimated tokens: 29,532 (codebase: ~1,376,061)

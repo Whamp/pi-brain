@@ -5,25 +5,19 @@
 
 ## Statistics
 - Total files: 65
-- Total symbols: 358
+- Total symbols: 359
   - function: 212
-  - interface: 99
+  - interface: 100
   - variable: 20
   - type: 18
   - class: 9
 
 ---
 
-src/daemon/cli.test.ts [1-166]
+src/daemon/cli.test.ts [1-90]
   imports:
-    - ../config/config.js
-    - ../storage/database.js
-    - ../storage/embedding-utils.js
-    - ../storage/node-storage.js
     - ./cli.js
-    - ./facet-discovery.js
     - node:fs
-    - node:path
     - vitest
 
 src/daemon/cli.ts [1-1337]
@@ -199,15 +193,11 @@ src/daemon/cli.ts [1-1337]
         - src/daemon/index.ts:132: reexport (module)
     1244-1326: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
-      refs in: 9 [call: 6, import: 2, reexport: 1]
+      refs in: 5 [call: 2, import: 2, reexport: 1]
         - src/cli.ts:32: import (module)
         - src/cli.ts:350: call result
-        - src/daemon/cli.test.ts:12: import (module)
-        - src/daemon/cli.test.ts:83: call result
-        - src/daemon/cli.test.ts:95: call result
-        - src/daemon/cli.test.ts:115: call result
-        - src/daemon/cli.test.ts:140: call (module)
-        - src/daemon/cli.test.ts:160: call result
+        - src/daemon/cli.test.ts:4: import (module)
+        - src/daemon/cli.test.ts:81: call result
         - src/daemon/index.ts:133: reexport (module)
   variable:
     108-108: any [exported]
@@ -233,7 +223,7 @@ src/daemon/cli.ts [1-1337]
     - node:net
     - node:path
 
-src/daemon/connection-discovery.test.ts [1-442]
+src/daemon/connection-discovery.test.ts [1-446]
   imports:
     - ../storage/index.js
     - ./connection-discovery.js
@@ -540,17 +530,17 @@ src/daemon/facet-discovery.ts [1-1925]
         - src/daemon/index.ts:177: reexport (module)
     140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-      refs in: 30 [import: 6, reexport: 1, type: 23]
+      refs in: 34 [import: 7, reexport: 1, type: 26]
+        - src/api/routes/query.ts:14: import (module)
+        - src/api/routes/query.ts:62: type cachedEmbeddingProvider
+        - src/api/routes/query.ts:75: type getEmbeddingProvider
+        - src/api/routes/query.ts:176: type embeddingProvider
         - src/daemon/facet-discovery.ts:150: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:151: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:153: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:154: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:155: type isEmbeddingProvider
         - src/daemon/facet-discovery.ts:164: type createEmbeddingProvider
-        - src/daemon/facet-discovery.ts:206: type createOllamaProvider
-        - src/daemon/facet-discovery.ts:252: type createOpenAIProvider
-        - src/daemon/facet-discovery.ts:294: type createOpenRouterProvider
-        - src/daemon/facet-discovery.ts:331: type createMockEmbeddingProvider
     755-759: interface FacetDiscoveryLogger [exported]
       refs in: 4 [reexport: 1, type: 3]
         - src/daemon/facet-discovery.ts:762: type noopLogger
@@ -560,7 +550,9 @@ src/daemon/facet-discovery.ts [1-1925]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs in: 11 [call: 6, import: 4, reexport: 1]
+      refs in: 13 [call: 7, import: 5, reexport: 1]
+        - src/api/routes/query.ts:13: import (module)
+        - src/api/routes/query.ts:103: call getEmbeddingProvider
         - src/daemon/cli.ts:40: import (module)
         - src/daemon/cli.ts:1271: call provider
         - src/daemon/facet-discovery.test.ts:15: import (module)
@@ -569,8 +561,6 @@ src/daemon/facet-discovery.ts [1-1925]
         - src/daemon/facet-discovery.ts:783: call FacetDiscovery.constructor
         - src/daemon/index.ts:170: reexport (module)
         - src/daemon/scheduler.ts:30: import (module)
-        - src/daemon/scheduler.ts:725: call Scheduler.createSchedulerEmbeddingProvider
-        - src/daemon/worker.ts:48: import (module)
     331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
       refs in: 16 [call: 14, import: 2]
@@ -708,7 +698,7 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.test.ts [1-729]
+src/daemon/processor.test.ts [1-733]
   imports:
     - ./processor.js
     - ./queue.js
@@ -938,40 +928,38 @@ src/daemon/processor.ts [1-857]
     - node:os
     - node:path
 
-src/daemon/query-processor.test.ts [1-411]
+src/daemon/query-processor.test.ts [1-403]
   imports:
     - ../config/types.js
     - ../storage/bridge-discovery.js
-    - ../storage/database.js
     - ../storage/hybrid-search.js
     - ../storage/node-queries.js
-    - ../storage/quirk-repository.js
-    - ../storage/tool-error-repository.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
     - node:child_process
-    - node:fs/promises
     - vitest
 
 src/daemon/query-processor.ts [1-926]
   interface:
     38-52: interface QueryRequest [exported]
       /** Query request from the API */
-      refs in: 14 [import: 2, type: 12]
-        - src/daemon/query-processor.test.ts:20: import (module)
-        - src/daemon/query-processor.test.ts:92: type request
-        - src/daemon/query-processor.test.ts:180: type request
-        - src/daemon/query-processor.test.ts:233: type request
-        - src/daemon/query-processor.test.ts:268: type request
-        - src/daemon/query-processor.test.ts:313: type request
-        - src/daemon/query-processor.test.ts:351: type request
-        - src/daemon/query-processor.test.ts:397: type request
-        - src/daemon/query-processor.ts:117: type processQuery
-        - src/daemon/semantic-search.integration.test.ts:17: import (module)
+      refs in: 16 [import: 3, type: 13]
+        - src/api/routes/query.ts:18: import (module)
+        - src/api/routes/query.ts:165: type queryRequest
+        - src/daemon/query-processor.test.ts:12: import (module)
+        - src/daemon/query-processor.test.ts:84: type request
+        - src/daemon/query-processor.test.ts:172: type request
+        - src/daemon/query-processor.test.ts:225: type request
+        - src/daemon/query-processor.test.ts:260: type request
+        - src/daemon/query-processor.test.ts:305: type request
+        - src/daemon/query-processor.test.ts:343: type request
+        - src/daemon/query-processor.test.ts:389: type request
     55-73: interface QueryResponse [exported]
       /** Query response to return to the client */
-      refs in: 5 [type: 5]
+      refs in: 7 [import: 1, type: 6]
+        - src/api/routes/query.ts:19: import (module)
+        - src/api/routes/query.ts:186: type response
         - src/daemon/query-processor.ts:78: type AgentQueryResult
         - src/daemon/query-processor.ts:119: type processQuery
         - src/daemon/query-processor.ts:181: type buildNoResultsResponse
@@ -984,17 +972,17 @@ src/daemon/query-processor.ts [1-926]
   function:
     116-176: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
-      refs in: 13 [call: 11, import: 2]
-        - src/daemon/query-processor.test.ts:20: import (module)
-        - src/daemon/query-processor.test.ts:93: call response
-        - src/daemon/query-processor.test.ts:181: call response
-        - src/daemon/query-processor.test.ts:234: call response
-        - src/daemon/query-processor.test.ts:269: call response
-        - src/daemon/query-processor.test.ts:314: call response
-        - src/daemon/query-processor.test.ts:352: call response
-        - src/daemon/query-processor.test.ts:401: call (module)
-        - src/daemon/semantic-search.integration.test.ts:17: import (module)
-        - src/daemon/semantic-search.integration.test.ts:197: call response
+      refs in: 15 [call: 12, import: 3]
+        - src/api/routes/query.ts:17: import (module)
+        - src/api/routes/query.ts:186: call response
+        - src/daemon/query-processor.test.ts:12: import (module)
+        - src/daemon/query-processor.test.ts:85: call response
+        - src/daemon/query-processor.test.ts:173: call response
+        - src/daemon/query-processor.test.ts:226: call response
+        - src/daemon/query-processor.test.ts:261: call response
+        - src/daemon/query-processor.test.ts:306: call response
+        - src/daemon/query-processor.test.ts:344: call response
+        - src/daemon/query-processor.test.ts:393: call (module)
   imports:
     - ../config/types.js
     - ../storage/bridge-discovery.js
@@ -1048,7 +1036,10 @@ src/daemon/queue.ts [1-807]
         - src/daemon/queue.ts:748: type QueueManager.parseRow
     53-88: interface AnalysisJob [exported]
       /** Analysis job structure */
-      refs in: 57 [import: 7, reexport: 1, type: 49]
+      refs in: 60 [import: 8, reexport: 1, type: 51]
+        - src/api/websocket.test.ts:9: import (module)
+        - src/api/websocket.test.ts:300: type mockJob
+        - src/api/websocket.test.ts:415: type mockJob
         - src/daemon/cli.ts:51: import (module)
         - src/daemon/cli.ts:125: type QueueStatus
         - src/daemon/cli.ts:126: type QueueStatus
@@ -1056,9 +1047,6 @@ src/daemon/queue.ts [1-807]
         - src/daemon/cli.ts:987: type formatJobLine
         - src/daemon/cli.ts:1008: type appendJobSection
         - src/daemon/index.ts:50: reexport (module)
-        - src/daemon/processor.test.ts:9: import (module)
-        - src/daemon/processor.test.ts:34: type createTestJob
-        - src/daemon/processor.test.ts:34: type createTestJob
     102-115: interface QueueStats [exported]
       /** Queue statistics */
       refs in: 5 [import: 1, reexport: 1, type: 3]
@@ -1127,7 +1115,7 @@ src/daemon/queue.ts [1-807]
         - src/daemon/queue.test.ts:15: import (module)
         - src/daemon/queue.test.ts:30: call (module)
         - src/daemon/worker.test.ts:26: import (module)
-        - src/daemon/worker.test.ts:291: call (module)
+        - src/daemon/worker.test.ts:295: call (module)
         - src/daemon/worker.ts:58: import (module)
     788-806: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
@@ -1276,18 +1264,16 @@ src/daemon/scheduler.ts [1-945]
     - better-sqlite3
     - croner
 
-src/daemon/semantic-search.integration.test.ts [1-340]
+src/daemon/semantic-search.integration.test.ts [1-338]
   imports:
     - ../config/types.js
     - ../storage/database.js
     - ../storage/embedding-utils.js
     - ../storage/node-crud.js
-    - ../storage/types.js
     - ../types/index.js
     - ./facet-discovery.js
     - ./query-processor.js
     - better-sqlite3
-    - node:child_process
     - node:fs
     - node:os
     - node:path
@@ -1356,17 +1342,17 @@ src/daemon/watcher-events.ts [1-117]
         - src/daemon/daemon-process.ts:224: call sessionPath
         - src/daemon/index.ts:33: reexport (module)
         - src/daemon/watcher.test.ts:18: import (module)
-        - src/daemon/watcher.test.ts:261: call (module)
-        - src/daemon/watcher.test.ts:304: call (module)
-        - src/daemon/watcher.test.ts:335: call (module)
-        - src/daemon/watcher.test.ts:363: call (module)
-        - src/daemon/watcher.test.ts:397: call (module)
+        - src/daemon/watcher.test.ts:265: call (module)
+        - src/daemon/watcher.test.ts:308: call (module)
+        - src/daemon/watcher.test.ts:339: call (module)
+        - src/daemon/watcher.test.ts:367: call (module)
+        - src/daemon/watcher.test.ts:401: call (module)
     111-116: getEventError(event: Event): any [exported]
       /** Helper to get error from an error event */
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:34: reexport (module)
         - src/daemon/watcher.test.ts:15: import (module)
-        - src/daemon/watcher.test.ts:822: call (module)
+        - src/daemon/watcher.test.ts:826: call (module)
   variable:
     24-37: SESSION_EVENTS [exported]
       /** Session event names */
@@ -1376,7 +1362,7 @@ src/daemon/watcher-events.ts [1-117]
         - src/daemon/watcher.test.ts:20: import (module)
         - src/daemon/watcher.ts:18: import (module)
 
-src/daemon/watcher.test.ts [1-826]
+src/daemon/watcher.test.ts [1-830]
   imports:
     - ../config/types.js
     - ./index.js
@@ -1394,12 +1380,12 @@ src/daemon/watcher.ts [1-582]
         - src/daemon/daemon-process.ts:200: instantiate watcher
         - src/daemon/index.ts:15: reexport (module)
         - src/daemon/watcher.test.ts:21: import (module)
-        - src/daemon/watcher.test.ts:86: type waitForEvent
-        - src/daemon/watcher.test.ts:106: type createTestWatcher
-        - src/daemon/watcher.test.ts:107: instantiate createTestWatcher
-        - src/daemon/watcher.test.ts:117: instantiate watcher
-        - src/daemon/watcher.test.ts:123: instantiate watcher
-        - src/daemon/watcher.test.ts:376: instantiate watcher
+        - src/daemon/watcher.test.ts:90: type waitForEvent
+        - src/daemon/watcher.test.ts:110: type createTestWatcher
+        - src/daemon/watcher.test.ts:111: instantiate createTestWatcher
+        - src/daemon/watcher.test.ts:121: instantiate watcher
+        - src/daemon/watcher.test.ts:127: instantiate watcher
+        - src/daemon/watcher.test.ts:380: instantiate watcher
   interface:
     27-42: interface SessionState [exported]
       /** State tracking for a single session file */
@@ -1422,31 +1408,31 @@ src/daemon/watcher.ts [1-582]
       refs in: 3 [call: 1, import: 1, reexport: 1]
         - src/daemon/index.ts:16: reexport (module)
         - src/daemon/watcher.test.ts:13: import (module)
-        - src/daemon/watcher.test.ts:758: call watcher
+        - src/daemon/watcher.test.ts:762: call watcher
     555-557: isSessionFile(filePath: string): boolean [exported]
       /** Check if a path is a valid session file */
       refs in: 7 [call: 5, import: 1, reexport: 1]
         - src/daemon/index.ts:17: reexport (module)
         - src/daemon/watcher.test.ts:19: import (module)
-        - src/daemon/watcher.test.ts:765: call (module)
-        - src/daemon/watcher.test.ts:766: call (module)
+        - src/daemon/watcher.test.ts:769: call (module)
         - src/daemon/watcher.test.ts:770: call (module)
-        - src/daemon/watcher.test.ts:771: call (module)
-        - src/daemon/watcher.test.ts:772: call (module)
+        - src/daemon/watcher.test.ts:774: call (module)
+        - src/daemon/watcher.test.ts:775: call (module)
+        - src/daemon/watcher.test.ts:776: call (module)
     562-564: getSessionName(sessionPath: string): string [exported]
       /** Extract session name from path */
       refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:18: reexport (module)
         - src/daemon/watcher.test.ts:17: import (module)
-        - src/daemon/watcher.test.ts:778: call (module)
-        - src/daemon/watcher.test.ts:780: call (module)
+        - src/daemon/watcher.test.ts:782: call (module)
+        - src/daemon/watcher.test.ts:784: call (module)
     571-581: getProjectFromSessionPath(sessionPath: string): string [exported]
       /** Extract project name from session path Session paths are typically: ~/.pi/agent/sessions/<project-name>/<session-file>.jsonl */
       refs in: 4 [call: 2, import: 1, reexport: 1]
         - src/daemon/index.ts:19: reexport (module)
         - src/daemon/watcher.test.ts:16: import (module)
-        - src/daemon/watcher.test.ts:788: call (module)
-        - src/daemon/watcher.test.ts:796: call (module)
+        - src/daemon/watcher.test.ts:792: call (module)
+        - src/daemon/watcher.test.ts:800: call (module)
   variable:
     67-73: WatcherConfig [exported]
       /** Default watcher configuration */
@@ -1462,7 +1448,7 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.test.ts [1-1180]
+src/daemon/worker.test.ts [1-1229]
   imports:
     - ../config/types.js
     - ../storage/database.js
@@ -1495,8 +1481,8 @@ src/daemon/worker.ts [1-894]
       refs in: 6 [import: 1, reexport: 1, type: 4]
         - src/daemon/index.ts:107: reexport (module)
         - src/daemon/worker.test.ts:31: import (module)
-        - src/daemon/worker.test.ts:84: type createTestWorkerConfig
-        - src/daemon/worker.test.ts:85: type createTestWorkerConfig
+        - src/daemon/worker.test.ts:88: type createTestWorkerConfig
+        - src/daemon/worker.test.ts:89: type createTestWorkerConfig
         - src/daemon/worker.ts:161: type Worker.constructor
         - src/daemon/worker.ts:842: type createWorker
     88-103: interface WorkerStatus [exported]
@@ -1523,12 +1509,12 @@ src/daemon/worker.ts [1-894]
         - src/daemon/daemon-process.ts:140: call worker
         - src/daemon/index.ts:104: reexport (module)
         - src/daemon/worker.test.ts:28: import (module)
-        - src/daemon/worker.test.ts:135: call worker
-        - src/daemon/worker.test.ts:142: call worker
-        - src/daemon/worker.test.ts:151: call worker
-        - src/daemon/worker.test.ts:159: call worker
-        - src/daemon/worker.test.ts:175: call worker
-        - src/daemon/worker.test.ts:189: call worker
+        - src/daemon/worker.test.ts:139: call worker
+        - src/daemon/worker.test.ts:146: call worker
+        - src/daemon/worker.test.ts:155: call worker
+        - src/daemon/worker.test.ts:163: call worker
+        - src/daemon/worker.test.ts:179: call worker
+        - src/daemon/worker.test.ts:193: call worker
     850-864: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
       refs in: 1 [reexport: 1]
@@ -1538,14 +1524,14 @@ src/daemon/worker.ts [1-894]
       refs in: 11 [call: 9, import: 1, reexport: 1]
         - src/daemon/index.ts:106: reexport (module)
         - src/daemon/worker.test.ts:29: import (module)
-        - src/daemon/worker.test.ts:204: call result
-        - src/daemon/worker.test.ts:214: call result
-        - src/daemon/worker.test.ts:223: call result
-        - src/daemon/worker.test.ts:232: call result
-        - src/daemon/worker.test.ts:250: call result
-        - src/daemon/worker.test.ts:269: call result0
-        - src/daemon/worker.test.ts:270: call result1
-        - src/daemon/worker.test.ts:271: call result2
+        - src/daemon/worker.test.ts:208: call result
+        - src/daemon/worker.test.ts:218: call result
+        - src/daemon/worker.test.ts:227: call result
+        - src/daemon/worker.test.ts:236: call result
+        - src/daemon/worker.test.ts:254: call result
+        - src/daemon/worker.test.ts:273: call result0
+        - src/daemon/worker.test.ts:274: call result1
+        - src/daemon/worker.test.ts:275: call result2
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1598,7 +1584,7 @@ src/storage/bridge-discovery.ts [1-338]
     266-296: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
       /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
       refs in: 10 [call: 7, import: 3]
-        - src/daemon/query-processor.test.ts:17: import (module)
+        - src/daemon/query-processor.test.ts:9: import (module)
         - src/daemon/query-processor.ts:20: import (module)
         - src/daemon/query-processor.ts:230: call bridgePaths
         - src/storage/bridge-discovery.test.ts:8: import (module)
@@ -1715,11 +1701,11 @@ src/storage/database.ts [1-331]
         - src/daemon/queue.test.ts:12: import (module)
         - src/daemon/queue.test.ts:34: call (module)
         - src/daemon/worker.test.ts:15: import (module)
-        - src/daemon/worker.test.ts:128: call (module)
-        - src/daemon/worker.test.ts:295: call (module)
-        - src/daemon/worker.test.ts:389: call (module)
-        - src/daemon/worker.test.ts:477: call (module)
-        - src/daemon/worker.test.ts:571: call (module)
+        - src/daemon/worker.test.ts:132: call (module)
+        - src/daemon/worker.test.ts:299: call (module)
+        - src/daemon/worker.test.ts:393: call (module)
+        - src/daemon/worker.test.ts:481: call (module)
+        - src/daemon/worker.test.ts:575: call (module)
         - src/storage/bridge-discovery.test.ts:9: import (module)
         - src/storage/bridge-discovery.test.ts:34: call (module)
     294-301: isDatabaseHealthy(db: Database.Database): boolean [exported]
@@ -1745,7 +1731,7 @@ src/storage/database.ts [1-331]
         - src/storage/embedding-utils.ts:182: call txn
         - src/storage/embedding-utils.ts:227: call deleteEmbedding
         - src/storage/hybrid-search.ts:17: import (module)
-        - src/storage/hybrid-search.ts:547: call collectCandidates
+        - src/storage/hybrid-search.ts:561: call collectCandidates
   variable:
     15-15: any [exported]
       /** Default pi-brain data directory */
@@ -1931,7 +1917,7 @@ src/storage/edge-repository.ts [1-197]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.test.ts [1-1069]
+src/storage/embedding-utils.test.ts [1-1075]
   imports:
     - ../types/index.js
     - ./database.js
@@ -1974,11 +1960,11 @@ src/storage/embedding-utils.ts [1-676]
         - src/daemon/facet-discovery.ts:35: import (module)
         - src/daemon/facet-discovery.ts:995: call FacetDiscovery.buildNodeEmbeddingText
         - src/daemon/worker.test.ts:17: import (module)
-        - src/daemon/worker.test.ts:660: call text
-        - src/daemon/worker.test.ts:755: call text
-        - src/daemon/worker.test.ts:922: call text
-        - src/daemon/worker.test.ts:1022: call text
-        - src/daemon/worker.test.ts:1133: call text
+        - src/daemon/worker.test.ts:673: call text
+        - src/daemon/worker.test.ts:777: call text
+        - src/daemon/worker.test.ts:953: call text
+        - src/daemon/worker.test.ts:1062: call text
+        - src/daemon/worker.test.ts:1182: call text
         - src/daemon/worker.ts:29: import (module)
         - src/daemon/worker.ts:794: call Worker.text
     97-109: buildSimpleEmbeddingText(type: string | null, summary: string | null): string [exported]
@@ -2007,13 +1993,13 @@ src/storage/embedding-utils.ts [1-676]
     135-205: storeEmbeddingWithVec(db: Database.Database, nodeId: string, embedding: number[], modelName: string, inputText: string): { rowid: bigint; vecUpdated: boolean; } [exported]
       /** Store an embedding for a node in both node_embeddings and node_embeddings_vec tables. Handles upsert semantics - if an embedding already exists for the node, it will be replaced. The vec table is only updated if sqlite-vec is loaded. Uses a transaction to ensure atomicity - either both tables are updated or neither. */
       refs in: 26 [call: 23, import: 3]
-        - src/daemon/semantic-search.integration.test.ts:15: import (module)
-        - src/daemon/semantic-search.integration.test.ts:180: call (module)
-        - src/daemon/semantic-search.integration.test.ts:181: call (module)
-        - src/daemon/semantic-search.integration.test.ts:224: call (module)
-        - src/daemon/semantic-search.integration.test.ts:269: call (module)
-        - src/daemon/semantic-search.integration.test.ts:270: call (module)
-        - src/daemon/semantic-search.integration.test.ts:308: call (module)
+        - src/daemon/semantic-search.integration.test.ts:13: import (module)
+        - src/daemon/semantic-search.integration.test.ts:178: call (module)
+        - src/daemon/semantic-search.integration.test.ts:179: call (module)
+        - src/daemon/semantic-search.integration.test.ts:222: call (module)
+        - src/daemon/semantic-search.integration.test.ts:267: call (module)
+        - src/daemon/semantic-search.integration.test.ts:268: call (module)
+        - src/daemon/semantic-search.integration.test.ts:306: call (module)
         - src/daemon/worker.ts:30: import (module)
         - src/daemon/worker.ts:807: call Worker.{ vecUpdated }
         - src/storage/embedding-utils.test.ts:25: import (module)
@@ -2027,18 +2013,18 @@ src/storage/embedding-utils.ts [1-676]
       /** Get embedding for a node. */
       refs in: 6 [call: 4, import: 2]
         - src/daemon/worker.test.ts:18: import (module)
-        - src/daemon/worker.test.ts:1041: call stored
+        - src/daemon/worker.test.ts:1081: call stored
         - src/storage/embedding-utils.test.ts:21: import (module)
         - src/storage/embedding-utils.test.ts:432: call stored
         - src/storage/embedding-utils.test.ts:463: call stored
-        - src/storage/embedding-utils.test.ts:903: call stored
+        - src/storage/embedding-utils.test.ts:909: call stored
     280-285: hasEmbedding(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node has an embedding stored. */
       refs in: 11 [call: 9, import: 2]
         - src/daemon/worker.test.ts:19: import (module)
-        - src/daemon/worker.test.ts:553: call (module)
-        - src/daemon/worker.test.ts:1038: call (module)
-        - src/daemon/worker.test.ts:1147: call (module)
+        - src/daemon/worker.test.ts:557: call (module)
+        - src/daemon/worker.test.ts:1078: call (module)
+        - src/daemon/worker.test.ts:1196: call (module)
         - src/storage/embedding-utils.test.ts:22: import (module)
         - src/storage/embedding-utils.test.ts:516: call (module)
         - src/storage/embedding-utils.test.ts:548: call (module)
@@ -2061,7 +2047,7 @@ src/storage/embedding-utils.ts [1-676]
         - src/storage/embedding-utils.test.ts:618: call restored
         - src/storage/embedding-utils.test.ts:627: call restored
         - src/storage/embedding-utils.ts:270: call getEmbedding
-        - src/storage/semantic-search.test.ts:9: import (module)
+        - src/storage/semantic-search.test.ts:6: import (module)
         - src/storage/semantic-search.ts:18: import (module)
         - src/storage/semantic-search.ts:178: call getNodeEmbeddingVector
     403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
@@ -2085,11 +2071,11 @@ src/storage/embedding-utils.ts [1-676]
         - src/daemon/scheduler.ts:25: import (module)
         - src/daemon/scheduler.ts:761: call Scheduler.runBackfillEmbeddings
         - src/storage/embedding-utils.test.ts:13: import (module)
-        - src/storage/embedding-utils.test.ts:895: call result
-        - src/storage/embedding-utils.test.ts:919: call result
-        - src/storage/embedding-utils.test.ts:941: call result
-        - src/storage/embedding-utils.test.ts:964: call result
-        - src/storage/embedding-utils.test.ts:994: call result
+        - src/storage/embedding-utils.test.ts:901: call result
+        - src/storage/embedding-utils.test.ts:925: call result
+        - src/storage/embedding-utils.test.ts:947: call result
+        - src/storage/embedding-utils.test.ts:970: call result
+        - src/storage/embedding-utils.test.ts:1000: call result
     643-675: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
       refs in: 3 [call: 2, import: 1]
@@ -2144,7 +2130,7 @@ src/storage/filter-utils.ts [1-272]
       /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
       refs in: 9 [call: 5, import: 4]
         - src/storage/hybrid-search.ts:18: import (module)
-        - src/storage/hybrid-search.ts:610: call { clause: filterClause, params: filterParams }
+        - src/storage/hybrid-search.ts:624: call { clause: filterClause, params: filterParams }
         - src/storage/node-queries.ts:14: import (module)
         - src/storage/node-queries.ts:198: call { clause, params }
         - src/storage/search-repository.ts:14: import (module)
@@ -2232,72 +2218,75 @@ src/storage/graph-repository.ts [1-412]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/hybrid-search.test.ts [1-446]
+src/storage/hybrid-search.test.ts [1-443]
   imports:
-    - ./database.js
     - ./hybrid-search.js
-    - ./semantic-search.js
     - better-sqlite3
     - vitest
 
-src/storage/hybrid-search.ts [1-718]
+src/storage/hybrid-search.ts [1-732]
   interface:
-    57-76: interface HybridScoreBreakdown [exported]
+    28-37: interface HybridWeights [exported]
+      /** Type for hybrid search weight keys */
+      refs in: 2 [type: 2]
+        - src/storage/hybrid-search.ts:44: type HYBRID_WEIGHTS
+        - src/storage/hybrid-search.ts:125: type HybridSearchOptions
+    71-90: interface HybridScoreBreakdown [exported]
       /** Breakdown of scores for transparency and debugging. */
       refs in: 6 [import: 1, type: 5]
         - src/daemon/query-processor.ts:26: import (module)
         - src/daemon/query-processor.ts:256: type RelevantNode
-        - src/storage/hybrid-search.ts:87: type HybridSearchResult
-        - src/storage/hybrid-search.ts:282: type calculateHybridScore
-        - src/storage/hybrid-search.ts:288: type breakdown
-        - src/storage/hybrid-search.ts:676: type calculateNodeHybridScore
-    81-92: interface HybridSearchResult [exported]
+        - src/storage/hybrid-search.ts:101: type HybridSearchResult
+        - src/storage/hybrid-search.ts:296: type calculateHybridScore
+        - src/storage/hybrid-search.ts:302: type breakdown
+        - src/storage/hybrid-search.ts:690: type calculateNodeHybridScore
+    95-106: interface HybridSearchResult [exported]
       /** Enhanced search result with hybrid scoring. */
       refs in: 5 [import: 1, type: 4]
-        - src/storage/hybrid-search.test.ts:13: import (module)
-        - src/storage/hybrid-search.test.ts:403: type findNode
-        - src/storage/hybrid-search.ts:121: type HybridSearchResponse
-        - src/storage/hybrid-search.ts:510: type buildScoredResults
-        - src/storage/hybrid-search.ts:511: type results
-    97-114: interface HybridSearchOptions [exported]
+        - src/storage/hybrid-search.test.ts:10: import (module)
+        - src/storage/hybrid-search.test.ts:400: type findNode
+        - src/storage/hybrid-search.ts:135: type HybridSearchResponse
+        - src/storage/hybrid-search.ts:524: type buildScoredResults
+        - src/storage/hybrid-search.ts:525: type results
+    111-128: interface HybridSearchOptions [exported]
       /** Options for hybrid search. */
       refs in: 4 [type: 4]
-        - src/storage/hybrid-search.ts:281: type calculateHybridScore
-        - src/storage/hybrid-search.ts:509: type buildScoredResults
-        - src/storage/hybrid-search.ts:594: type hybridSearch
-        - src/storage/hybrid-search.ts:675: type calculateNodeHybridScore
-    119-130: interface HybridSearchResponse [exported]
+        - src/storage/hybrid-search.ts:295: type calculateHybridScore
+        - src/storage/hybrid-search.ts:523: type buildScoredResults
+        - src/storage/hybrid-search.ts:608: type hybridSearch
+        - src/storage/hybrid-search.ts:689: type calculateNodeHybridScore
+    133-144: interface HybridSearchResponse [exported]
       /** Result from hybrid search with pagination metadata. */
       refs in: 1 [type: 1]
-        - src/storage/hybrid-search.ts:595: type hybridSearch
+        - src/storage/hybrid-search.ts:609: type hybridSearch
   function:
-    591-662: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+    605-676: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
       /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
       refs in: 16 [call: 13, import: 3]
-        - src/daemon/query-processor.test.ts:18: import (module)
+        - src/daemon/query-processor.test.ts:10: import (module)
         - src/daemon/query-processor.ts:25: import (module)
         - src/daemon/query-processor.ts:281: call searchResponse
-        - src/storage/hybrid-search.test.ts:15: import (module)
-        - src/storage/hybrid-search.test.ts:280: call result
-        - src/storage/hybrid-search.test.ts:287: call result
-        - src/storage/hybrid-search.test.ts:294: call result
-        - src/storage/hybrid-search.test.ts:301: call result
-        - src/storage/hybrid-search.test.ts:307: call result
-        - src/storage/hybrid-search.test.ts:312: call resultWithoutBoost
-    671-717: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+        - src/storage/hybrid-search.test.ts:12: import (module)
+        - src/storage/hybrid-search.test.ts:277: call result
+        - src/storage/hybrid-search.test.ts:284: call result
+        - src/storage/hybrid-search.test.ts:291: call result
+        - src/storage/hybrid-search.test.ts:298: call result
+        - src/storage/hybrid-search.test.ts:304: call result
+        - src/storage/hybrid-search.test.ts:309: call resultWithoutBoost
+    685-731: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
       /** Calculate hybrid score for a single node (useful for re-ranking). */
       refs in: 6 [call: 5, import: 1]
-        - src/storage/hybrid-search.test.ts:14: import (module)
-        - src/storage/hybrid-search.test.ts:363: call result
-        - src/storage/hybrid-search.test.ts:368: call result
-        - src/storage/hybrid-search.test.ts:375: call result
-        - src/storage/hybrid-search.test.ts:380: call resultWithBoost
-        - src/storage/hybrid-search.test.ts:387: call result
+        - src/storage/hybrid-search.test.ts:11: import (module)
+        - src/storage/hybrid-search.test.ts:360: call result
+        - src/storage/hybrid-search.test.ts:365: call result
+        - src/storage/hybrid-search.test.ts:372: call result
+        - src/storage/hybrid-search.test.ts:377: call resultWithBoost
+        - src/storage/hybrid-search.test.ts:384: call result
   variable:
-    30-39: Record<string, number> [exported]
+    44-53: HybridWeights [exported]
       /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
       refs in: 1 [import: 1]
-        - src/storage/hybrid-search.test.ts:16: import (module)
+        - src/storage/hybrid-search.test.ts:13: import (module)
   imports:
     - ./database.js
     - ./filter-utils.js
@@ -2441,10 +2430,12 @@ src/storage/node-conversion.ts [1-432]
         - src/storage/node-conversion.ts:430: call nodeRowsToNodes
     429-431: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
-      refs in: 3 [call: 2, import: 1]
+      refs in: 5 [call: 3, import: 2]
         - src/api/routes/nodes.ts:13: import (module)
         - src/api/routes/nodes.ts:163: call transformedResult
         - src/api/routes/nodes.ts:253: call transformedResult
+        - src/api/routes/sessions.ts:9: import (module)
+        - src/api/routes/sessions.ts:239: call sessionNodes
   imports:
     - ../daemon/processor.js
     - ../daemon/queue.js
@@ -2456,7 +2447,9 @@ src/storage/node-crud.ts [1-881]
   interface:
     52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-      refs in: 8 [import: 2, type: 6]
+      refs in: 10 [import: 3, type: 7]
+        - src/daemon/semantic-search.integration.test.ts:14: import (module)
+        - src/daemon/semantic-search.integration.test.ts:126: type options
         - src/storage/decision-repository.test.ts:8: import (module)
         - src/storage/decision-repository.test.ts:22: type options
         - src/storage/index.test.ts:67: import (module)
@@ -2528,7 +2521,7 @@ src/storage/node-crud.ts [1-881]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
       refs in: 11 [call: 8, import: 3]
         - src/daemon/worker.test.ts:21: import (module)
-        - src/daemon/worker.test.ts:1019: call (module)
+        - src/daemon/worker.test.ts:1059: call (module)
         - src/daemon/worker.ts:35: import (module)
         - src/daemon/worker.ts:562: call Worker.{ created }
         - src/storage/index.test.ts:65: import (module)
@@ -3312,7 +3305,7 @@ src/storage/search-repository.ts [1-485]
       /** Highlight match for search results */
       refs in: 7 [import: 2, type: 5]
         - src/storage/hybrid-search.ts:15: import (module)
-        - src/storage/hybrid-search.ts:89: type HybridSearchResult
+        - src/storage/hybrid-search.ts:103: type HybridSearchResult
         - src/storage/search-repository.ts:55: type SearchResult
         - src/storage/search-repository.ts:321: type findHighlights
         - src/storage/search-repository.ts:322: type highlights
@@ -3351,9 +3344,9 @@ src/storage/search-repository.ts [1-485]
       /** Filters for search queries (subset of node filters relevant to search) */
       refs in: 8 [import: 2, type: 6]
         - src/storage/hybrid-search.ts:15: import (module)
-        - src/storage/hybrid-search.ts:103: type HybridSearchOptions
-        - src/storage/hybrid-search.ts:346: type addVectorCandidates
-        - src/storage/hybrid-search.ts:537: type collectCandidates
+        - src/storage/hybrid-search.ts:117: type HybridSearchOptions
+        - src/storage/hybrid-search.ts:360: type addVectorCandidates
+        - src/storage/hybrid-search.ts:551: type collectCandidates
         - src/storage/search-repository.ts:67: type SearchOptions
         - src/storage/semantic-search.ts:12: import (module)
         - src/storage/semantic-search.ts:36: type SemanticSearchOptions
@@ -3416,7 +3409,7 @@ src/storage/search-repository.ts [1-485]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/semantic-search.test.ts [1-388]
+src/storage/semantic-search.test.ts [1-385]
   imports:
     - ./database.js
     - ./embedding-utils.js
@@ -3439,30 +3432,30 @@ src/storage/semantic-search.ts [1-214]
       /** Perform semantic search using vector similarity. Finds nodes with embeddings close to the query embedding. */
       refs in: 16 [call: 14, import: 2]
         - src/storage/hybrid-search.ts:19: import (module)
-        - src/storage/hybrid-search.ts:349: call vectorResults
-        - src/storage/semantic-search.test.ts:11: import (module)
-        - src/storage/semantic-search.test.ts:49: call result
-        - src/storage/semantic-search.test.ts:72: call result
-        - src/storage/semantic-search.test.ts:104: call result
-        - src/storage/semantic-search.test.ts:116: call (module)
-        - src/storage/semantic-search.test.ts:132: call result
-        - src/storage/semantic-search.test.ts:142: call result
-        - src/storage/semantic-search.test.ts:169: call result
+        - src/storage/hybrid-search.ts:363: call vectorResults
+        - src/storage/semantic-search.test.ts:8: import (module)
+        - src/storage/semantic-search.test.ts:46: call result
+        - src/storage/semantic-search.test.ts:69: call result
+        - src/storage/semantic-search.test.ts:101: call result
+        - src/storage/semantic-search.test.ts:113: call (module)
+        - src/storage/semantic-search.test.ts:129: call result
+        - src/storage/semantic-search.test.ts:139: call result
+        - src/storage/semantic-search.test.ts:166: call result
     166-179: getNodeEmbeddingVector(db: Database.Database, nodeId: string): {} [exported]
       /** Get the embedding vector for a node from the database. Useful for finding "related nodes" (node-to-node similarity). */
       refs in: 5 [call: 4, import: 1]
-        - src/storage/semantic-search.test.ts:13: import (module)
-        - src/storage/semantic-search.test.ts:356: call result
-        - src/storage/semantic-search.test.ts:367: call result
-        - src/storage/semantic-search.test.ts:378: call (module)
+        - src/storage/semantic-search.test.ts:10: import (module)
+        - src/storage/semantic-search.test.ts:353: call result
+        - src/storage/semantic-search.test.ts:364: call result
+        - src/storage/semantic-search.test.ts:375: call (module)
         - src/storage/semantic-search.ts:194: call embedding
     189-213: findSimilarNodes(db: Database.Database, nodeId: string, options: SemanticSearchOptions = {}): {} [exported]
       /** Find nodes similar to a given node. Wraps semanticSearch using the node's own embedding. */
       refs in: 4 [call: 3, import: 1]
-        - src/storage/semantic-search.test.ts:12: import (module)
-        - src/storage/semantic-search.test.ts:266: call result
-        - src/storage/semantic-search.test.ts:295: call result
-        - src/storage/semantic-search.test.ts:342: call result
+        - src/storage/semantic-search.test.ts:9: import (module)
+        - src/storage/semantic-search.test.ts:263: call result
+        - src/storage/semantic-search.test.ts:292: call result
+        - src/storage/semantic-search.test.ts:339: call result
   imports:
     - ./database.js
     - ./embedding-utils.js
@@ -3574,4 +3567,4 @@ src/storage/tool-error-repository.ts [1-374]
 
 ---
 Files: 65
-Estimated tokens: 47,168 (codebase: ~1,375,884)
+Estimated tokens: 47,137 (codebase: ~1,411,762)

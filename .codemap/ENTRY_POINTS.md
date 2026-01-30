@@ -63,7 +63,7 @@ src/api/routes/agents.ts [1-207]
     - ../server.js
     - fastify
 
-src/api/routes/clusters.test.ts [1-268]
+src/api/routes/clusters.test.ts [1-267]
   imports:
     - ../../storage/database.js
     - ../server.js
@@ -74,26 +74,20 @@ src/api/routes/clusters.test.ts [1-268]
 src/api/routes/clusters.ts [1-393]
   interface:
     16-21: interface ClusterNodeWithDetails extends ClusterNode
-      refs out: 1 [extends: 1]
-        - src/api/routes/clusters.ts:16: extends ClusterNode -> src/types/index.ts
     23-25: interface ClusterWithNodes extends Cluster
-      refs out: 2 [extends: 1, type: 1]
-        - src/api/routes/clusters.ts:23: extends Cluster -> src/types/index.ts
+      refs out: 1 [type: 1]
         - src/api/routes/clusters.ts:24: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
     28-40: interface ClusterRow
       /** Database row shape for cluster queries */
     43-52: interface ClusterNodeRow
       /** Database row shape for cluster node queries */
     142-145: interface ClusterFilterParams
-      refs out: 1 [type: 1]
-        - src/api/routes/clusters.ts:143: type ClusterStatus -> src/types/index.ts
   function:
     59-73: mapClusterRow(row: ClusterRow): ClusterWithNodes
       /** Map a database row to a ClusterWithNodes object */
-      refs out: 3 [type: 3]
+      refs out: 2 [type: 2]
         - src/api/routes/clusters.ts:59: type ClusterRow -> src/api/routes/clusters.ts
         - src/api/routes/clusters.ts:59: type ClusterWithNodes -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:67: type ClusterStatus -> src/types/index.ts
     76-87: mapNodeRow(nr: ClusterNodeRow): ClusterNodeWithDetails
       /** Map a node row to ClusterNodeWithDetails */
       refs out: 2 [type: 2]
@@ -120,12 +114,12 @@ src/api/routes/clusters.ts [1-393]
         - src/api/routes/clusters.ts:179: type ClusterWithNodes -> src/api/routes/clusters.ts
         - src/api/routes/clusters.ts:188: call get -> external
     196-392: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 24 [call: 14, type: 10]
+      refs out: 23 [call: 14, type: 9]
         - src/api/routes/clusters.ts:196: type FastifyInstance -> external
         - src/api/routes/clusters.ts:196: type Promise -> external
         - src/api/routes/clusters.ts:202: call get -> external
-        - src/api/routes/clusters.ts:204: type ClusterStatus -> src/types/index.ts
         - src/api/routes/clusters.ts:237: call attachRepresentativeNodes -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:241: type const -> external
   imports:
     - ../../types/index.js
     - better-sqlite3
@@ -627,9 +621,9 @@ src/api/routes/query.test.ts [1-78]
     - fastify
     - vitest
 
-src/api/routes/query.ts [1-282]
+src/api/routes/query.ts [1-291]
   function:
-    60-104: getEmbeddingProvider(config: {
+    69-113: getEmbeddingProvider(config: {
   embeddingProvider?: "openrouter" | "ollama" | "openai";
   embeddingModel?: string;
   embeddingApiKey?: string;
@@ -637,23 +631,28 @@ src/api/routes/query.ts [1-282]
   embeddingDimensions?: number;
 }): any
       /** Get or create the embedding provider with caching. Cache is invalidated if the configuration changes. */
-    106-281: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 2 [call: 1, type: 1]
+        - src/api/routes/query.ts:75: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+        - src/api/routes/query.ts:103: call createEmbeddingProvider -> src/daemon/facet-discovery.ts
+    115-290: async queryRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 37 [call: 30, instantiate: 1, type: 6]
-        - src/api/routes/query.ts:106: type FastifyInstance -> external
-        - src/api/routes/query.ts:106: type Promise -> external
-        - src/api/routes/query.ts:117: call post -> external
-        - src/api/routes/query.ts:120: type FastifyRequest -> external
-        - src/api/routes/query.ts:134: type FastifyReply -> external
+        - src/api/routes/query.ts:115: type FastifyInstance -> external
+        - src/api/routes/query.ts:115: type Promise -> external
+        - src/api/routes/query.ts:126: call post -> external
+        - src/api/routes/query.ts:129: type FastifyRequest -> external
+        - src/api/routes/query.ts:143: type FastifyReply -> external
   variable:
-    24-47: DEFAULT_QUERY_CONFIG
+    24-56: DEFAULT_QUERY_CONFIG
       /** Default daemon config for query processing */
       refs out: 3 [call: 2, type: 1]
         - src/api/routes/query.ts:27: call join -> external
         - src/api/routes/query.ts:28: call homedir -> external
         - src/api/routes/query.ts:42: type const -> external
-    53-53: EmbeddingProvider | undefined
+    62-62: EmbeddingProvider | undefined
       /** Cached embedding provider instance. Created once on first use to avoid HTTP client setup overhead per request. */
-    54-54: string | undefined
+      refs out: 1 [type: 1]
+        - src/api/routes/query.ts:62: type EmbeddingProvider -> src/daemon/facet-discovery.ts
+    63-63: string | undefined
   imports:
     - ../../daemon/facet-discovery.js
     - ../../daemon/query-processor.js
@@ -1257,4 +1256,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 29
-Estimated tokens: 16,009 (codebase: ~1,345,870)
+Estimated tokens: 15,993 (codebase: ~1,376,067)

@@ -34,7 +34,7 @@ src/daemon/insight-aggregation.ts [1-628]
     - better-sqlite3
     - node:crypto
 
-src/prompt/agents-generator.test.ts [1-242]
+src/prompt/agents-generator.test.ts [1-245]
   imports:
     - ./agents-generator.js
     - ./prompt-generator.js
@@ -59,10 +59,10 @@ src/prompt/agents-generator.ts [1-683]
       refs in: 10 [import: 1, type: 9]
         - src/prompt/agents-generator.test.ts:10: import (module)
         - src/prompt/agents-generator.test.ts:17: type data
-        - src/prompt/agents-generator.test.ts:85: type data
-        - src/prompt/agents-generator.test.ts:105: type data
-        - src/prompt/agents-generator.test.ts:142: type data
-        - src/prompt/agents-generator.test.ts:194: type data
+        - src/prompt/agents-generator.test.ts:88: type data
+        - src/prompt/agents-generator.test.ts:108: type data
+        - src/prompt/agents-generator.test.ts:144: type data
+        - src/prompt/agents-generator.test.ts:198: type data
         - src/prompt/agents-generator.ts:133: type gatherModelData
         - src/prompt/agents-generator.ts:268: type formatDataForPrompt
         - src/prompt/agents-generator.ts:333: type generateFallbackAgents
@@ -82,16 +82,16 @@ src/prompt/agents-generator.ts [1-683]
         - src/api/routes/agents.ts:16: import (module)
         - src/api/routes/agents.ts:199: call promptContent
         - src/prompt/agents-generator.test.ts:8: import (module)
-        - src/prompt/agents-generator.test.ts:72: call result
-        - src/prompt/agents-generator.test.ts:96: call result
-        - src/prompt/agents-generator.test.ts:131: call result
+        - src/prompt/agents-generator.test.ts:75: call result
+        - src/prompt/agents-generator.test.ts:99: call result
+        - src/prompt/agents-generator.test.ts:133: call result
         - src/prompt/agents-generator.ts:410: call userPrompt
     333-388: generateFallbackAgents(data: ModelInsightData): string [exported]
       /** Generate a fallback AGENTS.md without LLM synthesis Used when LLM is not available or synthesis fails */
       refs in: 5 [call: 4, import: 1]
         - src/prompt/agents-generator.test.ts:9: import (module)
-        - src/prompt/agents-generator.test.ts:181: call result
-        - src/prompt/agents-generator.test.ts:220: call result
+        - src/prompt/agents-generator.test.ts:185: call result
+        - src/prompt/agents-generator.test.ts:223: call result
         - src/prompt/agents-generator.ts:570: call generateAgentsForModel
         - src/prompt/agents-generator.ts:659: call previewAgentsForModel
     393-422: async synthesizeWithLLM(data: ModelInsightData, config: AgentsGeneratorConfig = {}): Promise<string> [exported]
@@ -292,10 +292,10 @@ src/prompt/prompt-generator.ts [1-391]
       /** Get a human-readable model name from provider/model format */
       refs in: 15 [call: 11, import: 4]
         - src/prompt/agents-generator.test.ts:12: import (module)
-        - src/prompt/agents-generator.test.ts:230: call (module)
-        - src/prompt/agents-generator.test.ts:231: call (module)
+        - src/prompt/agents-generator.test.ts:233: call (module)
         - src/prompt/agents-generator.test.ts:234: call (module)
-        - src/prompt/agents-generator.test.ts:238: call (module)
+        - src/prompt/agents-generator.test.ts:237: call (module)
+        - src/prompt/agents-generator.test.ts:241: call (module)
         - src/prompt/agents-generator.ts:22: import (module)
         - src/prompt/agents-generator.ts:181: call gatherModelData
         - src/prompt/prompt-generator.test.ts:17: import (module)
@@ -710,10 +710,21 @@ src/storage/pattern-repository.ts [1-373]
         - src/storage/pattern-repository.ts:213: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/pattern-repository.test.ts:8: import (module)
+        - src/storage/pattern-repository.test.ts:28: call patterns
+        - src/storage/pattern-repository.test.ts:35: call rarePatterns
     117-136: listModelStats(db: Database.Database): {} [exported]
+      refs in: 2 [call: 1, import: 1]
+        - src/storage/pattern-repository.test.ts:11: import (module)
+        - src/storage/pattern-repository.test.ts:52: call stats
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/pattern-repository.test.ts:10: import (module)
+        - src/storage/pattern-repository.test.ts:71: call patterns
+        - src/storage/pattern-repository.test.ts:76: call projectPatterns
     211-260: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-      refs in: 9 [call: 6, import: 3]
+      refs in: 19 [call: 15, import: 4]
         - src/cli.ts:62: import (module)
         - src/cli.ts:657: call insights
         - src/cli.ts:800: call (module)
@@ -723,8 +734,9 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/prompt-generator.ts:15: import (module)
         - src/prompt/prompt-generator.ts:294: call insights
         - src/prompt/prompt-generator.ts:379: call insights
+        - src/storage/pattern-repository.test.ts:9: import (module)
     262-276: getInsight(db: Database.Database, id: string): any [exported]
-      refs in: 7 [call: 5, import: 2]
+      refs in: 11 [call: 8, import: 3]
         - src/cli.ts:61: import (module)
         - src/cli.ts:708: call insight
         - src/cli.ts:740: call insight
@@ -732,10 +744,23 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
+        - src/storage/pattern-repository.test.ts:6: import (module)
+        - src/storage/pattern-repository.test.ts:167: call insight
+        - src/storage/pattern-repository.test.ts:172: call missing
     278-302: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
+      refs in: 3 [call: 2, import: 1]
+        - src/storage/pattern-repository.test.ts:7: import (module)
+        - src/storage/pattern-repository.test.ts:179: call claudeInsights
+        - src/storage/pattern-repository.test.ts:183: call highConfidence
     304-332: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
+      refs in: 5 [call: 4, import: 1]
+        - src/storage/pattern-repository.test.ts:5: import (module)
+        - src/storage/pattern-repository.test.ts:193: call (module)
+        - src/storage/pattern-repository.test.ts:194: call (module)
+        - src/storage/pattern-repository.test.ts:195: call (module)
+        - src/storage/pattern-repository.test.ts:196: call (module)
     334-351: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
-      refs in: 7 [call: 4, import: 3]
+      refs in: 9 [call: 5, import: 4]
         - src/cli.ts:63: import (module)
         - src/cli.ts:714: call (module)
         - src/cli.ts:746: call (module)
@@ -743,10 +768,12 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
         - src/prompt/prompt-generator.ts:360: call updateInsightPromptTexts
+        - src/storage/pattern-repository.test.ts:12: import (module)
+        - src/storage/pattern-repository.test.ts:202: call (module)
   imports:
     - ../types/index.js
     - better-sqlite3
 
 ---
 Files: 14
-Estimated tokens: 10,251 (codebase: ~1,375,884)
+Estimated tokens: 10,677 (codebase: ~1,411,762)

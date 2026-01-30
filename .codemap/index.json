@@ -1,14 +1,14 @@
 {
   "stats": {
     "totalFiles": 103,
-    "totalSymbols": 1572,
+    "totalSymbols": 1573,
     "byLanguage": {
       "typescript": 103
     },
     "bySymbolKind": {
       "function": 764,
       "type": 48,
-      "interface": 322,
+      "interface": 323,
       "variable": 159,
       "class": 15,
       "property": 62,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 54903,
-  "codebase_tokens": 1375884,
+  "total_tokens": 54928,
+  "codebase_tokens": 1411762,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -1877,7 +1877,7 @@
       "language": "typescript",
       "lines": [
         1,
-        282
+        291
       ],
       "detail_level": "full",
       "token_estimate": 234,
@@ -1888,7 +1888,7 @@
           "signature": "DEFAULT_QUERY_CONFIG",
           "lines": [
             24,
-            47
+            56
           ],
           "exported": false,
           "is_default": false,
@@ -1906,8 +1906,8 @@
           "kind": "variable",
           "signature": "EmbeddingProvider | undefined",
           "lines": [
-            53,
-            53
+            62,
+            62
           ],
           "exported": false,
           "is_default": false,
@@ -1925,8 +1925,8 @@
           "kind": "variable",
           "signature": "string | undefined",
           "lines": [
-            54,
-            54
+            63,
+            63
           ],
           "exported": false,
           "is_default": false,
@@ -1944,8 +1944,8 @@
           "kind": "function",
           "signature": "getEmbeddingProvider(config: {\n  embeddingProvider?: \"openrouter\" | \"ollama\" | \"openai\";\n  embeddingModel?: string;\n  embeddingApiKey?: string;\n  embeddingBaseUrl?: string;\n  embeddingDimensions?: number;\n}): any",
           "lines": [
-            60,
-            104
+            69,
+            113
           ],
           "exported": false,
           "is_default": false,
@@ -1963,8 +1963,8 @@
           "kind": "function",
           "signature": "async queryRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            106,
-            281
+            115,
+            290
           ],
           "exported": true,
           "is_default": false,
@@ -3625,10 +3625,10 @@
       "language": "typescript",
       "lines": [
         1,
-        1187
+        1190
       ],
       "detail_level": "full",
-      "token_estimate": 2400,
+      "token_estimate": 2407,
       "symbols": [
         {
           "name": "DEFAULT_CONFIG_DIR",
@@ -3918,7 +3918,7 @@
         {
           "name": "validateRsyncOptions",
           "kind": "function",
-          "signature": "validateRsyncOptions(spokeName: string, syncMethod: SyncMethod, rawOptions: RawConfig[\"spokes\"][number][\"rsync_options\"]): any",
+          "signature": "validateRsyncOptions(spokeName: string, syncMethod: SyncMethod, rawOptions: NonNullable<RawConfig[\"spokes\"]>[number][\"rsync_options\"]): any",
           "lines": [
             256,
             296
@@ -3937,10 +3937,10 @@
         {
           "name": "validateSpoke",
           "kind": "function",
-          "signature": "validateSpoke(raw: RawConfig[\"spokes\"], index: number): SpokeConfig",
+          "signature": "validateSpoke(raw: NonNullable<RawConfig[\"spokes\"]>, index: number): SpokeConfig",
           "lines": [
             301,
-            349
+            352
           ],
           "exported": false,
           "is_default": false,
@@ -3958,8 +3958,8 @@
           "kind": "function",
           "signature": "validateCronSchedule(schedule: string, field: string): void",
           "lines": [
-            354,
-            362
+            357,
+            365
           ],
           "exported": false,
           "is_default": false,
@@ -3977,8 +3977,8 @@
           "kind": "function",
           "signature": "validatePort(port: number, field: string): void",
           "lines": [
-            367,
-            373
+            370,
+            376
           ],
           "exported": false,
           "is_default": false,
@@ -3996,8 +3996,8 @@
           "kind": "function",
           "signature": "validatePositiveInt(value: number, field: string): void",
           "lines": [
-            378,
-            384
+            381,
+            387
           ],
           "exported": false,
           "is_default": false,
@@ -4015,8 +4015,8 @@
           "kind": "function",
           "signature": "validateNonNegativeInt(value: number, field: string): void",
           "lines": [
-            389,
-            395
+            392,
+            398
           ],
           "exported": false,
           "is_default": false,
@@ -4034,8 +4034,8 @@
           "kind": "function",
           "signature": "transformHubConfig(raw: RawConfig, defaults: PiBrainConfig): HubConfig",
           "lines": [
-            400,
-            417
+            403,
+            420
           ],
           "exported": false,
           "is_default": false,
@@ -4053,8 +4053,8 @@
           "kind": "function",
           "signature": "transformDaemonPrimarySchedules(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"reanalysisSchedule\" | \"connectionDiscoverySchedule\" | \"patternAggregationSchedule\">",
           "lines": [
-            422,
-            441
+            425,
+            444
           ],
           "exported": false,
           "is_default": false,
@@ -4072,8 +4072,8 @@
           "kind": "function",
           "signature": "transformDaemonSecondarySchedules(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"clusteringSchedule\" | \"backfillEmbeddingsSchedule\">",
           "lines": [
-            446,
-            457
+            449,
+            460
           ],
           "exported": false,
           "is_default": false,
@@ -4091,8 +4091,8 @@
           "kind": "function",
           "signature": "transformDaemonSchedules(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"reanalysisSchedule\" | \"connectionDiscoverySchedule\" | \"patternAggregationSchedule\" | \"clusteringSchedule\" | \"backfillEmbeddingsSchedule\">",
           "lines": [
-            462,
-            477
+            465,
+            480
           ],
           "exported": false,
           "is_default": false,
@@ -4110,8 +4110,8 @@
           "kind": "function",
           "signature": "transformDaemonPrimaryLimits(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"backfillLimit\" | \"reanalysisLimit\" | \"connectionDiscoveryLimit\">",
           "lines": [
-            482,
-            497
+            485,
+            500
           ],
           "exported": false,
           "is_default": false,
@@ -4129,8 +4129,8 @@
           "kind": "function",
           "signature": "transformDaemonSecondaryLimits(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"connectionDiscoveryLookbackDays\" | \"connectionDiscoveryCooldownHours\" | \"semanticSearchThreshold\">",
           "lines": [
-            502,
-            522
+            505,
+            525
           ],
           "exported": false,
           "is_default": false,
@@ -4148,8 +4148,8 @@
           "kind": "function",
           "signature": "transformDaemonLimits(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"backfillLimit\" | \"reanalysisLimit\" | \"connectionDiscoveryLimit\" | \"connectionDiscoveryLookbackDays\" | \"connectionDiscoveryCooldownHours\" | \"semanticSearchThreshold\">",
           "lines": [
-            527,
-            543
+            530,
+            546
           ],
           "exported": false,
           "is_default": false,
@@ -4167,8 +4167,8 @@
           "kind": "function",
           "signature": "transformDaemonEmbeddings(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"embeddingProvider\" | \"embeddingModel\" | \"embeddingApiKey\" | \"embeddingBaseUrl\" | \"embeddingDimensions\">",
           "lines": [
-            548,
-            567
+            551,
+            570
           ],
           "exported": false,
           "is_default": false,
@@ -4186,8 +4186,8 @@
           "kind": "function",
           "signature": "transformDaemonTiming(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"idleTimeoutMinutes\" | \"parallelWorkers\" | \"maxRetries\" | \"retryDelaySeconds\">",
           "lines": [
-            572,
-            588
+            575,
+            591
           ],
           "exported": false,
           "is_default": false,
@@ -4205,8 +4205,8 @@
           "kind": "function",
           "signature": "transformDaemonProvider(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"provider\" | \"model\" | \"promptFile\">",
           "lines": [
-            593,
-            604
+            596,
+            607
           ],
           "exported": false,
           "is_default": false,
@@ -4224,8 +4224,8 @@
           "kind": "function",
           "signature": "transformDaemonCore(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"idleTimeoutMinutes\" | \"parallelWorkers\" | \"maxRetries\" | \"retryDelaySeconds\" | \"provider\" | \"model\" | \"promptFile\">",
           "lines": [
-            609,
-            626
+            612,
+            629
           ],
           "exported": false,
           "is_default": false,
@@ -4243,8 +4243,8 @@
           "kind": "function",
           "signature": "transformDaemonQueue(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"maxConcurrentAnalysis\" | \"analysisTimeoutMinutes\" | \"maxQueueSize\">",
           "lines": [
-            631,
-            646
+            634,
+            649
           ],
           "exported": false,
           "is_default": false,
@@ -4262,8 +4262,8 @@
           "kind": "function",
           "signature": "transformDaemonDecay(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"decaySchedule\" | \"creativeSchedule\" | \"baseDecayRate\" | \"creativeSimilarityThreshold\">",
           "lines": [
-            651,
-            670
+            654,
+            673
           ],
           "exported": false,
           "is_default": false,
@@ -4281,8 +4281,8 @@
           "kind": "function",
           "signature": "transformDaemonAnalysis(rawDaemon: RawConfig[\"daemon\"], defaultDaemon: DaemonConfig): Pick<DaemonConfig, \"maxConcurrentAnalysis\" | \"analysisTimeoutMinutes\" | \"maxQueueSize\" | \"decaySchedule\" | \"creativeSchedule\" | \"baseDecayRate\" | \"creativeSimilarityThreshold\">",
           "lines": [
-            675,
-            692
+            678,
+            695
           ],
           "exported": false,
           "is_default": false,
@@ -4300,8 +4300,8 @@
           "kind": "function",
           "signature": "transformDaemonConfig(raw: RawConfig, defaults: PiBrainConfig): DaemonConfig",
           "lines": [
-            697,
-            711
+            700,
+            714
           ],
           "exported": false,
           "is_default": false,
@@ -4319,8 +4319,8 @@
           "kind": "function",
           "signature": "validateRatio(value: number, field: string): void",
           "lines": [
-            716,
-            722
+            719,
+            725
           ],
           "exported": false,
           "is_default": false,
@@ -4338,8 +4338,8 @@
           "kind": "function",
           "signature": "validateOptionalCronSchedule(schedule: string | undefined, field: string): void",
           "lines": [
-            727,
-            734
+            730,
+            737
           ],
           "exported": false,
           "is_default": false,
@@ -4357,8 +4357,8 @@
           "kind": "function",
           "signature": "validateDaemonCoreInts(daemon: DaemonConfig): void",
           "lines": [
-            739,
-            747
+            742,
+            750
           ],
           "exported": false,
           "is_default": false,
@@ -4376,8 +4376,8 @@
           "kind": "function",
           "signature": "validateDaemonSchedules(daemon: DaemonConfig): void",
           "lines": [
-            752,
-            772
+            755,
+            775
           ],
           "exported": false,
           "is_default": false,
@@ -4395,8 +4395,8 @@
           "kind": "function",
           "signature": "validateDaemonLimits(daemon: DaemonConfig): void",
           "lines": [
-            777,
-            803
+            780,
+            806
           ],
           "exported": false,
           "is_default": false,
@@ -4414,8 +4414,8 @@
           "kind": "function",
           "signature": "validateDaemonThresholds(daemon: DaemonConfig): void",
           "lines": [
-            808,
-            820
+            811,
+            823
           ],
           "exported": false,
           "is_default": false,
@@ -4433,8 +4433,8 @@
           "kind": "function",
           "signature": "validateDaemonConfig(daemon: DaemonConfig): void",
           "lines": [
-            825,
-            830
+            828,
+            833
           ],
           "exported": false,
           "is_default": false,
@@ -4452,8 +4452,8 @@
           "kind": "function",
           "signature": "transformQueryConfig(raw: RawConfig, defaults: PiBrainConfig): QueryConfig",
           "lines": [
-            835,
-            843
+            838,
+            846
           ],
           "exported": false,
           "is_default": false,
@@ -4471,8 +4471,8 @@
           "kind": "function",
           "signature": "transformApiConfig(raw: RawConfig, defaults: PiBrainConfig): ApiConfig",
           "lines": [
-            848,
-            861
+            851,
+            864
           ],
           "exported": false,
           "is_default": false,
@@ -4490,8 +4490,8 @@
           "kind": "function",
           "signature": "transformConfig(raw: RawConfig): PiBrainConfig",
           "lines": [
-            866,
-            900
+            869,
+            903
           ],
           "exported": true,
           "is_default": false,
@@ -4509,8 +4509,8 @@
           "kind": "class",
           "signature": "ConfigError extends Error",
           "lines": [
-            905,
-            913
+            908,
+            916
           ],
           "exported": true,
           "is_default": false,
@@ -4528,8 +4528,8 @@
           "kind": "constructor",
           "signature": "constructor(message: string, public readonly configPath?: string)",
           "lines": [
-            906,
-            912
+            909,
+            915
           ],
           "exported": false,
           "is_default": false,
@@ -4547,8 +4547,8 @@
           "kind": "function",
           "signature": "validateConfigExtension(filePath: string): void",
           "lines": [
-            918,
-            927
+            921,
+            930
           ],
           "exported": false,
           "is_default": false,
@@ -4566,8 +4566,8 @@
           "kind": "function",
           "signature": "readConfigFile(filePath: string): string",
           "lines": [
-            932,
-            941
+            935,
+            944
           ],
           "exported": false,
           "is_default": false,
@@ -4585,8 +4585,8 @@
           "kind": "function",
           "signature": "parseYamlContent(content: string, filePath: string): any",
           "lines": [
-            946,
-            955
+            949,
+            958
           ],
           "exported": false,
           "is_default": false,
@@ -4604,8 +4604,8 @@
           "kind": "function",
           "signature": "loadConfig(configPath?: string): PiBrainConfig",
           "lines": [
-            960,
-            987
+            963,
+            990
           ],
           "exported": true,
           "is_default": false,
@@ -4623,8 +4623,8 @@
           "kind": "function",
           "signature": "ensureConfigDir(configDir?: string): void",
           "lines": [
-            992,
-            997
+            995,
+            1000
           ],
           "exported": true,
           "is_default": false,
@@ -4642,8 +4642,8 @@
           "kind": "function",
           "signature": "ensureDirectories(config: PiBrainConfig): void",
           "lines": [
-            1002,
-            1037
+            1005,
+            1040
           ],
           "exported": true,
           "is_default": false,
@@ -4661,8 +4661,8 @@
           "kind": "function",
           "signature": "writeDefaultConfig(configPath?: string): void",
           "lines": [
-            1042,
-            1105
+            1045,
+            1108
           ],
           "exported": true,
           "is_default": false,
@@ -4680,8 +4680,8 @@
           "kind": "function",
           "signature": "getSessionDirs(config: PiBrainConfig): {}",
           "lines": [
-            1110,
-            1118
+            1113,
+            1121
           ],
           "exported": true,
           "is_default": false,
@@ -4699,8 +4699,8 @@
           "kind": "function",
           "signature": "getEnabledSpokes(config: PiBrainConfig): {}",
           "lines": [
-            1123,
-            1125
+            1126,
+            1128
           ],
           "exported": true,
           "is_default": false,
@@ -4718,8 +4718,8 @@
           "kind": "function",
           "signature": "getRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            1130,
-            1134
+            1133,
+            1137
           ],
           "exported": true,
           "is_default": false,
@@ -4737,8 +4737,8 @@
           "kind": "function",
           "signature": "getScheduledRsyncSpokes(config: PiBrainConfig): {}",
           "lines": [
-            1139,
-            1146
+            1142,
+            1149
           ],
           "exported": true,
           "is_default": false,
@@ -4756,8 +4756,8 @@
           "kind": "function",
           "signature": "getComputerFromPath(sessionPath: string, config: PiBrainConfig): string",
           "lines": [
-            1157,
-            1186
+            1160,
+            1189
           ],
           "exported": true,
           "is_default": false,
@@ -6356,18 +6356,18 @@
       "language": "typescript",
       "lines": [
         1,
-        245
+        241
       ],
       "detail_level": "full",
-      "token_estimate": 429,
+      "token_estimate": 425,
       "symbols": [
         {
           "name": "DEFAULT_SIMILARITY_THRESHOLD",
           "kind": "variable",
           "signature": "0.75",
           "lines": [
-            26,
-            26
+            27,
+            27
           ],
           "exported": false,
           "is_default": false,
@@ -6385,8 +6385,8 @@
           "kind": "variable",
           "signature": "50",
           "lines": [
-            29,
-            29
+            30,
+            30
           ],
           "exported": false,
           "is_default": false,
@@ -6404,8 +6404,8 @@
           "kind": "variable",
           "signature": "3",
           "lines": [
-            32,
-            32
+            33,
+            33
           ],
           "exported": false,
           "is_default": false,
@@ -6423,8 +6423,8 @@
           "kind": "interface",
           "signature": "CreativeAssociatorConfig",
           "lines": [
-            41,
-            50
+            42,
+            51
           ],
           "exported": true,
           "is_default": false,
@@ -6442,8 +6442,8 @@
           "kind": "interface",
           "signature": "CreativeAssociatorResult",
           "lines": [
-            55,
-            64
+            56,
+            65
           ],
           "exported": true,
           "is_default": false,
@@ -6461,8 +6461,8 @@
           "kind": "interface",
           "signature": "NodeWithEmbedding",
           "lines": [
-            69,
-            73
+            70,
+            74
           ],
           "exported": false,
           "is_default": false,
@@ -6480,8 +6480,8 @@
           "kind": "class",
           "signature": "CreativeAssociator",
           "lines": [
-            82,
-            244
+            83,
+            240
           ],
           "exported": true,
           "is_default": false,
@@ -6499,8 +6499,8 @@
           "kind": "property",
           "signature": "similarityThreshold: number",
           "lines": [
-            83,
-            83
+            84,
+            84
           ],
           "exported": false,
           "is_default": false,
@@ -6518,8 +6518,8 @@
           "kind": "property",
           "signature": "sampleSize: number",
           "lines": [
-            84,
-            84
+            85,
+            85
           ],
           "exported": false,
           "is_default": false,
@@ -6537,8 +6537,8 @@
           "kind": "property",
           "signature": "minRelevance: number",
           "lines": [
-            85,
-            85
+            86,
+            86
           ],
           "exported": false,
           "is_default": false,
@@ -6556,8 +6556,8 @@
           "kind": "property",
           "signature": "maxEdgesPerNode: number",
           "lines": [
-            86,
-            86
+            87,
+            87
           ],
           "exported": false,
           "is_default": false,
@@ -6575,8 +6575,8 @@
           "kind": "constructor",
           "signature": "constructor(private db: Database.Database, config: CreativeAssociatorConfig = {})",
           "lines": [
-            88,
-            97
+            89,
+            98
           ],
           "exported": false,
           "is_default": false,
@@ -6594,8 +6594,8 @@
           "kind": "method",
           "signature": "edgeExists(sourceId: string, targetId: string): boolean",
           "lines": [
-            102,
-            113
+            103,
+            114
           ],
           "exported": false,
           "is_default": false,
@@ -6613,8 +6613,8 @@
           "kind": "method",
           "signature": "sampleNodes(): {}",
           "lines": [
-            118,
-            139
+            119,
+            140
           ],
           "exported": false,
           "is_default": false,
@@ -6630,14 +6630,14 @@
         {
           "name": "findSimilarNodes",
           "kind": "method",
-          "signature": "async findSimilarNodes(nodeId: string, summary: string | null): Promise<{}>",
+          "signature": "findSimilarNodes(nodeId: string): {}",
           "lines": [
-            144,
-            168
+            145,
+            167
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "CreativeAssociator",
@@ -6649,14 +6649,14 @@
         {
           "name": "run",
           "kind": "method",
-          "signature": "async run(): Promise<CreativeAssociatorResult>",
+          "signature": "run(): CreativeAssociatorResult",
           "lines": [
-            173,
-            231
+            172,
+            227
           ],
           "exported": false,
           "is_default": false,
-          "is_async": true,
+          "is_async": false,
           "is_static": false,
           "is_abstract": false,
           "parent_name": "CreativeAssociator",
@@ -6670,8 +6670,8 @@
           "kind": "method",
           "signature": "getConfig(): Required<CreativeAssociatorConfig>",
           "lines": [
-            236,
-            243
+            232,
+            239
           ],
           "exported": false,
           "is_default": false,
@@ -6692,6 +6692,7 @@
         "../../storage/database.js",
         "../../storage/edge-repository.js",
         "../../storage/embedding-utils.js",
+        "../../storage/semantic-search.js",
         "better-sqlite3"
       ]
     },
@@ -22775,18 +22776,37 @@
       "language": "typescript",
       "lines": [
         1,
-        718
+        732
       ],
       "detail_level": "full",
-      "token_estimate": 1234,
+      "token_estimate": 1256,
       "symbols": [
+        {
+          "name": "HybridWeights",
+          "kind": "interface",
+          "signature": "HybridWeights",
+          "lines": [
+            28,
+            37
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Type for hybrid search weight keys",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "HYBRID_WEIGHTS",
           "kind": "variable",
-          "signature": "Record<string, number>",
+          "signature": "HybridWeights",
           "lines": [
-            30,
-            39
+            44,
+            53
           ],
           "exported": true,
           "is_default": false,
@@ -22804,8 +22824,8 @@
           "kind": "variable",
           "signature": "10",
           "lines": [
-            42,
-            42
+            56,
+            56
           ],
           "exported": false,
           "is_default": false,
@@ -22823,8 +22843,8 @@
           "kind": "variable",
           "signature": "30",
           "lines": [
-            45,
-            45
+            59,
+            59
           ],
           "exported": false,
           "is_default": false,
@@ -22842,8 +22862,8 @@
           "kind": "variable",
           "signature": "number",
           "lines": [
-            48,
-            48
+            62,
+            62
           ],
           "exported": false,
           "is_default": false,
@@ -22861,8 +22881,8 @@
           "kind": "interface",
           "signature": "HybridScoreBreakdown",
           "lines": [
-            57,
-            76
+            71,
+            90
           ],
           "exported": true,
           "is_default": false,
@@ -22880,8 +22900,8 @@
           "kind": "interface",
           "signature": "HybridSearchResult",
           "lines": [
-            81,
-            92
+            95,
+            106
           ],
           "exported": true,
           "is_default": false,
@@ -22899,8 +22919,8 @@
           "kind": "interface",
           "signature": "HybridSearchOptions",
           "lines": [
-            97,
-            114
+            111,
+            128
           ],
           "exported": true,
           "is_default": false,
@@ -22918,8 +22938,8 @@
           "kind": "interface",
           "signature": "HybridSearchResponse",
           "lines": [
-            119,
-            130
+            133,
+            144
           ],
           "exported": true,
           "is_default": false,
@@ -22937,8 +22957,8 @@
           "kind": "interface",
           "signature": "CandidateNode",
           "lines": [
-            136,
-            143
+            150,
+            157
           ],
           "exported": false,
           "is_default": false,
@@ -22956,8 +22976,8 @@
           "kind": "function",
           "signature": "calculateVectorScore(distance: number | null): number",
           "lines": [
-            153,
-            159
+            167,
+            173
           ],
           "exported": false,
           "is_default": false,
@@ -22975,8 +22995,8 @@
           "kind": "function",
           "signature": "calculateKeywordScore(rank: number | null): number",
           "lines": [
-            165,
-            174
+            179,
+            188
           ],
           "exported": false,
           "is_default": false,
@@ -22994,8 +23014,8 @@
           "kind": "function",
           "signature": "calculateRelationScore(edgeCount: number): number",
           "lines": [
-            180,
-            183
+            194,
+            197
           ],
           "exported": false,
           "is_default": false,
@@ -23013,8 +23033,8 @@
           "kind": "function",
           "signature": "calculateContentScore(query: string, summary: string | null): number",
           "lines": [
-            189,
-            219
+            203,
+            233
           ],
           "exported": false,
           "is_default": false,
@@ -23032,8 +23052,8 @@
           "kind": "function",
           "signature": "calculateTemporalScore(nodeTimestamp: string, referenceTime: Date | null): number",
           "lines": [
-            225,
-            240
+            239,
+            254
           ],
           "exported": false,
           "is_default": false,
@@ -23051,8 +23071,8 @@
           "kind": "function",
           "signature": "calculateTagScore(matchedTags: number, totalBoostTags: number): number",
           "lines": [
-            245,
-            253
+            259,
+            267
           ],
           "exported": false,
           "is_default": false,
@@ -23070,8 +23090,8 @@
           "kind": "function",
           "signature": "calculateImportanceScore(importance: number | null): number",
           "lines": [
-            258,
-            260
+            272,
+            274
           ],
           "exported": false,
           "is_default": false,
@@ -23089,8 +23109,8 @@
           "kind": "function",
           "signature": "calculateRecencyScore(nodeTimestamp: string): number",
           "lines": [
-            266,
-            273
+            280,
+            287
           ],
           "exported": false,
           "is_default": false,
@@ -23108,8 +23128,8 @@
           "kind": "function",
           "signature": "calculateHybridScore(candidate: CandidateNode, query: string, options: HybridSearchOptions): HybridScoreBreakdown",
           "lines": [
-            278,
-            331
+            292,
+            345
           ],
           "exported": false,
           "is_default": false,
@@ -23127,8 +23147,8 @@
           "kind": "function",
           "signature": "addVectorCandidates(db: Database.Database, candidateMap: Map<string, CandidateNode>, queryEmbedding: number[], limit: number, filters: SearchFilters | undefined, boostTags: string[]): void",
           "lines": [
-            341,
-            364
+            355,
+            378
           ],
           "exported": false,
           "is_default": false,
@@ -23146,8 +23166,8 @@
           "kind": "function",
           "signature": "addFtsCandidates(db: Database.Database, candidateMap: Map<string, CandidateNode>, query: string, limit: number, filterClause: string, filterParams: (string | number)[], archivedClause: string, boostTags: string[]): void",
           "lines": [
-            370,
-            428
+            384,
+            442
           ],
           "exported": false,
           "is_default": false,
@@ -23165,8 +23185,8 @@
           "kind": "function",
           "signature": "enrichWithEdgeCounts(db: Database.Database, candidateMap: Map<string, CandidateNode>, nodeIds: string[]): void",
           "lines": [
-            434,
-            463
+            448,
+            477
           ],
           "exported": false,
           "is_default": false,
@@ -23184,8 +23204,8 @@
           "kind": "function",
           "signature": "enrichWithTagMatches(db: Database.Database, candidateMap: Map<string, CandidateNode>, nodeIds: string[], boostTags: string[]): void",
           "lines": [
-            469,
-            500
+            483,
+            514
           ],
           "exported": false,
           "is_default": false,
@@ -23203,8 +23223,8 @@
           "kind": "function",
           "signature": "buildScoredResults(candidateMap: Map<string, CandidateNode>, query: string, options: HybridSearchOptions): {}",
           "lines": [
-            506,
-            526
+            520,
+            540
           ],
           "exported": false,
           "is_default": false,
@@ -23222,8 +23242,8 @@
           "kind": "function",
           "signature": "collectCandidates(db: Database.Database, query: string, queryEmbedding: number[] | undefined, limit: number, filters: SearchFilters | undefined, filterClause: string, filterParams: (string | number)[], archivedClause: string, boostTags: string[]): { candidateMap: Map<string, CandidateNode>; usedVectorSearch: boolean; }",
           "lines": [
-            532,
-            574
+            546,
+            588
           ],
           "exported": false,
           "is_default": false,
@@ -23241,8 +23261,8 @@
           "kind": "function",
           "signature": "hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse",
           "lines": [
-            591,
-            662
+            605,
+            676
           ],
           "exported": true,
           "is_default": false,
@@ -23260,8 +23280,8 @@
           "kind": "function",
           "signature": "calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown",
           "lines": [
-            671,
-            717
+            685,
+            731
           ],
           "exported": true,
           "is_default": false,
@@ -27752,7 +27772,7 @@
       "language": "typescript",
       "lines": [
         1,
-        728
+        730
       ],
       "detail_level": "full",
       "token_estimate": 1136,
@@ -28200,7 +28220,7 @@
           "signature": "EdgeMetadata",
           "lines": [
             299,
-            312
+            314
           ],
           "exported": true,
           "is_default": false,
@@ -28218,8 +28238,8 @@
           "kind": "interface",
           "signature": "Edge",
           "lines": [
-            314,
-            327
+            316,
+            329
           ],
           "exported": true,
           "is_default": false,
@@ -28237,8 +28257,8 @@
           "kind": "variable",
           "signature": "AUTOMEM_EDGE_TYPES",
           "lines": [
-            333,
-            345
+            335,
+            347
           ],
           "exported": true,
           "is_default": false,
@@ -28256,8 +28276,8 @@
           "kind": "type",
           "signature": "AutoMemEdgeType = (typeof AUTOMEM_EDGE_TYPES)[number]",
           "lines": [
-            347,
-            347
+            349,
+            349
           ],
           "exported": true,
           "is_default": false,
@@ -28275,8 +28295,8 @@
           "kind": "type",
           "signature": "VersionTrigger = | \"initial\"\n  | \"prompt_update\"\n  | \"connection_found\"\n  | \"user_feedback\"\n  | \"schema_migration\"",
           "lines": [
-            353,
-            358
+            355,
+            360
           ],
           "exported": true,
           "is_default": false,
@@ -28294,8 +28314,8 @@
           "kind": "interface",
           "signature": "NodeVersion",
           "lines": [
-            360,
-            367
+            362,
+            369
           ],
           "exported": true,
           "is_default": false,
@@ -28313,8 +28333,8 @@
           "kind": "interface",
           "signature": "AggregatedFailurePattern",
           "lines": [
-            373,
-            383
+            375,
+            385
           ],
           "exported": true,
           "is_default": false,
@@ -28332,8 +28352,8 @@
           "kind": "interface",
           "signature": "AggregatedModelStats",
           "lines": [
-            385,
-            394
+            387,
+            396
           ],
           "exported": true,
           "is_default": false,
@@ -28351,8 +28371,8 @@
           "kind": "interface",
           "signature": "AggregatedLessonPattern",
           "lines": [
-            396,
-            405
+            398,
+            407
           ],
           "exported": true,
           "is_default": false,
@@ -28370,8 +28390,8 @@
           "kind": "type",
           "signature": "InsightType = \"quirk\" | \"win\" | \"failure\" | \"tool_error\" | \"lesson\"",
           "lines": [
-            411,
-            411
+            413,
+            413
           ],
           "exported": true,
           "is_default": false,
@@ -28389,8 +28409,8 @@
           "kind": "type",
           "signature": "InsightSeverity = \"low\" | \"medium\" | \"high\"",
           "lines": [
-            412,
-            412
+            414,
+            414
           ],
           "exported": true,
           "is_default": false,
@@ -28408,8 +28428,8 @@
           "kind": "interface",
           "signature": "AggregatedInsight",
           "lines": [
-            414,
-            441
+            416,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -28427,8 +28447,8 @@
           "kind": "interface",
           "signature": "PromptAddition",
           "lines": [
-            447,
-            458
+            449,
+            460
           ],
           "exported": true,
           "is_default": false,
@@ -28446,8 +28466,8 @@
           "kind": "interface",
           "signature": "DateRange",
           "lines": [
-            467,
-            472
+            469,
+            474
           ],
           "exported": true,
           "is_default": false,
@@ -28465,8 +28485,8 @@
           "kind": "interface",
           "signature": "EffectivenessResult",
           "lines": [
-            477,
-            495
+            479,
+            497
           ],
           "exported": true,
           "is_default": false,
@@ -28484,8 +28504,8 @@
           "kind": "interface",
           "signature": "PromptEffectiveness",
           "lines": [
-            500,
-            536
+            502,
+            538
           ],
           "exported": true,
           "is_default": false,
@@ -28503,8 +28523,8 @@
           "kind": "interface",
           "signature": "ManualFlag",
           "lines": [
-            545,
-            552
+            547,
+            554
           ],
           "exported": true,
           "is_default": false,
@@ -28522,8 +28542,8 @@
           "kind": "interface",
           "signature": "FrictionSignals",
           "lines": [
-            557,
-            572
+            559,
+            574
           ],
           "exported": true,
           "is_default": false,
@@ -28541,8 +28561,8 @@
           "kind": "interface",
           "signature": "DelightSignals",
           "lines": [
-            577,
-            586
+            579,
+            588
           ],
           "exported": true,
           "is_default": false,
@@ -28560,8 +28580,8 @@
           "kind": "interface",
           "signature": "NodeSignals",
           "lines": [
-            591,
-            595
+            593,
+            597
           ],
           "exported": true,
           "is_default": false,
@@ -28579,8 +28599,8 @@
           "kind": "type",
           "signature": "ClusterStatus = \"pending\" | \"confirmed\" | \"dismissed\"",
           "lines": [
-            604,
-            604
+            606,
+            606
           ],
           "exported": true,
           "is_default": false,
@@ -28598,8 +28618,8 @@
           "kind": "type",
           "signature": "ClusterSignalType = \"friction\" | \"delight\" | null",
           "lines": [
-            609,
-            609
+            611,
+            611
           ],
           "exported": true,
           "is_default": false,
@@ -28617,8 +28637,8 @@
           "kind": "interface",
           "signature": "Cluster",
           "lines": [
-            614,
-            636
+            616,
+            638
           ],
           "exported": true,
           "is_default": false,
@@ -28636,8 +28656,8 @@
           "kind": "interface",
           "signature": "ClusterNode",
           "lines": [
-            641,
-            648
+            643,
+            650
           ],
           "exported": true,
           "is_default": false,
@@ -28655,8 +28675,8 @@
           "kind": "interface",
           "signature": "NodeEmbedding",
           "lines": [
-            653,
-            663
+            655,
+            665
           ],
           "exported": true,
           "is_default": false,
@@ -28674,8 +28694,8 @@
           "kind": "interface",
           "signature": "ClusteringRun",
           "lines": [
-            668,
-            681
+            670,
+            683
           ],
           "exported": true,
           "is_default": false,
@@ -28693,8 +28713,8 @@
           "kind": "interface",
           "signature": "EmbeddingConfig",
           "lines": [
-            686,
-            697
+            688,
+            699
           ],
           "exported": true,
           "is_default": false,
@@ -28712,8 +28732,8 @@
           "kind": "interface",
           "signature": "ClusteringConfig",
           "lines": [
-            702,
-            713
+            704,
+            715
           ],
           "exported": true,
           "is_default": false,
@@ -28731,8 +28751,8 @@
           "kind": "interface",
           "signature": "FacetDiscoveryResult",
           "lines": [
-            718,
-            721
+            720,
+            723
           ],
           "exported": true,
           "is_default": false,
