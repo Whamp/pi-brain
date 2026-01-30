@@ -94,26 +94,20 @@ src/api/routes/clusters.test.ts [1-267]
 src/api/routes/clusters.ts [1-393]
   interface:
     16-21: interface ClusterNodeWithDetails extends ClusterNode
-      refs out: 1 [extends: 1]
-        - src/api/routes/clusters.ts:16: extends ClusterNode -> src/types/index.ts
     23-25: interface ClusterWithNodes extends Cluster
-      refs out: 2 [extends: 1, type: 1]
-        - src/api/routes/clusters.ts:23: extends Cluster -> src/types/index.ts
+      refs out: 1 [type: 1]
         - src/api/routes/clusters.ts:24: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
     28-40: interface ClusterRow
       /** Database row shape for cluster queries */
     43-52: interface ClusterNodeRow
       /** Database row shape for cluster node queries */
     142-145: interface ClusterFilterParams
-      refs out: 1 [type: 1]
-        - src/api/routes/clusters.ts:143: type ClusterStatus -> src/types/index.ts
   function:
     59-73: mapClusterRow(row: ClusterRow): ClusterWithNodes
       /** Map a database row to a ClusterWithNodes object */
-      refs out: 3 [type: 3]
+      refs out: 2 [type: 2]
         - src/api/routes/clusters.ts:59: type ClusterRow -> src/api/routes/clusters.ts
         - src/api/routes/clusters.ts:59: type ClusterWithNodes -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:67: type ClusterStatus -> src/types/index.ts
     76-87: mapNodeRow(nr: ClusterNodeRow): ClusterNodeWithDetails
       /** Map a node row to ClusterNodeWithDetails */
       refs out: 2 [type: 2]
@@ -140,12 +134,12 @@ src/api/routes/clusters.ts [1-393]
         - src/api/routes/clusters.ts:179: type ClusterWithNodes -> src/api/routes/clusters.ts
         - src/api/routes/clusters.ts:188: call get -> external
     196-392: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 24 [call: 14, type: 10]
+      refs out: 23 [call: 14, type: 9]
         - src/api/routes/clusters.ts:196: type FastifyInstance -> external
         - src/api/routes/clusters.ts:196: type Promise -> external
         - src/api/routes/clusters.ts:202: call get -> external
-        - src/api/routes/clusters.ts:204: type ClusterStatus -> src/types/index.ts
         - src/api/routes/clusters.ts:237: call attachRepresentativeNodes -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:241: type const -> external
   imports:
     - ../../types/index.js
     - better-sqlite3
@@ -468,7 +462,7 @@ src/api/routes/config.ts [1-1792]
 src/api/routes/daemon.ts [1-385]
   function:
     26-317: async daemonRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 46 [call: 34, type: 12]
+      refs out: 45 [call: 33, type: 12]
         - src/api/routes/daemon.ts:26: type FastifyInstance -> external
         - src/api/routes/daemon.ts:26: type Promise -> external
         - src/api/routes/daemon.ts:30: call get -> external
@@ -594,7 +588,7 @@ src/api/routes/patterns.ts [1-93]
 src/api/routes/prompt-learning.ts [1-166]
   function:
     18-165: async promptLearningRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 35 [call: 27, type: 8]
+      refs out: 34 [call: 26, type: 8]
         - src/api/routes/prompt-learning.ts:19: type FastifyInstance -> external
         - src/api/routes/prompt-learning.ts:20: type Promise -> external
         - src/api/routes/prompt-learning.ts:24: call get -> external
@@ -811,12 +805,9 @@ src/api/routes/stats.ts [1-485]
         - src/api/routes/stats.ts:208: call setDate -> external
         - src/api/routes/stats.ts:208: call getDate -> external
     223-230: getOutcomeCounts(db: Database.Database): OutcomeCounts
-      refs out: 6 [call: 4, type: 2]
+      refs out: 2 [type: 2]
         - src/api/routes/stats.ts:223: type Database -> external
         - src/api/routes/stats.ts:223: type OutcomeCounts -> src/api/routes/stats.ts
-        - src/api/routes/stats.ts:225: call countNodes -> src/storage/node-queries.ts
-        - src/api/routes/stats.ts:226: call countNodes -> src/storage/node-queries.ts
-        - src/api/routes/stats.ts:227: call countNodes -> src/storage/node-queries.ts
     238-276: getVagueGoalTrends(db: Database.Database, dates: DateRanges): VagueGoalTrends
       refs out: 3 [type: 3]
         - src/api/routes/stats.ts:239: type Database -> external
@@ -1080,23 +1071,21 @@ src/api/websocket.ts [1-404]
           - src/api/websocket.ts:279: instantiate Date -> external
       286-296: broadcastAnalysisStarted(job: AnalysisJob, workerId: string): void
         /** Broadcast analysis started event */
-        refs out: 4 [call: 2, instantiate: 1, type: 1]
-          - src/api/websocket.ts:286: type AnalysisJob -> src/daemon/types.ts
+        refs out: 3 [call: 2, instantiate: 1]
           - src/api/websocket.ts:287: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:294: call toISOString -> external
           - src/api/websocket.ts:294: instantiate Date -> external
       301-323: broadcastAnalysisCompleted(job: AnalysisJob, node: Node): void
         /** Broadcast analysis completed event */
-        refs out: 8 [call: 4, instantiate: 2, type: 2]
-          - src/api/websocket.ts:301: type AnalysisJob -> src/daemon/types.ts
-          - src/api/websocket.ts:301: type Node -> src/types/index.ts
+        refs out: 6 [call: 4, instantiate: 2]
           - src/api/websocket.ts:302: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:309: call toISOString -> external
           - src/api/websocket.ts:309: instantiate Date -> external
+          - src/api/websocket.ts:313: call WebSocketManager.broadcast -> src/api/websocket.ts
+          - src/api/websocket.ts:321: call toISOString -> external
       328-342: broadcastAnalysisFailed(job: AnalysisJob, error: Error, willRetry: boolean): void
         /** Broadcast analysis failed event */
-        refs out: 5 [call: 2, instantiate: 1, type: 2]
-          - src/api/websocket.ts:329: type AnalysisJob -> src/daemon/types.ts
+        refs out: 4 [call: 2, instantiate: 1, type: 1]
           - src/api/websocket.ts:330: type Error -> external
           - src/api/websocket.ts:333: call WebSocketManager.broadcast -> src/api/websocket.ts
           - src/api/websocket.ts:340: call toISOString -> external
@@ -1239,4 +1228,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 31
-Estimated tokens: 15,662 (codebase: ~1,351,431)
+Estimated tokens: 15,451 (codebase: ~1,348,622)

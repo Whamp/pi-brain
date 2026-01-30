@@ -45,7 +45,13 @@
     "prepare": "husky",
     "web:dev": "npm run dev --prefix src/web/app",
     "web:build": "npm run build --prefix src/web/app",
-    "web:check": "npm run check --prefix src/web/app"
+    "web:check": "npm run check --prefix src/web/app",
+    "docs:generate": "node scripts/generate-docs.js",
+    "docs:agent": "node scripts/generate-docs.js --agent-only && node scripts/agent-docs-processor.js",
+    "docs:watch": "node scripts/generate-docs.js --watch",
+    "docs:query": "node scripts/agent-docs-processor.js",
+    "docs:extract": "npx api-extractor run --local",
+    "docs:markdown": "npx api-documenter markdown --input-folder docs/api --output-folder docs/api/markdown"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
@@ -63,6 +69,8 @@
   },
   "devDependencies": {
     "@mariozechner/pi-coding-agent": "^0.50.0",
+    "@microsoft/api-documenter": "^7.28.6",
+    "@microsoft/api-extractor": "^7.56.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/chokidar": "^1.7.5",
     "@types/node": "^22.10.5",

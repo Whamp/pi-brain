@@ -75,6 +75,9 @@ npm run validate                 # Full validation before commit
 | `npm run dev:all`      | Concurrent dev mode (daemon + web + watch). |
 | `npm run web:check`    | Lint the web app.                           |
 | `npx ultracite doctor` | Diagnose Ultracite setup issues.            |
+| `npm run docs:agent`   | Generate agent-optimized API docs (JSON).   |
+| `npm run docs:query`   | Query API docs (use with `-- --query="x"`). |
+| `npm run docs:watch`   | Regenerate docs on file changes.            |
 
 #### Blocking Commands
 
@@ -112,7 +115,11 @@ If any step fails, the commit is blocked.
 
 ### Codebase Navigation
 
-This project uses **codemap** to provide structured navigation aids for agents. These are stored in the `.codemap/` directory and auto-refreshed on every commit.
+This project uses two complementary systems for codebase navigation: **codemap** for structural analysis and **API Extractor** for typed API documentation.
+
+#### Codemap (Structural Navigation)
+
+Stored in `.codemap/` and auto-refreshed on every commit:
 
 | Guide                                                          | Description                                  |
 | -------------------------------------------------------------- | -------------------------------------------- |
@@ -126,6 +133,35 @@ This project uses **codemap** to provide structured navigation aids for agents. 
 - Check `.codemap/API.md` before implementing new features
 - Use `codemap callers <symbol>` to understand how a function is used
 - Use `codemap call-graph <symbol>` to trace data flows
+
+#### API Extractor Documentation (Typed API Reference)
+
+Structured TypeScript API documentation generated via Microsoft's API Extractor. Provides machine-readable JSON with full type information.
+
+**Generate documentation:**
+
+```bash
+# Generate agent-optimized JSON (fast, no markdown)
+npm run docs:agent
+
+# Generate full documentation (includes markdown)
+npm run docs:generate
+
+# Query the API for specific functions/types
+npm run docs:query -- --query="session"
+
+# Watch mode - regenerate on file changes
+npm run docs:watch
+```
+
+**Output files (gitignored, generate on-demand):**
+
+- `docs/api/pi-brain.api.json` - Main API doc model
+- `docs/api/agent/agent-api-index.json` - Flattened API index
+- `docs/api/agent/agent-function-catalog.json` - Function signatures
+- `docs/api/agent/agent-type-registry.json` - Type definitions
+
+**For agents:** Load `docs/api/agent/agent-api-index.json` to explore the API programmatically. Query it to find functions by name, signature, or description.
 
 ---
 

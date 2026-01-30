@@ -8,3 +8,7 @@ surf-cli/
 
 # Reports
 reports/
+
+# Generated API documentation (generate on-demand with npm run docs:agent)
+docs/api/
+temp/

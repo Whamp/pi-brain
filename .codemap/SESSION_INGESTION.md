@@ -436,8 +436,7 @@ src/daemon/facet-discovery.ts [1-1925]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 8 [call: 3, instantiate: 3, type: 2]
-        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
+      refs out: 7 [call: 3, instantiate: 3, type: 1]
         - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:174: instantiate Error -> external
@@ -1491,25 +1490,21 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:458: type SessionEntry -> src/types/session.ts
     514-542: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 2 [call: 1, type: 1]
         - src/parser/signals.ts:514: type SessionEntry -> src/types/session.ts
-        - src/parser/signals.ts:514: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:532: call push -> external
-        - src/parser/signals.ts:533: type ManualFlag -> src/types/index.ts
     553-581: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 5 [call: 4, type: 1]
-        - src/parser/signals.ts:553: type FrictionSignals -> src/types/index.ts
+      refs out: 4 [call: 4]
         - src/parser/signals.ts:557: call min -> external
         - src/parser/signals.ts:560: call min -> external
         - src/parser/signals.ts:563: call min -> external
         - src/parser/signals.ts:580: call min -> external
     604-636: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:605: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:606: type FrictionDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:607: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:633: call calculateFrictionScore -> src/parser/signals.ts
     676-690: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1573,19 +1568,17 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:1084: call hasGenuinePraise -> src/parser/signals.ts
     1125-1144: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 2 [call: 1, type: 1]
-        - src/parser/signals.ts:1125: type DelightSignals -> src/types/index.ts
+      refs out: 1 [call: 1]
         - src/parser/signals.ts:1143: call min -> external
     1161-1180: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 4 [call: 1, type: 3]
+      refs out: 3 [call: 1, type: 2]
         - src/parser/signals.ts:1162: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:1163: type DelightDetectionOptions -> src/parser/signals.ts
-        - src/parser/signals.ts:1164: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1177: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types/index.js
 
 ---
 Files: 42
-Estimated tokens: 20,888 (codebase: ~1,353,646)
+Estimated tokens: 20,744 (codebase: ~1,369,273)
