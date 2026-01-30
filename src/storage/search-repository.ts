@@ -8,8 +8,8 @@
 
 import type Database from "better-sqlite3";
 
-import type { NodeRow } from "./node-crud.js";
 import type { Node } from "./node-types.js";
+import type { NodeRow } from "./types.js";
 
 import { buildWhereClause, type BaseFilters } from "./filter-utils.js";
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import type { HTMLAttributes } from 'svelte/elements';
+  import type { HTMLAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
   /**
    * Card - Reusable card component with different variants
@@ -39,14 +39,16 @@
 
   const variantClass = $derived(variant === 'default' ? 'card' : `card-${variant}`);
   const Component = $derived(href ? 'a' : tag);
+  
+  // Build element props - only include href for anchor elements
+  const elementProps = $derived(href ? { href, ...rest } : rest);
 </script>
 
 <svelte:element
   this={Component}
-  {href}
   class="{variantClass} {interactive ? 'card-interactive' : ''} {className}"
   style={padding ? `padding: ${padding}` : undefined}
-  {...rest}
+  {...elementProps}
 >
   {@render children?.()}
 </svelte:element>

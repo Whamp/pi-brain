@@ -1220,17 +1220,18 @@
           </p>
 
           <div class="theme-selector">
-            {#each ["system", "light", "dark"] as option}
+            {#each ["system", "light", "dark"] as option (option)}
+              {@const typedOption = option as "light" | "dark" | "system"}
               <button
                 class="theme-option"
-                class:active={themePreferenceValue === option}
-                onclick={() => themePreferenceValue = option}
-                aria-pressed={themePreferenceValue === option}
+                class:active={themePreferenceValue === typedOption}
+                onclick={() => themePreferenceValue = typedOption}
+                aria-pressed={themePreferenceValue === typedOption}
               >
                 <div class="theme-icon">
-                  {#if option === "system"}
+                  {#if typedOption === "system"}
                     <Monitor size={24} />
-                  {:else if option === "light"}
+                  {:else if typedOption === "light"}
                     <Sun size={24} />
                   {:else}
                     <Moon size={24} />
@@ -1238,25 +1239,25 @@
                 </div>
                 <div class="theme-label">
                   <span class="theme-name">
-                    {#if option === "system"}
+                    {#if typedOption === "system"}
                       System
-                    {:else if option === "light"}
+                    {:else if typedOption === "light"}
                       Light
                     {:else}
                       Dark
                     {/if}
                   </span>
                   <span class="theme-description">
-                    {#if option === "system"}
+                    {#if typedOption === "system"}
                       Use your system preference
-                    {:else if option === "light"}
+                    {:else if typedOption === "light"}
                       Always use light mode
                     {:else}
                       Always use dark mode
                     {/if}
                   </span>
                 </div>
-                {#if themePreferenceValue === option}
+                {#if themePreferenceValue === typedOption}
                   <div class="theme-check">
                     <div class="check-mark"></div>
                   </div>
@@ -1589,13 +1590,6 @@
     font-weight: 500;
     width: 3em;
     text-align: right;
-  }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    margin-top: var(--space-6);
   }
 
   .btn-primary,

@@ -48,7 +48,7 @@
 </script>
 
 <div class="loading-state {className}" class:inline {style} {...rest} role="status" aria-live="polite">
-  <Spinner {size} variant="inline" aria-hidden="true" />
+  <Spinner {size} variant="inline" />
   {#if message}
     <p class="loading-message">{message}</p>
   {/if}

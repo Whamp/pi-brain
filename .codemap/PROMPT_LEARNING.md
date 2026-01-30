@@ -607,7 +607,7 @@ src/prompt/prompt.ts [1-388]
       /** Get or create a prompt version If the current prompt has the same hash as an existing version, returns that version. Otherwise, creates a new version, archives the prompt, and records it in the database. */
       refs in: 11 [call: 9, import: 2]
         - src/daemon/worker.ts:27: import (module)
-        - src/daemon/worker.ts:596: call Worker.promptVersion
+        - src/daemon/worker.ts:598: call Worker.promptVersion
         - src/prompt/prompt.test.ts:32: import (module)
         - src/prompt/prompt.test.ts:403: call (module)
         - src/prompt/prompt.test.ts:421: call version
@@ -710,27 +710,21 @@ src/storage/pattern-repository.ts [1-373]
         - src/storage/pattern-repository.ts:213: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
-      refs in: 5 [call: 3, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:8: import (module)
         - src/api/routes/patterns.ts:35: call result
-        - src/storage/pattern-repository.test.ts:8: import (module)
-        - src/storage/pattern-repository.test.ts:28: call patterns
-        - src/storage/pattern-repository.test.ts:35: call rarePatterns
     117-136: listModelStats(db: Database.Database): {} [exported]
-      refs in: 4 [call: 2, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:10: import (module)
         - src/api/routes/patterns.ts:57: call result
-        - src/storage/pattern-repository.test.ts:11: import (module)
-        - src/storage/pattern-repository.test.ts:52: call stats
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-      refs in: 5 [call: 3, import: 2]
+      refs in: 2 [call: 1, import: 1]
         - src/api/routes/patterns.ts:9: import (module)
         - src/api/routes/patterns.ts:82: call result
-        - src/storage/pattern-repository.test.ts:10: import (module)
-        - src/storage/pattern-repository.test.ts:71: call patterns
-        - src/storage/pattern-repository.test.ts:76: call projectPatterns
     211-260: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-      refs in: 19 [call: 15, import: 4]
+      refs in: 11 [call: 7, import: 4]
+        - src/api/routes/prompt-learning.ts:12: import (module)
+        - src/api/routes/prompt-learning.ts:51: call insights
         - src/cli.ts:62: import (module)
         - src/cli.ts:657: call insights
         - src/cli.ts:800: call (module)
@@ -739,10 +733,10 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/agents-generator.ts:151: call generalToolErrors
         - src/prompt/prompt-generator.ts:15: import (module)
         - src/prompt/prompt-generator.ts:294: call insights
-        - src/prompt/prompt-generator.ts:379: call insights
-        - src/storage/pattern-repository.test.ts:9: import (module)
     262-276: getInsight(db: Database.Database, id: string): any [exported]
-      refs in: 11 [call: 8, import: 3]
+      refs in: 9 [call: 6, import: 3]
+        - src/api/routes/prompt-learning.ts:13: import (module)
+        - src/api/routes/prompt-learning.ts:146: call insight
         - src/cli.ts:61: import (module)
         - src/cli.ts:708: call insight
         - src/cli.ts:740: call insight
@@ -750,23 +744,12 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
-        - src/storage/pattern-repository.test.ts:6: import (module)
-        - src/storage/pattern-repository.test.ts:167: call insight
-        - src/storage/pattern-repository.test.ts:172: call missing
     278-302: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
-      refs in: 3 [call: 2, import: 1]
-        - src/storage/pattern-repository.test.ts:7: import (module)
-        - src/storage/pattern-repository.test.ts:179: call claudeInsights
-        - src/storage/pattern-repository.test.ts:183: call highConfidence
     304-332: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
-      refs in: 5 [call: 4, import: 1]
-        - src/storage/pattern-repository.test.ts:5: import (module)
-        - src/storage/pattern-repository.test.ts:193: call (module)
-        - src/storage/pattern-repository.test.ts:194: call (module)
-        - src/storage/pattern-repository.test.ts:195: call (module)
-        - src/storage/pattern-repository.test.ts:196: call (module)
     334-351: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
       refs in: 9 [call: 5, import: 4]
+        - src/api/routes/prompt-learning.ts:14: import (module)
+        - src/api/routes/prompt-learning.ts:153: call promptLearningRoutes
         - src/cli.ts:63: import (module)
         - src/cli.ts:714: call (module)
         - src/cli.ts:746: call (module)
@@ -774,12 +757,10 @@ src/storage/pattern-repository.ts [1-373]
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
         - src/prompt/prompt-generator.ts:360: call updateInsightPromptTexts
-        - src/storage/pattern-repository.test.ts:12: import (module)
-        - src/storage/pattern-repository.test.ts:202: call (module)
   imports:
     - ../types/index.js
     - better-sqlite3
 
 ---
 Files: 14
-Estimated tokens: 10,759 (codebase: ~1,347,749)
+Estimated tokens: 10,444 (codebase: ~1,351,431)

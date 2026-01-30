@@ -1061,30 +1061,6 @@
     min-height: 400px;
   }
 
-  .loading-state,
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-4);
-    padding: var(--space-12);
-    text-align: center;
-  }
-
-  .loading-state {
-    color: var(--color-text-muted);
-  }
-
-  .empty-state {
-    color: var(--color-text-subtle);
-  }
-
-  .empty-state h2 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-2);
-  }
-
   .results-info {
     margin-bottom: var(--space-4);
   }

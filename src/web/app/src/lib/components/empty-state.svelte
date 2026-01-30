@@ -25,11 +25,10 @@
 <script lang="ts">
   import type { Snippet, ComponentType } from 'svelte';
   import type { HTMLAttributes } from 'svelte/elements';
-  import type { LucideProps } from 'lucide-svelte';
 
   interface Props extends HTMLAttributes<HTMLElement> {
     /** Icon component to display */
-    icon?: ComponentType<LucideProps>;
+    icon?: ComponentType;
     /** Icon size (default: 48) */
     iconSize?: number;
     /** Primary title text */

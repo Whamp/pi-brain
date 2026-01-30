@@ -1,6 +1,12 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
+  interface TooltipArgs {
+    data: number[];
+    last: number;
+    trend: "up" | "down" | "neutral" | undefined;
+  }
+
   interface Props {
     data: number[];
     color?: string;
@@ -8,7 +14,7 @@
     width?: number;
     showLast?: boolean;
     trend?: "up" | "down" | "neutral";
-    tooltip?: Snippet;
+    tooltip?: Snippet<[TooltipArgs]>;
   }
 
   let {

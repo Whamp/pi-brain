@@ -9,15 +9,19 @@
 
 import type Database from "better-sqlite3";
 
-// =============================================================================
-// Types
-// =============================================================================
+import type {
+  AnalysisJob,
+  JobContext,
+  JobInput,
+  JobStatus,
+  JobType,
+} from "./types.js";
 
-/** Job type determines analysis behavior */
-export type JobType = "initial" | "reanalysis" | "connection_discovery";
+export type { AnalysisJob, JobContext, JobInput, JobStatus, JobType };
 
-/** Job status tracks progress through the queue */
-export type JobStatus = "pending" | "running" | "completed" | "failed";
+// =============================================================================
+// Priority Levels
+// =============================================================================
 
 /** Priority levels (lower = higher priority) */
 export const PRIORITY = {
@@ -32,71 +36,6 @@ export const PRIORITY = {
   /** Nightly connection discovery */
   CONNECTION: 300,
 } as const;
-
-/** Additional context for analysis jobs */
-export interface JobContext {
-  /** For reanalysis: existing node ID */
-  existingNodeId?: string;
-  /** Reason for reanalysis */
-  reason?: string;
-  /** For connection_discovery: node ID to find connections for */
-  nodeId?: string;
-  /** Whether to find connections */
-  findConnections?: boolean;
-  /** Boundary type that triggered this job */
-  boundaryType?: string;
-  /** Additional metadata */
-  [key: string]: unknown;
-}
-
-/** Analysis job structure */
-export interface AnalysisJob {
-  /** Unique job identifier */
-  id: string;
-  /** Type of analysis to perform */
-  type: JobType;
-  /** Priority (lower = higher priority) */
-  priority: number;
-  /** Path to session file */
-  sessionFile: string;
-  /** Start entry ID for segment (optional) */
-  segmentStart?: string;
-  /** End entry ID for segment (optional) */
-  segmentEnd?: string;
-  /** Additional context for the agent */
-  context?: JobContext;
-  /** Current job status */
-  status: JobStatus;
-  /** When job was added to queue */
-  queuedAt: string;
-  /** When job started processing */
-  startedAt?: string;
-  /** When job completed or failed */
-  completedAt?: string;
-  /** Result node ID on success */
-  resultNodeId?: string;
-  /** Error message on failure */
-  error?: string;
-  /** Number of retry attempts */
-  retryCount: number;
-  /** Maximum retry attempts */
-  maxRetries: number;
-  /** Worker ID processing this job */
-  workerId?: string;
-  /** Lock expiration time */
-  lockedUntil?: string;
-}
-
-/** Job creation input (id, status, queuedAt are auto-generated) */
-export type JobInput = Omit<
-  AnalysisJob,
-  "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
-> & {
-  /** Priority (defaults to PRIORITY.INITIAL) */
-  priority?: number;
-  /** Override default max retries */
-  maxRetries?: number;
-};
 
 /** Queue statistics */
 export interface QueueStats {

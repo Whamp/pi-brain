@@ -126,7 +126,7 @@
       <div class="action-label">Daemon</div>
       <div class="daemon-status-badge {getDaemonStatusClass()}">
         <StatusDot
-          status={$daemonStore.status?.running ? 'success' : ($daemonStore.backendOffline ? 'error' : 'neutral')}
+          status={$daemonStore.status?.running ? 'success' : ($daemonStore.backendOffline ? 'error' : 'offline')}
           size={10}
         />
         <span>{getDaemonStatusText()}</span>

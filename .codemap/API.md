@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 103 files
+- typescript: 107 files
 
 ## Statistics
-- Total files: 103
-- Total symbols: 698
-  - function: 371
+- Total files: 107
+- Total symbols: 699
+  - function: 372
   - interface: 229
   - type: 44
   - variable: 39
@@ -51,7 +51,7 @@ src/api/routes/agents.ts [1-207]
       /** Register AGENTS.md routes */
   imports:
     - ../../prompt/agents-generator.js
-    - ../server.js
+    - ../types.js
     - fastify
 
 src/api/routes/clusters.ts [1-393]
@@ -222,16 +222,14 @@ src/api/routes/tool-errors.ts [1-111]
     - ../responses.js
     - fastify
 
-src/api/server.ts [1-205]
+src/api/server.ts [1-197]
   interface:
-    49-54: interface ServerContext [exported]
-      /** Server context passed to route handlers */
-    171-174: interface ServerResult [exported]
+    163-166: interface ServerResult [exported]
       /** Server result including the Fastify instance and WebSocket manager */
   function:
-    68-166: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
+    60-158: async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance> [exported]
       /** Create and configure the Fastify server */
-    179-197: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
+    171-189: async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult> [exported]
       /** Start the API server */
   imports:
     - ../config/types.js
@@ -253,11 +251,20 @@ src/api/server.ts [1-205]
     - ./routes/signals.js
     - ./routes/stats.js
     - ./routes/tool-errors.js
+    - ./types.js
     - ./websocket.js
     - @fastify/cors
     - @fastify/websocket
     - better-sqlite3
     - fastify
+
+src/api/types.ts [1-21]
+  interface:
+    15-20: interface ServerContext [exported]
+      /** Server context passed to route handlers */
+  imports:
+    - ../config/types.js
+    - better-sqlite3
 
 src/api/websocket.ts [1-404]
   class:
@@ -695,62 +702,59 @@ src/daemon/pattern-aggregation.ts [1-331]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-857]
+src/daemon/processor.ts [1-741]
   class:
-    795-849: class JobProcessor [exported]
+    679-733: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
-    21-34: interface AgentResult [exported]
+    23-36: interface AgentResult [exported]
       /** Result from invoking the pi agent */
-    37-118: interface AgentNodeOutput [exported]
-      /** Output schema from the session analyzer (matches session-analyzer.md) */
-    121-143: interface RelationshipOutput [exported]
-      /** Output schema for relationships extracted by the session analyzer */
-    155-159: interface SkillInfo [exported]
+    39-43: interface SkillInfo [exported]
       /** Skill availability information */
-    162-167: interface ProcessorLogger [exported]
+    46-51: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    239-246: interface EnvironmentValidationResult [exported]
+    123-130: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    785-790: interface ProcessorConfig [exported]
+    669-674: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
-    203-211: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    87-95: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
-    216-236: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+    100-120: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
-    252-264: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+    136-148: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    299-313: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+    183-197: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
-    322-354: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    206-238: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    387-495: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    271-379: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    601-670: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    485-554: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    676-709: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    560-593: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    763-778: isValidNodeOutput(obj: unknown): boolean [exported]
+    647-662: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    854-856: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    738-740: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
-    170-175: ProcessorLogger [exported]
+    54-59: ProcessorLogger [exported]
       /** Default console logger */
-    182-182: readonly [] [exported]
+    66-66: readonly [] [exported]
       /** Required skills for analysis - must be available */
-    185-185: readonly ["codemap"] [exported]
+    69-69: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
-    188-188: readonly ["rlm"] [exported]
+    72-72: readonly ["rlm"] [exported]
       /** Skills that are conditionally included based on file size */
-    191-191: number [exported]
+    75-75: number [exported]
       /** File size threshold (in bytes) for including RLM skill */
-    194-194: any [exported]
+    78-78: any [exported]
       /** Skills directory location */
   imports:
     - ../config/types.js
     - ./queue.js
+    - ./types.js
     - node:child_process
     - node:fs/promises
     - node:os
@@ -783,41 +787,25 @@ src/daemon/query-processor.ts [1-926]
     - node:os
     - node:path
 
-src/daemon/queue.ts [1-807]
+src/daemon/queue.ts [1-746]
   class:
-    151-762: class QueueManager [exported]
+    90-701: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
-    37-50: interface JobContext [exported]
-      /** Additional context for analysis jobs */
-    53-88: interface AnalysisJob [exported]
-      /** Analysis job structure */
-    102-115: interface QueueStats [exported]
+    41-54: interface QueueStats [exported]
       /** Queue statistics */
-  type:
-    17-17: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
-      /** Job type determines analysis behavior */
-    20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
-      /** Job status tracks progress through the queue */
-    91-99: JobInput = Omit<
-  AnalysisJob,
-  "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
-> & {
-  /** Priority (defaults to PRIORITY.INITIAL) */
-  priority?: number;
-  /** Override default max re... [exported]
-      /** Job creation input (id, status, queuedAt are auto-generated) */
   function:
-    773-775: generateJobId(): string [exported]
+    712-714: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
-    780-782: createQueueManager(db: Database.Database): QueueManager [exported]
+    719-721: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-    788-806: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    727-745: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
   variable:
-    23-34: PRIORITY [exported]
+    27-38: PRIORITY [exported]
       /** Priority levels (lower = higher priority) */
   imports:
+    - ./types.js
     - better-sqlite3
 
 src/daemon/scheduler.ts [1-945]
@@ -864,6 +852,30 @@ src/daemon/scheduler.ts [1-945]
     - ./queue.js
     - better-sqlite3
     - croner
+
+src/daemon/types.ts [1-204]
+  interface:
+    19-32: interface JobContext [exported]
+      /** Additional context for analysis jobs */
+    35-70: interface AnalysisJob [exported]
+      /** Analysis job structure */
+    88-110: interface RelationshipOutput [exported]
+      /** Output schema for relationships extracted by the session analyzer */
+    113-194: interface AgentNodeOutput [exported]
+      /** Output schema from the session analyzer (matches session-analyzer.md) */
+  type:
+    13-13: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
+      /** Daemon Types - Shared types for the daemon layer This module provides types that need to be shared across the daemon layer and to other layers (storage, etc.) without creating circular dependencies. Job type determines analysis behavior */
+    16-16: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
+      /** Job status tracks progress through the queue */
+    73-81: JobInput = Omit<
+  AnalysisJob,
+  "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
+> & {
+  /** Priority (defaults to PRIORITY.INITIAL) */
+  priority?: number;
+  /** Override default max re... [exported]
+      /** Job creation input (id, status, queuedAt are auto-generated) */
 
 src/daemon/watcher-events.ts [1-117]
   interface:
@@ -923,9 +935,9 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-874]
+src/daemon/worker.ts [1-882]
   class:
-    128-833: class Worker [exported]
+    128-841: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     68-85: interface WorkerConfig [exported]
@@ -935,9 +947,9 @@ src/daemon/worker.ts [1-874]
     106-119: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    842-844: createWorker(config: WorkerConfig): Worker [exported]
+    850-852: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    849-873: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    857-881: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -973,34 +985,35 @@ src/index.ts [1-58]
     - ./types/index.js
     - ./web/generator.js
 
-src/parser/analyzer.ts [1-340]
+src/parser/analyzer.ts [1-312]
   function:
-    20-22: getDefaultSessionDir(): string [exported]
+    21-23: getDefaultSessionDir(): string [exported]
       /** Default session directory */
-    35-47: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+    36-48: async scanSessions(sessionDir?: string): Promise<{}> [exported]
       /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
-    64-106: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+    65-107: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
       /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
-    111-131: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+    112-132: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
-    136-168: groupByProject(sessions: SessionInfo[]): {} [exported]
+    138-140: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
-    189-200: decodeProjectDir(encodedName: string): string [exported]
+    161-172: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
-    214-221: getProjectName(sessionPath: string): string [exported]
+    186-193: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
-    232-234: getProjectNameFromSession(session: SessionInfo): string [exported]
+    204-206: getProjectNameFromSession(session: SessionInfo): string [exported]
       /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
-    239-244: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+    211-216: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
-    249-264: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+    221-236: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
-    269-298: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+    241-270: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
-    303-339: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+    275-311: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
   imports:
     - ../types/index.js
+    - ../utils/session-utils.js
     - ./session.js
     - node:fs/promises
     - node:os
@@ -1598,58 +1611,55 @@ src/storage/lesson-repository.ts [1-286]
     - ./filter-utils.js
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-432]
+src/storage/node-conversion.ts [1-451]
   interface:
-    25-44: interface NodeConversionContext [exported]
+    24-47: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
-    54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
+    76-280: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    416-424: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    435-443: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    429-431: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    448-450: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
-    - ../daemon/processor.js
-    - ../daemon/queue.js
-    - ./node-crud.js
+    - ../daemon/types.js
     - ./node-storage.js
     - ./node-types.js
+    - ./types.js
 
-src/storage/node-crud.ts [1-784]
+src/storage/node-crud.ts [1-753]
   interface:
-    52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
+    54-57: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    58-91: interface NodeRow [exported]
-      /** Node row from the database */
   function:
-    100-155: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    69-124: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node and update lesson_patterns aggregation */
-    160-193: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    129-162: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node and update model_stats aggregation */
-    198-262: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    167-231: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
-    267-286: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    236-255: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    296-325: clearAllData(db: Database.Database): void [exported]
+    265-294: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    477-493: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    446-462: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    499-513: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    468-482: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    587-619: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    556-588: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    624-630: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    593-599: getNode(db: Database.Database, nodeId: string): any [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    635-638: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    604-607: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    643-649: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    612-618: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    657-668: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    626-637: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find a node that contains a specific entry ID as its end boundary Find the latest node for a given session file */
-    677-702: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    646-671: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    729-767: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    698-736: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -1658,6 +1668,7 @@ src/storage/node-crud.ts [1-784]
     - ./node-storage.js
     - ./node-types.js
     - ./search-repository.js
+    - ./types.js
     - better-sqlite3
     - node:crypto
 
@@ -1846,7 +1857,7 @@ src/storage/relationship-edges.ts [1-290]
     242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
       /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
   imports:
-    - ../daemon/processor.js
+    - ../daemon/types.js
     - ../types/index.js
     - ./edge-repository.js
     - better-sqlite3
@@ -1879,8 +1890,8 @@ src/storage/search-repository.ts [1-419]
       /** Enhanced search with scores, highlights, and filter support */
   imports:
     - ./filter-utils.js
-    - ./node-crud.js
     - ./node-types.js
+    - ./types.js
     - better-sqlite3
 
 src/storage/semantic-search.ts [1-214]
@@ -1936,6 +1947,11 @@ src/storage/tool-error-repository.ts [1-351]
   imports:
     - ./filter-utils.js
     - better-sqlite3
+
+src/storage/types.ts [1-47]
+  interface:
+    13-46: interface NodeRow [exported]
+      /** Storage Types - Shared types for the storage layer This module provides types that need to be shared across the storage layer without creating circular dependencies. Node row from the database */
 
 src/sync/index.ts [1-9]
   imports:
@@ -2147,6 +2163,13 @@ src/types/session.ts [1-298]
   | ToolCallContent
   | ImageContent [exported]
 
+src/utils/session-utils.ts [1-46]
+  function:
+    13-45: groupByProject(sessions: SessionInfo[]): {} [exported]
+      /** Group sessions by project (cwd) */
+  imports:
+    - ../types/index.js
+
 src/web/app/playwright.config.ts [1-27]
   imports:
     - @playwright/test
@@ -2288,9 +2311,9 @@ src/web/app/src/lib/utils/date.ts [1-131]
     128-130: parseDate(date: string | Date): Date [exported]
       /** Parse a date string or Date object to Date */
 
-src/web/app/src/lib/utils/focus-trap.ts [1-146]
+src/web/app/src/lib/utils/focus-trap.ts [1-151]
   function:
-    47-121: createFocusTrap(container: HTMLElement, options: {
+    47-126: createFocusTrap(container: HTMLElement, options: {
     /** Called when Escape key is pressed */
     onEscape?: () => void;
     /** Element to restore focus to when trap is removed */
@@ -2299,7 +2322,7 @@ src/web/app/src/lib/utils/focus-trap.ts [1-146]
     autoFocus?: boolean;
   } = {}): () => void [exported]
       /** Creates a focus trap for a container element. */
-    127-145: focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; } [exported]
+    132-150: focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; } [exported]
       /** Svelte action for focus trapping. Use as `use:focusTrap={{ onEscape: () => ... }}` */
 
 src/web/app/vite.config.ts [1-15]
@@ -2312,13 +2335,13 @@ src/web/generator.ts [1-972]
     194-264: generateHTML(sessions: SessionInfo[], forks: ForkRelationship[]): string [exported]
       /** Generate complete visualization HTML */
   imports:
-    - ../parser/analyzer.js
     - ../types/index.js
+    - ../utils/session-utils.js
 
 src/web/index.ts [1-6]
   imports:
     - ./generator.js
 
 ---
-Files: 103
-Estimated tokens: 28,812 (codebase: ~1,347,309)
+Files: 107
+Estimated tokens: 29,000 (codebase: ~258,300)

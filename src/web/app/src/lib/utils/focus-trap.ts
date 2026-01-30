@@ -92,6 +92,11 @@ export function createFocusTrap(
       const [first] = focusable;
       const last = focusable.at(-1);
 
+      // Guard against undefined (shouldn't happen since we checked length > 0)
+      if (!last) {
+        return;
+      }
+
       if (event.shiftKey) {
         // Shift+Tab: if on first element, go to last
         if (document.activeElement === first) {

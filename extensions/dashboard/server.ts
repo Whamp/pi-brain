@@ -20,9 +20,9 @@ import { WebSocketServer, type WebSocket } from "ws";
 
 import {
   scanSessions,
-  groupByProject,
   findForkRelationships,
 } from "../../src/parser/analyzer.js";
+import { groupByProject } from "../../src/utils/session-utils.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

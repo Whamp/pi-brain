@@ -555,7 +555,8 @@ export class Worker {
       session,
       result,
       entryCount,
-      signals
+      signals,
+      segmentEntries
     );
 
     // 6. Store node in SQLite and JSON
@@ -587,7 +588,8 @@ export class Worker {
     session: Awaited<ReturnType<typeof parseSession>>,
     result: Awaited<ReturnType<JobProcessor["process"]>>,
     entryCount: number,
-    signals: ReturnType<Worker["detectSignals"]>
+    signals: ReturnType<Worker["detectSignals"]>,
+    segmentEntries: SessionEntry[]
   ): Node {
     if (!this.db || !result.nodeData) {
       throw new Error("Worker not initialized or no node data");
@@ -599,6 +601,10 @@ export class Worker {
     );
     const computer = getComputerFromPath(job.sessionFile, this.config);
 
+    // Extract segment timestamps for duration calculation
+    const segmentStartTimestamp = segmentEntries[0]?.timestamp;
+    const segmentEndTimestamp = segmentEntries.at(-1)?.timestamp;
+
     return agentOutputToNode(result.nodeData, {
       job,
       computer,
@@ -608,6 +614,8 @@ export class Worker {
       analysisDurationMs: result.durationMs,
       analyzerVersion: promptVersion.version,
       signals,
+      segmentStartTimestamp,
+      segmentEndTimestamp,
     });
   }
 

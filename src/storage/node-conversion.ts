@@ -5,9 +5,8 @@
  * structured Node objects with all source, identity, and metadata fields.
  */
 
-import type { AgentNodeOutput } from "../daemon/processor.js";
-import type { AnalysisJob } from "../daemon/queue.js";
-import type { NodeRow } from "./node-crud.js";
+import type { AgentNodeOutput, AnalysisJob } from "../daemon/types.js";
+import type { NodeRow } from "./types.js";
 
 import { readNodeFromPath } from "./node-storage.js";
 import {
@@ -41,6 +40,29 @@ export interface NodeConversionContext {
   existingNode?: Node;
   /** Friction/delight signals detected in the segment */
   signals?: NodeSignals;
+  /** Timestamp of first entry in segment (ISO 8601) */
+  segmentStartTimestamp?: string;
+  /** Timestamp of last entry in segment (ISO 8601) */
+  segmentEndTimestamp?: string;
+}
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
+/**
+ * Calculate segment duration in minutes from timestamps
+ * Falls back to analysis duration if timestamps not available
+ */
+function calculateDurationMinutes(context: NodeConversionContext): number {
+  if (context.segmentStartTimestamp && context.segmentEndTimestamp) {
+    const startTime = new Date(context.segmentStartTimestamp).getTime();
+    const endTime = new Date(context.segmentEndTimestamp).getTime();
+    const durationMs = endTime - startTime;
+    return Math.max(1, Math.round(durationMs / 60_000));
+  }
+  // Fallback to analysis duration (how long the LLM took)
+  return Math.round(context.analysisDurationMs / 60_000);
 }
 
 // =============================================================================
@@ -56,10 +78,7 @@ export function agentOutputToNode(
   context: NodeConversionContext
 ): Node {
   const now = new Date().toISOString();
-
-  // Calculate duration from segment timestamps if available
-  // For now, use a placeholder - real duration calculation requires parsing session
-  const durationMinutes = Math.round(context.analysisDurationMs / 60_000);
+  const durationMinutes = calculateDurationMinutes(context);
 
   // Calculate total tokens from modelsUsed
   const tokensUsed = output.observations.modelsUsed.reduce(

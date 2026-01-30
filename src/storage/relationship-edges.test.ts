@@ -9,7 +9,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import type { RelationshipOutput } from "../daemon/processor.js";
+import type { RelationshipOutput } from "../daemon/types.js";
 
 import { migrate, openDatabase } from "./database.js";
 import { getEdgesFrom } from "./edge-repository.js";

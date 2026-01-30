@@ -107,7 +107,7 @@
 
   function getSessionName(sessionFile: string): string {
     const parts = sessionFile.split("/");
-    return parts.at(-1);
+    return parts.at(-1) ?? sessionFile;
   }
 
   function getErrorTypeColor(type: string): string {

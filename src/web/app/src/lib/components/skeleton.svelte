@@ -18,10 +18,12 @@
   interface Props {
     /** Skeleton shape variant */
     variant?: "text" | "title" | "circle" | "rect" | "card";
-    /** Custom width (CSS value) */
-    width?: string;
-    /** Custom height (CSS value) */
-    height?: string;
+    /** Custom width (CSS value or number in px) */
+    width?: string | number;
+    /** Custom height (CSS value or number in px) */
+    height?: string | number;
+    /** Border radius preset */
+    radius?: "sm" | "md" | "lg" | "full";
     /** Whether to animate the shimmer */
     animate?: boolean;
     /** Additional CSS classes */
@@ -32,6 +34,7 @@
     variant = "text",
     width,
     height,
+    radius,
     animate = true,
     class: className = "",
   }: Props = $props();
@@ -44,9 +47,15 @@
     card: { width: "100%", height: "auto" },
   };
 
-  const defaultStyle = variantStyles[variant] ?? variantStyles.text;
-  const computedWidth = width ?? defaultStyle.width;
-  const computedHeight = height ?? defaultStyle.height;
+  // Convert number to px string
+  function toCss(value: string | number | undefined, fallback: string): string {
+    if (value === undefined) {return fallback;}
+    return typeof value === "number" ? `${value}px` : value;
+  }
+
+  const defaultStyle = $derived(variantStyles[variant] ?? variantStyles.text);
+  const computedWidth = $derived(toCss(width, defaultStyle.width));
+  const computedHeight = $derived(toCss(height, defaultStyle.height));
 </script>
 
 {#if variant === "card"}

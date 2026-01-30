@@ -533,7 +533,7 @@
     const contentWidth = Math.max(bounds.maxX - bounds.minX, 100);
     const contentHeight = Math.max(bounds.maxY - bounds.minY, 100);
 
-    minimapSvg.attr("viewBox", `${bounds.minX} ${bounds.minY} ${contentWidth} ${contentHeight}`);
+    minimapSelection.attr("viewBox", `${bounds.minX} ${bounds.minY} ${contentWidth} ${contentHeight}`);
 
     updateMinimapEdges(minimapG.select(".minimap-edges"), contentWidth, minimapWidth);
     updateMinimapNodes(minimapG.select(".minimap-nodes"), contentWidth, minimapWidth);

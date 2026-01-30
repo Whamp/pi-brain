@@ -11,6 +11,16 @@
  *
  * Note: Full E2E tests requiring pi agent are marked as integration tests
  * and can be run manually with: npm test -- --run integration
+ *
+ * ## Environment Variables Required for LLM Tests
+ *
+ * Set INTEGRATION_TESTS=1 to enable skipped tests.
+ * At least one LLM API key must be configured:
+ * - ANTHROPIC_API_KEY (Claude)
+ * - OPENROUTER_API_KEY (multi-provider)
+ * - GOOGLE_API_KEY (Gemini)
+ *
+ * See docs/testing/INTEGRATION_TESTS.md for full documentation.
  */
 
 import type { FastifyInstance } from "fastify";

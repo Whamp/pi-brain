@@ -1,12 +1,12 @@
 {
   "stats": {
-    "totalFiles": 103,
-    "totalSymbols": 1547,
+    "totalFiles": 107,
+    "totalSymbols": 1549,
     "byLanguage": {
-      "typescript": 103
+      "typescript": 107
     },
     "bySymbolKind": {
-      "function": 735,
+      "function": 737,
       "type": 48,
       "interface": 323,
       "variable": 161,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 53913,
-  "codebase_tokens": 1347749,
+  "total_tokens": 54153,
+  "codebase_tokens": 1351431,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -194,7 +194,7 @@
         207
       ],
       "detail_level": "full",
-      "token_estimate": 62,
+      "token_estimate": 61,
       "symbols": [
         {
           "name": "agentsRoutes",
@@ -221,7 +221,7 @@
       "code_blocks": null,
       "imports": [
         "../../prompt/agents-generator.js",
-        "../server.js",
+        "../types.js",
         "fastify"
       ]
     },
@@ -2623,37 +2623,18 @@
       "language": "typescript",
       "lines": [
         1,
-        205
+        197
       ],
       "detail_level": "full",
-      "token_estimate": 321,
+      "token_estimate": 301,
       "symbols": [
-        {
-          "name": "ServerContext",
-          "kind": "interface",
-          "signature": "ServerContext",
-          "lines": [
-            49,
-            54
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Server context passed to route handlers",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "createServer",
           "kind": "function",
           "signature": "async createServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<FastifyInstance>",
           "lines": [
-            68,
-            166
+            60,
+            158
           ],
           "exported": true,
           "is_default": false,
@@ -2671,8 +2652,8 @@
           "kind": "interface",
           "signature": "ServerResult",
           "lines": [
-            171,
-            174
+            163,
+            166
           ],
           "exported": true,
           "is_default": false,
@@ -2690,8 +2671,8 @@
           "kind": "function",
           "signature": "async startServer(db: Database, config: ApiConfig, daemonConfig?: DaemonConfig, wsManager?: WebSocketManager): Promise<ServerResult>",
           "lines": [
-            179,
-            197
+            171,
+            189
           ],
           "exported": true,
           "is_default": false,
@@ -2728,11 +2709,50 @@
         "./routes/signals.js",
         "./routes/stats.js",
         "./routes/tool-errors.js",
+        "./types.js",
         "./websocket.js",
         "@fastify/cors",
         "@fastify/websocket",
         "better-sqlite3",
         "fastify"
+      ]
+    },
+    {
+      "path": "src/api/types.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        21
+      ],
+      "detail_level": "full",
+      "token_estimate": 48,
+      "symbols": [
+        {
+          "name": "ServerContext",
+          "kind": "interface",
+          "signature": "ServerContext",
+          "lines": [
+            15,
+            20
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Server context passed to route handlers",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../config/types.js",
+        "better-sqlite3"
       ]
     },
     {
@@ -10526,18 +10546,18 @@
       "language": "typescript",
       "lines": [
         1,
-        857
+        741
       ],
       "detail_level": "full",
-      "token_estimate": 1357,
+      "token_estimate": 1278,
       "symbols": [
         {
           "name": "AgentResult",
           "kind": "interface",
           "signature": "AgentResult",
           "lines": [
-            21,
-            34
+            23,
+            36
           ],
           "exported": true,
           "is_default": false,
@@ -10551,69 +10571,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "AgentNodeOutput",
-          "kind": "interface",
-          "signature": "AgentNodeOutput",
-          "lines": [
-            37,
-            118
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Output schema from the session analyzer (matches session-analyzer.md)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "RelationshipOutput",
-          "kind": "interface",
-          "signature": "RelationshipOutput",
-          "lines": [
-            121,
-            143
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Output schema for relationships extracted by the session analyzer",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "LessonOutput",
-          "kind": "interface",
-          "signature": "LessonOutput",
-          "lines": [
-            145,
-            152
-          ],
-          "exported": false,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": null,
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "SkillInfo",
           "kind": "interface",
           "signature": "SkillInfo",
           "lines": [
-            155,
-            159
+            39,
+            43
           ],
           "exported": true,
           "is_default": false,
@@ -10631,8 +10594,8 @@
           "kind": "interface",
           "signature": "ProcessorLogger",
           "lines": [
-            162,
-            167
+            46,
+            51
           ],
           "exported": true,
           "is_default": false,
@@ -10650,8 +10613,8 @@
           "kind": "variable",
           "signature": "ProcessorLogger",
           "lines": [
-            170,
-            175
+            54,
+            59
           ],
           "exported": true,
           "is_default": false,
@@ -10669,8 +10632,8 @@
           "kind": "variable",
           "signature": "readonly []",
           "lines": [
-            182,
-            182
+            66,
+            66
           ],
           "exported": true,
           "is_default": false,
@@ -10688,8 +10651,8 @@
           "kind": "variable",
           "signature": "readonly [\"codemap\"]",
           "lines": [
-            185,
-            185
+            69,
+            69
           ],
           "exported": true,
           "is_default": false,
@@ -10707,8 +10670,8 @@
           "kind": "variable",
           "signature": "readonly [\"rlm\"]",
           "lines": [
-            188,
-            188
+            72,
+            72
           ],
           "exported": true,
           "is_default": false,
@@ -10726,8 +10689,8 @@
           "kind": "variable",
           "signature": "number",
           "lines": [
-            191,
-            191
+            75,
+            75
           ],
           "exported": true,
           "is_default": false,
@@ -10745,8 +10708,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            194,
-            194
+            78,
+            78
           ],
           "exported": true,
           "is_default": false,
@@ -10764,8 +10727,8 @@
           "kind": "function",
           "signature": "async checkSkillAvailable(skillName: string): Promise<boolean>",
           "lines": [
-            203,
-            211
+            87,
+            95
           ],
           "exported": true,
           "is_default": false,
@@ -10783,8 +10746,8 @@
           "kind": "function",
           "signature": "async getSkillAvailability(): Promise<Map<string, SkillInfo>>",
           "lines": [
-            216,
-            236
+            100,
+            120
           ],
           "exported": true,
           "is_default": false,
@@ -10802,8 +10765,8 @@
           "kind": "interface",
           "signature": "EnvironmentValidationResult",
           "lines": [
-            239,
-            246
+            123,
+            130
           ],
           "exported": true,
           "is_default": false,
@@ -10821,8 +10784,8 @@
           "kind": "function",
           "signature": "async validateRequiredSkills(): Promise<EnvironmentValidationResult>",
           "lines": [
-            252,
-            264
+            136,
+            148
           ],
           "exported": true,
           "is_default": false,
@@ -10840,8 +10803,8 @@
           "kind": "function",
           "signature": "async shouldIncludeRlm(sessionFile?: string): Promise<boolean>",
           "lines": [
-            270,
-            280
+            154,
+            164
           ],
           "exported": false,
           "is_default": false,
@@ -10859,8 +10822,8 @@
           "kind": "function",
           "signature": "collectAvailableSkills(skillNames: readonly string[], skillAvailability: Map<string, SkillInfo>): {}",
           "lines": [
-            285,
-            290
+            169,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -10878,8 +10841,8 @@
           "kind": "function",
           "signature": "async buildSkillsArg(sessionFile?: string): Promise<string>",
           "lines": [
-            299,
-            313
+            183,
+            197
           ],
           "exported": true,
           "is_default": false,
@@ -10897,8 +10860,8 @@
           "kind": "function",
           "signature": "buildAnalysisPrompt(job: AnalysisJob): string",
           "lines": [
-            322,
-            354
+            206,
+            238
           ],
           "exported": true,
           "is_default": false,
@@ -10916,8 +10879,8 @@
           "kind": "function",
           "signature": "formatJobContext(context: Record<string, unknown>): string",
           "lines": [
-            359,
-            378
+            243,
+            262
           ],
           "exported": false,
           "is_default": false,
@@ -10935,8 +10898,8 @@
           "kind": "function",
           "signature": "async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult>",
           "lines": [
-            387,
-            495
+            271,
+            379
           ],
           "exported": true,
           "is_default": false,
@@ -10954,8 +10917,8 @@
           "kind": "interface",
           "signature": "SpawnResult",
           "lines": [
-            498,
-            504
+            382,
+            388
           ],
           "exported": false,
           "is_default": false,
@@ -10973,8 +10936,8 @@
           "kind": "function",
           "signature": "spawnPiProcess(args: string[], timeoutMinutes: number, logger: ProcessorLogger): Promise<SpawnResult>",
           "lines": [
-            509,
-            573
+            393,
+            457
           ],
           "exported": false,
           "is_default": false,
@@ -10992,8 +10955,8 @@
           "kind": "interface",
           "signature": "PiJsonEvent",
           "lines": [
-            580,
-            585
+            464,
+            469
           ],
           "exported": false,
           "is_default": false,
@@ -11011,8 +10974,8 @@
           "kind": "interface",
           "signature": "PiMessage",
           "lines": [
-            587,
-            590
+            471,
+            474
           ],
           "exported": false,
           "is_default": false,
@@ -11030,8 +10993,8 @@
           "kind": "interface",
           "signature": "PiContentBlock",
           "lines": [
-            592,
-            596
+            476,
+            480
           ],
           "exported": false,
           "is_default": false,
@@ -11049,8 +11012,8 @@
           "kind": "function",
           "signature": "parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, \"exitCode\" | \"durationMs\">",
           "lines": [
-            601,
-            670
+            485,
+            554
           ],
           "exported": true,
           "is_default": false,
@@ -11066,10 +11029,10 @@
         {
           "name": "extractNodeFromText",
           "kind": "function",
-          "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput",
+          "signature": "extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any",
           "lines": [
-            676,
-            709
+            560,
+            593
           ],
           "exported": true,
           "is_default": false,
@@ -11087,8 +11050,8 @@
           "kind": "variable",
           "signature": "readonly [\"classification\", \"content\", \"lessons\", \"observations\", \"semantic\", \"daemonMeta\"]",
           "lines": [
-            714,
-            721
+            598,
+            605
           ],
           "exported": false,
           "is_default": false,
@@ -11106,8 +11069,8 @@
           "kind": "function",
           "signature": "isObject(value: unknown): boolean",
           "lines": [
-            726,
-            728
+            610,
+            612
           ],
           "exported": false,
           "is_default": false,
@@ -11125,8 +11088,8 @@
           "kind": "function",
           "signature": "hasRequiredObjectFields(node: Record<string, unknown>): boolean",
           "lines": [
-            733,
-            737
+            617,
+            621
           ],
           "exported": false,
           "is_default": false,
@@ -11144,8 +11107,8 @@
           "kind": "function",
           "signature": "hasValidClassification(classification: Record<string, unknown>): boolean",
           "lines": [
-            742,
-            749
+            626,
+            633
           ],
           "exported": false,
           "is_default": false,
@@ -11163,8 +11126,8 @@
           "kind": "function",
           "signature": "hasValidContent(content: Record<string, unknown>): boolean",
           "lines": [
-            754,
-            758
+            638,
+            642
           ],
           "exported": false,
           "is_default": false,
@@ -11182,8 +11145,8 @@
           "kind": "function",
           "signature": "isValidNodeOutput(obj: unknown): boolean",
           "lines": [
-            763,
-            778
+            647,
+            662
           ],
           "exported": true,
           "is_default": false,
@@ -11201,8 +11164,8 @@
           "kind": "interface",
           "signature": "ProcessorConfig",
           "lines": [
-            785,
-            790
+            669,
+            674
           ],
           "exported": true,
           "is_default": false,
@@ -11220,8 +11183,8 @@
           "kind": "class",
           "signature": "JobProcessor",
           "lines": [
-            795,
-            849
+            679,
+            733
           ],
           "exported": true,
           "is_default": false,
@@ -11239,8 +11202,8 @@
           "kind": "property",
           "signature": "config: DaemonConfig",
           "lines": [
-            796,
-            796
+            680,
+            680
           ],
           "exported": false,
           "is_default": false,
@@ -11258,8 +11221,8 @@
           "kind": "property",
           "signature": "logger: ProcessorLogger",
           "lines": [
-            797,
-            797
+            681,
+            681
           ],
           "exported": false,
           "is_default": false,
@@ -11277,8 +11240,8 @@
           "kind": "constructor",
           "signature": "constructor(processorConfig: ProcessorConfig)",
           "lines": [
-            799,
-            802
+            683,
+            686
           ],
           "exported": false,
           "is_default": false,
@@ -11296,8 +11259,8 @@
           "kind": "method",
           "signature": "async process(job: AnalysisJob): Promise<AgentResult>",
           "lines": [
-            807,
-            823
+            691,
+            707
           ],
           "exported": false,
           "is_default": false,
@@ -11315,8 +11278,8 @@
           "kind": "method",
           "signature": "async validateEnvironment(): Promise<EnvironmentValidationResult>",
           "lines": [
-            829,
-            848
+            713,
+            732
           ],
           "exported": false,
           "is_default": false,
@@ -11334,8 +11297,8 @@
           "kind": "function",
           "signature": "createProcessor(config: ProcessorConfig): JobProcessor",
           "lines": [
-            854,
-            856
+            738,
+            740
           ],
           "exported": true,
           "is_default": false,
@@ -11355,6 +11318,7 @@
       "imports": [
         "../config/types.js",
         "./queue.js",
+        "./types.js",
         "node:child_process",
         "node:fs/promises",
         "node:os",
@@ -12082,56 +12046,18 @@
       "language": "typescript",
       "lines": [
         1,
-        807
+        746
       ],
       "detail_level": "full",
-      "token_estimate": 1320,
+      "token_estimate": 1126,
       "symbols": [
-        {
-          "name": "JobType",
-          "kind": "type",
-          "signature": "JobType = \"initial\" | \"reanalysis\" | \"connection_discovery\"",
-          "lines": [
-            17,
-            17
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Job type determines analysis behavior",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "JobStatus",
-          "kind": "type",
-          "signature": "JobStatus = \"pending\" | \"running\" | \"completed\" | \"failed\"",
-          "lines": [
-            20,
-            20
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Job status tracks progress through the queue",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
         {
           "name": "PRIORITY",
           "kind": "variable",
           "signature": "PRIORITY",
           "lines": [
-            23,
-            34
+            27,
+            38
           ],
           "exported": true,
           "is_default": false,
@@ -12145,69 +12071,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "JobContext",
-          "kind": "interface",
-          "signature": "JobContext",
-          "lines": [
-            37,
-            50
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Additional context for analysis jobs",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "AnalysisJob",
-          "kind": "interface",
-          "signature": "AnalysisJob",
-          "lines": [
-            53,
-            88
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Analysis job structure",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
-          "name": "JobInput",
-          "kind": "type",
-          "signature": "JobInput = Omit<\n  AnalysisJob,\n  \"id\" | \"status\" | \"queuedAt\" | \"retryCount\" | \"maxRetries\" | \"priority\"\n> & {\n  /** Priority (defaults to PRIORITY.INITIAL) */\n  priority?: number;\n  /** Override default max re...",
-          "lines": [
-            91,
-            99
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Job creation input (id, status, queuedAt are auto-generated)",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "QueueStats",
           "kind": "interface",
           "signature": "QueueStats",
           "lines": [
-            102,
-            115
+            41,
+            54
           ],
           "exported": true,
           "is_default": false,
@@ -12225,8 +12094,8 @@
           "kind": "interface",
           "signature": "QueueRow",
           "lines": [
-            118,
-            136
+            57,
+            75
           ],
           "exported": false,
           "is_default": false,
@@ -12244,8 +12113,8 @@
           "kind": "variable",
           "signature": "3",
           "lines": [
-            139,
-            139
+            78,
+            78
           ],
           "exported": false,
           "is_default": false,
@@ -12263,8 +12132,8 @@
           "kind": "variable",
           "signature": "30",
           "lines": [
-            140,
-            140
+            79,
+            79
           ],
           "exported": false,
           "is_default": false,
@@ -12282,8 +12151,8 @@
           "kind": "class",
           "signature": "QueueManager",
           "lines": [
-            151,
-            762
+            90,
+            701
           ],
           "exported": true,
           "is_default": false,
@@ -12301,8 +12170,8 @@
           "kind": "constructor",
           "signature": "constructor(private readonly db: Database.Database, private readonly lockDurationMinutes: number = DEFAULT_LOCK_DURATION_MINUTES)",
           "lines": [
-            152,
-            155
+            91,
+            94
           ],
           "exported": false,
           "is_default": false,
@@ -12320,8 +12189,8 @@
           "kind": "method",
           "signature": "enqueue(job: JobInput): string",
           "lines": [
-            160,
-            189
+            99,
+            128
           ],
           "exported": false,
           "is_default": false,
@@ -12339,8 +12208,8 @@
           "kind": "method",
           "signature": "jobToInsertParams(job: JobInput): [string, string, number, string, string, string, string, number, string]",
           "lines": [
-            194,
-            222
+            133,
+            161
           ],
           "exported": false,
           "is_default": false,
@@ -12358,8 +12227,8 @@
           "kind": "method",
           "signature": "enqueueMany(jobs: JobInput[]): {}",
           "lines": [
-            227,
-            247
+            166,
+            186
           ],
           "exported": false,
           "is_default": false,
@@ -12375,10 +12244,10 @@
         {
           "name": "dequeue",
           "kind": "method",
-          "signature": "dequeue(workerId: string): AnalysisJob",
+          "signature": "dequeue(workerId: string): any",
           "lines": [
-            255,
-            300
+            194,
+            239
           ],
           "exported": false,
           "is_default": false,
@@ -12396,8 +12265,8 @@
           "kind": "method",
           "signature": "complete(jobId: string, nodeId: string): void",
           "lines": [
-            305,
-            319
+            244,
+            258
           ],
           "exported": false,
           "is_default": false,
@@ -12415,8 +12284,8 @@
           "kind": "method",
           "signature": "fail(jobId: string, error: string): void",
           "lines": [
-            327,
-            366
+            266,
+            305
           ],
           "exported": false,
           "is_default": false,
@@ -12434,8 +12303,8 @@
           "kind": "method",
           "signature": "failPermanently(jobId: string, error: string): void",
           "lines": [
-            374,
-            388
+            313,
+            327
           ],
           "exported": false,
           "is_default": false,
@@ -12451,10 +12320,10 @@
         {
           "name": "getJob",
           "kind": "method",
-          "signature": "getJob(jobId: string): AnalysisJob",
+          "signature": "getJob(jobId: string): any",
           "lines": [
-            393,
-            399
+            332,
+            338
           ],
           "exported": false,
           "is_default": false,
@@ -12472,8 +12341,8 @@
           "kind": "method",
           "signature": "getPendingJobs(sessionFile?: string, limit?: number): {}",
           "lines": [
-            404,
-            422
+            343,
+            361
           ],
           "exported": false,
           "is_default": false,
@@ -12491,8 +12360,8 @@
           "kind": "method",
           "signature": "getRunningJobs(): {}",
           "lines": [
-            427,
-            435
+            366,
+            374
           ],
           "exported": false,
           "is_default": false,
@@ -12510,8 +12379,8 @@
           "kind": "method",
           "signature": "getFailedJobs(limit = 100): {}",
           "lines": [
-            440,
-            453
+            379,
+            392
           ],
           "exported": false,
           "is_default": false,
@@ -12529,8 +12398,8 @@
           "kind": "method",
           "signature": "getJobsForSession(sessionFile: string): {}",
           "lines": [
-            458,
-            470
+            397,
+            409
           ],
           "exported": false,
           "is_default": false,
@@ -12548,8 +12417,8 @@
           "kind": "method",
           "signature": "hasExistingJob(sessionFile: string, segmentStart?: string, segmentEnd?: string): boolean",
           "lines": [
-            477,
-            505
+            416,
+            444
           ],
           "exported": false,
           "is_default": false,
@@ -12567,8 +12436,8 @@
           "kind": "method",
           "signature": "retryJob(jobId: string): boolean",
           "lines": [
-            510,
-            531
+            449,
+            470
           ],
           "exported": false,
           "is_default": false,
@@ -12586,8 +12455,8 @@
           "kind": "method",
           "signature": "cancelJob(jobId: string): boolean",
           "lines": [
-            536,
-            547
+            475,
+            486
           ],
           "exported": false,
           "is_default": false,
@@ -12605,8 +12474,8 @@
           "kind": "method",
           "signature": "cancelJobsForSession(sessionFile: string): number",
           "lines": [
-            552,
-            563
+            491,
+            502
           ],
           "exported": false,
           "is_default": false,
@@ -12624,8 +12493,8 @@
           "kind": "method",
           "signature": "releaseStale(): number",
           "lines": [
-            572,
-            591
+            511,
+            530
           ],
           "exported": false,
           "is_default": false,
@@ -12643,8 +12512,8 @@
           "kind": "method",
           "signature": "releaseAllRunning(): number",
           "lines": [
-            600,
-            618
+            539,
+            557
           ],
           "exported": false,
           "is_default": false,
@@ -12662,8 +12531,8 @@
           "kind": "method",
           "signature": "getDailyStats(): { completedToday: number; failedToday: number; }",
           "lines": [
-            623,
-            639
+            562,
+            578
           ],
           "exported": false,
           "is_default": false,
@@ -12681,8 +12550,8 @@
           "kind": "method",
           "signature": "getStats(): QueueStats",
           "lines": [
-            644,
-            679
+            583,
+            618
           ],
           "exported": false,
           "is_default": false,
@@ -12700,8 +12569,8 @@
           "kind": "method",
           "signature": "getJobCounts(): Record<JobStatus, number>",
           "lines": [
-            684,
-            709
+            623,
+            648
           ],
           "exported": false,
           "is_default": false,
@@ -12719,8 +12588,8 @@
           "kind": "method",
           "signature": "clearOldCompleted(daysOld: number): number",
           "lines": [
-            714,
-            726
+            653,
+            665
           ],
           "exported": false,
           "is_default": false,
@@ -12738,8 +12607,8 @@
           "kind": "method",
           "signature": "clearAll(): number",
           "lines": [
-            731,
-            734
+            670,
+            673
           ],
           "exported": false,
           "is_default": false,
@@ -12757,8 +12626,8 @@
           "kind": "method",
           "signature": "parseRow(row: QueueRow): AnalysisJob",
           "lines": [
-            739,
-            761
+            678,
+            700
           ],
           "exported": false,
           "is_default": false,
@@ -12776,8 +12645,8 @@
           "kind": "function",
           "signature": "generateJobId(): string",
           "lines": [
-            773,
-            775
+            712,
+            714
           ],
           "exported": true,
           "is_default": false,
@@ -12795,8 +12664,8 @@
           "kind": "function",
           "signature": "createQueueManager(db: Database.Database): QueueManager",
           "lines": [
-            780,
-            782
+            719,
+            721
           ],
           "exported": true,
           "is_default": false,
@@ -12814,8 +12683,8 @@
           "kind": "function",
           "signature": "getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; }",
           "lines": [
-            788,
-            806
+            727,
+            745
           ],
           "exported": true,
           "is_default": false,
@@ -12833,6 +12702,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
+        "./types.js",
         "better-sqlite3"
       ]
     },
@@ -13699,6 +13569,174 @@
         "better-sqlite3",
         "croner"
       ]
+    },
+    {
+      "path": "src/daemon/types.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        204
+      ],
+      "detail_level": "full",
+      "token_estimate": 326,
+      "symbols": [
+        {
+          "name": "JobType",
+          "kind": "type",
+          "signature": "JobType = \"initial\" | \"reanalysis\" | \"connection_discovery\"",
+          "lines": [
+            13,
+            13
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Daemon Types - Shared types for the daemon layer\n\nThis module provides types that need to be shared across the daemon layer\nand to other layers (storage, etc.) without creating circular dependencies.\nJob type determines analysis behavior",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "JobStatus",
+          "kind": "type",
+          "signature": "JobStatus = \"pending\" | \"running\" | \"completed\" | \"failed\"",
+          "lines": [
+            16,
+            16
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Job status tracks progress through the queue",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "JobContext",
+          "kind": "interface",
+          "signature": "JobContext",
+          "lines": [
+            19,
+            32
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Additional context for analysis jobs",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AnalysisJob",
+          "kind": "interface",
+          "signature": "AnalysisJob",
+          "lines": [
+            35,
+            70
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Analysis job structure",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "JobInput",
+          "kind": "type",
+          "signature": "JobInput = Omit<\n  AnalysisJob,\n  \"id\" | \"status\" | \"queuedAt\" | \"retryCount\" | \"maxRetries\" | \"priority\"\n> & {\n  /** Priority (defaults to PRIORITY.INITIAL) */\n  priority?: number;\n  /** Override default max re...",
+          "lines": [
+            73,
+            81
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Job creation input (id, status, queuedAt are auto-generated)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "RelationshipOutput",
+          "kind": "interface",
+          "signature": "RelationshipOutput",
+          "lines": [
+            88,
+            110
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Output schema for relationships extracted by the session analyzer",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "AgentNodeOutput",
+          "kind": "interface",
+          "signature": "AgentNodeOutput",
+          "lines": [
+            113,
+            194
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Output schema from the session analyzer (matches session-analyzer.md)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "LessonOutput",
+          "kind": "interface",
+          "signature": "LessonOutput",
+          "lines": [
+            196,
+            203
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
     },
     {
       "path": "src/daemon/watcher-events.ts",
@@ -14657,10 +14695,10 @@
       "language": "typescript",
       "lines": [
         1,
-        874
+        882
       ],
       "detail_level": "full",
-      "token_estimate": 1491,
+      "token_estimate": 1499,
       "symbols": [
         {
           "name": "WorkerConfig",
@@ -14725,7 +14763,7 @@
           "signature": "Worker",
           "lines": [
             128,
-            833
+            841
           ],
           "exported": true,
           "is_default": false,
@@ -15390,7 +15428,7 @@
           "signature": "async processAnalysisResult(job: AnalysisJob, result: Awaited<ReturnType<JobProcessor[\"process\"]>>, startTime: number): Promise<JobProcessingResult>",
           "lines": [
             511,
-            580
+            581
           ],
           "exported": false,
           "is_default": false,
@@ -15406,10 +15444,10 @@
         {
           "name": "createNodeFromResult",
           "kind": "method",
-          "signature": "createNodeFromResult(job: AnalysisJob, session: Awaited<ReturnType<typeof parseSession>>, result: Awaited<ReturnType<JobProcessor[\"process\"]>>, entryCount: number, signals: ReturnType<Worker[\"detectSignals\"]>): Node",
+          "signature": "createNodeFromResult(job: AnalysisJob, session: Awaited<ReturnType<typeof parseSession>>, result: Awaited<ReturnType<JobProcessor[\"process\"]>>, entryCount: number, signals: ReturnType<Worker[\"detectSignals\"]>, segmentEntries: SessionEntry[]): Node",
           "lines": [
-            585,
-            612
+            586,
+            620
           ],
           "exported": false,
           "is_default": false,
@@ -15427,8 +15465,8 @@
           "kind": "method",
           "signature": "async finalizeJobSuccess(job: AnalysisJob, node: Node, created: boolean, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            617,
-            645
+            625,
+            653
           ],
           "exported": false,
           "is_default": false,
@@ -15446,8 +15484,8 @@
           "kind": "method",
           "signature": "extractSegment(entries: SessionEntry[], segmentStart?: string, segmentEnd?: string): { segmentEntries: {}; entryCount: number; }",
           "lines": [
-            650,
-            673
+            658,
+            681
           ],
           "exported": false,
           "is_default": false,
@@ -15465,8 +15503,8 @@
           "kind": "method",
           "signature": "detectAbandonedRestart(project: string | undefined, segmentStartTime: string, currentFilesTouched: string[]): boolean",
           "lines": [
-            678,
-            706
+            686,
+            714
           ],
           "exported": false,
           "is_default": false,
@@ -15484,8 +15522,8 @@
           "kind": "method",
           "signature": "async handleJobFailure(job: AnalysisJob, error: Error, startTime: number): Promise<JobProcessingResult>",
           "lines": [
-            711,
-            778
+            719,
+            786
           ],
           "exported": false,
           "is_default": false,
@@ -15503,8 +15541,8 @@
           "kind": "method",
           "signature": "async generateNodeEmbedding(node: Node): Promise<void>",
           "lines": [
-            786,
-            823
+            794,
+            831
           ],
           "exported": false,
           "is_default": false,
@@ -15522,8 +15560,8 @@
           "kind": "method",
           "signature": "sleep(ms: number): Promise<void>",
           "lines": [
-            828,
-            832
+            836,
+            840
           ],
           "exported": false,
           "is_default": false,
@@ -15541,8 +15579,8 @@
           "kind": "function",
           "signature": "createWorker(config: WorkerConfig): Worker",
           "lines": [
-            842,
-            844
+            850,
+            852
           ],
           "exported": true,
           "is_default": false,
@@ -15560,8 +15598,8 @@
           "kind": "function",
           "signature": "handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; }",
           "lines": [
-            849,
-            873
+            857,
+            881
           ],
           "exported": true,
           "is_default": false,
@@ -15631,18 +15669,18 @@
       "language": "typescript",
       "lines": [
         1,
-        340
+        312
       ],
       "detail_level": "full",
-      "token_estimate": 722,
+      "token_estimate": 730,
       "symbols": [
         {
           "name": "getDefaultSessionDir",
           "kind": "function",
           "signature": "getDefaultSessionDir(): string",
           "lines": [
-            20,
-            22
+            21,
+            23
           ],
           "exported": true,
           "is_default": false,
@@ -15660,8 +15698,8 @@
           "kind": "function",
           "signature": "async scanSessions(sessionDir?: string): Promise<{}>",
           "lines": [
-            35,
-            47
+            36,
+            48
           ],
           "exported": true,
           "is_default": false,
@@ -15679,8 +15717,8 @@
           "kind": "function",
           "signature": "async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown>",
           "lines": [
-            64,
-            106
+            65,
+            107
           ],
           "exported": true,
           "is_default": false,
@@ -15698,8 +15736,8 @@
           "kind": "function",
           "signature": "findForkRelationships(sessions: SessionInfo[]): {}",
           "lines": [
-            111,
-            131
+            112,
+            132
           ],
           "exported": true,
           "is_default": false,
@@ -15717,8 +15755,8 @@
           "kind": "function",
           "signature": "groupByProject(sessions: SessionInfo[]): {}",
           "lines": [
-            136,
-            168
+            138,
+            140
           ],
           "exported": true,
           "is_default": false,
@@ -15736,8 +15774,8 @@
           "kind": "function",
           "signature": "decodeProjectDir(encodedName: string): string",
           "lines": [
-            189,
-            200
+            161,
+            172
           ],
           "exported": true,
           "is_default": false,
@@ -15755,8 +15793,8 @@
           "kind": "function",
           "signature": "getProjectName(sessionPath: string): string",
           "lines": [
-            214,
-            221
+            186,
+            193
           ],
           "exported": true,
           "is_default": false,
@@ -15774,8 +15812,8 @@
           "kind": "function",
           "signature": "getProjectNameFromSession(session: SessionInfo): string",
           "lines": [
-            232,
-            234
+            204,
+            206
           ],
           "exported": true,
           "is_default": false,
@@ -15793,8 +15831,8 @@
           "kind": "function",
           "signature": "filterByProject(sessions: SessionInfo[], projectPath: string): {}",
           "lines": [
-            239,
-            244
+            211,
+            216
           ],
           "exported": true,
           "is_default": false,
@@ -15812,8 +15850,8 @@
           "kind": "function",
           "signature": "filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {}",
           "lines": [
-            249,
-            264
+            221,
+            236
           ],
           "exported": true,
           "is_default": false,
@@ -15831,8 +15869,8 @@
           "kind": "function",
           "signature": "searchSessions(sessions: SessionInfo[], query: string): {}",
           "lines": [
-            269,
-            298
+            241,
+            270
           ],
           "exported": true,
           "is_default": false,
@@ -15850,8 +15888,8 @@
           "kind": "function",
           "signature": "getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; }",
           "lines": [
-            303,
-            339
+            275,
+            311
           ],
           "exported": true,
           "is_default": false,
@@ -15870,6 +15908,7 @@
       "code_blocks": null,
       "imports": [
         "../types/index.js",
+        "../utils/session-utils.js",
         "./session.js",
         "node:fs/promises",
         "node:os",
@@ -23396,18 +23435,18 @@
       "language": "typescript",
       "lines": [
         1,
-        432
+        451
       ],
       "detail_level": "full",
-      "token_estimate": 489,
+      "token_estimate": 532,
       "symbols": [
         {
           "name": "NodeConversionContext",
           "kind": "interface",
           "signature": "NodeConversionContext",
           "lines": [
-            25,
-            44
+            24,
+            47
           ],
           "exported": true,
           "is_default": false,
@@ -23421,12 +23460,31 @@
           "outgoing_refs": null
         },
         {
+          "name": "calculateDurationMinutes",
+          "kind": "function",
+          "signature": "calculateDurationMinutes(context: NodeConversionContext): number",
+          "lines": [
+            57,
+            66
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Calculate segment duration in minutes from timestamps\nFalls back to analysis duration if timestamps not available",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
           "name": "agentOutputToNode",
           "kind": "function",
           "signature": "agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node",
           "lines": [
-            54,
-            261
+            76,
+            280
           ],
           "exported": true,
           "is_default": false,
@@ -23444,8 +23502,8 @@
           "kind": "function",
           "signature": "tryLoadFullNode(row: NodeRow): any",
           "lines": [
-            266,
-            282
+            285,
+            301
           ],
           "exported": false,
           "is_default": false,
@@ -23463,8 +23521,8 @@
           "kind": "function",
           "signature": "buildSourceFromRow(row: NodeRow): Node",
           "lines": [
-            287,
-            298
+            306,
+            317
           ],
           "exported": false,
           "is_default": false,
@@ -23482,8 +23540,8 @@
           "kind": "function",
           "signature": "buildClassificationFromRow(row: NodeRow): Node",
           "lines": [
-            303,
-            310
+            322,
+            329
           ],
           "exported": false,
           "is_default": false,
@@ -23501,8 +23559,8 @@
           "kind": "function",
           "signature": "buildCoreMetadata(row: NodeRow): Pick<Node, \"tokensUsed\" | \"cost\" | \"durationMinutes\" | \"timestamp\" | \"analyzedAt\" | \"analyzerVersion\">",
           "lines": [
-            315,
-            334
+            334,
+            353
           ],
           "exported": false,
           "is_default": false,
@@ -23520,8 +23578,8 @@
           "kind": "function",
           "signature": "buildMessageCountMetadata(row: NodeRow): Pick<Node, \"userMessageCount\" | \"assistantMessageCount\" | \"clarifyingQuestionCount\" | \"promptedQuestionCount\">",
           "lines": [
-            339,
-            354
+            358,
+            373
           ],
           "exported": false,
           "is_default": false,
@@ -23539,8 +23597,8 @@
           "kind": "function",
           "signature": "buildMetadataFromRow(row: NodeRow): Node",
           "lines": [
-            359,
-            364
+            378,
+            383
           ],
           "exported": false,
           "is_default": false,
@@ -23558,8 +23616,8 @@
           "kind": "function",
           "signature": "buildMinimalNodeFromRow(row: NodeRow): Node",
           "lines": [
-            369,
-            409
+            388,
+            428
           ],
           "exported": false,
           "is_default": false,
@@ -23577,8 +23635,8 @@
           "kind": "function",
           "signature": "nodeRowToNode(row: NodeRow, loadFull = false): Node",
           "lines": [
-            416,
-            424
+            435,
+            443
           ],
           "exported": true,
           "is_default": false,
@@ -23596,8 +23654,8 @@
           "kind": "function",
           "signature": "nodeRowsToNodes(rows: NodeRow[], loadFull = false): {}",
           "lines": [
-            429,
-            431
+            448,
+            450
           ],
           "exported": true,
           "is_default": false,
@@ -23615,11 +23673,10 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../daemon/processor.js",
-        "../daemon/queue.js",
-        "./node-crud.js",
+        "../daemon/types.js",
         "./node-storage.js",
-        "./node-types.js"
+        "./node-types.js",
+        "./types.js"
       ]
     },
     {
@@ -23627,18 +23684,18 @@
       "language": "typescript",
       "lines": [
         1,
-        784
+        753
       ],
       "detail_level": "full",
-      "token_estimate": 1429,
+      "token_estimate": 1411,
       "symbols": [
         {
           "name": "createPatternId",
           "kind": "function",
           "signature": "createPatternId(input: string): string",
           "lines": [
-            43,
-            45
+            45,
+            47
           ],
           "exported": false,
           "is_default": false,
@@ -23656,8 +23713,8 @@
           "kind": "interface",
           "signature": "RepositoryOptions extends NodeStorageOptions",
           "lines": [
-            52,
-            55
+            54,
+            57
           ],
           "exported": true,
           "is_default": false,
@@ -23671,31 +23728,12 @@
           "outgoing_refs": null
         },
         {
-          "name": "NodeRow",
-          "kind": "interface",
-          "signature": "NodeRow",
-          "lines": [
-            58,
-            91
-          ],
-          "exported": true,
-          "is_default": false,
-          "is_async": false,
-          "is_static": false,
-          "is_abstract": false,
-          "parent_name": null,
-          "annotation": null,
-          "comment": "Node row from the database",
-          "incoming_refs": null,
-          "outgoing_refs": null
-        },
-        {
           "name": "insertLessons",
           "kind": "function",
           "signature": "insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void",
           "lines": [
-            100,
-            155
+            69,
+            124
           ],
           "exported": true,
           "is_default": false,
@@ -23713,8 +23751,8 @@
           "kind": "function",
           "signature": "insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void",
           "lines": [
-            160,
-            193
+            129,
+            162
           ],
           "exported": true,
           "is_default": false,
@@ -23732,8 +23770,8 @@
           "kind": "function",
           "signature": "insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void",
           "lines": [
-            198,
-            262
+            167,
+            231
           ],
           "exported": true,
           "is_default": false,
@@ -23751,8 +23789,8 @@
           "kind": "function",
           "signature": "insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void",
           "lines": [
-            267,
-            286
+            236,
+            255
           ],
           "exported": true,
           "is_default": false,
@@ -23770,8 +23808,8 @@
           "kind": "function",
           "signature": "clearAllData(db: Database.Database): void",
           "lines": [
-            296,
-            325
+            265,
+            294
           ],
           "exported": true,
           "is_default": false,
@@ -23789,8 +23827,8 @@
           "kind": "function",
           "signature": "boolToInt(value: boolean | undefined): number",
           "lines": [
-            330,
-            332
+            299,
+            301
           ],
           "exported": false,
           "is_default": false,
@@ -23808,8 +23846,8 @@
           "kind": "function",
           "signature": "buildSourceParams(node: Node): {}",
           "lines": [
-            337,
-            346
+            306,
+            315
           ],
           "exported": false,
           "is_default": false,
@@ -23827,8 +23865,8 @@
           "kind": "function",
           "signature": "buildClassificationContentParams(node: Node): {}",
           "lines": [
-            351,
-            361
+            320,
+            330
           ],
           "exported": false,
           "is_default": false,
@@ -23846,8 +23884,8 @@
           "kind": "function",
           "signature": "buildMetadataParams(node: Node, dataFile: string): {}",
           "lines": [
-            366,
-            380
+            335,
+            349
           ],
           "exported": false,
           "is_default": false,
@@ -23865,8 +23903,8 @@
           "kind": "function",
           "signature": "buildAutoMemParams(node: Node): {}",
           "lines": [
-            385,
-            392
+            354,
+            361
           ],
           "exported": false,
           "is_default": false,
@@ -23884,8 +23922,8 @@
           "kind": "function",
           "signature": "buildMessageCountParams(node: Node): {}",
           "lines": [
-            397,
-            404
+            366,
+            373
           ],
           "exported": false,
           "is_default": false,
@@ -23903,8 +23941,8 @@
           "kind": "function",
           "signature": "buildNodeInsertParams(node: Node, dataFile: string): {}",
           "lines": [
-            409,
-            420
+            378,
+            389
           ],
           "exported": false,
           "is_default": false,
@@ -23922,8 +23960,8 @@
           "kind": "variable",
           "signature": "INSERT_NODE_SQL",
           "lines": [
-            422,
-            440
+            391,
+            409
           ],
           "exported": false,
           "is_default": false,
@@ -23941,8 +23979,8 @@
           "kind": "function",
           "signature": "insertNodeRow(db: Database.Database, node: Node, dataFile: string): void",
           "lines": [
-            445,
-            452
+            414,
+            421
           ],
           "exported": false,
           "is_default": false,
@@ -23960,8 +23998,8 @@
           "kind": "function",
           "signature": "insertTagsAndTopics(db: Database.Database, node: Node): void",
           "lines": [
-            457,
-            471
+            426,
+            440
           ],
           "exported": false,
           "is_default": false,
@@ -23979,8 +24017,8 @@
           "kind": "function",
           "signature": "insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void",
           "lines": [
-            477,
-            493
+            446,
+            462
           ],
           "exported": true,
           "is_default": false,
@@ -23998,8 +24036,8 @@
           "kind": "function",
           "signature": "createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node",
           "lines": [
-            499,
-            513
+            468,
+            482
           ],
           "exported": true,
           "is_default": false,
@@ -24017,8 +24055,8 @@
           "kind": "function",
           "signature": "buildNodeUpdateParams(node: Node, dataFile: string): {}",
           "lines": [
-            518,
-            529
+            487,
+            498
           ],
           "exported": false,
           "is_default": false,
@@ -24036,8 +24074,8 @@
           "kind": "variable",
           "signature": "UPDATE_NODE_SQL",
           "lines": [
-            531,
-            553
+            500,
+            522
           ],
           "exported": false,
           "is_default": false,
@@ -24055,8 +24093,8 @@
           "kind": "function",
           "signature": "clearNodeRelatedData(db: Database.Database, nodeId: string): void",
           "lines": [
-            558,
-            565
+            527,
+            534
           ],
           "exported": false,
           "is_default": false,
@@ -24074,8 +24112,8 @@
           "kind": "function",
           "signature": "insertNodeRelatedData(db: Database.Database, node: Node): void",
           "lines": [
-            570,
-            576
+            539,
+            545
           ],
           "exported": false,
           "is_default": false,
@@ -24093,8 +24131,8 @@
           "kind": "function",
           "signature": "upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; }",
           "lines": [
-            587,
-            619
+            556,
+            588
           ],
           "exported": true,
           "is_default": false,
@@ -24110,10 +24148,10 @@
         {
           "name": "getNode",
           "kind": "function",
-          "signature": "getNode(db: Database.Database, nodeId: string): NodeRow",
+          "signature": "getNode(db: Database.Database, nodeId: string): any",
           "lines": [
-            624,
-            630
+            593,
+            599
           ],
           "exported": true,
           "is_default": false,
@@ -24131,8 +24169,8 @@
           "kind": "function",
           "signature": "nodeExistsInDb(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            635,
-            638
+            604,
+            607
           ],
           "exported": true,
           "is_default": false,
@@ -24150,8 +24188,8 @@
           "kind": "function",
           "signature": "getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {}",
           "lines": [
-            643,
-            649
+            612,
+            618
           ],
           "exported": true,
           "is_default": false,
@@ -24167,10 +24205,10 @@
         {
           "name": "findLastNodeInSession",
           "kind": "function",
-          "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow",
+          "signature": "findLastNodeInSession(db: Database.Database, sessionFile: string): any",
           "lines": [
-            657,
-            668
+            626,
+            637
           ],
           "exported": true,
           "is_default": false,
@@ -24188,8 +24226,8 @@
           "kind": "function",
           "signature": "findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any",
           "lines": [
-            677,
-            702
+            646,
+            671
           ],
           "exported": true,
           "is_default": false,
@@ -24207,8 +24245,8 @@
           "kind": "variable",
           "signature": "any",
           "lines": [
-            705,
-            712
+            674,
+            681
           ],
           "exported": false,
           "is_default": false,
@@ -24226,8 +24264,8 @@
           "kind": "function",
           "signature": "normalizeEdgeType(boundaryType: string | undefined): EdgeType",
           "lines": [
-            717,
-            722
+            686,
+            691
           ],
           "exported": false,
           "is_default": false,
@@ -24245,8 +24283,8 @@
           "kind": "function",
           "signature": "linkNodeToPredecessors(db: Database.Database, node: Node, context: {\n    boundaryType?: string;\n  } = {}): {}",
           "lines": [
-            729,
-            767
+            698,
+            736
           ],
           "exported": true,
           "is_default": false,
@@ -24264,8 +24302,8 @@
           "kind": "function",
           "signature": "edgeExistsInSameSession(db: Database.Database, nodeId: string): boolean",
           "lines": [
-            772,
-            783
+            741,
+            752
           ],
           "exported": false,
           "is_default": false,
@@ -24287,6 +24325,7 @@
         "./node-storage.js",
         "./node-types.js",
         "./search-repository.js",
+        "./types.js",
         "better-sqlite3",
         "node:crypto"
       ]
@@ -25765,7 +25804,7 @@
         290
       ],
       "detail_level": "full",
-      "token_estimate": 468,
+      "token_estimate": 467,
       "symbols": [
         {
           "name": "StoreRelationshipsResult",
@@ -25924,7 +25963,7 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../daemon/processor.js",
+        "../daemon/types.js",
         "../types/index.js",
         "./edge-repository.js",
         "better-sqlite3"
@@ -25938,7 +25977,7 @@
         419
       ],
       "detail_level": "full",
-      "token_estimate": 619,
+      "token_estimate": 618,
       "symbols": [
         {
           "name": "SearchField",
@@ -26269,8 +26308,8 @@
       "code_blocks": null,
       "imports": [
         "./filter-utils.js",
-        "./node-crud.js",
         "./node-types.js",
+        "./types.js",
         "better-sqlite3"
       ]
     },
@@ -26752,6 +26791,41 @@
         "./filter-utils.js",
         "better-sqlite3"
       ]
+    },
+    {
+      "path": "src/storage/types.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        47
+      ],
+      "detail_level": "full",
+      "token_estimate": 72,
+      "symbols": [
+        {
+          "name": "NodeRow",
+          "kind": "interface",
+          "signature": "NodeRow",
+          "lines": [
+            13,
+            46
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Storage Types - Shared types for the storage layer\n\nThis module provides types that need to be shared across the storage layer\nwithout creating circular dependencies.\nNode row from the database",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
     },
     {
       "path": "src/sync/index.ts",
@@ -28899,6 +28973,43 @@
       "headings": null,
       "code_blocks": null,
       "imports": []
+    },
+    {
+      "path": "src/utils/session-utils.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        46
+      ],
+      "detail_level": "full",
+      "token_estimate": 48,
+      "symbols": [
+        {
+          "name": "groupByProject",
+          "kind": "function",
+          "signature": "groupByProject(sessions: SessionInfo[]): {}",
+          "lines": [
+            13,
+            45
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Group sessions by project (cwd)",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": [
+        "../types/index.js"
+      ]
     },
     {
       "path": "src/web/app/playwright.config.ts",
@@ -31234,7 +31345,7 @@
       "language": "typescript",
       "lines": [
         1,
-        146
+        151
       ],
       "detail_level": "full",
       "token_estimate": 265,
@@ -31283,7 +31394,7 @@
           "signature": "createFocusTrap(container: HTMLElement, options: {\n    /** Called when Escape key is pressed */\n    onEscape?: () => void;\n    /** Element to restore focus to when trap is removed */\n    restoreFocus?: HTMLElement | null;\n    /** Whether to focus the first element on activation (default: true) */\n    autoFocus?: boolean;\n  } = {}): () => void",
           "lines": [
             47,
-            121
+            126
           ],
           "exported": true,
           "is_default": false,
@@ -31301,8 +31412,8 @@
           "kind": "function",
           "signature": "focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; }",
           "lines": [
-            127,
-            145
+            132,
+            150
           ],
           "exported": true,
           "is_default": false,
@@ -31347,7 +31458,7 @@
         972
       ],
       "detail_level": "full",
-      "token_estimate": 328,
+      "token_estimate": 329,
       "symbols": [
         {
           "name": "CompactSessionInfo",
@@ -31582,8 +31693,8 @@
       "headings": null,
       "code_blocks": null,
       "imports": [
-        "../parser/analyzer.js",
-        "../types/index.js"
+        "../types/index.js",
+        "../utils/session-utils.js"
       ]
     },
     {

@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 20 files
+- typescript: 21 files
 
 ## Statistics
-- Total files: 20
+- Total files: 21
 - Total symbols: 198
   - function: 122
   - interface: 60
@@ -267,58 +267,55 @@ src/storage/lesson-repository.ts [1-286]
     - ./filter-utils.js
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-432]
+src/storage/node-conversion.ts [1-451]
   interface:
-    25-44: interface NodeConversionContext [exported]
+    24-47: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
-    54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
+    76-280: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    416-424: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    435-443: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    429-431: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    448-450: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
-    - ../daemon/processor.js
-    - ../daemon/queue.js
-    - ./node-crud.js
+    - ../daemon/types.js
     - ./node-storage.js
     - ./node-types.js
+    - ./types.js
 
-src/storage/node-crud.ts [1-784]
+src/storage/node-crud.ts [1-753]
   interface:
-    52-55: interface RepositoryOptions extends NodeStorageOptions [exported]
+    54-57: interface RepositoryOptions extends NodeStorageOptions [exported]
       /** Options for node repository operations */
-    58-91: interface NodeRow [exported]
-      /** Node row from the database */
   function:
-    100-155: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
+    69-124: insertLessons(db: Database.Database, nodeId: string, lessonsByLevel: LessonsByLevel): void [exported]
       /** Insert lessons for a node and update lesson_patterns aggregation */
-    160-193: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
+    129-162: insertModelQuirks(db: Database.Database, nodeId: string, quirks: ModelQuirk[]): void [exported]
       /** Insert model quirks for a node and update model_stats aggregation */
-    198-262: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
+    167-231: insertToolErrors(db: Database.Database, nodeId: string, errors: ToolError[]): void [exported]
       /** Insert tool errors for a node and update failure_patterns + model_stats aggregation */
-    267-286: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
+    236-255: insertDaemonDecisions(db: Database.Database, nodeId: string, decisions: DaemonDecision[]): void [exported]
       /** Insert daemon decisions for a node */
-    296-325: clearAllData(db: Database.Database): void [exported]
+    265-294: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    477-493: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    446-462: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    499-513: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    468-482: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    587-619: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    556-588: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    624-630: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
+    593-599: getNode(db: Database.Database, nodeId: string): any [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
-    635-638: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
+    604-607: nodeExistsInDb(db: Database.Database, nodeId: string): boolean [exported]
       /** Check if a node exists in the database */
-    643-649: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
+    612-618: getAllNodeVersions(nodeId: string, options: RepositoryOptions = {}): {} [exported]
       /** Get all versions of a node from JSON storage */
-    657-668: findLastNodeInSession(db: Database.Database, sessionFile: string): NodeRow [exported]
+    626-637: findLastNodeInSession(db: Database.Database, sessionFile: string): any [exported]
       /** Find a node that contains a specific entry ID as its end boundary Find the latest node for a given session file */
-    677-702: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
+    646-671: findPreviousProjectNode(db: Database.Database, project: string, beforeTimestamp: string): any [exported]
       /** Find the most recent node for a project before a given timestamp. Used for abandoned restart detection. Returns the full Node from JSON storage (not just the row) to access filesTouched and other content fields. */
-    729-767: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
+    698-736: linkNodeToPredecessors(db: Database.Database, node: Node, context: {
     boundaryType?: string;
   } = {}): {} [exported]
       /** Automatically link a node to its predecessors based on session structure. Creates structural edges based on session continuity and fork relationships. Idempotent: will not create duplicate edges if called multiple times. */
@@ -327,6 +324,7 @@ src/storage/node-crud.ts [1-784]
     - ./node-storage.js
     - ./node-types.js
     - ./search-repository.js
+    - ./types.js
     - better-sqlite3
     - node:crypto
 
@@ -515,7 +513,7 @@ src/storage/relationship-edges.ts [1-290]
     242-289: resolveRelationship(db: Database.Database, edgeId: string, resolvedTargetNodeId: string): boolean [exported]
       /** Resolve an unresolved relationship by updating its target node Call this after semantic search finds a matching node for an unresolved relationship. */
   imports:
-    - ../daemon/processor.js
+    - ../daemon/types.js
     - ../types/index.js
     - ./edge-repository.js
     - better-sqlite3
@@ -548,8 +546,8 @@ src/storage/search-repository.ts [1-419]
       /** Enhanced search with scores, highlights, and filter support */
   imports:
     - ./filter-utils.js
-    - ./node-crud.js
     - ./node-types.js
+    - ./types.js
     - better-sqlite3
 
 src/storage/semantic-search.ts [1-214]
@@ -606,6 +604,11 @@ src/storage/tool-error-repository.ts [1-351]
     - ./filter-utils.js
     - better-sqlite3
 
+src/storage/types.ts [1-47]
+  interface:
+    13-46: interface NodeRow [exported]
+      /** Storage Types - Shared types for the storage layer This module provides types that need to be shared across the storage layer without creating circular dependencies. Node row from the database */
+
 ---
-Files: 20
-Estimated tokens: 9,387 (codebase: ~1,347,309)
+Files: 21
+Estimated tokens: 9,431 (codebase: ~258,300)

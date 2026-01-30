@@ -10,7 +10,7 @@
 
 import type Database from "better-sqlite3";
 
-import type { RelationshipOutput } from "../daemon/processor.js";
+import type { RelationshipOutput } from "../daemon/types.js";
 
 import {
   AUTOMEM_EDGE_TYPES,

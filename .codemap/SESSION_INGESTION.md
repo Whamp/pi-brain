@@ -1,10 +1,10 @@
 # Project Overview
 
 ## Languages
-- typescript: 41 files
+- typescript: 42 files
 
 ## Statistics
-- Total files: 41
+- Total files: 42
 - Total symbols: 202
   - function: 120
   - interface: 48
@@ -28,9 +28,9 @@ src/daemon/cli.ts [1-1337]
       /** Queue status info */
       refs out: 4 [type: 4]
         - src/daemon/cli.ts:124: type QueueStats -> src/daemon/queue.ts
-        - src/daemon/cli.ts:125: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/cli.ts:126: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/cli.ts:127: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/cli.ts:125: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/cli.ts:126: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/cli.ts:127: type AnalysisJob -> src/daemon/types.ts
     131-136: interface HealthCheckResult [exported]
       /** Health check result */
     139-143: interface HealthStatus [exported]
@@ -290,7 +290,7 @@ src/daemon/errors.ts [1-457]
       /** Classify an error to determine retry behavior */
       refs out: 6 [call: 3, type: 3]
         - src/daemon/errors.ts:252: type Error -> external
-        - src/daemon/errors.ts:253: type JobContext -> src/daemon/queue.ts
+        - src/daemon/errors.ts:253: type JobContext -> src/daemon/types.ts
         - src/daemon/errors.ts:254: type ErrorCategory -> src/daemon/errors.ts
         - src/daemon/errors.ts:260: call test -> external
         - src/daemon/errors.ts:261: call category -> src/daemon/errors.ts
@@ -436,7 +436,8 @@ src/daemon/facet-discovery.ts [1-1925]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
-      refs out: 7 [call: 3, instantiate: 3, type: 1]
+      refs out: 8 [call: 3, instantiate: 3, type: 2]
+        - src/daemon/facet-discovery.ts:163: type EmbeddingConfig -> src/types/index.ts
         - src/daemon/facet-discovery.ts:164: type EmbeddingProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:167: call createOllamaProvider -> src/daemon/facet-discovery.ts
         - src/daemon/facet-discovery.ts:174: instantiate Error -> external
@@ -550,158 +551,146 @@ src/daemon/processor.test.ts [1-733]
     - node:path
     - vitest
 
-src/daemon/processor.ts [1-857]
+src/daemon/processor.ts [1-741]
   class:
-    795-849: class JobProcessor [exported]
+    679-733: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
-    21-34: interface AgentResult [exported]
+    23-36: interface AgentResult [exported]
       /** Result from invoking the pi agent */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:27: type AgentNodeOutput -> src/daemon/processor.ts
-    37-118: interface AgentNodeOutput [exported]
-      /** Output schema from the session analyzer (matches session-analyzer.md) */
-      refs out: 8 [type: 8]
-        - src/daemon/processor.ts:63: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:64: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:65: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:66: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:67: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:68: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:69: type LessonOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:117: type RelationshipOutput -> src/daemon/processor.ts
-    121-143: interface RelationshipOutput [exported]
-      /** Output schema for relationships extracted by the session analyzer */
-    155-159: interface SkillInfo [exported]
+        - src/daemon/processor.ts:29: type AgentNodeOutput -> src/daemon/types.ts
+    39-43: interface SkillInfo [exported]
       /** Skill availability information */
-    162-167: interface ProcessorLogger [exported]
+    46-51: interface ProcessorLogger [exported]
       /** Logger interface for processor */
-    239-246: interface EnvironmentValidationResult [exported]
+    123-130: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    785-790: interface ProcessorConfig [exported]
+    669-674: interface ProcessorConfig [exported]
       /** Processor configuration */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:787: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:789: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:671: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:673: type ProcessorLogger -> src/daemon/processor.ts
   function:
-    203-211: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
+    87-95: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
       /** Check if a skill is available by looking for SKILL.md */
       refs out: 2 [call: 1, type: 1]
-        - src/daemon/processor.ts:203: type Promise -> external
-        - src/daemon/processor.ts:206: call access -> external
-    216-236: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
+        - src/daemon/processor.ts:87: type Promise -> external
+        - src/daemon/processor.ts:90: call access -> external
+    100-120: async getSkillAvailability(): Promise<Map<string, SkillInfo>> [exported]
       /** Get availability information for all skills */
       refs out: 4 [call: 1, type: 3]
-        - src/daemon/processor.ts:216: type Promise -> external
-        - src/daemon/processor.ts:216: type Map -> external
-        - src/daemon/processor.ts:216: type SkillInfo -> src/daemon/processor.ts
-        - src/daemon/processor.ts:228: call set -> external
-    252-264: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
+        - src/daemon/processor.ts:100: type Promise -> external
+        - src/daemon/processor.ts:100: type Map -> external
+        - src/daemon/processor.ts:100: type SkillInfo -> src/daemon/processor.ts
+        - src/daemon/processor.ts:112: call set -> external
+    136-148: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
       refs out: 2 [type: 2]
-        - src/daemon/processor.ts:252: type Promise -> external
-        - src/daemon/processor.ts:252: type EnvironmentValidationResult -> src/daemon/processor.ts
-    299-313: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+        - src/daemon/processor.ts:136: type Promise -> external
+        - src/daemon/processor.ts:136: type EnvironmentValidationResult -> src/daemon/processor.ts
+    183-197: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
       refs out: 4 [call: 3, type: 1]
-        - src/daemon/processor.ts:299: type Promise -> external
-        - src/daemon/processor.ts:308: call get -> external
-        - src/daemon/processor.ts:309: call push -> external
-        - src/daemon/processor.ts:312: call join -> external
-    322-354: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+        - src/daemon/processor.ts:183: type Promise -> external
+        - src/daemon/processor.ts:192: call get -> external
+        - src/daemon/processor.ts:193: call push -> external
+        - src/daemon/processor.ts:196: call join -> external
+    206-238: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
       refs out: 10 [call: 9, type: 1]
-        - src/daemon/processor.ts:322: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/processor.ts:330: call push -> external
-        - src/daemon/processor.ts:334: call push -> external
-        - src/daemon/processor.ts:336: call push -> external
-        - src/daemon/processor.ts:342: call push -> external
-        - src/daemon/processor.ts:343: call push -> external
-        - src/daemon/processor.ts:344: call push -> external
-        - src/daemon/processor.ts:348: call push -> external
-        - src/daemon/processor.ts:349: call push -> external
-        - src/daemon/processor.ts:353: call join -> external
-    387-495: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+        - src/daemon/processor.ts:206: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/processor.ts:214: call push -> external
+        - src/daemon/processor.ts:218: call push -> external
+        - src/daemon/processor.ts:220: call push -> external
+        - src/daemon/processor.ts:226: call push -> external
+        - src/daemon/processor.ts:227: call push -> external
+        - src/daemon/processor.ts:228: call push -> external
+        - src/daemon/processor.ts:232: call push -> external
+        - src/daemon/processor.ts:233: call push -> external
+        - src/daemon/processor.ts:237: call join -> external
+    271-379: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
       refs out: 13 [call: 8, type: 5]
-        - src/daemon/processor.ts:388: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/processor.ts:389: type DaemonConfig -> src/config/types.ts
-        - src/daemon/processor.ts:390: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:391: type Promise -> external
-        - src/daemon/processor.ts:391: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:396: call access -> external
-        - src/daemon/processor.ts:403: call now -> external
-        - src/daemon/processor.ts:409: call access -> external
-        - src/daemon/processor.ts:416: call now -> external
-        - src/daemon/processor.ts:444: call debug -> src/daemon/processor.ts
-    601-670: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+        - src/daemon/processor.ts:272: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/processor.ts:273: type DaemonConfig -> src/config/types.ts
+        - src/daemon/processor.ts:274: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:275: type Promise -> external
+        - src/daemon/processor.ts:275: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:280: call access -> external
+        - src/daemon/processor.ts:287: call now -> external
+        - src/daemon/processor.ts:293: call access -> external
+        - src/daemon/processor.ts:300: call now -> external
+        - src/daemon/processor.ts:328: call debug -> src/daemon/processor.ts
+    485-554: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
       refs out: 9 [call: 5, type: 4]
-        - src/daemon/processor.ts:603: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:604: type Omit -> external
-        - src/daemon/processor.ts:604: type AgentResult -> src/daemon/processor.ts
-        - src/daemon/processor.ts:610: call trim -> external
-        - src/daemon/processor.ts:614: call push -> external
-        - src/daemon/processor.ts:614: call parse -> external
-        - src/daemon/processor.ts:614: type PiJsonEvent -> src/daemon/processor.ts
-        - src/daemon/processor.ts:617: call debug -> src/daemon/processor.ts
-        - src/daemon/processor.ts:617: call slice -> external
-    676-709: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+        - src/daemon/processor.ts:487: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:488: type Omit -> external
+        - src/daemon/processor.ts:488: type AgentResult -> src/daemon/processor.ts
+        - src/daemon/processor.ts:494: call trim -> external
+        - src/daemon/processor.ts:498: call push -> external
+        - src/daemon/processor.ts:498: call parse -> external
+        - src/daemon/processor.ts:498: type PiJsonEvent -> src/daemon/processor.ts
+        - src/daemon/processor.ts:501: call debug -> src/daemon/processor.ts
+        - src/daemon/processor.ts:501: call slice -> external
+    560-593: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): any [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
       refs out: 8 [call: 6, type: 2]
-        - src/daemon/processor.ts:678: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:679: type AgentNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:685: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:688: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:690: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:699: call isValidNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:702: call warn -> src/daemon/processor.ts
-        - src/daemon/processor.ts:704: call warn -> src/daemon/processor.ts
-    763-778: isValidNodeOutput(obj: unknown): boolean [exported]
+        - src/daemon/processor.ts:562: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:563: type AgentNodeOutput -> src/daemon/types.ts
+        - src/daemon/processor.ts:569: call isValidNodeOutput -> src/daemon/processor.ts
+        - src/daemon/processor.ts:572: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:574: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:583: call isValidNodeOutput -> src/daemon/processor.ts
+        - src/daemon/processor.ts:586: call warn -> src/daemon/processor.ts
+        - src/daemon/processor.ts:588: call warn -> src/daemon/processor.ts
+    647-662: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/processor.ts:763: type AgentNodeOutput -> src/daemon/processor.ts
-        - src/daemon/processor.ts:764: call isObject -> src/daemon/processor.ts
-        - src/daemon/processor.ts:770: call hasRequiredObjectFields -> src/daemon/processor.ts
-        - src/daemon/processor.ts:777: call hasValidClassification -> src/daemon/processor.ts
-        - src/daemon/processor.ts:777: call hasValidContent -> src/daemon/processor.ts
-    854-856: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+        - src/daemon/processor.ts:647: type AgentNodeOutput -> src/daemon/types.ts
+        - src/daemon/processor.ts:648: call isObject -> src/daemon/processor.ts
+        - src/daemon/processor.ts:654: call hasRequiredObjectFields -> src/daemon/processor.ts
+        - src/daemon/processor.ts:661: call hasValidClassification -> src/daemon/processor.ts
+        - src/daemon/processor.ts:661: call hasValidContent -> src/daemon/processor.ts
+    738-740: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/processor.ts:854: type ProcessorConfig -> src/daemon/processor.ts
-        - src/daemon/processor.ts:854: type JobProcessor -> src/daemon/processor.ts
-        - src/daemon/processor.ts:855: instantiate JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:738: type ProcessorConfig -> src/daemon/processor.ts
+        - src/daemon/processor.ts:738: type JobProcessor -> src/daemon/processor.ts
+        - src/daemon/processor.ts:739: instantiate JobProcessor -> src/daemon/processor.ts
   variable:
-    170-175: ProcessorLogger [exported]
+    54-59: ProcessorLogger [exported]
       /** Default console logger */
       refs out: 5 [call: 4, type: 1]
-        - src/daemon/processor.ts:170: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/processor.ts:171: call debug -> external
-        - src/daemon/processor.ts:172: call log -> external
-        - src/daemon/processor.ts:173: call warn -> external
-        - src/daemon/processor.ts:174: call error -> external
-    182-182: readonly [] [exported]
+        - src/daemon/processor.ts:54: type ProcessorLogger -> src/daemon/processor.ts
+        - src/daemon/processor.ts:55: call debug -> external
+        - src/daemon/processor.ts:56: call log -> external
+        - src/daemon/processor.ts:57: call warn -> external
+        - src/daemon/processor.ts:58: call error -> external
+    66-66: readonly [] [exported]
       /** Required skills for analysis - must be available */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:182: type const -> external
-    185-185: readonly ["codemap"] [exported]
+        - src/daemon/processor.ts:66: type const -> external
+    69-69: readonly ["codemap"] [exported]
       /** Optional skills - enhance analysis but not required */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:185: type const -> external
-    188-188: readonly ["rlm"] [exported]
+        - src/daemon/processor.ts:69: type const -> external
+    72-72: readonly ["rlm"] [exported]
       /** Skills that are conditionally included based on file size */
       refs out: 1 [type: 1]
-        - src/daemon/processor.ts:188: type const -> external
-    191-191: number [exported]
+        - src/daemon/processor.ts:72: type const -> external
+    75-75: number [exported]
       /** File size threshold (in bytes) for including RLM skill */
-    194-194: any [exported]
+    78-78: any [exported]
       /** Skills directory location */
       refs out: 2 [call: 2]
-        - src/daemon/processor.ts:194: call join -> external
-        - src/daemon/processor.ts:194: call homedir -> external
+        - src/daemon/processor.ts:78: call join -> external
+        - src/daemon/processor.ts:78: call homedir -> external
   imports:
     - ../config/types.js
     - ./queue.js
+    - ./types.js
     - node:child_process
     - node:fs/promises
     - node:os
@@ -772,64 +761,41 @@ src/daemon/queue.test.ts [1-837]
     - node:path
     - vitest
 
-src/daemon/queue.ts [1-807]
+src/daemon/queue.ts [1-746]
   class:
-    151-762: class QueueManager [exported]
+    90-701: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
-    37-50: interface JobContext [exported]
-      /** Additional context for analysis jobs */
-    53-88: interface AnalysisJob [exported]
-      /** Analysis job structure */
-      refs out: 3 [type: 3]
-        - src/daemon/queue.ts:57: type JobType -> src/daemon/queue.ts
-        - src/daemon/queue.ts:67: type JobContext -> src/daemon/queue.ts
-        - src/daemon/queue.ts:69: type JobStatus -> src/daemon/queue.ts
-    102-115: interface QueueStats [exported]
+    41-54: interface QueueStats [exported]
       /** Queue statistics */
-  type:
-    17-17: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
-      /** Job type determines analysis behavior */
-    20-20: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
-      /** Job status tracks progress through the queue */
-    91-99: JobInput = Omit<
-  AnalysisJob,
-  "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
-> & {
-  /** Priority (defaults to PRIORITY.INITIAL) */
-  priority?: number;
-  /** Override default max re... [exported]
-      /** Job creation input (id, status, queuedAt are auto-generated) */
-      refs out: 2 [type: 2]
-        - src/daemon/queue.ts:91: type Omit -> external
-        - src/daemon/queue.ts:92: type AnalysisJob -> src/daemon/queue.ts
   function:
-    773-775: generateJobId(): string [exported]
+    712-714: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
       refs out: 3 [call: 3]
-        - src/daemon/queue.ts:774: call slice -> external
-        - src/daemon/queue.ts:774: call replaceAll -> external
-        - src/daemon/queue.ts:774: call randomUUID -> external
-    780-782: createQueueManager(db: Database.Database): QueueManager [exported]
+        - src/daemon/queue.ts:713: call slice -> external
+        - src/daemon/queue.ts:713: call replaceAll -> external
+        - src/daemon/queue.ts:713: call randomUUID -> external
+    719-721: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/queue.ts:780: type Database -> external
-        - src/daemon/queue.ts:780: type QueueManager -> src/daemon/queue.ts
-        - src/daemon/queue.ts:781: instantiate QueueManager -> src/daemon/queue.ts
-    788-806: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+        - src/daemon/queue.ts:719: type Database -> external
+        - src/daemon/queue.ts:719: type QueueManager -> src/daemon/queue.ts
+        - src/daemon/queue.ts:720: instantiate QueueManager -> src/daemon/queue.ts
+    727-745: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
       refs out: 5 [type: 5]
-        - src/daemon/queue.ts:788: type Database -> external
-        - src/daemon/queue.ts:789: type QueueStats -> src/daemon/queue.ts
-        - src/daemon/queue.ts:790: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:791: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/queue.ts:792: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/queue.ts:727: type Database -> external
+        - src/daemon/queue.ts:728: type QueueStats -> src/daemon/queue.ts
+        - src/daemon/queue.ts:729: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/queue.ts:730: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/queue.ts:731: type AnalysisJob -> src/daemon/types.ts
   variable:
-    23-34: PRIORITY [exported]
+    27-38: PRIORITY [exported]
       /** Priority levels (lower = higher priority) */
       refs out: 1 [type: 1]
-        - src/daemon/queue.ts:34: type const -> external
+        - src/daemon/queue.ts:38: type const -> external
   imports:
+    - ./types.js
     - better-sqlite3
 
 src/daemon/scheduler.test.ts [1-961]
@@ -929,6 +895,46 @@ src/daemon/semantic-search.integration.test.ts [1-338]
     - node:os
     - node:path
     - vitest
+
+src/daemon/types.ts [1-204]
+  interface:
+    19-32: interface JobContext [exported]
+      /** Additional context for analysis jobs */
+    35-70: interface AnalysisJob [exported]
+      /** Analysis job structure */
+      refs out: 3 [type: 3]
+        - src/daemon/types.ts:39: type JobType -> src/daemon/types.ts
+        - src/daemon/types.ts:49: type JobContext -> src/daemon/types.ts
+        - src/daemon/types.ts:51: type JobStatus -> src/daemon/types.ts
+    88-110: interface RelationshipOutput [exported]
+      /** Output schema for relationships extracted by the session analyzer */
+    113-194: interface AgentNodeOutput [exported]
+      /** Output schema from the session analyzer (matches session-analyzer.md) */
+      refs out: 8 [type: 8]
+        - src/daemon/types.ts:139: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:140: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:141: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:142: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:143: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:144: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:145: type LessonOutput -> src/daemon/types.ts
+        - src/daemon/types.ts:193: type RelationshipOutput -> src/daemon/types.ts
+  type:
+    13-13: JobType = "initial" | "reanalysis" | "connection_discovery" [exported]
+      /** Daemon Types - Shared types for the daemon layer This module provides types that need to be shared across the daemon layer and to other layers (storage, etc.) without creating circular dependencies. Job type determines analysis behavior */
+    16-16: JobStatus = "pending" | "running" | "completed" | "failed" [exported]
+      /** Job status tracks progress through the queue */
+    73-81: JobInput = Omit<
+  AnalysisJob,
+  "id" | "status" | "queuedAt" | "retryCount" | "maxRetries" | "priority"
+> & {
+  /** Priority (defaults to PRIORITY.INITIAL) */
+  priority?: number;
+  /** Override default max re... [exported]
+      /** Job creation input (id, status, queuedAt are auto-generated) */
+      refs out: 2 [type: 2]
+        - src/daemon/types.ts:73: type Omit -> external
+        - src/daemon/types.ts:74: type AnalysisJob -> src/daemon/types.ts
 
 src/daemon/watcher-events.ts [1-117]
   interface:
@@ -1064,9 +1070,9 @@ src/daemon/worker.test.ts [1-1229]
     - node:path
     - vitest
 
-src/daemon/worker.ts [1-874]
+src/daemon/worker.ts [1-882]
   class:
-    128-833: class Worker [exported]
+    128-841: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
     68-85: interface WorkerConfig [exported]
@@ -1075,39 +1081,39 @@ src/daemon/worker.ts [1-874]
         - src/daemon/worker.ts:72: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:74: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:76: type ProcessorLogger -> src/daemon/processor.ts
-        - src/daemon/worker.ts:78: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:78: type AnalysisJob -> src/daemon/types.ts
         - src/daemon/worker.ts:78: type Promise -> external
-        - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/types.ts
         - src/daemon/worker.ts:80: type Node -> src/types/index.ts
         - src/daemon/worker.ts:80: type Promise -> external
-        - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/types.ts
         - src/daemon/worker.ts:82: type Error -> external
     88-103: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:94: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:94: type AnalysisJob -> src/daemon/types.ts
         - src/daemon/worker.ts:102: type Date -> external
     106-119: interface JobProcessingResult [exported]
       /** Result from processing a single job */
       refs out: 2 [type: 2]
-        - src/daemon/worker.ts:110: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:110: type AnalysisJob -> src/daemon/types.ts
         - src/daemon/worker.ts:114: type Error -> external
   function:
-    842-844: createWorker(config: WorkerConfig): Worker [exported]
+    850-852: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
       refs out: 3 [instantiate: 1, type: 2]
-        - src/daemon/worker.ts:842: type WorkerConfig -> src/daemon/worker.ts
-        - src/daemon/worker.ts:842: type Worker -> src/daemon/worker.ts
-        - src/daemon/worker.ts:843: instantiate Worker -> src/daemon/worker.ts
-    849-873: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+        - src/daemon/worker.ts:850: type WorkerConfig -> src/daemon/worker.ts
+        - src/daemon/worker.ts:850: type Worker -> src/daemon/worker.ts
+        - src/daemon/worker.ts:851: instantiate Worker -> src/daemon/worker.ts
+    857-881: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
       refs out: 6 [call: 2, type: 4]
-        - src/daemon/worker.ts:850: type Error -> external
-        - src/daemon/worker.ts:851: type AnalysisJob -> src/daemon/queue.ts
-        - src/daemon/worker.ts:852: type RetryPolicy -> src/daemon/errors.ts
-        - src/daemon/worker.ts:857: type ReturnType -> external
-        - src/daemon/worker.ts:869: call ceil -> external
-        - src/daemon/worker.ts:870: call formatErrorForStorage -> src/daemon/errors.ts
+        - src/daemon/worker.ts:858: type Error -> external
+        - src/daemon/worker.ts:859: type AnalysisJob -> src/daemon/types.ts
+        - src/daemon/worker.ts:860: type RetryPolicy -> src/daemon/errors.ts
+        - src/daemon/worker.ts:865: type ReturnType -> external
+        - src/daemon/worker.ts:877: call ceil -> external
+        - src/daemon/worker.ts:878: call formatErrorForStorage -> src/daemon/errors.ts
   imports:
     - ../config/config.js
     - ../config/types.js
@@ -1127,101 +1133,95 @@ src/daemon/worker.ts [1-874]
     - better-sqlite3
     - node:path
 
-src/parser/analyzer.ts [1-340]
+src/parser/analyzer.ts [1-312]
   function:
-    20-22: getDefaultSessionDir(): string [exported]
+    21-23: getDefaultSessionDir(): string [exported]
       /** Default session directory */
       refs out: 2 [call: 2]
-        - src/parser/analyzer.ts:21: call join -> external
-        - src/parser/analyzer.ts:21: call homedir -> external
-    35-47: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+        - src/parser/analyzer.ts:22: call join -> external
+        - src/parser/analyzer.ts:22: call homedir -> external
+    36-48: async scanSessions(sessionDir?: string): Promise<{}> [exported]
       /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
       refs out: 6 [call: 4, type: 2]
-        - src/parser/analyzer.ts:37: type Promise -> external
-        - src/parser/analyzer.ts:37: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:39: call scanSessionsIterator -> src/parser/analyzer.ts
-        - src/parser/analyzer.ts:40: call push -> external
-        - src/parser/analyzer.ts:44: call sort -> external
-        - src/parser/analyzer.ts:44: call localeCompare -> external
-    64-106: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+        - src/parser/analyzer.ts:38: type Promise -> external
+        - src/parser/analyzer.ts:38: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:40: call scanSessionsIterator -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:41: call push -> external
+        - src/parser/analyzer.ts:45: call sort -> external
+        - src/parser/analyzer.ts:45: call localeCompare -> external
+    65-107: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
       /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
       refs out: 7 [call: 4, instantiate: 1, type: 2]
-        - src/parser/analyzer.ts:66: type AsyncGenerator -> external
-        - src/parser/analyzer.ts:66: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:76: call isDirectory -> external
-        - src/parser/analyzer.ts:84: call endsWith -> external
-        - src/parser/analyzer.ts:93: call warn -> external
-        - src/parser/analyzer.ts:97: call warn -> external
-        - src/parser/analyzer.ts:101: instantiate Error -> external
-    111-131: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+        - src/parser/analyzer.ts:67: type AsyncGenerator -> external
+        - src/parser/analyzer.ts:67: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:77: call isDirectory -> external
+        - src/parser/analyzer.ts:85: call endsWith -> external
+        - src/parser/analyzer.ts:94: call warn -> external
+        - src/parser/analyzer.ts:98: call warn -> external
+        - src/parser/analyzer.ts:102: instantiate Error -> external
+    112-132: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
       refs out: 5 [call: 3, type: 2]
-        - src/parser/analyzer.ts:112: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:113: type ForkRelationship -> src/types/session.ts
-        - src/parser/analyzer.ts:118: call push -> external
-        - src/parser/analyzer.ts:128: call sort -> external
-        - src/parser/analyzer.ts:128: call localeCompare -> external
-    136-168: groupByProject(sessions: SessionInfo[]): {} [exported]
+        - src/parser/analyzer.ts:113: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:114: type ForkRelationship -> src/types/session.ts
+        - src/parser/analyzer.ts:119: call push -> external
+        - src/parser/analyzer.ts:129: call sort -> external
+        - src/parser/analyzer.ts:129: call localeCompare -> external
+    138-140: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
-      refs out: 11 [call: 9, type: 2]
-        - src/parser/analyzer.ts:136: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:136: type ProjectGroup -> src/types/session.ts
-        - src/parser/analyzer.ts:141: call has -> external
-        - src/parser/analyzer.ts:142: call set -> external
-        - src/parser/analyzer.ts:144: call push -> external
-        - src/parser/analyzer.ts:144: call get -> external
-        - src/parser/analyzer.ts:150: call sort -> external
-        - src/parser/analyzer.ts:151: call localeCompare -> external
-        - src/parser/analyzer.ts:154: call push -> external
-        - src/parser/analyzer.ts:157: call reduce -> external
-    189-200: decodeProjectDir(encodedName: string): string [exported]
+      refs out: 3 [call: 1, type: 2]
+        - src/parser/analyzer.ts:138: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:138: type ProjectGroup -> src/types/session.ts
+        - src/parser/analyzer.ts:139: call groupByProject -> src/utils/session-utils.ts
+    161-172: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
       refs out: 3 [call: 3]
-        - src/parser/analyzer.ts:190: call startsWith -> external
-        - src/parser/analyzer.ts:190: call endsWith -> external
-        - src/parser/analyzer.ts:199: call replaceAll -> external
-    214-221: getProjectName(sessionPath: string): string [exported]
+        - src/parser/analyzer.ts:162: call startsWith -> external
+        - src/parser/analyzer.ts:162: call endsWith -> external
+        - src/parser/analyzer.ts:171: call replaceAll -> external
+    186-193: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
       refs out: 2 [call: 2]
-        - src/parser/analyzer.ts:218: call decodeProjectDir -> src/parser/analyzer.ts
-        - src/parser/analyzer.ts:220: call basename -> external
-    232-234: getProjectNameFromSession(session: SessionInfo): string [exported]
+        - src/parser/analyzer.ts:190: call decodeProjectDir -> src/parser/analyzer.ts
+        - src/parser/analyzer.ts:192: call basename -> external
+    204-206: getProjectNameFromSession(session: SessionInfo): string [exported]
       /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
       refs out: 1 [type: 1]
-        - src/parser/analyzer.ts:232: type SessionInfo -> src/types/session.ts
-    239-244: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+        - src/parser/analyzer.ts:204: type SessionInfo -> src/types/session.ts
+    211-216: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
       refs out: 3 [call: 1, type: 2]
-        - src/parser/analyzer.ts:240: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:242: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:243: call filter -> external
-    249-264: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+        - src/parser/analyzer.ts:212: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:214: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:215: call filter -> external
+    221-236: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
       refs out: 5 [call: 1, type: 4]
-        - src/parser/analyzer.ts:250: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:251: type Date -> external
-        - src/parser/analyzer.ts:252: type Date -> external
-        - src/parser/analyzer.ts:253: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:254: call filter -> external
-    269-298: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+        - src/parser/analyzer.ts:222: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:223: type Date -> external
+        - src/parser/analyzer.ts:224: type Date -> external
+        - src/parser/analyzer.ts:225: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:226: call filter -> external
+    241-270: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
       refs out: 9 [call: 7, type: 2]
-        - src/parser/analyzer.ts:270: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:272: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:280: call includes -> external
-        - src/parser/analyzer.ts:280: call toLowerCase -> external
-        - src/parser/analyzer.ts:281: call push -> external
-        - src/parser/analyzer.ts:285: call includes -> external
-        - src/parser/analyzer.ts:285: call toLowerCase -> external
-        - src/parser/analyzer.ts:286: call push -> external
-        - src/parser/analyzer.ts:293: call push -> external
-    303-339: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+        - src/parser/analyzer.ts:242: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:244: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:252: call includes -> external
+        - src/parser/analyzer.ts:252: call toLowerCase -> external
+        - src/parser/analyzer.ts:253: call push -> external
+        - src/parser/analyzer.ts:257: call includes -> external
+        - src/parser/analyzer.ts:257: call toLowerCase -> external
+        - src/parser/analyzer.ts:258: call push -> external
+        - src/parser/analyzer.ts:265: call push -> external
+    275-311: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
       refs out: 2 [call: 1, type: 1]
-        - src/parser/analyzer.ts:303: type SessionInfo -> src/types/session.ts
-        - src/parser/analyzer.ts:320: call add -> external
+        - src/parser/analyzer.ts:275: type SessionInfo -> src/types/session.ts
+        - src/parser/analyzer.ts:292: call add -> external
   imports:
     - ../types/index.js
+    - ../utils/session-utils.js
     - ./session.js
     - node:fs/promises
     - node:os
@@ -1491,21 +1491,25 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:458: type SessionEntry -> src/types/session.ts
     514-542: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-      refs out: 2 [call: 1, type: 1]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:514: type SessionEntry -> src/types/session.ts
+        - src/parser/signals.ts:514: type ManualFlag -> src/types/index.ts
         - src/parser/signals.ts:532: call push -> external
+        - src/parser/signals.ts:533: type ManualFlag -> src/types/index.ts
     553-581: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-      refs out: 4 [call: 4]
+      refs out: 5 [call: 4, type: 1]
+        - src/parser/signals.ts:553: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:557: call min -> external
         - src/parser/signals.ts:560: call min -> external
         - src/parser/signals.ts:563: call min -> external
         - src/parser/signals.ts:580: call min -> external
     604-636: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:605: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:606: type FrictionDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:607: type FrictionSignals -> src/types/index.ts
         - src/parser/signals.ts:633: call calculateFrictionScore -> src/parser/signals.ts
     676-690: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
@@ -1569,17 +1573,19 @@ src/parser/signals.ts [1-1181]
         - src/parser/signals.ts:1084: call hasGenuinePraise -> src/parser/signals.ts
     1125-1144: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-      refs out: 1 [call: 1]
+      refs out: 2 [call: 1, type: 1]
+        - src/parser/signals.ts:1125: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1143: call min -> external
     1161-1180: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
-      refs out: 3 [call: 1, type: 2]
+      refs out: 4 [call: 1, type: 3]
         - src/parser/signals.ts:1162: type SessionEntry -> src/types/session.ts
         - src/parser/signals.ts:1163: type DelightDetectionOptions -> src/parser/signals.ts
+        - src/parser/signals.ts:1164: type DelightSignals -> src/types/index.ts
         - src/parser/signals.ts:1177: call calculateDelightScore -> src/parser/signals.ts
   imports:
     - ../types/index.js
 
 ---
-Files: 41
-Estimated tokens: 20,796 (codebase: ~1,347,749)
+Files: 42
+Estimated tokens: 20,888 (codebase: ~1,351,431)

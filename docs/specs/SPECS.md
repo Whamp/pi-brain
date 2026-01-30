@@ -62,7 +62,7 @@ Technical specifications for implementing pi-brain.
 | daemon.md           | Watcher, queue, workers, scheduling        | ✅ Complete |
 | session-analyzer.md | Prompt, RLM/codemap, output schema         | ✅ Complete |
 | api.md              | REST API, WebSocket, endpoints             | ✅ Complete |
-| web-ui.md           | SvelteKit, components, D3 graph, dashboard | ⚠️ Buggy    |
+| web-ui.md           | SvelteKit, components, D3 graph, dashboard | ✅ Complete |
 | prompt-learning.md  | Insight aggregation, prompt injection      | ✅ Complete |
 | signals.md          | Friction/delight, clustering, embeddings   | ✅ Complete |
 | settings-ui.md      | Complete config management via web UI      | 📋 Planned  |

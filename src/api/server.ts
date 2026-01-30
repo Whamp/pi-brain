@@ -16,6 +16,7 @@ import Fastify, {
 } from "fastify";
 
 import type { ApiConfig, DaemonConfig } from "../config/types.js";
+import type { ServerContext } from "./types.js";
 
 import { errorResponse } from "./responses.js";
 import { agentsRoutes } from "./routes/agents.js";
@@ -42,16 +43,7 @@ export { WebSocketManager, registerWebSocketRoute };
 // Re-export response helpers for convenience
 export { successResponse, errorResponse } from "./responses.js";
 export type { ApiErrorCode } from "./responses.js";
-
-/**
- * Server context passed to route handlers
- */
-export interface ServerContext {
-  db: Database;
-  config: ApiConfig;
-  /** Optional full daemon config for routes that need it (e.g., query) */
-  daemonConfig?: DaemonConfig;
-}
+export type { ServerContext } from "./types.js";
 
 /**
  * Extend FastifyRequest to include timing

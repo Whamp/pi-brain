@@ -12,12 +12,14 @@ import * as path from "node:path";
 
 import type { DaemonConfig } from "../config/types.js";
 import type { AnalysisJob } from "./queue.js";
+import type { AgentNodeOutput, RelationshipOutput } from "./types.js";
 
-// =============================================================================
-// Types
-// =============================================================================
+// Re-export types for backward compatibility
+export type { AgentNodeOutput, RelationshipOutput };
 
-/** Result from invoking the pi agent */
+/**
+ * Result from invoking the pi agent
+ */
 export interface AgentResult {
   /** Whether the analysis succeeded */
   success: boolean;
@@ -31,124 +33,6 @@ export interface AgentResult {
   exitCode: number | null;
   /** Duration in milliseconds */
   durationMs: number;
-}
-
-/** Output schema from the session analyzer (matches session-analyzer.md) */
-export interface AgentNodeOutput {
-  classification: {
-    type: string;
-    project: string;
-    isNewProject: boolean;
-    hadClearGoal: boolean;
-    language?: string;
-    frameworks?: string[];
-  };
-  content: {
-    summary: string;
-    outcome: "success" | "partial" | "failed" | "abandoned";
-    keyDecisions: {
-      what: string;
-      why: string;
-      alternativesConsidered: string[];
-    }[];
-    filesTouched: string[];
-    toolsUsed: string[];
-    errorsSeen: {
-      type: string;
-      message: string;
-      resolved: boolean;
-    }[];
-  };
-  lessons: {
-    project: LessonOutput[];
-    task: LessonOutput[];
-    user: LessonOutput[];
-    model: LessonOutput[];
-    tool: LessonOutput[];
-    skill: LessonOutput[];
-    subagent: LessonOutput[];
-  };
-  observations: {
-    modelsUsed: {
-      provider: string;
-      model: string;
-      tokensInput: number;
-      tokensOutput: number;
-      cacheRead?: number;
-      cacheWrite?: number;
-      cost: number;
-    }[];
-    promptingWins: string[];
-    promptingFailures: string[];
-    modelQuirks: {
-      model: string;
-      observation: string;
-      frequency: "once" | "sometimes" | "often" | "always";
-      workaround?: string;
-      severity: "low" | "medium" | "high";
-    }[];
-    toolUseErrors: {
-      tool: string;
-      errorType: string;
-      context: string;
-      model: string;
-      wasRetried: boolean;
-    }[];
-  };
-  semantic: {
-    tags: string[];
-    topics: string[];
-    relatedProjects?: string[];
-    concepts?: string[];
-  };
-  daemonMeta: {
-    decisions: {
-      timestamp: string;
-      decision: string;
-      reasoning: string;
-      needsReview?: boolean;
-    }[];
-    rlmUsed: boolean;
-    codemapAvailable?: boolean;
-    analysisLog?: string;
-    segmentTokenCount?: number;
-  };
-  /** AutoMem typed relationships extracted by the analyzer */
-  relationships?: RelationshipOutput[];
-}
-
-/** Output schema for relationships extracted by the session analyzer */
-export interface RelationshipOutput {
-  /** UUID of the target node if known (null if unknown) */
-  targetNodeId: string | null;
-  /** Human-readable description of what this connects to */
-  targetDescription: string;
-  /** One of the 11 AutoMem relationship types */
-  type:
-    | "LEADS_TO"
-    | "PREFERS_OVER"
-    | "CONTRADICTS"
-    | "REINFORCES"
-    | "DERIVED_FROM"
-    | "EXEMPLIFIES"
-    | "PART_OF"
-    | "RELATES_TO"
-    | "OCCURRED_BEFORE"
-    | "INVALIDATED_BY"
-    | "EVOLVED_INTO";
-  /** Confidence in this relationship (0.0-1.0) */
-  confidence: number;
-  /** Brief explanation of why this relationship exists */
-  reason: string;
-}
-
-interface LessonOutput {
-  level: string;
-  summary: string;
-  details: string;
-  confidence: "high" | "medium" | "low";
-  tags: string[];
-  actionable?: string;
 }
 
 /** Skill availability information */

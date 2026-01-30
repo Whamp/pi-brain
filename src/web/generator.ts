@@ -16,7 +16,7 @@ import type {
   ThinkingLevelChangeEntry,
 } from "../types/index.js";
 
-import { groupByProject } from "../parser/analyzer.js";
+import { groupByProject } from "../utils/session-utils.js";
 
 /**
  * Compact session info for embedding (removes full content)

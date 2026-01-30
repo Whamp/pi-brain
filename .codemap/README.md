@@ -7,6 +7,7 @@ This directory contains auto-generated maps of the codebase to help agents under
 Start with these files to get a high-level understanding of specific subsystems:
 
 - **[API.md](./API.md)**: Public API surface. Check this first to see what functionality is exported and available for use.
+- **[BOUNDARIES.md](./BOUNDARIES.md)**: Architectural boundary rules and dependency-cruiser configuration.
 - **[STORAGE.md](./STORAGE.md)**: Data model and storage layer. Crucial for understanding how data is persisted.
 - **[SESSION_INGESTION.md](./SESSION_INGESTION.md)**: Documentation of the ingestion pipeline logic.
 - **[BRAIN_QUERIES.md](./BRAIN_QUERIES.md)**: Common patterns for querying the knowledge graph.

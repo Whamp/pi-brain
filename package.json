@@ -39,6 +39,8 @@
     "deadcode": "npx knip --tags=-public",
     "duplicates": "npx jscpd src",
     "validate": "npm run check && npm run deadcode && npm run duplicates && npm run test:quiet",
+    "boundaries": "node scripts/check-boundaries.js",
+    "boundaries:detail": "npx depcruise src extensions --output-type json",
     "prepublishOnly": "npm run build",
     "prepare": "husky",
     "web:dev": "npm run dev --prefix src/web/app",
@@ -66,13 +68,14 @@
     "@types/node": "^22.10.5",
     "@types/ws": "^8.18.1",
     "concurrently": "^9.2.1",
+    "dependency-cruiser": "^16.9.0",
     "husky": "^9.1.7",
     "oxfmt": "^0.26.0",
     "oxlint": "^1.41.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
     "ultracite": "^7.0.12",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=20"

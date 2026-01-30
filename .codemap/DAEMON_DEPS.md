@@ -39,12 +39,15 @@ src/daemon/index.ts
     - src/daemon/processor.ts
       - src/config/types.ts
       - src/daemon/queue.ts
+        - src/daemon/types.ts
         - [external] better-sqlite3
+      - src/daemon/types.ts
       - [builtin] child_process
       - [builtin] fs/promises
       - [builtin] os
       - [builtin] path
     - src/daemon/queue.ts
+      - src/daemon/types.ts
       - [external] better-sqlite3
     - src/storage/database.ts
       - [external] better-sqlite3
@@ -89,12 +92,13 @@ src/daemon/index.ts
             - src/types/index.ts
               - src/types/session.ts
             - [builtin] crypto
-        - src/storage/node-crud.ts (circular ref)
         - src/storage/node-types.ts
           - src/types/index.ts
             - src/types/session.ts
           - [builtin] crypto
+        - src/storage/types.ts
         - [external] better-sqlite3
+      - src/storage/types.ts
       - [external] better-sqlite3
       - [builtin] crypto
     - src/storage/node-storage.ts
@@ -141,12 +145,13 @@ src/daemon/index.ts
             - src/types/index.ts
               - src/types/session.ts
             - [builtin] crypto
-        - src/storage/node-crud.ts (circular ref)
         - src/storage/node-types.ts
           - src/types/index.ts
             - src/types/session.ts
           - [builtin] crypto
+        - src/storage/types.ts
         - [external] better-sqlite3
+      - src/storage/types.ts
       - [external] better-sqlite3
       - [builtin] crypto
     - src/storage/node-queries.ts
@@ -180,12 +185,13 @@ src/daemon/index.ts
               - src/types/index.ts
                 - src/types/session.ts
               - [builtin] crypto
-          - src/storage/node-crud.ts (circular ref)
           - src/storage/node-types.ts
             - src/types/index.ts
               - src/types/session.ts
             - [builtin] crypto
+          - src/storage/types.ts
           - [external] better-sqlite3
+        - src/storage/types.ts
         - [external] better-sqlite3
         - [builtin] crypto
       - [external] better-sqlite3
@@ -194,6 +200,7 @@ src/daemon/index.ts
     - [external] better-sqlite3
   - src/daemon/errors.ts
     - src/daemon/queue.ts
+      - src/daemon/types.ts
       - [external] better-sqlite3
   - src/daemon/facet-discovery.ts
     - src/storage/embedding-utils.ts
@@ -230,12 +237,15 @@ src/daemon/index.ts
   - src/daemon/processor.ts
     - src/config/types.ts
     - src/daemon/queue.ts
+      - src/daemon/types.ts
       - [external] better-sqlite3
+    - src/daemon/types.ts
     - [builtin] child_process
     - [builtin] fs/promises
     - [builtin] os
     - [builtin] path
   - src/daemon/queue.ts
+    - src/daemon/types.ts
     - [external] better-sqlite3
   - src/daemon/scheduler.ts
     - src/config/types.ts
@@ -285,6 +295,7 @@ src/daemon/index.ts
       - [external] better-sqlite3
       - [builtin] crypto
     - src/daemon/queue.ts
+      - src/daemon/types.ts
       - [external] better-sqlite3
     - src/prompt/effectiveness.ts
       - src/storage/node-storage.ts
@@ -386,12 +397,13 @@ src/daemon/index.ts
               - src/types/index.ts
                 - src/types/session.ts
               - [builtin] crypto
-          - src/storage/node-crud.ts (circular ref)
           - src/storage/node-types.ts
             - src/types/index.ts
               - src/types/session.ts
             - [builtin] crypto
+          - src/storage/types.ts
           - [external] better-sqlite3
+        - src/storage/types.ts
         - [external] better-sqlite3
         - [builtin] crypto
       - src/storage/node-queries.ts
@@ -425,12 +437,13 @@ src/daemon/index.ts
                 - src/types/index.ts
                   - src/types/session.ts
                 - [builtin] crypto
-            - src/storage/node-crud.ts (circular ref)
             - src/storage/node-types.ts
               - src/types/index.ts
                 - src/types/session.ts
               - [builtin] crypto
+            - src/storage/types.ts
             - [external] better-sqlite3
+          - src/storage/types.ts
           - [external] better-sqlite3
           - [builtin] crypto
         - [external] better-sqlite3
@@ -439,6 +452,7 @@ src/daemon/index.ts
       - [external] better-sqlite3
     - src/daemon/errors.ts
       - src/daemon/queue.ts
+        - src/daemon/types.ts
         - [external] better-sqlite3
     - src/daemon/facet-discovery.ts
       - src/storage/embedding-utils.ts
@@ -472,12 +486,15 @@ src/daemon/index.ts
     - src/daemon/processor.ts
       - src/config/types.ts
       - src/daemon/queue.ts
+        - src/daemon/types.ts
         - [external] better-sqlite3
+      - src/daemon/types.ts
       - [builtin] child_process
       - [builtin] fs/promises
       - [builtin] os
       - [builtin] path
     - src/daemon/queue.ts
+      - src/daemon/types.ts
       - [external] better-sqlite3
     - src/parser/index.ts
       - src/parser/analyzer.ts
@@ -487,6 +504,9 @@ src/daemon/index.ts
           - [builtin] fs/promises
         - src/types/index.ts
           - src/types/session.ts
+        - src/utils/session-utils.ts
+          - src/types/index.ts
+            - src/types/session.ts
         - [builtin] fs/promises
         - [builtin] os
         - [builtin] path
@@ -520,49 +540,7 @@ src/daemon/index.ts
         - src/types/session.ts
       - [external] better-sqlite3
     - src/storage/node-conversion.ts
-      - src/daemon/processor.ts
-        - src/config/types.ts
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
-        - [builtin] child_process
-        - [builtin] fs/promises
-        - [builtin] os
-        - [builtin] path
-      - src/daemon/queue.ts
-        - [external] better-sqlite3
-      - src/storage/node-crud.ts
-        - src/storage/edge-repository.ts
-          - src/storage/node-types.ts
-            - src/types/index.ts
-              - src/types/session.ts
-            - [builtin] crypto
-          - [external] better-sqlite3
-        - src/storage/node-storage.ts
-          - src/storage/node-types.ts
-            - src/types/index.ts
-              - src/types/session.ts
-            - [builtin] crypto
-          - [builtin] fs
-          - [builtin] os
-          - [builtin] path
-        - src/storage/node-types.ts
-          - src/types/index.ts
-            - src/types/session.ts
-          - [builtin] crypto
-        - src/storage/search-repository.ts
-          - src/storage/filter-utils.ts
-            - src/storage/node-types.ts
-              - src/types/index.ts
-                - src/types/session.ts
-              - [builtin] crypto
-          - src/storage/node-crud.ts (circular ref)
-          - src/storage/node-types.ts
-            - src/types/index.ts
-              - src/types/session.ts
-            - [builtin] crypto
-          - [external] better-sqlite3
-        - [external] better-sqlite3
-        - [builtin] crypto
+      - src/daemon/types.ts
       - src/storage/node-storage.ts
         - src/storage/node-types.ts
           - src/types/index.ts
@@ -575,6 +553,7 @@ src/daemon/index.ts
         - src/types/index.ts
           - src/types/session.ts
         - [builtin] crypto
+      - src/storage/types.ts
     - src/storage/node-crud.ts
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
@@ -600,12 +579,13 @@ src/daemon/index.ts
             - src/types/index.ts
               - src/types/session.ts
             - [builtin] crypto
-        - src/storage/node-crud.ts (circular ref)
         - src/storage/node-types.ts
           - src/types/index.ts
             - src/types/session.ts
           - [builtin] crypto
+        - src/storage/types.ts
         - [external] better-sqlite3
+      - src/storage/types.ts
       - [external] better-sqlite3
       - [builtin] crypto
     - src/storage/node-types.ts
@@ -613,14 +593,7 @@ src/daemon/index.ts
         - src/types/session.ts
       - [builtin] crypto
     - src/storage/relationship-edges.ts
-      - src/daemon/processor.ts
-        - src/config/types.ts
-        - src/daemon/queue.ts
-          - [external] better-sqlite3
-        - [builtin] child_process
-        - [builtin] fs/promises
-        - [builtin] os
-        - [builtin] path
+      - src/daemon/types.ts
       - src/storage/edge-repository.ts
         - src/storage/node-types.ts
           - src/types/index.ts

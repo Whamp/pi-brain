@@ -6,6 +6,7 @@
 <script lang="ts">
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDate, parseDate } from "$lib/utils/date";
+  import type { AggregatedInsight, PromptEffectiveness } from "$lib/types";
   import Spinner from "$lib/components/spinner.svelte";
   import {
     Lightbulb,
@@ -63,10 +64,8 @@
     const { column, direction } = historySort;
     
     sorted.sort((a, b) => {
-      // @ts-expect-error - dynamic column access
-      const aVal = a[column] ?? "";
-      // @ts-expect-error - dynamic column access
-      const bVal = b[column] ?? "";
+      const aVal = (a as unknown as Record<string, unknown>)[column] ?? "";
+      const bVal = (b as unknown as Record<string, unknown>)[column] ?? "";
       
       if (typeof aVal === "number" && typeof bVal === "number") {
         return direction === "asc" ? aVal - bVal : bVal - aVal;

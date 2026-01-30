@@ -6,7 +6,7 @@
 
 import type { FastifyInstance } from "fastify";
 
-import type { ServerContext } from "../server.js";
+import type { ServerContext } from "../types.js";
 
 import {
   generateAgentsForModel,

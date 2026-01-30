@@ -27,10 +27,14 @@
     "docs/**",
     "prompts/**",
     "scripts/refresh-codemap.sh",
-    "extensions/dashboard/lib/types.ts"
+    "extensions/dashboard/lib/types.ts",
+    "vitest.workspace.ts"
   ],
   "ignoreDependencies": ["ultracite"],
   "ignoreExportsUsedInFile": true,
+  "vitest": {
+    "config": ["vitest.config.ts"]
+  },
   "rules": {
     "exports": "error",
     "types": "warn",
