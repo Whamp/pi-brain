@@ -7,6 +7,14 @@ if [ -z "$(git diff --cached --name-only)" ]; then
   exit 0
 fi
 
+# Secret scanning (staged files only) - fast, runs first
+echo "🔐 Scanning for secrets..."
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --config .gitleaks.toml
+else
+  echo "⚠️  gitleaks not installed, skipping secret scan"
+fi
+
 # Run full validation stack (build, format, lint, deadcode, duplicates, tests)
 npm run validate
 

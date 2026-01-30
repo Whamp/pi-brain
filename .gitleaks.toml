@@ -1,0 +1,22 @@
+# Gitleaks configuration for pi-brain
+# See https://github.com/gitleaks/gitleaks for documentation
+
+[extend]
+useDefault = true
+
+# Paths to ignore (test fixtures, generated files)
+[allowlist]
+  paths = [
+    '''node_modules/''',
+    '''dist/''',
+    '''\.git/''',
+    '''package-lock\.json''',
+    '''\.codemap/''',
+  ]
+
+# Custom rules can be added here
+# [[rules]]
+#   id = "custom-rule"
+#   description = "Custom rule description"
+#   regex = '''pattern'''
+#   secretGroup = 1

@@ -1,0 +1,40 @@
+# Semgrep ignore file
+# https://semgrep.dev/docs/ignoring-files-folders-code
+
+# Build output
+dist/
+build/
+.svelte-kit/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.min.js
+*.bundle.js
+reports/
+docs/api/
+
+# Test fixtures and mocks
+**/__fixtures__/
+**/__mocks__/
+**/test-data/
+
+# Config files
+*.config.js
+*.config.ts
+vite.config.ts
+vitest.config.ts
+svelte.config.js
+tsconfig.json
+tsup.config.ts
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+
+# Codemap (generated)
+.codemap/
+
+# Cache
+.semgrep-cache/

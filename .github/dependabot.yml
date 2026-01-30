@@ -1,0 +1,70 @@
+# Dependabot configuration
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+
+version: 2
+updates:
+  # Root package.json
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Los_Angeles
+    open-pull-requests-limit: 10
+    groups:
+      # Group minor and patch updates together
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "deps"
+      include: scope
+    labels:
+      - dependencies
+      - automated
+
+  # Web app package.json
+  - package-ecosystem: npm
+    directory: /src/web/app
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Los_Angeles
+    open-pull-requests-limit: 5
+    groups:
+      web-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: "deps(web)"
+      include: scope
+    labels:
+      - dependencies
+      - web
+      - automated
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Los_Angeles
+    commit-message:
+      prefix: "ci"
+    labels:
+      - ci
+      - automated

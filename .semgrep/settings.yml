@@ -1,0 +1,18 @@
+# Semgrep settings file
+# https://semgrep.dev/docs/semgrep-ci/configuration-reference/
+
+# Use latest rules
+version: 2
+
+# Enable caching for faster repeat scans
+cache:
+  enabled: true
+  path: .semgrep-cache
+
+# Exclude rules that generate false positives for Fastify (not Express)
+rule-exclusions:
+  - javascript.express.security.audit.xss.direct-response-write.direct-response-write
+
+# Only report errors in CI, not warnings
+ci:
+  enabled: true

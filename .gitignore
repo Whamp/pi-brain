@@ -12,3 +12,6 @@ reports/
 # Generated API documentation (generate on-demand with npm run docs:agent)
 docs/api/
 temp/
+
+# Semgrep cache
+.semgrep-cache/
