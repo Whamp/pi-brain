@@ -86,14 +86,14 @@
       {#each patterns as pattern}
         <div class="pattern-card">
           <div class="pattern-header">
-            <AlertCircle size={18} class="pattern-icon" />
+            <AlertCircle size={16} class="pattern-icon" />
             <span class="pattern-title">{pattern.pattern}</span>
             <span class="pattern-count">{pattern.occurrences}×</span>
           </div>
 
           <div class="pattern-meta">
             <span class="meta-item">
-              <Clock size={14} />
+              <Clock size={12} />
               Last seen {formatDistanceToNow(parseDate(pattern.lastSeen))}
             </span>
           </div>
@@ -116,7 +116,7 @@
 
           {#if pattern.learningOpportunity}
             <div class="pattern-learning">
-              <Lightbulb size={16} />
+              <Lightbulb size={14} />
               <span>{pattern.learningOpportunity}</span>
             </div>
           {/if}
@@ -218,23 +218,23 @@
   }
 
   .pattern-card {
-    padding: var(--space-4);
-    background: rgba(239, 68, 68, 0.05);
+    padding: var(--space-3);
+    background: var(--color-bg-elevated);
     border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-error);
-    border-radius: var(--radius-lg);
+    border-left: 3px solid hsla(0, 65%, 55%, 0.6);
+    border-radius: var(--radius-md);
   }
 
   .pattern-header {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    margin-bottom: var(--space-3);
-    color: var(--color-error);
+    margin-bottom: var(--space-2);
   }
 
-  .pattern-icon {
+  .pattern-header :global(.pattern-icon) {
     flex-shrink: 0;
+    color: hsla(0, 65%, 55%, 0.7);
   }
 
   .pattern-title {
@@ -246,14 +246,17 @@
   .pattern-count {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--color-error);
+    padding: 2px 8px;
+    background: hsla(0, 65%, 55%, 0.1);
+    color: hsla(0, 65%, 55%, 0.9);
+    border-radius: var(--radius-sm);
   }
 
   .pattern-meta {
     display: flex;
     gap: var(--space-4);
-    margin-bottom: var(--space-3);
-    font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
 
@@ -269,8 +272,8 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
-    margin-bottom: var(--space-2);
-    font-size: var(--text-sm);
+    margin-bottom: var(--space-1);
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
 
@@ -287,17 +290,18 @@
     display: flex;
     align-items: flex-start;
     gap: var(--space-2);
-    padding: var(--space-3);
-    background: var(--color-bg-elevated);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    color: var(--color-text);
-    margin-top: var(--space-3);
+    padding: var(--space-2);
+    background: var(--color-bg-hover);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
   }
 
   .pattern-learning :global(svg) {
     flex-shrink: 0;
     color: var(--color-warning);
-    margin-top: 2px;
+    opacity: 0.8;
+    margin-top: 1px;
   }
 </style>

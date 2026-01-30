@@ -328,13 +328,13 @@ src/storage/node-crud.ts [1-753]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-258]
+src/storage/node-queries.ts [1-289]
   interface:
     76-85: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
     88-97: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    183-195: interface SessionSummaryRow [exported]
+    183-199: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
   type:
     59-67: NodeSortField = | "timestamp"
@@ -359,11 +359,11 @@ src/storage/node-queries.ts [1-258]
       /** Get topics for a node */
     127-174: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    201-229: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    205-260: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    238-246: getAllProjects(db: Database.Database): {} [exported]
+    269-277: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    251-257: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    282-288: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -611,4 +611,4 @@ src/storage/types.ts [1-47]
 
 ---
 Files: 21
-Estimated tokens: 9,431 (codebase: ~1,389,221)
+Estimated tokens: 9,431 (codebase: ~1,390,813)

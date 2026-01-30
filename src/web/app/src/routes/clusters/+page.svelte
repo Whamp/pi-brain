@@ -309,12 +309,12 @@
     gap: 0.5rem;
     margin: 0 0 0.5rem;
     font-size: 1.75rem;
-    color: var(--color-text-primary, #fff);
+    color: var(--color-text);
   }
 
   .subtitle {
     margin: 0;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
   }
 
   .btn-filter {
@@ -322,23 +322,23 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    border: 1px solid var(--color-border, #333);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
-    background: var(--color-bg-secondary, #1a1a1a);
-    color: var(--color-text-primary, #fff);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
     cursor: pointer;
     position: relative;
   }
 
   .btn-filter.active {
-    border-color: var(--color-accent, #3b82f6);
+    border-color: var(--color-accent);
   }
 
   .filter-badge {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--color-accent, #3b82f6);
+    background: var(--color-accent);
     position: absolute;
     top: -2px;
     right: -2px;
@@ -349,8 +349,8 @@
     gap: 1rem;
     padding: 1rem;
     margin-bottom: 1.5rem;
-    background: var(--color-bg-secondary, #1a1a1a);
-    border: 1px solid var(--color-border, #333);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -364,16 +364,16 @@
 
   .filter-group label {
     font-size: 0.75rem;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
     text-transform: uppercase;
   }
 
   .filter-group select {
     padding: 0.5rem;
-    border: 1px solid var(--color-border, #333);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background: var(--color-bg-primary, #0a0a0a);
-    color: var(--color-text-primary, #fff);
+    background: var(--color-bg);
+    color: var(--color-text);
     min-width: 120px;
   }
 
@@ -385,20 +385,20 @@
     border: none;
     border-radius: 4px;
     background: transparent;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
     cursor: pointer;
   }
 
   .btn-clear-filters:hover {
-    color: var(--color-text-primary, #fff);
+    color: var(--color-text);
   }
 
   .error-message {
     padding: 1rem;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: var(--color-error-muted);
+    border: 1px solid hsl(0, 65%, 65%, 0.25);
     border-radius: 8px;
-    color: #ef4444;
+    color: var(--color-error);
     text-align: center;
   }
 
@@ -410,14 +410,14 @@
     justify-content: center;
     padding: 4rem 2rem;
     text-align: center;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
   }
 
   .spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid var(--color-border, #333);
-    border-top-color: var(--color-accent, #3b82f6);
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -430,7 +430,7 @@
 
   .empty-state h2 {
     margin: 1rem 0 0.5rem;
-    color: var(--color-text-primary, #fff);
+    color: var(--color-text);
   }
 
   .clusters-list {
@@ -441,8 +441,8 @@
 
   .cluster-card {
     padding: 1.25rem;
-    background: var(--color-bg-secondary, #1a1a1a);
-    border: 1px solid var(--color-border, #333);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
   }
 
@@ -469,15 +469,15 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text-primary, #fff);
+    color: var(--color-text);
   }
 
   .node-count {
     font-size: 0.75rem;
     padding: 0.125rem 0.5rem;
-    background: var(--color-bg-primary, #0a0a0a);
+    background: var(--color-bg);
     border-radius: 4px;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
   }
 
   .cluster-meta {
@@ -495,13 +495,13 @@
   }
 
   .status-pending {
-    background: rgba(234, 179, 8, 0.1);
-    color: #eab308;
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
   }
 
   .status-confirmed {
-    background: rgba(34, 197, 94, 0.1);
-    color: #22c55e;
+    background: var(--color-success-bg);
+    color: var(--color-success);
   }
 
   .status-dismissed {
@@ -511,13 +511,13 @@
 
   .timestamp {
     font-size: 0.75rem;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
   }
 
   .cluster-description {
     margin: 0 0 1rem;
     font-size: 0.875rem;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
     line-height: 1.5;
   }
 
@@ -528,7 +528,7 @@
   .cluster-nodes h4 {
     margin: 0 0 0.5rem;
     font-size: 0.75rem;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
     text-transform: uppercase;
   }
 
@@ -547,7 +547,7 @@
   }
 
   .node-link {
-    color: var(--color-accent, #3b82f6);
+    color: var(--color-accent);
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -562,9 +562,9 @@
   .node-project {
     font-size: 0.75rem;
     padding: 0.125rem 0.375rem;
-    background: var(--color-bg-primary, #0a0a0a);
+    background: var(--color-bg);
     border-radius: 3px;
-    color: var(--color-text-secondary, #888);
+    color: var(--color-text-muted);
     flex-shrink: 0;
   }
 
@@ -572,7 +572,7 @@
     display: flex;
     gap: 0.5rem;
     padding-top: 0.75rem;
-    border-top: 1px solid var(--color-border, #333);
+    border-top: 1px solid var(--color-border);
   }
 
   .btn-confirm,
@@ -589,13 +589,13 @@
   }
 
   .btn-confirm {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: rgba(34, 197, 94, 0.3);
-    color: #22c55e;
+    background: var(--color-success-bg);
+    border-color: var(--color-success-border);
+    color: var(--color-success);
   }
 
   .btn-confirm:hover:not(:disabled) {
-    background: rgba(34, 197, 94, 0.2);
+    background: hsla(145, 65%, 52%, 0.2);
   }
 
   .btn-dismiss {
@@ -625,16 +625,16 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    border: 1px solid var(--color-border, #333);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
-    background: var(--color-bg-secondary, #1a1a1a);
-    color: var(--color-text-primary, #fff);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
     cursor: pointer;
     transition: all 0.15s;
   }
 
   .load-more button:hover:not(:disabled) {
-    border-color: var(--color-accent, #3b82f6);
+    border-color: var(--color-accent);
   }
 
   .load-more button:disabled {

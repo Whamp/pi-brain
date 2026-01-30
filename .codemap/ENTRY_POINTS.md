@@ -5,10 +5,10 @@
 
 ## Statistics
 - Total files: 31
-- Total symbols: 161
-  - function: 94
+- Total symbols: 163
+  - function: 95
   - interface: 30
-  - variable: 15
+  - variable: 16
   - method: 12
   - type: 6
   - property: 2
@@ -544,7 +544,7 @@ src/api/routes/nodes.ts [1-232]
   function:
     39-61: buildIncludeFetchers(db: Database.Database, id: string): Record<string, () => unknown>
       /** Lookup table for include data fetchers Each key maps to a function that fetches the relevant data */
-      refs out: 8 [call: 6, type: 2]
+      refs out: 6 [call: 4, type: 2]
         - src/api/routes/nodes.ts:40: type Database -> external
         - src/api/routes/nodes.ts:42: type Record -> external
         - src/api/routes/nodes.ts:44: call getNodeLessons -> src/storage/lesson-repository.ts
@@ -690,20 +690,31 @@ src/api/routes/search.ts [1-82]
     - ../responses.js
     - fastify
 
-src/api/routes/sessions.ts [1-263]
+src/api/routes/sessions.ts [1-312]
   interface:
-    21-35: interface SessionSummary
+    64-82: interface SessionSummary
       /** Session summary for the file browser */
-    40-45: interface ProjectSummary
+    87-92: interface ProjectSummary
       /** Project summary for the file browser */
   function:
-    47-262: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
+    27-59: generateSessionTitle(summary: string | null): string
+      /** Generate a human-readable session title from the first node's summary. Truncates long summaries and cleans up formatting. */
+      refs out: 6 [call: 6]
+        - src/api/routes/sessions.ts:28: call trim -> external
+        - src/api/routes/sessions.ts:40: call replace -> external
+        - src/api/routes/sessions.ts:44: call toUpperCase -> external
+        - src/api/routes/sessions.ts:44: call charAt -> external
+        - src/api/routes/sessions.ts:44: call slice -> external
+    94-311: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
       refs out: 34 [call: 24, instantiate: 2, type: 8]
-        - src/api/routes/sessions.ts:47: type FastifyInstance -> external
-        - src/api/routes/sessions.ts:47: type Promise -> external
-        - src/api/routes/sessions.ts:51: call get -> external
-        - src/api/routes/sessions.ts:51: type FastifyRequest -> external
-        - src/api/routes/sessions.ts:51: type FastifyReply -> external
+        - src/api/routes/sessions.ts:94: type FastifyInstance -> external
+        - src/api/routes/sessions.ts:94: type Promise -> external
+        - src/api/routes/sessions.ts:98: call get -> external
+        - src/api/routes/sessions.ts:98: type FastifyRequest -> external
+        - src/api/routes/sessions.ts:98: type FastifyReply -> external
+  variable:
+    21-21: 80
+      /** Max length for session title before truncation */
   imports:
     - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
@@ -1241,4 +1252,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 31
-Estimated tokens: 15,658 (codebase: ~1,389,221)
+Estimated tokens: 15,819 (codebase: ~1,390,813)

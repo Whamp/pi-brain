@@ -5,6 +5,11 @@
     TrendingUp,
     CircleAlert,
     Lightbulb,
+    ChevronDown,
+    Activity,
+    Server,
+    AlertTriangle,
+    BarChart3,
   } from "lucide-svelte";
   import { api, getErrorMessage, isBackendOffline } from "$lib/api/client";
   import { formatDistanceToNow, parseDate } from "$lib/utils/date";
@@ -27,9 +32,13 @@
   import TokenSparkline from "$lib/components/dashboard/token-sparkline.svelte";
   import Card from "$lib/components/card.svelte";
   import CardHeader from "$lib/components/card-header.svelte";
+  import CollapsibleSection from "$lib/components/collapsible-section.svelte";
   import TableSortIcon from "$lib/components/table-sort-icon.svelte";
   import Tag from "$lib/components/tag.svelte";
   import StatusDot from "$lib/components/status-dot.svelte";
+  import TruncatedText from "$lib/components/truncated-text.svelte";
+  import StatCard from "$lib/components/dashboard/stat-card.svelte";
+  import { abbreviateModelName } from "$lib/utils/model";
 
   // State
   let stats = $state<DashboardStats | null>(null);
@@ -199,7 +208,8 @@
   async function fetchTimeSeriesData() {
     timeSeriesLoading = true;
     try {
-      const res = await api.getTimeSeries(7);
+      // Fetch 14 days for week-over-week comparison
+      const res = await api.getTimeSeries(14);
       timeSeriesData = res.data;
     } catch (error) {
       console.error("Failed to fetch time series data:", error);
@@ -210,10 +220,71 @@
     }
   }
 
-  // Extract tokens and costs from time series data
-  const tokensTimeSeries = $derived.by(() => timeSeriesData.map((d) => d.tokens));
+  // Extract tokens and costs from time series data (last 7 days only for sparklines)
+  const tokensTimeSeries = $derived.by(() => timeSeriesData.slice(-7).map((d) => d.tokens));
 
-  const costsTimeSeries = $derived.by(() => timeSeriesData.map((d) => d.cost * 100)); // Multiply by 100 for better visibility in sparkline
+  const costsTimeSeries = $derived.by(() => timeSeriesData.slice(-7).map((d) => d.cost * 100)); // Multiply by 100 for better visibility in sparkline
+
+  // Calculate week-over-week trends from 14-day time series
+  const weeklyTrends = $derived.by(() => {
+    if (timeSeriesData.length < 14) {
+      return {
+        thisWeekTokens: 0,
+        lastWeekTokens: 0,
+        thisWeekCost: 0,
+        lastWeekCost: 0,
+        thisWeekNodes: 0,
+        lastWeekNodes: 0,
+      };
+    }
+    
+    // Split into two weeks: days 0-6 = last week, days 7-13 = this week
+    const lastWeekData = timeSeriesData.slice(0, 7);
+    const thisWeekData = timeSeriesData.slice(7, 14);
+    
+    return {
+      thisWeekTokens: thisWeekData.reduce((sum, d) => sum + d.tokens, 0),
+      lastWeekTokens: lastWeekData.reduce((sum, d) => sum + d.tokens, 0),
+      thisWeekCost: thisWeekData.reduce((sum, d) => sum + d.cost, 0),
+      lastWeekCost: lastWeekData.reduce((sum, d) => sum + d.cost, 0),
+      thisWeekNodes: thisWeekData.reduce((sum, d) => sum + d.nodes, 0),
+      lastWeekNodes: lastWeekData.reduce((sum, d) => sum + d.nodes, 0),
+    };
+  });
+
+  // Helper functions for contextual hints
+  function getNodeCountHint(count: number): string | undefined {
+    if (count < 10) {return "Just getting started";}
+    if (count < 50) {return "Building your knowledge base";}
+    if (count < 200) {return "Growing steadily";}
+    return "Rich knowledge base";
+  }
+
+  function getWeekActivityHint(thisWeek: number, lastWeek: number): string | undefined {
+    if (thisWeek === 0) {return "No activity yet";}
+    if (lastWeek > 0 && thisWeek > lastWeek) {return "More active than usual";}
+    if (lastWeek > 0 && thisWeek < lastWeek) {return "Lighter week";}
+    return undefined;
+  }
+
+  function getCostHint(totalCost: number, nodeCount: number): string | undefined {
+    if (nodeCount === 0) {return undefined;}
+    const avgCostPerNode = totalCost / nodeCount;
+    if (avgCostPerNode < 0.05) {return "Efficient usage";}
+    if (avgCostPerNode < 0.15) {return "Moderate usage";}
+    return "Heavy sessions";
+  }
+
+  // Generate contextual hints based on the data
+  const statContextHints = $derived.by(() => {
+    if (!stats) {return {};}
+    
+    return {
+      totalNodes: getNodeCountHint(stats.totals.nodes),
+      thisWeek: getWeekActivityHint(stats.recent.nodesThisWeek, weeklyTrends.lastWeekNodes),
+      totalCost: getCostHint(stats.usage.totalCost, stats.totals.nodes),
+    };
+  });
 
   onMount(async () => {
     await refreshDashboardData();
@@ -300,149 +371,52 @@
           <p class="hero-subtitle">Your coding sessions, decisions, and lessons at a glance</p>
         </div>
         <div class="hero-stats list-animate">
-          <div class="hero-stat">
-            <div class="hero-stat-value">{stats.totals.nodes}</div>
-            <div class="hero-stat-label">Total Nodes</div>
-          </div>
-          <div class="hero-stat accent">
-            <div class="hero-stat-value">{stats.recent.nodesThisWeek}</div>
-            <div class="hero-stat-label">This Week</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-value">{stats.usage.totalTokens.toLocaleString()}</div>
-            <div class="hero-stat-label">Total Tokens</div>
-          </div>
-          <div class="hero-stat success">
-            <div class="hero-stat-value">${stats.usage.totalCost.toFixed(2)}</div>
-            <div class="hero-stat-label">Total Cost</div>
-          </div>
+          <StatCard
+            value={stats.totals.nodes}
+            label="Total Nodes"
+            previousValue={stats.totals.nodes - weeklyTrends.thisWeekNodes}
+            trendPeriod="this week"
+            contextHint={statContextHints.totalNodes}
+            higherIsBetter={true}
+          />
+          <StatCard
+            value={stats.recent.nodesThisWeek}
+            label="This Week"
+            previousValue={weeklyTrends.lastWeekNodes}
+            trendPeriod="vs last week"
+            contextHint={statContextHints.thisWeek}
+            variant="accent"
+            higherIsBetter={true}
+          />
+          <StatCard
+            value={stats.usage.totalTokens}
+            label="Total Tokens"
+            previousValue={stats.usage.totalTokens - weeklyTrends.thisWeekTokens}
+            trendPeriod="this week"
+          />
+          <StatCard
+            value={stats.usage.totalCost}
+            label="Total Cost"
+            format="currency"
+            previousValue={stats.usage.totalCost - weeklyTrends.thisWeekCost}
+            trendPeriod="this week"
+            contextHint={statContextHints.totalCost}
+            variant="success"
+            higherIsBetter={false}
+          />
         </div>
       </div>
       <div class="hero-glow"></div>
     </section>
 
-    <!-- Main Content Grid -->
-    <div class="dashboard-grid card-grid-animate">
-      <!-- Quick Actions -->
+    <!-- PRIMARY TIER: Essential at-a-glance info -->
+    <div class="primary-grid card-grid-animate">
+      <!-- Quick Actions (includes daemon controls) -->
       <QuickActions />
 
-      <!-- Usage Sparklines -->
-      <TokenSparkline tokens={tokensTimeSeries} costs={costsTimeSeries} loading={timeSeriesLoading} />
-
-      <!-- Tool Errors Panel -->
-      <Card tag="section" variant="elevated" class="tool-errors-panel">
-        <CardHeader title="Tool Errors by Model" href="/search?type=error" />
-
-        <div class="table-wrapper">
-          <table class="data-table" aria-label="Tool errors grouped by model">
-            <thead>
-              <tr>
-                <th
-                  class="sortable"
-                  class:sorted={toolErrorSort.column === "models"}
-                  onclick={() => sortToolErrors("models")}
-                >
-                  Model
-                  <TableSortIcon direction={toolErrorSort.column === "models" ? toolErrorSort.direction : null} />
-                </th>
-                <th
-                  class="sortable"
-                  class:sorted={toolErrorSort.column === "tool"}
-                  onclick={() => sortToolErrors("tool")}
-                >
-                  Tool
-                  <TableSortIcon direction={toolErrorSort.column === "tool" ? toolErrorSort.direction : null} />
-                </th>
-                <th
-                  class="sortable"
-                  class:sorted={toolErrorSort.column === "errorType"}
-                  onclick={() => sortToolErrors("errorType")}
-                >
-                  Error
-                  <TableSortIcon direction={toolErrorSort.column === "errorType" ? toolErrorSort.direction : null} />
-                </th>
-                <th
-                  class="sortable col-numeric"
-                  class:sorted={toolErrorSort.column === "count"}
-                  onclick={() => sortToolErrors("count")}
-                >
-                  Count
-                  <TableSortIcon direction={toolErrorSort.column === "count" ? toolErrorSort.direction : null} />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each sortedToolErrors as error}
-                <tr>
-                  <td><code>{error.models || error.model || "Unknown"}</code></td>
-                  <td><code>{error.tool}</code></td>
-                  <td>{error.errorType}</td>
-                  <td class="col-numeric count">{error.count}</td>
-                </tr>
-              {/each}
-              {#if sortedToolErrors.length === 0}
-                <tr>
-                  <td colspan="4" class="empty-state">No errors recorded</td>
-                </tr>
-              {/if}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      <!-- Vague Goal Tracker -->
-      <Card tag="section" variant="accent" class="vague-goal-panel">
-        <CardHeader title="Vague Goal Tracker" />
-
-        <div class="vague-goal-content">
-          <div class="vague-goal-metric">
-            <span class="metric-label">hadClearGoal: false</span>
-            <div class="metric-value-row">
-              <span class="metric-value"
-                >{formatPercent(stats.trends.vagueGoals.thisWeek)}</span
-              >
-              <span
-                class="metric-trend"
-                class:improving={stats.trends.vagueGoals.change < 0}
-                class:worsening={stats.trends.vagueGoals.change > 0}
-              >
-                {#if stats.trends.vagueGoals.change < 0}
-                  <TrendingDown size={16} />
-                {:else if stats.trends.vagueGoals.change > 0}
-                  <TrendingUp size={16} />
-                {/if}
-                {getTrendLabel(stats.trends.vagueGoals.change)}
-              </span>
-            </div>
-          </div>
-
-          <div class="vague-goal-comparison">
-            <div class="comparison-item">
-              <span class="comparison-label">This week</span>
-              <span class="comparison-value"
-                >{formatPercent(stats.trends.vagueGoals.thisWeek)}</span
-              >
-            </div>
-            <div class="comparison-item">
-              <span class="comparison-label">Last week</span>
-              <span class="comparison-value"
-                >{formatPercent(stats.trends.vagueGoals.lastWeek)}</span
-              >
-            </div>
-          </div>
-
-          <a href="/search?hadClearGoal=false" class="view-all"
-            >View sessions →</a
-          >
-        </div>
-      </Card>
-
-      <!-- Recent Activity -->
+      <!-- Recent Activity - most important for context -->
       <Card tag="section" variant="accent" class="recent-activity-panel">
-        <div class="card-header">
-          <h2 class="card-title">Recent Activity</h2>
-        </div>
-
+        <CardHeader title="Recent Activity" href="/sessions" />
         <ul class="activity-list list-animate">
           {#each recentActivity as activity (activity.id)}
             <li class="activity-item">
@@ -451,8 +425,7 @@
                   >{getOutcomeIcon(activity.content?.outcome ?? "abandoned")}</span
                 >
                 <div class="activity-content">
-                  <span class="activity-summary">{activity.content?.summary ?? `Session from ${activity.metadata?.timestamp ?? 'unknown'}`}</span
-                  >
+                  <span class="activity-summary">{activity.content?.summary ?? `Session from ${activity.metadata?.timestamp ?? 'unknown'}`}</span>
                   <span class="activity-meta">
                     {activity.classification?.project?.split("/").pop() ?? 'Unknown Project'} • {activity.metadata?.timestamp ? formatDistanceToNow(
                       parseDate(activity.metadata.timestamp)
@@ -467,75 +440,17 @@
           {/if}
         </ul>
       </Card>
-
-      <!-- Daemon Decisions -->
-      <DaemonDecisions />
-
-      <!-- Daemon Status -->
-      <Card tag="section" variant="featured" class="daemon-status-panel">
-        <CardHeader title="Daemon Status" />
-
-        {#if $daemonStore.status}
-          <div class="daemon-info">
-            <div class="daemon-row">
-              <span class="daemon-label">Status</span>
-              <span class="daemon-value">
-                <StatusDot
-                  status={$daemonStore.status.running ? 'success' : 'error'}
-                  size={10}
-                />
-                {$daemonStore.status.running ? "Running" : "Stopped"}
-              </span>
-            </div>
-            <div class="daemon-row">
-              <span class="daemon-label">Started</span>
-              <span class="daemon-value">{$daemonStore.status.uptime ? formatDistanceToNow(new Date(Date.now() - $daemonStore.status.uptime * 1000)) : "-"}</span>
-            </div>
-            <div class="daemon-row">
-              <span class="daemon-label">Queue</span>
-              <span class="daemon-value"
-                >{$daemonStore.status.queue.pending} pending</span
-              >
-            </div>
-            <div class="daemon-row">
-              <span class="daemon-label">Workers</span>
-              <span class="daemon-value"
-                >{$daemonStore.status.workers.active}/{$daemonStore.status.workers.total} active</span
-              >
-            </div>
-            <div class="daemon-row">
-              <span class="daemon-label">Today</span>
-              <span class="daemon-value"
-                >{$daemonStore.status.queue.completedToday} completed / {$daemonStore.status.queue.failedToday} failed</span
-              >
-            </div>
-          </div>
-        {:else}
-          <div class="daemon-info">
-            <div class="daemon-row">
-              <span class="daemon-label">Status</span>
-              <span class="daemon-value">
-                {#if $daemonStore.loading}
-                  Checking...
-                {:else if $daemonStore.backendOffline}
-                  Backend offline
-                {:else}
-                  Unknown
-                {/if}
-              </span>
-            </div>
-          </div>
-        {/if}
-      </Card>
     </div>
 
-    <!-- Patterns & Insights -->
-    <div class="patterns-grid card-grid-animate">
-      <!-- Failure Patterns -->
+    <!-- SECONDARY TIER: Usage & Patterns (if data exists) -->
+    <div class="secondary-grid card-grid-animate">
+      <!-- Usage Sparklines -->
+      <TokenSparkline tokens={tokensTimeSeries} costs={costsTimeSeries} loading={timeSeriesLoading} />
+
+      <!-- Patterns Side-by-Side (only if data exists) -->
       {#if failurePatterns.length > 0}
         <Card tag="section" class="failure-patterns-panel">
           <CardHeader title="Failure Patterns" href="/patterns/failures" />
-
           <div class="patterns-list list-animate">
             {#each failurePatterns as pattern}
               <div class="pattern-card error card-interactive">
@@ -558,11 +473,9 @@
         </Card>
       {/if}
 
-      <!-- Lesson Patterns -->
       {#if lessonPatterns.length > 0}
         <Card tag="section" class="lesson-patterns-panel">
           <CardHeader title="Lesson Patterns" href="/patterns/lessons" />
-
           <div class="patterns-list list-animate">
             {#each lessonPatterns as pattern}
               <div class="pattern-card success card-interactive">
@@ -586,69 +499,252 @@
       {/if}
     </div>
 
-    <!-- News Feed (Discovered Clusters) -->
+    <!-- News Feed & Abandoned Restarts (hidden when empty) -->
     <NewsFeed />
-
-    <!-- Abandoned Restarts (Friction Patterns) -->
     <AbandonedRestarts />
 
-    <!-- Model Stats -->
-    {#if modelStats.length > 0}
-      <Card tag="section" variant="elevated" class="model-stats-panel">
-        <CardHeader title="Model Reliability" href="/patterns/models" />
-
-        <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th 
-                  class="sortable" 
-                  class:sorted={modelStatsSort.column === "model"} 
-                  onclick={() => sortModelStats("model")}
-                >
-                  Model
-                  <TableSortIcon direction={modelStatsSort.column === "model" ? modelStatsSort.direction : null} />
-                </th>
-                <th 
-                  class="sortable col-numeric" 
-                  class:sorted={modelStatsSort.column === "quirkCount"} 
-                  onclick={() => sortModelStats("quirkCount")}
-                >
-                  Quirks
-                  <TableSortIcon direction={modelStatsSort.column === "quirkCount" ? modelStatsSort.direction : null} />
-                </th>
-                <th 
-                  class="sortable col-numeric" 
-                  class:sorted={modelStatsSort.column === "errorCount"} 
-                  onclick={() => sortModelStats("errorCount")}
-                >
-                  Errors
-                  <TableSortIcon direction={modelStatsSort.column === "errorCount" ? modelStatsSort.direction : null} />
-                </th>
-                <th 
-                  class="sortable" 
-                  class:sorted={modelStatsSort.column === "lastUsed"} 
-                  onclick={() => sortModelStats("lastUsed")}
-                >
-                  Last Used
-                  <TableSortIcon direction={modelStatsSort.column === "lastUsed" ? modelStatsSort.direction : null} />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each sortedModelStats as stat}
+    <!-- TERTIARY TIER: Detailed analytics (collapsed by default) -->
+    <div class="tertiary-section">
+      <!-- Tool Errors (collapsed) -->
+      {#if sortedToolErrors.length > 0}
+        <CollapsibleSection 
+          title="Tool Errors by Model" 
+          icon={AlertTriangle}
+          badge={sortedToolErrors.length}
+          badgeVariant="error"
+        >
+          {#snippet headerAction()}
+            <a href="/search?type=error" class="view-all" onclick={(e) => e.stopPropagation()}>View all →</a>
+          {/snippet}
+          <div class="table-wrapper">
+            <table class="data-table" aria-label="Tool errors grouped by model">
+              <thead>
                 <tr>
-                  <td><code>{stat.model}</code></td>
-                  <td class="col-numeric">{stat.quirkCount}</td>
-                  <td class="col-numeric" class:count={stat.errorCount > 0}>{stat.errorCount}</td>
-                  <td>{formatDistanceToNow(parseDate(stat.lastUsed))}</td>
+                  <th
+                    class="sortable"
+                    class:sorted={toolErrorSort.column === "models"}
+                    onclick={() => sortToolErrors("models")}
+                  >
+                    Model
+                    <TableSortIcon direction={toolErrorSort.column === "models" ? toolErrorSort.direction : null} />
+                  </th>
+                  <th
+                    class="sortable"
+                    class:sorted={toolErrorSort.column === "tool"}
+                    onclick={() => sortToolErrors("tool")}
+                  >
+                    Tool
+                    <TableSortIcon direction={toolErrorSort.column === "tool" ? toolErrorSort.direction : null} />
+                  </th>
+                  <th
+                    class="sortable"
+                    class:sorted={toolErrorSort.column === "errorType"}
+                    onclick={() => sortToolErrors("errorType")}
+                  >
+                    Error
+                    <TableSortIcon direction={toolErrorSort.column === "errorType" ? toolErrorSort.direction : null} />
+                  </th>
+                  <th
+                    class="sortable col-numeric"
+                    class:sorted={toolErrorSort.column === "count"}
+                    onclick={() => sortToolErrors("count")}
+                  >
+                    Count
+                    <TableSortIcon direction={toolErrorSort.column === "count" ? toolErrorSort.direction : null} />
+                  </th>
                 </tr>
-              {/each}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {#each sortedToolErrors as error}
+                  {@const fullModelName = error.models || error.model || "Unknown"}
+                  <tr>
+                    <td class="col-model">
+                      <TruncatedText 
+                        text={fullModelName} 
+                        displayText={abbreviateModelName(fullModelName)}
+                        maxWidth="200px"
+                      />
+                    </td>
+                    <td><code>{error.tool}</code></td>
+                    <td class="col-error">{error.errorType}</td>
+                    <td class="col-numeric col-count">{error.count}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </CollapsibleSection>
+      {/if}
+
+      <!-- Model Stats (collapsed) -->
+      {#if modelStats.length > 0}
+        <CollapsibleSection 
+          title="Model Reliability" 
+          icon={BarChart3}
+          badge={modelStats.length}
+        >
+          {#snippet headerAction()}
+            <a href="/patterns/models" class="view-all" onclick={(e) => e.stopPropagation()}>View all →</a>
+          {/snippet}
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th 
+                    class="sortable" 
+                    class:sorted={modelStatsSort.column === "model"} 
+                    onclick={() => sortModelStats("model")}
+                  >
+                    Model
+                    <TableSortIcon direction={modelStatsSort.column === "model" ? modelStatsSort.direction : null} />
+                  </th>
+                  <th 
+                    class="sortable col-numeric" 
+                    class:sorted={modelStatsSort.column === "quirkCount"} 
+                    onclick={() => sortModelStats("quirkCount")}
+                  >
+                    Quirks
+                    <TableSortIcon direction={modelStatsSort.column === "quirkCount" ? modelStatsSort.direction : null} />
+                  </th>
+                  <th 
+                    class="sortable col-numeric" 
+                    class:sorted={modelStatsSort.column === "errorCount"} 
+                    onclick={() => sortModelStats("errorCount")}
+                  >
+                    Errors
+                    <TableSortIcon direction={modelStatsSort.column === "errorCount" ? modelStatsSort.direction : null} />
+                  </th>
+                  <th 
+                    class="sortable" 
+                    class:sorted={modelStatsSort.column === "lastUsed"} 
+                    onclick={() => sortModelStats("lastUsed")}
+                  >
+                    Last Used
+                    <TableSortIcon direction={modelStatsSort.column === "lastUsed" ? modelStatsSort.direction : null} />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each sortedModelStats as stat}
+                  <tr>
+                    <td class="col-model">
+                      <TruncatedText 
+                        text={stat.model} 
+                        displayText={abbreviateModelName(stat.model)}
+                        maxWidth="200px"
+                      />
+                    </td>
+                    <td class="col-numeric">{stat.quirkCount}</td>
+                    <td class="col-numeric" class:count={stat.errorCount > 0}>{stat.errorCount}</td>
+                    <td>{formatDistanceToNow(parseDate(stat.lastUsed))}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </CollapsibleSection>
+      {/if}
+
+      <!-- Vague Goal Tracker (collapsed) -->
+      <CollapsibleSection 
+        title="Vague Goal Tracker" 
+        icon={Activity}
+        badge={formatPercent(stats.trends.vagueGoals.thisWeek)}
+        badgeVariant={stats.trends.vagueGoals.change < 0 ? "success" : stats.trends.vagueGoals.change > 0 ? "warning" : "default"}
+      >
+        {#snippet headerAction()}
+          <a href="/search?hadClearGoal=false" class="view-all" onclick={(e) => e.stopPropagation()}>View sessions →</a>
+        {/snippet}
+        <div class="vague-goal-content">
+          <div class="vague-goal-metric">
+            <span class="metric-label">hadClearGoal: false</span>
+            <div class="metric-value-row">
+              <span class="metric-value">{formatPercent(stats.trends.vagueGoals.thisWeek)}</span>
+              <span
+                class="metric-trend"
+                class:improving={stats.trends.vagueGoals.change < 0}
+                class:worsening={stats.trends.vagueGoals.change > 0}
+              >
+                {#if stats.trends.vagueGoals.change < 0}
+                  <TrendingDown size={16} />
+                {:else if stats.trends.vagueGoals.change > 0}
+                  <TrendingUp size={16} />
+                {/if}
+                {getTrendLabel(stats.trends.vagueGoals.change)}
+              </span>
+            </div>
+          </div>
+
+          <div class="vague-goal-comparison">
+            <div class="comparison-item">
+              <span class="comparison-label">This week</span>
+              <span class="comparison-value">{formatPercent(stats.trends.vagueGoals.thisWeek)}</span>
+            </div>
+            <div class="comparison-item">
+              <span class="comparison-label">Last week</span>
+              <span class="comparison-value">{formatPercent(stats.trends.vagueGoals.lastWeek)}</span>
+            </div>
+          </div>
         </div>
-      </Card>
-    {/if}
+      </CollapsibleSection>
+
+      <!-- Daemon Status (collapsed) -->
+      <CollapsibleSection 
+        title="Daemon Status" 
+        icon={Server}
+        badge={$daemonStore.status?.running ? "Running" : "Stopped"}
+        badgeVariant={$daemonStore.status?.running ? "success" : "error"}
+      >
+        {#if $daemonStore.status}
+          <div class="daemon-info">
+            <div class="daemon-row">
+              <span class="daemon-label">Status</span>
+              <span class="daemon-value">
+                <StatusDot
+                  status={$daemonStore.status.running ? 'success' : 'error'}
+                  size={10}
+                />
+                {$daemonStore.status.running ? "Running" : "Stopped"}
+              </span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Started</span>
+              <span class="daemon-value">{$daemonStore.status.uptime ? formatDistanceToNow(new Date(Date.now() - $daemonStore.status.uptime * 1000)) : "-"}</span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Queue</span>
+              <span class="daemon-value">{$daemonStore.status.queue.pending} pending</span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Workers</span>
+              <span class="daemon-value">{$daemonStore.status.workers.active}/{$daemonStore.status.workers.total} active</span>
+            </div>
+            <div class="daemon-row">
+              <span class="daemon-label">Today</span>
+              <span class="daemon-value">{$daemonStore.status.queue.completedToday} completed / {$daemonStore.status.queue.failedToday} failed</span>
+            </div>
+          </div>
+        {:else}
+          <div class="daemon-info">
+            <div class="daemon-row">
+              <span class="daemon-label">Status</span>
+              <span class="daemon-value">
+                {#if $daemonStore.loading}
+                  Checking...
+                {:else if $daemonStore.backendOffline}
+                  Backend offline
+                {:else}
+                  Unknown
+                {/if}
+              </span>
+            </div>
+          </div>
+        {/if}
+      </CollapsibleSection>
+
+      <!-- Daemon Decisions (collapsed) -->
+      <DaemonDecisions />
+    </div>
     {/if}
   {/if}
 </div>
@@ -714,54 +810,6 @@
     flex-wrap: wrap;
   }
 
-  .hero-stat {
-    text-align: center;
-    padding: var(--space-3) var(--space-4);
-    background: var(--color-bg-hover);
-    border-radius: var(--radius-lg);
-    min-width: 100px;
-    border: 1px solid var(--color-border-subtle);
-    transition: border-color var(--transition-fast), transform var(--transition-fast);
-  }
-
-  .hero-stat:hover {
-    border-color: var(--color-border);
-    transform: translateY(-1px);
-  }
-
-  .hero-stat.accent {
-    border-color: var(--color-accent-muted);
-    background: hsla(190, 100%, 50%, 0.05);
-  }
-
-  .hero-stat.accent .hero-stat-value {
-    color: var(--color-accent);
-  }
-
-  .hero-stat.success {
-    border-color: hsla(145, 65%, 52%, 0.3);
-    background: hsla(145, 65%, 52%, 0.05);
-  }
-
-  .hero-stat.success .hero-stat-value {
-    color: var(--color-success);
-  }
-
-  .hero-stat-value {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-bold);
-    color: var(--color-text);
-    line-height: 1;
-    margin-bottom: var(--space-1);
-  }
-
-  .hero-stat-label {
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
   /* Decorative glow behind hero */
   .hero-glow {
     position: absolute;
@@ -791,30 +839,54 @@
       width: 100%;
       justify-content: space-between;
     }
-
-    .hero-stat {
-      flex: 1;
-      min-width: 70px;
-      padding: var(--space-2) var(--space-3);
-    }
-
-    .hero-stat-value {
-      font-size: var(--text-lg);
-    }
   }
 
-  /* Dashboard Grid */
-  .dashboard-grid {
+  /* Primary Grid - Essential info at top */
+  .primary-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-4);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-6);
   }
 
   @media (max-width: 1024px) {
-    .dashboard-grid {
+    .primary-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* Secondary Grid - Usage & patterns */
+  .secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  @media (max-width: 1024px) {
+    .secondary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Tertiary Section - Collapsible detailed analytics */
+  .tertiary-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .tertiary-section::before {
+    content: "Detailed Analytics";
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
   }
 
   .view-all {
@@ -823,6 +895,24 @@
   }
 
   /* Tool Errors Table */
+  .data-table .col-model {
+    width: 30%;
+    min-width: 140px;
+  }
+
+  .data-table .col-error {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .data-table .col-count {
+    width: 80px;
+    font-weight: 600;
+    color: var(--color-error);
+  }
+
   .data-table .count {
     font-weight: 600;
     color: var(--color-error);
@@ -968,20 +1058,6 @@
     font-weight: 500;
   }
 
-  /* Patterns Grid */
-  .patterns-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
-  }
-
-  @media (max-width: 1024px) {
-    .patterns-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
   /* Failure Patterns */
   /* .failure-patterns-panel { margin-top: 0; } */
 
@@ -1053,10 +1129,5 @@
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-2);
-  }
-
-  /* Model Stats */
-  .model-stats-panel {
-    margin-bottom: var(--space-4);
   }
 </style>

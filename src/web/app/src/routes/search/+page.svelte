@@ -265,7 +265,7 @@
     const tagCounts = new Map<string, number>();
     
     for (const result of searchResults) {
-      const {tags} = result.node.semantic;
+      const tags = result.node.semantic?.tags ?? [];
       for (const tag of tags) {
         tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
       }

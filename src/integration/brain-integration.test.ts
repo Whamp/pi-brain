@@ -12,9 +12,8 @@
  * Note: Full E2E tests requiring pi agent are marked as integration tests
  * and can be run manually with: npm test -- --run integration
  *
- * ## Environment Variables Required for LLM Tests
+ * ## Environment Variables for LLM Tests
  *
- * Set INTEGRATION_TESTS=1 to enable skipped tests.
  * At least one LLM API key must be configured:
  * - ANTHROPIC_API_KEY (Claude)
  * - OPENROUTER_API_KEY (multi-provider)
@@ -46,10 +45,6 @@ import { generateNodeId, type Node } from "../storage/node-types.js";
 
 // Integration tests that invoke pi agent need longer timeout
 const INTEGRATION_TIMEOUT = 60_000; // 60 seconds - agent queries can be slow
-
-// Skip slow tests unless explicitly running integration tests
-// Set INTEGRATION_TESTS=1 to run, or use: npm test -- --run -t "brain integration"
-const skipSlowTests = process.env.INTEGRATION_TESTS !== "1";
 
 // =============================================================================
 // Test Fixtures
@@ -205,7 +200,7 @@ describe("brain integration", () => {
       db.exec("DELETE FROM nodes");
     });
 
-    it.skipIf(skipSlowTests)(
+    it(
       "should find nodes matching query text",
       { timeout: INTEGRATION_TIMEOUT },
       async () => {
@@ -250,7 +245,7 @@ describe("brain integration", () => {
       }
     );
 
-    it.skipIf(skipSlowTests)(
+    it(
       "should include model quirks in context for model-related queries",
       { timeout: INTEGRATION_TIMEOUT },
       async () => {
@@ -311,7 +306,7 @@ describe("brain integration", () => {
       }
     );
 
-    it.skipIf(skipSlowTests)(
+    it(
       "should include tool errors in context for tool-related queries",
       { timeout: INTEGRATION_TIMEOUT },
       async () => {
@@ -390,7 +385,7 @@ describe("brain integration", () => {
       expect(body.data.answer).toContain("couldn't find");
     });
 
-    it.skipIf(skipSlowTests)(
+    it(
       "should filter by project context",
       { timeout: INTEGRATION_TIMEOUT },
       async () => {

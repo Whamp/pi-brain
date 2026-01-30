@@ -94,12 +94,7 @@
   {:else if loading}
     <LoadingState message="Loading friction patterns..." size="md" variant="sm" />
   {:else if patterns.length === 0}
-    <EmptyState
-      icon={RefreshCw}
-      title="No abandoned restart patterns detected"
-      description="This is good! Users aren't abandoning and restarting tasks."
-      size="sm"
-    />
+    <!-- Empty: section hidden on dashboard to reduce clutter -->
   {:else}
     <div class="patterns-content">
       {#if summary}

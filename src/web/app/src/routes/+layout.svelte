@@ -17,6 +17,12 @@
   import { daemonStore } from "$lib/stores/daemon";
   import { keyboardShortcuts } from "$lib/stores/keyboard-shortcuts";
   import { activeTheme, initTheme, applyTheme } from "$lib/stores/theme";
+  import {
+    isDetailPage,
+    loadSidebarPreference,
+    saveSidebarPreference,
+    shouldCollapseForPage,
+  } from "$lib/stores/sidebar";
   import ErrorFallback from "$lib/components/error-fallback.svelte";
   import Toast from "$lib/components/toast.svelte";
   import MobileNav from "$lib/components/mobile-nav.svelte";
@@ -52,29 +58,43 @@
     }
   });
 
-  // Sidebar collapse state with localStorage persistence
+  // Sidebar collapse state with auto-collapse on detail pages
   let sidebarCollapsed = $state(false);
-  const STORAGE_KEY = "pi-brain-sidebar-collapsed";
+  let userPreference = $state<boolean | null>(null);
+  let hasManualOverride = $state(false);
+  let lastPageType = $state<"detail" | "list" | null>(null);
+
+  // Track whether we're on a detail page
+  const onDetailPage = $derived(isDetailPage(page.url.pathname));
+
+  // Auto-collapse sidebar on detail pages, expand on list pages
+  $effect(() => {
+    const currentPageType = onDetailPage ? "detail" : "list";
+
+    // Reset manual override when switching between detail/list pages
+    if (lastPageType !== null && lastPageType !== currentPageType) {
+      hasManualOverride = false;
+    }
+    lastPageType = currentPageType;
+
+    // Calculate collapse state
+    sidebarCollapsed = shouldCollapseForPage(
+      page.url.pathname,
+      userPreference,
+      hasManualOverride
+    );
+  });
 
   function toggleSidebar() {
+    hasManualOverride = true;
+    userPreference = !sidebarCollapsed;
     sidebarCollapsed = !sidebarCollapsed;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(sidebarCollapsed));
-    } catch {
-      // localStorage may be unavailable
-    }
+    saveSidebarPreference(sidebarCollapsed);
   }
 
   onMount(() => {
     // Load sidebar preference from localStorage
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved !== null) {
-        sidebarCollapsed = JSON.parse(saved);
-      }
-    } catch {
-      // localStorage may be unavailable
-    }
+    userPreference = loadSidebarPreference();
 
     // Load initial daemon status
     daemonStore.loadStatus();
@@ -151,7 +171,7 @@
       <div class="daemon-status" title={sidebarCollapsed ? ($daemonStore.loading ? "Checking..." : $daemonStore.backendOffline ? "Backend offline" : $daemonStore.status?.running ? "Daemon running" : $daemonStore.status ? "Daemon stopped" : "Daemon unknown") : undefined}>
         <StatusDot
           status={$daemonStore.loading ? 'loading' : $daemonStore.backendOffline ? 'offline' : $daemonStore.status?.running ? 'success' : 'error'}
-          size={10}
+          size={14}
         />
         <span class="status-text">
           {#if $daemonStore.loading}
@@ -170,8 +190,13 @@
 
       <button
         class="collapse-toggle"
+        class:auto-collapsed={sidebarCollapsed && !hasManualOverride && onDetailPage}
         onclick={toggleSidebar}
-        title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        title={sidebarCollapsed 
+          ? (onDetailPage && !hasManualOverride 
+              ? "Expand sidebar (auto-collapsed for detail view)" 
+              : "Expand sidebar") 
+          : "Collapse sidebar"}
         aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {#if sidebarCollapsed}
@@ -284,9 +309,11 @@
     font-weight: 500;
     transition:
       background var(--transition-fast),
-      color var(--transition-fast);
+      color var(--transition-fast),
+      border-color var(--transition-fast);
     white-space: nowrap;
     overflow: hidden;
+    border: 1px solid transparent;
   }
 
   .sidebar.collapsed .nav-link {
@@ -313,6 +340,13 @@
   .nav-link.active {
     background: var(--color-accent-muted);
     color: var(--color-accent);
+    border-color: var(--color-accent);
+    font-weight: 600;
+    box-shadow: 0 0 12px -2px rgba(0, 217, 255, 0.25);
+  }
+
+  .nav-link.active:hover {
+    background: rgba(0, 217, 255, 0.15);
   }
 
   .sidebar-footer {
@@ -333,13 +367,18 @@
     align-items: center;
     gap: var(--space-2);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
+    color: var(--color-text);
     white-space: nowrap;
     overflow: hidden;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg-hover);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-subtle);
   }
 
   .sidebar.collapsed .daemon-status {
     justify-content: center;
+    padding: var(--space-2);
   }
 
   .status-text {
@@ -380,6 +419,12 @@
   .sidebar.collapsed .collapse-toggle {
     width: auto;
     padding: var(--space-2);
+  }
+
+  /* Subtle accent when auto-collapsed on detail pages */
+  .collapse-toggle.auto-collapsed {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
   }
 
   .main-content {

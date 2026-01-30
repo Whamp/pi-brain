@@ -194,12 +194,7 @@
   {:else if loading}
     <LoadingState message="Discovering patterns..." size="md" variant="sm" />
   {:else if clusters.length === 0}
-    <EmptyState
-      icon={Sparkles}
-      title="No new patterns discovered yet"
-      description="Clusters will appear here after nightly analysis"
-      size="sm"
-    />
+    <!-- Empty: section hidden on dashboard to reduce clutter -->
   {:else}
     <div class="clusters-list">
       {#each clusters as cluster (cluster.id)}

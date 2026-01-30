@@ -1,15 +1,15 @@
 {
   "stats": {
-    "totalFiles": 109,
-    "totalSymbols": 1566,
+    "totalFiles": 111,
+    "totalSymbols": 1575,
     "byLanguage": {
-      "typescript": 109
+      "typescript": 111
     },
     "bySymbolKind": {
-      "function": 743,
+      "function": 749,
       "type": 49,
       "interface": 324,
-      "variable": 170,
+      "variable": 173,
       "class": 15,
       "property": 62,
       "constructor": 14,
@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 54687,
-  "codebase_tokens": 1389445,
+  "total_tokens": 55076,
+  "codebase_tokens": 1407022,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -2008,18 +2008,56 @@
       "language": "typescript",
       "lines": [
         1,
-        263
+        312
       ],
       "detail_level": "full",
-      "token_estimate": 115,
+      "token_estimate": 186,
       "symbols": [
+        {
+          "name": "MAX_TITLE_LENGTH",
+          "kind": "variable",
+          "signature": "80",
+          "lines": [
+            21,
+            21
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Max length for session title before truncation",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "generateSessionTitle",
+          "kind": "function",
+          "signature": "generateSessionTitle(summary: string | null): string",
+          "lines": [
+            27,
+            59
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Generate a human-readable session title from the first node's summary.\nTruncates long summaries and cleans up formatting.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
         {
           "name": "SessionSummary",
           "kind": "interface",
           "signature": "SessionSummary",
           "lines": [
-            21,
-            35
+            64,
+            82
           ],
           "exported": false,
           "is_default": false,
@@ -2037,8 +2075,8 @@
           "kind": "interface",
           "signature": "ProjectSummary",
           "lines": [
-            40,
-            45
+            87,
+            92
           ],
           "exported": false,
           "is_default": false,
@@ -2056,8 +2094,8 @@
           "kind": "function",
           "signature": "async sessionsRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            47,
-            262
+            94,
+            311
           ],
           "exported": true,
           "is_default": false,
@@ -24404,7 +24442,7 @@
       "language": "typescript",
       "lines": [
         1,
-        258
+        289
       ],
       "detail_level": "full",
       "token_estimate": 598,
@@ -24605,7 +24643,7 @@
           "signature": "SessionSummaryRow",
           "lines": [
             183,
-            195
+            199
           ],
           "exported": true,
           "is_default": false,
@@ -24623,8 +24661,8 @@
           "kind": "function",
           "signature": "getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {}",
           "lines": [
-            201,
-            229
+            205,
+            260
           ],
           "exported": true,
           "is_default": false,
@@ -24642,8 +24680,8 @@
           "kind": "function",
           "signature": "getAllProjects(db: Database.Database): {}",
           "lines": [
-            238,
-            246
+            269,
+            277
           ],
           "exported": true,
           "is_default": false,
@@ -24661,8 +24699,8 @@
           "kind": "function",
           "signature": "countNodes(db: Database.Database, filters: ListNodesFilters = {}): number",
           "lines": [
-            251,
-            257
+            282,
+            288
           ],
           "exported": true,
           "is_default": false,
@@ -29417,7 +29455,7 @@
       "language": "typescript",
       "lines": [
         1,
-        748
+        750
       ],
       "detail_level": "full",
       "token_estimate": 397,
@@ -29808,7 +29846,7 @@
           "signature": "api",
           "lines": [
             232,
-            734
+            736
           ],
           "exported": true,
           "is_default": false,
@@ -30345,6 +30383,136 @@
       "imports": [
         "svelte/store"
       ]
+    },
+    {
+      "path": "src/web/app/src/lib/stores/sidebar.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        75
+      ],
+      "detail_level": "full",
+      "token_estimate": 209,
+      "symbols": [
+        {
+          "name": "STORAGE_KEY",
+          "kind": "variable",
+          "signature": "\"pi-brain-sidebar-collapsed\"",
+          "lines": [
+            1,
+            1
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": null,
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "DETAIL_PAGE_PATTERNS",
+          "kind": "variable",
+          "signature": "{}",
+          "lines": [
+            7,
+            13
+          ],
+          "exported": false,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Detail page patterns that should auto-collapse the sidebar.\nThese are content-focused pages where users need more horizontal space.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "isDetailPage",
+          "kind": "function",
+          "signature": "isDetailPage(pathname: string): boolean",
+          "lines": [
+            18,
+            20
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Check if a pathname is a detail page.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "loadSidebarPreference",
+          "kind": "function",
+          "signature": "loadSidebarPreference(): boolean",
+          "lines": [
+            25,
+            39
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Load saved sidebar preference from localStorage.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "saveSidebarPreference",
+          "kind": "function",
+          "signature": "saveSidebarPreference(collapsed: boolean): void",
+          "lines": [
+            44,
+            50
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Save sidebar preference to localStorage.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        },
+        {
+          "name": "shouldCollapseForPage",
+          "kind": "function",
+          "signature": "shouldCollapseForPage(pathname: string, userPreference: boolean | null, hasManualOverride: boolean): boolean",
+          "lines": [
+            55,
+            74
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Determine if sidebar should be collapsed based on page and preferences.",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
     },
     {
       "path": "src/web/app/src/lib/stores/theme.ts",
@@ -30958,7 +31126,7 @@
       "language": "typescript",
       "lines": [
         1,
-        381
+        385
       ],
       "detail_level": "full",
       "token_estimate": 373,
@@ -31178,7 +31346,7 @@
           "signature": "SessionSummary",
           "lines": [
             261,
-            275
+            279
           ],
           "exported": true,
           "is_default": false,
@@ -31196,8 +31364,8 @@
           "kind": "interface",
           "signature": "ClusterNodeWithDetails extends ClusterNode",
           "lines": [
-            278,
-            283
+            282,
+            287
           ],
           "exported": true,
           "is_default": false,
@@ -31215,8 +31383,8 @@
           "kind": "interface",
           "signature": "ClusterWithNodes extends Cluster",
           "lines": [
-            285,
-            287
+            289,
+            291
           ],
           "exported": true,
           "is_default": false,
@@ -31234,8 +31402,8 @@
           "kind": "interface",
           "signature": "ClusterFeedResponse",
           "lines": [
-            289,
-            292
+            293,
+            296
           ],
           "exported": true,
           "is_default": false,
@@ -31253,8 +31421,8 @@
           "kind": "interface",
           "signature": "ClusterListResponse",
           "lines": [
-            294,
-            299
+            298,
+            303
           ],
           "exported": true,
           "is_default": false,
@@ -31272,8 +31440,8 @@
           "kind": "interface",
           "signature": "AbandonedRestartPattern",
           "lines": [
-            302,
-            318
+            306,
+            322
           ],
           "exported": true,
           "is_default": false,
@@ -31291,8 +31459,8 @@
           "kind": "interface",
           "signature": "AbandonedRestartsResponse",
           "lines": [
-            320,
-            326
+            324,
+            330
           ],
           "exported": true,
           "is_default": false,
@@ -31310,8 +31478,8 @@
           "kind": "interface",
           "signature": "FrictionSummary",
           "lines": [
-            328,
-            341
+            332,
+            345
           ],
           "exported": true,
           "is_default": false,
@@ -31329,8 +31497,8 @@
           "kind": "type",
           "signature": "SyncMethod = \"syncthing\" | \"rsync\" | \"api\"",
           "lines": [
-            344,
-            344
+            348,
+            348
           ],
           "exported": true,
           "is_default": false,
@@ -31348,8 +31516,8 @@
           "kind": "interface",
           "signature": "RsyncOptions",
           "lines": [
-            346,
-            351
+            350,
+            355
           ],
           "exported": true,
           "is_default": false,
@@ -31367,8 +31535,8 @@
           "kind": "interface",
           "signature": "SpokeConfig",
           "lines": [
-            353,
-            361
+            357,
+            365
           ],
           "exported": true,
           "is_default": false,
@@ -31386,8 +31554,8 @@
           "kind": "interface",
           "signature": "SpokeCreateRequest",
           "lines": [
-            363,
-            371
+            367,
+            375
           ],
           "exported": true,
           "is_default": false,
@@ -31405,8 +31573,8 @@
           "kind": "interface",
           "signature": "SpokeUpdateRequest",
           "lines": [
-            373,
-            380
+            377,
+            384
           ],
           "exported": true,
           "is_default": false,
@@ -31792,6 +31960,41 @@
           "parent_name": null,
           "annotation": null,
           "comment": "Svelte action for focus trapping.\nUse as `use:focusTrap={{ onEscape: () => ... }}`",
+          "incoming_refs": null,
+          "outgoing_refs": null
+        }
+      ],
+      "annotation": null,
+      "headings": null,
+      "code_blocks": null,
+      "imports": []
+    },
+    {
+      "path": "src/web/app/src/lib/utils/model.ts",
+      "language": "typescript",
+      "lines": [
+        1,
+        24
+      ],
+      "detail_level": "full",
+      "token_estimate": 109,
+      "symbols": [
+        {
+          "name": "abbreviateModelName",
+          "kind": "function",
+          "signature": "abbreviateModelName(fullName: string): string",
+          "lines": [
+            10,
+            23
+          ],
+          "exported": true,
+          "is_default": false,
+          "is_async": false,
+          "is_static": false,
+          "is_abstract": false,
+          "parent_name": null,
+          "annotation": null,
+          "comment": "Abbreviates a model name by extracting just the model identifier.\n\nExamples:\n- \"google-antigravity/claude-opus-4-5-thinking\" -> \"claude-opus-4-5-thinking\"\n- \"anthropic/claude-sonnet-4-20250514\" -> \"claude-sonnet-4\"\n- \"openai/gpt-4o\" -> \"gpt-4o\"\n- \"claude-3-opus\" -> \"claude-3-opus\" (no provider prefix)",
           "incoming_refs": null,
           "outgoing_refs": null
         }

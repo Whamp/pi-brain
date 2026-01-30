@@ -272,6 +272,10 @@ export interface SessionSummary {
   types: string[];
   totalTokens: number;
   totalCost: number;
+  /** Generated title from first node summary (truncated) */
+  title: string | null;
+  /** Type of the first node in the session */
+  firstNodeType: string | null;
 }
 
 // Cluster types for News Feed

@@ -91,7 +91,7 @@
     </div>
   {/if}
 
-  {#if node.semantic.tags.length > 0}
+  {#if node.semantic?.tags?.length}
     <div class="tags">
       {#each node.semantic.tags.slice(0, 5) as tag}
         <Tag text={`#${tag}`} variant="auto" />

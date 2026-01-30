@@ -1107,7 +1107,9 @@
       simulation.stop();
     }
     clearTimeout(resizeTimeout);
-    window.removeEventListener("mousedown", handleClickOutside);
+    if (typeof window !== "undefined") {
+      window.removeEventListener("mousedown", handleClickOutside);
+    }
   });
 
   // ResizeObserver for precise container tracking with cleanup

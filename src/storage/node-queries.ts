@@ -192,6 +192,10 @@ export interface SessionSummaryRow {
   partialCount: number;
   failedCount: number;
   abandonedCount: number;
+  /** Summary of the first node (earliest timestamp) in the session */
+  firstNodeSummary: string | null;
+  /** Type of the first node in the session */
+  firstNodeType: string | null;
 }
 
 /**
@@ -205,27 +209,54 @@ export function getSessionSummaries(
 ): SessionSummaryRow[] {
   const { limit, offset } = normalizePagination(options.limit, options.offset);
 
+  // Get the first node ID for each session (earliest timestamp)
+  // Then join with nodes_fts to get the summary
   const stmt = db.prepare(`
+    WITH session_stats AS (
+      SELECT
+        session_file,
+        COUNT(*) as nodeCount,
+        MIN(timestamp) as firstTimestamp,
+        MAX(timestamp) as lastTimestamp,
+        SUM(tokens_used) as totalTokens,
+        SUM(cost) as totalCost,
+        GROUP_CONCAT(DISTINCT type) as types,
+        SUM(CASE WHEN outcome = 'success' THEN 1 ELSE 0 END) as successCount,
+        SUM(CASE WHEN outcome = 'partial' THEN 1 ELSE 0 END) as partialCount,
+        SUM(CASE WHEN outcome = 'failed' THEN 1 ELSE 0 END) as failedCount,
+        SUM(CASE WHEN outcome = 'abandoned' THEN 1 ELSE 0 END) as abandonedCount
+      FROM nodes
+      WHERE project = ?
+      GROUP BY session_file
+    ),
+    first_nodes AS (
+      SELECT n.session_file, n.id as first_node_id, n.type as first_node_type
+      FROM nodes n
+      INNER JOIN session_stats s ON n.session_file = s.session_file AND n.timestamp = s.firstTimestamp
+      WHERE n.project = ?
+    )
     SELECT
-      session_file as sessionFile,
-      COUNT(*) as nodeCount,
-      MIN(timestamp) as firstTimestamp,
-      MAX(timestamp) as lastTimestamp,
-      SUM(tokens_used) as totalTokens,
-      SUM(cost) as totalCost,
-      GROUP_CONCAT(DISTINCT type) as types,
-      SUM(CASE WHEN outcome = 'success' THEN 1 ELSE 0 END) as successCount,
-      SUM(CASE WHEN outcome = 'partial' THEN 1 ELSE 0 END) as partialCount,
-      SUM(CASE WHEN outcome = 'failed' THEN 1 ELSE 0 END) as failedCount,
-      SUM(CASE WHEN outcome = 'abandoned' THEN 1 ELSE 0 END) as abandonedCount
-    FROM nodes
-    WHERE project = ?
-    GROUP BY session_file
-    ORDER BY lastTimestamp DESC
+      s.session_file as sessionFile,
+      s.nodeCount,
+      s.firstTimestamp,
+      s.lastTimestamp,
+      s.totalTokens,
+      s.totalCost,
+      s.types,
+      s.successCount,
+      s.partialCount,
+      s.failedCount,
+      s.abandonedCount,
+      fts.summary as firstNodeSummary,
+      fn.first_node_type as firstNodeType
+    FROM session_stats s
+    LEFT JOIN first_nodes fn ON s.session_file = fn.session_file
+    LEFT JOIN nodes_fts fts ON fn.first_node_id = fts.node_id
+    ORDER BY s.lastTimestamp DESC
     LIMIT ? OFFSET ?
   `);
 
-  return stmt.all(project, limit, offset) as SessionSummaryRow[];
+  return stmt.all(project, project, limit, offset) as SessionSummaryRow[];
 }
 
 // =============================================================================

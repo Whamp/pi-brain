@@ -191,6 +191,48 @@
     return parts.at(-1) || project;
   }
 
+  // Generate a deterministic color from project name
+  // Returns HSL color values for consistent project identification
+  function hashProjectToColor(project: string): { hue: number; saturation: number; lightness: number } {
+    const name = getProjectName(project);
+    // Simple hash using modular arithmetic (no bitwise operators)
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = ((hash * 31) + (name.codePointAt(i) ?? 0)) % 100_000;
+    }
+    // Use golden ratio for better hue distribution
+    const hue = (hash * 137.508) % 360;
+    return { hue, saturation: 65, lightness: 55 };
+  }
+
+  // Get CSS variables for project color
+  function getProjectColorStyle(project: string): string {
+    const { hue, saturation, lightness } = hashProjectToColor(project);
+    return `--project-hue: ${hue}; --project-sat: ${saturation}%; --project-light: ${lightness}%;`;
+  }
+
+  // Categorize project activity level based on session count and recency
+  function getActivityLevel(project: ProjectSummary): "high" | "medium" | "low" {
+    const daysSinceActivity = (Date.now() - parseDate(project.lastActivity).getTime()) / (1000 * 60 * 60 * 24);
+    const isRecent = daysSinceActivity < 7;
+    const isActive = project.sessionCount >= 10;
+    
+    if (isRecent && isActive) {return "high";}
+    if (isRecent || isActive) {return "medium";}
+    return "low";
+  }
+
+  // Get initials from project name for badge
+  function getProjectInitials(project: string): string {
+    const name = getProjectName(project);
+    // Handle kebab-case and camelCase
+    const words = name.split(/[-_]|(?=[A-Z])/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+
   // Helper to get session display name
   function getSessionName(sessionFile: string): string {
     // Handle both / and \ separators for cross-platform compatibility
@@ -198,6 +240,22 @@
     const filename = parts.at(-1) || sessionFile;
     // Truncate if too long
     return filename.length > 50 ? `${filename.slice(0, 47)}...` : filename;
+  }
+
+  // Extract short session ID from filename for display
+  // Filename format: 2026-01-05T19-41-33-626Z_94f3b659-cd2c-4d25-9a1...
+  function extractSessionId(sessionFile: string): string {
+    const parts = sessionFile.split(/[/\\]/);
+    const filename = parts.at(-1) || sessionFile;
+    // Extract UUID portion after the timestamp (after first underscore)
+    const underscoreIndex = filename.indexOf("_");
+    if (underscoreIndex > 0) {
+      const uuid = filename.slice(underscoreIndex + 1).replace(/\.jsonl$/, "");
+      // Return first 8 chars of UUID
+      return uuid.slice(0, 8);
+    }
+    // Fallback: return first 8 chars
+    return filename.slice(0, 8);
   }
 
   // Get outcome icon component
@@ -380,18 +438,20 @@
         <GettingStarted variant="sessions" />
       {:else}
         {#each sortedProjects as project}
+          {@const activityLevel = getActivityLevel(project)}
           <Card
             tag="button"
             interactive
-            class="file-item"
+            class="file-item project-card activity-{activityLevel}"
             onclick={() => loadSessions(project.project)}
+            style={getProjectColorStyle(project.project)}
           >
-            <div class="file-icon project-icon">
-              <Folder size={20} />
+            <div class="project-badge">
+              <span class="badge-initials">{getProjectInitials(project.project)}</span>
             </div>
             <div class="file-info">
-              <div class="file-name">{getProjectName(project.project)}</div>
-              <div class="file-path">{project.project}</div>
+              <div class="project-name">{getProjectName(project.project)}</div>
+              <div class="project-path">{project.project}</div>
             </div>
             <div class="file-meta">
               <span class="meta-item" title="Sessions">
@@ -424,17 +484,23 @@
         />
       {:else}
         {#each sortedSessions as session}
+          {@const sessionTitle = session.title || getSessionName(session.sessionFile)}
+          {@const sessionId = extractSessionId(session.sessionFile)}
           <Card
             tag="button"
             interactive
-            class="file-item"
+            class="file-item session-card"
             onclick={() => loadNodes(session.sessionFile)}
+            style={currentProject ? getProjectColorStyle(currentProject) : undefined}
           >
-            <div class="file-icon session-icon">
-              <FileText size={20} />
+            <div class="session-badge">
+              <FileText size={18} />
             </div>
             <div class="file-info">
-              <div class="file-name">{getSessionName(session.sessionFile)}</div>
+              <div class="session-title" title={session.title ? session.sessionFile : undefined}>{sessionTitle}</div>
+              {#if session.title}
+                <div class="session-id" title="Session ID">{sessionId}</div>
+              {/if}
               <div class="file-meta-row">
                 <span class="meta-item" title="Nodes">
                   <Hash size={12} />
@@ -658,6 +724,105 @@
     width: 100%;
   }
 
+  /* Project Cards with Color-coded Badges */
+  .project-card {
+    --project-color: hsl(var(--project-hue, 200), var(--project-sat, 65%), var(--project-light, 55%));
+    --project-color-muted: hsl(var(--project-hue, 200), var(--project-sat, 65%), var(--project-light, 55%), 0.15);
+    border-left: 3px solid var(--project-color);
+    transition: all 0.2s ease;
+  }
+
+  .project-card:hover {
+    border-left-color: var(--project-color);
+    box-shadow: 
+      inset 3px 0 0 0 var(--project-color-muted),
+      var(--shadow-sm);
+  }
+
+  /* Activity level variations */
+  .project-card.activity-high {
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .project-card.activity-high :global(.project-name),
+  :global(.project-card.activity-high) .project-name {
+    font-size: var(--text-lg);
+  }
+
+  .project-card.activity-medium {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .project-card.activity-low {
+    padding: var(--space-2) var(--space-4);
+    opacity: 0.85;
+  }
+
+  .project-card.activity-low :global(.project-name),
+  :global(.project-card.activity-low) .project-name {
+    font-size: var(--text-sm);
+  }
+
+  .project-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--project-color-muted);
+    flex-shrink: 0;
+  }
+
+  .badge-initials {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--project-color);
+    letter-spacing: 0.5px;
+  }
+
+  .project-name {
+    font-weight: 600;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .project-path {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
+
+  /* Session Cards with Project Color Context */
+  .session-card {
+    --project-color: hsl(var(--project-hue, 145), var(--project-sat, 65%), var(--project-light, 52%));
+    --project-color-muted: hsl(var(--project-hue, 145), var(--project-sat, 65%), var(--project-light, 52%), 0.15);
+  }
+
+  .session-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--project-color-muted);
+    color: var(--project-color);
+    flex-shrink: 0;
+  }
+
+  .session-title {
+    font-weight: 500;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
   .file-icon {
     display: flex;
     align-items: center;
@@ -696,6 +861,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .session-id {
+    font-size: var(--text-xs);
+    color: var(--color-text-subtle);
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-1);
   }
 
   .file-meta-row {

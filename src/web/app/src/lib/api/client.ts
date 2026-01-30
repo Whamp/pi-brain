@@ -435,6 +435,8 @@ export const api = {
         types: string[];
         totalTokens: number;
         totalCost: number;
+        title: string | null;
+        firstNodeType: string | null;
       }[];
       total: number;
       limit: number;

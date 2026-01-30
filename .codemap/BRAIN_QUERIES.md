@@ -2109,7 +2109,7 @@ src/storage/filter-utils.ts [1-302]
         - src/storage/lesson-repository.ts:11: import (module)
         - src/storage/lesson-repository.ts:163: call { limit, offset }
         - src/storage/node-queries.ts:16: import (module)
-        - src/storage/node-queries.ts:206: call { limit, offset }
+        - src/storage/node-queries.ts:210: call { limit, offset }
         - src/storage/quirk-repository.ts:11: import (module)
         - src/storage/quirk-repository.ts:109: call { limit, offset }
         - src/storage/quirk-repository.ts:228: call { limit }
@@ -2333,6 +2333,9 @@ src/storage/node-conversion.ts [1-451]
         - src/storage/node-conversion.ts:449: call nodeRowsToNodes
     448-450: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
+      refs in: 2 [call: 1, import: 1]
+        - src/api/routes/sessions.ts:9: import (module)
+        - src/api/routes/sessions.ts:278: call sessionNodes
   imports:
     - ../daemon/types.js
     - ./node-storage.js
@@ -2446,25 +2449,21 @@ src/storage/node-crud.ts [1-753]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-258]
+src/storage/node-queries.ts [1-289]
   interface:
     76-85: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
-      refs in: 5 [import: 1, type: 4]
-        - src/api/routes/nodes.ts:19: import (module)
-        - src/api/routes/nodes.ts:124: type options
-        - src/api/routes/nodes.ts:127: type options
-        - src/api/routes/nodes.ts:128: type options
+      refs in: 1 [type: 1]
         - src/storage/node-queries.ts:130: type listNodes
     88-97: interface ListNodesResult [exported]
       /** Result from listNodes query */
       refs in: 1 [type: 1]
         - src/storage/node-queries.ts:131: type listNodes
-    183-195: interface SessionSummaryRow [exported]
+    183-199: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
       refs in: 2 [type: 2]
-        - src/storage/node-queries.ts:205: type getSessionSummaries
-        - src/storage/node-queries.ts:228: type getSessionSummaries
+        - src/storage/node-queries.ts:209: type getSessionSummaries
+        - src/storage/node-queries.ts:259: type getSessionSummaries
   type:
     59-67: NodeSortField = | "timestamp"
   | "analyzed_at"
@@ -2488,17 +2487,12 @@ src/storage/node-queries.ts [1-258]
         - src/storage/node-queries.ts:142: type order
     73-73: ListNodesFilters = ExtendedFilters [exported]
       /** Filters for querying nodes */
-      refs in: 13 [import: 3, type: 10]
-        - src/api/routes/nodes.ts:18: import (module)
-        - src/api/routes/nodes.ts:111: type filters
-        - src/api/routes/nodes.ts:113: type filters
-        - src/api/routes/nodes.ts:114: type filters
-        - src/api/routes/search.ts:7: import (module)
-        - src/api/routes/search.ts:48: type filters
-        - src/api/routes/search.ts:50: type filters
-        - src/api/routes/search.ts:51: type filters
+      refs in: 5 [import: 1, type: 4]
         - src/daemon/query-processor.ts:28: import (module)
         - src/daemon/query-processor.ts:270: type filters
+        - src/daemon/query-processor.ts:348: type listFilters
+        - src/storage/node-queries.ts:129: type listNodes
+        - src/storage/node-queries.ts:284: type countNodes
   function:
     27-34: getNodeSummary(db: Database.Database, nodeId: string): string [exported]
       /** Get node summary from FTS index */
@@ -2509,39 +2503,33 @@ src/storage/node-queries.ts [1-258]
         - src/daemon/graph-export.ts:67: call summary
     39-43: getNodeTags(db: Database.Database, nodeId: string): {} [exported]
       /** Get tags for a node */
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/nodes.ts:15: import (module)
-        - src/api/routes/nodes.ts:47: call buildIncludeFetchers
     48-52: getNodeTopics(db: Database.Database, nodeId: string): {} [exported]
       /** Get topics for a node */
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/nodes.ts:16: import (module)
-        - src/api/routes/nodes.ts:48: call buildIncludeFetchers
     127-174: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-      refs in: 12 [call: 7, import: 5]
-        - src/api/routes/nodes.ts:17: import (module)
-        - src/api/routes/nodes.ts:131: call result
+      refs in: 10 [call: 6, import: 4]
         - src/api/routes/sessions.ts:13: import (module)
-        - src/api/routes/sessions.ts:61: call result
-        - src/api/routes/sessions.ts:132: call checkResult
-        - src/api/routes/sessions.ts:224: call result
+        - src/api/routes/sessions.ts:108: call result
+        - src/api/routes/sessions.ts:179: call checkResult
+        - src/api/routes/sessions.ts:273: call result
         - src/daemon/graph-export.ts:13: import (module)
         - src/daemon/graph-export.ts:37: call nodesResult
         - src/daemon/query-processor.test.ts:11: import (module)
         - src/daemon/query-processor.ts:28: import (module)
-    201-229: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+        - src/daemon/query-processor.ts:349: call nodes
+        - src/storage/node-queries.ts:286: call result
+    205-260: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
       refs in: 3 [call: 2, import: 1]
         - src/api/routes/sessions.ts:12: import (module)
-        - src/api/routes/sessions.ts:69: call sessionSummaries
-        - src/api/routes/sessions.ts:152: call allSummaries
-    238-246: getAllProjects(db: Database.Database): {} [exported]
+        - src/api/routes/sessions.ts:116: call sessionSummaries
+        - src/api/routes/sessions.ts:199: call allSummaries
+    269-277: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
       refs in: 2 [call: 1, import: 1]
         - src/api/routes/sessions.ts:11: import (module)
-        - src/api/routes/sessions.ts:56: call projects
-    251-257: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+        - src/api/routes/sessions.ts:103: call projects
+    282-288: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -3257,4 +3245,4 @@ src/storage/types.ts [1-47]
 
 ---
 Files: 65
-Estimated tokens: 42,981 (codebase: ~1,389,445)
+Estimated tokens: 42,827 (codebase: ~1,407,022)

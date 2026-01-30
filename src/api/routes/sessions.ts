@@ -16,6 +16,49 @@ import { parseIntParam } from "../query-params.js";
 import { successResponse, errorResponse } from "../responses.js";
 
 /**
+ * Max length for session title before truncation
+ */
+const MAX_TITLE_LENGTH = 80;
+
+/**
+ * Generate a human-readable session title from the first node's summary.
+ * Truncates long summaries and cleans up formatting.
+ */
+function generateSessionTitle(summary: string | null): string | null {
+  if (!summary || summary.trim().length === 0) {
+    return null;
+  }
+
+  // Clean up the summary: take first line, trim whitespace
+  let title = summary.split("\n")[0].trim();
+
+  // Remove common prefixes that don't add value
+  const prefixesToRemove = [
+    /^(implemented|added|fixed|updated|created|modified|refactored|debugged|resolved)\s+/i,
+  ];
+  for (const pattern of prefixesToRemove) {
+    title = title.replace(pattern, "");
+  }
+
+  // Capitalize first letter
+  title = `${title.charAt(0).toUpperCase()}${title.slice(1)}`;
+
+  // Truncate if too long
+  if (title.length > MAX_TITLE_LENGTH) {
+    // Try to break at a word boundary
+    const truncated = title.slice(0, MAX_TITLE_LENGTH);
+    const lastSpace = truncated.lastIndexOf(" ");
+    if (lastSpace > MAX_TITLE_LENGTH * 0.6) {
+      title = `${truncated.slice(0, lastSpace)}…`;
+    } else {
+      title = `${truncated}…`;
+    }
+  }
+
+  return title;
+}
+
+/**
  * Session summary for the file browser
  */
 interface SessionSummary {
@@ -32,6 +75,10 @@ interface SessionSummary {
   types: string[];
   totalTokens: number;
   totalCost: number;
+  /** Generated title from first node summary (truncated) */
+  title: string | null;
+  /** Type of the first node in the session */
+  firstNodeType: string | null;
 }
 
 /**
@@ -170,6 +217,8 @@ export async function sessionsRoutes(app: FastifyInstance): Promise<void> {
         types: row.types ? row.types.split(",") : [],
         totalTokens: row.totalTokens,
         totalCost: row.totalCost,
+        title: generateSessionTitle(row.firstNodeSummary),
+        firstNodeType: row.firstNodeType,
       }));
 
       const durationMs = Date.now() - startTime;

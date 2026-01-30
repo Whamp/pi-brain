@@ -1,12 +1,12 @@
 # Project Overview
 
 ## Languages
-- typescript: 109 files
+- typescript: 111 files
 
 ## Statistics
-- Total files: 109
-- Total symbols: 711
-  - function: 377
+- Total files: 111
+- Total symbols: 716
+  - function: 382
   - interface: 230
   - type: 45
   - variable: 44
@@ -187,9 +187,9 @@ src/api/routes/search.ts [1-82]
     - ../responses.js
     - fastify
 
-src/api/routes/sessions.ts [1-263]
+src/api/routes/sessions.ts [1-312]
   function:
-    47-262: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
+    94-311: async sessionsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-conversion.js
     - ../../storage/node-queries.js
@@ -1682,13 +1682,13 @@ src/storage/node-crud.ts [1-753]
     - better-sqlite3
     - node:crypto
 
-src/storage/node-queries.ts [1-258]
+src/storage/node-queries.ts [1-289]
   interface:
     76-85: interface ListNodesOptions [exported]
       /** Pagination and sorting options */
     88-97: interface ListNodesResult [exported]
       /** Result from listNodes query */
-    183-195: interface SessionSummaryRow [exported]
+    183-199: interface SessionSummaryRow [exported]
       /** Session summary row from aggregation query */
   type:
     59-67: NodeSortField = | "timestamp"
@@ -1713,11 +1713,11 @@ src/storage/node-queries.ts [1-258]
       /** Get topics for a node */
     127-174: listNodes(db: Database.Database, filters: ListNodesFilters = {}, options: ListNodesOptions = {}): ListNodesResult [exported]
       /** List nodes with filters, pagination, and sorting. Supports filtering by: - project (partial match via LIKE) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) Per specs/api.md GET /api/v1/nodes endpoint. */
-    201-229: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
+    205-260: getSessionSummaries(db: Database.Database, project: string, options: { limit?: number; offset?: number } = {}): {} [exported]
       /** Get aggregated session summaries for a project. Used for the session browser to avoid loading thousands of nodes. */
-    238-246: getAllProjects(db: Database.Database): {} [exported]
+    269-277: getAllProjects(db: Database.Database): {} [exported]
       /** Get all unique projects in the system */
-    251-257: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
+    282-288: countNodes(db: Database.Database, filters: ListNodesFilters = {}): number [exported]
       /** Count nodes matching filters (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -2216,7 +2216,7 @@ src/web/app/playwright.config.ts [1-27]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-748]
+src/web/app/src/lib/api/client.ts [1-750]
   function:
     68-77: createApiError(options: ApiErrorOptions): Error [exported]
     79-83: createTimeoutError(timeoutMs: number): Error [exported]
@@ -2231,7 +2231,7 @@ src/web/app/src/lib/api/client.ts [1-748]
     135-152: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    232-734: api [exported]
+    232-736: api [exported]
   imports:
     - $lib/types
 
@@ -2274,6 +2274,17 @@ src/web/app/src/lib/stores/search-history.ts [1-106]
   imports:
     - svelte/store
 
+src/web/app/src/lib/stores/sidebar.ts [1-75]
+  function:
+    18-20: isDetailPage(pathname: string): boolean [exported]
+      /** Check if a pathname is a detail page. */
+    25-39: loadSidebarPreference(): boolean [exported]
+      /** Load saved sidebar preference from localStorage. */
+    44-50: saveSidebarPreference(collapsed: boolean): void [exported]
+      /** Save sidebar preference to localStorage. */
+    55-74: shouldCollapseForPage(pathname: string, userPreference: boolean | null, hasManualOverride: boolean): boolean [exported]
+      /** Determine if sidebar should be collapsed based on page and preferences. */
+
 src/web/app/src/lib/stores/theme.ts [1-180]
   type:
     10-10: Theme = "light" | "dark" | "system" [exported]
@@ -2307,7 +2318,7 @@ src/web/app/src/lib/stores/websocket.ts [1-180]
     - ./nodes
     - svelte/store
 
-src/web/app/src/lib/types.ts [1-381]
+src/web/app/src/lib/types.ts [1-385]
   interface:
     78-84: interface LessonEntity extends Omit<Lesson, "tags"> [exported]
     86-91: interface ModelQuirkEntity extends ModelQuirk [exported]
@@ -2321,20 +2332,20 @@ src/web/app/src/lib/types.ts [1-381]
     230-239: interface DaemonDecisionEntity [exported]
     242-251: interface NodeFilters [exported]
     254-259: interface ProjectSummary [exported]
-    261-275: interface SessionSummary [exported]
-    278-283: interface ClusterNodeWithDetails extends ClusterNode [exported]
-    285-287: interface ClusterWithNodes extends Cluster [exported]
-    289-292: interface ClusterFeedResponse [exported]
-    294-299: interface ClusterListResponse [exported]
-    302-318: interface AbandonedRestartPattern [exported]
-    320-326: interface AbandonedRestartsResponse [exported]
-    328-341: interface FrictionSummary [exported]
-    346-351: interface RsyncOptions [exported]
-    353-361: interface SpokeConfig [exported]
-    363-371: interface SpokeCreateRequest [exported]
-    373-380: interface SpokeUpdateRequest [exported]
+    261-279: interface SessionSummary [exported]
+    282-287: interface ClusterNodeWithDetails extends ClusterNode [exported]
+    289-291: interface ClusterWithNodes extends Cluster [exported]
+    293-296: interface ClusterFeedResponse [exported]
+    298-303: interface ClusterListResponse [exported]
+    306-322: interface AbandonedRestartPattern [exported]
+    324-330: interface AbandonedRestartsResponse [exported]
+    332-345: interface FrictionSummary [exported]
+    350-355: interface RsyncOptions [exported]
+    357-365: interface SpokeConfig [exported]
+    367-375: interface SpokeCreateRequest [exported]
+    377-384: interface SpokeUpdateRequest [exported]
   type:
-    344-344: SyncMethod = "syncthing" | "rsync" | "api" [exported]
+    348-348: SyncMethod = "syncthing" | "rsync" | "api" [exported]
   imports:
     - ../../../../types/index.js
 
@@ -2365,6 +2376,11 @@ src/web/app/src/lib/utils/focus-trap.ts [1-151]
     132-150: focusTrap(node: HTMLElement, options: Parameters<typeof createFocusTrap>[1] = {}): { destroy: () => void; update: (newOptions: Parameters<typeof createFocusTrap>) => void; } [exported]
       /** Svelte action for focus trapping. Use as `use:focusTrap={{ onEscape: () => ... }}` */
 
+src/web/app/src/lib/utils/model.ts [1-24]
+  function:
+    10-23: abbreviateModelName(fullName: string): string [exported]
+      /** Abbreviates a model name by extracting just the model identifier. Examples: - "google-antigravity/claude-opus-4-5-thinking" -> "claude-opus-4-5-thinking" - "anthropic/claude-sonnet-4-20250514" -> "claude-sonnet-4" - "openai/gpt-4o" -> "gpt-4o" - "claude-3-opus" -> "claude-3-opus" (no provider prefix) */
+
 src/web/app/vite.config.ts [1-15]
   imports:
     - @sveltejs/kit/vite
@@ -2383,5 +2399,5 @@ src/web/index.ts [1-6]
     - ./generator.js
 
 ---
-Files: 109
-Estimated tokens: 29,448 (codebase: ~1,389,221)
+Files: 111
+Estimated tokens: 29,714 (codebase: ~1,390,813)
