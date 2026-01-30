@@ -284,60 +284,97 @@ function extractLsDirectory(cmd: string): string {
 }
 
 /**
+ * State for tracking context churn
+ */
+interface ChurnState {
+  filesAccessed: Set<string>;
+  dirsAccessed: Set<string>;
+  readLsCount: number;
+}
+
+/**
+ * Process a read tool call for churn tracking
+ */
+function processReadToolForChurn(
+  args: Record<string, unknown>,
+  state: ChurnState
+): void {
+  if (!args.path) {
+    return;
+  }
+  const path = args.path as string;
+  if (!state.filesAccessed.has(path)) {
+    state.filesAccessed.add(path);
+    state.readLsCount++;
+  }
+}
+
+/**
+ * Process a bash tool call for churn tracking (ls commands)
+ */
+function processBashToolForChurn(
+  args: Record<string, unknown>,
+  state: ChurnState
+): void {
+  if (typeof args.command !== "string") {
+    return;
+  }
+  const cmd = args.command;
+  if (!cmd.startsWith("ls ") && cmd !== "ls") {
+    return;
+  }
+  const dir = extractLsDirectory(cmd);
+  if (!state.dirsAccessed.has(dir)) {
+    state.dirsAccessed.add(dir);
+    state.readLsCount++;
+  }
+}
+
+/**
+ * Process a tool call for churn tracking
+ */
+function processToolCallForChurn(
+  toolCall: ToolCallContent,
+  state: ChurnState
+): void {
+  const args = (toolCall.arguments ?? {}) as Record<string, unknown>;
+  if (toolCall.name === "read") {
+    processReadToolForChurn(args, state);
+  } else if (toolCall.name === "bash") {
+    processBashToolForChurn(args, state);
+  }
+}
+
+/**
  * Count context churn events
  *
  * Context churn is high frequency of read/ls operations on different files,
  * indicating the user is fighting the context window.
  */
 export function countContextChurn(entries: SessionEntry[]): number {
-  const filesAccessed = new Set<string>();
-  const dirsAccessed = new Set<string>();
-  let readLsCount = 0;
+  const state: ChurnState = {
+    filesAccessed: new Set<string>(),
+    dirsAccessed: new Set<string>(),
+    readLsCount: 0,
+  };
 
   for (const entry of entries) {
     if (entry.type !== "message") {
       continue;
     }
-
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
-
-    // Look for tool calls to read/bash (for ls)
-    if (msg.role === "assistant") {
-      const assistantMsg = msg as AssistantMessage;
-      for (const block of assistantMsg.content ?? []) {
-        if (block.type === "toolCall") {
-          const toolCall = block as ToolCallContent;
-          const args = (toolCall.arguments ?? {}) as Record<string, unknown>;
-
-          if (toolCall.name === "read" && args.path) {
-            const path = args.path as string;
-            if (!filesAccessed.has(path)) {
-              filesAccessed.add(path);
-              readLsCount++;
-            }
-          } else if (
-            toolCall.name === "bash" &&
-            typeof args.command === "string"
-          ) {
-            const cmd = args.command;
-            // Check for ls commands - extract directory and track uniqueness
-            if (cmd.startsWith("ls ") || cmd === "ls") {
-              const dir = extractLsDirectory(cmd);
-              if (!dirsAccessed.has(dir)) {
-                dirsAccessed.add(dir);
-                readLsCount++;
-              }
-            }
-          }
-        }
+    const msg = (entry as SessionMessageEntry).message;
+    if (msg.role !== "assistant") {
+      continue;
+    }
+    for (const block of (msg as AssistantMessage).content ?? []) {
+      if (block.type === "toolCall") {
+        processToolCallForChurn(block as ToolCallContent, state);
       }
     }
   }
 
-  // Return number of churn events above threshold
-  return readLsCount >= CONTEXT_CHURN_THRESHOLD
-    ? Math.floor(readLsCount / CONTEXT_CHURN_THRESHOLD)
+  return state.readLsCount >= CONTEXT_CHURN_THRESHOLD
+    ? Math.floor(state.readLsCount / CONTEXT_CHURN_THRESHOLD)
     : 0;
 }
 
@@ -381,6 +418,39 @@ export function detectModelSwitch(
 }
 
 /**
+ * Check if an entry indicates an unresolved tool error
+ */
+function isUnresolvedToolError(entry: SessionEntry): boolean {
+  if (entry.type !== "message") {
+    return false;
+  }
+  const msg = (entry as SessionMessageEntry).message;
+  if (msg.role !== "toolResult") {
+    return false;
+  }
+  return (msg as ToolResultMessage).isError;
+}
+
+/**
+ * Check if an entry indicates user success acknowledgment
+ */
+function isUserSuccessIndicator(entry: SessionEntry): boolean {
+  if (entry.type !== "message") {
+    return false;
+  }
+  const msg = (entry as SessionMessageEntry).message;
+  if (msg.role !== "user") {
+    return false;
+  }
+  const userMsg = msg as UserMessage;
+  const text =
+    typeof userMsg.content === "string"
+      ? userMsg.content
+      : extractTextFromContent(userMsg.content);
+  return hasGenuineSuccessIndicator(text);
+}
+
+/**
  * Detect silent termination
  *
  * Session ends mid-task (no handoff, no success) and is not resumed.
@@ -395,43 +465,10 @@ export function detectSilentTermination(
     return false;
   }
 
-  // Look at the last few entries to determine if work was incomplete
   const lastEntries = entries.slice(-10);
+  const hasUnresolvedError = lastEntries.some(isUnresolvedToolError);
+  const hasSuccessIndicator = lastEntries.some(isUserSuccessIndicator);
 
-  // Check if there's an incomplete tool result or error
-  let hasUnresolvedError = false;
-  let hasSuccessIndicator = false;
-
-  for (const entry of lastEntries) {
-    if (entry.type !== "message") {
-      continue;
-    }
-
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
-
-    if (msg.role === "toolResult") {
-      const toolResult = msg as ToolResultMessage;
-      if (toolResult.isError) {
-        hasUnresolvedError = true;
-      }
-    }
-
-    if (msg.role === "user") {
-      const userMsg = msg as UserMessage;
-      const text =
-        typeof userMsg.content === "string"
-          ? userMsg.content
-          : extractTextFromContent(userMsg.content);
-
-      // Check for genuine success indicators (not negated)
-      if (hasGenuineSuccessIndicator(text)) {
-        hasSuccessIndicator = true;
-      }
-    }
-  }
-
-  // Silent termination if we have unresolved error and no success indicator
   return hasUnresolvedError && !hasSuccessIndicator;
 }
 
@@ -605,6 +642,36 @@ export function detectFrictionSignals(
 // =============================================================================
 
 /**
+ * Extract file paths from a tool call's arguments
+ */
+function extractFilePathsFromToolCall(
+  toolCall: ToolCallContent,
+  files: Set<string>
+): void {
+  const args = (toolCall.arguments ?? {}) as Record<string, unknown>;
+  if (args.path && typeof args.path === "string") {
+    files.add(args.path);
+  }
+  if (args.file && typeof args.file === "string") {
+    files.add(args.file);
+  }
+}
+
+/**
+ * Process an assistant message to extract touched files
+ */
+function extractFilesFromAssistantMessage(
+  msg: AssistantMessage,
+  files: Set<string>
+): void {
+  for (const block of msg.content ?? []) {
+    if (block.type === "toolCall") {
+      extractFilePathsFromToolCall(block as ToolCallContent, files);
+    }
+  }
+}
+
+/**
  * Check if a segment touches similar files to another segment
  * (for abandoned restart detection)
  */
@@ -615,26 +682,9 @@ export function getFilesTouched(entries: SessionEntry[]): Set<string> {
     if (entry.type !== "message") {
       continue;
     }
-
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
-
+    const msg = (entry as SessionMessageEntry).message;
     if (msg.role === "assistant") {
-      const assistantMsg = msg as AssistantMessage;
-      for (const block of assistantMsg.content ?? []) {
-        if (block.type === "toolCall") {
-          const toolCall = block as ToolCallContent;
-          const args = (toolCall.arguments ?? {}) as Record<string, unknown>;
-
-          // Extract file paths from common tools
-          if (args.path && typeof args.path === "string") {
-            files.add(args.path);
-          }
-          if (args.file && typeof args.file === "string") {
-            files.add(args.file);
-          }
-        }
-      }
+      extractFilesFromAssistantMessage(msg as AssistantMessage, files);
     }
   }
 
@@ -814,53 +864,79 @@ export function isAbandonedRestartFromNode(
 // =============================================================================
 
 /**
+ * State tracker for resilient recovery detection
+ */
+interface RecoveryState {
+  sawToolError: boolean;
+  userInterventionBeforeRecovery: boolean;
+  successAfterError: boolean;
+}
+
+/**
+ * Process a tool result entry for recovery detection
+ */
+function processToolResultForRecovery(
+  toolResult: ToolResultMessage,
+  state: RecoveryState
+): void {
+  if (toolResult.isError) {
+    state.sawToolError = true;
+    state.userInterventionBeforeRecovery = false;
+    state.successAfterError = false;
+  } else if (state.sawToolError && !state.userInterventionBeforeRecovery) {
+    state.successAfterError = true;
+  }
+}
+
+/**
+ * Process a user message entry for recovery detection
+ */
+function processUserMessageForRecovery(
+  userMsg: UserMessage,
+  state: RecoveryState
+): void {
+  if (!state.sawToolError || state.successAfterError) {
+    return;
+  }
+  const text =
+    typeof userMsg.content === "string"
+      ? userMsg.content
+      : extractTextFromContent(userMsg.content);
+  if (!isMinimalAcknowledgment(text)) {
+    state.userInterventionBeforeRecovery = true;
+  }
+}
+
+/**
  * Detect resilient recovery
  *
  * Tool error occurs, but the model fixes it WITHOUT user intervention,
  * and the task ultimately succeeds.
  */
 export function detectResilientRecovery(entries: SessionEntry[]): boolean {
-  let sawToolError = false;
-  let userInterventionBeforeRecovery = false;
-  let successAfterError = false;
+  const state: RecoveryState = {
+    sawToolError: false,
+    userInterventionBeforeRecovery: false,
+    successAfterError: false,
+  };
 
   for (const entry of entries) {
     if (entry.type !== "message") {
       continue;
     }
-
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
-
+    const msg = (entry as SessionMessageEntry).message;
     if (msg.role === "toolResult") {
-      const toolResult = msg as ToolResultMessage;
-      if (toolResult.isError) {
-        sawToolError = true;
-        userInterventionBeforeRecovery = false;
-        successAfterError = false;
-      } else if (sawToolError && !userInterventionBeforeRecovery) {
-        // Successful tool result after error, before user intervened
-        successAfterError = true;
-      }
-    } else if (msg.role === "user" && sawToolError && !successAfterError) {
-      // User sent a message after we saw an error but BEFORE recovery
-      // This means they had to intervene to help fix it
-      const userMsg = msg as UserMessage;
-      const text =
-        typeof userMsg.content === "string"
-          ? userMsg.content
-          : extractTextFromContent(userMsg.content);
-
-      // If it's correction/guidance, not just acknowledgment
-      if (!isMinimalAcknowledgment(text)) {
-        userInterventionBeforeRecovery = true;
-      }
+      processToolResultForRecovery(msg as ToolResultMessage, state);
+    } else if (msg.role === "user") {
+      processUserMessageForRecovery(msg as UserMessage, state);
     }
-    // User messages AFTER successful recovery are fine (praise, etc.)
   }
 
-  // Resilient recovery if we had an error, recovered successfully, without user intervention
-  return sawToolError && successAfterError && !userInterventionBeforeRecovery;
+  return (
+    state.sawToolError &&
+    state.successAfterError &&
+    !state.userInterventionBeforeRecovery
+  );
 }
 
 /**
@@ -887,6 +963,36 @@ function isMinimalAcknowledgment(text: string): boolean {
 }
 
 /**
+ * Count tool calls in an assistant message
+ */
+function countToolCallsInMessage(msg: AssistantMessage): number {
+  let count = 0;
+  for (const block of msg.content ?? []) {
+    if (block.type === "toolCall") {
+      count++;
+    }
+  }
+  return count;
+}
+
+/**
+ * Check if a user message is a correction (not first message)
+ */
+function checkUserMessageForCorrection(
+  userMsg: UserMessage,
+  isFirst: boolean
+): { isCorrection: boolean; isFirst: boolean } {
+  if (isFirst) {
+    return { isCorrection: false, isFirst: false };
+  }
+  const text =
+    typeof userMsg.content === "string"
+      ? userMsg.content
+      : extractTextFromContent(userMsg.content);
+  return { isCorrection: isUserCorrection(text), isFirst: false };
+}
+
+/**
  * Detect one-shot success
  *
  * Complex task (multiple tool calls) completed with zero user corrections/rephrasings.
@@ -900,40 +1006,22 @@ export function detectOneShotSuccess(entries: SessionEntry[]): boolean {
     if (entry.type !== "message") {
       continue;
     }
-
-    const msgEntry = entry as SessionMessageEntry;
-    const msg = msgEntry.message;
+    const msg = (entry as SessionMessageEntry).message;
 
     if (msg.role === "assistant") {
-      const assistantMsg = msg as AssistantMessage;
-      for (const block of assistantMsg.content ?? []) {
-        if (block.type === "toolCall") {
-          toolCallCount++;
-        }
-      }
+      toolCallCount += countToolCallsInMessage(msg as AssistantMessage);
     } else if (msg.role === "user") {
-      if (isFirstUserMessage) {
-        // First user message is the task, not a correction
-        isFirstUserMessage = false;
-      } else {
-        // Subsequent user messages are potential corrections
-        const userMsg = msg as UserMessage;
-        const text =
-          typeof userMsg.content === "string"
-            ? userMsg.content
-            : extractTextFromContent(userMsg.content);
-
-        // Check if this looks like a correction vs. just praise/acknowledgment
-        if (isUserCorrection(text)) {
-          userCorrectionCount++;
-        }
+      const result = checkUserMessageForCorrection(
+        msg as UserMessage,
+        isFirstUserMessage
+      );
+      isFirstUserMessage = result.isFirst;
+      if (result.isCorrection) {
+        userCorrectionCount++;
       }
     }
   }
 
-  // One-shot success if:
-  // - Complex task (3+ tool calls)
-  // - Zero user corrections
   return (
     toolCallCount >= COMPLEX_TASK_TOOL_CALL_THRESHOLD &&
     userCorrectionCount === 0
