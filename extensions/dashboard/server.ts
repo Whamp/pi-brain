@@ -22,7 +22,7 @@ import {
   scanSessions,
   groupByProject,
   findForkRelationships,
-} from "./lib/analyzer.js";
+} from "../../src/parser/analyzer.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

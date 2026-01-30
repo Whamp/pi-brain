@@ -13,13 +13,13 @@
 
 ---
 
-src/storage/bridge-discovery.ts [1-260]
+src/storage/bridge-discovery.ts [1-338]
   interface:
     23-32: interface BridgePath [exported]
       /** A discovered path in the graph */
     34-41: interface BridgeDiscoveryOptions [exported]
   function:
-    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+    266-296: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
       /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
   imports:
     - ./edge-repository.js
@@ -27,32 +27,32 @@ src/storage/bridge-discovery.ts [1-260]
     - ./node-storage.js
     - better-sqlite3
 
-src/storage/database.ts [1-298]
+src/storage/database.ts [1-331]
   interface:
-    20-34: interface DatabaseOptions [exported]
-    36-41: interface MigrationInfo [exported]
+    20-36: interface DatabaseOptions [exported]
+    38-43: interface MigrationInfo [exported]
   function:
-    46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
+    100-117: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-    89-112: loadMigrations(): {} [exported]
+    122-145: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
-    117-127: getSchemaVersion(db: Database.Database): number [exported]
+    150-160: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    133-154: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
+    166-187: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
       /** Check if a specific migration was skipped due to missing dependencies. Returns the requirement that caused it to be skipped, or null if not skipped. */
-    161-170: parseMigrationRequirements(sql: string): {} [exported]
+    194-203: parseMigrationRequirements(sql: string): {} [exported]
       /** Parse a migration SQL file for REQUIRES directives. Format: -- REQUIRES: requirement1, requirement2 Returns array of requirements (e.g., ['sqlite-vec']) */
-    176-187: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
+    209-220: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
       /** Check if migration requirements are satisfied. Returns unsatisfied requirement, or null if all satisfied. */
-    192-249: migrate(db: Database.Database): number [exported]
+    225-282: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    254-256: closeDatabase(db: Database.Database): void [exported]
+    287-289: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    261-268: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    294-301: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
-    273-281: loadVecExtension(db: Database.Database): boolean [exported]
+    306-314: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
-    286-297: isVecLoaded(db: Database.Database): boolean [exported]
+    319-330: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
   variable:
     15-15: any [exported]
@@ -119,7 +119,7 @@ src/storage/edge-repository.ts [1-197]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-625]
+src/storage/embedding-utils.ts [1-676]
   interface:
     325-329: interface BackfillEmbeddingProvider [exported]
       /** Embedding provider interface for backfill operations. Matches the EmbeddingProvider interface from facet-discovery.ts. */
@@ -150,9 +150,9 @@ src/storage/embedding-utils.ts [1-625]
       /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
     403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
       /** Find nodes that need embedding generation or update. A node needs embedding if: 1. No embedding exists for it 2. Embedding uses a different model than the current provider 3. Embedding uses old format (not rich format with decisions/lessons) */
-    459-585: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
+    570-636: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
-    592-624: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
+    643-675: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
   variable:
     19-19: "[emb:v2]" [exported]
@@ -162,7 +162,7 @@ src/storage/embedding-utils.ts [1-625]
     - ./database.js
     - better-sqlite3
 
-src/storage/filter-utils.ts [1-191]
+src/storage/filter-utils.ts [1-272]
   interface:
     17-38: interface BaseFilters [exported]
       /** Base filter fields shared by all filter types */
@@ -171,12 +171,12 @@ src/storage/filter-utils.ts [1-191]
     49-54: interface WhereClauseResult [exported]
       /** Result of building a WHERE clause */
   function:
-    88-190: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
+    249-271: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
       /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
   imports:
     - ./node-types.js
 
-src/storage/graph-repository.ts [1-366]
+src/storage/graph-repository.ts [1-412]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
@@ -188,15 +188,15 @@ src/storage/graph-repository.ts [1-366]
     28-28: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
       /** Direction for graph traversal */
   function:
-    110-215: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    219-271: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    224-271: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    280-317: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    279-333: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    325-379: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    339-349: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    385-395: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    355-365: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    401-411: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
   imports:
     - ./edge-repository.js
@@ -204,7 +204,7 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/hybrid-search.ts [1-606]
+src/storage/hybrid-search.ts [1-718]
   interface:
     57-76: interface HybridScoreBreakdown [exported]
       /** Breakdown of scores for transparency and debugging. */
@@ -215,12 +215,12 @@ src/storage/hybrid-search.ts [1-606]
     119-130: interface HybridSearchResponse [exported]
       /** Result from hybrid search with pagination metadata. */
   function:
-    348-550: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+    591-662: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
       /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
-    559-605: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+    671-717: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
       /** Calculate hybrid score for a single node (useful for re-ranking). */
   variable:
-    30-39: HYBRID_WEIGHTS [exported]
+    30-39: Record<string, number> [exported]
       /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
     - ./database.js
@@ -250,7 +250,7 @@ src/storage/index.ts [1-22]
     - ./semantic-search.js
     - ./tool-error-repository.js
 
-src/storage/lesson-repository.ts [1-284]
+src/storage/lesson-repository.ts [1-308]
   interface:
     16-25: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
@@ -272,29 +272,29 @@ src/storage/lesson-repository.ts [1-284]
 > [exported]
       /** Result from getLessonsByLevel */
   function:
-    85-184: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
+    156-208: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
-    192-232: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
+    216-256: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    237-243: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
+    261-267: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
       /** Count lessons matching filters (without fetching data) */
-    248-271: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+    272-295: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
-    276-283: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
+    300-307: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
       /** Get tags for a specific lesson */
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-360]
+src/storage/node-conversion.ts [1-432]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-352: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    416-424: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    357-359: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    429-431: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -320,13 +320,13 @@ src/storage/node-crud.ts [1-881]
       /** Insert daemon decisions for a node */
     296-325: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    331-414: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    477-493: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    420-434: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    499-513: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    445-560: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    587-619: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    567-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    626-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
     662-668: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
@@ -489,7 +489,7 @@ src/storage/node-types.ts [1-151]
     - ../types/index.js
     - node:crypto
 
-src/storage/pattern-repository.ts [1-369]
+src/storage/pattern-repository.ts [1-373]
   interface:
     74-78: interface ListFailurePatternsOptions [exported]
     142-146: interface ListLessonPatternsOptions [exported]
@@ -498,11 +498,11 @@ src/storage/pattern-repository.ts [1-369]
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
     117-136: listModelStats(db: Database.Database): {} [exported]
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-    199-252: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-    254-268: getInsight(db: Database.Database, id: string): any [exported]
-    270-294: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
-    296-328: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
-    330-347: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
+    211-260: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
+    262-276: getInsight(db: Database.Database, id: string): any [exported]
+    278-302: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
+    304-332: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
+    334-351: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
   imports:
     - ../types/index.js
     - better-sqlite3
@@ -563,7 +563,7 @@ src/storage/relationship-edges.ts [1-290]
     - ./edge-repository.js
     - better-sqlite3
 
-src/storage/search-repository.ts [1-449]
+src/storage/search-repository.ts [1-485]
   interface:
     41-46: interface SearchHighlight [exported]
       /** Highlight match for search results */
@@ -587,11 +587,11 @@ src/storage/search-repository.ts [1-449]
       /** Index a node for full-text search */
     127-153: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    207-274: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    286-310: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
-    358-418: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    394-454: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    423-448: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    459-484: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -618,7 +618,7 @@ src/storage/semantic-search.ts [1-214]
     - ./search-repository.js
     - better-sqlite3
 
-src/storage/tool-error-repository.ts [1-352]
+src/storage/tool-error-repository.ts [1-374]
   interface:
     16-25: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
@@ -641,21 +641,21 @@ src/storage/tool-error-repository.ts [1-352]
     97-103: interface NodeToolError [exported]
       /** A single tool error for a node */
   function:
-    112-170: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    176-213: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    176-252: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+    219-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
-    258-312: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
+    280-334: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
-    317-323: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
+    339-345: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
       /** Count tool errors matching filters. */
-    328-335: getAllToolsWithErrors(db: Database.Database): {} [exported]
+    350-357: getAllToolsWithErrors(db: Database.Database): {} [exported]
       /** Get all unique tools that have errors recorded */
-    340-351: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
+    362-373: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
   imports:
     - better-sqlite3
 
 ---
 Files: 21
-Estimated tokens: 10,186 (codebase: ~252,154)
+Estimated tokens: 10,190 (codebase: ~1,345,870)

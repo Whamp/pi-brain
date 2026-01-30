@@ -43,17 +43,17 @@ src/api/routes/agents.ts [1-207]
     - ../server.js
     - fastify
 
-src/api/routes/clusters.ts [1-375]
+src/api/routes/clusters.ts [1-393]
   function:
-    142-374: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
+    196-392: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../types/index.js
     - better-sqlite3
     - fastify
 
-src/api/routes/config.ts [1-1743]
+src/api/routes/config.ts [1-1792]
   function:
-    896-1742: async configRoutes(app: FastifyInstance): Promise<void> [exported]
+    1043-1791: async configRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../config/config.js
     - ../../config/types.js
@@ -103,9 +103,9 @@ src/api/routes/lessons.ts [1-94]
     - ../responses.js
     - fastify
 
-src/api/routes/nodes.ts [1-243]
+src/api/routes/nodes.ts [1-261]
   function:
-    59-242: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
+    109-260: async nodesRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/graph-repository.js
     - ../../storage/index.js
@@ -117,6 +117,7 @@ src/api/routes/nodes.ts [1-243]
     - ../../storage/quirk-repository.js
     - ../../storage/tool-error-repository.js
     - ../responses.js
+    - better-sqlite3
     - fastify
 
 src/api/routes/patterns.ts [1-119]
@@ -183,9 +184,9 @@ src/api/routes/signals.ts [1-260]
     - better-sqlite3
     - fastify
 
-src/api/routes/stats.ts [1-437]
+src/api/routes/stats.ts [1-485]
   function:
-    184-427: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
+    297-475: async statsRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../storage/node-queries.js
     - ../../storage/tool-error-repository.js
@@ -270,7 +271,7 @@ src/api/websocket.ts [1-404]
     - fastify
     - ws
 
-src/cli.ts [1-1148]
+src/cli.ts [1-1165]
   imports:
     - ./config/index.js
     - ./daemon/export.js
@@ -292,9 +293,9 @@ src/cli.ts [1-1148]
     - node:path
     - open
 
-src/config/config.ts [1-931]
+src/config/config.ts [1-1187]
   class:
-    663-671: class ConfigError extends Error [exported]
+    905-913: class ConfigError extends Error [exported]
       /** Configuration loading errors */
   function:
     35-43: expandPath(p: string): string [exported]
@@ -309,25 +310,25 @@ src/config/config.ts [1-931]
       /** Default API configuration */
     127-135: getDefaultConfig(): PiBrainConfig [exported]
       /** Get complete default configuration */
-    624-658: transformConfig(raw: RawConfig): PiBrainConfig [exported]
+    866-900: transformConfig(raw: RawConfig): PiBrainConfig [exported]
       /** Transform raw YAML config to typed config with validation */
-    676-731: loadConfig(configPath?: string): PiBrainConfig [exported]
+    960-987: loadConfig(configPath?: string): PiBrainConfig [exported]
       /** Load configuration from a YAML file */
-    736-741: ensureConfigDir(configDir?: string): void [exported]
+    992-997: ensureConfigDir(configDir?: string): void [exported]
       /** Ensure the config directory exists */
-    746-781: ensureDirectories(config: PiBrainConfig): void [exported]
+    1002-1037: ensureDirectories(config: PiBrainConfig): void [exported]
       /** Ensure all required directories exist based on configuration */
-    786-849: writeDefaultConfig(configPath?: string): void [exported]
+    1042-1105: writeDefaultConfig(configPath?: string): void [exported]
       /** Write a default configuration file */
-    854-862: getSessionDirs(config: PiBrainConfig): {} [exported]
+    1110-1118: getSessionDirs(config: PiBrainConfig): {} [exported]
       /** Get all session directories to watch (hub + enabled spokes) */
-    867-869: getEnabledSpokes(config: PiBrainConfig): {} [exported]
+    1123-1125: getEnabledSpokes(config: PiBrainConfig): {} [exported]
       /** Get enabled spokes from configuration */
-    874-878: getRsyncSpokes(config: PiBrainConfig): {} [exported]
+    1130-1134: getRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get rsync spokes (enabled spokes with rsync sync method) */
-    883-890: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
+    1139-1146: getScheduledRsyncSpokes(config: PiBrainConfig): {} [exported]
       /** Get scheduled rsync spokes (rsync spokes with a schedule) */
-    901-930: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
+    1157-1186: getComputerFromPath(sessionPath: string, config: PiBrainConfig): string [exported]
       /** Get the computer name for a session based on its path. For sessions from spoke directories, returns the spoke name. For local sessions (hub), returns the local hostname. Uses proper path boundary checking to avoid false matches (e.g., `/synced/laptop` should not match `/synced/laptop-backup/...`) */
   variable:
     25-25: any [exported]
@@ -368,7 +369,7 @@ src/config/types.ts [1-280]
     11-11: SyncMethod = "syncthing" | "rsync" | "api" [exported]
       /** Configuration types for pi-brain Configuration is loaded from ~/.pi-brain/config.yaml All paths support ~ expansion for home directory Spoke sync method options */
 
-src/daemon/cli.ts [1-1222]
+src/daemon/cli.ts [1-1337]
   interface:
     114-120: interface DaemonStatus [exported]
       /** Daemon status info */
@@ -403,27 +404,27 @@ src/daemon/cli.ts [1-1222]
       /** Format uptime in a human-readable way */
     259-269: getProcessUptime(): number [exported]
       /** Get process uptime (approximate based on PID file modification time) */
-    291-436: async startDaemon(options: StartOptions = {}): Promise<{ success: boolean; message: string; pid?: number; }> [exported]
+    484-514: async startDaemon(options: StartOptions = {}): Promise<DaemonResult> [exported]
       /** Start the daemon process */
-    441-503: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
+    553-588: async stopDaemon(options: StopOptions = {}): Promise<{ success: boolean; message: string; }> [exported]
       /** Stop the daemon process */
-    508-520: getDaemonStatus(configPath?: string): DaemonStatus [exported]
+    593-605: getDaemonStatus(configPath?: string): DaemonStatus [exported]
       /** Get daemon status information */
-    529-558: getQueueStatus(configPath?: string): QueueStatus [exported]
+    614-643: getQueueStatus(configPath?: string): QueueStatus [exported]
       /** Get queue status information */
-    563-616: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
+    648-701: queueAnalysis(sessionPath: string, configPath?: string): { success: boolean; message: string; jobId?: string; } [exported]
       /** Queue a session for analysis */
-    836-866: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
+    921-951: async runHealthChecks(configPath?: string): Promise<HealthStatus> [exported]
       /** Run all health checks */
-    875-896: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
+    960-981: formatDaemonStatus(status: DaemonStatus, _options: OutputOptions = {}): string [exported]
       /** Format daemon status for display */
-    901-951: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
+    1032-1066: formatQueueStatus(queueStatus: QueueStatus, _options: OutputOptions = {}): string [exported]
       /** Format queue status for display */
-    966-989: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
+    1081-1104: formatHealthStatus(status: HealthStatus, _options: OutputOptions = {}): string [exported]
       /** Format health check results for display */
-    1004-1124: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
+    1119-1239: rebuildIndex(configPath?: string): { success: boolean; message: string; count: number; } [exported]
       /** Rebuild the SQLite index from JSON files */
-    1129-1211: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
+    1244-1326: async rebuildEmbeddings(configPath?: string, options: { force?: boolean } = {}): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Rebuild embeddings for all nodes */
   variable:
     108-108: any [exported]
@@ -445,9 +446,9 @@ src/daemon/cli.ts [1-1222]
     - node:net
     - node:path
 
-src/daemon/connection-discovery.ts [1-620]
+src/daemon/connection-discovery.ts [1-629]
   class:
-    159-619: class ConnectionDiscoverer [exported]
+    159-628: class ConnectionDiscoverer [exported]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
     138-143: interface ConnectionResult [exported]
@@ -578,23 +579,23 @@ src/daemon/errors.ts [1-457]
   imports:
     - ./queue.js
 
-src/daemon/export.ts [1-148]
+src/daemon/export.ts [1-175]
   function:
     17-30: getSegmentEntries(entries: SessionEntry[], startId: string, endId: string): {} [exported]
       /** Extract entries within a segment range */
-    41-147: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
+    121-174: async exportFineTuneData(outputPath: string, configPath?: string): Promise<{ success: boolean; message: string; count: number; }> [exported]
       /** Export fine-tuning data to JSONL Format: { "input": <JSON string of segment entries>, "output": <JSON string of node analysis> } */
   imports:
     - ../config/index.js
     - ../parser/session.js
     - ../storage/node-storage.js
-    - ../types.js
+    - ../types/index.js
     - node:fs
     - node:path
 
-src/daemon/facet-discovery.ts [1-1760]
+src/daemon/facet-discovery.ts [1-1925]
   class:
-    670-1731: class FacetDiscovery [exported]
+    769-1896: class FacetDiscovery [exported]
   interface:
     99-108: interface ClusterAnalysisConfig [exported]
       /** Configuration for LLM cluster analysis */
@@ -604,15 +605,15 @@ src/daemon/facet-discovery.ts [1-1760]
       /** Result from analyzing multiple clusters */
     140-144: interface EmbeddingProvider [exported]
       /** Interface for embedding providers */
-    656-660: interface FacetDiscoveryLogger [exported]
+    755-759: interface FacetDiscoveryLogger [exported]
   function:
     162-198: createEmbeddingProvider(config: EmbeddingConfig): EmbeddingProvider [exported]
       /** Create an embedding provider from config */
     331-355: createMockEmbeddingProvider(dims = 384): EmbeddingProvider [exported]
       /** Create mock embedding provider for testing only. Not exposed in EmbeddingConfig - use createMockEmbeddingProvider() directly in tests. */
-    384-451: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
+    473-500: kMeansClustering(embeddings: number[][], k: number, maxIterations = 100): KMeansResult [exported]
       /** Simple K-means++ clustering implementation */
-    494-513: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
+    543-562: hdbscanClustering(embeddings: number[][], minClusterSize = 3, minSamples = 3): {} [exported]
       /** HDBSCAN-like density-based clustering (simplified) */
   imports:
     - ../storage/embedding-utils.js
@@ -658,9 +659,9 @@ src/daemon/index.ts [1-182]
     - ./watcher.js
     - ./worker.js
 
-src/daemon/insight-aggregation.ts [1-553]
+src/daemon/insight-aggregation.ts [1-628]
   class:
-    149-552: class InsightAggregator [exported]
+    149-627: class InsightAggregator [exported]
   imports:
     - ../storage/node-storage.js
     - ../types/index.js
@@ -674,9 +675,9 @@ src/daemon/pattern-aggregation.ts [1-332]
     - better-sqlite3
     - node:crypto
 
-src/daemon/processor.ts [1-836]
+src/daemon/processor.ts [1-857]
   class:
-    774-828: class JobProcessor [exported]
+    795-849: class JobProcessor [exported]
       /** Job processor that invokes pi agents for analysis */
   interface:
     21-34: interface AgentResult [exported]
@@ -691,7 +692,7 @@ src/daemon/processor.ts [1-836]
       /** Logger interface for processor */
     239-246: interface EnvironmentValidationResult [exported]
       /** Result of environment validation */
-    764-769: interface ProcessorConfig [exported]
+    785-790: interface ProcessorConfig [exported]
       /** Processor configuration */
   function:
     203-211: async checkSkillAvailable(skillName: string): Promise<boolean> [exported]
@@ -700,19 +701,19 @@ src/daemon/processor.ts [1-836]
       /** Get availability information for all skills */
     252-264: async validateRequiredSkills(): Promise<EnvironmentValidationResult> [exported]
       /** Validate that all required skills are available Returns validation result instead of throwing */
-    273-310: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
+    299-313: async buildSkillsArg(sessionFile?: string): Promise<string> [exported]
       /** Build the skills argument for pi invocation Returns comma-separated list of available skills RLM skill is only included for files larger than RLM_SIZE_THRESHOLD to avoid confusing smaller models with RLM instructions. */
-    319-351: buildAnalysisPrompt(job: AnalysisJob): string [exported]
+    322-354: buildAnalysisPrompt(job: AnalysisJob): string [exported]
       /** Build the analysis prompt for a job */
-    384-492: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
+    387-495: async invokeAgent(job: AnalysisJob, config: DaemonConfig, logger: ProcessorLogger = consoleLogger): Promise<AgentResult> [exported]
       /** Invoke the pi agent to analyze a session */
-    598-667: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
+    601-670: parseAgentOutput(stdout: string, logger: ProcessorLogger = consoleLogger): Omit<AgentResult, "exitCode" | "durationMs"> [exported]
       /** Parse the pi agent's JSON mode output */
-    673-706: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
+    676-709: extractNodeFromText(text: string, logger: ProcessorLogger = consoleLogger): AgentNodeOutput [exported]
       /** Extract node JSON from text content Handles both raw JSON and code-fenced JSON */
-    711-757: isValidNodeOutput(obj: unknown): boolean [exported]
+    763-778: isValidNodeOutput(obj: unknown): boolean [exported]
       /** Basic validation that output matches expected schema */
-    833-835: createProcessor(config: ProcessorConfig): JobProcessor [exported]
+    854-856: createProcessor(config: ProcessorConfig): JobProcessor [exported]
       /** Create a job processor */
   variable:
     170-175: ProcessorLogger [exported]
@@ -735,7 +736,7 @@ src/daemon/processor.ts [1-836]
     - node:os
     - node:path
 
-src/daemon/query-processor.ts [1-823]
+src/daemon/query-processor.ts [1-926]
   interface:
     38-52: interface QueryRequest [exported]
       /** Query request from the API */
@@ -743,7 +744,7 @@ src/daemon/query-processor.ts [1-823]
       /** Query response to return to the client */
     98-111: interface QueryProcessorConfig [exported]
   function:
-    116-211: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
+    116-176: async processQuery(request: QueryRequest, config: QueryProcessorConfig): Promise<QueryResponse> [exported]
       /** Process a natural language query against the knowledge graph */
   imports:
     - ../config/types.js
@@ -762,9 +763,9 @@ src/daemon/query-processor.ts [1-823]
     - node:os
     - node:path
 
-src/daemon/queue.ts [1-787]
+src/daemon/queue.ts [1-807]
   class:
-    151-742: class QueueManager [exported]
+    151-762: class QueueManager [exported]
       /** Manages the analysis job queue Thread-safe queue operations backed by SQLite with optimistic locking. */
   interface:
     37-50: interface JobContext [exported]
@@ -787,11 +788,11 @@ src/daemon/queue.ts [1-787]
   /** Override default max re... [exported]
       /** Job creation input (id, status, queuedAt are auto-generated) */
   function:
-    753-755: generateJobId(): string [exported]
+    773-775: generateJobId(): string [exported]
       /** Generate a unique job ID Uses the same format as node IDs: 16-char hex string */
-    760-762: createQueueManager(db: Database.Database): QueueManager [exported]
+    780-782: createQueueManager(db: Database.Database): QueueManager [exported]
       /** Create a queue manager from a database */
-    768-786: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
+    788-806: getQueueStatusSummary(db: Database.Database): { stats: QueueStats; pendingJobs: {}; runningJobs: {}; recentFailed: {}; } [exported]
       /** Get aggregated queue status Used by CLI and API */
   variable:
     23-34: PRIORITY [exported]
@@ -799,9 +800,9 @@ src/daemon/queue.ts [1-787]
   imports:
     - better-sqlite3
 
-src/daemon/scheduler.ts [1-972]
+src/daemon/scheduler.ts [1-945]
   class:
-    163-898: class Scheduler [exported]
+    163-871: class Scheduler [exported]
       /** Scheduler manages cron-based scheduled jobs */
   interface:
     59-66: interface ScheduledJobResult [exported]
@@ -820,11 +821,11 @@ src/daemon/scheduler.ts [1-972]
   | "backfill_embeddings" [exported]
       /** Job types that can be scheduled */
   function:
-    903-933: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
+    876-906: createScheduler(config: DaemonConfig, queue: QueueManager, db: Database.Database, logger?: SchedulerLogger): Scheduler [exported]
       /** Create a scheduler from daemon config */
-    939-949: isValidCronExpression(expression: string): boolean [exported]
+    912-922: isValidCronExpression(expression: string): boolean [exported]
       /** Validate a cron expression Returns true if valid, false otherwise */
-    954-971: getNextRunTimes(expression: string, count = 5): {} [exported]
+    927-944: getNextRunTimes(expression: string, count = 5): {} [exported]
       /** Get the next N run times for a cron expression */
   variable:
     78-83: SchedulerLogger [exported]
@@ -902,23 +903,23 @@ src/daemon/watcher.ts [1-582]
     - node:fs/promises
     - node:path
 
-src/daemon/worker.ts [1-815]
+src/daemon/worker.ts [1-894]
   class:
-    127-754: class Worker [exported]
+    128-833: class Worker [exported]
       /** Worker that processes jobs from the analysis queue */
   interface:
-    67-84: interface WorkerConfig [exported]
+    68-85: interface WorkerConfig [exported]
       /** Worker configuration */
-    87-102: interface WorkerStatus [exported]
+    88-103: interface WorkerStatus [exported]
       /** Worker status */
-    105-118: interface JobProcessingResult [exported]
+    106-119: interface JobProcessingResult [exported]
       /** Result from processing a single job */
   function:
-    763-765: createWorker(config: WorkerConfig): Worker [exported]
+    842-844: createWorker(config: WorkerConfig): Worker [exported]
       /** Create a worker instance */
-    771-785: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
+    850-864: processSingleJob(job: AnalysisJob, config: PiBrainConfig, db: Database.Database, logger?: ProcessorLogger): Promise<JobProcessingResult> [exported]
       /** Process a single job without the full worker loop Useful for one-off processing or testing */
-    790-814: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
+    869-893: handleJobError(error: Error, job: AnalysisJob, retryPolicy: RetryPolicy = DEFAULT_RETRY_POLICY): { shouldRetry: boolean; retryDelayMinutes: number; formattedError: string; category: ReturnType<any>; } [exported]
       /** Handle job error manually (for custom queue implementations) */
   imports:
     - ../config/config.js
@@ -930,6 +931,7 @@ src/daemon/worker.ts [1-815]
     - ../storage/node-conversion.js
     - ../storage/node-types.js
     - ../storage/relationship-edges.js
+    - ../types/index.js
     - ./connection-discovery.js
     - ./errors.js
     - ./facet-discovery.js
@@ -950,43 +952,43 @@ src/index.ts [1-58]
     - ./storage/database.js
     - ./storage/node-storage.js
     - ./storage/node-types.js
-    - ./types.js
+    - ./types/index.js
     - ./web/generator.js
 
-src/parser/analyzer.ts [1-336]
+src/parser/analyzer.ts [1-340]
   function:
-    16-18: getDefaultSessionDir(): string [exported]
+    20-22: getDefaultSessionDir(): string [exported]
       /** Default session directory */
-    31-43: async scanSessions(sessionDir?: string): Promise<{}> [exported]
+    35-47: async scanSessions(sessionDir?: string): Promise<{}> [exported]
       /** Scan session directory and parse all sessions Note: This function loads all sessions into memory. For large session histories (thousands of sessions), consider using `scanSessionsIterator` which processes sessions one at a time. */
-    60-102: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
+    64-106: async *scanSessionsIterator(sessionDir?: string): AsyncGenerator<SessionInfo, void, unknown> [exported]
       /** Async generator that yields sessions one at a time for memory efficiency Use this instead of `scanSessions` when processing large session histories (hundreds or thousands of sessions) to avoid loading all sessions into memory. Sessions are yielded in file system order, not sorted by timestamp. */
-    107-127: findForkRelationships(sessions: SessionInfo[]): {} [exported]
+    111-131: findForkRelationships(sessions: SessionInfo[]): {} [exported]
       /** Find fork relationships between sessions */
-    132-164: groupByProject(sessions: SessionInfo[]): {} [exported]
+    136-168: groupByProject(sessions: SessionInfo[]): {} [exported]
       /** Group sessions by project (cwd) */
-    185-196: decodeProjectDir(encodedName: string): string [exported]
+    189-200: decodeProjectDir(encodedName: string): string [exported]
       /** Decode project directory name to path e.g., "--home-will-projects-myapp--" → "/home/will/projects/myapp" **Warning**: Pi's encoding is lossy - hyphens in original paths are not escaped. This means "--home-will-projects-pi-brain--" could be either: - /home/will/projects/pi-brain (correct) - /home/will/projects/pi/brain (wrong) Prefer using session.header.cwd which contains the accurate original path. This function is only useful for display purposes when session data is unavailable. */
-    210-217: getProjectName(sessionPath: string): string [exported]
+    214-221: getProjectName(sessionPath: string): string [exported]
       /** Get project name from session path */
-    228-230: getProjectNameFromSession(session: SessionInfo): string [exported]
+    232-234: getProjectNameFromSession(session: SessionInfo): string [exported]
       /** Get project name from a SessionInfo object (preferred over getProjectName) This function returns the accurate project path from the session header, which is not affected by the lossy directory name encoding. */
-    235-240: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
+    239-244: filterByProject(sessions: SessionInfo[], projectPath: string): {} [exported]
       /** Filter sessions by project path */
-    245-260: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
+    249-264: filterByDateRange(sessions: SessionInfo[], startDate?: Date, endDate?: Date): {} [exported]
       /** Filter sessions by date range */
-    265-294: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
+    269-298: searchSessions(sessions: SessionInfo[], query: string): {} [exported]
       /** Search sessions for text content */
-    299-335: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
+    303-339: getOverallStats(sessions: SessionInfo[]): { totalSessions: number; totalEntries: number; totalMessages: number; totalTokens: number; totalCost: number; projectCount: number; forkCount: number; } [exported]
       /** Get session summary statistics */
   imports:
-    - ../types.js
+    - ../types/index.js
     - ./session.js
     - node:fs/promises
     - node:os
     - node:path
 
-src/parser/boundary.ts [1-573]
+src/parser/boundary.ts [1-655]
   class:
     214-291: class LeafTracker [exported]
       /** Tracks the "current leaf" as entries are processed. In a session tree, the leaf is the most recently added entry that hasn't become a parent of another entry. This is used to detect tree jumps (when a new entry's parentId doesn't match the current leaf). */
@@ -999,7 +1001,7 @@ src/parser/boundary.ts [1-573]
       /** A segment is a contiguous span of entries between boundaries */
     103-109: interface BoundaryOptions [exported]
       /** Options for boundary detection */
-    535-539: interface BoundaryStats [exported]
+    617-621: interface BoundaryStats [exported]
       /** Get boundary statistics for a session */
   type:
     29-34: BoundaryType = | "branch"
@@ -1009,37 +1011,37 @@ src/parser/boundary.ts [1-573]
   | "handoff" [exported]
       /** Types of boundaries that can occur within a session */
   function:
-    304-443: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
+    468-525: detectBoundaries(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Detect all boundaries in a list of session entries */
-    474-530: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
+    556-612: extractSegments(entries: SessionEntry[], options: BoundaryOptions = {}): {} [exported]
       /** Extract segments from entries based on detected boundaries A segment is a contiguous span of entries. Boundaries define the split points. */
-    548-572: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
+    630-654: getBoundaryStats(entries: SessionEntry[], options: BoundaryOptions = {}): BoundaryStats [exported]
       /** Calculate statistics about boundaries in a session */
   variable:
     98-98: 10 [exported]
       /** Default minimum gap in minutes to trigger a resume boundary. Can be overridden via BoundaryOptions.resumeGapMinutes. */
   imports:
-    - ../types.js
+    - ../types/index.js
 
-src/parser/fork.ts [1-191]
+src/parser/fork.ts [1-195]
   interface:
-    22-33: interface ForkInfo [exported]
+    26-37: interface ForkInfo [exported]
       /** Result of detecting a fork from a session header */
   function:
-    46-57: isForkSession(header: SessionHeader, sessionPath: string): ForkInfo [exported]
+    50-61: isForkSession(header: SessionHeader, sessionPath: string): ForkInfo [exported]
       /** Check if a session is a fork (has parentSession in header) */
-    70-85: findForks(sessions: SessionInfo[]): {} [exported]
+    74-89: findForks(sessions: SessionInfo[]): {} [exported]
       /** Find all fork relationships from a list of parsed sessions Note: Similar to analyzer.ts:findForkRelationships() but without sorting. The analyzer version sorts by timestamp; this version preserves input order. Both are exported to avoid circular imports that would exceed the barrel file module limit. */
-    94-111: findForksFromHeaders(headers: [string, SessionHeader][]): {} [exported]
+    98-115: findForksFromHeaders(headers: [string, SessionHeader][]): {} [exported]
       /** Find fork relationships given just session headers and paths Useful when you don't have fully parsed sessions */
-    119-131: buildForkTree(forks: ForkRelationship[]): Map<string, {}> [exported]
+    123-135: buildForkTree(forks: ForkRelationship[]): Map<string, {}> [exported]
       /** Build a map of session paths to their fork children */
-    140-159: getForkChain(sessionPath: string, forks: ForkRelationship[]): {} [exported]
+    144-163: getForkChain(sessionPath: string, forks: ForkRelationship[]): {} [exported]
       /** Get the fork chain for a session (all ancestors via fork) */
-    168-190: getForkDescendants(sessionPath: string, forks: ForkRelationship[]): {} [exported]
+    172-194: getForkDescendants(sessionPath: string, forks: ForkRelationship[]): {} [exported]
       /** Get all descendants of a session via forks */
   imports:
-    - ../types.js
+    - ../types/index.js
 
 src/parser/index.ts [1-9]
   imports:
@@ -1048,84 +1050,83 @@ src/parser/index.ts [1-9]
     - ./session.js
     - ./signals.js
 
-src/parser/session.ts [1-419]
+src/parser/session.ts [1-438]
   function:
     25-28: async parseSession(filePath: string): Promise<SessionInfo> [exported]
       /** Parse a session JSONL file */
     33-82: parseSessionContent(content: string, filePath: string): SessionInfo [exported]
       /** Parse session content from string */
-    87-180: buildTree(entries: SessionEntry[]): any [exported]
+    151-182: buildTree(entries: SessionEntry[]): any [exported]
       /** Build a tree structure from entries */
-    186-210: findLeaf(entries: SessionEntry[]): string [exported]
+    188-212: findLeaf(entries: SessionEntry[]): string [exported]
       /** Find the current leaf entry ID The leaf is the latest entry that has no children */
-    215-227: findBranchPoints(entries: SessionEntry[]): {} [exported]
+    217-229: findBranchPoints(entries: SessionEntry[]): {} [exported]
       /** Find branch points (entries with multiple children) */
-    232-304: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
+    273-323: calculateStats(entries: SessionEntry[], tree: TreeNode | null): SessionStats [exported]
       /** Calculate session statistics */
-    351-370: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
+    370-389: extractTextPreview(message: UserMessage | AssistantMessage, maxLength = 100): string [exported]
       /** Extract text preview from a message */
-    386-408: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
+    405-427: getPathToEntry(entries: SessionEntry[], targetId: string): {} [exported]
       /** Get the path from root to a specific entry */
-    413-418: getEntry(entries: SessionEntry[], id: string): any [exported]
+    432-437: getEntry(entries: SessionEntry[], id: string): any [exported]
       /** Get entry by ID */
   imports:
-    - ../types.js
+    - ../types/index.js
     - node:fs/promises
 
-src/parser/signals.ts [1-1095]
+src/parser/signals.ts [1-1181]
   interface:
-    555-564: interface FrictionDetectionOptions [exported]
+    590-599: interface FrictionDetectionOptions [exported]
       /** Options for friction detection */
-    1067-1070: interface DelightDetectionOptions [exported]
+    1153-1156: interface DelightDetectionOptions [exported]
       /** Options for delight detection */
   function:
-    126-163: countRephrasingCascades(entries: SessionEntry[]): number [exported]
+    124-161: countRephrasingCascades(entries: SessionEntry[]): number [exported]
       /** Count rephrasing cascades in a segment A rephrasing cascade is 3+ consecutive user messages without a meaningful assistant response (no tool calls, no substantial text). */
-    190-220: countToolLoops(entries: SessionEntry[]): number [exported]
+    188-218: countToolLoops(entries: SessionEntry[]): number [exported]
       /** Count tool loops in a segment A tool loop is when the same tool fails with the same error type 3+ times. */
-    292-342: countContextChurn(entries: SessionEntry[]): number [exported]
+    352-377: countContextChurn(entries: SessionEntry[]): number [exported]
       /** Count context churn events Context churn is high frequency of read/ls operations on different files, indicating the user is fighting the context window. */
-    349-381: detectModelSwitch(entries: SessionEntry[], previousSegmentModel?: string): string [exported]
+    384-416: detectModelSwitch(entries: SessionEntry[], previousSegmentModel?: string): string [exported]
       /** Detect if a model switch occurred for this segment Returns the model switched FROM if this segment is a retry with a different model. */
-    389-436: detectSilentTermination(entries: SessionEntry[], isLastSegment: boolean, wasResumed: boolean): boolean [exported]
+    457-471: detectSilentTermination(entries: SessionEntry[], isLastSegment: boolean, wasResumed: boolean): boolean [exported]
       /** Detect silent termination Session ends mid-task (no handoff, no success) and is not resumed. This is detected by checking if the last entry shows incomplete work. */
-    479-507: extractManualFlags(entries: SessionEntry[]): {} [exported]
+    514-542: extractManualFlags(entries: SessionEntry[]): {} [exported]
       /** Extract manual flags from session entries Looks for custom entries with type 'brain_flag' */
-    518-546: calculateFrictionScore(friction: FrictionSignals): number [exported]
+    553-581: calculateFrictionScore(friction: FrictionSignals): number [exported]
       /** Calculate overall friction score (0.0-1.0) Weights different friction signals based on severity. */
-    569-601: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
+    604-636: detectFrictionSignals(entries: SessionEntry[], options: FrictionDetectionOptions = {}): FrictionSignals [exported]
       /** Detect all friction signals in a session segment */
-    611-642: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
+    676-690: getFilesTouched(entries: SessionEntry[]): Set<string> [exported]
       /** Check if a segment touches similar files to another segment (for abandoned restart detection) */
-    647-665: hasFileOverlap(files1: Set<string>, files2: Set<string>, threshold = 0.3): boolean [exported]
+    695-713: hasFileOverlap(files1: Set<string>, files2: Set<string>, threshold = 0.3): boolean [exported]
       /** Check if two sets of files have significant overlap */
-    670-700: getPrimaryModel(entries: SessionEntry[]): string [exported]
+    718-748: getPrimaryModel(entries: SessionEntry[]): string [exported]
       /** Get the primary model used in a segment */
-    705-714: getSegmentTimestamp(entries: SessionEntry[]): string [exported]
+    753-762: getSegmentTimestamp(entries: SessionEntry[]): string [exported]
       /** Get segment timestamp for abandoned restart detection */
-    724-758: isAbandonedRestart(segmentA: { entries: SessionEntry[]; outcome: string; endTime: string }, segmentB: { entries: SessionEntry[]; startTime: string }): boolean [exported]
+    772-806: isAbandonedRestart(segmentA: { entries: SessionEntry[]; outcome: string; endTime: string }, segmentB: { entries: SessionEntry[]; startTime: string }): boolean [exported]
       /** Check if segment B is an abandoned restart of segment A Criteria: - Segment A has outcome 'abandoned' - Segment B starts within 30 minutes of segment A ending - Both segments touch similar files */
-    771-810: isAbandonedRestartFromNode(previousNode: {
+    819-858: isAbandonedRestartFromNode(previousNode: {
     outcome: string;
     timestamp: string;
     filesTouched: string[];
   }, currentStartTime: string, currentFilesTouched: string[]): boolean [exported]
       /** Check if a current segment is an abandoned restart of a previous node. This is similar to `isAbandonedRestart` but works with already-computed node data (with filesTouched arrays) instead of raw session entries. Criteria: - Previous node has outcome 'abandoned' - Current segment starts within 30 minutes of previous node's timestamp - Both touch similar files (30% overlap threshold) */
-    822-864: detectResilientRecovery(entries: SessionEntry[]): boolean [exported]
+    914-938: detectResilientRecovery(entries: SessionEntry[]): boolean [exported]
       /** Detect resilient recovery Tool error occurs, but the model fixes it WITHOUT user intervention, and the task ultimately succeeds. */
-    894-941: detectOneShotSuccess(entries: SessionEntry[]): boolean [exported]
+    998-1027: detectOneShotSuccess(entries: SessionEntry[]): boolean [exported]
       /** Detect one-shot success Complex task (multiple tool calls) completed with zero user corrections/rephrasings. */
-    982-1005: detectExplicitPraise(entries: SessionEntry[]): boolean [exported]
+    1068-1091: detectExplicitPraise(entries: SessionEntry[]): boolean [exported]
       /** Detect explicit praise from user User says "great job", "perfect", "thanks", etc. */
-    1039-1058: calculateDelightScore(delight: DelightSignals): number [exported]
+    1125-1144: calculateDelightScore(delight: DelightSignals): number [exported]
       /** Calculate overall delight score (0.0-1.0) Weights different delight signals based on significance. */
-    1075-1094: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
+    1161-1180: detectDelightSignals(entries: SessionEntry[], _options: DelightDetectionOptions = {}): DelightSignals [exported]
       /** Detect all delight signals in a session segment */
   imports:
-    - ../types.js
     - ../types/index.js
 
-src/prompt/agents-generator.ts [1-649]
+src/prompt/agents-generator.ts [1-683]
   interface:
     31-52: interface AgentsGeneratorConfig [exported]
       /** Configuration for AGENTS.md generation */
@@ -1136,17 +1137,17 @@ src/prompt/agents-generator.ts [1-649]
   function:
     129-189: gatherModelData(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): ModelInsightData [exported]
       /** Gather all insights and clusters for a specific model */
-    231-298: formatDataForPrompt(data: ModelInsightData): string [exported]
+    268-327: formatDataForPrompt(data: ModelInsightData): string [exported]
       /** Format model data into a structured prompt for LLM synthesis */
-    304-354: generateFallbackAgents(data: ModelInsightData): string [exported]
+    333-388: generateFallbackAgents(data: ModelInsightData): string [exported]
       /** Generate a fallback AGENTS.md without LLM synthesis Used when LLM is not available or synthesis fails */
-    359-388: async synthesizeWithLLM(data: ModelInsightData, config: AgentsGeneratorConfig = {}): Promise<string> [exported]
+    393-422: async synthesizeWithLLM(data: ModelInsightData, config: AgentsGeneratorConfig = {}): Promise<string> [exported]
       /** Use LLM to synthesize model data into coherent AGENTS.md content */
-    500-571: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
+    534-605: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Generate AGENTS.md for a specific model */
-    576-586: listModelsWithInsights(db: Database.Database): {} [exported]
+    610-620: listModelsWithInsights(db: Database.Database): {} [exported]
       /** List all models that have insights in the database */
-    591-648: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
+    625-682: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Preview AGENTS.md generation without saving */
   imports:
     - ../storage/pattern-repository.js
@@ -1205,7 +1206,7 @@ src/prompt/index.ts [1-13]
     - ./prompt.js
     - ./types.js
 
-src/prompt/prompt-generator.ts [1-360]
+src/prompt/prompt-generator.ts [1-391]
   interface:
     25-36: interface GeneratePromptOptions [exported]
   function:
@@ -1215,17 +1216,17 @@ src/prompt/prompt-generator.ts [1-360]
       /** Group insights by model */
     104-129: filterActionableInsights(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
       /** Filter insights to actionable ones */
-    134-198: formatModelSection(model: string, insights: AggregatedInsight[], options: GeneratePromptOptions = {}): string [exported]
+    211-229: formatModelSection(model: string, insights: AggregatedInsight[], options: GeneratePromptOptions = {}): string [exported]
       /** Format a model-specific prompt section */
-    207-246: generatePromptAdditions(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
+    238-277: generatePromptAdditions(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
       /** Generate prompt additions for all models with insights */
-    253-270: generatePromptAdditionsFromDb(db: Database.Database, options: GeneratePromptOptions = {}): {} [exported]
+    284-301: generatePromptAdditionsFromDb(db: Database.Database, options: GeneratePromptOptions = {}): {} [exported]
       /** Generate prompt additions from the database Fetches insights from aggregated_insights table and generates additions. */
-    277-300: formatPromptAdditionsDocument(additions: PromptAddition[]): string [exported]
+    308-331: formatPromptAdditionsDocument(additions: PromptAddition[]): string [exported]
       /** Format a complete prompt additions document Combines all model-specific additions into a single markdown document. */
-    308-332: updateInsightPromptTexts(db: Database.Database, additions: PromptAddition[], promptVersion?: string): void [exported]
+    339-363: updateInsightPromptTexts(db: Database.Database, additions: PromptAddition[], promptVersion?: string): void [exported]
       /** Generate and store prompt text for insights For each insight that should be included in prompts, generates the appropriate prompt text and updates the database. */
-    337-359: getPromptAdditionsForModel(db: Database.Database, model: string, options: GeneratePromptOptions = {}): any [exported]
+    368-390: getPromptAdditionsForModel(db: Database.Database, model: string, options: GeneratePromptOptions = {}): any [exported]
       /** Get prompt additions for a specific model */
   imports:
     - ../storage/pattern-repository.js
@@ -1325,13 +1326,13 @@ src/prompt/types.ts [1-35]
     28-34: interface PromptVersionRecord [exported]
       /** Prompt info retrieved from database */
 
-src/storage/bridge-discovery.ts [1-260]
+src/storage/bridge-discovery.ts [1-338]
   interface:
     23-32: interface BridgePath [exported]
       /** A discovered path in the graph */
     34-41: interface BridgeDiscoveryOptions [exported]
   function:
-    57-218: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
+    266-296: findBridgePaths(db: Database.Database, seedNodeIds: string[], options: BridgeDiscoveryOptions = {}): {} [exported]
       /** Find interesting multi-hop paths originating from seed nodes. Uses BFS/DFS to traverse outgoing edges, scoring paths based on edge confidence and node relevance. */
   imports:
     - ./edge-repository.js
@@ -1339,32 +1340,32 @@ src/storage/bridge-discovery.ts [1-260]
     - ./node-storage.js
     - better-sqlite3
 
-src/storage/database.ts [1-298]
+src/storage/database.ts [1-331]
   interface:
-    20-34: interface DatabaseOptions [exported]
-    36-41: interface MigrationInfo [exported]
+    20-36: interface DatabaseOptions [exported]
+    38-43: interface MigrationInfo [exported]
   function:
-    46-84: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
+    100-117: openDatabase(options: DatabaseOptions = {}): Database.Database [exported]
       /** Open or create the pi-brain database */
-    89-112: loadMigrations(): {} [exported]
+    122-145: loadMigrations(): {} [exported]
       /** Load migrations from the migrations directory */
-    117-127: getSchemaVersion(db: Database.Database): number [exported]
+    150-160: getSchemaVersion(db: Database.Database): number [exported]
       /** Get current schema version */
-    133-154: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
+    166-187: getMigrationSkippedReason(db: Database.Database, version: number): string [exported]
       /** Check if a specific migration was skipped due to missing dependencies. Returns the requirement that caused it to be skipped, or null if not skipped. */
-    161-170: parseMigrationRequirements(sql: string): {} [exported]
+    194-203: parseMigrationRequirements(sql: string): {} [exported]
       /** Parse a migration SQL file for REQUIRES directives. Format: -- REQUIRES: requirement1, requirement2 Returns array of requirements (e.g., ['sqlite-vec']) */
-    176-187: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
+    209-220: checkMigrationRequirements(db: Database.Database, requirements: string[]): string [exported]
       /** Check if migration requirements are satisfied. Returns unsatisfied requirement, or null if all satisfied. */
-    192-249: migrate(db: Database.Database): number [exported]
+    225-282: migrate(db: Database.Database): number [exported]
       /** Run pending migrations */
-    254-256: closeDatabase(db: Database.Database): void [exported]
+    287-289: closeDatabase(db: Database.Database): void [exported]
       /** Close the database connection */
-    261-268: isDatabaseHealthy(db: Database.Database): boolean [exported]
+    294-301: isDatabaseHealthy(db: Database.Database): boolean [exported]
       /** Check if the database is healthy */
-    273-281: loadVecExtension(db: Database.Database): boolean [exported]
+    306-314: loadVecExtension(db: Database.Database): boolean [exported]
       /** Load the sqlite-vec extension */
-    286-297: isVecLoaded(db: Database.Database): boolean [exported]
+    319-330: isVecLoaded(db: Database.Database): boolean [exported]
       /** Check if sqlite-vec extension is loaded */
   variable:
     15-15: any [exported]
@@ -1431,7 +1432,7 @@ src/storage/edge-repository.ts [1-197]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/embedding-utils.ts [1-625]
+src/storage/embedding-utils.ts [1-676]
   interface:
     325-329: interface BackfillEmbeddingProvider [exported]
       /** Embedding provider interface for backfill operations. Matches the EmbeddingProvider interface from facet-discovery.ts. */
@@ -1462,9 +1463,9 @@ src/storage/embedding-utils.ts [1-625]
       /** Deserialize a binary Buffer to an embedding array. Inverse of serializeEmbedding. */
     403-443: findNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { limit?: number; force?: boolean } = {}): {} [exported]
       /** Find nodes that need embedding generation or update. A node needs embedding if: 1. No embedding exists for it 2. Embedding uses a different model than the current provider 3. Embedding uses old format (not rich format with decisions/lessons) */
-    459-585: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
+    570-636: async backfillEmbeddings(db: Database.Database, provider: BackfillEmbeddingProvider, readNodeFromPath: (dataFile: string) => Node, options: BackfillEmbeddingsOptions = {}): Promise<BackfillResult> [exported]
       /** Backfill embeddings for nodes that are missing or have outdated embeddings. This function: 1. Finds nodes needing embedding (missing, wrong model, or old format) 2. Loads full node data from JSON files 3. Builds rich embedding text (summary + decisions + lessons) 4. Generates embeddings in batches via the provider 5. Stores in both node_embeddings table and node_embeddings_vec (if available) Errors are handled gracefully: - Individual node failures don't stop the batch - Returns statistics including failed node IDs for retry */
-    592-624: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
+    643-675: countNodesNeedingEmbedding(db: Database.Database, provider: BackfillEmbeddingProvider, options: { force?: boolean } = {}): { total: number; needsEmbedding: number; } [exported]
       /** Count nodes that need embedding backfill. Useful for showing progress or estimating work before running backfill. */
   variable:
     19-19: "[emb:v2]" [exported]
@@ -1474,7 +1475,7 @@ src/storage/embedding-utils.ts [1-625]
     - ./database.js
     - better-sqlite3
 
-src/storage/filter-utils.ts [1-191]
+src/storage/filter-utils.ts [1-272]
   interface:
     17-38: interface BaseFilters [exported]
       /** Base filter fields shared by all filter types */
@@ -1483,12 +1484,12 @@ src/storage/filter-utils.ts [1-191]
     49-54: interface WhereClauseResult [exported]
       /** Result of building a WHERE clause */
   function:
-    88-190: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
+    249-271: buildWhereClause(filters: BaseFilters | ExtendedFilters | undefined, tableAlias = "n"): WhereClauseResult [exported]
       /** Build a WHERE clause from filter conditions. Supports filtering by: - project (partial match via LIKE) - exactProject (exact match) - type (exact match) - outcome (exact match) - date range (from/to on timestamp field) - computer (exact match) - hadClearGoal (boolean) - isNewProject (boolean) - sessionFile (exact match) - tags (AND logic - nodes must have ALL specified tags) - topics (AND logic - nodes must have ALL specified topics) */
   imports:
     - ./node-types.js
 
-src/storage/graph-repository.ts [1-366]
+src/storage/graph-repository.ts [1-412]
   interface:
     31-47: interface ConnectedNodesOptions [exported]
       /** Options for getConnectedNodes */
@@ -1500,15 +1501,15 @@ src/storage/graph-repository.ts [1-366]
     28-28: TraversalDirection = "incoming" | "outgoing" | "both" [exported]
       /** Direction for graph traversal */
   function:
-    110-215: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    219-271: getConnectedNodes(db: Database.Database, nodeId: string, options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get all nodes connected to a specific node with graph traversal. Supports: - Multi-hop traversal (depth 1-5) - Direction filtering (incoming, outgoing, both) - Edge type filtering Based on specs/storage.md graph traversal query and specs/api.md GET /api/v1/nodes/:id/connected endpoint. */
-    224-271: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
+    280-317: getSubgraph(db: Database.Database, rootNodeIds: string[], options: ConnectedNodesOptions = {}): ConnectedNodesResult [exported]
       /** Get the subgraph for visualization - returns nodes and edges within a given depth from multiple root nodes. Unlike getConnectedNodes, this INCLUDES the root nodes in the result, which is useful for rendering a graph view starting from selected nodes. */
-    279-333: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
+    325-379: findPath(db: Database.Database, fromNodeId: string, toNodeId: string, options: { maxDepth?: number } = {}): { nodeIds: {}; edges: {}; } [exported]
       /** Get the path between two nodes if one exists. Uses BFS to find the shortest path. Returns null if no path exists. */
-    339-349: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    385-395: getAncestors(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all ancestors of a node (nodes that lead TO this node). Follows incoming edges only. */
-    355-365: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
+    401-411: getDescendants(db: Database.Database, nodeId: string, options: { maxDepth?: number; edgeTypes?: EdgeType[] } = {}): ConnectedNodesResult [exported]
       /** Get all descendants of a node (nodes that this node leads TO). Follows outgoing edges only. */
   imports:
     - ./edge-repository.js
@@ -1516,7 +1517,7 @@ src/storage/graph-repository.ts [1-366]
     - ./node-types.js
     - better-sqlite3
 
-src/storage/hybrid-search.ts [1-606]
+src/storage/hybrid-search.ts [1-718]
   interface:
     57-76: interface HybridScoreBreakdown [exported]
       /** Breakdown of scores for transparency and debugging. */
@@ -1527,12 +1528,12 @@ src/storage/hybrid-search.ts [1-606]
     119-130: interface HybridSearchResponse [exported]
       /** Result from hybrid search with pagination metadata. */
   function:
-    348-550: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
+    591-662: hybridSearch(db: Database.Database, query: string, options: HybridSearchOptions = {}): HybridSearchResponse [exported]
       /** Perform hybrid search combining vector, FTS, relation, and other signals. The algorithm: 1. If queryEmbedding provided, perform vector search to get initial candidates 2. Perform FTS search to get keyword matches 3. Merge candidates from both sources 4. For each candidate, calculate edge count (relation score) 5. Calculate all score components and weighted final score 6. Sort by final score, apply pagination */
-    559-605: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
+    671-717: calculateNodeHybridScore(db: Database.Database, nodeId: string, query: string, options: HybridSearchOptions = {}): HybridScoreBreakdown [exported]
       /** Calculate hybrid score for a single node (useful for re-ranking). */
   variable:
-    30-39: HYBRID_WEIGHTS [exported]
+    30-39: Record<string, number> [exported]
       /** Weights for each scoring component. Sum should equal ~1.3 to allow strong signals to boost final score. Final scores are normalized to 0..1 range. */
   imports:
     - ./database.js
@@ -1562,7 +1563,7 @@ src/storage/index.ts [1-22]
     - ./semantic-search.js
     - ./tool-error-repository.js
 
-src/storage/lesson-repository.ts [1-284]
+src/storage/lesson-repository.ts [1-308]
   interface:
     16-25: interface ListLessonsFilters [exported]
       /** Filters for querying lessons */
@@ -1584,29 +1585,29 @@ src/storage/lesson-repository.ts [1-284]
 > [exported]
       /** Result from getLessonsByLevel */
   function:
-    85-184: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
+    156-208: listLessons(db: Database.Database, filters: ListLessonsFilters = {}, options: ListLessonsOptions = {}): ListLessonsResult [exported]
       /** List lessons with filters and pagination. Supports filtering by: - level (exact match) - project (partial match via nodes table) - tags (AND logic via lesson_tags table) - confidence (exact match) Per specs/api.md GET /api/v1/lessons endpoint. */
-    192-232: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
+    216-256: getLessonsByLevel(db: Database.Database, recentLimit = 5): Record<string, { count: number; recent: {}; }> [exported]
       /** Get aggregated lesson stats by level. Returns counts and most recent lessons for each level. Per specs/api.md GET /api/v1/lessons/by-level endpoint. */
-    237-243: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
+    261-267: countLessons(db: Database.Database, filters: ListLessonsFilters = {}): number [exported]
       /** Count lessons matching filters (without fetching data) */
-    248-271: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
+    272-295: getNodeLessons(db: Database.Database, nodeId: string): {} [exported]
       /** Get lessons for a node */
-    276-283: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
+    300-307: getLessonTags(db: Database.Database, lessonId: string): {} [exported]
       /** Get tags for a specific lesson */
   imports:
     - better-sqlite3
 
-src/storage/node-conversion.ts [1-360]
+src/storage/node-conversion.ts [1-432]
   interface:
     25-44: interface NodeConversionContext [exported]
       /** Context needed to convert AgentNodeOutput to a full Node */
   function:
     54-261: agentOutputToNode(output: AgentNodeOutput, context: NodeConversionContext): Node [exported]
       /** Convert AgentNodeOutput from the analyzer to a full Node structure Fills in source, metadata, and identity fields from the job context */
-    268-352: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
+    416-424: nodeRowToNode(row: NodeRow, loadFull = false): Node [exported]
       /** Transform a NodeRow (flat SQLite row) to Node (nested structure). For listings, constructs Node from row data without reading JSON. For full details, reads the JSON file. */
-    357-359: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
+    429-431: nodeRowsToNodes(rows: NodeRow[], loadFull = false): {} [exported]
       /** Transform array of NodeRows to Nodes */
   imports:
     - ../daemon/processor.js
@@ -1632,13 +1633,13 @@ src/storage/node-crud.ts [1-881]
       /** Insert daemon decisions for a node */
     296-325: clearAllData(db: Database.Database): void [exported]
       /** Clear all data from the database (nodes, edges, etc.) Used by rebuild-index CLI */
-    331-414: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
+    477-493: insertNodeToDb(db: Database.Database, node: Node, dataFile: string, options: { skipFts?: boolean } = {}): void [exported]
       /** Insert a node into the database (without writing JSON file) Used by createNode and rebuild-index CLI */
-    420-434: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    499-513: createNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Create a node - writes to both SQLite and JSON storage Returns the node with any auto-generated fields filled in */
-    445-560: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
+    587-619: upsertNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): { node: Node; created: boolean; } [exported]
       /** Upsert a node - creates if not exists, updates if exists. This provides idempotent ingestion for analysis jobs. If a job crashes after writing JSON but before DB insert, re-running will update the existing data cleanly without duplicates or errors. Returns the node and whether it was created (true) or updated (false). */
-    567-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
+    626-657: updateNode(db: Database.Database, node: Node, options: RepositoryOptions = {}): Node [exported]
       /** Update a node - writes new JSON version and updates SQLite row. Throws if the node doesn't exist in the database. Returns the updated node. */
     662-668: getNode(db: Database.Database, nodeId: string): NodeRow [exported]
       /** Get a node by ID (returns the row from SQLite - always the latest version) */
@@ -1801,7 +1802,7 @@ src/storage/node-types.ts [1-151]
     - ../types/index.js
     - node:crypto
 
-src/storage/pattern-repository.ts [1-369]
+src/storage/pattern-repository.ts [1-373]
   interface:
     74-78: interface ListFailurePatternsOptions [exported]
     142-146: interface ListLessonPatternsOptions [exported]
@@ -1810,11 +1811,11 @@ src/storage/pattern-repository.ts [1-369]
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
     117-136: listModelStats(db: Database.Database): {} [exported]
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-    199-252: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-    254-268: getInsight(db: Database.Database, id: string): any [exported]
-    270-294: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
-    296-328: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
-    330-347: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
+    211-260: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
+    262-276: getInsight(db: Database.Database, id: string): any [exported]
+    278-302: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
+    304-332: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
+    334-351: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
   imports:
     - ../types/index.js
     - better-sqlite3
@@ -1875,7 +1876,7 @@ src/storage/relationship-edges.ts [1-290]
     - ./edge-repository.js
     - better-sqlite3
 
-src/storage/search-repository.ts [1-449]
+src/storage/search-repository.ts [1-485]
   interface:
     41-46: interface SearchHighlight [exported]
       /** Highlight match for search results */
@@ -1899,11 +1900,11 @@ src/storage/search-repository.ts [1-449]
       /** Index a node for full-text search */
     127-153: searchNodes(db: Database.Database, query: string, limit = 20): {} [exported]
       /** Search nodes using full-text search Quotes the query to handle special characters like hyphens */
-    207-274: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
+    286-310: extractSnippet(text: string, query: string, maxLength = 100): string [exported]
       /** Extract a highlight snippet from text containing a match */
-    358-418: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
+    394-454: searchNodesAdvanced(db: Database.Database, query: string, options: SearchOptions = {}): SearchNodesResult [exported]
       /** Enhanced search with scores, highlights, and filter support */
-    423-448: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
+    459-484: countSearchResults(db: Database.Database, query: string, options: Pick<SearchOptions, "fields" | "filters"> = {}): number [exported]
       /** Count total search results (without fetching data) */
   imports:
     - ./filter-utils.js
@@ -1930,7 +1931,7 @@ src/storage/semantic-search.ts [1-214]
     - ./search-repository.js
     - better-sqlite3
 
-src/storage/tool-error-repository.ts [1-352]
+src/storage/tool-error-repository.ts [1-374]
   interface:
     16-25: interface ListToolErrorsFilters [exported]
       /** Filters for querying tool errors */
@@ -1953,17 +1954,17 @@ src/storage/tool-error-repository.ts [1-352]
     97-103: interface NodeToolError [exported]
       /** A single tool error for a node */
   function:
-    112-170: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
+    176-213: listToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: ListToolErrorsOptions = {}): ListToolErrorsResult [exported]
       /** List individual tool errors with filters and pagination. */
-    176-252: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
+    219-274: getAggregatedToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}, options: { limit?: number; offset?: number; groupByModel?: boolean } = {}): {} [exported]
       /** Get aggregated tool errors - grouped by tool and error type (and optionally model). Per specs/api.md GET /api/v1/tool-errors. */
-    258-312: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
+    280-334: getToolErrorStats(db: Database.Database): ToolErrorStatsResult [exported]
       /** Get tool error statistics for the dashboard. Per specs/api.md GET /api/v1/stats/tool-errors. */
-    317-323: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
+    339-345: countToolErrors(db: Database.Database, filters: ListToolErrorsFilters = {}): number [exported]
       /** Count tool errors matching filters. */
-    328-335: getAllToolsWithErrors(db: Database.Database): {} [exported]
+    350-357: getAllToolsWithErrors(db: Database.Database): {} [exported]
       /** Get all unique tools that have errors recorded */
-    340-351: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
+    362-373: getNodeToolErrors(db: Database.Database, nodeId: string): {} [exported]
       /** Get tool errors for a node */
   imports:
     - better-sqlite3
@@ -1973,24 +1974,24 @@ src/sync/index.ts [1-9]
     - ./rsync.js
     - ./status.js
 
-src/sync/rsync.ts [1-405]
+src/sync/rsync.ts [1-409]
   interface:
     20-28: interface RsyncResult [exported]
       /** Result of an rsync operation */
     33-44: interface RsyncOptions [exported]
       /** Options for running rsync */
   function:
-    270-321: async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult> [exported]
+    274-325: async runRsync(spoke: SpokeConfig, options: RsyncOptions = {}): Promise<RsyncResult> [exported]
       /** Run rsync for a spoke with rsync sync method */
-    326-337: formatBytes(bytes: number): string [exported]
+    330-341: formatBytes(bytes: number): string [exported]
       /** Format bytes to human-readable string */
-    345-353: async isRsyncAvailable(): Promise<boolean> [exported]
+    349-357: async isRsyncAvailable(): Promise<boolean> [exported]
       /** Check if rsync is available on the system Uses `rsync --version` instead of `which` for cross-platform compatibility (works on Windows, Linux, macOS). Gracefully handles ENOENT. */
-    358-369: countSpokeSessionFiles(spokePath: string): number [exported]
+    362-373: countSpokeSessionFiles(spokePath: string): number [exported]
       /** Count session files in a spoke's sync directory */
-    374-388: listSpokeSessions(spokePath: string): {} [exported]
+    378-392: listSpokeSessions(spokePath: string): {} [exported]
       /** Get list of session files from a spoke's sync directory */
-    393-404: getLastSyncTime(spokePath: string): any [exported]
+    397-408: getLastSyncTime(spokePath: string): any [exported]
       /** Get last sync time for a spoke (based on directory modification time) */
   imports:
     - ../config/types.js
@@ -2020,55 +2021,7 @@ src/sync/status.ts [1-182]
     - node:fs
     - node:os
 
-src/types.ts [1-298]
-  interface:
-    10-15: interface SessionEntryBase [exported]
-      /** Type definitions for pi session data structures Based on pi-coding-agent's session format (version 3) */
-    17-24: interface SessionHeader [exported]
-    26-29: interface SessionMessageEntry extends SessionEntryBase [exported]
-    31-38: interface CompactionEntry extends SessionEntryBase [exported]
-    40-43: interface CompactionDetails [exported]
-    45-51: interface BranchSummaryEntry extends SessionEntryBase [exported]
-    53-56: interface BranchSummaryDetails [exported]
-    58-62: interface ModelChangeEntry extends SessionEntryBase [exported]
-    64-67: interface ThinkingLevelChangeEntry extends SessionEntryBase [exported]
-    69-73: interface CustomEntry extends SessionEntryBase [exported]
-    75-81: interface CustomMessageEntry extends SessionEntryBase [exported]
-    83-87: interface LabelEntry extends SessionEntryBase [exported]
-    89-92: interface SessionInfoEntry extends SessionEntryBase [exported]
-    109-114: interface UserMessage [exported]
-    116-124: interface AssistantMessage [exported]
-    126-133: interface ToolResultMessage [exported]
-    137-140: interface TextContent [exported]
-    142-145: interface ThinkingContent [exported]
-    147-152: interface ToolCallContent [exported]
-    154-157: interface ImageContent [exported]
-    159-164: interface ImageSource [exported]
-    172-184: interface Usage [exported]
-    186-195: interface Attachment [exported]
-    201-218: interface SessionInfo [exported]
-    220-233: interface TreeNode [exported]
-    235-260: interface SessionStats [exported]
-    262-271: interface ForkRelationship [exported]
-    273-280: interface ProjectGroup [exported]
-    286-297: interface VisualizationData [exported]
-  type:
-    94-103: SessionEntry = | SessionMessageEntry
-  | CompactionEntry
-  | BranchSummaryEntry
-  | ModelChangeEntry
-  | ThinkingLevelChangeEntry
-  | CustomEntry
-  | CustomMessageEntry
-  | LabelEntry
-  | SessionInfoEntry [exported]
-    135-135: AgentMessage = UserMessage | AssistantMessage | ToolResultMessage [exported]
-    166-170: ContentBlock = | TextContent
-  | ThinkingContent
-  | ToolCallContent
-  | ImageContent [exported]
-
-src/types/index.ts [1-722]
+src/types/index.ts [1-728]
   interface:
     12-40: interface Node [exported]
       /** Shared type definitions for pi-brain This file contains pure type definitions (no runtime code) shared between the daemon/storage backend and the web frontend. */
@@ -2175,6 +2128,56 @@ src/types/index.ts [1-722]
   variable:
     333-345: AUTOMEM_EDGE_TYPES [exported]
       /** AutoMem typed relationship edge types (per automem-features.md) These enable semantic reasoning ("why" queries, causal chains) */
+  imports:
+    - ./session.js
+
+src/types/session.ts [1-298]
+  interface:
+    10-15: interface SessionEntryBase [exported]
+      /** Type definitions for pi session data structures Based on pi-coding-agent's session format (version 3) */
+    17-24: interface SessionHeader [exported]
+    26-29: interface SessionMessageEntry extends SessionEntryBase [exported]
+    31-38: interface CompactionEntry extends SessionEntryBase [exported]
+    40-43: interface CompactionDetails [exported]
+    45-51: interface BranchSummaryEntry extends SessionEntryBase [exported]
+    53-56: interface BranchSummaryDetails [exported]
+    58-62: interface ModelChangeEntry extends SessionEntryBase [exported]
+    64-67: interface ThinkingLevelChangeEntry extends SessionEntryBase [exported]
+    69-73: interface CustomEntry extends SessionEntryBase [exported]
+    75-81: interface CustomMessageEntry extends SessionEntryBase [exported]
+    83-87: interface LabelEntry extends SessionEntryBase [exported]
+    89-92: interface SessionInfoEntry extends SessionEntryBase [exported]
+    109-114: interface UserMessage [exported]
+    116-124: interface AssistantMessage [exported]
+    126-133: interface ToolResultMessage [exported]
+    137-140: interface TextContent [exported]
+    142-145: interface ThinkingContent [exported]
+    147-152: interface ToolCallContent [exported]
+    154-157: interface ImageContent [exported]
+    159-164: interface ImageSource [exported]
+    172-184: interface Usage [exported]
+    186-195: interface Attachment [exported]
+    201-218: interface SessionInfo [exported]
+    220-233: interface TreeNode [exported]
+    235-260: interface SessionStats [exported]
+    262-271: interface ForkRelationship [exported]
+    273-280: interface ProjectGroup [exported]
+    286-297: interface VisualizationData [exported]
+  type:
+    94-103: SessionEntry = | SessionMessageEntry
+  | CompactionEntry
+  | BranchSummaryEntry
+  | ModelChangeEntry
+  | ThinkingLevelChangeEntry
+  | CustomEntry
+  | CustomMessageEntry
+  | LabelEntry
+  | SessionInfoEntry [exported]
+    135-135: AgentMessage = UserMessage | AssistantMessage | ToolResultMessage [exported]
+    166-170: ContentBlock = | TextContent
+  | ThinkingContent
+  | ToolCallContent
+  | ImageContent [exported]
 
 src/web/app/playwright.config.ts [1-27]
   imports:
@@ -2182,7 +2185,7 @@ src/web/app/playwright.config.ts [1-27]
 
 src/web/app/src/app.d.ts [1-12]
 
-src/web/app/src/lib/api/client.ts [1-739]
+src/web/app/src/lib/api/client.ts [1-748]
   function:
     68-77: createApiError(options: ApiErrorOptions): Error [exported]
     79-83: createTimeoutError(timeoutMs: number): Error [exported]
@@ -2197,7 +2200,7 @@ src/web/app/src/lib/api/client.ts [1-739]
     135-152: getErrorMessage(error: unknown): string [exported]
       /** Get a user-friendly message for API errors */
   variable:
-    223-725: api [exported]
+    232-734: api [exported]
   imports:
     - $lib/types
 
@@ -2218,9 +2221,9 @@ src/web/app/src/lib/stores/daemon.ts [1-132]
     - $lib/types
     - svelte/store
 
-src/web/app/src/lib/stores/keyboard-shortcuts.ts [1-198]
+src/web/app/src/lib/stores/keyboard-shortcuts.ts [1-204]
   variable:
-    197-197: keyboardShortcuts [exported]
+    203-203: keyboardShortcuts [exported]
   imports:
     - $app/navigation
     - svelte/store
@@ -2240,17 +2243,17 @@ src/web/app/src/lib/stores/search-history.ts [1-106]
   imports:
     - svelte/store
 
-src/web/app/src/lib/stores/theme.ts [1-171]
+src/web/app/src/lib/stores/theme.ts [1-180]
   type:
     10-10: Theme = "light" | "dark" | "system" [exported]
   function:
-    92-120: initTheme(): () => void [exported]
-    139-156: applyTheme(theme: "light" | "dark"): void [exported]
-    159-170: toggleTheme(): void [exported]
+    93-121: initTheme(): () => void [exported]
+    140-157: applyTheme(theme: "light" | "dark"): void [exported]
+    160-179: toggleTheme(): void [exported]
   variable:
-    80-80: themePreference [exported]
-    81-81: { subscribe: any; set: any; } [exported]
-    85-89: any [exported]
+    81-81: themePreference [exported]
+    82-82: { subscribe: any; set: any; } [exported]
+    86-90: any [exported]
   imports:
     - svelte/store
 
@@ -2304,17 +2307,17 @@ src/web/app/src/lib/types.ts [1-381]
   imports:
     - ../../../../types/index.js
 
-src/web/app/src/lib/utils/date.ts [1-94]
+src/web/app/src/lib/utils/date.ts [1-131]
   function:
-    16-51: formatDistanceToNow(date: Date): string [exported]
+    73-88: formatDistanceToNow(date: Date): string [exported]
       /** Format a date as a relative distance from now e.g., "5 minutes ago", "2 hours ago", "3 days ago" */
-    56-65: formatDate(date: Date): string [exported]
+    93-102: formatDate(date: Date): string [exported]
       /** Format a date as "MMM D, YYYY at h:mm AM/PM" */
-    70-76: formatDateShort(date: Date): string [exported]
+    107-113: formatDateShort(date: Date): string [exported]
       /** Format a date as "MMM D, YYYY" */
-    81-86: formatDateForInput(date: Date): string [exported]
+    118-123: formatDateForInput(date: Date): string [exported]
       /** Format a date as "YYYY-MM-DD" for input[type="date"] */
-    91-93: parseDate(date: string | Date): Date [exported]
+    128-130: parseDate(date: string | Date): Date [exported]
       /** Parse a date string or Date object to Date */
 
 src/web/app/src/lib/utils/focus-trap.ts [1-146]
@@ -2336,13 +2339,13 @@ src/web/app/vite.config.ts [1-15]
     - @sveltejs/kit/vite
     - vite
 
-src/web/generator.ts [1-948]
+src/web/generator.ts [1-972]
   function:
-    170-240: generateHTML(sessions: SessionInfo[], forks: ForkRelationship[]): string [exported]
+    194-264: generateHTML(sessions: SessionInfo[], forks: ForkRelationship[]): string [exported]
       /** Generate complete visualization HTML */
   imports:
     - ../parser/analyzer.js
-    - ../types.js
+    - ../types/index.js
 
 src/web/index.ts [1-6]
   imports:
@@ -2350,4 +2353,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 103
-Estimated tokens: 29,471 (codebase: ~252,154)
+Estimated tokens: 29,500 (codebase: ~1,345,870)

@@ -11,7 +11,7 @@ import type {
   SessionInfoEntry,
   SessionMessageEntry,
   UserMessage,
-} from "../types.js";
+} from "../types/index.js";
 
 import {
   buildTree,

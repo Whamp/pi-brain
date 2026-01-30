@@ -9,7 +9,7 @@ import type {
   CompactionEntry,
   SessionEntry,
   SessionMessageEntry,
-} from "../types.js";
+} from "../types/index.js";
 
 import {
   detectBoundaries,

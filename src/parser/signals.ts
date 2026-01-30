@@ -10,16 +10,14 @@
 import type {
   AssistantMessage,
   ContentBlock,
+  DelightSignals,
+  FrictionSignals,
+  ManualFlag,
   SessionEntry,
   SessionMessageEntry,
   ToolCallContent,
   ToolResultMessage,
   UserMessage,
-} from "../types.js";
-import type {
-  DelightSignals,
-  FrictionSignals,
-  ManualFlag,
 } from "../types/index.js";
 
 // =============================================================================

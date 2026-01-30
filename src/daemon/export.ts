@@ -5,7 +5,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import type { SessionEntry } from "../types.js";
+import type { SessionEntry } from "../types/index.js";
 
 import { loadConfig } from "../config/index.js";
 import { parseSession } from "../parser/session.js";

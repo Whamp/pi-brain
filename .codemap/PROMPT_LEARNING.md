@@ -14,9 +14,9 @@
 
 ---
 
-src/daemon/insight-aggregation.ts [1-553]
+src/daemon/insight-aggregation.ts [1-628]
   class:
-    149-552: class InsightAggregator [exported]
+    149-627: class InsightAggregator [exported]
       refs in: 11 [import: 2, instantiate: 8, type: 1]
         - src/daemon/insight-aggregation.test.ts:14: import (module)
         - src/daemon/insight-aggregation.test.ts:185: instantiate aggregator
@@ -40,20 +40,20 @@ src/prompt/agents-generator.test.ts [1-242]
     - ./prompt-generator.js
     - vitest
 
-src/prompt/agents-generator.ts [1-649]
+src/prompt/agents-generator.ts [1-683]
   interface:
     31-52: interface AgentsGeneratorConfig [exported]
       /** Configuration for AGENTS.md generation */
       refs in: 4 [type: 4]
         - src/prompt/agents-generator.ts:132: type gatherModelData
-        - src/prompt/agents-generator.ts:361: type synthesizeWithLLM
-        - src/prompt/agents-generator.ts:503: type generateAgentsForModel
-        - src/prompt/agents-generator.ts:594: type previewAgentsForModel
+        - src/prompt/agents-generator.ts:395: type synthesizeWithLLM
+        - src/prompt/agents-generator.ts:537: type generateAgentsForModel
+        - src/prompt/agents-generator.ts:628: type previewAgentsForModel
     57-76: interface AgentsGeneratorResult [exported]
       /** Result of AGENTS.md generation */
       refs in: 2 [type: 2]
-        - src/prompt/agents-generator.ts:504: type generateAgentsForModel
-        - src/prompt/agents-generator.ts:595: type previewAgentsForModel
+        - src/prompt/agents-generator.ts:538: type generateAgentsForModel
+        - src/prompt/agents-generator.ts:629: type previewAgentsForModel
     81-90: interface ModelInsightData [exported]
       /** Data gathered for a model's AGENTS.md */
       refs in: 10 [import: 1, type: 9]
@@ -64,9 +64,9 @@ src/prompt/agents-generator.ts [1-649]
         - src/prompt/agents-generator.test.ts:142: type data
         - src/prompt/agents-generator.test.ts:194: type data
         - src/prompt/agents-generator.ts:133: type gatherModelData
-        - src/prompt/agents-generator.ts:231: type formatDataForPrompt
-        - src/prompt/agents-generator.ts:304: type generateFallbackAgents
-        - src/prompt/agents-generator.ts:360: type synthesizeWithLLM
+        - src/prompt/agents-generator.ts:268: type formatDataForPrompt
+        - src/prompt/agents-generator.ts:333: type generateFallbackAgents
+        - src/prompt/agents-generator.ts:394: type synthesizeWithLLM
   function:
     129-189: gatherModelData(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): ModelInsightData [exported]
       /** Gather all insights and clusters for a specific model */
@@ -74,9 +74,9 @@ src/prompt/agents-generator.ts [1-649]
         - src/api/routes/agents.ts:15: import (module)
         - src/api/routes/agents.ts:55: call data
         - src/api/routes/agents.ts:190: call data
-        - src/prompt/agents-generator.ts:509: call data
-        - src/prompt/agents-generator.ts:598: call data
-    231-298: formatDataForPrompt(data: ModelInsightData): string [exported]
+        - src/prompt/agents-generator.ts:543: call data
+        - src/prompt/agents-generator.ts:632: call data
+    268-327: formatDataForPrompt(data: ModelInsightData): string [exported]
       /** Format model data into a structured prompt for LLM synthesis */
       refs in: 7 [call: 5, import: 2]
         - src/api/routes/agents.ts:16: import (module)
@@ -85,41 +85,41 @@ src/prompt/agents-generator.ts [1-649]
         - src/prompt/agents-generator.test.ts:72: call result
         - src/prompt/agents-generator.test.ts:96: call result
         - src/prompt/agents-generator.test.ts:131: call result
-        - src/prompt/agents-generator.ts:376: call userPrompt
-    304-354: generateFallbackAgents(data: ModelInsightData): string [exported]
+        - src/prompt/agents-generator.ts:410: call userPrompt
+    333-388: generateFallbackAgents(data: ModelInsightData): string [exported]
       /** Generate a fallback AGENTS.md without LLM synthesis Used when LLM is not available or synthesis fails */
       refs in: 5 [call: 4, import: 1]
         - src/prompt/agents-generator.test.ts:9: import (module)
         - src/prompt/agents-generator.test.ts:181: call result
         - src/prompt/agents-generator.test.ts:220: call result
-        - src/prompt/agents-generator.ts:536: call generateAgentsForModel
-        - src/prompt/agents-generator.ts:625: call previewAgentsForModel
-    359-388: async synthesizeWithLLM(data: ModelInsightData, config: AgentsGeneratorConfig = {}): Promise<string> [exported]
+        - src/prompt/agents-generator.ts:570: call generateAgentsForModel
+        - src/prompt/agents-generator.ts:659: call previewAgentsForModel
+    393-422: async synthesizeWithLLM(data: ModelInsightData, config: AgentsGeneratorConfig = {}): Promise<string> [exported]
       /** Use LLM to synthesize model data into coherent AGENTS.md content */
       refs in: 2 [call: 2]
-        - src/prompt/agents-generator.ts:531: call generateAgentsForModel
-        - src/prompt/agents-generator.ts:620: call previewAgentsForModel
-    500-571: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
+        - src/prompt/agents-generator.ts:565: call generateAgentsForModel
+        - src/prompt/agents-generator.ts:654: call previewAgentsForModel
+    534-605: async generateAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Generate AGENTS.md for a specific model */
       refs in: 4 [call: 2, import: 2]
         - src/api/routes/agents.ts:12: import (module)
         - src/api/routes/agents.ts:155: call result
         - src/cli.ts:41: import (module)
-        - src/cli.ts:1007: call result
-    576-586: listModelsWithInsights(db: Database.Database): {} [exported]
+        - src/cli.ts:1024: call result
+    610-620: listModelsWithInsights(db: Database.Database): {} [exported]
       /** List all models that have insights in the database */
       refs in: 4 [call: 2, import: 2]
         - src/api/routes/agents.ts:13: import (module)
         - src/api/routes/agents.ts:31: call models
         - src/cli.ts:42: import (module)
-        - src/cli.ts:955: call models
-    591-648: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
+        - src/cli.ts:972: call models
+    625-682: async previewAgentsForModel(db: Database.Database, model: string, config: AgentsGeneratorConfig = {}): Promise<AgentsGeneratorResult> [exported]
       /** Preview AGENTS.md generation without saving */
       refs in: 4 [call: 2, import: 2]
         - src/api/routes/agents.ts:14: import (module)
         - src/api/routes/agents.ts:109: call result
         - src/cli.ts:43: import (module)
-        - src/cli.ts:1068: call result
+        - src/cli.ts:1085: call result
   imports:
     - ../storage/pattern-repository.js
     - ../types/index.js
@@ -203,9 +203,9 @@ src/prompt/effectiveness.ts [1-881]
       /** Measure effectiveness and store the result in the database */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:47: import (module)
-        - src/cli.ts:794: call result
+        - src/cli.ts:811: call result
         - src/daemon/scheduler.ts:21: import (module)
-        - src/daemon/scheduler.ts:689: call Scheduler.runPatternAggregation
+        - src/daemon/scheduler.ts:662: call Scheduler.runPatternAggregation
         - src/prompt/effectiveness.test.ts:22: import (module)
         - src/prompt/effectiveness.test.ts:711: call result
         - src/prompt/effectiveness.test.ts:752: call result1
@@ -234,7 +234,7 @@ src/prompt/effectiveness.ts [1-881]
       /** Get all insights that need effectiveness measurement. Returns insights that are included in prompts but haven't been measured recently. */
       refs in: 6 [call: 4, import: 2]
         - src/daemon/scheduler.ts:20: import (module)
-        - src/daemon/scheduler.ts:658: call Scheduler.needingMeasurement
+        - src/daemon/scheduler.ts:631: call Scheduler.needingMeasurement
         - src/prompt/effectiveness.test.ts:19: import (module)
         - src/prompt/effectiveness.test.ts:933: call needing
         - src/prompt/effectiveness.test.ts:957: call needing
@@ -246,9 +246,9 @@ src/prompt/effectiveness.ts [1-881]
       /** Auto-disable insights that have been measured as ineffective. Returns the IDs of disabled insights. */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:46: import (module)
-        - src/cli.ts:813: call disabled
+        - src/cli.ts:830: call disabled
         - src/daemon/scheduler.ts:19: import (module)
-        - src/daemon/scheduler.ts:705: call Scheduler.disabled
+        - src/daemon/scheduler.ts:678: call Scheduler.disabled
         - src/prompt/effectiveness.test.ts:13: import (module)
         - src/prompt/effectiveness.test.ts:1035: call disabled
         - src/prompt/effectiveness.test.ts:1068: call disabled
@@ -278,15 +278,15 @@ src/prompt/prompt-generator.test.ts [1-685]
     - better-sqlite3
     - vitest
 
-src/prompt/prompt-generator.ts [1-360]
+src/prompt/prompt-generator.ts [1-391]
   interface:
     25-36: interface GeneratePromptOptions [exported]
       refs in: 5 [type: 5]
         - src/prompt/prompt-generator.ts:106: type filterActionableInsights
-        - src/prompt/prompt-generator.ts:137: type formatModelSection
-        - src/prompt/prompt-generator.ts:209: type generatePromptAdditions
-        - src/prompt/prompt-generator.ts:255: type generatePromptAdditionsFromDb
-        - src/prompt/prompt-generator.ts:340: type getPromptAdditionsForModel
+        - src/prompt/prompt-generator.ts:214: type formatModelSection
+        - src/prompt/prompt-generator.ts:240: type generatePromptAdditions
+        - src/prompt/prompt-generator.ts:286: type generatePromptAdditionsFromDb
+        - src/prompt/prompt-generator.ts:371: type getPromptAdditionsForModel
   function:
     55-74: getModelDisplayName(model: string): string [exported]
       /** Get a human-readable model name from provider/model format */
@@ -308,7 +308,7 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-generator.test.ts:86: call grouped
         - src/prompt/prompt-generator.test.ts:99: call grouped
         - src/prompt/prompt-generator.test.ts:106: call grouped
-        - src/prompt/prompt-generator.ts:217: call byModel
+        - src/prompt/prompt-generator.ts:248: call byModel
     104-129: filterActionableInsights(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
       /** Filter insights to actionable ones */
       refs in: 7 [call: 6, import: 1]
@@ -318,8 +318,8 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-generator.test.ts:150: call filtered
         - src/prompt/prompt-generator.test.ts:164: call filtered
         - src/prompt/prompt-generator.test.ts:176: call filtered
-        - src/prompt/prompt-generator.ts:214: call actionable
-    134-198: formatModelSection(model: string, insights: AggregatedInsight[], options: GeneratePromptOptions = {}): string [exported]
+        - src/prompt/prompt-generator.ts:245: call actionable
+    211-229: formatModelSection(model: string, insights: AggregatedInsight[], options: GeneratePromptOptions = {}): string [exported]
       /** Format a model-specific prompt section */
       refs in: 8 [call: 7, import: 1]
         - src/prompt/prompt-generator.test.ts:13: import (module)
@@ -329,8 +329,8 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-generator.test.ts:246: call section
         - src/prompt/prompt-generator.test.ts:258: call section
         - src/prompt/prompt-generator.test.ts:279: call section
-        - src/prompt/prompt-generator.ts:226: call content
-    207-246: generatePromptAdditions(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
+        - src/prompt/prompt-generator.ts:257: call content
+    238-277: generatePromptAdditions(insights: AggregatedInsight[], options: GeneratePromptOptions = {}): {} [exported]
       /** Generate prompt additions for all models with insights */
       refs in: 10 [call: 9, import: 1]
         - src/prompt/prompt-generator.test.ts:15: import (module)
@@ -341,13 +341,13 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-generator.test.ts:373: call additions
         - src/prompt/prompt-generator.test.ts:391: call (module)
         - src/prompt/prompt-generator.test.ts:394: call additions
-        - src/prompt/prompt-generator.ts:269: call generatePromptAdditionsFromDb
-        - src/prompt/prompt-generator.ts:355: call additions
-    253-270: generatePromptAdditionsFromDb(db: Database.Database, options: GeneratePromptOptions = {}): {} [exported]
+        - src/prompt/prompt-generator.ts:300: call generatePromptAdditionsFromDb
+        - src/prompt/prompt-generator.ts:386: call additions
+    284-301: generatePromptAdditionsFromDb(db: Database.Database, options: GeneratePromptOptions = {}): {} [exported]
       /** Generate prompt additions from the database Fetches insights from aggregated_insights table and generates additions. */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:50: import (module)
-        - src/cli.ts:599: call additions
+        - src/cli.ts:616: call additions
         - src/prompt/prompt-generator.test.ts:16: import (module)
         - src/prompt/prompt-generator.test.ts:516: call additions
         - src/prompt/prompt-generator.test.ts:533: call additions
@@ -355,11 +355,11 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-injector.ts:20: import (module)
         - src/prompt/prompt-injector.ts:142: call additions
         - src/prompt/prompt-injector.ts:249: call additions
-    277-300: formatPromptAdditionsDocument(additions: PromptAddition[]): string [exported]
+    308-331: formatPromptAdditionsDocument(additions: PromptAddition[]): string [exported]
       /** Format a complete prompt additions document Combines all model-specific additions into a single markdown document. */
       refs in: 9 [call: 6, import: 3]
         - src/cli.ts:51: import (module)
-        - src/cli.ts:612: call (module)
+        - src/cli.ts:629: call (module)
         - src/prompt/prompt-generator.test.ts:14: import (module)
         - src/prompt/prompt-generator.test.ts:418: call doc
         - src/prompt/prompt-generator.test.ts:446: call doc
@@ -367,16 +367,16 @@ src/prompt/prompt-generator.ts [1-360]
         - src/prompt/prompt-injector.ts:21: import (module)
         - src/prompt/prompt-injector.ts:116: call content
         - src/prompt/prompt-injector.ts:221: call formatAgentsSection
-    308-332: updateInsightPromptTexts(db: Database.Database, additions: PromptAddition[], promptVersion?: string): void [exported]
+    339-363: updateInsightPromptTexts(db: Database.Database, additions: PromptAddition[], promptVersion?: string): void [exported]
       /** Generate and store prompt text for insights For each insight that should be included in prompts, generates the appropriate prompt text and updates the database. */
       refs in: 2 [call: 1, import: 1]
         - src/prompt/prompt-generator.test.ts:20: import (module)
         - src/prompt/prompt-generator.test.ts:661: call (module)
-    337-359: getPromptAdditionsForModel(db: Database.Database, model: string, options: GeneratePromptOptions = {}): any [exported]
+    368-390: getPromptAdditionsForModel(db: Database.Database, model: string, options: GeneratePromptOptions = {}): any [exported]
       /** Get prompt additions for a specific model */
       refs in: 7 [call: 4, import: 3]
         - src/cli.ts:52: import (module)
-        - src/cli.ts:579: call addition
+        - src/cli.ts:596: call addition
         - src/prompt/prompt-generator.test.ts:18: import (module)
         - src/prompt/prompt-generator.test.ts:603: call addition
         - src/prompt/prompt-generator.test.ts:620: call addition
@@ -467,7 +467,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Inject insights into prompts using configured method */
       refs in: 5 [call: 3, import: 2]
         - src/cli.ts:55: import (module)
-        - src/cli.ts:845: call result
+        - src/cli.ts:862: call result
         - src/prompt/prompt-injector.test.ts:19: import (module)
         - src/prompt/prompt-injector.test.ts:456: call result
         - src/prompt/prompt-injector.test.ts:463: call result
@@ -475,7 +475,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Remove injected insights */
       refs in: 5 [call: 3, import: 2]
         - src/cli.ts:56: import (module)
-        - src/cli.ts:883: call result
+        - src/cli.ts:900: call result
         - src/prompt/prompt-injector.test.ts:20: import (module)
         - src/prompt/prompt-injector.test.ts:490: call result
         - src/prompt/prompt-injector.test.ts:500: call result
@@ -483,7 +483,7 @@ src/prompt/prompt-injector.ts [1-445]
       /** Check current injection status */
       refs in: 6 [call: 4, import: 2]
         - src/cli.ts:57: import (module)
-        - src/cli.ts:907: call status
+        - src/cli.ts:924: call status
         - src/prompt/prompt-injector.test.ts:21: import (module)
         - src/prompt/prompt-injector.test.ts:525: call status
         - src/prompt/prompt-injector.test.ts:536: call status
@@ -577,7 +577,7 @@ src/prompt/prompt.ts [1-388]
       /** Get the latest prompt version from database */
       refs in: 5 [call: 3, import: 2]
         - src/daemon/scheduler.ts:23: import (module)
-        - src/daemon/scheduler.ts:472: call Scheduler.latestVersion
+        - src/daemon/scheduler.ts:445: call Scheduler.latestVersion
         - src/prompt/prompt.test.ts:28: import (module)
         - src/prompt/prompt.test.ts:235: call (module)
         - src/prompt/prompt.test.ts:251: call result
@@ -606,8 +606,8 @@ src/prompt/prompt.ts [1-388]
     203-255: getOrCreatePromptVersion(db: Database.Database, promptPath: string, historyDir?: string): PromptVersion [exported]
       /** Get or create a prompt version If the current prompt has the same hash as an existing version, returns that version. Otherwise, creates a new version, archives the prompt, and records it in the database. */
       refs in: 11 [call: 9, import: 2]
-        - src/daemon/worker.ts:26: import (module)
-        - src/daemon/worker.ts:486: call Worker.promptVersion
+        - src/daemon/worker.ts:27: import (module)
+        - src/daemon/worker.ts:596: call Worker.promptVersion
         - src/prompt/prompt.test.ts:32: import (module)
         - src/prompt/prompt.test.ts:403: call (module)
         - src/prompt/prompt.test.ts:421: call version
@@ -697,7 +697,7 @@ src/prompt/types.ts [1-35]
         - src/prompt/prompt.ts:136: type result
         - src/prompt/prompt.ts:280: type rows
 
-src/storage/pattern-repository.ts [1-369]
+src/storage/pattern-repository.ts [1-373]
   interface:
     74-78: interface ListFailurePatternsOptions [exported]
       refs in: 1 [type: 1]
@@ -707,60 +707,46 @@ src/storage/pattern-repository.ts [1-369]
         - src/storage/pattern-repository.ts:150: type listLessonPatterns
     188-197: interface ListInsightsOptions [exported]
       refs in: 1 [type: 1]
-        - src/storage/pattern-repository.ts:201: type listInsights
+        - src/storage/pattern-repository.ts:213: type listInsights
   function:
     80-111: listFailurePatterns(db: Database.Database, options: ListFailurePatternsOptions = {}): {} [exported]
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/patterns.ts:13: import (module)
-        - src/api/routes/patterns.ts:61: call result
     117-136: listModelStats(db: Database.Database): {} [exported]
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/patterns.ts:15: import (module)
-        - src/api/routes/patterns.ts:83: call result
     148-182: listLessonPatterns(db: Database.Database, options: ListLessonPatternsOptions = {}): {} [exported]
-      refs in: 2 [call: 1, import: 1]
-        - src/api/routes/patterns.ts:14: import (module)
-        - src/api/routes/patterns.ts:108: call result
-    199-252: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
-      refs in: 11 [call: 7, import: 4]
-        - src/api/routes/prompt-learning.ts:12: import (module)
-        - src/api/routes/prompt-learning.ts:51: call insights
+    211-260: listInsights(db: Database.Database, options: ListInsightsOptions = {}): {} [exported]
+      refs in: 9 [call: 6, import: 3]
         - src/cli.ts:62: import (module)
-        - src/cli.ts:640: call insights
-        - src/cli.ts:783: call (module)
+        - src/cli.ts:657: call insights
+        - src/cli.ts:800: call (module)
         - src/prompt/agents-generator.ts:21: import (module)
         - src/prompt/agents-generator.ts:143: call insights
         - src/prompt/agents-generator.ts:151: call generalToolErrors
         - src/prompt/prompt-generator.ts:15: import (module)
-        - src/prompt/prompt-generator.ts:263: call insights
-    254-268: getInsight(db: Database.Database, id: string): any [exported]
-      refs in: 9 [call: 6, import: 3]
-        - src/api/routes/prompt-learning.ts:13: import (module)
-        - src/api/routes/prompt-learning.ts:146: call insight
+        - src/prompt/prompt-generator.ts:294: call insights
+        - src/prompt/prompt-generator.ts:379: call insights
+    262-276: getInsight(db: Database.Database, id: string): any [exported]
+      refs in: 7 [call: 5, import: 2]
         - src/cli.ts:61: import (module)
-        - src/cli.ts:691: call insight
-        - src/cli.ts:723: call insight
-        - src/cli.ts:775: call insight
+        - src/cli.ts:708: call insight
+        - src/cli.ts:740: call insight
+        - src/cli.ts:792: call insight
         - src/prompt/effectiveness.ts:24: import (module)
         - src/prompt/effectiveness.ts:409: call insight
         - src/prompt/effectiveness.ts:464: call insight
-    270-294: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
-    296-328: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
-    330-347: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
-      refs in: 9 [call: 5, import: 4]
-        - src/api/routes/prompt-learning.ts:14: import (module)
-        - src/api/routes/prompt-learning.ts:153: call promptLearningRoutes
+    278-302: getInsightsByModel(db: Database.Database, model: string, options: { minConfidence?: number; promptIncludedOnly?: boolean } = {}): {} [exported]
+    304-332: countInsights(db: Database.Database, options: { type?: InsightType; model?: string; promptIncluded?: boolean } = {}): number [exported]
+    334-351: updateInsightPrompt(db: Database.Database, id: string, promptText: string, promptIncluded: boolean, promptVersion?: string): void [exported]
+      refs in: 7 [call: 4, import: 3]
         - src/cli.ts:63: import (module)
-        - src/cli.ts:697: call (module)
-        - src/cli.ts:729: call (module)
+        - src/cli.ts:714: call (module)
+        - src/cli.ts:746: call (module)
         - src/prompt/effectiveness.ts:25: import (module)
         - src/prompt/effectiveness.ts:779: call autoDisableIneffectiveInsights
         - src/prompt/prompt-generator.ts:16: import (module)
-        - src/prompt/prompt-generator.ts:329: call updateInsightPromptTexts
+        - src/prompt/prompt-generator.ts:360: call updateInsightPromptTexts
   imports:
     - ../types/index.js
     - better-sqlite3
 
 ---
 Files: 14
-Estimated tokens: 10,445 (codebase: ~1,338,344)
+Estimated tokens: 10,251 (codebase: ~1,375,884)

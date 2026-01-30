@@ -14,7 +14,7 @@ import type {
   BranchSummaryEntry,
   ModelChangeEntry,
   ThinkingLevelChangeEntry,
-} from "../types.js";
+} from "../types/index.js";
 
 import { groupByProject } from "../parser/analyzer.js";
 

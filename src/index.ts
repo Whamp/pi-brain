@@ -7,7 +7,7 @@
 /* oxlint-disable no-barrel-file */
 
 // Types
-export * from "./types.js";
+export * from "./types/index.js";
 
 // Parser module
 export * from "./parser/session.js";

@@ -17,7 +17,7 @@ import type {
   SessionMessageEntry,
   TextContent,
   UserMessage,
-} from "../types.js";
+} from "../types/index.js";
 
 // =============================================================================
 // Types

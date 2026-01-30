@@ -10,7 +10,11 @@
  * separate session files.
  */
 
-import type { ForkRelationship, SessionHeader, SessionInfo } from "../types.js";
+import type {
+  ForkRelationship,
+  SessionHeader,
+  SessionInfo,
+} from "../types/index.js";
 
 // =============================================================================
 // Types

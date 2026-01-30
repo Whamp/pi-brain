@@ -719,3 +719,9 @@ export interface FacetDiscoveryResult {
   run: ClusteringRun;
   clusters: Cluster[];
 }
+
+// =============================================================================
+// Session Types (pi session file format)
+// =============================================================================
+
+export * from "./session.js";

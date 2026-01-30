@@ -17,7 +17,7 @@ import type {
   TextContent,
   LabelEntry,
   SessionInfoEntry,
-} from "../types.js";
+} from "../types/index.js";
 
 /**
  * Parse a session JSONL file

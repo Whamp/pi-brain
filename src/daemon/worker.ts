@@ -13,7 +13,7 @@ import { join } from "node:path";
 
 import type { PiBrainConfig } from "../config/types.js";
 import type { Node } from "../storage/node-types.js";
-import type { SessionEntry } from "../types.js";
+import type { SessionEntry } from "../types/index.js";
 
 import { getComputerFromPath } from "../config/config.js";
 import {
