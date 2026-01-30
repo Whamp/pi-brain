@@ -1,11 +1,13 @@
 # Runbook: Database Backup and Restore
 
 ## Overview
+
 pi-brain stores all knowledge in `~/.pi-brain/brain.db`. Regular backups protect against data loss.
 
 ## Backup Procedures
 
 ### Manual Backup
+
 ```bash
 # Stop daemon for consistent backup
 pi-brain daemon stop
@@ -18,13 +20,17 @@ pi-brain daemon start
 ```
 
 ### Online Backup (no downtime)
+
 SQLite supports online backup:
+
 ```bash
 sqlite3 ~/.pi-brain/brain.db ".backup ~/.pi-brain/backups/brain-$(date +%Y%m%d).db"
 ```
 
 ### Automated Backup Script
+
 Create `~/.pi-brain/backup.sh`:
+
 ```bash
 #!/bin/bash
 BACKUP_DIR="$HOME/.pi-brain/backups"
@@ -40,6 +46,7 @@ echo "Backup complete: $BACKUP_DIR/brain-$(date +%Y%m%d).db"
 ```
 
 Add to crontab:
+
 ```bash
 crontab -e
 # Add: 0 2 * * * ~/.pi-brain/backup.sh
@@ -48,6 +55,7 @@ crontab -e
 ## Restore Procedures
 
 ### Restore from Backup
+
 ```bash
 # Stop daemon
 pi-brain daemon stop
@@ -67,6 +75,7 @@ pi-brain health
 ```
 
 ### Partial Restore (specific tables)
+
 ```bash
 # Attach backup and copy specific data
 sqlite3 ~/.pi-brain/brain.db <<EOF
@@ -79,11 +88,13 @@ EOF
 ## Verification
 
 ### Check backup integrity
+
 ```bash
 sqlite3 ~/.pi-brain/backups/brain-YYYYMMDD.db "PRAGMA integrity_check;"
 ```
 
 ### Compare row counts
+
 ```bash
 echo "Current:"
 sqlite3 ~/.pi-brain/brain.db "SELECT 'nodes:', COUNT(*) FROM nodes UNION SELECT 'edges:', COUNT(*) FROM edges;"
@@ -95,17 +106,20 @@ sqlite3 ~/.pi-brain/backups/brain-YYYYMMDD.db "SELECT 'nodes:', COUNT(*) FROM no
 ## Storage Considerations
 
 ### Backup size
+
 ```bash
 du -sh ~/.pi-brain/brain.db
 du -sh ~/.pi-brain/backups/
 ```
 
 ### Compress old backups
+
 ```bash
 gzip ~/.pi-brain/backups/brain-20240101.db
 ```
 
 ### Remote backup
+
 ```bash
 rsync -av ~/.pi-brain/backups/ user@backup-server:/backups/pi-brain/
 ```

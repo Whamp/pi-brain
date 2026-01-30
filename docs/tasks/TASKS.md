@@ -392,3 +392,14 @@ Ref: docs/plans/settings-ui-complete.md, docs/specs/settings-ui.md
 | 19.8.2 | Add E2E tests for settings UI             | done   | 19.7      | 2026-01-28 34 Playwright tests covering tabs, forms, spokes CRUD                       |
 | 19.8.3 | Update README with settings capabilities  | done   | 19.8.1    | 2026-01-28 Settings section with tabs table and config examples                        |
 | 19.8.4 | Add tooltips/help text for complex fields | done   | 19.7      | 2026-01-28 All fields have contextual hints in UI                                      |
+
+## Phase 20: Semgrep Remediation
+
+Ref: docs/plans/SEMGREP-REMEDIATION-PLAN.md
+
+| ID   | Task                                            | Status | Deps | Notes      |
+| ---- | ----------------------------------------------- | ------ | ---- | ---------- |
+| 20.1 | Create logger infrastructure (Phase 1)          | done   | -    | 2026-01-30 |
+| 20.2 | Replace console.log with logger (Phase 2)       | done   | 20.1 | 2026-01-30 |
+| 20.3 | Replace sync fs calls with async (Phase 3)      | done   | -    | 2026-01-30 |
+| 20.4 | Fix tainted-direct-response in clusters.ts (P4) | active | -    | 2026-01-30 |

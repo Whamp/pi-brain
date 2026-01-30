@@ -611,4 +611,4 @@ src/storage/types.ts [1-47]
 
 ---
 Files: 21
-Estimated tokens: 9,431 (codebase: ~1,385,805)
+Estimated tokens: 9,431 (codebase: ~1,388,954)

@@ -91,57 +91,64 @@ src/api/routes/clusters.test.ts [1-267]
     - fastify
     - vitest
 
-src/api/routes/clusters.ts [1-393]
+src/api/routes/clusters.ts [1-388]
   interface:
-    16-21: interface ClusterNodeWithDetails extends ClusterNode
-    23-25: interface ClusterWithNodes extends Cluster
-      refs out: 1 [type: 1]
-        - src/api/routes/clusters.ts:24: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
-    28-40: interface ClusterRow
+    18-23: interface ClusterNodeWithDetails extends ClusterNode
+      refs out: 1 [extends: 1]
+        - src/api/routes/clusters.ts:18: extends ClusterNode -> src/types/index.ts
+    25-27: interface ClusterWithNodes extends Cluster
+      refs out: 2 [extends: 1, type: 1]
+        - src/api/routes/clusters.ts:25: extends Cluster -> src/types/index.ts
+        - src/api/routes/clusters.ts:26: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
+    30-42: interface ClusterRow
       /** Database row shape for cluster queries */
-    43-52: interface ClusterNodeRow
+    45-54: interface ClusterNodeRow
       /** Database row shape for cluster node queries */
-    142-145: interface ClusterFilterParams
+    144-147: interface ClusterFilterParams
+      refs out: 1 [type: 1]
+        - src/api/routes/clusters.ts:145: type ClusterStatus -> src/types/index.ts
   function:
-    59-73: mapClusterRow(row: ClusterRow): ClusterWithNodes
+    61-75: mapClusterRow(row: ClusterRow): ClusterWithNodes
       /** Map a database row to a ClusterWithNodes object */
-      refs out: 2 [type: 2]
-        - src/api/routes/clusters.ts:59: type ClusterRow -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:59: type ClusterWithNodes -> src/api/routes/clusters.ts
-    76-87: mapNodeRow(nr: ClusterNodeRow): ClusterNodeWithDetails
+      refs out: 3 [type: 3]
+        - src/api/routes/clusters.ts:61: type ClusterRow -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:61: type ClusterWithNodes -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:69: type ClusterStatus -> src/types/index.ts
+    78-89: mapNodeRow(nr: ClusterNodeRow): ClusterNodeWithDetails
       /** Map a node row to ClusterNodeWithDetails */
       refs out: 2 [type: 2]
-        - src/api/routes/clusters.ts:76: type ClusterNodeRow -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:76: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
-    93-136: fetchRepresentativeNodes(db: Database, clusterIds: string[], limitPerCluster: number): Map<string, {}>
+        - src/api/routes/clusters.ts:78: type ClusterNodeRow -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:78: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
+    95-138: fetchRepresentativeNodes(db: Database, clusterIds: string[], limitPerCluster: number): Map<string, {}>
       /** Batch fetch representative nodes for multiple clusters. Returns a map of clusterId -> nodes array. */
       refs out: 8 [call: 4, instantiate: 1, type: 3]
-        - src/api/routes/clusters.ts:94: type Database -> external
-        - src/api/routes/clusters.ts:97: type Map -> external
-        - src/api/routes/clusters.ts:97: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:99: instantiate Map -> external
-        - src/api/routes/clusters.ts:129: call set -> external
-    150-172: buildClusterWhereClause(filters: ClusterFilterParams): { sql: string; params: {}; }
+        - src/api/routes/clusters.ts:96: type Database -> external
+        - src/api/routes/clusters.ts:99: type Map -> external
+        - src/api/routes/clusters.ts:99: type ClusterNodeWithDetails -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:101: instantiate Map -> external
+        - src/api/routes/clusters.ts:131: call set -> external
+    152-174: buildClusterWhereClause(filters: ClusterFilterParams): { sql: string; params: {}; }
       /** Build WHERE clause fragments for cluster filters */
       refs out: 3 [call: 2, type: 1]
-        - src/api/routes/clusters.ts:150: type ClusterFilterParams -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:159: call push -> external
-        - src/api/routes/clusters.ts:167: call push -> external
-    177-190: attachRepresentativeNodes(db: Database, clusters: ClusterWithNodes[], limitPerCluster: number): void
+        - src/api/routes/clusters.ts:152: type ClusterFilterParams -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:161: call push -> external
+        - src/api/routes/clusters.ts:169: call push -> external
+    179-192: attachRepresentativeNodes(db: Database, clusters: ClusterWithNodes[], limitPerCluster: number): void
       /** Attach representative nodes to clusters */
       refs out: 3 [call: 1, type: 2]
-        - src/api/routes/clusters.ts:178: type Database -> external
-        - src/api/routes/clusters.ts:179: type ClusterWithNodes -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:188: call get -> external
-    196-392: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
-      refs out: 23 [call: 14, type: 9]
-        - src/api/routes/clusters.ts:196: type FastifyInstance -> external
-        - src/api/routes/clusters.ts:196: type Promise -> external
-        - src/api/routes/clusters.ts:202: call get -> external
-        - src/api/routes/clusters.ts:237: call attachRepresentativeNodes -> src/api/routes/clusters.ts
-        - src/api/routes/clusters.ts:241: type const -> external
+        - src/api/routes/clusters.ts:180: type Database -> external
+        - src/api/routes/clusters.ts:181: type ClusterWithNodes -> src/api/routes/clusters.ts
+        - src/api/routes/clusters.ts:190: call get -> external
+    198-387: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
+      refs out: 24 [call: 17, type: 7]
+        - src/api/routes/clusters.ts:198: type FastifyInstance -> external
+        - src/api/routes/clusters.ts:198: type Promise -> external
+        - src/api/routes/clusters.ts:204: call get -> external
+        - src/api/routes/clusters.ts:206: type ClusterStatus -> src/types/index.ts
+        - src/api/routes/clusters.ts:239: call attachRepresentativeNodes -> src/api/routes/clusters.ts
   imports:
     - ../../types/index.js
+    - ../responses.js
     - better-sqlite3
     - fastify
 
@@ -1234,4 +1241,4 @@ src/cli.ts [1-1165]
 
 ---
 Files: 31
-Estimated tokens: 15,548 (codebase: ~1,385,805)
+Estimated tokens: 15,658 (codebase: ~1,388,954)

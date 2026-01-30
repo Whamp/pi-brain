@@ -12,7 +12,6 @@ import type Database from "better-sqlite3";
 
 import { Cron } from "croner";
 
-import { createLogger } from "../utils/logger.js";
 import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
@@ -27,6 +26,7 @@ import {
   type BackfillResult,
 } from "../storage/embedding-utils.js";
 import { readNodeFromPath } from "../storage/node-storage.js";
+import { createLogger } from "../utils/logger.js";
 import {
   createEmbeddingProvider,
   FacetDiscovery,

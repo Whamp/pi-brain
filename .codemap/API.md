@@ -54,11 +54,12 @@ src/api/routes/agents.ts [1-207]
     - ../types.js
     - fastify
 
-src/api/routes/clusters.ts [1-393]
+src/api/routes/clusters.ts [1-388]
   function:
-    196-392: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
+    198-387: async clustersRoutes(app: FastifyInstance): Promise<void> [exported]
   imports:
     - ../../types/index.js
+    - ../responses.js
     - better-sqlite3
     - fastify
 
@@ -2383,4 +2384,4 @@ src/web/index.ts [1-6]
 
 ---
 Files: 109
-Estimated tokens: 29,443 (codebase: ~1,385,805)
+Estimated tokens: 29,448 (codebase: ~1,388,954)

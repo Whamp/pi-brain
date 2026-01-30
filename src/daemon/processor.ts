@@ -10,10 +10,11 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
-import { createLogger } from "../utils/logger.js";
 import type { DaemonConfig } from "../config/types.js";
 import type { AnalysisJob } from "./queue.js";
 import type { AgentNodeOutput, RelationshipOutput } from "./types.js";
+
+import { createLogger } from "../utils/logger.js";
 
 // Re-export types for backward compatibility
 export type { AgentNodeOutput, RelationshipOutput };

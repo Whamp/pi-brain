@@ -16,8 +16,8 @@ export default defineConfig({
     },
     slowTestThreshold: 300, // Flag tests slower than 300ms
     logHeapUsage: true, // Track memory usage
-    testTimeout: 10000, // 10s default timeout
-    hookTimeout: 10000,
+    testTimeout: 10_000, // 10s default timeout
+    hookTimeout: 10_000,
 
     coverage: {
       provider: "v8",

@@ -2,12 +2,12 @@
 
 ## Summary
 
-| Rule | Findings | Priority | Effort |
-|------|----------|----------|--------|
-| `no-console-log` | 41 | Medium | Low |
-| `no-sync-fs-in-async` | 20 | High | Medium |
-| `tainted-direct-response` | 1 | Low | Low |
-| **Total** | **62** | | |
+| Rule                      | Findings | Priority | Effort |
+| ------------------------- | -------- | -------- | ------ |
+| `no-console-log`          | 41       | Medium   | Low    |
+| `no-sync-fs-in-async`     | 20       | High     | Medium |
+| `tainted-direct-response` | 1        | Low      | Low    |
+| **Total**                 | **62**   |          |        |
 
 ---
 
@@ -62,12 +62,12 @@ Exclude logger.ts from console.log rule since it wraps console intentionally.
 
 ### Task 2.2: Daemon Components (6 findings)
 
-| File | Lines | Action |
-|------|-------|--------|
-| `src/daemon/export.ts` | 141, 160 | Use `createLogger("export")` |
-| `src/daemon/insight-aggregation.ts` | 168, 579 | Use `createLogger("insights")` |
-| `src/daemon/processor.ts` | 56 | Replace inline logger with createLogger |
-| `src/daemon/scheduler.ts` | 88 | Replace inline logger with createLogger |
+| File                                | Lines    | Action                                  |
+| ----------------------------------- | -------- | --------------------------------------- |
+| `src/daemon/export.ts`              | 141, 160 | Use `createLogger("export")`            |
+| `src/daemon/insight-aggregation.ts` | 168, 579 | Use `createLogger("insights")`          |
+| `src/daemon/processor.ts`           | 56       | Replace inline logger with createLogger |
+| `src/daemon/scheduler.ts`           | 88       | Replace inline logger with createLogger |
 
 ### Task 2.3: API Layer (1 finding)
 
@@ -98,6 +98,7 @@ Exclude logger.ts from console.log rule since it wraps console intentionally.
 Lines: 1139-1154, 1268-1283, 1411-1426, 1515-1530, 1751-1778
 
 **Pattern to fix:**
+
 ```typescript
 // Before
 if (fs.existsSync(path)) {
@@ -124,6 +125,7 @@ await writeFile(path, content, "utf8");
 ```
 
 **Refactoring approach:**
+
 1. Create helper: `src/utils/fs-async.ts` with `fileExists`, `safeReadFile`, `safeWriteFile`
 2. Replace all 5 occurrences in config.ts
 
@@ -205,27 +207,27 @@ npm run semgrep
 
 ## Files to Modify
 
-| File | Changes |
-|------|---------|
-| `src/daemon/daemon-process.ts` | Replace 32 console.log |
-| `src/daemon/export.ts` | Replace 2 console.log, 2 sync fs |
-| `src/daemon/insight-aggregation.ts` | Replace 2 console.log |
-| `src/daemon/processor.ts` | Replace 1 console.log |
-| `src/daemon/scheduler.ts` | Replace 1 console.log |
-| `src/api/websocket.ts` | Replace 1 console.log |
-| `src/api/routes/config.ts` | Replace 15 sync fs calls |
-| `src/api/routes/daemon.ts` | Replace 1 sync fs call |
-| `src/daemon/cli.ts` | Replace 2 sync fs calls |
-| `src/web/app/src/lib/stores/websocket.ts` | Review 1 console.log |
-| `.semgrep.yml` | Exclude logger.ts from no-console-log |
+| File                                      | Changes                               |
+| ----------------------------------------- | ------------------------------------- |
+| `src/daemon/daemon-process.ts`            | Replace 32 console.log                |
+| `src/daemon/export.ts`                    | Replace 2 console.log, 2 sync fs      |
+| `src/daemon/insight-aggregation.ts`       | Replace 2 console.log                 |
+| `src/daemon/processor.ts`                 | Replace 1 console.log                 |
+| `src/daemon/scheduler.ts`                 | Replace 1 console.log                 |
+| `src/api/websocket.ts`                    | Replace 1 console.log                 |
+| `src/api/routes/config.ts`                | Replace 15 sync fs calls              |
+| `src/api/routes/daemon.ts`                | Replace 1 sync fs call                |
+| `src/daemon/cli.ts`                       | Replace 2 sync fs calls               |
+| `src/web/app/src/lib/stores/websocket.ts` | Review 1 console.log                  |
+| `.semgrep.yml`                            | Exclude logger.ts from no-console-log |
 
 ---
 
 ## Risk Assessment
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                        | Mitigation                       |
+| --------------------------- | -------------------------------- |
 | Breaking async/await chains | Run tests after each file change |
-| Logger import cycles | Keep logger.ts dependency-free |
-| CLI behavior change | Test CLI commands manually |
-| Config file race conditions | Use atomic write patterns |
+| Logger import cycles        | Keep logger.ts dependency-free   |
+| CLI behavior change         | Test CLI commands manually       |
+| Config file race conditions | Use atomic write patterns        |

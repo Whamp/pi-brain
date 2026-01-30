@@ -19,19 +19,20 @@ The brain recalls past decisions, surfaces recurring mistakes, and exposes model
 
 See [docs/runbooks/](docs/runbooks/) for operational procedures:
 
-| Runbook | When to Use |
-|---------|-------------|
-| [daemon-not-running](docs/runbooks/daemon-not-running.md) | Daemon stopped or won't start |
-| [database-corruption](docs/runbooks/database-corruption.md) | SQLite errors, integrity failures |
-| [high-queue-backlog](docs/runbooks/high-queue-backlog.md) | Analysis queue growing, stuck jobs |
-| [api-unresponsive](docs/runbooks/api-unresponsive.md) | API timeouts, connection refused |
-| [sync-failures](docs/runbooks/sync-failures.md) | Sessions not syncing from spokes |
-| [embedding-errors](docs/runbooks/embedding-errors.md) | Semantic search not working |
-| [slow-queries](docs/runbooks/slow-queries.md) | Query performance issues |
-| [database-backup](docs/runbooks/database-backup.md) | Backup and restore procedures |
-| [upgrade-procedure](docs/runbooks/upgrade-procedure.md) | Version upgrades and rollbacks |
+| Runbook                                                     | When to Use                        |
+| ----------------------------------------------------------- | ---------------------------------- |
+| [daemon-not-running](docs/runbooks/daemon-not-running.md)   | Daemon stopped or won't start      |
+| [database-corruption](docs/runbooks/database-corruption.md) | SQLite errors, integrity failures  |
+| [high-queue-backlog](docs/runbooks/high-queue-backlog.md)   | Analysis queue growing, stuck jobs |
+| [api-unresponsive](docs/runbooks/api-unresponsive.md)       | API timeouts, connection refused   |
+| [sync-failures](docs/runbooks/sync-failures.md)             | Sessions not syncing from spokes   |
+| [embedding-errors](docs/runbooks/embedding-errors.md)       | Semantic search not working        |
+| [slow-queries](docs/runbooks/slow-queries.md)               | Query performance issues           |
+| [database-backup](docs/runbooks/database-backup.md)         | Backup and restore procedures      |
+| [upgrade-procedure](docs/runbooks/upgrade-procedure.md)     | Version upgrades and rollbacks     |
 
 Quick health check:
+
 ```bash
 pi-brain health
 pi-brain daemon status

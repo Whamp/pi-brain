@@ -8,9 +8,10 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { WebSocket } from "ws";
 
-import { websocketLogger } from "../utils/logger.js";
 import type { AnalysisJob } from "../daemon/queue.js";
 import type { Node } from "../storage/node-types.js";
+
+import { websocketLogger } from "../utils/logger.js";
 
 // =============================================================================
 // Constants

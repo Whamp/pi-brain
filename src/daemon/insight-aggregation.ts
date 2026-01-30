@@ -15,10 +15,10 @@ import type Database from "better-sqlite3";
 
 import { createHash } from "node:crypto";
 
-import { createLogger } from "../utils/logger.js";
 import type { InsightSeverity, InsightType, Node } from "../types/index.js";
 
 import { readNodeFromPath } from "../storage/node-storage.js";
+import { createLogger } from "../utils/logger.js";
 
 // =============================================================================
 // Types

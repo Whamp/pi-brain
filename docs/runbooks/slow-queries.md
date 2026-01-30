@@ -1,6 +1,7 @@
 # Runbook: Slow Queries
 
 ## Symptoms
+
 - Web UI slow to load
 - CLI queries take >5 seconds
 - API timeouts
@@ -9,6 +10,7 @@
 ## Diagnosis
 
 ### 1. Identify slow queries
+
 ```bash
 # Enable query logging temporarily
 sqlite3 ~/.pi-brain/brain.db ".timer on"
@@ -16,12 +18,14 @@ sqlite3 ~/.pi-brain/brain.db ".timer on"
 ```
 
 ### 2. Check database size
+
 ```bash
 ls -lh ~/.pi-brain/brain.db
 sqlite3 ~/.pi-brain/brain.db "SELECT COUNT(*) FROM nodes; SELECT COUNT(*) FROM edges;"
 ```
 
 ### 3. Check index usage
+
 ```bash
 sqlite3 ~/.pi-brain/brain.db "EXPLAIN QUERY PLAN SELECT * FROM nodes WHERE type = 'decision';"
 ```
@@ -29,6 +33,7 @@ sqlite3 ~/.pi-brain/brain.db "EXPLAIN QUERY PLAN SELECT * FROM nodes WHERE type 
 Look for "SCAN" (bad) vs "SEARCH USING INDEX" (good).
 
 ### 4. Check for locks
+
 ```bash
 fuser ~/.pi-brain/brain.db
 ```
@@ -36,6 +41,7 @@ fuser ~/.pi-brain/brain.db
 ## Resolution
 
 ### Scenario A: Missing indexes
+
 ```bash
 pi-brain daemon stop
 
@@ -51,6 +57,7 @@ pi-brain daemon start
 ```
 
 ### Scenario B: Database needs optimization
+
 ```bash
 pi-brain daemon stop
 
@@ -64,6 +71,7 @@ pi-brain daemon start
 ```
 
 ### Scenario C: WAL file too large
+
 ```bash
 ls -lh ~/.pi-brain/brain.db-wal
 
@@ -73,7 +81,9 @@ pi-brain daemon start
 ```
 
 ### Scenario D: Vector search slow
+
 For semantic queries:
+
 ```bash
 # Check embedding index
 sqlite3 ~/.pi-brain/brain.db "SELECT COUNT(*) FROM node_embeddings;"
@@ -83,7 +93,9 @@ pi-brain daemon rebuild-embeddings --index-only
 ```
 
 ### Scenario E: Too many results
+
 Add limits to queries:
+
 ```bash
 # Instead of
 pi-brain query "find all errors"
@@ -93,7 +105,9 @@ pi-brain query "find all errors" --limit 50
 ```
 
 ### Scenario F: Concurrent load
+
 Reduce concurrent operations:
+
 ```yaml
 # ~/.pi-brain/config.yaml
 daemon:
@@ -106,6 +120,7 @@ api:
 ## Query Optimization Tips
 
 ### Use specific types
+
 ```bash
 # Slow: scans all nodes
 pi-brain query "authentication"
@@ -115,16 +130,19 @@ pi-brain query "authentication errors" --type error
 ```
 
 ### Limit date range
+
 ```bash
 pi-brain query "errors" --since 2024-01-01
 ```
 
 ### Use pagination
+
 ```bash
 pi-brain query "patterns" --limit 20 --offset 0
 ```
 
 ## Verification
+
 ```bash
 # Time a query
 time pi-brain query "test"
@@ -133,11 +151,13 @@ time pi-brain query "test"
 ```
 
 ## When to Consider Scaling
+
 - Database >1GB
-- >100k nodes
+- > 100k nodes
 - Response times consistently >5s
 
 Options:
+
 - Archive old sessions
 - Split by project
 - Consider PostgreSQL migration

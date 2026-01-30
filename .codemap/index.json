@@ -17,8 +17,8 @@
       "getter": 2
     }
   },
-  "total_tokens": 54682,
-  "codebase_tokens": 1388983,
+  "total_tokens": 54687,
+  "codebase_tokens": 1389221,
   "files": [
     {
       "path": "src/api/index.ts",
@@ -230,18 +230,18 @@
       "language": "typescript",
       "lines": [
         1,
-        393
+        388
       ],
       "detail_level": "full",
-      "token_estimate": 337,
+      "token_estimate": 342,
       "symbols": [
         {
           "name": "ClusterNodeWithDetails",
           "kind": "interface",
           "signature": "ClusterNodeWithDetails extends ClusterNode",
           "lines": [
-            16,
-            21
+            18,
+            23
           ],
           "exported": false,
           "is_default": false,
@@ -259,8 +259,8 @@
           "kind": "interface",
           "signature": "ClusterWithNodes extends Cluster",
           "lines": [
-            23,
-            25
+            25,
+            27
           ],
           "exported": false,
           "is_default": false,
@@ -278,8 +278,8 @@
           "kind": "interface",
           "signature": "ClusterRow",
           "lines": [
-            28,
-            40
+            30,
+            42
           ],
           "exported": false,
           "is_default": false,
@@ -297,8 +297,8 @@
           "kind": "interface",
           "signature": "ClusterNodeRow",
           "lines": [
-            43,
-            52
+            45,
+            54
           ],
           "exported": false,
           "is_default": false,
@@ -316,8 +316,8 @@
           "kind": "function",
           "signature": "mapClusterRow(row: ClusterRow): ClusterWithNodes",
           "lines": [
-            59,
-            73
+            61,
+            75
           ],
           "exported": false,
           "is_default": false,
@@ -335,8 +335,8 @@
           "kind": "function",
           "signature": "mapNodeRow(nr: ClusterNodeRow): ClusterNodeWithDetails",
           "lines": [
-            76,
-            87
+            78,
+            89
           ],
           "exported": false,
           "is_default": false,
@@ -354,8 +354,8 @@
           "kind": "function",
           "signature": "fetchRepresentativeNodes(db: Database, clusterIds: string[], limitPerCluster: number): Map<string, {}>",
           "lines": [
-            93,
-            136
+            95,
+            138
           ],
           "exported": false,
           "is_default": false,
@@ -373,8 +373,8 @@
           "kind": "interface",
           "signature": "ClusterFilterParams",
           "lines": [
-            142,
-            145
+            144,
+            147
           ],
           "exported": false,
           "is_default": false,
@@ -392,8 +392,8 @@
           "kind": "function",
           "signature": "buildClusterWhereClause(filters: ClusterFilterParams): { sql: string; params: {}; }",
           "lines": [
-            150,
-            172
+            152,
+            174
           ],
           "exported": false,
           "is_default": false,
@@ -411,8 +411,8 @@
           "kind": "function",
           "signature": "attachRepresentativeNodes(db: Database, clusters: ClusterWithNodes[], limitPerCluster: number): void",
           "lines": [
-            177,
-            190
+            179,
+            192
           ],
           "exported": false,
           "is_default": false,
@@ -430,8 +430,8 @@
           "kind": "function",
           "signature": "async clustersRoutes(app: FastifyInstance): Promise<void>",
           "lines": [
-            196,
-            392
+            198,
+            387
           ],
           "exported": true,
           "is_default": false,
@@ -450,6 +450,7 @@
       "code_blocks": null,
       "imports": [
         "../../types/index.js",
+        "../responses.js",
         "better-sqlite3",
         "fastify"
       ]

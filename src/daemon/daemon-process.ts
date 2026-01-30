@@ -13,6 +13,9 @@
 
 import * as path from "node:path";
 
+import { startServer, WebSocketManager } from "../api/server.js";
+import { loadConfig, ensureDirectories } from "../config/config.js";
+import { openDatabase, migrate } from "../storage/database.js";
 import {
   createLogger,
   daemonLogger as log,
@@ -20,10 +23,6 @@ import {
   schedulerLogger,
   websocketLogger,
 } from "../utils/logger.js";
-
-import { startServer, WebSocketManager } from "../api/server.js";
-import { loadConfig, ensureDirectories } from "../config/config.js";
-import { openDatabase, migrate } from "../storage/database.js";
 import { writePidFile, removePidFile } from "./cli.js";
 import { createConsolidationScheduler } from "./consolidation/index.js";
 import { createQueueManager, PRIORITY } from "./queue.js";

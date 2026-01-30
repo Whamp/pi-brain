@@ -9,6 +9,8 @@ import type { FastifyInstance } from "fastify";
 
 import type { Cluster, ClusterNode, ClusterStatus } from "../../types/index.js";
 
+import { errorResponse } from "../responses.js";
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -303,13 +305,9 @@ export async function clustersRoutes(app: FastifyInstance): Promise<void> {
       | undefined;
 
     if (!row) {
-      return reply.status(404).send({
-        status: "error" as const,
-        error: {
-          code: "NOT_FOUND",
-          message: `Cluster ${id} not found`,
-        },
-      });
+      return reply
+        .status(404)
+        .send(errorResponse("NOT_FOUND", `Cluster ${id} not found`));
     }
 
     // Get all nodes for this cluster (not just representative)
@@ -347,13 +345,14 @@ export async function clustersRoutes(app: FastifyInstance): Promise<void> {
     const { status: newStatus } = request.body;
 
     if (!newStatus || !["confirmed", "dismissed"].includes(newStatus)) {
-      return reply.status(400).send({
-        status: "error" as const,
-        error: {
-          code: "BAD_REQUEST",
-          message: "Status must be 'confirmed' or 'dismissed'",
-        },
-      });
+      return reply
+        .status(400)
+        .send(
+          errorResponse(
+            "BAD_REQUEST",
+            "Status must be 'confirmed' or 'dismissed'"
+          )
+        );
     }
 
     const { db } = app.ctx;
@@ -362,13 +361,9 @@ export async function clustersRoutes(app: FastifyInstance): Promise<void> {
     const exists = db.prepare("SELECT id FROM clusters WHERE id = ?").get(id);
 
     if (!exists) {
-      return reply.status(404).send({
-        status: "error" as const,
-        error: {
-          code: "NOT_FOUND",
-          message: `Cluster ${id} not found`,
-        },
-      });
+      return reply
+        .status(404)
+        .send(errorResponse("NOT_FOUND", `Cluster ${id} not found`));
     }
 
     // Update status
