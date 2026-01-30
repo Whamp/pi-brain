@@ -221,7 +221,27 @@ npm test
 
 # Run linter/formatter
 npm run check
+
+# Generate API documentation for agents
+npm run docs:agent
 ```
+
+### API Documentation
+
+This project uses [API Extractor](https://api-extractor.com/) to generate structured API documentation optimized for AI agents:
+
+```bash
+# Generate agent-friendly JSON docs
+npm run docs:agent
+
+# Query the API (e.g., find functions related to "session")
+npm run docs:query -- --query="session"
+
+# Watch mode - regenerate on changes
+npm run docs:watch
+```
+
+See [docs/API-DOCUMENTATION.md](docs/API-DOCUMENTATION.md) for details.
 
 ## License
 
