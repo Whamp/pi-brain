@@ -402,4 +402,4 @@ Ref: docs/plans/SEMGREP-REMEDIATION-PLAN.md
 | 20.1 | Create logger infrastructure (Phase 1)          | done   | -    | 2026-01-30 |
 | 20.2 | Replace console.log with logger (Phase 2)       | done   | 20.1 | 2026-01-30 |
 | 20.3 | Replace sync fs calls with async (Phase 3)      | done   | -    | 2026-01-30 |
-| 20.4 | Fix tainted-direct-response in clusters.ts (P4) | active | -    | 2026-01-30 |
+| 20.4 | Fix tainted-direct-response in clusters.ts (P4) | done   | -    | 2026-01-30 |

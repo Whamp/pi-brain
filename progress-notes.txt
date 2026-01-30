@@ -651,3 +651,25 @@ save/reset pattern.
 **Commit**: cb741fdd
 **Notes**: Phase 3 complete - all sync fs calls in async functions replaced.
 Remaining: Phase 4 (tainted-direct-response) - 1 finding in clusters.ts
+
+---
+
+## 2026-01-30 10:17 - Task 20.4: Fix tainted-direct-response in clusters.ts
+
+**Status**: pending → done
+**Validation**:
+  - Imported errorResponse helper from ../responses.js
+  - Replaced 3 inline error responses with errorResponse() calls:
+    - GET /clusters/:id - 404 NOT_FOUND
+    - POST /clusters/:id/status - 400 BAD_REQUEST
+    - POST /clusters/:id/status - 404 NOT_FOUND
+  - Build: success
+  - Lint: 0 errors, 0 warnings
+  - Tests: 1396 passed, 4 skipped
+  - Semgrep full scan: 324 rules, 0 findings (tainted-direct-response eliminated)
+**Commit**: 35dc172f
+**Notes**: Semgrep remediation plan Phase 4 complete. All 62 original findings now resolved:
+  - Phase 1: Logger infrastructure (done)
+  - Phase 2: console.log → logger (41 findings → 0)
+  - Phase 3: sync fs → async (20 findings → 0)
+  - Phase 4: tainted-direct-response (1 finding → 0)
