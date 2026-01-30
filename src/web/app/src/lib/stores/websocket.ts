@@ -96,6 +96,7 @@ function createWebSocketStore() {
     const delay = getReconnectDelay();
     reconnectAttempts++;
 
+    // nosemgrep: no-console-log - Browser-side debugging for WebSocket reconnection
     console.log(
       `WebSocket reconnecting in ${Math.round(delay / 1000)}s (attempt ${reconnectAttempts})`
     );

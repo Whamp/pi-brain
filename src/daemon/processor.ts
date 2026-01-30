@@ -10,6 +10,7 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
+import { createLogger } from "../utils/logger.js";
 import type { DaemonConfig } from "../config/types.js";
 import type { AnalysisJob } from "./queue.js";
 import type { AgentNodeOutput, RelationshipOutput } from "./types.js";
@@ -51,11 +52,12 @@ export interface ProcessorLogger {
 }
 
 /** Default console logger */
+const defaultLogger = createLogger("processor");
 export const consoleLogger: ProcessorLogger = {
-  debug: (msg) => console.debug(`[processor] ${msg}`),
-  info: (msg) => console.log(`[processor] ${msg}`),
-  warn: (msg) => console.warn(`[processor] ${msg}`),
-  error: (msg) => console.error(`[processor] ${msg}`),
+  debug: (msg) => defaultLogger.debug(msg),
+  info: (msg) => defaultLogger.info(msg),
+  warn: (msg) => defaultLogger.warn(msg),
+  error: (msg) => defaultLogger.error(msg),
 };
 
 // =============================================================================

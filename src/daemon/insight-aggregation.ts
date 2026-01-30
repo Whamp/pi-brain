@@ -15,6 +15,7 @@ import type Database from "better-sqlite3";
 
 import { createHash } from "node:crypto";
 
+import { createLogger } from "../utils/logger.js";
 import type { InsightSeverity, InsightType, Node } from "../types/index.js";
 
 import { readNodeFromPath } from "../storage/node-storage.js";
@@ -77,6 +78,9 @@ interface NodeRow {
 const MAX_PATTERNS = 10_000;
 const MAX_EXAMPLES = 10;
 const NODE_BATCH_SIZE = 1000; // Process nodes in batches to limit memory pressure
+
+// Logger for insight aggregation
+const log = createLogger("insight-aggregation");
 
 // =============================================================================
 // Helper Functions
@@ -165,7 +169,7 @@ export class InsightAggregator {
     // Store results
     this.storeInsights(insights);
 
-    console.log(`[insight-aggregation] Aggregated ${insights.size} insights`);
+    log.info(` Aggregated ${insights.size} insights`);
   }
 
   /**
@@ -188,7 +192,7 @@ export class InsightAggregator {
       if (!group) {
         if (insights.size >= MAX_PATTERNS) {
           if (!hitLimit) {
-            console.warn(
+            log.warn(
               `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit for quirks`
             );
             hitLimit = true;
@@ -260,7 +264,7 @@ export class InsightAggregator {
       if (!group) {
         if (insights.size >= MAX_PATTERNS) {
           if (!hitLimit) {
-            console.warn(
+            log.warn(
               `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit for tool errors`
             );
             hitLimit = true;
@@ -323,7 +327,7 @@ export class InsightAggregator {
       if (!group) {
         if (insights.size >= MAX_PATTERNS) {
           if (!hitLimit) {
-            console.warn(
+            log.warn(
               `[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit for lessons`
             );
             hitLimit = true;
@@ -471,7 +475,7 @@ export class InsightAggregator {
   ): boolean {
     let hitLimit = currentHitLimit;
     if (insights.size >= MAX_PATTERNS && !hitLimit) {
-      console.warn(`[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`);
+      log.warn(` Hit ${MAX_PATTERNS} pattern limit`);
       hitLimit = true;
     }
 
@@ -513,7 +517,7 @@ export class InsightAggregator {
   ): boolean {
     let hitLimit = currentHitLimit;
     if (insights.size >= MAX_PATTERNS && !hitLimit) {
-      console.warn(`[insight-aggregation] Hit ${MAX_PATTERNS} pattern limit`);
+      log.warn(` Hit ${MAX_PATTERNS} pattern limit`);
       hitLimit = true;
     }
 
@@ -572,11 +576,11 @@ export class InsightAggregator {
     errorsEncountered: number
   ): void {
     if (errorsEncountered > 0) {
-      console.warn(
+      log.warn(
         `[insight-aggregation] Skipped ${errorsEncountered} nodes due to missing/invalid JSON files`
       );
     }
-    console.log(
+    log.info(
       `[insight-aggregation] Processed ${nodesProcessed} nodes for prompting patterns`
     );
   }

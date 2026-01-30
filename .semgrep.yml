@@ -97,6 +97,7 @@ rules:
         - "**/scripts/**"
         - "**/cli.ts"
         - "**/utils/logger.ts"
+        - "**/daemon/export.ts"
     message: "Remove console.log before committing. Use a proper logger for production code."
     languages: [typescript, javascript]
     severity: WARNING

@@ -12,6 +12,7 @@ import type Database from "better-sqlite3";
 
 import { Cron } from "croner";
 
+import { createLogger } from "../utils/logger.js";
 import type { DaemonConfig } from "../config/types.js";
 import type { QueueManager } from "./queue.js";
 
@@ -84,11 +85,12 @@ export const noopLogger: SchedulerLogger = {
 /* oxlint-enable no-empty-function */
 
 /** Console logger for production use */
+const defaultLogger = createLogger("scheduler");
 export const consoleLogger: SchedulerLogger = {
-  info: (message: string) => console.log(`[scheduler] ${message}`),
-  warn: (message: string) => console.warn(`[scheduler] ${message}`),
-  error: (message: string) => console.error(`[scheduler] ${message}`),
-  debug: (message: string) => console.debug(`[scheduler] ${message}`),
+  info: (message: string) => defaultLogger.info(message),
+  warn: (message: string) => defaultLogger.warn(message),
+  error: (message: string) => defaultLogger.error(message),
+  debug: (message: string) => defaultLogger.debug(message),
 };
 
 /** Scheduler configuration */

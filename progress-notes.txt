@@ -581,3 +581,22 @@ the reactivity chain.
 Spokes section uses immediate save pattern (no Save/Reset buttons) since spoke CRUD
 operations are performed immediately via API calls. Other tabs retain the form-based
 save/reset pattern.
+
+---
+
+## 2026-01-30 10:25 - Semgrep Phase 1 (Tasks 1.1, 1.2)
+
+**Status**: pending → done
+**Validation**:
+  - Created src/utils/logger.ts with structured logging
+  - createLogger() factory with prefix and timestamp
+  - LOG_LEVEL env var support (debug/info/warn/error)
+  - Pre-configured loggers: daemonLogger, workerLogger, schedulerLogger, websocketLogger, apiLogger
+  - Exported from src/index.ts
+  - Updated .semgrep.yml to exclude utils/logger.ts from no-console-log
+  - Build: success
+  - Lint: 0 errors, 0 warnings
+  - Tests: 1396 passed, 4 skipped
+  - Semgrep: 61 findings (logger.ts excluded)
+**Commit**: 43c26688
+**Notes**: Logger infrastructure complete. Ready for Phase 2 (replace console.log in daemon-process.ts and other files).

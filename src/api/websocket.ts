@@ -8,6 +8,7 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { WebSocket } from "ws";
 
+import { websocketLogger } from "../utils/logger.js";
 import type { AnalysisJob } from "../daemon/queue.js";
 import type { Node } from "../storage/node-types.js";
 
@@ -85,9 +86,9 @@ export class WebSocketManager {
     debug: (msg: string) => void;
   }) {
     this.logger = logger ?? {
-      info: (msg: string) => console.log(`[ws] ${msg}`),
-      error: (msg: string) => console.error(`[ws] ${msg}`),
-      debug: (msg: string) => console.debug(`[ws] ${msg}`),
+      info: (msg: string) => websocketLogger.info(msg),
+      error: (msg: string) => websocketLogger.error(msg),
+      debug: (msg: string) => websocketLogger.debug(msg),
     };
   }
 

@@ -13,6 +13,14 @@
 
 import * as path from "node:path";
 
+import {
+  createLogger,
+  daemonLogger as log,
+  workerLogger,
+  schedulerLogger,
+  websocketLogger,
+} from "../utils/logger.js";
+
 import { startServer, WebSocketManager } from "../api/server.js";
 import { loadConfig, ensureDirectories } from "../config/config.js";
 import { openDatabase, migrate } from "../storage/database.js";
@@ -47,7 +55,7 @@ for (let i = 0; i < args.length; i++) {
 
 const handleWatcherError = (event: Event) => {
   const customEvent = event as CustomEvent;
-  console.error("[daemon] Watcher error:", customEvent.detail?.error);
+  log.error("Watcher error:", customEvent.detail?.error);
 };
 
 const sleep = (ms: number) =>
@@ -60,7 +68,7 @@ const sleep = (ms: number) =>
 // =============================================================================
 
 async function main(): Promise<void> {
-  console.log("[daemon] Starting pi-brain daemon process...");
+  log.info("Starting pi-brain daemon process...");
 
   // Load configuration
   const config = loadConfig(configPath);
@@ -72,21 +80,19 @@ async function main(): Promise<void> {
   if (!portAvailable) {
     const existingPid = findProcessOnPort(config.api.port);
     if (force && existingPid) {
-      console.log(
-        `[daemon] Killing process ${existingPid} on port ${config.api.port}...`
-      );
+      log.info(`Killing process ${existingPid} on port ${config.api.port}...`);
       try {
         process.kill(existingPid, "SIGKILL");
         await sleep(500); // Wait for cleanup
       } catch (error) {
-        console.error(
-          `[daemon] Failed to kill process on port ${config.api.port}: ${(error as Error).message}`
+        log.error(
+          `Failed to kill process on port ${config.api.port}: ${(error as Error).message}`
         );
         process.exit(1);
       }
     } else {
-      console.error(
-        `[daemon] Port ${config.api.port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`
+      log.error(
+        `Port ${config.api.port} is already in use${existingPid ? ` by PID ${existingPid}` : ""}. Use --force to kill it.`
       );
       process.exit(1);
     }
@@ -97,23 +103,23 @@ async function main(): Promise<void> {
   const db = openDatabase({ path: dbPath });
   migrate(db);
 
-  console.log(`[daemon] Database opened at ${dbPath}`);
+  log.info(`Database opened at ${dbPath}`);
 
   // Write PID file
   writePidFile(process.pid);
-  console.log(`[daemon] PID ${process.pid} written`);
+  log.info(`PID ${process.pid} written`);
 
   // Create queue manager
   const queue = createQueueManager(db);
-  console.log("[daemon] Queue manager initialized");
+  log.info("Queue manager initialized");
 
   // Release any stale jobs from previous run
   // We use releaseAllRunning() here instead of releaseStale() because on daemon startup
   // any jobs marked as 'running' are definitely stale regardless of lock expiration.
   const releasedCount = queue.releaseAllRunning();
   if (releasedCount > 0) {
-    console.log(
-      `[daemon] Released ${releasedCount} stale running jobs from previous session`
+    log.info(
+      `Released ${releasedCount} stale running jobs from previous session`
     );
   }
 
@@ -122,7 +128,7 @@ async function main(): Promise<void> {
     () => {
       const staleCount = queue.releaseStale();
       if (staleCount > 0) {
-        console.log(`[daemon] Released ${staleCount} stale locks`);
+        log.info(`Released ${staleCount} stale locks`);
       }
     },
     15 * 60 * 1000
@@ -130,21 +136,21 @@ async function main(): Promise<void> {
 
   // Create WebSocket manager for real-time updates
   const wsManager = new WebSocketManager({
-    info: (msg: string) => console.log(`[ws] ${msg}`),
-    error: (msg: string) => console.error(`[ws] ${msg}`),
-    debug: (msg: string) => console.debug(`[ws] ${msg}`),
+    info: (msg: string) => websocketLogger.info(msg),
+    error: (msg: string) => websocketLogger.error(msg),
+    debug: (msg: string) => websocketLogger.debug(msg),
   });
-  console.log("[daemon] WebSocket manager created");
+  log.info("WebSocket manager created");
 
   // Create worker with WebSocket event broadcasting
   const worker = createWorker({
     id: "worker-1",
     config,
     logger: {
-      info: (msg: string) => console.log(`[worker] ${msg}`),
-      warn: (msg: string) => console.warn(`[worker] ${msg}`),
-      error: (msg: string) => console.error(`[worker] ${msg}`),
-      debug: (msg: string) => console.debug(`[worker] ${msg}`),
+      info: (msg: string) => workerLogger.info(msg),
+      warn: (msg: string) => workerLogger.warn(msg),
+      error: (msg: string) => workerLogger.error(msg),
+      debug: (msg: string) => workerLogger.debug(msg),
     },
     onJobStarted: (job, workerId) => {
       // Broadcast analysis started via WebSocket
@@ -162,21 +168,20 @@ async function main(): Promise<void> {
       return Promise.resolve();
     },
   });
-  console.log("[daemon] Worker created");
-
   worker.initialize(db);
-  console.log("[daemon] Worker initialized");
+  log.info("Worker created and initialized");
 
   // Create scheduler for nightly jobs (takes full DaemonConfig)
   const scheduler = createScheduler(config.daemon, queue, db, {
-    info: (msg: string) => console.log(`[scheduler] ${msg}`),
-    warn: (msg: string) => console.warn(`[scheduler] ${msg}`),
-    error: (msg: string) => console.error(`[scheduler] ${msg}`),
-    debug: (msg: string) => console.debug(`[scheduler] ${msg}`),
+    info: (msg: string) => schedulerLogger.info(msg),
+    warn: (msg: string) => schedulerLogger.warn(msg),
+    error: (msg: string) => schedulerLogger.error(msg),
+    debug: (msg: string) => schedulerLogger.debug(msg),
   });
-  console.log("[daemon] Scheduler created");
+  log.info("Scheduler created");
 
   // Create consolidation scheduler for memory decay and creative association
+  const consolidationLogger = createLogger("consolidation");
   const consolidationScheduler = createConsolidationScheduler(
     db,
     {
@@ -188,13 +193,13 @@ async function main(): Promise<void> {
       },
     },
     {
-      info: (msg: string) => console.log(`[consolidation] ${msg}`),
-      warn: (msg: string) => console.warn(`[consolidation] ${msg}`),
-      error: (msg: string) => console.error(`[consolidation] ${msg}`),
-      debug: (msg: string) => console.debug(`[consolidation] ${msg}`),
+      info: (msg: string) => consolidationLogger.info(msg),
+      warn: (msg: string) => consolidationLogger.warn(msg),
+      error: (msg: string) => consolidationLogger.error(msg),
+      debug: (msg: string) => consolidationLogger.debug(msg),
     }
   );
-  console.log("[daemon] Consolidation scheduler created");
+  log.info("Consolidation scheduler created");
 
   // Create session watcher
   const watcher = new SessionWatcher({
@@ -205,9 +210,7 @@ async function main(): Promise<void> {
   const handleSessionIdle = (event: Event) => {
     const sessionPath = getSessionPath(event);
     if (sessionPath) {
-      console.log(
-        `[daemon] Session idle, queuing for analysis: ${sessionPath}`
-      );
+      log.info(`Session idle, queuing for analysis: ${sessionPath}`);
       // Queue for analysis if not already queued
       if (!queue.hasExistingJob(sessionPath)) {
         queue.enqueue({
@@ -223,7 +226,7 @@ async function main(): Promise<void> {
   const handleSessionChange = (event: Event) => {
     const sessionPath = getSessionPath(event);
     if (sessionPath) {
-      console.log(`[daemon] Session changed: ${sessionPath}`);
+      log.debug(`Session changed: ${sessionPath}`);
       // Watcher handles idle detection, just log for now
     }
   };
@@ -234,16 +237,16 @@ async function main(): Promise<void> {
 
   // Start components - use startFromConfig for PiBrainConfig
   await watcher.startFromConfig(config);
-  console.log("[daemon] Session watcher started");
+  log.info("Session watcher started");
 
   scheduler.start();
-  console.log("[daemon] Scheduler started");
+  log.info("Scheduler started");
 
   consolidationScheduler.start();
-  console.log("[daemon] Consolidation scheduler started");
+  log.info("Consolidation scheduler started");
 
   worker.start();
-  console.log("[daemon] Worker started");
+  log.info("Worker started");
 
   // Start API server with WebSocket support
   const { app: server } = await startServer(
@@ -252,8 +255,8 @@ async function main(): Promise<void> {
     config.daemon,
     wsManager
   );
-  console.log(
-    `[daemon] API server listening on http://${config.api.host}:${config.api.port}`
+  log.info(
+    `API server listening on http://${config.api.host}:${config.api.port}`
   );
 
   // Broadcast daemon status periodically
@@ -278,39 +281,39 @@ async function main(): Promise<void> {
     });
   }, 2000); // Every 2 seconds
 
-  console.log("[daemon] pi-brain daemon is running");
+  log.info("pi-brain daemon is running");
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {
-    console.log(`[daemon] Received ${signal}, shutting down...`);
+    log.info(`Received ${signal}, shutting down...`);
 
     clearInterval(staleReleaseInterval);
     clearInterval(statusBroadcastInterval);
 
     // Stop components in order
     worker.stop();
-    console.log("[daemon] Worker stopped");
+    log.info("Worker stopped");
 
     scheduler.stop();
-    console.log("[daemon] Scheduler stopped");
+    log.info("Scheduler stopped");
 
     consolidationScheduler.stop();
-    console.log("[daemon] Consolidation scheduler stopped");
+    log.info("Consolidation scheduler stopped");
 
     await watcher.stop();
-    console.log("[daemon] Watcher stopped");
+    log.info("Watcher stopped");
 
     await server.close();
-    console.log("[daemon] API server stopped");
+    log.info("API server stopped");
 
     wsManager.closeAll();
-    console.log("[daemon] WebSocket connections closed");
+    log.info("WebSocket connections closed");
 
     db.close();
-    console.log("[daemon] Database closed");
+    log.info("Database closed");
 
     removePidFile();
-    console.log("[daemon] Shutdown complete");
+    log.info("Shutdown complete");
 
     process.exit(0);
   };
@@ -331,7 +334,7 @@ async function main(): Promise<void> {
   try {
     await main();
   } catch (error) {
-    console.error("[daemon] Fatal error:", error);
+    log.error("Fatal error:", error);
     removePidFile();
     process.exit(1);
   }
