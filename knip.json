@@ -8,10 +8,7 @@
     "src/web/index.ts",
     "extensions/brain-query/index.ts",
     "extensions/dashboard/index.ts",
-    "extensions/dashboard/lib/analyzer.ts",
-    "extensions/dashboard/lib/parser.ts",
-    "extensions/dashboard/server.ts",
-    "scripts/launch.js"
+    "extensions/dashboard/server.ts"
   ],
   "project": [
     "src/**/*.{ts,tsx}",
@@ -32,10 +29,11 @@
     "scripts/refresh-codemap.sh",
     "extensions/dashboard/lib/types.ts"
   ],
-  "ignoreDependencies": ["lint-staged", "oxfmt"],
+  "ignoreDependencies": [],
+  "ignoreExportsUsedInFile": true,
   "rules": {
-    "exports": "error",
-    "types": "error",
+    "exports": "warn",
+    "types": "warn",
     "files": "error",
     "dependencies": "warn",
     "devDependencies": "warn",

@@ -235,6 +235,8 @@ src/daemon/connection-discovery.ts [1-629]
       /** Discovers semantic connections between nodes in the knowledge graph. Uses keyword/tag similarity, explicit references, and lesson reinforcement patterns to find related nodes. Does not use LLM - relies on FTS and Jaccard similarity for performance. */
   interface:
     138-143: interface ConnectionResult [exported]
+      refs out: 1 [type: 1]
+        - src/daemon/connection-discovery.ts:142: type Edge -> src/types/index.ts
   imports:
     - ../storage/edge-repository.js
     - ../storage/index.js
@@ -1070,17 +1072,17 @@ src/daemon/worker.ts [1-894]
   interface:
     68-85: interface WorkerConfig [exported]
       /** Worker configuration */
-      refs out: 10 [type: 10]
+      refs out: 11 [type: 11]
         - src/daemon/worker.ts:72: type PiBrainConfig -> src/config/types.ts
         - src/daemon/worker.ts:74: type RetryPolicy -> src/daemon/errors.ts
         - src/daemon/worker.ts:76: type ProcessorLogger -> src/daemon/processor.ts
         - src/daemon/worker.ts:78: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:78: type Promise -> external
         - src/daemon/worker.ts:80: type AnalysisJob -> src/daemon/queue.ts
+        - src/daemon/worker.ts:80: type Node -> src/types/index.ts
         - src/daemon/worker.ts:80: type Promise -> external
         - src/daemon/worker.ts:82: type AnalysisJob -> src/daemon/queue.ts
         - src/daemon/worker.ts:82: type Error -> external
-        - src/daemon/worker.ts:82: type Promise -> external
     88-103: interface WorkerStatus [exported]
       /** Worker status */
       refs out: 2 [type: 2]
@@ -1592,4 +1594,4 @@ src/parser/signals.ts [1-1181]
 
 ---
 Files: 41
-Estimated tokens: 20,997 (codebase: ~1,411,762)
+Estimated tokens: 21,025 (codebase: ~1,412,048)
