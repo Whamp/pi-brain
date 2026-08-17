@@ -7,7 +7,7 @@ import type {
   ExtensionAPI,
   ExtensionContext,
   ToolDefinition,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 import fc from "fast-check";
 
 import activate from "./index.js";
@@ -202,7 +202,6 @@ describe("extensionWiring", () => {
     expect(handlerNames).toContain("turn_end");
     expect(handlerNames).toContain("before_agent_start");
     expect(handlerNames).toContain("session_start");
-    expect(handlerNames).toContain("session_switch");
     expect(handlerNames).toContain("session_compact");
     expect(handlerNames).toContain("session_before_compact");
     expect(handlerNames).toContain("resources_discover");
@@ -502,94 +501,6 @@ describe("extensionWiring", () => {
       expect(ui.statuses.get("brain")).toContain("feature-status");
     } finally {
       cleanup();
-    }
-  });
-
-  it("should refresh footer status on session_switch for initialized project", async () => {
-    const { projectDir, cleanup } = setupInitializedProject();
-    try {
-      const mockPi = createMockPi();
-      activate(mockPi.api);
-
-      const ui = createMockUi();
-      const ctx = createCtx(projectDir, {
-        ui,
-        sessionFile: "/tmp/pi-session-switch-refresh.jsonl",
-      });
-
-      const sessionStart = getHandler(mockPi.handlers, "session_start");
-      const sessionSwitch = getHandler(mockPi.handlers, "session_switch");
-      const memoryBranch = mockPi.tools.find((t) => t.name === "memory_branch");
-
-      await sessionStart?.({ type: "session_start" }, ctx);
-      await memoryBranch?.execute(
-        "tc-switch-refresh",
-        {
-          action: "create",
-          name: "feature-switch",
-          purpose: "Check switch refresh",
-        },
-        undefined,
-        undefined,
-        ctx
-      );
-
-      ui.setStatus("brain", "Brain: stale (99 uncommitted turns)");
-
-      await sessionSwitch?.(
-        {
-          type: "session_switch",
-          reason: "resume",
-          previousSessionFile: "/tmp/previous-session.jsonl",
-        },
-        ctx
-      );
-
-      expect(ui.statuses.get("brain")).toContain("feature-switch");
-      expect(ui.statuses.get("brain")).toContain("0 uncommitted turns");
-    } finally {
-      cleanup();
-    }
-  });
-
-  it("should clear footer status on session_switch to an uninitialized project", async () => {
-    const { projectDir, cleanup } = setupInitializedProject();
-    const uninitializedDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "memory-index-switch-uninitialized-")
-    );
-
-    try {
-      const mockPi = createMockPi();
-      activate(mockPi.api);
-
-      const ui = createMockUi();
-      const sessionStart = getHandler(mockPi.handlers, "session_start");
-      const sessionSwitch = getHandler(mockPi.handlers, "session_switch");
-
-      const initializedCtx = createCtx(projectDir, {
-        ui,
-        sessionFile: "/tmp/pi-session-switch-initialized.jsonl",
-      });
-      await sessionStart?.({ type: "session_start" }, initializedCtx);
-      expect(ui.statuses.get("brain")).toContain("main");
-
-      const uninitializedCtx = createCtx(uninitializedDir, {
-        ui,
-        sessionFile: "/tmp/pi-session-switch-uninitialized.jsonl",
-      });
-      await sessionSwitch?.(
-        {
-          type: "session_switch",
-          reason: "new",
-          previousSessionFile: "/tmp/pi-session-switch-initialized.jsonl",
-        },
-        uninitializedCtx
-      );
-
-      expect(ui.statuses.get("brain")).toBeUndefined();
-    } finally {
-      cleanup();
-      fs.rmSync(uninitializedDir, { recursive: true, force: true });
     }
   });
 
@@ -1017,72 +928,6 @@ describe("extensionWiring", () => {
 
       // session_start resets the epoch and should rebuild from updated roadmap
       await sessionStart?.({ type: "session_start" }, ctx);
-
-      const result3 = (await beforeStart?.(event, ctx)) as {
-        systemPrompt?: string;
-      };
-      const thirdSnapshot = extractFrozenSnapshot(
-        readInjectedSystemPrompt(result3),
-        event.systemPrompt
-      );
-      expect(thirdSnapshot).toContain("# Memory Status");
-      expect(thirdSnapshot).toContain(updatedToken);
-      expect(thirdSnapshot).not.toBe(firstSnapshot);
-    } finally {
-      cleanup();
-    }
-  });
-
-  it("should rebuild frozen snapshot after session_switch resets the epoch", async () => {
-    const { projectDir, cleanup } = setupInitializedProject();
-    try {
-      const initialToken = "[[ROADMAP:before-session-switch-reset]]";
-      const updatedToken = "[[ROADMAP:after-session-switch-reset]]";
-      writeRoadmap(projectDir, `# Roadmap\n\n${initialToken}`);
-
-      const mockPi = createMockPi();
-      activate(mockPi.api);
-
-      const ctx = createCtx(projectDir);
-      const sessionStart = getHandler(mockPi.handlers, "session_start");
-      const beforeStart = getHandler(mockPi.handlers, "before_agent_start");
-      const sessionSwitch = getHandler(mockPi.handlers, "session_switch");
-      const event = {
-        type: "before_agent_start",
-        prompt: "hello",
-        systemPrompt: "base",
-      };
-
-      await sessionStart?.({ type: "session_start" }, ctx);
-      const result1 = (await beforeStart?.(event, ctx)) as {
-        systemPrompt?: string;
-      };
-      const firstSnapshot = extractFrozenSnapshot(
-        readInjectedSystemPrompt(result1),
-        event.systemPrompt
-      );
-      expect(firstSnapshot).toContain(initialToken);
-
-      writeRoadmap(projectDir, `# Roadmap\n\n${updatedToken}`);
-
-      const result2 = (await beforeStart?.(event, ctx)) as {
-        systemPrompt?: string;
-      };
-      const secondSnapshot = extractFrozenSnapshot(
-        readInjectedSystemPrompt(result2),
-        event.systemPrompt
-      );
-      expect(secondSnapshot).toBe(firstSnapshot);
-      expect(secondSnapshot).not.toContain(updatedToken);
-
-      await sessionSwitch?.(
-        {
-          type: "session_switch",
-          reason: "resume",
-          previousSessionFile: "/tmp/old-session.jsonl",
-        },
-        ctx
-      );
 
       const result3 = (await beforeStart?.(event, ctx)) as {
         systemPrompt?: string;

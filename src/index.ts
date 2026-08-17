@@ -7,7 +7,7 @@ import type {
   ExtensionAPI,
   ExtensionContext,
   SessionBeforeCompactEvent,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 
 import { BranchManager } from "./branches.js";
@@ -102,9 +102,10 @@ export default function activate(pi: ExtensionAPI) {
   let state: MemoryState | null = null;
   let branchManager: BranchManager | null = null;
   let frozenStatusSnapshot: string | null = null;
+  let activeCwd: string | null = null;
 
   function tryLoad(ctx: ExtensionContext): boolean {
-    if (isMemoryReady(state, branchManager)) {
+    if (isMemoryReady(state, branchManager) && activeCwd === ctx.cwd) {
       return true;
     }
 
@@ -117,6 +118,7 @@ export default function activate(pi: ExtensionAPI) {
 
     state = candidate;
     branchManager = new BranchManager(ctx.cwd);
+    activeCwd = ctx.cwd;
     upsertCurrentSession(state, ctx);
     return true;
   }
@@ -197,7 +199,10 @@ export default function activate(pi: ExtensionAPI) {
 
       const { task } = executeMemoryCommit(params, state, branchManager);
 
-      const result = await spawnCommitter(ctx.cwd, task, signal);
+      const result = await spawnCommitter(ctx.cwd, task, signal, {
+        model: ctx.model ? `${ctx.model.provider}/${ctx.model.id}` : undefined,
+        thinking: ctx.thinkingLevel,
+      });
 
       if (result.exitCode !== 0 || result.error) {
         return createTextResult(
@@ -231,6 +236,7 @@ export default function activate(pi: ExtensionAPI) {
     state.load();
     branchManager = new BranchManager(ctx.cwd);
     frozenStatusSnapshot = null;
+    activeCwd = ctx.cwd;
 
     if (!state.isInitialized) {
       setBrainFooterStatus(ctx, state, branchManager);
@@ -247,20 +253,6 @@ export default function activate(pi: ExtensionAPI) {
         `Brain: log.md is large (${sizeKB} KB). You should commit to distill this into structured memory.`,
         "warning"
       );
-    }
-
-    setBrainFooterStatus(ctx, state, branchManager);
-  });
-
-  pi.on("session_switch", (_event, ctx) => {
-    frozenStatusSnapshot = null;
-
-    state = new MemoryState(ctx.cwd);
-    state.load();
-    branchManager = new BranchManager(ctx.cwd);
-
-    if (state.isInitialized) {
-      upsertCurrentSession(state, ctx);
     }
 
     setBrainFooterStatus(ctx, state, branchManager);

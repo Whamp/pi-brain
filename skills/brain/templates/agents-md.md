@@ -23,6 +23,7 @@ This directory contains your project's agent memory, managed by the Brain extens
 .memory/
 ├── AGENTS.md                    # This file — protocol reference
 ├── main.md                      # Project roadmap (agent-authored)
+├── config.yaml                  # Optional committer model/thinking overrides
 └── branches/
     └── <branch-name>/
         ├── commits.md           # Milestone memory snapshots
@@ -59,3 +60,4 @@ Call `memory_commit` when one of these is true:
 - **No direct log.md writes**: The extension maintains log.md automatically
 - **Status is automatic**: Memory status is injected at session start and appended to tool results (compact/truncated when large; use `read .memory/main.md` for full roadmap)
 - **Keep main.md current**: After every commit, re-read `.memory/main.md` in full and rewrite stale sections. Current State should describe what is true _right now_ — remove historical context that belongs in Key Decisions or Milestones. The goal is curation, not accumulation. For trivial commits that don't change project state, pass `update_roadmap: false` to skip the reminder.
+- **Committer configuration**: `.memory/config.yaml` may define `committer.model` and `committer.thinking`. If omitted, Brain uses the active Pi session values. Pi handles authentication for the selected provider; do not add credentials to Brain configuration.

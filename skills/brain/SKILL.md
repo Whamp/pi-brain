@@ -17,6 +17,22 @@ bash "/absolute/path/to/skills/brain/scripts/brain-init.sh"
 Replace `/absolute/path/to/skills/brain` with the skill directory shown in the
 `<skill>` tag's `location` attribute (strip the `/SKILL.md` suffix).
 
+### Committer Configuration
+
+`memory_commit` runs its distiller as a child Pi process. By default, it inherits
+the currently selected model and thinking level from the active Pi session. To
+choose a dedicated committer, add `.memory/config.yaml`:
+
+```yaml
+committer:
+  model: google/gemini-3.6-flash
+  thinking: low
+```
+
+Either field may be omitted to inherit the active session value. Pi resolves
+provider authentication normally; do not put API keys or other credentials in
+this file.
+
 ### After Init
 
 1. **Write `.memory/main.md`** — the project roadmap (see below).

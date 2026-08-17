@@ -3,18 +3,67 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-import type { SubagentResult } from "./types.js";
+import type { CommitterOptions, SubagentResult } from "./types.js";
 import { parseYaml } from "./yaml.js";
 
-const COMMITTER_MODEL = "google-antigravity/gemini-3-flash";
 const COMMITTER_TOOLS = "read,grep,find,ls";
 
 interface AgentDefinition {
   prompt: string;
-  model: string;
   tools: string;
   skills: string;
   extensions: string;
+}
+
+function nonEmptyString(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+}
+
+function readCommitterConfig(cwd: string): CommitterOptions {
+  const configPath = path.join(cwd, ".memory", "config.yaml");
+
+  if (!fs.existsSync(configPath)) {
+    return {};
+  }
+
+  try {
+    const parsed = parseYaml(fs.readFileSync(configPath, "utf8"));
+    const { committer } = parsed;
+
+    if (
+      typeof committer !== "object" ||
+      committer === null ||
+      Array.isArray(committer)
+    ) {
+      return {};
+    }
+
+    const config = committer as Record<string, unknown>;
+    return {
+      model: nonEmptyString(config.model),
+      thinking: nonEmptyString(config.thinking),
+    };
+  } catch {
+    // An unreadable or invalid optional config must not prevent memory commits.
+    return {};
+  }
+}
+
+function resolveCommitterOptions(
+  cwd: string,
+  current: CommitterOptions = {}
+): CommitterOptions {
+  const configured = readCommitterConfig(cwd);
+
+  return {
+    model: configured.model ?? current.model,
+    thinking: configured.thinking ?? current.thinking,
+  };
 }
 
 /**
@@ -61,8 +110,6 @@ function resolveAgentPrompt(): AgentDefinition {
 
       return {
         prompt,
-        model:
-          typeof parsed.model === "string" ? parsed.model : COMMITTER_MODEL,
         tools:
           typeof parsed.tools === "string" ? parsed.tools : COMMITTER_TOOLS,
         skills: typeof parsed.skills === "string" ? parsed.skills : "",
@@ -212,7 +259,8 @@ function writePromptToTempFile(prompt: string): {
 export function spawnCommitter(
   cwd: string,
   task: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  current: CommitterOptions = {}
 ): Promise<SubagentResult> {
   return new Promise((resolve) => {
     let agentDef: AgentDefinition;
@@ -230,17 +278,19 @@ export function spawnCommitter(
       return;
     }
 
-    const args = [
-      "--mode",
-      "json",
-      "--no-session",
-      "--model",
-      agentDef.model,
-      "--tools",
-      agentDef.tools,
-      "-p",
-      `Task: ${task}`,
-    ];
+    const committerOptions = resolveCommitterOptions(cwd, current);
+
+    const args = ["--mode", "json", "--no-session", "--tools", agentDef.tools];
+
+    if (committerOptions.model) {
+      args.push("--model", committerOptions.model);
+    }
+
+    if (committerOptions.thinking) {
+      args.push("--thinking", committerOptions.thinking);
+    }
+
+    args.push("-p", `Task: ${task}`);
 
     if (agentDef.skills) {
       const skills = agentDef.skills
