@@ -7,7 +7,40 @@ type YamlItem = Record<string, string>;
 type YamlValue = string | Record<string, string> | YamlItem[];
 type YamlObject = Record<string, YamlValue>;
 
-const NEEDS_QUOTING = /[-:{}[\],&*?|>!%@`]|^\d{4}-\d{2}/;
+const NEEDS_QUOTING = /[-:{}[\],&*?|>!%@#`]|^\d{4}-\d{2}/;
+
+/** True for lines that are blank or start with a YAML comment */
+function isCommentOrBlank(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed === "" || trimmed.startsWith("#");
+}
+
+/**
+ * Strip a trailing YAML comment from a scalar value: a `#` starts a comment
+ * only at the start of the value or when preceded by whitespace, and only
+ * outside single- or double-quoted regions.
+ */
+function stripComment(value: string): string {
+  let inSingle = false;
+  let inDouble = false;
+
+  for (let i = 0; i < value.length; i++) {
+    const char = value[i];
+
+    if (char === "'" && !inDouble) {
+      inSingle = !inSingle;
+    } else if (char === '"' && !inSingle) {
+      inDouble = !inDouble;
+    } else if (char === "#" && !inSingle && !inDouble) {
+      const prev = i === 0 ? "" : value[i - 1];
+      if (i === 0 || prev === " " || prev === "\t") {
+        return value.slice(0, i).trimEnd();
+      }
+    }
+  }
+
+  return value;
+}
 
 function unquote(value: string): string {
   if (
@@ -42,7 +75,7 @@ function parseKeyValue(text: string): { key: string; value: string } | null {
 
   return {
     key: text.slice(0, colonIdx).trim(),
-    value: text.slice(colonIdx + 1).trim(),
+    value: stripComment(text.slice(colonIdx + 1).trim()),
   };
 }
 
@@ -58,7 +91,7 @@ function parseNestedObject(
 
   while (i < lines.length) {
     const line = lines[i];
-    if (line.trim() === "") {
+    if (isCommentOrBlank(line)) {
       i++;
       continue;
     }
@@ -91,7 +124,7 @@ function parseList(
 
   while (i < lines.length) {
     const line = lines[i];
-    if (line.trim() === "") {
+    if (isCommentOrBlank(line)) {
       i++;
       continue;
     }
@@ -135,7 +168,7 @@ export function parseYaml(input: string): YamlObject {
 
   while (i < lines.length) {
     const line = lines[i];
-    if (line.trim() === "") {
+    if (isCommentOrBlank(line)) {
       i++;
       continue;
     }
@@ -159,7 +192,7 @@ export function parseYaml(input: string): YamlObject {
     }
 
     i++;
-    while (i < lines.length && lines[i].trim() === "") {
+    while (i < lines.length && isCommentOrBlank(lines[i])) {
       i++;
     }
 

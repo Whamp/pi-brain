@@ -4,6 +4,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { parseYaml } from "./yaml.js";
+
 describe("brain-init.sh", () => {
   let tmpDir: string;
   const testDir = path.dirname(fileURLToPath(import.meta.url));
@@ -135,5 +137,35 @@ describe("brain-init.sh", () => {
     expect(memoryAgents).toContain("merge");
     expect(memoryAgents).toContain("## When to Commit");
     expect(memoryAgents).toContain("end the session");
+  });
+
+  it("should create a comment-only .memory/config.yaml skeleton", () => {
+    // Act
+    execFileSync("bash", [scriptPath], { cwd: tmpDir });
+
+    // Assert
+    const configPath = path.join(tmpDir, ".memory", "config.yaml");
+    expect(fs.existsSync(configPath)).toBeTruthy();
+
+    const content = fs.readFileSync(configPath, "utf8");
+    // Skeleton must mention the committer keys so users can discover them
+    expect(content).toContain("committer");
+    // Comment-only file parses to an empty object: inherit the active session
+    expect(parseYaml(content)).toStrictEqual({});
+  });
+
+  it("should preserve an existing .memory/config.yaml on re-init", () => {
+    // Arrange
+    fs.mkdirSync(path.join(tmpDir, ".memory"), { recursive: true });
+    const custom = "committer:\n  model: openai/gpt-5.6-luna\n";
+    fs.writeFileSync(path.join(tmpDir, ".memory", "config.yaml"), custom);
+
+    // Act
+    execFileSync("bash", [scriptPath], { cwd: tmpDir });
+
+    // Assert
+    expect(
+      fs.readFileSync(path.join(tmpDir, ".memory", "config.yaml"), "utf8")
+    ).toBe(custom);
   });
 });
