@@ -59,9 +59,13 @@ if [ ! -f "$CONFIG_FILE" ]; then
   cat > "$CONFIG_FILE" <<'EOF'
 # Optional Brain configuration. Pi handles provider authentication.
 # Omit model and/or thinking to inherit the active Pi session values.
+# extensions: YAML list or comma-separated string; passed as --extension.
+# Session extensions are not inherited.
 # committer:
 #   model: google/gemini-3.6-flash
 #   thinking: low
+#   extensions:
+#     - ./custom-provider.ts
 EOF
 fi
 

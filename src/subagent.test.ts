@@ -1,11 +1,13 @@
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import fc from "fast-check";
 
 import {
   buildCommitterTask,
+  directoryFromModuleUrl,
   extractCommitBlocks,
   extractFinalText,
   spawnCommitter,
@@ -86,6 +88,20 @@ const validCommitTextArb = fc
       parts.trailer,
     ].join("\n")
   );
+
+describe("directoryFromModuleUrl", () => {
+  it("decodes percent-encoded spaces so memory-committer.md can be found", () => {
+    // URL.pathname leaves `%20`; npm global installs can contain spaces.
+    const filePath = path.join("/tmp", "pi brain", "src", "subagent.ts");
+    const moduleUrl = pathToFileURL(filePath).href;
+
+    expect(moduleUrl).toContain("%20");
+    expect(new URL(moduleUrl).pathname).toContain("%20");
+    expect(directoryFromModuleUrl(moduleUrl)).toBe(
+      path.join("/tmp", "pi brain", "src")
+    );
+  });
+});
 
 describe("buildCommitterTask", () => {
   it("should build task string with branch, summary, and file paths", () => {
@@ -531,6 +547,54 @@ describe("spawnCommitter model and thinking resolution", () => {
     const argv = await runSpawn();
 
     expect(argv).toContain("--no-extensions");
+    expect(argv).not.toContain("--extension");
+  });
+
+  it("does not forward session extensions onto the committer child", async () => {
+    const argv = await runSpawn({
+      extensions: ["./from-session.ts"],
+    });
+
+    expect(argv).not.toContain("--extension");
+  });
+
+  it("passes --extension args from a config list before -p", async () => {
+    writeConfig(
+      [
+        "committer:",
+        "  extensions:",
+        "    - ./custom-provider.ts",
+        "    - ./another-ext.ts",
+      ].join("\n")
+    );
+
+    const argv = await runSpawn();
+    const pIndex = argv.indexOf("-p");
+    const firstExt = argv.indexOf("--extension");
+    const secondExt = argv.indexOf("--extension", firstExt + 1);
+
+    expect(firstExt).toBeGreaterThan(-1);
+    expect(firstExt).toBeLessThan(pIndex);
+    expect(argv[firstExt + 1]).toBe("./custom-provider.ts");
+    expect(secondExt).toBeGreaterThan(firstExt);
+    expect(secondExt).toBeLessThan(pIndex);
+    expect(argv[secondExt + 1]).toBe("./another-ext.ts");
+  });
+
+  it("passes --extension args from a comma-separated config string before -p", async () => {
+    writeConfig(
+      "committer:\n  extensions: ./custom-provider.ts, ./another-ext.ts\n"
+    );
+
+    const argv = await runSpawn();
+    const pIndex = argv.indexOf("-p");
+    const firstExt = argv.indexOf("--extension");
+    const secondExt = argv.indexOf("--extension", firstExt + 1);
+
+    expect(argv[firstExt + 1]).toBe("./custom-provider.ts");
+    expect(argv[secondExt + 1]).toBe("./another-ext.ts");
+    expect(firstExt).toBeLessThan(pIndex);
+    expect(secondExt).toBeLessThan(pIndex);
   });
 });
 

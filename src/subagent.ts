@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { CommitterOptions, SubagentResult } from "./types.js";
 import { parseYaml } from "./yaml.js";
@@ -23,6 +24,34 @@ function nonEmptyString(value: unknown): string | undefined {
 
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
+}
+
+function extensionSpecsFromConfig(value: unknown): string[] | undefined {
+  if (typeof value === "string") {
+    const specs = value
+      .split(",")
+      .map((spec) => spec.trim())
+      .filter((spec) => spec !== "");
+    return specs.length > 0 ? specs : undefined;
+  }
+
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  const specs: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") {
+      continue;
+    }
+
+    const trimmed = item.trim();
+    if (trimmed !== "") {
+      specs.push(trimmed);
+    }
+  }
+
+  return specs.length > 0 ? specs : undefined;
 }
 
 function readCommitterConfig(cwd: string): CommitterOptions {
@@ -48,6 +77,7 @@ function readCommitterConfig(cwd: string): CommitterOptions {
     return {
       model: nonEmptyString(config.model),
       thinking: nonEmptyString(config.thinking),
+      extensions: extensionSpecsFromConfig(config.extensions),
     };
   } catch {
     // An unreadable or invalid optional config must not prevent memory commits.
@@ -64,7 +94,21 @@ function resolveCommitterOptions(
   return {
     model: configured.model ?? current.model,
     thinking: configured.thinking ?? current.thinking,
+    // Extensions come from .memory/config.yaml only. Session extensions are
+    // not inherited: the session's active model provider may not need them,
+    // and forwarding the parent process's extension list would defeat
+    // committer isolation (`--no-extensions`).
+    extensions: configured.extensions,
   };
+}
+
+/**
+ * Directory containing this module. Uses fileURLToPath so a checkout path
+ * with spaces (common in npm global installs) does not keep `%20` in the
+ * filesystem path — URL.pathname would miss memory-committer.md.
+ */
+export function directoryFromModuleUrl(moduleUrl: string): string {
+  return path.dirname(fileURLToPath(moduleUrl));
 }
 
 /**
@@ -73,8 +117,7 @@ function resolveCommitterOptions(
  * Parses the YAML frontmatter for properties and uses the body as the system prompt.
  */
 function resolveAgentPrompt(): AgentDefinition {
-  const currentFile = new URL(import.meta.url).pathname;
-  const currentDir = path.dirname(currentFile);
+  const currentDir = directoryFromModuleUrl(import.meta.url);
 
   // Possible locations for the agent definition file
   const candidates = [
@@ -298,6 +341,12 @@ export function spawnCommitter(
 
     if (committerOptions.thinking) {
       args.push("--thinking", committerOptions.thinking);
+    }
+
+    if (committerOptions.extensions) {
+      for (const spec of committerOptions.extensions) {
+        args.push("--extension", spec);
+      }
     }
 
     args.push("-p", `Task: ${task}`);

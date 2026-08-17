@@ -20,7 +20,7 @@ That's it. The agent decides when to commit, branch, and merge — you don't **n
 
 ## How It Works
 
-Brain adds five tools and a few lifecycle hooks to pi. The design is simple: the agent works normally, and Brain records what happens in the background.
+Brain adds two tools and a few lifecycle hooks to pi. The design is simple: the agent works normally, and Brain records what happens in the background.
 
 **Every turn**, Brain appends a structured log entry to `.memory/branches/<branch>/log.md`. This happens automatically via the `turn_end` hook — the agent doesn't call anything.
 
@@ -28,19 +28,16 @@ Brain adds five tools and a few lifecycle hooks to pi. The design is simple: the
 
 **Each commit is self-contained.** It includes a rolling summary of all prior commits, so the latest commit always tells the full branch story. A new session can read one commit and know everything.
 
-**Branching and merging** work like you'd expect. The agent branches to explore alternatives without contaminating the main line, then merges conclusions back with a synthesis.
+**Branching and merging** work like you'd expect. The agent calls `memory_branch` to explore alternatives without contaminating the main line, then merges conclusions back with a synthesis.
 
-### The Five Tools
+### The Two Tools
 
-| Tool            | What it does                                                     |
-| --------------- | ---------------------------------------------------------------- |
-| `memory_status` | Quick status overview — active branch, latest commit, turn count |
-| `memory_commit` | Checkpoint a milestone (subagent distills the log)               |
-| `memory_branch` | Create a branch for exploration                                  |
-| `memory_switch` | Switch between branches                                          |
-| `memory_merge`  | Merge insights from one branch into another                      |
+| Tool            | What it does                                                               |
+| --------------- | -------------------------------------------------------------------------- |
+| `memory_commit` | Checkpoint a milestone (subagent distills the log)                         |
+| `memory_branch` | Create, switch, or merge memory branches (`action`: create, switch, merge) |
 
-For deep retrieval, the agent uses pi's built-in `read` tool on `.memory/` files directly. No special API needed.
+Memory status is injected automatically at session start and appended to successful tool results. For deep retrieval, the agent uses pi's built-in `read` tool on `.memory/` files directly. No special API needed.
 
 ## Prompt Cache Safety
 
