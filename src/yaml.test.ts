@@ -239,3 +239,65 @@ describe("yaml property-based tests", () => {
     );
   });
 });
+
+// --- comment handling ---
+
+describe("parseYaml comment handling", () => {
+  it("strips an inline comment after an unquoted scalar", () => {
+    expect(parseYaml("model: openai/gpt-4o  # note")).toStrictEqual({
+      model: "openai/gpt-4o",
+    });
+  });
+
+  it("keeps # inside double-quoted values", () => {
+    expect(parseYaml('model: "openai/x # y"')).toStrictEqual({
+      model: "openai/x # y",
+    });
+  });
+
+  it("keeps # inside single-quoted values", () => {
+    expect(parseYaml("model: 'a # b'")).toStrictEqual({ model: "a # b" });
+  });
+
+  it("keeps # that is not preceded by whitespace", () => {
+    expect(parseYaml("model: a#b")).toStrictEqual({ model: "a#b" });
+  });
+
+  it("treats a value that is only a comment like an empty value", () => {
+    // `key:` with no value parses as an empty nested map; a comment-only
+    // value must behave identically after stripping
+    expect(parseYaml("model: #fff")).toStrictEqual({ model: {} });
+  });
+
+  it("ignores top-level comment lines, even with colons", () => {
+    expect(parseYaml("# a comment: with colon\nkey: v")).toStrictEqual({
+      key: "v",
+    });
+  });
+
+  it("preserves a nested map across a comment line after the key", () => {
+    expect(parseYaml("committer:\n# note\n  model: x\n")).toStrictEqual({
+      committer: { model: "x" },
+    });
+  });
+
+  it("preserves indented comment lines inside a nested map", () => {
+    expect(parseYaml("committer:\n  # note\n  model: x\n")).toStrictEqual({
+      committer: { model: "x" },
+    });
+  });
+
+  it("preserves comment lines inside a list", () => {
+    expect(parseYaml("items:\n  # note\n  - name: a\n")).toStrictEqual({
+      items: [{ name: "a" }],
+    });
+  });
+
+  it("serializes values containing ' #' quoted so they round-trip", () => {
+    const original = { key: "x #y" };
+    const serialized = serializeYaml(original);
+
+    expect(serialized).toBe('key: "x #y"');
+    expect(parseYaml(serialized)).toStrictEqual(original);
+  });
+});

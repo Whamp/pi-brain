@@ -1,10 +1,16 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
+
 import fc from "fast-check";
 
 import {
   buildCommitterTask,
   extractCommitBlocks,
   extractFinalText,
+  spawnCommitter,
 } from "./subagent.js";
+import type { CommitterOptions } from "./types.js";
 
 // Helpers
 
@@ -363,4 +369,226 @@ describe("buildCommitterTask property-based tests", () => {
       )
     );
   });
+});
+
+// --- spawnCommitter argv resolution ---
+
+/** Read the value that follows a flag in captured argv, or undefined when absent */
+function argAfter(argv: string[], flag: string): string | undefined {
+  const index = argv.indexOf(flag);
+  return index === -1 ? undefined : argv[index + 1];
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+describe("spawnCommitter model and thinking resolution", () => {
+  const originalPath = process.env.PATH;
+  let binDir: string;
+  let capturePath: string;
+  let tmpCwd: string;
+
+  beforeEach(() => {
+    tmpCwd = fs.mkdtempSync(path.join(os.tmpdir(), "committer-cwd-"));
+    binDir = fs.mkdtempSync(path.join(os.tmpdir(), "committer-bin-"));
+    capturePath = path.join(binDir, "argv.txt");
+    // Fake pi: capture argv and exit 0 (a successful, empty commit run)
+    fs.writeFileSync(
+      path.join(binDir, "pi"),
+      `#!/bin/sh\nprintf '%s\\n' "$@" > "${capturePath}"\nexit 0\n`,
+      { mode: 0o755 }
+    );
+    process.env.PATH = `${binDir}:${originalPath}`;
+  });
+
+  afterEach(() => {
+    process.env.PATH = originalPath;
+    fs.rmSync(tmpCwd, { recursive: true, force: true });
+    fs.rmSync(binDir, { recursive: true, force: true });
+  });
+
+  async function runSpawn(current: CommitterOptions = {}): Promise<string[]> {
+    const result = await spawnCommitter(
+      tmpCwd,
+      "distill the log",
+      undefined,
+      current
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.error).toBeUndefined();
+    return fs.readFileSync(capturePath, "utf8").split("\n").filter(Boolean);
+  }
+
+  function writeConfig(content: string): void {
+    fs.mkdirSync(path.join(tmpCwd, ".memory"), { recursive: true });
+    fs.writeFileSync(path.join(tmpCwd, ".memory", "config.yaml"), content);
+  }
+
+  it("omits --model and --thinking when no config and no session values exist", async () => {
+    const argv = await runSpawn();
+
+    expect(argv).not.toContain("--model");
+    expect(argv).not.toContain("--thinking");
+    // Preservation: core committer flags unchanged
+    expect(argAfter(argv, "--mode")).toBe("json");
+    expect(argv).toContain("--no-session");
+    expect(argAfter(argv, "-p")).toBe("Task: distill the log");
+  });
+
+  it("passes session model and thinking when no config exists", async () => {
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("openai/gpt-5.6-luna");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("lets config override session values", async () => {
+    writeConfig(
+      "committer:\n  model: google/gemini-3.6-flash\n  thinking: low\n"
+    );
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("google/gemini-3.6-flash");
+    expect(argAfter(argv, "--thinking")).toBe("low");
+  });
+
+  it("merges config and session values per field", async () => {
+    writeConfig("committer:\n  model: google/gemini-3.6-flash\n");
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("google/gemini-3.6-flash");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("inherits session values from a comment-only config file", async () => {
+    writeConfig(
+      "# Optional Brain configuration.\n# committer:\n#   model: x\n"
+    );
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("openai/gpt-5.6-luna");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("falls back to session values when the config file is unreadable", async () => {
+    fs.mkdirSync(path.join(tmpCwd, ".memory", "config.yaml"), {
+      recursive: true,
+    });
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("openai/gpt-5.6-luna");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("falls back to session values when committer is not a map", async () => {
+    writeConfig("committer: not-a-map\n");
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("openai/gpt-5.6-luna");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("treats empty config strings as unset and inherits session values", async () => {
+    writeConfig('committer:\n  model: ""\n');
+
+    const argv = await runSpawn({
+      model: "openai/gpt-5.6-luna",
+      thinking: "high",
+    });
+
+    expect(argAfter(argv, "--model")).toBe("openai/gpt-5.6-luna");
+    expect(argAfter(argv, "--thinking")).toBe("high");
+  });
+
+  it("runs the committer child with extension discovery disabled", async () => {
+    const argv = await runSpawn();
+
+    expect(argv).toContain("--no-extensions");
+  });
+});
+
+describe("spawnCommitter abort escalation", () => {
+  const originalPath = process.env.PATH;
+  let binDir: string;
+  let tmpCwd: string;
+
+  beforeEach(() => {
+    tmpCwd = fs.mkdtempSync(path.join(os.tmpdir(), "committer-cwd-"));
+    binDir = fs.mkdtempSync(path.join(os.tmpdir(), "committer-bin-"));
+    // Fake pi that ignores SIGTERM and self-exits after 20s as a safety net
+    fs.writeFileSync(
+      path.join(binDir, "pi"),
+      [
+        "#!/usr/bin/env node",
+        'process.on("SIGTERM", () => {});',
+        "setTimeout(() => process.exit(0), 20_000);",
+        "",
+      ].join("\n"),
+      { mode: 0o755 }
+    );
+    process.env.PATH = `${binDir}:${originalPath}`;
+  });
+
+  afterEach(() => {
+    process.env.PATH = originalPath;
+    fs.rmSync(tmpCwd, { recursive: true, force: true });
+    fs.rmSync(binDir, { recursive: true, force: true });
+  });
+
+  it(
+    "kills a child that ignores SIGTERM and resolves with an error",
+    { timeout: 15_000 },
+    async () => {
+      const controller = new AbortController();
+      const pending = spawnCommitter(
+        tmpCwd,
+        "distill the log",
+        controller.signal,
+        { model: "openai/gpt-5.6-luna" }
+      );
+
+      // Give the child time to install its SIGTERM handler
+      await sleep(600);
+      controller.abort();
+
+      const result = await Promise.race([
+        pending,
+        sleep(9000).then(() => {
+          throw new Error(
+            "spawnCommitter never resolved: SIGKILL escalation did not fire"
+          );
+        }),
+      ]);
+
+      expect(result.exitCode).not.toBe(0);
+      expect(result.error).toBeTruthy();
+    }
+  );
 });

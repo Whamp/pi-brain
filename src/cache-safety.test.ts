@@ -224,7 +224,7 @@ describe("cache safety invariants", () => {
   // 2) Do not clear frozen snapshot on session_compact.
   // 3) Recompute snapshot on every before_agent_start (no freeze).
   // 4) Allow mid-epoch main.md edits to leak into frozen snapshot.
-  // This test should fail for all five.
+  // This test should fail for all four.
   it("should freeze roadmap content within an epoch and refresh only after reset events", async () => {
     const opArb = fc.array(
       fc.constantFrom(

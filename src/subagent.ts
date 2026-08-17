@@ -7,6 +7,7 @@ import type { CommitterOptions, SubagentResult } from "./types.js";
 import { parseYaml } from "./yaml.js";
 
 const COMMITTER_TOOLS = "read,grep,find,ls";
+const KILL_ESCALATION_MS = 3000;
 
 interface AgentDefinition {
   prompt: string;
@@ -193,7 +194,6 @@ export function extractCommitBlocks(text: string): string | null {
     return null;
   }
 
-  // Extract from "### Branch Purpose" onward
   const fromStart = text.slice(branchPurposeIndex);
   const lines = fromStart.split("\n");
 
@@ -280,7 +280,17 @@ export function spawnCommitter(
 
     const committerOptions = resolveCommitterOptions(cwd, current);
 
-    const args = ["--mode", "json", "--no-session", "--tools", agentDef.tools];
+    const args = [
+      "--mode",
+      "json",
+      "--no-session",
+      // Isolate distillation from project extensions: a trusted project would
+      // reload pi-brain in the child, whose turn_end hook appends to the very
+      // log.md being distilled.
+      "--no-extensions",
+      "--tools",
+      agentDef.tools,
+    ];
 
     if (committerOptions.model) {
       args.push("--model", committerOptions.model);
@@ -379,7 +389,14 @@ export function spawnCommitter(
     if (signal) {
       const kill = () => {
         proc.kill("SIGTERM");
-        setTimeout(() => !proc.killed && proc.kill("SIGKILL"), 3000);
+        // proc.killed turns true as soon as kill() is called, even when the
+        // child ignores SIGTERM — escalate unconditionally so a stuck
+        // committer child cannot hang the commit forever.
+        const escalation = setTimeout(
+          () => proc.kill("SIGKILL"),
+          KILL_ESCALATION_MS
+        );
+        proc.on("close", () => clearTimeout(escalation));
       };
       if (signal.aborted) {
         kill();
