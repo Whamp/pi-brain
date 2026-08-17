@@ -2,7 +2,6 @@
 name: memory-committer
 description: Distills OTA logs into structured memory commit entries
 tools: read, grep, find, ls
-model: google-antigravity/gemini-3-flash
 skills: brain
 extensions:
 ---
