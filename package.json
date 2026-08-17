@@ -1,6 +1,6 @@
 {
   "name": "pi-brain",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Versioned memory extension for the pi coding agent",
   "keywords": [
     "agent-memory",
@@ -47,7 +47,7 @@
     "prepare": "node -e \"try{require.resolve('husky')}catch(e){process.exit(0)}\" && husky"
   },
   "devDependencies": {
-    "@mariozechner/pi-coding-agent": "^0.54.2",
+    "@earendil-works/pi-coding-agent": "^0.84.2",
     "@types/node": "^25.3.0",
     "changelogen": "^0.6.2",
     "fast-check": "^4.5.3",
@@ -64,11 +64,6 @@
   },
   "peerDependencies": {
     "@sinclair/typebox": "*"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   },
   "pi": {
     "extensions": [
