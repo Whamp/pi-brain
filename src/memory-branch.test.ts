@@ -83,6 +83,23 @@ describe("executeMemoryBranch", () => {
     expect(result).toContain("required");
   });
 
+  it("rejects invalid branch names on create without throwing", () => {
+    const invalidNames = ["../x", "a/b", "a\\b", ".hidden", "..", "."];
+
+    for (const name of invalidNames) {
+      const result = executeMemoryBranch(
+        { action: "create", name, purpose: "invalid" },
+        state,
+        branches,
+        tmpDir
+      );
+
+      expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+      expect(result).not.toContain("# Memory Status");
+      expect(state.activeBranch).toBe("main");
+    }
+  });
+
   // --- switch action ---
 
   it("should switch to an existing branch", () => {
@@ -137,6 +154,19 @@ describe("executeMemoryBranch", () => {
     );
 
     expect(result).toContain("required");
+  });
+
+  it("rejects invalid branch names on switch", () => {
+    const result = executeMemoryBranch(
+      { action: "switch", branch: "../x" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+    expect(result).not.toContain("# Memory Status");
+    expect(state.activeBranch).toBe("main");
   });
 
   // --- merge action ---
@@ -196,6 +226,18 @@ describe("executeMemoryBranch", () => {
     );
 
     expect(result).toContain("required");
+  });
+
+  it("rejects invalid branch names on merge", () => {
+    const result = executeMemoryBranch(
+      { action: "merge", branch: "a/b", synthesis: "Nope." },
+      state,
+      branches,
+      tmpDir
+    );
+
+    expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+    expect(result).not.toContain("# Memory Status");
   });
 
   it("should update state with last commit info on merge", () => {

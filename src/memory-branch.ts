@@ -1,4 +1,4 @@
-import type { BranchManager } from "./branches.js";
+import { invalidBranchNameReason, type BranchManager } from "./branches.js";
 import { generateHash } from "./hash.js";
 import { buildStatusView } from "./memory-context.js";
 import type { MemoryState } from "./state.js";
@@ -30,6 +30,11 @@ function executeCreate(
     };
   }
 
+  const invalidName = invalidBranchNameReason(name);
+  if (invalidName) {
+    return { text: invalidName, ok: false };
+  }
+
   if (branches.branchExists(name)) {
     return {
       text: `Branch "${name}" already exists. Use action "switch" to switch to it.`,
@@ -56,6 +61,11 @@ function executeSwitch(
 
   if (!branch) {
     return { text: '"branch" is required for the switch action.', ok: false };
+  }
+
+  const invalidName = invalidBranchNameReason(branch);
+  if (invalidName) {
+    return { text: invalidName, ok: false };
   }
 
   if (!branches.branchExists(branch)) {
@@ -88,7 +98,16 @@ function executeMerge(
     };
   }
 
+  const invalidSource = invalidBranchNameReason(sourceBranch);
+  if (invalidSource) {
+    return { text: invalidSource, ok: false };
+  }
+
   const targetBranch = state.activeBranch;
+  const invalidTarget = invalidBranchNameReason(targetBranch);
+  if (invalidTarget) {
+    return { text: invalidTarget, ok: false };
+  }
 
   if (sourceBranch === targetBranch) {
     return {

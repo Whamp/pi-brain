@@ -184,6 +184,32 @@ function extractFrozenSnapshot(
   return injectedPrompt.slice(prefix.length);
 }
 
+function makeTurnEndEvent(text = "logged thought"): {
+  type: "turn_end";
+  turnIndex: number;
+  message: {
+    role: string;
+    content: { type: string; text: string }[];
+    provider: string;
+    model: string;
+    timestamp: number;
+  };
+  toolResults: [];
+} {
+  return {
+    type: "turn_end",
+    turnIndex: 0,
+    message: {
+      role: "assistant",
+      content: [{ type: "text", text }],
+      provider: "anthropic",
+      model: "claude",
+      timestamp: Date.parse("2026-02-23T00:00:00.000Z"),
+    },
+    toolResults: [],
+  };
+}
+
 describe("extensionWiring", () => {
   it("should register 2 memory tools and required event handlers", () => {
     // Arrange
@@ -1048,6 +1074,179 @@ describe("extensionWiring", () => {
       );
     } finally {
       cleanup();
+    }
+  });
+
+  it("appends to log.md from turn_end after mid-session init", async () => {
+    const projectDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "memory-turn-end-lazy-")
+    );
+
+    try {
+      const mockPi = createMockPi();
+      activate(mockPi.api);
+
+      const ctx = createCtx(projectDir);
+      const sessionStart = getHandler(mockPi.handlers, "session_start");
+      const turnEnd = getHandler(mockPi.handlers, "turn_end");
+      await sessionStart?.({ type: "session_start" }, ctx);
+
+      const branchDir = path.join(projectDir, ".memory", "branches", "main");
+      fs.mkdirSync(branchDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(projectDir, ".memory", "state.yaml"),
+        ["active_branch: main", 'initialized: "2026-02-25T00:00:00Z"'].join(
+          "\n"
+        )
+      );
+      fs.writeFileSync(path.join(branchDir, "log.md"), "");
+      fs.writeFileSync(
+        path.join(branchDir, "commits.md"),
+        "# main\n\n**Purpose:** Main branch\n"
+      );
+      fs.writeFileSync(path.join(branchDir, "metadata.yaml"), "");
+
+      await turnEnd?.(makeTurnEndEvent("mid-session thought"), ctx);
+
+      const log = fs.readFileSync(path.join(branchDir, "log.md"), "utf8");
+      expect(log).toContain("mid-session thought");
+    } finally {
+      fs.rmSync(projectDir, { recursive: true, force: true });
+    }
+  });
+
+  it("appends turn_end to the new project's log after a cwd change", async () => {
+    const projectA = setupInitializedProject();
+    const projectB = setupInitializedProject();
+
+    try {
+      const mockPi = createMockPi();
+      activate(mockPi.api);
+
+      const sessionStart = getHandler(mockPi.handlers, "session_start");
+      const turnEnd = getHandler(mockPi.handlers, "turn_end");
+      const ctxA = createCtx(projectA.projectDir, {
+        sessionFile: "/tmp/pi-session-cwd-a.jsonl",
+      });
+      const ctxB = createCtx(projectB.projectDir, {
+        sessionFile: "/tmp/pi-session-cwd-b.jsonl",
+      });
+
+      await sessionStart?.({ type: "session_start" }, ctxA);
+      await turnEnd?.(makeTurnEndEvent("thought for B"), ctxB);
+
+      const logA = fs.readFileSync(
+        path.join(projectA.projectDir, ".memory", "branches", "main", "log.md"),
+        "utf8"
+      );
+      const logB = fs.readFileSync(
+        path.join(projectB.projectDir, ".memory", "branches", "main", "log.md"),
+        "utf8"
+      );
+
+      expect(logA).not.toContain("thought for B");
+      expect(logB).toContain("thought for B");
+    } finally {
+      projectA.cleanup();
+      projectB.cleanup();
+    }
+  });
+
+  it("clears the frozen status snapshot when cwd changes", async () => {
+    const projectA = setupInitializedProject();
+    const projectB = setupInitializedProject();
+
+    try {
+      writeRoadmap(projectA.projectDir, "# Roadmap\n\n[[ROADMAP:project-a]]");
+      writeRoadmap(projectB.projectDir, "# Roadmap\n\n[[ROADMAP:project-b]]");
+
+      const mockPi = createMockPi();
+      activate(mockPi.api);
+
+      const sessionStart = getHandler(mockPi.handlers, "session_start");
+      const beforeStart = getHandler(mockPi.handlers, "before_agent_start");
+      const ctxA = createCtx(projectA.projectDir, {
+        sessionFile: "/tmp/pi-session-snap-a.jsonl",
+      });
+      const ctxB = createCtx(projectB.projectDir, {
+        sessionFile: "/tmp/pi-session-snap-b.jsonl",
+      });
+
+      await sessionStart?.({ type: "session_start" }, ctxA);
+      const resultA = (await beforeStart?.(
+        {
+          type: "before_agent_start",
+          prompt: "hello",
+          systemPrompt: "base",
+        },
+        ctxA
+      )) as { systemPrompt?: string } | undefined;
+      const snapshotA = extractFrozenSnapshot(
+        readInjectedSystemPrompt(resultA),
+        "base"
+      );
+      expect(snapshotA).toContain("[[ROADMAP:project-a]]");
+
+      const resultB = (await beforeStart?.(
+        {
+          type: "before_agent_start",
+          prompt: "hello",
+          systemPrompt: "base",
+        },
+        ctxB
+      )) as { systemPrompt?: string } | undefined;
+      const snapshotB = extractFrozenSnapshot(
+        readInjectedSystemPrompt(resultB),
+        "base"
+      );
+
+      expect(snapshotB).toContain("[[ROADMAP:project-b]]");
+      expect(snapshotB).not.toContain("[[ROADMAP:project-a]]");
+    } finally {
+      projectA.cleanup();
+      projectB.cleanup();
+    }
+  });
+
+  it("injects a compaction reminder after mid-session init", async () => {
+    const projectDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "memory-compact-lazy-")
+    );
+
+    try {
+      const mockPi = createMockPi();
+      activate(mockPi.api);
+
+      const ctx = createCtx(projectDir);
+      const sessionStart = getHandler(mockPi.handlers, "session_start");
+      const beforeCompact = getHandler(
+        mockPi.handlers,
+        "session_before_compact"
+      );
+      await sessionStart?.({ type: "session_start" }, ctx);
+
+      const branchDir = path.join(projectDir, ".memory", "branches", "main");
+      fs.mkdirSync(branchDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(projectDir, ".memory", "state.yaml"),
+        ["active_branch: main", 'initialized: "2026-02-25T00:00:00Z"'].join(
+          "\n"
+        )
+      );
+      fs.writeFileSync(path.join(branchDir, "log.md"), "");
+      fs.writeFileSync(
+        path.join(branchDir, "commits.md"),
+        "# main\n\n**Purpose:** Main branch\n"
+      );
+      fs.writeFileSync(path.join(branchDir, "metadata.yaml"), "");
+
+      const event: { customInstructions?: string } = {};
+      await beforeCompact?.(event, ctx);
+
+      expect(event.customInstructions).toContain("Brain memory active");
+      expect(event.customInstructions).toContain("main");
+    } finally {
+      fs.rmSync(projectDir, { recursive: true, force: true });
     }
   });
 });
