@@ -1,10 +1,11 @@
 /**
  * Minimal YAML parser and serializer for flat values, one-level nested objects,
- * and top-level lists of one-level objects.
+ * nested scalar lists, and top-level lists of one-level objects.
  */
 
 type YamlItem = Record<string, string>;
-type YamlValue = string | Record<string, string> | YamlItem[];
+type YamlNestedValue = string | string[];
+type YamlValue = string | Record<string, YamlNestedValue> | YamlItem[];
 type YamlObject = Record<string, YamlValue>;
 
 const NEEDS_QUOTING = /[-:{}[\],&*?|>!%@#`]|^\d{4}-\d{2}/;
@@ -18,7 +19,8 @@ function isCommentOrBlank(line: string): boolean {
 /**
  * Strip a trailing YAML comment from a scalar value: a `#` starts a comment
  * only at the start of the value or when preceded by whitespace, and only
- * outside single- or double-quoted regions.
+ * outside single- or double-quoted regions. Escaped quotes (`\"`) do not
+ * end a double-quoted region.
  */
 function stripComment(value: string): string {
   let inSingle = false;
@@ -26,6 +28,11 @@ function stripComment(value: string): string {
 
   for (let i = 0; i < value.length; i++) {
     const char = value[i];
+
+    if (char === "\\" && inDouble && i + 1 < value.length) {
+      i++;
+      continue;
+    }
 
     if (char === "'" && !inDouble) {
       inSingle = !inSingle;
@@ -42,16 +49,36 @@ function stripComment(value: string): string {
   return value;
 }
 
+function unescapeDoubleQuoted(body: string): string {
+  let result = "";
+
+  for (let i = 0; i < body.length; i++) {
+    if (body[i] === "\\" && i + 1 < body.length) {
+      result += body[i + 1];
+      i++;
+      continue;
+    }
+
+    result += body[i];
+  }
+
+  return result;
+}
+
 function unquote(value: string): string {
-  if (
-    value.length >= 2 &&
-    ((value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'")))
-  ) {
+  if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
+    return unescapeDoubleQuoted(value.slice(1, -1));
+  }
+
+  if (value.length >= 2 && value.startsWith("'") && value.endsWith("'")) {
     return value.slice(1, -1);
   }
 
   return value;
+}
+
+function escapeDoubleQuoted(value: string): string {
+  return value.replaceAll("\\", "\\\\").replaceAll('"', '\\"');
 }
 
 function quoteIfNeeded(value: string): string {
@@ -59,12 +86,47 @@ function quoteIfNeeded(value: string): string {
     value === "" ||
     value.trim() !== value ||
     value.includes("'") ||
+    value.includes('"') ||
+    value.includes("\\") ||
     NEEDS_QUOTING.test(value)
   ) {
-    return `"${value}"`;
+    return `"${escapeDoubleQuoted(value)}"`;
   }
 
   return value;
+}
+
+/**
+ * Quote unquoted scalars that contain `#` so later comment stripping cannot
+ * truncate them. Used to migrate state.yaml files written before `#` quoting.
+ */
+export function quoteUnquotedHashScalars(content: string): string {
+  return content
+    .split("\n")
+    .map((line) => {
+      const trimmedStart = line.trimStart();
+      if (trimmedStart === "" || trimmedStart.startsWith("#")) {
+        return line;
+      }
+
+      const colonIdx = line.indexOf(":");
+      if (colonIdx === -1) {
+        return line;
+      }
+
+      const value = line.slice(colonIdx + 1).trim();
+      if (
+        value === "" ||
+        value.startsWith('"') ||
+        value.startsWith("'") ||
+        !value.includes("#")
+      ) {
+        return line;
+      }
+
+      return `${line.slice(0, colonIdx + 1)} ${quoteIfNeeded(value)}`;
+    })
+    .join("\n");
 }
 
 function parseKeyValue(text: string): { key: string; value: string } | null {
@@ -79,14 +141,46 @@ function parseKeyValue(text: string): { key: string; value: string } | null {
   };
 }
 
+function parseNestedScalarList(
+  lines: string[],
+  startIndex: number
+): {
+  value: string[];
+  nextIndex: number;
+} {
+  const items: string[] = [];
+  let i = startIndex;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    if (isCommentOrBlank(line)) {
+      i++;
+      continue;
+    }
+
+    if (!line.startsWith("    - ")) {
+      break;
+    }
+
+    const raw = stripComment(line.slice(6).trim());
+    if (raw !== "") {
+      items.push(unquote(raw));
+    }
+
+    i++;
+  }
+
+  return { value: items, nextIndex: i };
+}
+
 function parseNestedObject(
   lines: string[],
   startIndex: number
 ): {
-  value: Record<string, string>;
+  value: Record<string, YamlNestedValue>;
   nextIndex: number;
 } {
-  const nested: Record<string, string> = {};
+  const nested: Record<string, YamlNestedValue> = {};
   let i = startIndex;
 
   while (i < lines.length) {
@@ -101,10 +195,26 @@ function parseNestedObject(
     }
 
     const parsed = parseKeyValue(line.slice(2));
-    if (parsed) {
-      nested[parsed.key] = unquote(parsed.value);
+    if (!parsed) {
+      i++;
+      continue;
     }
 
+    if (parsed.value === "") {
+      let lookAhead = i + 1;
+      while (lookAhead < lines.length && isCommentOrBlank(lines[lookAhead])) {
+        lookAhead++;
+      }
+
+      if (lookAhead < lines.length && lines[lookAhead].startsWith("    - ")) {
+        const parsedList = parseNestedScalarList(lines, lookAhead);
+        nested[parsed.key] = parsedList.value;
+        i = parsedList.nextIndex;
+        continue;
+      }
+    }
+
+    nested[parsed.key] = unquote(parsed.value);
     i++;
   }
 
@@ -246,6 +356,14 @@ export function serializeYaml(obj: YamlObject): string {
 
     lines.push(`${key}:`);
     for (const [nestedKey, nestedValue] of Object.entries(value)) {
+      if (Array.isArray(nestedValue)) {
+        lines.push(`  ${nestedKey}:`);
+        for (const item of nestedValue) {
+          lines.push(`    - ${quoteIfNeeded(item)}`);
+        }
+        continue;
+      }
+
       lines.push(`  ${nestedKey}: ${quoteIfNeeded(nestedValue)}`);
     }
   }

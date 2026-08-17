@@ -207,6 +207,45 @@ describe("memoryState", () => {
     ]);
   });
 
+  it("self-heals unquoted hashes in last_commit.summary on load", () => {
+    fs.writeFileSync(
+      path.join(memoryDir, "state.yaml"),
+      [
+        "active_branch: main",
+        'initialized: "2026-02-22T14:00:00Z"',
+        "last_commit:",
+        "  branch: main",
+        "  hash: a1b2c3d4",
+        '  timestamp: "2026-02-22T15:30:00Z"',
+        "  summary: Fixes #1",
+      ].join("\n")
+    );
+
+    const state = new MemoryState(tmpDir);
+    state.load();
+
+    expect(state.lastCommit?.summary).toBe("Fixes #1");
+
+    const onDisk = fs.readFileSync(path.join(memoryDir, "state.yaml"), "utf8");
+    expect(onDisk).toContain('summary: "Fixes #1"');
+    expect(onDisk).not.toMatch(/summary: Fixes #1(?:\n|$)/);
+  });
+
+  it("does not throw from load when state.yaml is read-only", () => {
+    const statePath = path.join(memoryDir, "state.yaml");
+    fs.writeFileSync(
+      statePath,
+      ["active_branch: main", 'initialized: "2026-02-22T14:00:00Z"'].join("\n")
+    );
+    fs.chmodSync(statePath, 0o444);
+
+    const state = new MemoryState(tmpDir);
+    expect(() => state.load()).not.toThrow();
+    expect(state.activeBranch).toBe("main");
+
+    fs.chmodSync(statePath, 0o644);
+  });
+
   describe("save/load roundtrip", () => {
     it("should preserve activeBranch through save and load", () => {
       fc.assert(
