@@ -6,7 +6,7 @@ import type {
   ExtensionAPI,
   ExtensionContext,
   ToolDefinition,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 import fc from "fast-check";
 
 import { BranchManager } from "./branches.js";
@@ -221,10 +221,9 @@ describe("cache safety invariants", () => {
 
   // Mutation checklist (epoch reset behavior):
   // 1) Do not clear frozen snapshot on session_start.
-  // 2) Do not clear frozen snapshot on session_switch.
-  // 3) Do not clear frozen snapshot on session_compact.
-  // 4) Recompute snapshot on every before_agent_start (no freeze).
-  // 5) Allow mid-epoch main.md edits to leak into frozen snapshot.
+  // 2) Do not clear frozen snapshot on session_compact.
+  // 3) Recompute snapshot on every before_agent_start (no freeze).
+  // 4) Allow mid-epoch main.md edits to leak into frozen snapshot.
   // This test should fail for all five.
   it("should freeze roadmap content within an epoch and refresh only after reset events", async () => {
     const opArb = fc.array(
@@ -232,7 +231,6 @@ describe("cache safety invariants", () => {
         "before_agent_start",
         "edit_main_md",
         "session_start",
-        "session_switch",
         "session_compact"
       ),
       { minLength: 1 }
@@ -251,7 +249,6 @@ describe("cache safety invariants", () => {
             mockPi.handlers.find((h) => h.event === name)?.handler;
           const beforeStart = getHandler("before_agent_start");
           const onSessionStart = getHandler("session_start");
-          const onSessionSwitch = getHandler("session_switch");
           const onSessionCompact = getHandler("session_compact");
 
           const ctx = createCtx(projectDir);
@@ -276,20 +273,6 @@ describe("cache safety invariants", () => {
 
             if (op === "session_start") {
               await onSessionStart?.({ type: "session_start" }, ctx);
-              frozenSnapshot = undefined;
-              frozenRoadmapToken = undefined;
-              continue;
-            }
-
-            if (op === "session_switch") {
-              await onSessionSwitch?.(
-                {
-                  type: "session_switch",
-                  reason: "resume",
-                  previousSessionFile: "/tmp/prev.jsonl",
-                },
-                ctx
-              );
               frozenSnapshot = undefined;
               frozenRoadmapToken = undefined;
               continue;

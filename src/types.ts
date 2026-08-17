@@ -1,3 +1,8 @@
+export interface CommitterOptions {
+  model?: string;
+  thinking?: string;
+}
+
 export interface OtaEntryInput {
   turnNumber: number;
   timestamp: string;
