@@ -1,0 +1,4 @@
+{
+  "name": "pi-brain",
+  "install": "bash .cursor/install.sh"
+}
