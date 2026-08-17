@@ -109,6 +109,10 @@ export default function activate(pi: ExtensionAPI) {
       return true;
     }
 
+    if (activeCwd !== ctx.cwd) {
+      frozenStatusSnapshot = null;
+    }
+
     const candidate = new MemoryState(ctx.cwd);
     candidate.load();
 
@@ -163,7 +167,15 @@ export default function activate(pi: ExtensionAPI) {
       }
 
       const previousBranch = state.activeBranch;
-      const result = executeMemoryBranch(params, state, branchManager, ctx.cwd);
+      let result: string;
+      try {
+        result = executeMemoryBranch(params, state, branchManager, ctx.cwd);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Branch operation failed.";
+        setBrainFooterStatus(ctx, state, branchManager);
+        return Promise.resolve(createTextResult(message));
+      }
 
       if (state.activeBranch !== previousBranch) {
         upsertCurrentSession(state, ctx);
@@ -289,7 +301,11 @@ export default function activate(pi: ExtensionAPI) {
   }));
 
   pi.on("turn_end", (event, ctx) => {
-    if (!isMemoryReady(state, branchManager) || !branchManager) {
+    if (
+      !tryLoad(ctx) ||
+      !isMemoryReady(state, branchManager) ||
+      !branchManager
+    ) {
       setBrainFooterStatus(ctx, state, branchManager);
       return;
     }
@@ -304,8 +320,12 @@ export default function activate(pi: ExtensionAPI) {
     setBrainFooterStatus(ctx, state, branchManager);
   });
 
-  pi.on("session_before_compact", (event) => {
-    if (!isMemoryReady(state, branchManager) || !branchManager) {
+  pi.on("session_before_compact", (event, ctx) => {
+    if (
+      !tryLoad(ctx) ||
+      !isMemoryReady(state, branchManager) ||
+      !branchManager
+    ) {
       return;
     }
 

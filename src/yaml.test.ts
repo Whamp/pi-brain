@@ -9,7 +9,8 @@ import { parseYaml, serializeYaml } from "./yaml.js";
  *
  * Strategy constraints reflect the minimal YAML subset this parser supports:
  * - Keys: no colons, no newlines, no leading/trailing whitespace, non-empty
- * - Values: no newlines, no double-quotes (quoting wraps in `"`)
+ * - Values: no newlines (line-based parser). Quotes, backslashes, and ` #`
+ *   must round-trip via escaped double-quoting.
  * - Structure: flat strings, one-level nested objects, top-level lists of
  *   one-level objects
  */
@@ -19,10 +20,10 @@ const yamlKey = fc
   .stringMatching(/^[a-zA-Z_][a-zA-Z0-9_]{0,19}$/)
   .filter((k) => k.length > 0);
 
-/** Safe YAML scalar value: no newlines, no double-quotes (breaks quoting) */
+/** Safe YAML scalar value: no newlines. Quotes and backslashes are in-domain. */
 const yamlValue = fc
   .string({ size: "-1" })
-  .filter((v) => !v.includes("\n") && !v.includes("\r") && !v.includes('"'));
+  .filter((v) => !v.includes("\n") && !v.includes("\r"));
 
 /**
  * fc.dictionary creates objects with null prototype ({__proto__: null}).
@@ -66,6 +67,21 @@ describe("parseYaml", () => {
     expect(parseYaml(input)).toStrictEqual({
       active_branch: "main",
       initialized: "2026-02-22T14:00:00Z",
+    });
+  });
+
+  it("parses a nested list of scalar extension specs", () => {
+    const input = [
+      "committer:",
+      "  extensions:",
+      "    - ./custom-provider.ts",
+      "    - ./another-ext.ts",
+    ].join("\n");
+
+    expect(parseYaml(input)).toStrictEqual({
+      committer: {
+        extensions: ["./custom-provider.ts", "./another-ext.ts"],
+      },
     });
   });
 
@@ -299,5 +315,26 @@ describe("parseYaml comment handling", () => {
 
     expect(serialized).toBe('key: "x #y"');
     expect(parseYaml(serialized)).toStrictEqual(original);
+  });
+
+  it("escapes embedded double quotes when quoting", () => {
+    const original = { summary: 'said "Fixes #1"' };
+    const serialized = serializeYaml(original);
+
+    expect(serialized).toBe('summary: "said \\"Fixes #1\\""');
+    expect(parseYaml(serialized)).toStrictEqual(original);
+  });
+
+  it("escapes backslashes when quoting", () => {
+    const original = { path: "C:\\temp\\file" };
+    const serialized = serializeYaml(original);
+
+    expect(parseYaml(serialized)).toStrictEqual(original);
+  });
+
+  it("parses double-quoted values containing escaped quotes and hashes", () => {
+    expect(parseYaml('model: "a \\" # b"')).toStrictEqual({
+      model: 'a " # b',
+    });
   });
 });

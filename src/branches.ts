@@ -1,6 +1,35 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+/** Tool-facing error when a branch name would escape `.memory/branches/`. */
+const INVALID_BRANCH_NAME_MESSAGE =
+  "Branch names cannot contain '/' or '\\' or be relative paths.";
+
+/**
+ * Return the branch-name rule error, or null when `name` is a safe single
+ * path segment under `.memory/branches/`.
+ */
+export function invalidBranchNameReason(name: string): string | null {
+  const trimmed = name.trim();
+  if (
+    trimmed === "" ||
+    trimmed.includes("/") ||
+    trimmed.includes("\\") ||
+    trimmed.startsWith(".")
+  ) {
+    return INVALID_BRANCH_NAME_MESSAGE;
+  }
+
+  return null;
+}
+
+function assertValidBranchName(name: string): void {
+  const reason = invalidBranchNameReason(name);
+  if (reason) {
+    throw new Error(reason);
+  }
+}
+
 function sortBranchNames(names: readonly string[]): string[] {
   const sorted: string[] = [];
 
@@ -32,6 +61,7 @@ export class BranchManager {
   }
 
   createBranch(name: string, purpose: string): void {
+    assertValidBranchName(name);
     const branchDir = path.join(this.branchesDir, name);
     fs.mkdirSync(branchDir, { recursive: true });
     fs.writeFileSync(path.join(branchDir, "log.md"), "");
@@ -101,6 +131,10 @@ export class BranchManager {
   }
 
   branchExists(name: string): boolean {
+    if (invalidBranchNameReason(name)) {
+      return false;
+    }
+
     const branchDir = path.join(this.branchesDir, name);
     return fs.existsSync(branchDir) && fs.statSync(branchDir).isDirectory();
   }

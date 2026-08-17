@@ -27,9 +27,14 @@ choose a dedicated committer, add `.memory/config.yaml`:
 committer:
   model: google/gemini-3.6-flash
   thinking: low
+  extensions:
+    - ./custom-provider.ts
 ```
 
-Either field may be omitted to inherit the active session value. Pi resolves
+Omit `model` or `thinking` to inherit the active session value. `extensions` is a
+YAML list of extension specs, or a comma-separated string. Each spec is passed as
+`--extension` to the committer child. Session extensions are not inherited — the
+child starts with `--no-extensions`, and only this list is added back. Pi resolves
 provider authentication normally; do not put API keys or other credentials in
 this file.
 

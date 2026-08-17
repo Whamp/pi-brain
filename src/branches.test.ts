@@ -44,14 +44,29 @@ describe("branchManager", () => {
       expect(commits).toContain("Explore feature X");
     });
 
-    it("should handle branch names with slashes", () => {
-      // Act
-      manager.createBranch("feature/auth", "Auth work");
+    it.each(["../x", "a/b", "a\\b", ".hidden", "..", "."])(
+      "rejects branch name %s",
+      (name) => {
+        expect(() => manager.createBranch(name, "invalid")).toThrow(
+          /cannot contain '\/' or '\\'|relative paths/
+        );
+        expect(manager.branchExists(name)).toBeFalsy();
+      }
+    );
 
-      // Assert
-      const branchDir = path.join(memoryDir, "branches/feature/auth");
+    it("does not write outside .memory/branches for ../ escaped names", () => {
+      expect(() => manager.createBranch("../x", "invalid")).toThrow(
+        /relative paths/
+      );
+      expect(fs.existsSync(path.join(tmpDir, "x"))).toBeFalsy();
+    });
+
+    it("creates a normal branch name", () => {
+      manager.createBranch("feature-auth", "Auth work");
+
+      const branchDir = path.join(memoryDir, "branches/feature-auth");
       expect(fs.existsSync(branchDir)).toBeTruthy();
-      expect(manager.branchExists("feature/auth")).toBeTruthy();
+      expect(manager.branchExists("feature-auth")).toBeTruthy();
     });
   });
 

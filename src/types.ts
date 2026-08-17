@@ -1,6 +1,7 @@
 export interface CommitterOptions {
   model?: string;
   thinking?: string;
+  extensions?: string[];
 }
 
 export interface OtaEntryInput {
