@@ -60,7 +60,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
 # Optional Brain configuration. Pi handles provider authentication.
 # Omit model and/or thinking to inherit the active Pi session values.
 # committer:
-#   model: google-antigravity/gemini-3-flash
+#   model: google/gemini-3.6-flash
 #   thinking: low
 EOF
 fi

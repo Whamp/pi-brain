@@ -25,7 +25,7 @@ choose a dedicated committer, add `.memory/config.yaml`:
 
 ```yaml
 committer:
-  model: google-antigravity/gemini-3-flash
+  model: google/gemini-3.6-flash
   thinking: low
 ```
 
