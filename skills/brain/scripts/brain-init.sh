@@ -11,6 +11,7 @@ TEMPLATES_DIR="$SCRIPT_DIR/../templates"
 MEMORY_DIR=".memory"
 BRANCHES_DIR="$MEMORY_DIR/branches/main"
 STATE_FILE="$MEMORY_DIR/state.yaml"
+CONFIG_FILE="$MEMORY_DIR/config.yaml"
 MEMORY_AGENTS_FILE="$MEMORY_DIR/AGENTS.md"
 MAIN_MD_FILE="$MEMORY_DIR/main.md"
 ROOT_AGENTS_FILE="AGENTS.md"
@@ -49,6 +50,18 @@ if [ ! -f "$STATE_FILE" ]; then
   cat > "$STATE_FILE" <<EOF
 active_branch: main
 initialized: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+EOF
+fi
+
+# --- Write optional committer configuration (skip if already exists) ---
+
+if [ ! -f "$CONFIG_FILE" ]; then
+  cat > "$CONFIG_FILE" <<'EOF'
+# Optional Brain configuration. Pi handles provider authentication.
+# Omit model and/or thinking to inherit the active Pi session values.
+# committer:
+#   model: google-antigravity/gemini-3-flash
+#   thinking: low
 EOF
 fi
 
