@@ -117,6 +117,9 @@ export default function activate(pi: ExtensionAPI) {
     candidate.load();
 
     if (!candidate.isInitialized) {
+      state = candidate;
+      branchManager = new BranchManager(ctx.cwd);
+      activeCwd = ctx.cwd;
       return false;
     }
 

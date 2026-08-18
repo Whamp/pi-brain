@@ -44,11 +44,11 @@ describe("branchManager", () => {
       expect(commits).toContain("Explore feature X");
     });
 
-    it.each(["../x", "a/b", "a\\b", ".hidden", "..", "."])(
+    it.each(["../x", "a\\b", ".hidden", "..", ".", "feat/../x", "feat//x"])(
       "rejects branch name %s",
       (name) => {
         expect(() => manager.createBranch(name, "invalid")).toThrow(
-          /cannot contain '\/' or '\\'|relative paths/
+          /cannot escape \.memory\/branches/
         );
         expect(manager.branchExists(name)).toBeFalsy();
       }
@@ -56,9 +56,18 @@ describe("branchManager", () => {
 
     it("does not write outside .memory/branches for ../ escaped names", () => {
       expect(() => manager.createBranch("../x", "invalid")).toThrow(
-        /relative paths/
+        /cannot escape \.memory\/branches/
       );
       expect(fs.existsSync(path.join(tmpDir, "x"))).toBeFalsy();
+    });
+
+    it("creates a nested git-style branch under .memory/branches", () => {
+      manager.createBranch("feat/auth", "Auth work");
+
+      const branchDir = path.join(memoryDir, "branches/feat/auth");
+      expect(fs.existsSync(path.join(branchDir, "commits.md"))).toBeTruthy();
+      expect(manager.branchExists("feat/auth")).toBeTruthy();
+      expect(manager.listBranches()).toStrictEqual(["feat/auth"]);
     });
 
     it("creates a normal branch name", () => {
@@ -144,6 +153,17 @@ describe("branchManager", () => {
       expect(branches).toContain("main");
       expect(branches).toContain("feature-a");
       expect(branches).not.toContain(".gitkeep");
+    });
+
+    it("lists pre-existing nested branch directories", () => {
+      const nested = path.join(memoryDir, "branches/feat/auth");
+      fs.mkdirSync(nested, { recursive: true });
+      fs.writeFileSync(path.join(nested, "commits.md"), "# feat/auth\n");
+      fs.writeFileSync(path.join(nested, "log.md"), "");
+      fs.writeFileSync(path.join(nested, "metadata.yaml"), "");
+
+      expect(manager.listBranches()).toStrictEqual(["feat/auth"]);
+      expect(manager.branchExists("feat/auth")).toBeTruthy();
     });
 
     it("should return empty array if branches dir is missing", () => {

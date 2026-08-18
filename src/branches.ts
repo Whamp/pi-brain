@@ -3,21 +3,28 @@ import * as path from "node:path";
 
 /** Tool-facing error when a branch name would escape `.memory/branches/`. */
 const INVALID_BRANCH_NAME_MESSAGE =
-  "Branch names cannot contain '/' or '\\' or be relative paths.";
+  "Branch names cannot escape .memory/branches: no '\\', '.', '..', or empty path segments.";
 
 /**
- * Return the branch-name rule error, or null when `name` is a safe single
- * path segment under `.memory/branches/`.
+ * Return the branch-name rule error, or null when `name` is a safe path
+ * under `.memory/branches/` (single segment or nested like `feat/auth`).
  */
 export function invalidBranchNameReason(name: string): string | null {
   const trimmed = name.trim();
-  if (
-    trimmed === "" ||
-    trimmed.includes("/") ||
-    trimmed.includes("\\") ||
-    trimmed.startsWith(".")
-  ) {
+  if (trimmed === "" || trimmed.includes("\\") || path.isAbsolute(trimmed)) {
     return INVALID_BRANCH_NAME_MESSAGE;
+  }
+
+  const segments = trimmed.split("/");
+  for (const segment of segments) {
+    if (
+      segment === "" ||
+      segment === "." ||
+      segment === ".." ||
+      segment.startsWith(".")
+    ) {
+      return INVALID_BRANCH_NAME_MESSAGE;
+    }
   }
 
   return null;
@@ -49,6 +56,12 @@ function sortBranchNames(names: readonly string[]): string[] {
   return sorted;
 }
 
+function isContainedBranchDir(branchesDir: string, resolved: string): boolean {
+  const root = path.resolve(branchesDir);
+  const rel = path.relative(root, resolved);
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
+}
+
 /**
  * Manages `.memory/branches/` directory operations.
  * Each branch has: log.md, commits.md, metadata.yaml.
@@ -61,8 +74,7 @@ export class BranchManager {
   }
 
   createBranch(name: string, purpose: string): void {
-    assertValidBranchName(name);
-    const branchDir = path.join(this.branchesDir, name);
+    const branchDir = this.resolveBranchDir(name);
     fs.mkdirSync(branchDir, { recursive: true });
     fs.writeFileSync(path.join(branchDir, "log.md"), "");
     fs.writeFileSync(
@@ -106,7 +118,7 @@ export class BranchManager {
   }
 
   readMetadata(branch: string): string {
-    const metaPath = path.join(this.branchesDir, branch, "metadata.yaml");
+    const metaPath = path.join(this.resolveBranchDir(branch), "metadata.yaml");
     if (!fs.existsSync(metaPath)) {
       return "";
     }
@@ -122,20 +134,17 @@ export class BranchManager {
       return [];
     }
 
-    const branchNames = this.readBranchEntries().filter((entry) => {
-      const fullPath = path.join(this.branchesDir, entry);
-      return fs.statSync(fullPath).isDirectory();
-    });
-
+    const branchNames: string[] = [];
+    this.collectBranchNames(this.branchesDir, "", branchNames);
     return sortBranchNames(branchNames);
   }
 
   branchExists(name: string): boolean {
-    if (invalidBranchNameReason(name)) {
+    const branchDir = this.containedBranchDir(name);
+    if (!branchDir) {
       return false;
     }
 
-    const branchDir = path.join(this.branchesDir, name);
     return fs.existsSync(branchDir) && fs.statSync(branchDir).isDirectory();
   }
 
@@ -174,11 +183,57 @@ export class BranchManager {
     return null;
   }
 
+  private collectBranchNames(
+    dir: string,
+    relative: string,
+    names: string[]
+  ): void {
+    const entries =
+      relative === "" ? this.readBranchEntries() : fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+        continue;
+      }
+
+      const childRelative = relative === "" ? entry : `${relative}/${entry}`;
+      if (fs.existsSync(path.join(fullPath, "commits.md"))) {
+        names.push(childRelative);
+      }
+
+      this.collectBranchNames(fullPath, childRelative, names);
+    }
+  }
+
+  private containedBranchDir(name: string): string | null {
+    if (invalidBranchNameReason(name)) {
+      return null;
+    }
+
+    const resolved = path.resolve(this.branchesDir, name);
+    if (!isContainedBranchDir(this.branchesDir, resolved)) {
+      return null;
+    }
+
+    return resolved;
+  }
+
+  private resolveBranchDir(name: string): string {
+    assertValidBranchName(name);
+    const resolved = this.containedBranchDir(name);
+    if (!resolved) {
+      throw new Error(INVALID_BRANCH_NAME_MESSAGE);
+    }
+
+    return resolved;
+  }
+
   private logPath(branch: string): string {
-    return path.join(this.branchesDir, branch, "log.md");
+    return path.join(this.resolveBranchDir(branch), "log.md");
   }
 
   private commitsPath(branch: string): string {
-    return path.join(this.branchesDir, branch, "commits.md");
+    return path.join(this.resolveBranchDir(branch), "commits.md");
   }
 }

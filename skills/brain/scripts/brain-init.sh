@@ -59,8 +59,8 @@ if [ ! -f "$CONFIG_FILE" ]; then
   cat > "$CONFIG_FILE" <<'EOF'
 # Optional Brain configuration. Pi handles provider authentication.
 # Omit model and/or thinking to inherit the active Pi session values.
-# extensions: YAML list or comma-separated string; passed as --extension.
-# Session extensions are not inherited.
+# Session extensions are forwarded except Brain itself. Set extensions
+# to replace that list (YAML list or comma-separated string).
 # committer:
 #   model: google/gemini-3.6-flash
 #   thinking: low

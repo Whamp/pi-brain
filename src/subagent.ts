@@ -4,6 +4,10 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  discoverCommitterExtensionSpecs,
+  isBrainExtensionSpec,
+} from "./committer-extensions.js";
 import type { CommitterOptions, SubagentResult } from "./types.js";
 import { parseYaml } from "./yaml.js";
 
@@ -54,6 +58,15 @@ function extensionSpecsFromConfig(value: unknown): string[] | undefined {
   return specs.length > 0 ? specs : undefined;
 }
 
+/**
+ * Directory containing this module. Uses fileURLToPath so a checkout path
+ * with spaces (common in npm global installs) does not keep `%20` in the
+ * filesystem path — URL.pathname would miss memory-committer.md.
+ */
+export function directoryFromModuleUrl(moduleUrl: string): string {
+  return path.dirname(fileURLToPath(moduleUrl));
+}
+
 function readCommitterConfig(cwd: string): CommitterOptions {
   const configPath = path.join(cwd, ".memory", "config.yaml");
 
@@ -90,25 +103,35 @@ function resolveCommitterOptions(
   current: CommitterOptions = {}
 ): CommitterOptions {
   const configured = readCommitterConfig(cwd);
+  const brainPackageDir = path.resolve(
+    directoryFromModuleUrl(import.meta.url),
+    ".."
+  );
+  const discovered = discoverCommitterExtensionSpecs({
+    cwd,
+    argv: process.argv,
+    homeDir: os.homedir(),
+    brainPackageDir,
+  });
+  const fromConfig = configured.extensions;
+  const extensions = (
+    fromConfig === undefined
+      ? discovered
+      : fromConfig.filter(
+          (spec) => !isBrainExtensionSpec(spec, cwd, brainPackageDir)
+        )
+  ).filter((spec) => spec !== "");
 
   return {
     model: configured.model ?? current.model,
     thinking: configured.thinking ?? current.thinking,
-    // Extensions come from .memory/config.yaml only. Session extensions are
-    // not inherited: the session's active model provider may not need them,
-    // and forwarding the parent process's extension list would defeat
-    // committer isolation (`--no-extensions`).
-    extensions: configured.extensions,
+    // Session extensions are rediscovered (CLI -e, settings.json, and Pi's
+    // standard extension directories) and passed back as --extension after
+    // --no-extensions. This package is stripped so the child cannot reload
+    // Brain onto the log it is distilling. committer.extensions in
+    // .memory/config.yaml replaces discovery when set.
+    extensions: extensions.length > 0 ? extensions : undefined,
   };
-}
-
-/**
- * Directory containing this module. Uses fileURLToPath so a checkout path
- * with spaces (common in npm global installs) does not keep `%20` in the
- * filesystem path — URL.pathname would miss memory-committer.md.
- */
-export function directoryFromModuleUrl(moduleUrl: string): string {
-  return path.dirname(fileURLToPath(moduleUrl));
 }
 
 /**

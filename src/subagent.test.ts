@@ -403,6 +403,8 @@ function sleep(ms: number): Promise<void> {
 
 describe("spawnCommitter model and thinking resolution", () => {
   const originalPath = process.env.PATH;
+  const originalArgv = process.argv;
+  const originalHome = process.env.HOME;
   let binDir: string;
   let capturePath: string;
   let tmpCwd: string;
@@ -418,10 +420,18 @@ describe("spawnCommitter model and thinking resolution", () => {
       { mode: 0o755 }
     );
     process.env.PATH = `${binDir}:${originalPath}`;
+    process.env.HOME = tmpCwd;
+    process.argv = ["node", "vitest"];
   });
 
   afterEach(() => {
     process.env.PATH = originalPath;
+    process.argv = originalArgv;
+    if (originalHome === undefined) {
+      delete process.env.HOME;
+    } else {
+      process.env.HOME = originalHome;
+    }
     fs.rmSync(tmpCwd, { recursive: true, force: true });
     fs.rmSync(binDir, { recursive: true, force: true });
   });
@@ -550,12 +560,49 @@ describe("spawnCommitter model and thinking resolution", () => {
     expect(argv).not.toContain("--extension");
   });
 
-  it("does not forward session extensions onto the committer child", async () => {
-    const argv = await runSpawn({
-      extensions: ["./from-session.ts"],
-    });
+  it("forwards session -e specs onto the committer child after --no-extensions", async () => {
+    process.argv = ["node", "pi", "-e", "./custom-provider.ts"];
 
-    expect(argv).not.toContain("--extension");
+    const argv = await runSpawn();
+    const pIndex = argv.indexOf("-p");
+    const extIndex = argv.indexOf("--extension");
+
+    expect(argv).toContain("--no-extensions");
+    expect(extIndex).toBeGreaterThan(-1);
+    expect(extIndex).toBeLessThan(pIndex);
+    expect(argv[extIndex + 1]).toBe("./custom-provider.ts");
+  });
+
+  it("does not forward npm:pi-brain from argv onto the committer child", async () => {
+    process.argv = [
+      "node",
+      "pi",
+      "-e",
+      "npm:pi-brain",
+      "-e",
+      "./custom-provider.ts",
+    ];
+
+    const argv = await runSpawn();
+    const extIndex = argv.indexOf("--extension");
+
+    expect(argv[extIndex + 1]).toBe("./custom-provider.ts");
+    expect(argv).not.toContain("npm:pi-brain");
+  });
+
+  it("lets config extensions replace session discovery", async () => {
+    process.argv = ["node", "pi", "-e", "./from-session.ts"];
+    writeConfig(
+      ["committer:", "  extensions:", "    - ./from-config.ts"].join("\n")
+    );
+
+    const argv = await runSpawn();
+    const extIndex = argv.indexOf("--extension");
+    const secondExt = argv.indexOf("--extension", extIndex + 1);
+
+    expect(argv[extIndex + 1]).toBe("./from-config.ts");
+    expect(secondExt).toBe(-1);
+    expect(argv).not.toContain("./from-session.ts");
   });
 
   it("passes --extension args from a config list before -p", async () => {
