@@ -63,6 +63,28 @@ describe("discoverCommitterExtensionSpecs", () => {
     ).toStrictEqual(["./custom-provider.ts"]);
   });
 
+  it("drops git-URL Brain specs including SSH form and .git suffix", () => {
+    expect(
+      discover([
+        "pi",
+        "-e",
+        "./custom-provider.ts",
+        "-e",
+        "git@github.com:Whamp/pi-brain.git",
+        "-e",
+        "https://github.com/Whamp/pi-brain.git",
+        "-e",
+        "https://github.com/Whamp/pi-brain",
+        // lookalike repo names must NOT be excluded
+        "-e",
+        "git@github.com:Whamp/pi-brain-fork.git",
+      ])
+    ).toStrictEqual([
+      "./custom-provider.ts",
+      "git@github.com:Whamp/pi-brain-fork.git",
+    ]);
+  });
+
   it("reads extensions from project and user settings.json", () => {
     fs.mkdirSync(path.join(cwd, ".pi"), { recursive: true });
     fs.writeFileSync(

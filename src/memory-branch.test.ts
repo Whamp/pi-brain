@@ -158,6 +158,25 @@ describe("executeMemoryBranch", () => {
     expect(state.activeBranch).toBe("main");
   });
 
+  it("should reject switching to a nested branch's parent directory", () => {
+    executeMemoryBranch(
+      { action: "create", name: "feat/auth", purpose: "Auth work" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    const result = executeMemoryBranch(
+      { action: "switch", branch: "feat" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    expect(result).toContain("not found");
+    expect(state.activeBranch).toBe("feat/auth");
+  });
+
   it("should require branch for switch", () => {
     const result = executeMemoryBranch(
       { action: "switch" },

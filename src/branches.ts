@@ -145,7 +145,14 @@ export class BranchManager {
       return false;
     }
 
-    return fs.existsSync(branchDir) && fs.statSync(branchDir).isDirectory();
+    // A branch is a directory with its own commits.md — a nested branch's
+    // parent directory (e.g. "feat" for "feat/auth") is a container, not
+    // a branch, and must not be switchable.
+    return (
+      fs.existsSync(branchDir) &&
+      fs.statSync(branchDir).isDirectory() &&
+      fs.existsSync(path.join(branchDir, "commits.md"))
+    );
   }
 
   getLogSizeBytes(branch: string): number {

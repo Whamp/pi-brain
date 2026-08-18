@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 const BRAIN_NPM_SPEC = /^npm:pi-brain(?:@|$)/;
-const BRAIN_GIT_SPEC = /github\.com\/Whamp\/pi-brain(?:\/|$)/i;
+const BRAIN_GIT_SPEC = /github\.com[:/]Whamp\/pi-brain(?:\.git)?(?:[/#]|$)/i;
 
 function extensionSpecsFromArgv(argv: readonly string[]): string[] {
   const specs: string[] = [];
