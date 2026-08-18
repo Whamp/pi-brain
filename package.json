@@ -31,7 +31,6 @@
     "banner.png"
   ],
   "type": "module",
-  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "lint": "oxlint -c .oxlintrc.json",
     "lint:fix": "oxlint -c .oxlintrc.json --fix",
@@ -66,6 +65,7 @@
   "peerDependencies": {
     "@sinclair/typebox": "*"
   },
+  "packageManager": "pnpm@10.33.0",
   "pi": {
     "extensions": [
       "./src/index.ts"
