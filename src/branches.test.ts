@@ -77,6 +77,16 @@ describe("branchManager", () => {
       expect(fs.existsSync(branchDir)).toBeTruthy();
       expect(manager.branchExists("feature-auth")).toBeTruthy();
     });
+
+    it("does not treat a nested branch's parent directory as a branch", () => {
+      manager.createBranch("feat/auth", "Auth work");
+
+      // "feat" exists on disk only as a container for nested branches; it
+      // has no commits.md, so switching to it would orphan OTA log entries
+      // in a directory no listing ever shows.
+      expect(manager.branchExists("feat")).toBeFalsy();
+      expect(manager.branchExists("feat/auth")).toBeTruthy();
+    });
   });
 
   describe("appendLog", () => {
