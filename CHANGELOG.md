@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.10
+
+[compare changes](https://github.com/Whamp/pi-brain/compare/v0.1.9...v0.1.10)
+
+### 🩹 Fixes
+
+- Nested branches, session provider passthrough, and stale cwd state ([6b034488](https://github.com/Whamp/pi-brain/commit/6b034488))
+- Pin pnpm 10.33.0 so GitHub Check can install ([6e186536](https://github.com/Whamp/pi-brain/commit/6e186536))
+- Install gitleaks in CI and normalize package.json ([1555a24f](https://github.com/Whamp/pi-brain/commit/1555a24f))
+- Exclude SSH/.git Brain specs and phantom nested-branch parents ([85d896f5](https://github.com/Whamp/pi-brain/commit/85d896f5))
+
+### 🏡 Chore
+
+- **cloud:** Add Cloud Agent environment setup ([8ace7e12](https://github.com/Whamp/pi-brain/commit/8ace7e12))
+- **cloud:** Align pinned toolchain with CI ([4c557a1f](https://github.com/Whamp/pi-brain/commit/4c557a1f))
+
+### ❤️ Contributors
+
+- Will Hampson <whamp@ggl.slmail.me>
+- Cursor Agent ([@cursoragent](https://github.com/cursoragent))
+
 ## v0.1.9
 
 [compare changes](https://github.com/Whamp/pi-brain/compare/v0.1.7...v0.1.9)
