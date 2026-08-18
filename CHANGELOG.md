@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.9
+
+[compare changes](https://github.com/Whamp/pi-brain/compare/v0.1.7...v0.1.9)
+
+### 🚀 Enhancements
+
+- Add optional committer configuration for memory_commit ([783579a8](https://github.com/Whamp/pi-brain/commit/783579a8))
+
+### 🩹 Fixes
+
+- Remove unused model reference from memory-committer ([1c0ec2a2](https://github.com/Whamp/pi-brain/commit/1c0ec2a2))
+- Update pi-coding-agent dependency import and remove unsupported session_switch references feat: Enhance committer options handling and configuration loading ([676c5587](https://github.com/Whamp/pi-brain/commit/676c5587))
+- Update model reference in SKILL.md and brain-init.sh for consistency ([6b27c7f7](https://github.com/Whamp/pi-brain/commit/6b27c7f7))
+- Synchronize the changes in the template files to AGENTS.md and memory-committer.md ([d47fede1](https://github.com/Whamp/pi-brain/commit/d47fede1))
+- Isolate committer child and guarantee SIGKILL escalation ([2e34fd69](https://github.com/Whamp/pi-brain/commit/2e34fd69))
+- Support YAML comments in parser and config ([6eb96853](https://github.com/Whamp/pi-brain/commit/6eb96853))
+- Make YAML quoting round-trip and self-heal legacy state files ([8aa8f041](https://github.com/Whamp/pi-brain/commit/8aa8f041))
+- Validate branch names and reload state in lifecycle handlers ([42daed61](https://github.com/Whamp/pi-brain/commit/42daed61))
+- Pass committer extensions from config and correct README tools ([1261ae15](https://github.com/Whamp/pi-brain/commit/1261ae15))
+
+### 🏡 Chore
+
+- Bump package version to 0.1.8 fix: Move redundant pnpm properties to pnpm-workspace.yaml ([e454645f](https://github.com/Whamp/pi-brain/commit/e454645f))
+
+### ❤️ Contributors
+
+- Will Hampson <whamp@ggl.slmail.me>
+- Cord Schneider <cord@memescape.co.uk>
+
 ## v0.1.7
 
 [compare changes](https://github.com/Whamp/pi-brain/compare/v0.1.6...v0.1.7)

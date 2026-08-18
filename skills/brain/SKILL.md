@@ -31,12 +31,13 @@ committer:
     - ./custom-provider.ts
 ```
 
-Omit `model` or `thinking` to inherit the active session value. `extensions` is a
-YAML list of extension specs, or a comma-separated string. Each spec is passed as
-`--extension` to the committer child. Session extensions are not inherited — the
-child starts with `--no-extensions`, and only this list is added back. Pi resolves
-provider authentication normally; do not put API keys or other credentials in
-this file.
+Omit `model` or `thinking` to inherit the active session value. By default the
+committer child starts with `--no-extensions` (so it does not reload Brain onto
+the log it is distilling), then Brain re-adds session extensions from `pi -e`,
+`.pi/settings.json`, `~/.pi/agent/extensions/`, and `<cwd>/.pi/extensions/`,
+skipping this package. Set `committer.extensions` to replace that list — a YAML
+list of specs, or a comma-separated string. Pi resolves provider authentication
+normally; do not put API keys or other credentials in this file.
 
 ### After Init
 

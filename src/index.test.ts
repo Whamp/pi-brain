@@ -1152,6 +1152,45 @@ describe("extensionWiring", () => {
     }
   });
 
+  it("clears footer and skips OTA writes after cwd change to an uninitialized project", async () => {
+    const projectA = setupInitializedProject();
+    const uninitializedDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), "memory-index-cwd-uninit-")
+    );
+
+    try {
+      const mockPi = createMockPi();
+      activate(mockPi.api);
+
+      const ui = createMockUi();
+      const sessionStart = getHandler(mockPi.handlers, "session_start");
+      const turnEnd = getHandler(mockPi.handlers, "turn_end");
+      const ctxA = createCtx(projectA.projectDir, {
+        ui,
+        sessionFile: "/tmp/pi-session-cwd-init.jsonl",
+      });
+      const ctxB = createCtx(uninitializedDir, {
+        ui,
+        sessionFile: "/tmp/pi-session-cwd-uninit.jsonl",
+      });
+
+      await sessionStart?.({ type: "session_start" }, ctxA);
+      expect(ui.statuses.get("brain")).toContain("main");
+
+      await turnEnd?.(makeTurnEndEvent("thought for uninitialized"), ctxB);
+
+      expect(ui.statuses.get("brain")).toBeUndefined();
+      const logA = fs.readFileSync(
+        path.join(projectA.projectDir, ".memory", "branches", "main", "log.md"),
+        "utf8"
+      );
+      expect(logA).not.toContain("thought for uninitialized");
+    } finally {
+      projectA.cleanup();
+      fs.rmSync(uninitializedDir, { recursive: true, force: true });
+    }
+  });
+
   it("clears the frozen status snapshot when cwd changes", async () => {
     const projectA = setupInitializedProject();
     const projectB = setupInitializedProject();

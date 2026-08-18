@@ -84,7 +84,7 @@ describe("executeMemoryBranch", () => {
   });
 
   it("rejects invalid branch names on create without throwing", () => {
-    const invalidNames = ["../x", "a/b", "a\\b", ".hidden", "..", "."];
+    const invalidNames = ["../x", "a\\b", ".hidden", "..", "."];
 
     for (const name of invalidNames) {
       const result = executeMemoryBranch(
@@ -94,10 +94,23 @@ describe("executeMemoryBranch", () => {
         tmpDir
       );
 
-      expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+      expect(result).toMatch(/cannot escape \.memory\/branches/);
       expect(result).not.toContain("# Memory Status");
       expect(state.activeBranch).toBe("main");
     }
+  });
+
+  it("creates a nested git-style branch name", () => {
+    const result = executeMemoryBranch(
+      { action: "create", name: "feat/auth", purpose: "Auth work" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    expect(result).toContain("feat/auth");
+    expect(branches.branchExists("feat/auth")).toBeTruthy();
+    expect(state.activeBranch).toBe("feat/auth");
   });
 
   // --- switch action ---
@@ -145,6 +158,25 @@ describe("executeMemoryBranch", () => {
     expect(state.activeBranch).toBe("main");
   });
 
+  it("should reject switching to a nested branch's parent directory", () => {
+    executeMemoryBranch(
+      { action: "create", name: "feat/auth", purpose: "Auth work" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    const result = executeMemoryBranch(
+      { action: "switch", branch: "feat" },
+      state,
+      branches,
+      tmpDir
+    );
+
+    expect(result).toContain("not found");
+    expect(state.activeBranch).toBe("feat/auth");
+  });
+
   it("should require branch for switch", () => {
     const result = executeMemoryBranch(
       { action: "switch" },
@@ -164,7 +196,7 @@ describe("executeMemoryBranch", () => {
       tmpDir
     );
 
-    expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+    expect(result).toMatch(/cannot escape \.memory\/branches/);
     expect(result).not.toContain("# Memory Status");
     expect(state.activeBranch).toBe("main");
   });
@@ -230,13 +262,13 @@ describe("executeMemoryBranch", () => {
 
   it("rejects invalid branch names on merge", () => {
     const result = executeMemoryBranch(
-      { action: "merge", branch: "a/b", synthesis: "Nope." },
+      { action: "merge", branch: "../x", synthesis: "Nope." },
       state,
       branches,
       tmpDir
     );
 
-    expect(result).toMatch(/cannot contain '\/' or '\\'|relative paths/);
+    expect(result).toMatch(/cannot escape \.memory\/branches/);
     expect(result).not.toContain("# Memory Status");
   });
 

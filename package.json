@@ -1,6 +1,6 @@
 {
   "name": "pi-brain",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Versioned memory extension for the pi coding agent",
   "keywords": [
     "agent-memory",
@@ -65,6 +65,7 @@
   "peerDependencies": {
     "@sinclair/typebox": "*"
   },
+  "packageManager": "pnpm@10.33.0",
   "pi": {
     "extensions": [
       "./src/index.ts"
