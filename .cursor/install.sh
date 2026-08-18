@@ -2,15 +2,15 @@
 # Cloud Agent install: idempotent dependency + toolchain setup for pi-brain.
 set -euo pipefail
 
-# Pin pnpm to the version the lockfile was generated with. The repo declares no
-# `packageManager` field, so activate an explicit version rather than letting
-# corepack resolve "latest" (which triggers a node_modules purge prompt).
-corepack prepare pnpm@10.33.3 --activate
+# Pin pnpm to the version declared in package.json `packageManager` (and used
+# in CI). An explicit version avoids corepack resolving "latest" (which triggers
+# a node_modules purge prompt) and keeps the cloud env on the CI toolchain.
+corepack prepare pnpm@10.33.0 --activate
 
 # gitleaks: the `secrets` check runs the real gitleaks binary. The npm
 # "gitleaks" devDependency is a config-only decoy package and ships no binary,
-# so install the official Go binary system-wide when it is missing.
-GITLEAKS_VERSION="8.28.0"
+# so install the official Go binary (same version as CI) when it is missing.
+GITLEAKS_VERSION="8.30.1"
 if ! command -v gitleaks >/dev/null 2>&1 || [ "$(gitleaks version 2>/dev/null || true)" != "$GITLEAKS_VERSION" ]; then
   tmp="$(mktemp -d)"
   curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o "$tmp/gitleaks.tar.gz"
